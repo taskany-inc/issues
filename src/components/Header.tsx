@@ -1,7 +1,8 @@
 import { Grid, Link, Spacer, Popover } from '@geist-ui/core';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
+import { useTranslations } from 'next-intl';
 
 import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
@@ -35,17 +36,23 @@ const StyledHeaderNavLink = styled(Link)`
 `;
 
 const CreatorMenu = () => {
+    const t = useTranslations('Header');
+
     const content = () => (
         <StyledPopoverContent>
             <Popover.Item>
                 <NextLink href={routes.createGoal()}>
-                    <Link>New goal</Link>
+                    <Link>{t('New goal')}</Link>
                 </NextLink>
             </Popover.Item>
             <Popover.Item>
                 <NextLink href={routes.createGroup()}>
-                    <Link>New group</Link>
+                    <Link>{t('New group')}</Link>
                 </NextLink>
+            </Popover.Item>
+            <Popover.Item line />
+            <Popover.Item>
+                <Link onClick={() => signOut()}>{t('Sign out')}</Link>
             </Popover.Item>
         </StyledPopoverContent>
     );
@@ -58,6 +65,7 @@ const CreatorMenu = () => {
 
 export const Header: React.FC = () => {
     const { data: session } = useSession();
+    const t = useTranslations('Header');
 
     return (
         <StyledHeader>
@@ -71,11 +79,11 @@ export const Header: React.FC = () => {
                 </Grid>
                 <Grid xs={19}>
                     <NextLink href={routes.goals()}>
-                        <StyledHeaderNavLink>Goals</StyledHeaderNavLink>
+                        <StyledHeaderNavLink>{t('Goals')}</StyledHeaderNavLink>
                     </NextLink>
                     <Spacer w={2} />
                     <NextLink href={'#'}>
-                        <StyledHeaderNavLink>Boards</StyledHeaderNavLink>
+                        <StyledHeaderNavLink>{t('Boards')}</StyledHeaderNavLink>
                     </NextLink>
                 </Grid>
                 <Grid xs={4}>

@@ -1,5 +1,12 @@
 {
-    "index": {
-        "signed in as": "Авторизован как"
-    }
+  "Header": {
+    "Goals": "Цели",
+    "Boards": "Доски",
+    "New goal": "Новая цель",
+    "New group": "Новая группа",
+    "Sign out": "Выйти"
+  },
+  "index": {
+    "title": "Taskany Goals — Персональная подборка"
+  }
 }

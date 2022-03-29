@@ -1,5 +1,12 @@
 {
-    "index": {
-        "signed in as": "signed in as"
-    }
+  "Header": {
+    "Goals": "Goals",
+    "Boards": "Boards",
+    "New goal": "New goal",
+    "New group": "New group",
+    "Sign out": "Sign out"
+  },
+  "index": {
+    "title": "Taskany Goals — Personal bundle"
+  }
 }

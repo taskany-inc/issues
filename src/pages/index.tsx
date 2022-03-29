@@ -1,10 +1,8 @@
 import type { NextPage, GetStaticPropsContext } from 'next';
 import Head from 'next/head';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
-import { Button } from '@geist-ui/core';
-import styled from 'styled-components';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Header } from '../components/Header';
@@ -23,10 +21,6 @@ const fetcher = createFetcher(() => ({
     },
 }));
 
-const Btn = styled(Button)`
-    font-weight: 600 !important;
-`;
-
 const Home: NextPage = () => {
     const { data: session } = useSession();
     const { data, error } = useSWR('users', fetcher());
@@ -35,7 +29,7 @@ const Home: NextPage = () => {
     return (
         <>
             <Head>
-                <title>Taskany Goals</title>
+                <title>{t('title')}</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
@@ -43,10 +37,6 @@ const Home: NextPage = () => {
 
             {session ? (
                 <>
-                    {t('signed in as')} {session!.user?.email} <br />
-
-                    <Btn ghost type='secondary' scale={0.8} onClick={() => signOut()}>Sign out</Btn>
-
                     {session.user.role === 'ADMIN' && (
                         <div>
                             {data?.users && data.users.map((user) => <div key={user.id}>{JSON.stringify(user)}</div>)}
@@ -55,8 +45,7 @@ const Home: NextPage = () => {
                 </>
             ) : (
                 <>
-                    Not signed in <br />
-                    <button onClick={() => signIn()}>Sign in</button>
+                    Not signed in
                 </>
             )}
         </>
