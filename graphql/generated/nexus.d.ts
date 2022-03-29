@@ -64,6 +64,15 @@ export interface NexusGenObjects {
     updated_at?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   Query: {};
+  Team: { // root type
+    created_at?: NexusGenScalars['DateTime'] | null; // DateTime
+    description?: string | null; // String
+    id: number; // Int!
+    owner?: NexusGenRootTypes['User'] | null; // User
+    owner_id?: string | null; // String
+    title: string; // String!
+    updated_at?: NexusGenScalars['DateTime'] | null; // DateTime
+  }
   User: { // root type
     created_at?: NexusGenScalars['DateTime'] | null; // DateTime
     email: string; // String!
@@ -89,6 +98,7 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnu
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post'] | null; // Post
+    createTeam: NexusGenRootTypes['Team'] | null; // Team
   }
   Post: { // field return type
     author: NexusGenRootTypes['User'] | null; // User
@@ -102,7 +112,17 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     post: NexusGenRootTypes['Post'] | null; // Post
     posts: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
+    teams: Array<NexusGenRootTypes['Team'] | null> | null; // [Team]
     users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
+  }
+  Team: { // field return type
+    created_at: NexusGenScalars['DateTime'] | null; // DateTime
+    description: string | null; // String
+    id: number; // Int!
+    owner: NexusGenRootTypes['User'] | null; // User
+    owner_id: string | null; // String
+    title: string; // String!
+    updated_at: NexusGenScalars['DateTime'] | null; // DateTime
   }
   User: { // field return type
     created_at: NexusGenScalars['DateTime'] | null; // DateTime
@@ -119,6 +139,7 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     createPost: 'Post'
+    createTeam: 'Team'
   }
   Post: { // field return type name
     author: 'User'
@@ -132,7 +153,17 @@ export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     post: 'Post'
     posts: 'Post'
+    teams: 'Team'
     users: 'User'
+  }
+  Team: { // field return type name
+    created_at: 'DateTime'
+    description: 'String'
+    id: 'Int'
+    owner: 'User'
+    owner_id: 'String'
+    title: 'String'
+    updated_at: 'DateTime'
   }
   User: { // field return type name
     created_at: 'DateTime'
@@ -153,6 +184,11 @@ export interface NexusGenArgTypes {
       title: string; // String!
       user: NexusGenInputs['UserSession']; // UserSession!
     }
+    createTeam: { // args
+      description?: string | null; // String
+      title: string; // String!
+      user: NexusGenInputs['UserSession']; // UserSession!
+    }
   }
   Query: {
     post: { // args
@@ -162,6 +198,9 @@ export interface NexusGenArgTypes {
     posts: { // args
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
       user: NexusGenInputs['UserSession']; // UserSession!
+    }
+    teams: { // args
+      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
     }
     users: { // args
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder

@@ -3,7 +3,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { signIn } from 'next-auth/react';
 
-import { textColorPrimary } from '../design/@generated/themes';
 import { Icon } from './Icon';
 
 interface UserPicProps {
@@ -32,6 +31,6 @@ export const UserPic: React.FC<UserPicProps> = ({ src, title, size = 32 }) => {
             <StyledImage src={src} height={sizePx} width={sizePx} />
         </Tooltip>
     ) : (
-        <Icon type="user" size="s" color={textColorPrimary} onClick={() => signIn()} />
+        <Icon type="user" size="s" onClick={() => signIn()} />
     );
 };

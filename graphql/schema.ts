@@ -64,6 +64,19 @@ const Post = objectType({
     },
 });
 
+const Team = objectType({
+    name: 'Team',
+    definition(t) {
+        t.nonNull.int('id');
+        t.nonNull.string('title');
+        t.string('description');
+        t.field('owner', { type: 'User' });
+        t.string('owner_id');
+        t.field('created_at', { type: 'DateTime' });
+        t.field('updated_at', { type: 'DateTime' });
+    },
+});
+
 const Query = queryType({
     definition(t) {
         t.list.field('users', {
@@ -76,6 +89,20 @@ const Query = queryType({
                     orderBy: { created_at: sortBy || undefined },
                     include: {
                         posts: true,
+                    },
+                }),
+        });
+
+        t.list.field('teams', {
+            type: 'Team',
+            args: {
+                sortBy: arg({ type: 'SortOrder' }),
+            },
+            resolve: async (_, { sortBy }, { db }) =>
+                db.team.findMany({
+                    orderBy: { created_at: sortBy || undefined },
+                    include: {
+                        owner: true,
                     },
                 }),
         });
@@ -157,11 +184,47 @@ const Mutation = mutationType({
                 }
             },
         });
+
+        t.field('createTeam', {
+            type: 'Team',
+            args: {
+                title: nonNull(stringArg()),
+                description: stringArg(),
+                user: nonNull(arg({ type: 'UserSession' })),
+            },
+            resolve: async (_, { user, title, description }, { db }) => {
+                const validUser = await db.user.findUnique({ where: { id: user.id } });
+
+                if (!validUser) return null;
+
+                try {
+                    const newTeam = db.team.create({
+                        data: {
+                            title,
+                            description,
+                            owner_id: validUser.id,
+                        },
+                    });
+
+                    // await mailServer.sendMail({
+                    //     from: '"Fred Foo 👻" <foo@example.com>',
+                    //     to: 'bar@example.com, baz@example.com',
+                    //     subject: 'Hello ✔',
+                    //     text: `new post '${title}'`,
+                    //     html: `new post <b>${title}</b>`,
+                    // });
+
+                    return newTeam;
+                } catch (error) {
+                    throw Error(`${error}`);
+                }
+            },
+        });
     },
 });
 
 export const schema = makeSchema({
-    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Post],
+    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Team, Post],
     outputs: {
         schema: join(process.cwd(), 'graphql/schema.graphql'),
         typegen: join(process.cwd(), 'graphql/generated/nexus.d.ts'),

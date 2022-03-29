@@ -78,6 +78,10 @@ export const Header: React.FC = () => {
                     </NextLink>
                 </Grid>
                 <Grid xs={19}>
+                    <NextLink href={routes.teams()}>
+                        <StyledHeaderNavLink>{t('Teams')}</StyledHeaderNavLink>
+                    </NextLink>
+                    <Spacer w={2} />
                     <NextLink href={routes.goals()}>
                         <StyledHeaderNavLink>{t('Goals')}</StyledHeaderNavLink>
                     </NextLink>

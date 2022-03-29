@@ -57,7 +57,9 @@ model User {
   created_at    DateTime  @default(now())
   updated_at    DateTime  @default(now()) @updatedAt
 
-  posts Post[]
+  posts       Post[]
+  teams       Team[]
+  participant Team[] @relation("teamParticipants")
 }
 
 model VerificationToken {
@@ -68,13 +70,29 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model Team {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  parent       Team?   @relation("parentChildren", fields: [id], references: [id])
+  children     Team[] @relation("parentChildren")
+  owner        User?   @relation(fields: [owner_id], references: [id])
+  owner_id     String?
+  participants User[] @relation("teamParticipants")
+
+  @@index([owner_id])
+}
+
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
-  author    User     @relation(fields: [author_id], references: [id], onDelete: Cascade)
+  author     User     @relation(fields: [author_id], references: [id], onDelete: Cascade)
   author_id  String
 
   @@index([author_id])

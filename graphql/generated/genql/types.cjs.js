@@ -5,7 +5,7 @@ module.exports = {
         4,
         6,
         7,
-        10
+        11
     ],
     "types": {
         "DateTime": {},
@@ -22,7 +22,23 @@ module.exports = {
                         "String!"
                     ],
                     "user": [
-                        9,
+                        10,
+                        "UserSession!"
+                    ]
+                }
+            ],
+            "createTeam": [
+                8,
+                {
+                    "description": [
+                        2
+                    ],
+                    "title": [
+                        2,
+                        "String!"
+                    ],
+                    "user": [
+                        10,
                         "UserSession!"
                     ]
                 }
@@ -34,7 +50,7 @@ module.exports = {
         "String": {},
         "Post": {
             "author": [
-                8
+                9
             ],
             "author_id": [
                 2
@@ -68,7 +84,7 @@ module.exports = {
                         "String!"
                     ],
                     "user": [
-                        9,
+                        10,
                         "UserSession!"
                     ]
                 }
@@ -80,13 +96,21 @@ module.exports = {
                         7
                     ],
                     "user": [
-                        9,
+                        10,
                         "UserSession!"
                     ]
                 }
             ],
-            "users": [
+            "teams": [
                 8,
+                {
+                    "sortBy": [
+                        7
+                    ]
+                }
+            ],
+            "users": [
+                9,
                 {
                     "sortBy": [
                         7
@@ -99,6 +123,32 @@ module.exports = {
         },
         "Role": {},
         "SortOrder": {},
+        "Team": {
+            "created_at": [
+                0
+            ],
+            "description": [
+                2
+            ],
+            "id": [
+                4
+            ],
+            "owner": [
+                9
+            ],
+            "owner_id": [
+                2
+            ],
+            "title": [
+                2
+            ],
+            "updated_at": [
+                0
+            ],
+            "__typename": [
+                2
+            ]
+        },
         "User": {
             "created_at": [
                 0

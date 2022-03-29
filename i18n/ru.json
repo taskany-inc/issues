@@ -1,5 +1,6 @@
 {
   "Header": {
+    "Teams": "Команды",
     "Goals": "Цели",
     "Boards": "Доски",
     "New goal": "Новая цель",
@@ -8,5 +9,14 @@
   },
   "index": {
     "title": "Taskany Goals — Персональная подборка"
+  },
+  "teams": {
+    "index": {
+      "title": "Taskany Goals — Команды"
+    },
+    "new": {
+      "title": "Taskany Goals — Новая команда",
+      "Create new team": "Новая команда"
+    }
   }
 }

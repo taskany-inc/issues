@@ -23,6 +23,14 @@ module.exports.isQuery = function(obj) {
 
 
 
+var Team_possibleTypes = ['Team']
+module.exports.isTeam = function(obj) {
+  if (!obj || !obj.__typename) throw new Error('__typename is missing in "isTeam"')
+  return Team_possibleTypes.includes(obj.__typename)
+}
+
+
+
 var User_possibleTypes = ['User']
 module.exports.isUser = function(obj) {
   if (!obj || !obj.__typename) throw new Error('__typename is missing in "isUser"')

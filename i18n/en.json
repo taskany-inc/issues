@@ -1,5 +1,6 @@
 {
   "Header": {
+    "Teams": "Teams",
     "Goals": "Goals",
     "Boards": "Boards",
     "New goal": "New goal",
@@ -8,5 +9,14 @@
   },
   "index": {
     "title": "Taskany Goals — Personal bundle"
+  },
+  "teams": {
+    "index": {
+      "title": "Taskany Goals — Teams"
+    },
+    "new": {
+      "title": "Taskany Goals — New team",
+      "Create new team": "Create new team"
+    }
   }
 }

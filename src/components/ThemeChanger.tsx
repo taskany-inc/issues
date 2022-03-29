@@ -4,7 +4,6 @@ import { useToasts } from '@geist-ui/core';
 import styled from 'styled-components';
 
 import { Icon } from './Icon';
-import { textColorPrimary } from '../design/@generated/themes';
 
 const StyledThemeChanger = styled.div`
     cursor: pointer;
@@ -27,7 +26,6 @@ export const ThemeChanger = () => {
                 <Icon
                     type="sun"
                     size="s"
-                    color={textColorPrimary}
                     onClick={() => {
                         setTheme('light');
                         setToast({
@@ -40,7 +38,6 @@ export const ThemeChanger = () => {
                 <Icon
                     type="moon"
                     size="s"
-                    color={textColorPrimary}
                     onClick={() => {
                         setTheme('dark');
                         setToast({

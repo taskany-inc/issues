@@ -9,7 +9,22 @@ export const useHotkeys = () => {
     useEffect(() => {
         const unsubscribe = tinykeys(window, {
             'c g': () => router.createGoal(),
+            'с п': () => router.createGoal(),
+
             'c t': () => router.createTeam(),
+            'с е': () => router.createTeam(),
+
+            'g h': () => router.index(),
+            'п р': () => router.index(),
+
+            'g t': () => router.teams(),
+            'п е': () => router.teams(),
+
+            'g g': () => router.goals(),
+            'п п': () => router.goals(),
+
+            // 'g b': () => router.boards(),
+            // 'п и': () => router.boards(),
         });
         return () => {
             unsubscribe();
