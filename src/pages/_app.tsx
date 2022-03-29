@@ -12,6 +12,7 @@ import { apolloClient } from '../utils/apolloClient';
 import { GlobalStyle } from '../components/GlobalStyle';
 import { NextPageWithAuth } from '../types/nextPageWithAuth';
 import { success } from '../design/@generated/themes';
+import { useHotkeys } from '../hooks/useHotkeys';
 
 type AppPropsWithAuth = AppProps & {
     Component: NextPageWithAuth;
@@ -32,6 +33,8 @@ const Auth = ({ children }: { children: React.ReactNode }) => {
 
 const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps: any }) => {
     const { theme } = useTheme();
+
+    useHotkeys();
 
     const customGeistDarkTheme = Themes.createFromDark({
         type: 'custom-dark',

@@ -46,8 +46,8 @@ const CreatorMenu = () => {
                 </NextLink>
             </Popover.Item>
             <Popover.Item>
-                <NextLink href={routes.createGroup()}>
-                    <Link>{t('New group')}</Link>
+                <NextLink href={routes.createTeam()}>
+                    <Link>{t('New team')}</Link>
                 </NextLink>
             </Popover.Item>
             <Popover.Item line />
