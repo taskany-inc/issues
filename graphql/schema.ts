@@ -87,9 +87,6 @@ const Query = queryType({
             resolve: async (_, { sortBy }, { db }) =>
                 db.user.findMany({
                     orderBy: { created_at: sortBy || undefined },
-                    include: {
-                        posts: true,
-                    },
                 }),
         });
 
@@ -106,85 +103,11 @@ const Query = queryType({
                     },
                 }),
         });
-
-        t.list.field('posts', {
-            type: 'Post',
-            args: {
-                user: nonNull(arg({ type: 'UserSession' })),
-                sortBy: arg({ type: 'SortOrder' }),
-            },
-            resolve: async (_, { sortBy, user }, { db }) => {
-                const validUser = await db.user.findUnique({ where: { id: user.id } });
-
-                if (!validUser) return null;
-
-                return db.post.findMany({
-                    where: { author_id: validUser.id },
-                    orderBy: { created_at: sortBy || undefined },
-                });
-            },
-        });
-
-        t.field('post', {
-            type: 'Post',
-            args: {
-                id: nonNull(stringArg()),
-                user: nonNull(arg({ type: 'UserSession' })),
-            },
-            resolve: async (_, { id, user }, { db }) => {
-                const validUser = await db.user.findUnique({ where: { id: user.id } });
-
-                if (!validUser) return null;
-
-                return db.post.findUnique({
-                    where: { id: parseInt(id) },
-                    include: {
-                        author: true,
-                    },
-                });
-            },
-        });
     },
 });
 
 const Mutation = mutationType({
     definition(t) {
-        t.field('createPost', {
-            type: 'Post',
-            args: {
-                title: nonNull(stringArg()),
-                content: nonNull(stringArg()),
-                user: nonNull(arg({ type: 'UserSession' })),
-            },
-            resolve: async (_, { user, title, content }, { db }) => {
-                const validUser = await db.user.findUnique({ where: { id: user.id } });
-
-                if (!validUser) return null;
-
-                try {
-                    const newPost = db.post.create({
-                        data: {
-                            title,
-                            content,
-                            author_id: validUser.id,
-                        },
-                    });
-
-                    await mailServer.sendMail({
-                        from: '"Fred Foo 👻" <foo@example.com>',
-                        to: 'bar@example.com, baz@example.com',
-                        subject: 'Hello ✔',
-                        text: `new post '${title}'`,
-                        html: `new post <b>${title}</b>`,
-                    });
-
-                    return newPost;
-                } catch (error) {
-                    throw Error(`${error}`);
-                }
-            },
-        });
-
         t.field('createTeam', {
             type: 'Team',
             args: {

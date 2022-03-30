@@ -10,23 +10,6 @@ module.exports = {
     "types": {
         "DateTime": {},
         "Mutation": {
-            "createPost": [
-                3,
-                {
-                    "content": [
-                        2,
-                        "String!"
-                    ],
-                    "title": [
-                        2,
-                        "String!"
-                    ],
-                    "user": [
-                        10,
-                        "UserSession!"
-                    ]
-                }
-            ],
             "createTeam": [
                 8,
                 {
@@ -76,31 +59,6 @@ module.exports = {
         },
         "Int": {},
         "Query": {
-            "post": [
-                3,
-                {
-                    "id": [
-                        2,
-                        "String!"
-                    ],
-                    "user": [
-                        10,
-                        "UserSession!"
-                    ]
-                }
-            ],
-            "posts": [
-                3,
-                {
-                    "sortBy": [
-                        7
-                    ],
-                    "user": [
-                        10,
-                        "UserSession!"
-                    ]
-                }
-            ],
             "teams": [
                 8,
                 {

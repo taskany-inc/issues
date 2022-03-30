@@ -97,7 +97,6 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnu
 
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
-    createPost: NexusGenRootTypes['Post'] | null; // Post
     createTeam: NexusGenRootTypes['Team'] | null; // Team
   }
   Post: { // field return type
@@ -110,8 +109,6 @@ export interface NexusGenFieldTypes {
     updated_at: NexusGenScalars['DateTime'] | null; // DateTime
   }
   Query: { // field return type
-    post: NexusGenRootTypes['Post'] | null; // Post
-    posts: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
     teams: Array<NexusGenRootTypes['Team'] | null> | null; // [Team]
     users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
   }
@@ -138,7 +135,6 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
-    createPost: 'Post'
     createTeam: 'Team'
   }
   Post: { // field return type name
@@ -151,8 +147,6 @@ export interface NexusGenFieldTypeNames {
     updated_at: 'DateTime'
   }
   Query: { // field return type name
-    post: 'Post'
-    posts: 'Post'
     teams: 'Team'
     users: 'User'
   }
@@ -179,11 +173,6 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
-    createPost: { // args
-      content: string; // String!
-      title: string; // String!
-      user: NexusGenInputs['UserSession']; // UserSession!
-    }
     createTeam: { // args
       description?: string | null; // String
       title: string; // String!
@@ -191,14 +180,6 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
-    post: { // args
-      id: string; // String!
-      user: NexusGenInputs['UserSession']; // UserSession!
-    }
-    posts: { // args
-      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
-      user: NexusGenInputs['UserSession']; // UserSession!
-    }
     teams: { // args
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
     }

@@ -8,7 +8,6 @@ export type Scalars = {
 }
 
 export interface Mutation {
-    createPost?: Post
     createTeam?: Team
     __typename: 'Mutation'
 }
@@ -25,8 +24,6 @@ export interface Post {
 }
 
 export interface Query {
-    post?: Post
-    posts?: (Post | undefined)[]
     teams?: (Team | undefined)[]
     users?: (User | undefined)[]
     __typename: 'Query'
@@ -60,7 +57,6 @@ export interface User {
 }
 
 export interface MutationRequest{
-    createPost?: [{content: Scalars['String'],title: Scalars['String'],user: UserSession},PostRequest]
     createTeam?: [{description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession},TeamRequest]
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -79,8 +75,6 @@ export interface PostRequest{
 }
 
 export interface QueryRequest{
-    post?: [{id: Scalars['String'],user: UserSession},PostRequest]
-    posts?: [{sortBy?: (SortOrder | null),user: UserSession},PostRequest]
     teams?: [{sortBy?: (SortOrder | null)},TeamRequest] | TeamRequest
     users?: [{sortBy?: (SortOrder | null)},UserRequest] | UserRequest
     __typename?: boolean | number
@@ -155,12 +149,10 @@ export const isUser = (obj?: { __typename?: any } | null): obj is User => {
 
 
 export interface MutationPromiseChain{
-    createPost: ((args: {content: Scalars['String'],title: Scalars['String'],user: UserSession}) => PostPromiseChain & {get: <R extends PostRequest>(request: R, defaultValue?: (FieldsSelection<Post, R> | undefined)) => Promise<(FieldsSelection<Post, R> | undefined)>}),
     createTeam: ((args: {description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession}) => TeamPromiseChain & {get: <R extends TeamRequest>(request: R, defaultValue?: (FieldsSelection<Team, R> | undefined)) => Promise<(FieldsSelection<Team, R> | undefined)>})
 }
 
 export interface MutationObservableChain{
-    createPost: ((args: {content: Scalars['String'],title: Scalars['String'],user: UserSession}) => PostObservableChain & {get: <R extends PostRequest>(request: R, defaultValue?: (FieldsSelection<Post, R> | undefined)) => Observable<(FieldsSelection<Post, R> | undefined)>}),
     createTeam: ((args: {description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession}) => TeamObservableChain & {get: <R extends TeamRequest>(request: R, defaultValue?: (FieldsSelection<Team, R> | undefined)) => Observable<(FieldsSelection<Team, R> | undefined)>})
 }
 
@@ -185,15 +177,11 @@ export interface PostObservableChain{
 }
 
 export interface QueryPromiseChain{
-    post: ((args: {id: Scalars['String'],user: UserSession}) => PostPromiseChain & {get: <R extends PostRequest>(request: R, defaultValue?: (FieldsSelection<Post, R> | undefined)) => Promise<(FieldsSelection<Post, R> | undefined)>}),
-    posts: ((args: {sortBy?: (SortOrder | null),user: UserSession}) => {get: <R extends PostRequest>(request: R, defaultValue?: ((FieldsSelection<Post, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Post, R> | undefined)[] | undefined)>}),
     teams: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Team, R> | undefined)[] | undefined)>})&({get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Team, R> | undefined)[] | undefined)>}),
     users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})
 }
 
 export interface QueryObservableChain{
-    post: ((args: {id: Scalars['String'],user: UserSession}) => PostObservableChain & {get: <R extends PostRequest>(request: R, defaultValue?: (FieldsSelection<Post, R> | undefined)) => Observable<(FieldsSelection<Post, R> | undefined)>}),
-    posts: ((args: {sortBy?: (SortOrder | null),user: UserSession}) => {get: <R extends PostRequest>(request: R, defaultValue?: ((FieldsSelection<Post, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Post, R> | undefined)[] | undefined)>}),
     teams: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Team, R> | undefined)[] | undefined)>})&({get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Team, R> | undefined)[] | undefined)>}),
     users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})
 }
