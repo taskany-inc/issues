@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
-import { Text, Spacer, Button, Breadcrumbs, Grid } from '@geist-ui/core';
+import { Text, Spacer, Breadcrumbs, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
@@ -13,6 +13,7 @@ import { gql } from '../../utils/gql';
 import { Header } from '../../components/Header';
 import { Card } from '../../components/Card';
 import { Icon } from '../../components/Icon';
+import { Button } from '../../components/Button';
 import { FormInput } from '../../components/FormInput';
 import { FormTextarea } from '../../components/FormTextarea';
 import { FormActions, FormActionRight } from '../../components/FormActions';
@@ -129,16 +130,12 @@ function Page() {
                                     <FormActions flat="top">
                                         <FormActionRight>
                                             <Button
-                                                ghost
-                                                type="success"
-                                                scale={0.8}
-                                                font={1.2}
-                                                style={{ fontWeight: 600 }}
-                                                htmlType="submit"
+                                                size="l"
+                                                view="primary-outline"
+                                                type="submit"
                                                 disabled={!isValid}
-                                            >
-                                                {t('Create team')}
-                                            </Button>
+                                                text={t('Create team')}
+                                            />
                                         </FormActionRight>
                                     </FormActions>
                                     <Spacer />
