@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { formInputBackgroundColor, textColorPrimary } from '../design/@generated/themes';
+import { formInputBackgroundColor, formInputErrorColor, textColorPrimary } from '../design/@generated/themes';
+import { Popup } from './Popup';
 
 interface FormInputProps {
     id?: string;
@@ -25,23 +26,18 @@ interface FormInputProps {
     error?: FieldError;
 }
 
-const StyledFormInputContainer = styled.div<{ error?: FormInputProps['error'] }>`
+const StyledFormInputContainer = styled.div`
     position: relative;
+`;
 
-    ${({ error }) =>
-        Boolean(error) &&
-        css`
-            &::before {
-                content: ' ';
-                position: absolute;
-                width: 6px;
-                height: 6px;
-                border-radius: 100%;
-                background-color: red;
-                top: 45%;
-                left: 4px;
-            }
-        `}
+const StyledErrorTrigger = styled.div`
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 100%;
+    background-color: ${formInputErrorColor};
+    top: 45%;
+    left: -2px;
 `;
 
 const StyledFormInput = styled(({ flat, error, forwardRef, ...props }) => <input ref={forwardRef} {...props} />)`
@@ -77,9 +73,70 @@ const StyledFormInput = styled(({ flat, error, forwardRef, ...props }) => <input
 `;
 
 export const FormInput = React.forwardRef<FormInputProps, FormInputProps>((props, ref) => {
+    const [popupVisible, setPopupVisibility] = useState(false);
+    const [inputFocused, setInputFocus] = useState(false);
+    const popupRef = useRef<any>();
+
+    useLayoutEffect(() => {
+        if (props.error && inputFocused) {
+            setPopupVisibility(true);
+        }
+    }, [props.error, inputFocused, setPopupVisibility]);
+
+    const onFocus = useCallback(
+        (e: React.FocusEvent<HTMLInputElement>) => {
+            setInputFocus(true);
+
+            if (props.error) {
+                setPopupVisibility(true);
+            }
+
+            if (props.onFocus) {
+                props.onFocus(e);
+            }
+        },
+        [props.onFocus, props.error, setPopupVisibility, setInputFocus],
+    );
+
+    const onBlur = useCallback(
+        (e: React.FocusEvent<HTMLInputElement>) => {
+            setInputFocus(false);
+
+            if (props.error) {
+                setPopupVisibility(false);
+            }
+
+            if (props.onBlur) {
+                props.onBlur(e);
+            }
+        },
+        [props.onBlur, props.error, setPopupVisibility, setInputFocus],
+    );
+
+    const onClickOutside = useCallback(() => setPopupVisibility(false), [setPopupVisibility]);
+
     return (
-        <StyledFormInputContainer error={props.error}>
-            <StyledFormInput forwardRef={ref} {...props} />
+        <StyledFormInputContainer>
+            {props.error ? (
+                <>
+                    <StyledErrorTrigger
+                        ref={popupRef}
+                        onMouseEnter={() => setPopupVisibility(true)}
+                        onMouseLeave={() => setPopupVisibility(false)}
+                    />
+                    <Popup
+                        tooltip
+                        view="danger"
+                        placement="top-start"
+                        visible={popupVisible}
+                        onClickOutside={onClickOutside}
+                        reference={popupRef}
+                    >
+                        {props.error.message}
+                    </Popup>
+                </>
+            ) : null}
+            <StyledFormInput forwardRef={ref} {...props} onFocus={onFocus} onBlur={onBlur} />
         </StyledFormInputContainer>
     );
 });

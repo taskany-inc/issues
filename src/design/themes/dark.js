@@ -3,8 +3,11 @@ module.exports = {
     textColorPrimary: '#fff',
     cardBorderColor: 'rgba(255, 255, 255, .1)',
     formInputBackgroundColor: 'rgba(0, 0, 0, .2)',
+    formInputErrorColor: '#e00',
     toastTextColor: '#fff',
     toastBackgroundColor: 'rgba(0, 0, 0, .2)',
+    popupDangerBackgroundColor: '#e00',
+    popupWarningBackgroundColor: '#f5a623',
 
     primaryTaskanyLogoColor: '#fff',
     secondaryTaskanyLogoColor: '#17b978',

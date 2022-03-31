@@ -7,8 +7,11 @@ export default createGlobalStyle`
         --text-color-primary: #fff;
         --card-border-color: rgba(255, 255, 255, .1);
         --form-input-background-color: rgba(0, 0, 0, .2);
+        --form-input-error-color: #e00;
         --toast-text-color: #fff;
         --toast-background-color: rgba(0, 0, 0, .2);
+        --popup-danger-background-color: #e00;
+        --popup-warning-background-color: #f5a623;
         --primary-taskany-logo-color: #fff;
         --secondary-taskany-logo-color: #17b978;
         --button-text-color: rgba(255, 255, 255, .8);
