@@ -26,7 +26,6 @@ const Home: NextPage = () => {
         <>
             <Head>
                 <title>{t('title')}</title>
-                <link rel="icon" href="/favicon.ico" />
             </Head>
 
             <Header/>

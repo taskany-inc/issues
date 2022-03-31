@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import { ApolloProvider } from '@apollo/client';
 import { SessionProvider, useSession, signIn } from 'next-auth/react';
 import { ThemeProvider, useTheme } from 'next-themes';
@@ -90,6 +91,10 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithAuth) => {
     return (
         <>
+            <Head>
+                <link rel="icon" href="/favicon.png" />
+            </Head>
+
             <SessionProvider session={session}>
                 <ApolloProvider client={apolloClient}>
                     <NextIntlProvider messages={pageProps.i18n}>
