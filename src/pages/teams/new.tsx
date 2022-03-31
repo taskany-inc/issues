@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
-import { Text, Spacer, Button, Breadcrumbs } from '@geist-ui/core';
+import { Text, Spacer, Button, Breadcrumbs, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
@@ -21,6 +21,10 @@ import { useRouter } from '../../hooks/router';
 
 const StyledDialogPage = styled.main`
     padding: 40px 20px;
+`;
+
+const CleanFlexContainer = styled.div`
+    width: 100%;
 `;
 
 function Page() {
@@ -90,52 +94,59 @@ function Page() {
             <Header />
 
             <StyledDialogPage>
-                <Breadcrumbs>
-                    <Breadcrumbs.Item>
-                        <Icon type="building" size="s" />
-                    </Breadcrumbs.Item>
-                    <Breadcrumbs.Item>
-                        <Icon type="plus" size="s" />
-                    </Breadcrumbs.Item>
-                    <Breadcrumbs.Item>
-                        <Text>{title || '???'}</Text>
-                    </Breadcrumbs.Item>
-                </Breadcrumbs>
+                <Grid.Container gap={0}>
+                    <Grid xs={1} />
+                    <Grid xs={23}>
+                        <CleanFlexContainer>
+                            <Breadcrumbs>
+                                <Breadcrumbs.Item>
+                                    <Icon type="building" size="s" />
+                                </Breadcrumbs.Item>
+                                <Breadcrumbs.Item>
+                                    <Icon type="plus" size="s" />
+                                </Breadcrumbs.Item>
+                                <Breadcrumbs.Item>
+                                    <Text>{title || '???'}</Text>
+                                </Breadcrumbs.Item>
+                            </Breadcrumbs>
 
-                <Text h1>{t('Create new team')}</Text>
+                            <Text h1>{t('Create new team')}</Text>
 
-                <Card style={{ maxWidth: '800px' }}>
-                    <Form onSubmit={handleSubmit(createTeam)}>
-                        <FormInput
-                            {...register('title')}
-                            error={isSubmitted ? errors.title : undefined}
-                            placeholder={t("Team's title")}
-                            flat="bottom"
-                        />
-                        <FormTextarea
-                            {...register('description')}
-                            error={isSubmitted ? errors.description : undefined}
-                            flat="both"
-                            placeholder={t("And its description")}
-                        />
-                        <FormActions flat="top">
-                            <FormActionRight>
-                                <Button
-                                    ghost
-                                    type="success"
-                                    scale={0.8}
-                                    font={1.2}
-                                    style={{ fontWeight: 600 }}
-                                    htmlType="submit"
-                                    disabled={!isValid}
-                                >
-                                    {t('Create team')}
-                                </Button>
-                            </FormActionRight>
-                        </FormActions>
-                        <Spacer />
-                    </Form>
-                </Card>
+                            <Card style={{ maxWidth: '800px' }}>
+                                <Form onSubmit={handleSubmit(createTeam)}>
+                                    <FormInput
+                                        {...register('title')}
+                                        error={isSubmitted ? errors.title : undefined}
+                                        placeholder={t("Team's title")}
+                                        flat="bottom"
+                                    />
+                                    <FormTextarea
+                                        {...register('description')}
+                                        error={isSubmitted ? errors.description : undefined}
+                                        flat="both"
+                                        placeholder={t('And its description')}
+                                    />
+                                    <FormActions flat="top">
+                                        <FormActionRight>
+                                            <Button
+                                                ghost
+                                                type="success"
+                                                scale={0.8}
+                                                font={1.2}
+                                                style={{ fontWeight: 600 }}
+                                                htmlType="submit"
+                                                disabled={!isValid}
+                                            >
+                                                {t('Create team')}
+                                            </Button>
+                                        </FormActionRight>
+                                    </FormActions>
+                                    <Spacer />
+                                </Form>
+                            </Card>
+                        </CleanFlexContainer>
+                    </Grid>
+                </Grid.Container>
             </StyledDialogPage>
         </>
     );
