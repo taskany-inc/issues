@@ -12,11 +12,11 @@ const fetcher = createFetcher(() => ({
         id: true,
         title: true,
         description: true,
-        owner: {
-            id: true,
-            name: true,
-            email: true,
-        },
+        // owner: {
+        //     id: true,
+        //     name: true,
+        //     email: true,
+        // },
         created_at: true,
     },
 }));

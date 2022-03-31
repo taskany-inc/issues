@@ -5,6 +5,10 @@ export default createGlobalStyle`
     :root {
         --background-color: #121212;
         --text-color-primary: #fff;
+        --card-border-color: rgba(255, 255, 255, .1);
+        --form-input-background-color: rgba(0, 0, 0, .2);
+        --toast-text-color: #fff;
+        --toast-background-color: rgba(0, 0, 0, .2);
         --primary-taskany-logo-color: #fff;
         --secondary-taskany-logo-color: #17b978;
         --success: #149561;

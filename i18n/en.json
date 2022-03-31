@@ -16,7 +16,16 @@
     },
     "new": {
       "title": "Taskany Goals — New team",
-      "Create new team": "Create new team"
+      "Create new team": "Create new team",
+      "Team's title is required": "Team's title is required",
+      "Team's title must be a string": "Team's title must be a string",
+      "Team's title must be longer than 2 symbols": "Team's title must be longer than 2 symbols",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are creating new team...": "We are creating new team...",
+      "Voila! Team is here 🎉": "Voila! Team is here 🎉",
+      "Create team": "Create team",
+      "Team's title": "Team's title",
+      "And its description": "And its description"
     }
   }
 }

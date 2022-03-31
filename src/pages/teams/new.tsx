@@ -1,24 +1,26 @@
 import type { GetStaticPropsContext } from 'next';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
+import { Text, Spacer, Button, Breadcrumbs } from '@geist-ui/core';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import z from 'zod';
+import toast from 'react-hot-toast';
 
 import { gql } from '../../utils/gql';
 import { Header } from '../../components/Header';
-import { Text, Card, Input, Textarea, Spacer, Button, useInput, Breadcrumbs } from '@geist-ui/core';
+import { Card } from '../../components/Card';
 import { Icon } from '../../components/Icon';
+import { FormInput } from '../../components/FormInput';
+import { FormTextarea } from '../../components/FormTextarea';
+import { FormActions, FormActionRight } from '../../components/FormActions';
+import { Form } from '../../components/Form';
+import { useRouter } from '../../hooks/router';
 
 const StyledDialogPage = styled.main`
     padding: 40px 20px;
-`;
-
-const StyledInput = styled(Input)`
-    &.input-container .input-wrapper input {
-        font-weight: 600;
-    }
 `;
 
 function Page() {
@@ -26,30 +28,57 @@ function Page() {
     const { data: session } = useSession();
     const t = useTranslations('teams.new');
 
-    const { state: title, bindings: titleBindings } = useInput('');
-    const { state: description, bindings: descriptionBindings } = useInput('');
-
-    const handleSubmit = async (e: React.SyntheticEvent) => {
-        e.preventDefault();
-
-        await gql
-            .mutation({
-                createTeam: [
-                    {
-                        user: session!.user,
-                        title,
-                        description,
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+    const schema = z.object({
+        title: z
+            .string({
+                required_error: t("Team's title is required"),
+                invalid_type_error: t("Team's title must be a string"),
             })
-            .then((res) => {
-                console.log(`Team ${res.createTeam?.id} created`);
-                router.push('/');
-            })
-            .catch((error) => console.log(error.message));
+            .min(2, {
+                message: t("Team's title must be longer than 2 symbols"),
+            }),
+        description: z.string().optional(),
+    });
+
+    type FormType = z.infer<typeof schema>;
+
+    const {
+        watch,
+        register,
+        handleSubmit,
+        formState: { errors, isValid, isSubmitted },
+    } = useForm<FormType>({
+        resolver: zodResolver(schema),
+        mode: 'onChange',
+        reValidateMode: 'onChange',
+        shouldFocusError: true,
+    });
+
+    const title = watch('title');
+
+    const createTeam = async ({ title, description }: FormType) => {
+        const promise = gql.mutation({
+            createTeam: [
+                {
+                    user: session!.user,
+                    title,
+                    description,
+                },
+                {
+                    id: true,
+                },
+            ],
+        });
+
+        toast.promise(promise, {
+            error: t('Something went wrong 😿'),
+            loading: t('We are creating new team...'),
+            success: t('Voila! Team is here 🎉'),
+        });
+
+        const res = await promise;
+
+        router.team(String(res.createTeam?.id));
     };
 
     return (
@@ -70,42 +99,43 @@ function Page() {
                         <Icon type="plus" size="s" />
                     </Breadcrumbs.Item>
                     <Breadcrumbs.Item>
-                        <Text>{title}</Text>
+                        <Text>{title || '???'}</Text>
                     </Breadcrumbs.Item>
                 </Breadcrumbs>
 
                 <Text h1>{t('Create new team')}</Text>
 
-                <Card style={{ maxWidth: 800, textAlign: 'right' }}>
-                    <form onSubmit={handleSubmit}>
-                        <StyledInput
-                            width="100%"
-                            scale={1.4}
-                            placeholder="Team's title"
-                            name="title"
-                            {...titleBindings}
+                <Card style={{ maxWidth: '800px' }}>
+                    <Form onSubmit={handleSubmit(createTeam)}>
+                        <FormInput
+                            {...register('title')}
+                            error={isSubmitted ? errors.title : undefined}
+                            placeholder={t("Team's title")}
+                            flat="bottom"
                         />
-                        <Spacer />
-                        <Textarea
-                            width="100%"
-                            scale={1.4}
-                            placeholder="And desctiption"
-                            name="description"
-                            {...descriptionBindings}
+                        <FormTextarea
+                            {...register('description')}
+                            error={isSubmitted ? errors.description : undefined}
+                            flat="both"
+                            placeholder={t("And its description")}
                         />
+                        <FormActions flat="top">
+                            <FormActionRight>
+                                <Button
+                                    ghost
+                                    type="success"
+                                    scale={0.8}
+                                    font={1.2}
+                                    style={{ fontWeight: 600 }}
+                                    htmlType="submit"
+                                    disabled={!isValid}
+                                >
+                                    {t('Create team')}
+                                </Button>
+                            </FormActionRight>
+                        </FormActions>
                         <Spacer />
-                        <Button
-                            ghost
-                            type="success"
-                            scale={0.8}
-                            font={1.2}
-                            style={{ fontWeight: 600 }}
-                            htmlType="submit"
-                            disabled={title === ''}
-                        >
-                            Create team
-                        </Button>
-                    </form>
+                    </Form>
                 </Card>
             </StyledDialogPage>
         </>

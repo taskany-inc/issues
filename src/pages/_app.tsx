@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import { ApolloProvider } from '@apollo/client';
 import { SessionProvider, useSession, signIn } from 'next-auth/react';
-import { ThemeProvider } from 'next-themes';
-import { useTheme } from 'next-themes';
+import { ThemeProvider, useTheme } from 'next-themes';
+import { Toaster } from 'react-hot-toast';
 import { NextIntlProvider } from 'next-intl';
 import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core';
 
@@ -11,7 +11,7 @@ import { Theme } from '../components/Theme';
 import { apolloClient } from '../utils/apolloClient';
 import { GlobalStyle } from '../components/GlobalStyle';
 import { NextPageWithAuth } from '../types/nextPageWithAuth';
-import { backgroundColor, success } from '../design/@generated/themes';
+import { backgroundColor, success, toastBackgroundColor, toastTextColor } from '../design/@generated/themes';
 import { useHotkeys } from '../hooks/useHotkeys';
 
 type AppPropsWithAuth = AppProps & {
@@ -68,6 +68,13 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
 
                 <Theme theme={themeType} />
 
+                <Toaster
+                    toastOptions={{
+                        style: { borderRadius: '6px', background: toastBackgroundColor, color: toastTextColor },
+                    }}
+                    position="bottom-right"
+                />
+
                 {Component.auth ? (
                     <Auth>
                         <Component {...pageProps} />
@@ -83,7 +90,6 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithAuth) => {
     return (
         <>
-
             <SessionProvider session={session}>
                 <ApolloProvider client={apolloClient}>
                     <NextIntlProvider messages={pageProps.i18n}>
