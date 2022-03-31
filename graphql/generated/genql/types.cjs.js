@@ -3,15 +3,16 @@ module.exports = {
         0,
         2,
         4,
-        6,
+        5,
         7,
+        9,
         11
     ],
     "types": {
         "DateTime": {},
         "Mutation": {
             "createTeam": [
-                8,
+                6,
                 {
                     "description": [
                         2
@@ -31,47 +32,20 @@ module.exports = {
             ]
         },
         "String": {},
-        "Post": {
-            "author": [
-                9
-            ],
-            "author_id": [
-                2
-            ],
-            "content": [
-                2
-            ],
-            "created_at": [
-                0
-            ],
-            "id": [
-                4
-            ],
-            "title": [
-                2
-            ],
-            "updated_at": [
-                0
-            ],
-            "__typename": [
-                2
-            ]
-        },
-        "Int": {},
         "Query": {
             "teams": [
-                8,
+                6,
                 {
                     "sortBy": [
-                        7
+                        5
                     ]
                 }
             ],
             "users": [
-                9,
+                8,
                 {
                     "sortBy": [
-                        7
+                        5
                     ]
                 }
             ],
@@ -89,10 +63,10 @@ module.exports = {
                 2
             ],
             "id": [
-                4
+                7
             ],
             "owner": [
-                9
+                8
             ],
             "owner_id": [
                 2
@@ -107,6 +81,7 @@ module.exports = {
                 2
             ]
         },
+        "Int": {},
         "User": {
             "created_at": [
                 0
@@ -115,7 +90,7 @@ module.exports = {
                 2
             ],
             "id": [
-                2
+                9
             ],
             "image": [
                 2
@@ -123,11 +98,8 @@ module.exports = {
             "name": [
                 2
             ],
-            "posts": [
-                3
-            ],
             "role": [
-                6
+                4
             ],
             "updated_at": [
                 0
@@ -136,12 +108,13 @@ module.exports = {
                 2
             ]
         },
+        "ID": {},
         "UserSession": {
             "email": [
                 2
             ],
             "id": [
-                2
+                9
             ],
             "image": [
                 2
@@ -150,7 +123,7 @@ module.exports = {
                 2
             ],
             "role": [
-                6
+                4
             ],
             "__typename": [
                 2

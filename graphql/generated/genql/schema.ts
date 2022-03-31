@@ -4,23 +4,13 @@ export type Scalars = {
     DateTime: any,
     String: string,
     Int: number,
+    ID: string,
     Boolean: boolean,
 }
 
 export interface Mutation {
     createTeam?: Team
     __typename: 'Mutation'
-}
-
-export interface Post {
-    author?: User
-    author_id?: Scalars['String']
-    content: Scalars['String']
-    created_at?: Scalars['DateTime']
-    id: Scalars['Int']
-    title: Scalars['String']
-    updated_at?: Scalars['DateTime']
-    __typename: 'Post'
 }
 
 export interface Query {
@@ -34,42 +24,29 @@ export type Role = 'ADMIN' | 'USER'
 export type SortOrder = 'asc' | 'desc'
 
 export interface Team {
-    created_at?: Scalars['DateTime']
+    created_at: Scalars['DateTime']
     description?: Scalars['String']
     id: Scalars['Int']
     owner?: User
     owner_id?: Scalars['String']
     title: Scalars['String']
-    updated_at?: Scalars['DateTime']
+    updated_at: Scalars['DateTime']
     __typename: 'Team'
 }
 
 export interface User {
-    created_at?: Scalars['DateTime']
+    created_at: Scalars['DateTime']
     email: Scalars['String']
-    id: Scalars['String']
+    id: Scalars['ID']
     image?: Scalars['String']
     name?: Scalars['String']
-    posts?: (Post | undefined)[]
-    role?: Role
-    updated_at?: Scalars['DateTime']
+    role: Role
+    updated_at: Scalars['DateTime']
     __typename: 'User'
 }
 
 export interface MutationRequest{
     createTeam?: [{description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession},TeamRequest]
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface PostRequest{
-    author?: UserRequest
-    author_id?: boolean | number
-    content?: boolean | number
-    created_at?: boolean | number
-    id?: boolean | number
-    title?: boolean | number
-    updated_at?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -99,28 +76,19 @@ export interface UserRequest{
     id?: boolean | number
     image?: boolean | number
     name?: boolean | number
-    posts?: PostRequest
     role?: boolean | number
     updated_at?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface UserSession {email: Scalars['String'],id: Scalars['String'],image?: (Scalars['String'] | null),name?: (Scalars['String'] | null),role?: (Role | null)}
+export interface UserSession {email: Scalars['String'],id: Scalars['ID'],image?: (Scalars['String'] | null),name?: (Scalars['String'] | null),role: Role}
 
 
 const Mutation_possibleTypes = ['Mutation']
 export const isMutation = (obj?: { __typename?: any } | null): obj is Mutation => {
   if (!obj?.__typename) throw new Error('__typename is missing in "isMutation"')
   return Mutation_possibleTypes.includes(obj.__typename)
-}
-
-
-
-const Post_possibleTypes = ['Post']
-export const isPost = (obj?: { __typename?: any } | null): obj is Post => {
-  if (!obj?.__typename) throw new Error('__typename is missing in "isPost"')
-  return Post_possibleTypes.includes(obj.__typename)
 }
 
 
@@ -156,26 +124,6 @@ export interface MutationObservableChain{
     createTeam: ((args: {description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession}) => TeamObservableChain & {get: <R extends TeamRequest>(request: R, defaultValue?: (FieldsSelection<Team, R> | undefined)) => Observable<(FieldsSelection<Team, R> | undefined)>})
 }
 
-export interface PostPromiseChain{
-    author: (UserPromiseChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Promise<(FieldsSelection<User, R> | undefined)>}),
-    author_id: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
-    content: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Promise<Scalars['String']>}),
-    created_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Promise<(Scalars['DateTime'] | undefined)>}),
-    id: ({get: (request?: boolean|number, defaultValue?: Scalars['Int']) => Promise<Scalars['Int']>}),
-    title: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Promise<Scalars['String']>}),
-    updated_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Promise<(Scalars['DateTime'] | undefined)>})
-}
-
-export interface PostObservableChain{
-    author: (UserObservableChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Observable<(FieldsSelection<User, R> | undefined)>}),
-    author_id: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
-    content: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Observable<Scalars['String']>}),
-    created_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Observable<(Scalars['DateTime'] | undefined)>}),
-    id: ({get: (request?: boolean|number, defaultValue?: Scalars['Int']) => Observable<Scalars['Int']>}),
-    title: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Observable<Scalars['String']>}),
-    updated_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Observable<(Scalars['DateTime'] | undefined)>})
-}
-
 export interface QueryPromiseChain{
     teams: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Team, R> | undefined)[] | undefined)>})&({get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Team, R> | undefined)[] | undefined)>}),
     users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})
@@ -187,43 +135,41 @@ export interface QueryObservableChain{
 }
 
 export interface TeamPromiseChain{
-    created_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Promise<(Scalars['DateTime'] | undefined)>}),
+    created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>}),
     description: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
     id: ({get: (request?: boolean|number, defaultValue?: Scalars['Int']) => Promise<Scalars['Int']>}),
     owner: (UserPromiseChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Promise<(FieldsSelection<User, R> | undefined)>}),
     owner_id: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
     title: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Promise<Scalars['String']>}),
-    updated_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Promise<(Scalars['DateTime'] | undefined)>})
+    updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>})
 }
 
 export interface TeamObservableChain{
-    created_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Observable<(Scalars['DateTime'] | undefined)>}),
+    created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>}),
     description: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
     id: ({get: (request?: boolean|number, defaultValue?: Scalars['Int']) => Observable<Scalars['Int']>}),
     owner: (UserObservableChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Observable<(FieldsSelection<User, R> | undefined)>}),
     owner_id: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
     title: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Observable<Scalars['String']>}),
-    updated_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Observable<(Scalars['DateTime'] | undefined)>})
+    updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>})
 }
 
 export interface UserPromiseChain{
-    created_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Promise<(Scalars['DateTime'] | undefined)>}),
+    created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>}),
     email: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Promise<Scalars['String']>}),
-    id: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Promise<Scalars['String']>}),
+    id: ({get: (request?: boolean|number, defaultValue?: Scalars['ID']) => Promise<Scalars['ID']>}),
     image: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
     name: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
-    posts: ({get: <R extends PostRequest>(request: R, defaultValue?: ((FieldsSelection<Post, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Post, R> | undefined)[] | undefined)>}),
-    role: ({get: (request?: boolean|number, defaultValue?: (Role | undefined)) => Promise<(Role | undefined)>}),
-    updated_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Promise<(Scalars['DateTime'] | undefined)>})
+    role: ({get: (request?: boolean|number, defaultValue?: Role) => Promise<Role>}),
+    updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>})
 }
 
 export interface UserObservableChain{
-    created_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Observable<(Scalars['DateTime'] | undefined)>}),
+    created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>}),
     email: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Observable<Scalars['String']>}),
-    id: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Observable<Scalars['String']>}),
+    id: ({get: (request?: boolean|number, defaultValue?: Scalars['ID']) => Observable<Scalars['ID']>}),
     image: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
     name: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
-    posts: ({get: <R extends PostRequest>(request: R, defaultValue?: ((FieldsSelection<Post, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Post, R> | undefined)[] | undefined)>}),
-    role: ({get: (request?: boolean|number, defaultValue?: (Role | undefined)) => Observable<(Role | undefined)>}),
-    updated_at: ({get: (request?: boolean|number, defaultValue?: (Scalars['DateTime'] | undefined)) => Observable<(Scalars['DateTime'] | undefined)>})
+    role: ({get: (request?: boolean|number, defaultValue?: Role) => Observable<Role>}),
+    updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>})
 }

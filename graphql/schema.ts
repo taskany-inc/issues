@@ -1,3 +1,4 @@
+import { join } from 'path';
 import {
     makeSchema,
     queryType,
@@ -12,7 +13,7 @@ import {
     intArg,
 } from 'nexus';
 import { DateTimeResolver } from 'graphql-scalars';
-import { join } from 'path';
+import { User as UserModel, Team as TeamModel } from 'nexus-prisma';
 
 import { mailServer } from '../src/utils/mailServer';
 
@@ -29,58 +30,44 @@ const Role = enumType({
 const UserSession = inputObjectType({
     name: 'UserSession',
     definition(t) {
-        t.nonNull.string('id');
-        t.nonNull.string('email');
-        t.string('name');
-        t.string('image');
-        t.field('role', { type: 'Role' });
+        t.field(UserModel.id);
+        t.field(UserModel.email);
+        t.field(UserModel.name);
+        t.field(UserModel.image);
+        t.field(UserModel.role);
     },
 });
 
 const User = objectType({
-    name: 'User',
+    name: UserModel.$name,
     definition(t) {
-        t.nonNull.string('id');
-        t.nonNull.string('email');
-        t.string('name');
-        t.string('image');
-        t.field('role', { type: 'Role' });
-        t.field('created_at', { type: 'DateTime' });
-        t.field('updated_at', { type: 'DateTime' });
-        t.list.field('posts', { type: 'Post' });
-    },
-});
-
-const Post = objectType({
-    name: 'Post',
-    definition(t) {
-        t.nonNull.int('id');
-        t.nonNull.string('title');
-        t.nonNull.string('content');
-        t.field('author', { type: 'User' });
-        t.string('author_id');
-        t.field('created_at', { type: 'DateTime' });
-        t.field('updated_at', { type: 'DateTime' });
+        t.field(UserModel.id);
+        t.field(UserModel.email);
+        t.field(UserModel.name);
+        t.field(UserModel.image);
+        t.field(UserModel.role);
+        t.field(UserModel.created_at);
+        t.field(UserModel.updated_at);
     },
 });
 
 const Team = objectType({
-    name: 'Team',
+    name: TeamModel.$name,
     definition(t) {
-        t.nonNull.int('id');
-        t.nonNull.string('title');
-        t.string('description');
-        t.field('owner', { type: 'User' });
-        t.string('owner_id');
-        t.field('created_at', { type: 'DateTime' });
-        t.field('updated_at', { type: 'DateTime' });
+        t.field(TeamModel.id);
+        t.field(TeamModel.title);
+        t.field(TeamModel.description);
+        t.field('owner', { type: User });
+        t.field(TeamModel.owner_id);
+        t.field(TeamModel.created_at);
+        t.field(TeamModel.updated_at);
     },
 });
 
 const Query = queryType({
     definition(t) {
         t.list.field('users', {
-            type: 'User',
+            type: User,
             args: {
                 sortBy: arg({ type: 'SortOrder' }),
             },
@@ -91,7 +78,7 @@ const Query = queryType({
         });
 
         t.list.field('teams', {
-            type: 'Team',
+            type: Team,
             args: {
                 sortBy: arg({ type: 'SortOrder' }),
             },
@@ -109,7 +96,7 @@ const Query = queryType({
 const Mutation = mutationType({
     definition(t) {
         t.field('createTeam', {
-            type: 'Team',
+            type: Team,
             args: {
                 title: nonNull(stringArg()),
                 description: stringArg(),
@@ -147,7 +134,7 @@ const Mutation = mutationType({
 });
 
 export const schema = makeSchema({
-    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Team, Post],
+    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Team],
     outputs: {
         schema: join(process.cwd(), 'graphql/schema.graphql'),
         typegen: join(process.cwd(), 'graphql/generated/nexus.d.ts'),
@@ -164,4 +151,5 @@ export const schema = makeSchema({
             },
         ],
     },
+    plugins: [],
 });

@@ -11,16 +11,6 @@ type Mutation {
   createTeam(description: String, title: String!, user: UserSession!): Team
 }
 
-type Post {
-  author: User
-  author_id: String
-  content: String!
-  created_at: DateTime
-  id: Int!
-  title: String!
-  updated_at: DateTime
-}
-
 type Query {
   teams(sortBy: SortOrder): [Team]
   users(sortBy: SortOrder): [User]
@@ -37,30 +27,29 @@ enum SortOrder {
 }
 
 type Team {
-  created_at: DateTime
+  created_at: DateTime!
   description: String
   id: Int!
   owner: User
   owner_id: String
   title: String!
-  updated_at: DateTime
+  updated_at: DateTime!
 }
 
 type User {
-  created_at: DateTime
+  created_at: DateTime!
   email: String!
-  id: String!
+  id: ID!
   image: String
   name: String
-  posts: [Post]
-  role: Role
-  updated_at: DateTime
+  role: Role!
+  updated_at: DateTime!
 }
 
 input UserSession {
   email: String!
-  id: String!
+  id: ID!
   image: String
   name: String
-  role: Role
+  role: Role!
 }

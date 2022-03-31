@@ -31,10 +31,10 @@ declare global {
 export interface NexusGenInputs {
   UserSession: { // input type
     email: string; // String!
-    id: string; // String!
+    id: string; // ID!
     image?: string | null; // String
     name?: string | null; // String
-    role?: NexusGenEnums['Role'] | null; // Role
+    role: NexusGenEnums['Role']; // Role!
   }
 }
 
@@ -54,34 +54,24 @@ export interface NexusGenScalars {
 
 export interface NexusGenObjects {
   Mutation: {};
-  Post: { // root type
-    author?: NexusGenRootTypes['User'] | null; // User
-    author_id?: string | null; // String
-    content: string; // String!
-    created_at?: NexusGenScalars['DateTime'] | null; // DateTime
-    id: number; // Int!
-    title: string; // String!
-    updated_at?: NexusGenScalars['DateTime'] | null; // DateTime
-  }
   Query: {};
   Team: { // root type
-    created_at?: NexusGenScalars['DateTime'] | null; // DateTime
+    created_at: NexusGenScalars['DateTime']; // DateTime!
     description?: string | null; // String
     id: number; // Int!
     owner?: NexusGenRootTypes['User'] | null; // User
     owner_id?: string | null; // String
     title: string; // String!
-    updated_at?: NexusGenScalars['DateTime'] | null; // DateTime
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
   }
   User: { // root type
-    created_at?: NexusGenScalars['DateTime'] | null; // DateTime
+    created_at: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
-    id: string; // String!
+    id: string; // ID!
     image?: string | null; // String
     name?: string | null; // String
-    posts?: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
-    role?: NexusGenEnums['Role'] | null; // Role
-    updated_at?: NexusGenScalars['DateTime'] | null; // DateTime
+    role: NexusGenEnums['Role']; // Role!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
   }
 }
 
@@ -99,52 +89,33 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createTeam: NexusGenRootTypes['Team'] | null; // Team
   }
-  Post: { // field return type
-    author: NexusGenRootTypes['User'] | null; // User
-    author_id: string | null; // String
-    content: string; // String!
-    created_at: NexusGenScalars['DateTime'] | null; // DateTime
-    id: number; // Int!
-    title: string; // String!
-    updated_at: NexusGenScalars['DateTime'] | null; // DateTime
-  }
   Query: { // field return type
     teams: Array<NexusGenRootTypes['Team'] | null> | null; // [Team]
     users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
   }
   Team: { // field return type
-    created_at: NexusGenScalars['DateTime'] | null; // DateTime
+    created_at: NexusGenScalars['DateTime']; // DateTime!
     description: string | null; // String
     id: number; // Int!
     owner: NexusGenRootTypes['User'] | null; // User
     owner_id: string | null; // String
     title: string; // String!
-    updated_at: NexusGenScalars['DateTime'] | null; // DateTime
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
   }
   User: { // field return type
-    created_at: NexusGenScalars['DateTime'] | null; // DateTime
+    created_at: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
-    id: string; // String!
+    id: string; // ID!
     image: string | null; // String
     name: string | null; // String
-    posts: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
-    role: NexusGenEnums['Role'] | null; // Role
-    updated_at: NexusGenScalars['DateTime'] | null; // DateTime
+    role: NexusGenEnums['Role']; // Role!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
   }
 }
 
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     createTeam: 'Team'
-  }
-  Post: { // field return type name
-    author: 'User'
-    author_id: 'String'
-    content: 'String'
-    created_at: 'DateTime'
-    id: 'Int'
-    title: 'String'
-    updated_at: 'DateTime'
   }
   Query: { // field return type name
     teams: 'Team'
@@ -162,10 +133,9 @@ export interface NexusGenFieldTypeNames {
   User: { // field return type name
     created_at: 'DateTime'
     email: 'String'
-    id: 'String'
+    id: 'ID'
     image: 'String'
     name: 'String'
-    posts: 'Post'
     role: 'Role'
     updated_at: 'DateTime'
   }
