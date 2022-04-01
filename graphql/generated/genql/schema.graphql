@@ -1,13 +1,34 @@
+type Activity {
+  created_at: DateTime!
+  id: ID!
+  updated_at: DateTime!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
 
+type Ghost {
+  activity: Activity
+  created_at: DateTime!
+  email: String!
+  host: User
+  host_id: String!
+  id: ID!
+  updated_at: DateTime!
+  user: User
+}
+
 type Mutation {
+  createGhost(email: String!, user: UserSession!): Ghost
   createTeam(description: String, title: String!, user: UserSession!): Team
+  createTestUser(email: String!): User
 }
 
 type Query {
+  findGhost(query: String!, sortBy: SortOrder): [Ghost]
+  findUser(query: String!, sortBy: SortOrder): [User]
   teams(sortBy: SortOrder): [Team]
   users(sortBy: SortOrder): [User]
 }
@@ -26,13 +47,15 @@ type Team {
   created_at: DateTime!
   description: String
   id: Int!
-  owner: User
+  owner: Activity
   owner_id: String
   title: String!
   updated_at: DateTime!
 }
 
 type User {
+  activity: Activity
+  activity_id: String
   created_at: DateTime!
   email: String!
   id: ID!

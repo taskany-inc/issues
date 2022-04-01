@@ -55,26 +55,6 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-  id              String     @id @default(cuid())
-  name            String?
-  email           String     @unique
-  emailVerified   DateTime?
-  image           String?
-  accounts        Account[]
-  sessions        Session[]
-  role            Role       @default(USER)
-  created_at      DateTime   @default(now())
-  updated_at      DateTime   @default(now()) @updatedAt
-  comments        Comment[]
-  reactions       Reaction[]
-  teams           Team[]
-  teamParticipant Team[]     @relation("teamParticipants")
-  goalParticipant Goal[]     @relation("goalParticipants")
-  goalOwner       Goal[]     @relation("goalOwner")
-  goalIssuer      Goal[]     @relation("goalIssuer")
-}
-
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -83,19 +63,69 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model User {
+  id            String    @id @default(cuid())
+  active        Boolean   @default(true)
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  role          Role      @default(USER)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @default(now()) @updatedAt
+  invites       Ghost[]   @relation("invite")
+  host          User?     @relation("invited", fields: [host_id], references: [id])
+  host_id       String?
+  invited       User[]    @relation("invited")
+  invited_at    DateTime?
+  activity      Activity? @relation(fields: [activity_id], references: [id])
+  activity_id   String?   @unique
+
+}
+
+model Ghost {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  host       User      @relation("invite", fields: [host_id], references: [id])
+  host_id    String
+  activity   Activity?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+
+  @@index([host_id])
+}
+
+model Activity {
+  id              String     @id @default(cuid())
+  ghost           Ghost?     @relation(fields: [ghost_id], references: [id])
+  ghost_id        String?    @unique
+  user            User?
+  comments        Comment[]
+  reactions       Reaction[]
+  teams           Team[]
+  teamParticipant Team[]     @relation("teamParticipants")
+  goalParticipant Goal[]     @relation("goalParticipants")
+  goalOwner       Goal[]     @relation("goalOwner")
+  goalIssuer      Goal[]     @relation("goalIssuer")
+  created_at      DateTime   @default(now())
+  updated_at      DateTime   @default(now()) @updatedAt
+
+  @@index([ghost_id])
+}
+
 model Team {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   title        String
   description  String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now()) @updatedAt
-  parent       Team?    @relation("parentChildren", fields: [id], references: [id])
-  children     Team[]   @relation("parentChildren")
-  owner        User?    @relation(fields: [owner_id], references: [id])
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @default(now()) @updatedAt
+  parent       Team?      @relation("parentChildren", fields: [id], references: [id])
+  children     Team[]     @relation("parentChildren")
+  owner        Activity?  @relation(fields: [owner_id], references: [id])
   owner_id     String?
-  participants User[]   @relation("teamParticipants")
-
-  @@index([owner_id])
+  participants Activity[] @relation("teamParticipants")
 }
 
 model Goal {
@@ -111,11 +141,11 @@ model Goal {
   created_at   DateTime   @default(now())
   updated_at   DateTime   @default(now()) @updatedAt
   criteria     Criteria[]
-  issuer       User?      @relation("goalIssuer", fields: [issuer_id], references: [id])
+  issuer       Activity?  @relation("goalIssuer", fields: [issuer_id], references: [id])
   issuer_id    String?
-  owner        User?      @relation("goalOwner", fields: [owner_id], references: [id])
+  owner        Activity?  @relation("goalOwner", fields: [owner_id], references: [id])
   owner_id     String?
-  participants User[]     @relation("goalParticipants")
+  participants Activity[] @relation("goalParticipants")
   comments     Comment[]
   reactions    Reaction[]
   dependsOn    Goal[]     @relation("dependsOn")
@@ -142,7 +172,7 @@ model Criteria {
 model Comment {
   id          String     @id @default(cuid())
   description String
-  author      User       @relation(fields: [author_id], references: [id])
+  author      Activity   @relation(fields: [author_id], references: [id])
   author_id   String
   goal        Goal       @relation(fields: [goal_id], references: [id])
   goal_id     Int
@@ -155,7 +185,7 @@ model Comment {
 model Reaction {
   id         String   @id @default(cuid())
   emoji      String
-  author     User     @relation(fields: [author_id], references: [id])
+  author     Activity @relation(fields: [author_id], references: [id])
   author_id  String
   goal       Goal?    @relation(fields: [goal_id], references: [id])
   goal_id    Int?

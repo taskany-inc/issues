@@ -1,132 +1,227 @@
 module.exports = {
     "scalars": [
-        0,
+        1,
         2,
         4,
-        5,
         7,
-        9,
-        11
+        8,
+        10,
+        13
     ],
     "types": {
+        "Activity": {
+            "created_at": [
+                2
+            ],
+            "id": [
+                1
+            ],
+            "updated_at": [
+                2
+            ],
+            "__typename": [
+                4
+            ]
+        },
+        "ID": {},
         "DateTime": {},
+        "Ghost": {
+            "activity": [
+                0
+            ],
+            "created_at": [
+                2
+            ],
+            "email": [
+                4
+            ],
+            "host": [
+                11
+            ],
+            "host_id": [
+                4
+            ],
+            "id": [
+                1
+            ],
+            "updated_at": [
+                2
+            ],
+            "user": [
+                11
+            ],
+            "__typename": [
+                4
+            ]
+        },
+        "String": {},
         "Mutation": {
-            "createTeam": [
-                6,
+            "createGhost": [
+                3,
                 {
-                    "description": [
-                        2
-                    ],
-                    "title": [
-                        2,
+                    "email": [
+                        4,
                         "String!"
                     ],
                     "user": [
-                        10,
+                        12,
                         "UserSession!"
                     ]
                 }
             ],
+            "createTeam": [
+                9,
+                {
+                    "description": [
+                        4
+                    ],
+                    "title": [
+                        4,
+                        "String!"
+                    ],
+                    "user": [
+                        12,
+                        "UserSession!"
+                    ]
+                }
+            ],
+            "createTestUser": [
+                11,
+                {
+                    "email": [
+                        4,
+                        "String!"
+                    ]
+                }
+            ],
             "__typename": [
-                2
+                4
             ]
         },
-        "String": {},
         "Query": {
+            "findGhost": [
+                3,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        8
+                    ]
+                }
+            ],
+            "findUser": [
+                11,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        8
+                    ]
+                }
+            ],
             "teams": [
-                6,
+                9,
                 {
                     "sortBy": [
-                        5
+                        8
                     ]
                 }
             ],
             "users": [
-                8,
+                11,
                 {
                     "sortBy": [
-                        5
+                        8
                     ]
                 }
             ],
             "__typename": [
-                2
+                4
             ]
         },
         "Role": {},
         "SortOrder": {},
         "Team": {
             "created_at": [
-                0
+                2
             ],
             "description": [
-                2
+                4
             ],
             "id": [
-                7
+                10
             ],
             "owner": [
-                8
-            ],
-            "owner_id": [
-                2
-            ],
-            "title": [
-                2
-            ],
-            "updated_at": [
                 0
             ],
-            "__typename": [
+            "owner_id": [
+                4
+            ],
+            "title": [
+                4
+            ],
+            "updated_at": [
                 2
+            ],
+            "__typename": [
+                4
             ]
         },
         "Int": {},
         "User": {
-            "created_at": [
+            "activity": [
                 0
             ],
-            "email": [
+            "activity_id": [
+                4
+            ],
+            "created_at": [
                 2
+            ],
+            "email": [
+                4
             ],
             "id": [
-                9
+                1
             ],
             "image": [
-                2
+                4
             ],
             "name": [
-                2
+                4
             ],
             "role": [
-                4
+                7
             ],
             "updated_at": [
-                0
+                2
             ],
             "__typename": [
-                2
+                4
             ]
         },
-        "ID": {},
         "UserSession": {
             "email": [
-                2
-            ],
-            "id": [
-                9
-            ],
-            "image": [
-                2
-            ],
-            "name": [
-                2
-            ],
-            "role": [
                 4
             ],
+            "id": [
+                1
+            ],
+            "image": [
+                4
+            ],
+            "name": [
+                4
+            ],
+            "role": [
+                7
+            ],
             "__typename": [
-                2
+                4
             ]
         },
         "Boolean": {}
