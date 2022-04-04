@@ -64,4 +64,10 @@ module.exports = {
     buttonDangerOutlineBackgroundColorHover: '#e00',
     buttonDangerOutlineBorderColor: '#e00',
     buttonDangerOutlineBorderColorHover: '#e00',
+
+    accentIconColor: '#ffed00',
+
+    keyboardTextColor: 'rgba(0, 0, 0, .6)',
+    keyboardBackgroundColor: 'rgba(0, 0, 0, .05)',
+    keyboardBorderColor: 'rgba(0, 0, 0, .1)'
 };

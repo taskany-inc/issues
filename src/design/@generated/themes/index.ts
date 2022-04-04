@@ -55,3 +55,7 @@ export const buttonDangerOutlineBackgroundColor = 'var(--button-danger-outline-b
 export const buttonDangerOutlineBackgroundColorHover = 'var(--button-danger-outline-background-color-hover)';
 export const buttonDangerOutlineBorderColor = 'var(--button-danger-outline-border-color)';
 export const buttonDangerOutlineBorderColorHover = 'var(--button-danger-outline-border-color-hover)';
+export const accentIconColor = 'var(--accent-icon-color)';
+export const keyboardTextColor = 'var(--keyboard-text-color)';
+export const keyboardBackgroundColor = 'var(--keyboard-background-color)';
+export const keyboardBorderColor = 'var(--keyboard-border-color)';

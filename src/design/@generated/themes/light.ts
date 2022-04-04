@@ -59,5 +59,9 @@ export default createGlobalStyle`
         --button-danger-outline-background-color-hover: #e00;
         --button-danger-outline-border-color: #e00;
         --button-danger-outline-border-color-hover: #e00;
+        --accent-icon-color: #ffed00;
+        --keyboard-text-color: rgba(0, 0, 0, .6);
+        --keyboard-background-color: rgba(0, 0, 0, .05);
+        --keyboard-border-color: rgba(0, 0, 0, .1);
     }
 `;

@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
-import { Text, Spacer, Breadcrumbs, Grid } from '@geist-ui/core';
+import { Text, Spacer, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
@@ -18,7 +18,10 @@ import { FormInput } from '../../components/FormInput';
 import { FormTextarea } from '../../components/FormTextarea';
 import { FormActions, FormActionRight } from '../../components/FormActions';
 import { Form } from '../../components/Form';
+import { Tip } from '../../components/Tip';
+import { Keyboard } from '../../components/Keyboard';
 import { useRouter } from '../../hooks/router';
+import { accentIconColor } from '../../design/@generated/themes';
 
 const StyledDialogPage = styled.main`
     padding: 40px 20px;
@@ -99,18 +102,6 @@ function Page() {
                     <Grid xs={1} />
                     <Grid xs={23}>
                         <CleanFlexContainer>
-                            <Breadcrumbs>
-                                <Breadcrumbs.Item>
-                                    <Icon type="building" size="s" />
-                                </Breadcrumbs.Item>
-                                <Breadcrumbs.Item>
-                                    <Icon type="plus" size="s" />
-                                </Breadcrumbs.Item>
-                                <Breadcrumbs.Item>
-                                    <Text>{title || '???'}</Text>
-                                </Breadcrumbs.Item>
-                            </Breadcrumbs>
-
                             <Text h1>{t('Create new team')}</Text>
 
                             <Card style={{ maxWidth: '800px' }}>
@@ -141,6 +132,9 @@ function Page() {
                                     <Spacer />
                                 </Form>
                             </Card>
+                            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={accentIconColor} />}>
+                                {t.rich('Press key to create the team', { key: () => <Keyboard command enter /> })}
+                            </Tip>
                         </CleanFlexContainer>
                     </Grid>
                 </Grid.Container>

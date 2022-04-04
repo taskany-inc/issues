@@ -9,6 +9,7 @@ import { Icon } from './Icon';
 import { ThemeChanger } from './ThemeChanger';
 import { UserPic } from './UserPic';
 import { routes } from '../hooks/router';
+import { secondaryTaskanyLogoColor } from '../design/@generated/themes';
 
 const StyledHeader = styled.header`
     padding: 20px 20px;
@@ -58,7 +59,7 @@ const CreatorMenu = () => {
     );
     return (
         <Popover content={content} hideArrow>
-            <StyledIcon type="plus" size="s" />
+            <StyledIcon type="plus" size="s" color={secondaryTaskanyLogoColor} />
         </Popover>
     );
 };
