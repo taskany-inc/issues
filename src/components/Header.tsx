@@ -47,8 +47,8 @@ const CreatorMenu = () => {
                 </NextLink>
             </Popover.Item>
             <Popover.Item>
-                <NextLink href={routes.createTeam()}>
-                    <Link>{t('New team')}</Link>
+                <NextLink href={routes.createProject()}>
+                    <Link>{t('New project')}</Link>
                 </NextLink>
             </Popover.Item>
             <Popover.Item line />
@@ -79,8 +79,8 @@ export const Header: React.FC = () => {
                     </NextLink>
                 </Grid>
                 <Grid xs={19}>
-                    <NextLink href={routes.teams()}>
-                        <StyledHeaderNavLink>{t('Teams')}</StyledHeaderNavLink>
+                    <NextLink href={routes.projects()}>
+                        <StyledHeaderNavLink>{t('Projects')}</StyledHeaderNavLink>
                     </NextLink>
                     <Spacer w={2} />
                     <NextLink href={routes.goals()}>

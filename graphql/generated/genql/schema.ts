@@ -29,24 +29,12 @@ export interface Ghost {
 
 export interface Mutation {
     createGhost?: Ghost
-    createTeam?: Team
+    createProject?: Project
     createTestUser?: User
     __typename: 'Mutation'
 }
 
-export interface Query {
-    findGhost?: (Ghost | undefined)[]
-    findUser?: (User | undefined)[]
-    teams?: (Team | undefined)[]
-    users?: (User | undefined)[]
-    __typename: 'Query'
-}
-
-export type Role = 'ADMIN' | 'USER'
-
-export type SortOrder = 'asc' | 'desc'
-
-export interface Team {
+export interface Project {
     created_at: Scalars['DateTime']
     description?: Scalars['String']
     id: Scalars['Int']
@@ -54,8 +42,20 @@ export interface Team {
     owner_id?: Scalars['String']
     title: Scalars['String']
     updated_at: Scalars['DateTime']
-    __typename: 'Team'
+    __typename: 'Project'
 }
+
+export interface Query {
+    findGhost?: (Ghost | undefined)[]
+    findUser?: (User | undefined)[]
+    projects?: (Project | undefined)[]
+    users?: (User | undefined)[]
+    __typename: 'Query'
+}
+
+export type Role = 'ADMIN' | 'USER'
+
+export type SortOrder = 'asc' | 'desc'
 
 export interface User {
     activity?: Activity
@@ -93,22 +93,13 @@ export interface GhostRequest{
 
 export interface MutationRequest{
     createGhost?: [{email: Scalars['String'],user: UserSession},GhostRequest]
-    createTeam?: [{description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession},TeamRequest]
+    createProject?: [{description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession},ProjectRequest]
     createTestUser?: [{email: Scalars['String']},UserRequest]
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface QueryRequest{
-    findGhost?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},GhostRequest]
-    findUser?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},UserRequest]
-    teams?: [{sortBy?: (SortOrder | null)},TeamRequest] | TeamRequest
-    users?: [{sortBy?: (SortOrder | null)},UserRequest] | UserRequest
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface TeamRequest{
+export interface ProjectRequest{
     created_at?: boolean | number
     description?: boolean | number
     id?: boolean | number
@@ -116,6 +107,15 @@ export interface TeamRequest{
     owner_id?: boolean | number
     title?: boolean | number
     updated_at?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface QueryRequest{
+    findGhost?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},GhostRequest]
+    findUser?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},UserRequest]
+    projects?: [{sortBy?: (SortOrder | null)},ProjectRequest] | ProjectRequest
+    users?: [{sortBy?: (SortOrder | null)},UserRequest] | UserRequest
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -161,18 +161,18 @@ export const isMutation = (obj?: { __typename?: any } | null): obj is Mutation =
 
 
 
-const Query_possibleTypes = ['Query']
-export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
-  if (!obj?.__typename) throw new Error('__typename is missing in "isQuery"')
-  return Query_possibleTypes.includes(obj.__typename)
+const Project_possibleTypes = ['Project']
+export const isProject = (obj?: { __typename?: any } | null): obj is Project => {
+  if (!obj?.__typename) throw new Error('__typename is missing in "isProject"')
+  return Project_possibleTypes.includes(obj.__typename)
 }
 
 
 
-const Team_possibleTypes = ['Team']
-export const isTeam = (obj?: { __typename?: any } | null): obj is Team => {
-  if (!obj?.__typename) throw new Error('__typename is missing in "isTeam"')
-  return Team_possibleTypes.includes(obj.__typename)
+const Query_possibleTypes = ['Query']
+export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
+  if (!obj?.__typename) throw new Error('__typename is missing in "isQuery"')
+  return Query_possibleTypes.includes(obj.__typename)
 }
 
 
@@ -220,31 +220,17 @@ export interface GhostObservableChain{
 
 export interface MutationPromiseChain{
     createGhost: ((args: {email: Scalars['String'],user: UserSession}) => GhostPromiseChain & {get: <R extends GhostRequest>(request: R, defaultValue?: (FieldsSelection<Ghost, R> | undefined)) => Promise<(FieldsSelection<Ghost, R> | undefined)>}),
-    createTeam: ((args: {description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession}) => TeamPromiseChain & {get: <R extends TeamRequest>(request: R, defaultValue?: (FieldsSelection<Team, R> | undefined)) => Promise<(FieldsSelection<Team, R> | undefined)>}),
+    createProject: ((args: {description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession}) => ProjectPromiseChain & {get: <R extends ProjectRequest>(request: R, defaultValue?: (FieldsSelection<Project, R> | undefined)) => Promise<(FieldsSelection<Project, R> | undefined)>}),
     createTestUser: ((args: {email: Scalars['String']}) => UserPromiseChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Promise<(FieldsSelection<User, R> | undefined)>})
 }
 
 export interface MutationObservableChain{
     createGhost: ((args: {email: Scalars['String'],user: UserSession}) => GhostObservableChain & {get: <R extends GhostRequest>(request: R, defaultValue?: (FieldsSelection<Ghost, R> | undefined)) => Observable<(FieldsSelection<Ghost, R> | undefined)>}),
-    createTeam: ((args: {description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession}) => TeamObservableChain & {get: <R extends TeamRequest>(request: R, defaultValue?: (FieldsSelection<Team, R> | undefined)) => Observable<(FieldsSelection<Team, R> | undefined)>}),
+    createProject: ((args: {description?: (Scalars['String'] | null),title: Scalars['String'],user: UserSession}) => ProjectObservableChain & {get: <R extends ProjectRequest>(request: R, defaultValue?: (FieldsSelection<Project, R> | undefined)) => Observable<(FieldsSelection<Project, R> | undefined)>}),
     createTestUser: ((args: {email: Scalars['String']}) => UserObservableChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Observable<(FieldsSelection<User, R> | undefined)>})
 }
 
-export interface QueryPromiseChain{
-    findGhost: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends GhostRequest>(request: R, defaultValue?: ((FieldsSelection<Ghost, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Ghost, R> | undefined)[] | undefined)>}),
-    findUser: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>}),
-    teams: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Team, R> | undefined)[] | undefined)>})&({get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Team, R> | undefined)[] | undefined)>}),
-    users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})
-}
-
-export interface QueryObservableChain{
-    findGhost: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends GhostRequest>(request: R, defaultValue?: ((FieldsSelection<Ghost, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Ghost, R> | undefined)[] | undefined)>}),
-    findUser: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>}),
-    teams: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Team, R> | undefined)[] | undefined)>})&({get: <R extends TeamRequest>(request: R, defaultValue?: ((FieldsSelection<Team, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Team, R> | undefined)[] | undefined)>}),
-    users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})
-}
-
-export interface TeamPromiseChain{
+export interface ProjectPromiseChain{
     created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>}),
     description: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
     id: ({get: (request?: boolean|number, defaultValue?: Scalars['Int']) => Promise<Scalars['Int']>}),
@@ -254,7 +240,7 @@ export interface TeamPromiseChain{
     updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>})
 }
 
-export interface TeamObservableChain{
+export interface ProjectObservableChain{
     created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>}),
     description: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
     id: ({get: (request?: boolean|number, defaultValue?: Scalars['Int']) => Observable<Scalars['Int']>}),
@@ -262,6 +248,20 @@ export interface TeamObservableChain{
     owner_id: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
     title: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Observable<Scalars['String']>}),
     updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>})
+}
+
+export interface QueryPromiseChain{
+    findGhost: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends GhostRequest>(request: R, defaultValue?: ((FieldsSelection<Ghost, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Ghost, R> | undefined)[] | undefined)>}),
+    findUser: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>}),
+    projects: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Project, R> | undefined)[] | undefined)>})&({get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Project, R> | undefined)[] | undefined)>}),
+    users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})
+}
+
+export interface QueryObservableChain{
+    findGhost: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends GhostRequest>(request: R, defaultValue?: ((FieldsSelection<Ghost, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Ghost, R> | undefined)[] | undefined)>}),
+    findUser: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>}),
+    projects: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Project, R> | undefined)[] | undefined)>})&({get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Project, R> | undefined)[] | undefined)>}),
+    users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})
 }
 
 export interface UserPromiseChain{

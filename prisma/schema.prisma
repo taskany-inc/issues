@@ -98,34 +98,34 @@ model Ghost {
 }
 
 model Activity {
-  id              String     @id @default(cuid())
-  ghost           Ghost?     @relation(fields: [ghost_id], references: [id])
-  ghost_id        String?    @unique
-  user            User?
-  comments        Comment[]
-  reactions       Reaction[]
-  teams           Team[]
-  teamParticipant Team[]     @relation("teamParticipants")
-  goalParticipant Goal[]     @relation("goalParticipants")
-  goalOwner       Goal[]     @relation("goalOwner")
-  goalIssuer      Goal[]     @relation("goalIssuer")
-  created_at      DateTime   @default(now())
-  updated_at      DateTime   @default(now()) @updatedAt
+  id                 String     @id @default(cuid())
+  ghost              Ghost?     @relation(fields: [ghost_id], references: [id])
+  ghost_id           String?    @unique
+  user               User?
+  comments           Comment[]
+  reactions          Reaction[]
+  projects           Project[]
+  projectParticipant Project[]  @relation("projectParticipants")
+  goalParticipant    Goal[]     @relation("goalParticipants")
+  goalOwner          Goal[]     @relation("goalOwner")
+  goalIssuer         Goal[]     @relation("goalIssuer")
+  created_at         DateTime   @default(now())
+  updated_at         DateTime   @default(now()) @updatedAt
 
   @@index([ghost_id])
 }
 
-model Team {
+model Project {
   id           Int        @id @default(autoincrement())
   title        String
   description  String?
   created_at   DateTime   @default(now())
   updated_at   DateTime   @default(now()) @updatedAt
-  parent       Team?      @relation("parentChildren", fields: [id], references: [id])
-  children     Team[]     @relation("parentChildren")
+  parent       Project?   @relation("parentChildren", fields: [id], references: [id])
+  children     Project[]  @relation("parentChildren")
   owner        Activity?  @relation(fields: [owner_id], references: [id])
   owner_id     String?
-  participants Activity[] @relation("teamParticipants")
+  participants Activity[] @relation("projectParticipants")
 }
 
 model Goal {

@@ -10,10 +10,14 @@ import {
     arg,
     nonNull,
     stringArg,
-    intArg,
 } from 'nexus';
 import { DateTimeResolver } from 'graphql-scalars';
-import { User as UserModel, Team as TeamModel, Ghost as GhostModel, Activity as ActivityModel } from 'nexus-prisma';
+import {
+    User as UserModel,
+    Project as ProjectModel,
+    Ghost as GhostModel,
+    Activity as ActivityModel,
+} from 'nexus-prisma';
 
 import { mailServer } from '../src/utils/mailServer';
 
@@ -76,16 +80,16 @@ const Ghost = objectType({
     },
 });
 
-const Team = objectType({
-    name: TeamModel.$name,
+const Project = objectType({
+    name: ProjectModel.$name,
     definition(t) {
-        t.field(TeamModel.id);
-        t.field(TeamModel.title);
-        t.field(TeamModel.description);
+        t.field(ProjectModel.id);
+        t.field(ProjectModel.title);
+        t.field(ProjectModel.description);
         t.field('owner', { type: Activity });
-        t.field(TeamModel.owner_id);
-        t.field(TeamModel.created_at);
-        t.field(TeamModel.updated_at);
+        t.field(ProjectModel.owner_id);
+        t.field(ProjectModel.created_at);
+        t.field(ProjectModel.updated_at);
     },
 });
 
@@ -115,14 +119,14 @@ const Query = queryType({
                             {
                                 email: {
                                     contains: query,
-                                    mode: 'insensitive'
+                                    mode: 'insensitive',
                                 },
                             },
                             {
                                 name: {
-                                    contains: query ,
-                                    mode: 'insensitive'
-                                }
+                                    contains: query,
+                                    mode: 'insensitive',
+                                },
                             },
                         ],
                     },
@@ -141,20 +145,20 @@ const Query = queryType({
                     where: {
                         email: {
                             contains: query,
-                            mode: 'insensitive'
-                        }
-                    }
+                            mode: 'insensitive',
+                        },
+                    },
                 });
             },
         });
 
-        t.list.field('teams', {
-            type: Team,
+        t.list.field('projects', {
+            type: Project,
             args: {
                 sortBy: arg({ type: 'SortOrder' }),
             },
             resolve: async (_, { sortBy }, { db }) =>
-                db.team.findMany({
+                db.project.findMany({
                     orderBy: { created_at: sortBy || undefined },
                     include: {
                         owner: true,
@@ -166,8 +170,8 @@ const Query = queryType({
 
 const Mutation = mutationType({
     definition(t) {
-        t.field('createTeam', {
-            type: Team,
+        t.field('createProject', {
+            type: Project,
             args: {
                 title: nonNull(stringArg()),
                 description: stringArg(),
@@ -179,7 +183,7 @@ const Mutation = mutationType({
                 if (!validUser) return null;
 
                 try {
-                    const newTeam = db.team.create({
+                    const newTeam = db.project.create({
                         data: {
                             title,
                             description,
@@ -219,8 +223,8 @@ const Mutation = mutationType({
                             email,
                             host_id: validUser.id,
                             activity: {
-                                create: {}
-                            }
+                                create: {},
+                            },
                         },
                     });
 
@@ -275,7 +279,7 @@ const Mutation = mutationType({
 });
 
 export const schema = makeSchema({
-    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Team, Ghost, Activity],
+    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Project, Ghost, Activity],
     outputs: {
         schema: join(process.cwd(), 'graphql/schema.graphql'),
         typegen: join(process.cwd(), 'graphql/generated/nexus.d.ts'),

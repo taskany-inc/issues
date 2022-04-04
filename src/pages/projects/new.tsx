@@ -34,16 +34,16 @@ const CleanFlexContainer = styled.div`
 function Page() {
     const router = useRouter();
     const { data: session } = useSession();
-    const t = useTranslations('teams.new');
+    const t = useTranslations('projects.new');
 
     const schema = z.object({
         title: z
             .string({
-                required_error: t("Team's title is required"),
-                invalid_type_error: t("Team's title must be a string"),
+                required_error: t("Project's title is required"),
+                invalid_type_error: t("Project's title must be a string"),
             })
             .min(2, {
-                message: t("Team's title must be longer than 2 symbols"),
+                message: t("Project's title must be longer than 2 symbols"),
             }),
         description: z.string().optional(),
     });
@@ -62,11 +62,9 @@ function Page() {
         shouldFocusError: true,
     });
 
-    const title = watch('title');
-
-    const createTeam = async ({ title, description }: FormType) => {
+    const createProject = async ({ title, description }: FormType) => {
         const promise = gql.mutation({
-            createTeam: [
+            createProject: [
                 {
                     user: session!.user,
                     title,
@@ -80,13 +78,13 @@ function Page() {
 
         toast.promise(promise, {
             error: t('Something went wrong 😿'),
-            loading: t('We are creating new team...'),
-            success: t('Voila! Team is here 🎉'),
+            loading: t('We are creating new project...'),
+            success: t('Voila! Project is here 🎉'),
         });
 
         const res = await promise;
 
-        router.team(String(res.createTeam?.id));
+        router.project(String(res.createProject?.id));
     };
 
     return (
@@ -102,14 +100,14 @@ function Page() {
                     <Grid xs={1} />
                     <Grid xs={23}>
                         <CleanFlexContainer>
-                            <Text h1>{t('Create new team')}</Text>
+                            <Text h1>{t('Create new project')}</Text>
 
                             <Card style={{ maxWidth: '800px' }}>
-                                <Form onSubmit={handleSubmit(createTeam)}>
+                                <Form onSubmit={handleSubmit(createProject)}>
                                     <FormInput
                                         {...register('title')}
                                         error={isSubmitted ? errors.title : undefined}
-                                        placeholder={t("Team's title")}
+                                        placeholder={t("Project's title")}
                                         flat="bottom"
                                     />
                                     <FormTextarea
@@ -125,7 +123,7 @@ function Page() {
                                                 view="primary-outline"
                                                 type="submit"
                                                 disabled={!isValid}
-                                                text={t('Create team')}
+                                                text={t('Create project')}
                                             />
                                         </FormActionRight>
                                     </FormActions>
@@ -133,7 +131,7 @@ function Page() {
                                 </Form>
                             </Card>
                             <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={accentIconColor} />}>
-                                {t.rich('Press key to create the team', { key: () => <Keyboard command enter /> })}
+                                {t.rich('Press key to create the project', { key: () => <Keyboard command enter /> })}
                             </Tip>
                         </CleanFlexContainer>
                     </Grid>

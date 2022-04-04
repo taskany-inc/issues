@@ -1,33 +1,33 @@
 {
   "Header": {
-    "Teams": "Teams",
+    "Projects": "Projects",
     "Goals": "Goals",
     "Boards": "Boards",
     "New goal": "New goal",
-    "New team": "New team",
+    "New project": "New project",
     "Sign out": "Sign out"
   },
   "index": {
     "title": "Taskany Goals — Personal bundle"
   },
-  "teams": {
+  "projects": {
     "index": {
-      "title": "Taskany Goals — Teams"
+      "title": "Taskany Goals — Projects"
     },
     "new": {
-      "title": "Taskany Goals — New team",
-      "Create new team": "Create new team",
-      "Team's title is required": "Team's title is required",
-      "Team's title must be a string": "Team's title must be a string",
-      "Team's title must be longer than 2 symbols": "Team's title must be longer than 2 symbols",
+      "title": "Taskany Goals — New project",
+      "Create new project": "Create new project",
+      "Project's title is required": "Project's title is required",
+      "Project's title must be a string": "Project's title must be a string",
+      "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
       "Something went wrong 😿": "Something went wrong 😿",
-      "We are creating new team...": "We are creating new team...",
-      "Voila! Team is here 🎉": "Voila! Team is here 🎉",
-      "Create team": "Create team",
-      "Team's title": "Team's title",
+      "We are creating new project...": "We are creating new project...",
+      "Voila! Project is here 🎉": "Voila! Project is here 🎉",
+      "Create project": "Create project",
+      "Project's title": "Project's title",
       "And its description": "And its description",
       "Pro tip!": "Pro tip!",
-      "Press key to create the team": "Press <key></key> to create the team."
+      "Press key to create the project": "Press <key></key> to create the project."
     }
   }
 }

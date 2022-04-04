@@ -26,14 +26,24 @@ type Ghost {
 
 type Mutation {
   createGhost(email: String!, user: UserSession!): Ghost
-  createTeam(description: String, title: String!, user: UserSession!): Team
+  createProject(description: String, title: String!, user: UserSession!): Project
   createTestUser(email: String!): User
+}
+
+type Project {
+  created_at: DateTime!
+  description: String
+  id: Int!
+  owner: Activity
+  owner_id: String
+  title: String!
+  updated_at: DateTime!
 }
 
 type Query {
   findGhost(query: String!, sortBy: SortOrder): [Ghost]
   findUser(query: String!, sortBy: SortOrder): [User]
-  teams(sortBy: SortOrder): [Team]
+  projects(sortBy: SortOrder): [Project]
   users(sortBy: SortOrder): [User]
 }
 
@@ -45,16 +55,6 @@ enum Role {
 enum SortOrder {
   asc
   desc
-}
-
-type Team {
-  created_at: DateTime!
-  description: String
-  id: Int!
-  owner: Activity
-  owner_id: String
-  title: String!
-  updated_at: DateTime!
 }
 
 type User {

@@ -8,7 +8,7 @@ import { createFetcher } from '../../utils/createFetcher';
 import { Header } from '../../components/Header';
 
 const fetcher = createFetcher(() => ({
-    teams: {
+    projects: {
         id: true,
         title: true,
         description: true,
@@ -34,8 +34,8 @@ const Page = () => {
 
             <Header />
 
-            {data?.teams ? (
-                <div>{data?.teams && data.teams.map((team) => <div key={team.id}>{JSON.stringify(team)}</div>)}</div>
+            {data?.projects ? (
+                <div>{data?.projects && data.projects.map((team) => <div key={team.id}>{JSON.stringify(team)}</div>)}</div>
             ) : null}
         </>
     );

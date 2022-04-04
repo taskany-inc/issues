@@ -6,10 +6,10 @@ export const routes = {
     createGoal: () => '/goals/new',
     goal: (id: string) => `/goals/${id}`,
     editGoal: (id: string) => `/goals/${id}/edit`,
-    createTeam: () => '/teams/new',
-    teams: () => `/teams`,
-    team: (id: string) => `/teams/${id}`,
-    editTeam: (id: string) => `/teams/${id}/edit`,
+    createProject: () => '/projects/new',
+    projects: () => `/projects`,
+    project: (id: string) => `/projects/${id}`,
+    editProject: (id: string) => `/projects/${id}/edit`,
 };
 
 export const useRouter = () => {
@@ -17,10 +17,10 @@ export const useRouter = () => {
 
     return {
         index: () => router.push(routes.index()),
-        teams: () => router.push(routes.teams()),
-        team: (id: string) => router.push(routes.team(id)),
-        createTeam: () => router.push(routes.createTeam()),
-        editTeam: (id: string) => router.push(routes.editTeam(id)),
+        projects: () => router.push(routes.projects()),
+        project: (id: string) => router.push(routes.project(id)),
+        createProject: () => router.push(routes.createProject()),
+        editProject: (id: string) => router.push(routes.editProject(id)),
         goals: () => router.push(routes.goals()),
         goal: (id: string) => router.push(routes.goal(id)),
         createGoal: () => router.push(routes.createGoal()),

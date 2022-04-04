@@ -69,8 +69,7 @@ export interface NexusGenObjects {
     user?: NexusGenRootTypes['User'] | null; // User
   }
   Mutation: {};
-  Query: {};
-  Team: { // root type
+  Project: { // root type
     created_at: NexusGenScalars['DateTime']; // DateTime!
     description?: string | null; // String
     id: number; // Int!
@@ -79,6 +78,7 @@ export interface NexusGenObjects {
     title: string; // String!
     updated_at: NexusGenScalars['DateTime']; // DateTime!
   }
+  Query: {};
   User: { // root type
     activity?: NexusGenRootTypes['Activity'] | null; // Activity
     activity_id?: string | null; // String
@@ -120,16 +120,10 @@ export interface NexusGenFieldTypes {
   }
   Mutation: { // field return type
     createGhost: NexusGenRootTypes['Ghost'] | null; // Ghost
-    createTeam: NexusGenRootTypes['Team'] | null; // Team
+    createProject: NexusGenRootTypes['Project'] | null; // Project
     createTestUser: NexusGenRootTypes['User'] | null; // User
   }
-  Query: { // field return type
-    findGhost: Array<NexusGenRootTypes['Ghost'] | null> | null; // [Ghost]
-    findUser: Array<NexusGenRootTypes['User'] | null> | null; // [User]
-    teams: Array<NexusGenRootTypes['Team'] | null> | null; // [Team]
-    users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
-  }
-  Team: { // field return type
+  Project: { // field return type
     created_at: NexusGenScalars['DateTime']; // DateTime!
     description: string | null; // String
     id: number; // Int!
@@ -137,6 +131,12 @@ export interface NexusGenFieldTypes {
     owner_id: string | null; // String
     title: string; // String!
     updated_at: NexusGenScalars['DateTime']; // DateTime!
+  }
+  Query: { // field return type
+    findGhost: Array<NexusGenRootTypes['Ghost'] | null> | null; // [Ghost]
+    findUser: Array<NexusGenRootTypes['User'] | null> | null; // [User]
+    projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+    users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
   }
   User: { // field return type
     activity: NexusGenRootTypes['Activity'] | null; // Activity
@@ -169,16 +169,10 @@ export interface NexusGenFieldTypeNames {
   }
   Mutation: { // field return type name
     createGhost: 'Ghost'
-    createTeam: 'Team'
+    createProject: 'Project'
     createTestUser: 'User'
   }
-  Query: { // field return type name
-    findGhost: 'Ghost'
-    findUser: 'User'
-    teams: 'Team'
-    users: 'User'
-  }
-  Team: { // field return type name
+  Project: { // field return type name
     created_at: 'DateTime'
     description: 'String'
     id: 'Int'
@@ -186,6 +180,12 @@ export interface NexusGenFieldTypeNames {
     owner_id: 'String'
     title: 'String'
     updated_at: 'DateTime'
+  }
+  Query: { // field return type name
+    findGhost: 'Ghost'
+    findUser: 'User'
+    projects: 'Project'
+    users: 'User'
   }
   User: { // field return type name
     activity: 'Activity'
@@ -206,7 +206,7 @@ export interface NexusGenArgTypes {
       email: string; // String!
       user: NexusGenInputs['UserSession']; // UserSession!
     }
-    createTeam: { // args
+    createProject: { // args
       description?: string | null; // String
       title: string; // String!
       user: NexusGenInputs['UserSession']; // UserSession!
@@ -224,7 +224,7 @@ export interface NexusGenArgTypes {
       query: string; // String!
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
     }
-    teams: { // args
+    projects: { // args
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
     }
     users: { // args

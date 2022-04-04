@@ -4,7 +4,7 @@ module.exports = {
         2,
         4,
         7,
-        8,
+        9,
         10,
         13
     ],
@@ -69,8 +69,8 @@ module.exports = {
                     ]
                 }
             ],
-            "createTeam": [
-                9,
+            "createProject": [
+                6,
                 {
                     "description": [
                         4
@@ -98,54 +98,7 @@ module.exports = {
                 4
             ]
         },
-        "Query": {
-            "findGhost": [
-                3,
-                {
-                    "query": [
-                        4,
-                        "String!"
-                    ],
-                    "sortBy": [
-                        8
-                    ]
-                }
-            ],
-            "findUser": [
-                11,
-                {
-                    "query": [
-                        4,
-                        "String!"
-                    ],
-                    "sortBy": [
-                        8
-                    ]
-                }
-            ],
-            "teams": [
-                9,
-                {
-                    "sortBy": [
-                        8
-                    ]
-                }
-            ],
-            "users": [
-                11,
-                {
-                    "sortBy": [
-                        8
-                    ]
-                }
-            ],
-            "__typename": [
-                4
-            ]
-        },
-        "Role": {},
-        "SortOrder": {},
-        "Team": {
+        "Project": {
             "created_at": [
                 2
             ],
@@ -153,7 +106,7 @@ module.exports = {
                 4
             ],
             "id": [
-                10
+                7
             ],
             "owner": [
                 0
@@ -172,6 +125,53 @@ module.exports = {
             ]
         },
         "Int": {},
+        "Query": {
+            "findGhost": [
+                3,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        10
+                    ]
+                }
+            ],
+            "findUser": [
+                11,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        10
+                    ]
+                }
+            ],
+            "projects": [
+                6,
+                {
+                    "sortBy": [
+                        10
+                    ]
+                }
+            ],
+            "users": [
+                11,
+                {
+                    "sortBy": [
+                        10
+                    ]
+                }
+            ],
+            "__typename": [
+                4
+            ]
+        },
+        "Role": {},
+        "SortOrder": {},
         "User": {
             "activity": [
                 0
@@ -195,7 +195,7 @@ module.exports = {
                 4
             ],
             "role": [
-                7
+                9
             ],
             "updated_at": [
                 2
@@ -218,7 +218,7 @@ module.exports = {
                 4
             ],
             "role": [
-                7
+                9
             ],
             "__typename": [
                 4
