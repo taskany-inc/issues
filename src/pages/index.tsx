@@ -19,7 +19,7 @@ const fetcher = createFetcher(() => ({
 
 const Home: NextPage = () => {
     const { data: session } = useSession();
-    const { data, error } = useSWR('users', fetcher());
+    const { data, error } = useSWR('users', () => fetcher());
     const t = useTranslations('index');
 
     return (
