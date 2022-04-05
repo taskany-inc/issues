@@ -6,7 +6,7 @@ export default createGlobalStyle`
         --background-color: #121212;
         --text-color-primary: #fff;
         --card-border-color: rgba(255, 255, 255, .1);
-        --form-input-background-color: rgba(0, 0, 0, .2);
+        --form-input-background-color: rgba(0, 0, 0, .35);
         --form-input-error-color: #e00;
         --toast-text-color: #fff;
         --toast-background-color: rgba(0, 0, 0, .2);
