@@ -1,15 +1,20 @@
-import { Grid, Link, Spacer, Popover } from '@geist-ui/core';
+import { useEffect, useState } from 'react';
+import { Grid, Link, Spacer, Popover, useKeyboard, KeyCode, Modal, Text } from '@geist-ui/core';
+import { useRouter as useNextRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
+import tinykeys from 'tinykeys';
 
 import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
 import { ThemeChanger } from './ThemeChanger';
 import { UserPic } from './UserPic';
-import { routes } from '../hooks/router';
+import { CreateProject } from './CreateProject';
+import { routes, useRouter } from '../hooks/router';
 import { secondaryTaskanyLogoColor } from '../design/@generated/themes';
+import { createProjectKeys, createHotkeys } from '../utils/hotkeys';
 
 const StyledHeader = styled.header`
     padding: 20px 20px;
@@ -57,10 +62,35 @@ const CreatorMenu = () => {
             </Popover.Item>
         </StyledPopoverContent>
     );
+
     return (
         <Popover content={content} hideArrow>
             <StyledIcon type="plus" size="s" color={secondaryTaskanyLogoColor} />
         </Popover>
+    );
+};
+
+const CreateProjectFromModal = () => {
+    const nextRouter = useNextRouter();
+    const router = useRouter();
+    const t = useTranslations('projects.new');
+    const [modalVisible, setModalVisibility] = useState(false);
+    const isCreateProjectPath = nextRouter.pathname === routes.createProject();
+    const showModalOrNavigate = (navigate: () => void) => (isCreateProjectPath ? navigate() : setModalVisibility(true));
+
+    useEffect(() =>
+        tinykeys(window, createHotkeys([createProjectKeys, () => showModalOrNavigate(router.createProject)])),
+    );
+
+    useKeyboard(() => modalVisible && setModalVisibility(false), [KeyCode.Escape]);
+
+    return (
+        <Modal visible={modalVisible} width="800px">
+            <Modal.Content>
+                <Text h1>{t('Create new project')}</Text>
+                <CreateProject />
+            </Modal.Content>
+        </Modal>
     );
 };
 
@@ -69,38 +99,42 @@ export const Header: React.FC = () => {
     const t = useTranslations('Header');
 
     return (
-        <StyledHeader>
-            <Grid.Container gap={0}>
-                <Grid xs={1}>
-                    <NextLink href={routes.index()}>
-                        <Link>
-                            <HeaderLogo />
-                        </Link>
-                    </NextLink>
-                </Grid>
-                <Grid xs={19}>
-                    <NextLink href={routes.projects()}>
-                        <StyledHeaderNavLink>{t('Projects')}</StyledHeaderNavLink>
-                    </NextLink>
-                    <Spacer w={2} />
-                    <NextLink href={routes.goals()}>
-                        <StyledHeaderNavLink>{t('Goals')}</StyledHeaderNavLink>
-                    </NextLink>
-                    <Spacer w={2} />
-                    <NextLink href={'#'}>
-                        <StyledHeaderNavLink>{t('Boards')}</StyledHeaderNavLink>
-                    </NextLink>
-                </Grid>
-                <Grid xs={4}>
-                    <StyledUserMenu>
-                        <ThemeChanger />
-                        <Spacer w={1} />
-                        <CreatorMenu />
-                        <Spacer w={1} />
-                        <UserPic src={session?.user.image} title={session?.user.name} size={32} />
-                    </StyledUserMenu>
-                </Grid>
-            </Grid.Container>
-        </StyledHeader>
+        <>
+            <StyledHeader>
+                <Grid.Container gap={0}>
+                    <Grid xs={1}>
+                        <NextLink href={routes.index()}>
+                            <Link>
+                                <HeaderLogo />
+                            </Link>
+                        </NextLink>
+                    </Grid>
+                    <Grid xs={19}>
+                        <NextLink href={routes.projects()}>
+                            <StyledHeaderNavLink>{t('Projects')}</StyledHeaderNavLink>
+                        </NextLink>
+                        <Spacer w={2} />
+                        <NextLink href={routes.goals()}>
+                            <StyledHeaderNavLink>{t('Goals')}</StyledHeaderNavLink>
+                        </NextLink>
+                        <Spacer w={2} />
+                        <NextLink href={'#'}>
+                            <StyledHeaderNavLink>{t('Boards')}</StyledHeaderNavLink>
+                        </NextLink>
+                    </Grid>
+                    <Grid xs={4}>
+                        <StyledUserMenu>
+                            <ThemeChanger />
+                            <Spacer w={1} />
+                            <CreatorMenu />
+                            <Spacer w={1} />
+                            <UserPic src={session?.user.image} title={session?.user.name} size={32} />
+                        </StyledUserMenu>
+                    </Grid>
+                </Grid.Container>
+            </StyledHeader>
+
+            <CreateProjectFromModal />
+        </>
     );
 };
