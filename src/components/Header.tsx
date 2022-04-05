@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Grid, Link, Spacer, Popover, useKeyboard, KeyCode, Modal, Text } from '@geist-ui/core';
+import { useCallback, useEffect, useState } from 'react';
+import { Grid, Link, Spacer, Popover, Modal, Text } from '@geist-ui/core';
 import { useRouter as useNextRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import NextLink from 'next/link';
@@ -77,15 +77,14 @@ const CreateProjectFromModal = () => {
     const [modalVisible, setModalVisibility] = useState(false);
     const isCreateProjectPath = nextRouter.pathname === routes.createProject();
     const showModalOrNavigate = (navigate: () => void) => (isCreateProjectPath ? navigate() : setModalVisibility(true));
+    const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
 
     useEffect(() =>
         tinykeys(window, createHotkeys([createProjectKeys, () => showModalOrNavigate(router.createProject)])),
     );
 
-    useKeyboard(() => modalVisible && setModalVisibility(false), [KeyCode.Escape]);
-
     return (
-        <Modal visible={modalVisible} width="800px">
+        <Modal visible={modalVisible} onClose={onModalClose} width="800px" keyboard disableBackdropClick>
             <Modal.Content>
                 <Text h1>{t('Create new project')}</Text>
                 <CreateProject />
@@ -128,7 +127,7 @@ export const Header: React.FC = () => {
                             <Spacer w={1} />
                             <CreatorMenu />
                             <Spacer w={1} />
-                            <UserPic src={session?.user.image} title={session?.user.name} size={32} />
+                            <UserPic src={session?.user.image} size={32} />
                         </StyledUserMenu>
                     </Grid>
                 </Grid.Container>
