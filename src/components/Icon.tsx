@@ -19,6 +19,7 @@ const componentsMap = {
 };
 
 const sizesMap = {
+    xs: 14,
     s: 16,
     m: 32,
     l: 48,
