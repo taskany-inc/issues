@@ -2,7 +2,7 @@ module.exports = {
     backgroundColor: '#121212',
     textColorPrimary: '#fff',
     cardBorderColor: 'rgba(255, 255, 255, .1)',
-    formInputBackgroundColor: 'rgba(0, 0, 0, .2)',
+    formInputBackgroundColor: 'rgba(0, 0, 0, .35)',
     formInputErrorColor: '#e00',
     toastTextColor: '#fff',
     toastBackgroundColor: 'rgba(0, 0, 0, .2)',

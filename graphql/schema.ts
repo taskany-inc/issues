@@ -178,16 +178,16 @@ const Mutation = mutationType({
                 user: nonNull(arg({ type: 'UserSession' })),
             },
             resolve: async (_, { user, title, description }, { db }) => {
-                const validUser = await db.user.findUnique({ where: { id: user.id } });
+                const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
 
                 if (!validUser) return null;
 
                 try {
-                    const newTeam = db.project.create({
+                    const newProject = db.project.create({
                         data: {
                             title,
                             description,
-                            owner_id: validUser.id,
+                            owner_id: validUser.activity?.id,
                         },
                     });
 
@@ -199,7 +199,7 @@ const Mutation = mutationType({
                     //     html: `new post <b>${title}</b>`,
                     // });
 
-                    return newTeam;
+                    return newProject;
                 } catch (error) {
                     throw Error(`${error}`);
                 }
