@@ -13,6 +13,9 @@ const StyledFormActions = styled(({ flat, ...props }) => <div {...props} />)`
     color: ${textColorPrimary};
     padding: 8px 10px 12px 10px;
     margin-top: -6px; // WTF?
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 
     ${({ flat }) =>
         flat === 'top' &&
@@ -29,10 +32,28 @@ const StyledFormActions = styled(({ flat, ...props }) => <div {...props} />)`
         `}
 `;
 
-export const FormActionRight = styled.div`
+export const StyledFormActionRight = styled.div`
     display: flex;
     justify-content: flex-end;
 `;
+
+// TODO: rewrite with Grid.Container
+export const FormActionRight: React.FC = ({ children }) => (
+    <StyledFormActionRight>
+        <div>{children}</div>
+    </StyledFormActionRight>
+);
+
+export const StyledFormActionLeft= styled.div`
+    display: flex;
+    justify-content: flex-start;
+`;
+
+export const FormActionLeft: React.FC = ({ children }) => (
+    <StyledFormActionLeft>
+        <div>{children}</div>
+    </StyledFormActionLeft>
+);
 
 export const FormActions: React.FC<FormActionsProps> = (props) => {
     return <StyledFormActions {...props} />;
