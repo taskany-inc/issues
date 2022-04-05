@@ -8,28 +8,18 @@ import { Icon } from './Icon';
 interface UserPicProps {
     src?: string | null;
     size?: number;
-    title?: React.ReactNode;
 }
 
 const StyledImage = styled.img`
     border: 0;
     border-radius: 100%;
-
-    display: inline-block;
-    vertical-align: middle;
 `;
 
-const StyledToolipContent = styled.div`
-    min-width: 100px;
-`;
-
-export const UserPic: React.FC<UserPicProps> = ({ src, title, size = 32 }) => {
+export const UserPic: React.FC<UserPicProps> = ({ src, size = 32 }) => {
     const sizePx = `${size}px`;
 
     return src ? (
-        <Tooltip text={<StyledToolipContent>{title}</StyledToolipContent>} type="lite" hideArrow placement="left">
-            <StyledImage src={src} height={sizePx} width={sizePx} />
-        </Tooltip>
+        <StyledImage src={src} height={sizePx} width={sizePx} />
     ) : (
         <Icon type="user" size="s" onClick={() => signIn()} />
     );
