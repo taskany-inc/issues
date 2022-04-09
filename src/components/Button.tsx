@@ -52,6 +52,7 @@ import { is } from '../utils/styles';
 
 interface ButtonProps {
     text: string;
+    tabIndex?: number;
     disabled?: boolean;
     view?:
         | 'default'
@@ -67,9 +68,12 @@ interface ButtonProps {
     iconLeft?: React.ReactNode;
     iconRight?: React.ReactNode;
     brick?: 'left' | 'right' | 'center';
+    onClick?: React.MouseEventHandler;
 }
 
-const StyledButton = styled.button`
+const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLeft, ...props }) => (
+    <button ref={forwardRef} {...props} />
+))`
     position: relative;
     display: inline-block;
     font-weight: 500;
@@ -104,14 +108,24 @@ const StyledButton = styled.button`
         `,
     )}
 
-    ${is(
-        { size: 'm' },
+    ${({ size }) =>
+        size === 'm' &&
         css`
             padding: 5px 16px;
 
             font-size: 14px;
-        `,
-    )}
+
+            span + span {
+                padding-left: 5px;
+            }
+        `}
+
+    ${({ iconRight, iconLeft, size }) =>
+        size === 'm' &&
+        (iconRight || iconLeft) &&
+        css`
+            padding: 5px 10px;
+        `}
 
     ${is(
         { size: 'l' },
@@ -304,20 +318,35 @@ const StyledText = styled.span`
     display: inline-block;
 `;
 
-export const Button: React.FC<ButtonProps> = ({ text, ...props }) => {
-    const content =
-        props.iconLeft || props.iconRight
-            ? [
-                  props.iconLeft ? [props.iconLeft, ' '] : null,
-                  <StyledText>{text}</StyledText>,
-                  props.iconRight ? [' ', props.iconRight] : null,
-              ]
-            : text;
+const StyledIcon = styled.span`
+    line-height: initial;
+    vertical-align: inherit;
+`;
 
-    return <StyledButton {...props}>{content}</StyledButton>;
-};
+export const Button = React.forwardRef<ButtonProps, ButtonProps>(
+    ({ text, view = 'default', size = 'm', type = 'button', ...props }, ref) => {
+        const content =
+            props.iconLeft || props.iconRight ? (
+                <>
+                    {props.iconLeft ? <StyledIcon>{props.iconLeft}</StyledIcon> : null}
+                    <StyledText>{text}</StyledText>
+                    {props.iconRight ? <StyledIcon>{props.iconRight}</StyledIcon> : null}
+                </>
+            ) : (
+                text
+            );
 
-Button.defaultProps = {
-    view: 'default',
-    size: 'm',
-};
+        return (
+            <StyledButton
+                type={type}
+                view={view}
+                size={size}
+                tabIndex={props.disabled ? -1 : undefined}
+                {...props}
+                forwardRef={ref}
+            >
+                {content}
+            </StyledButton>
+        );
+    },
+);

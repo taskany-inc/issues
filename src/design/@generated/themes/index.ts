@@ -11,6 +11,7 @@ export const popupWarningBackgroundColor = 'var(--popup-warning-background-color
 export const primaryTaskanyLogoColor = 'var(--primary-taskany-logo-color)';
 export const secondaryTaskanyLogoColor = 'var(--secondary-taskany-logo-color)';
 export const buttonTextColor = 'var(--button-text-color)';
+export const buttonIconColor = 'var(--button-icon-color)';
 export const buttonTextColorHover = 'var(--button-text-color-hover)';
 export const buttonBackgroundColor = 'var(--button-background-color)';
 export const buttonBackgroundColorHover = 'var(--button-background-color-hover)';

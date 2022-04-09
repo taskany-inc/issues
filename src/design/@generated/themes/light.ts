@@ -15,6 +15,7 @@ export default createGlobalStyle`
         --primary-taskany-logo-color: #000;
         --secondary-taskany-logo-color: #17b978;
         --button-text-color: rgba(0, 0, 0, .8);
+        --button-icon-color: rgba(0, 0, 0, .6);
         --button-text-color-hover: rgba(0, 0, 0, .9);
         --button-background-color: rgba(0, 0, 0, .02);
         --button-background-color-hover: rgba(0, 0, 0, .04);

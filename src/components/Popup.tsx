@@ -23,6 +23,7 @@ interface PopupProps {
     maxWidth?: number;
     tooltip?: boolean;
     view?: 'warning' | 'danger' | 'success';
+    offset?: number[];
 
     onTrigger?: ComponentProps<typeof Tippy>['onTrigger'];
     onShow?: ComponentProps<typeof Tippy>['onShow'];
@@ -149,6 +150,7 @@ export const Popup: React.FC<PopupProps> = ({
     tooltip,
     view,
     arrow = true,
+    offset,
     ...props
 }) => (
     <Tippy
@@ -175,7 +177,7 @@ export const Popup: React.FC<PopupProps> = ({
                     name: 'offset',
                     options: {
                         // https://popper.js.org/docs/v2/tutorial/#offset
-                        offset: [-10, 8],
+                        offset: offset || [-10, 8],
                     },
                 },
             ],

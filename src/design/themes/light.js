@@ -13,6 +13,7 @@ module.exports = {
     secondaryTaskanyLogoColor: '#17b978',
 
     buttonTextColor: 'rgba(0, 0, 0, .8)',
+    buttonIconColor: 'rgba(0, 0, 0, .6)',
     buttonTextColorHover: 'rgba(0, 0, 0, .9)',
     buttonBackgroundColor: 'rgba(0, 0, 0, .02)',
     buttonBackgroundColorHover: 'rgba(0, 0, 0, .04)',
