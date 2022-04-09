@@ -37,6 +37,7 @@ const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea 
     width: 100%;
     min-height: 200px;
     resize: none;
+    margin-bottom: -6px; // WTF?
 
     ${({ flat }) =>
         flat === 'top' &&

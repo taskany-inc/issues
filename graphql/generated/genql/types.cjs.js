@@ -57,19 +57,6 @@ module.exports = {
         },
         "String": {},
         "Mutation": {
-            "createGhost": [
-                3,
-                {
-                    "email": [
-                        4,
-                        "String!"
-                    ],
-                    "user": [
-                        14,
-                        "UserSession!"
-                    ]
-                }
-            ],
             "createProject": [
                 6,
                 {
@@ -90,12 +77,16 @@ module.exports = {
                     ]
                 }
             ],
-            "createTestUser": [
-                11,
+            "inviteUser": [
+                3,
                 {
                     "email": [
                         4,
                         "String!"
+                    ],
+                    "user": [
+                        14,
+                        "UserSession!"
                     ]
                 }
             ],

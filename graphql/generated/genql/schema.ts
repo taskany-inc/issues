@@ -28,9 +28,8 @@ export interface Ghost {
 }
 
 export interface Mutation {
-    createGhost?: Ghost
     createProject?: Project
-    createTestUser?: User
+    inviteUser?: Ghost
     __typename: 'Mutation'
 }
 
@@ -105,9 +104,8 @@ export interface GhostRequest{
 }
 
 export interface MutationRequest{
-    createGhost?: [{email: Scalars['String'],user: UserSession},GhostRequest]
     createProject?: [{description?: (Scalars['String'] | null),owner_id: Scalars['String'],title: Scalars['String'],user: UserSession},ProjectRequest]
-    createTestUser?: [{email: Scalars['String']},UserRequest]
+    inviteUser?: [{email: Scalars['String'],user: UserSession},GhostRequest]
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -252,15 +250,13 @@ export interface GhostObservableChain{
 }
 
 export interface MutationPromiseChain{
-    createGhost: ((args: {email: Scalars['String'],user: UserSession}) => GhostPromiseChain & {get: <R extends GhostRequest>(request: R, defaultValue?: (FieldsSelection<Ghost, R> | undefined)) => Promise<(FieldsSelection<Ghost, R> | undefined)>}),
     createProject: ((args: {description?: (Scalars['String'] | null),owner_id: Scalars['String'],title: Scalars['String'],user: UserSession}) => ProjectPromiseChain & {get: <R extends ProjectRequest>(request: R, defaultValue?: (FieldsSelection<Project, R> | undefined)) => Promise<(FieldsSelection<Project, R> | undefined)>}),
-    createTestUser: ((args: {email: Scalars['String']}) => UserPromiseChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Promise<(FieldsSelection<User, R> | undefined)>})
+    inviteUser: ((args: {email: Scalars['String'],user: UserSession}) => GhostPromiseChain & {get: <R extends GhostRequest>(request: R, defaultValue?: (FieldsSelection<Ghost, R> | undefined)) => Promise<(FieldsSelection<Ghost, R> | undefined)>})
 }
 
 export interface MutationObservableChain{
-    createGhost: ((args: {email: Scalars['String'],user: UserSession}) => GhostObservableChain & {get: <R extends GhostRequest>(request: R, defaultValue?: (FieldsSelection<Ghost, R> | undefined)) => Observable<(FieldsSelection<Ghost, R> | undefined)>}),
     createProject: ((args: {description?: (Scalars['String'] | null),owner_id: Scalars['String'],title: Scalars['String'],user: UserSession}) => ProjectObservableChain & {get: <R extends ProjectRequest>(request: R, defaultValue?: (FieldsSelection<Project, R> | undefined)) => Observable<(FieldsSelection<Project, R> | undefined)>}),
-    createTestUser: ((args: {email: Scalars['String']}) => UserObservableChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Observable<(FieldsSelection<User, R> | undefined)>})
+    inviteUser: ((args: {email: Scalars['String'],user: UserSession}) => GhostObservableChain & {get: <R extends GhostRequest>(request: R, defaultValue?: (FieldsSelection<Ghost, R> | undefined)) => Observable<(FieldsSelection<Ghost, R> | undefined)>})
 }
 
 export interface ProjectPromiseChain{

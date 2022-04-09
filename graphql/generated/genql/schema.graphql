@@ -21,9 +21,8 @@ type Ghost {
 }
 
 type Mutation {
-  createGhost(email: String!, user: UserSession!): Ghost
   createProject(description: String, owner_id: String!, title: String!, user: UserSession!): Project
-  createTestUser(email: String!): User
+  inviteUser(email: String!, user: UserSession!): Ghost
 }
 
 type Project {

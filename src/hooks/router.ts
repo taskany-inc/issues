@@ -10,6 +10,7 @@ export const routes = {
     projects: () => `/projects`,
     project: (id: string) => `/projects/${id}`,
     editProject: (id: string) => `/projects/${id}/edit`,
+    inviteUsers: () => '/users/invite',
 };
 
 export const useRouter = () => {
@@ -25,5 +26,6 @@ export const useRouter = () => {
         goal: (id: string) => router.push(routes.goal(id)),
         createGoal: () => router.push(routes.createGoal()),
         editGoal: (id: string) => router.push(routes.editGoal(id)),
+        inviteUsers: () => router.push(routes.inviteUsers()),
     };
 };

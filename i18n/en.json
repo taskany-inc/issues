@@ -5,6 +5,7 @@
     "Boards": "Boards",
     "New goal": "New goal",
     "New project": "New project",
+    "Invite users": "Invite users",
     "Sign out": "Sign out"
   },
   "index": {
@@ -30,6 +31,21 @@
       "Press key to create the project": "Press <key></key> to create the project.",
       "Assign": "Assign",
       "Enter name or email": "Enter name or email"
+    }
+  },
+  "users": {
+    "invite": {
+      "title": "Taskany Goals — Invite new user",
+      "Invite new user": "Invite new user",
+      "User email is required": "User email is required",
+      "User email must be a string": "User email must be a string",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are creating invite...": "We are creating invite...",
+      "Voila! User with email {email} invited 🎉": "Voila! User with email {email} invited 🎉",
+      "Send invite": "Send invite",
+      "User email": "User email",
+      "Pro tip!": "Pro tip!",
+      "Press key to send invite": "Press <key></key> to send invite"
     }
   }
 }

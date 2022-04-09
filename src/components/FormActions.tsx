@@ -12,7 +12,6 @@ const StyledFormActions = styled(({ flat, ...props }) => <div {...props} />)`
     background-color: ${formInputBackgroundColor};
     color: ${textColorPrimary};
     padding: 8px 10px 12px 10px;
-    margin-top: -6px; // WTF?
     display: flex;
     justify-content: space-between;
     align-items: flex-end;

@@ -3,6 +3,7 @@ export const createGoalKeys = ['c g', 'с п'];
 export const showHomeKeys = ['g h', 'п р'];
 export const showProjectsKeys = ['g p', 'п з'];
 export const showGoalsKeys = ['g g', 'п п'];
+export const inviteUserKeys = ['c u', 'с г'];
 
 type HotkeyDeclaration = [string[], () => void];
 export const createHotkeys = (...args: HotkeyDeclaration[]): Record<string, () => void> => {

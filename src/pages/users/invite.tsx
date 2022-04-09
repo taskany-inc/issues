@@ -2,16 +2,14 @@ import type { GetStaticPropsContext } from 'next';
 import { useTranslations } from 'next-intl';
 
 import { DialogPage } from '../../components/DialogPage';
-import { CreateProject } from '../../components/CreateProject';
-import { useRouter } from '../../hooks/router';
+import { InviteUser } from '../../components/InviteUser';
 
 function Page() {
-    const t = useTranslations('projects.new');
-    const router = useRouter();
+    const t = useTranslations('users.invite');
 
     return (
-        <DialogPage title={t('title')} heading={t('Create new project')}>
-            <CreateProject card onCreate={(id) => id && router.project(id)} />
+        <DialogPage title={t('title')} heading={t('Invite new user')}>
+            <InviteUser card />
         </DialogPage>
     );
 }

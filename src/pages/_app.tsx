@@ -71,7 +71,7 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
                     toastOptions={{
                         style: { borderRadius: '6px', background: toastBackgroundColor, color: toastTextColor },
                     }}
-                    position="bottom-right"
+                    position="bottom-center"
                 />
 
                 {Component.auth ? (

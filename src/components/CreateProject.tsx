@@ -25,9 +25,10 @@ import { UserAnyKind } from '../../graphql/generated/genql';
 
 interface CreateProjectProps {
     card?: boolean;
+    onCreate?: (id?: string) => void;
 }
 
-export const CreateProject: React.FC<CreateProjectProps> = ({ card }) => {
+export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) => {
     const router = useRouter();
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
@@ -81,7 +82,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card }) => {
 
         const res = await promise;
 
-        router.project(String(res.createProject?.id));
+        onCreate && onCreate(String(res.createProject?.id));
     };
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');

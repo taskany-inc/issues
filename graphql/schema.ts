@@ -289,7 +289,7 @@ const Mutation = mutationType({
             },
         });
 
-        t.field('createGhost', {
+        t.field('inviteUser', {
             type: Ghost,
             args: {
                 user: nonNull(arg({ type: 'UserSession' })),
@@ -308,39 +308,6 @@ const Mutation = mutationType({
                             activity: {
                                 create: {},
                             },
-                        },
-                    });
-
-                    // await mailServer.sendMail({
-                    //     from: '"Fred Foo 👻" <foo@example.com>',
-                    //     to: 'bar@example.com, baz@example.com',
-                    //     subject: 'Hello ✔',
-                    //     text: `new post '${title}'`,
-                    //     html: `new post <b>${title}</b>`,
-                    // });
-
-                    return newGhost;
-                } catch (error) {
-                    throw Error(`${error}`);
-                }
-            },
-        });
-
-        t.field('createTestUser', {
-            type: User,
-            args: {
-                // user: nonNull(arg({ type: 'UserSession' })),
-                email: nonNull(stringArg()),
-            },
-            resolve: async (_, { email }, { db }) => {
-                // const validUser = await db.user.findUnique({ where: { id: user.id } });
-
-                // if (!validUser) return null;
-
-                try {
-                    const newGhost = db.user.create({
-                        data: {
-                            email,
                         },
                     });
 

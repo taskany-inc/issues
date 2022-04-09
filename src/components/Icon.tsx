@@ -8,6 +8,7 @@ const componentsMap = {
     user: dynamic(() => import('teenyicons/outline/user.svg')),
     sun: dynamic(() => import('teenyicons/outline/sun.svg')),
     moon: dynamic(() => import('teenyicons/outline/moon.svg')),
+    cross: dynamic(() => import('teenyicons/outline/x.svg')),
     elbowСonnector: dynamic(() => import('teenyicons/outline/elbow-connector.svg')),
     bookmark: dynamic(() => import('teenyicons/outline/bookmark.svg')),
     building: dynamic(() => import('teenyicons/outline/building.svg')),

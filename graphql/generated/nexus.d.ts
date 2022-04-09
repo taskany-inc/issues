@@ -128,9 +128,8 @@ export interface NexusGenFieldTypes {
     user: NexusGenRootTypes['User'] | null; // User
   }
   Mutation: { // field return type
-    createGhost: NexusGenRootTypes['Ghost'] | null; // Ghost
     createProject: NexusGenRootTypes['Project'] | null; // Project
-    createTestUser: NexusGenRootTypes['User'] | null; // User
+    inviteUser: NexusGenRootTypes['Ghost'] | null; // Ghost
   }
   Project: { // field return type
     created_at: NexusGenScalars['DateTime']; // DateTime!
@@ -186,9 +185,8 @@ export interface NexusGenFieldTypeNames {
     user: 'User'
   }
   Mutation: { // field return type name
-    createGhost: 'Ghost'
     createProject: 'Project'
-    createTestUser: 'User'
+    inviteUser: 'Ghost'
   }
   Project: { // field return type name
     created_at: 'DateTime'
@@ -229,18 +227,15 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
-    createGhost: { // args
-      email: string; // String!
-      user: NexusGenInputs['UserSession']; // UserSession!
-    }
     createProject: { // args
       description?: string | null; // String
       owner_id: string; // String!
       title: string; // String!
       user: NexusGenInputs['UserSession']; // UserSession!
     }
-    createTestUser: { // args
+    inviteUser: { // args
       email: string; // String!
+      user: NexusGenInputs['UserSession']; // UserSession!
     }
   }
   Query: {

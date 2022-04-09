@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Grid, Link, Spacer, Popover, Modal, Text } from '@geist-ui/core';
+import { Grid, Link, Spacer, Popover } from '@geist-ui/core';
 import { useRouter as useNextRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import NextLink from 'next/link';
@@ -14,7 +14,9 @@ import { UserPic } from './UserPic';
 import { CreateProject } from './CreateProject';
 import { routes, useRouter } from '../hooks/router';
 import { secondaryTaskanyLogoColor } from '../design/@generated/themes';
-import { createProjectKeys, createHotkeys } from '../utils/hotkeys';
+import { createProjectKeys, createHotkeys, inviteUserKeys } from '../utils/hotkeys';
+import { InviteUser } from './InviteUser';
+import { DialogModal } from './DialogModal';
 
 const StyledHeader = styled.header`
     padding: 20px 20px;
@@ -56,6 +58,11 @@ const CreatorMenu = () => {
                     <Link>{t('New project')}</Link>
                 </NextLink>
             </Popover.Item>
+            <Popover.Item>
+                <NextLink href={routes.inviteUsers()}>
+                    <Link>{t('Invite users')}</Link>
+                </NextLink>
+            </Popover.Item>
             <Popover.Item line />
             <Popover.Item>
                 <Link onClick={() => signOut()}>{t('Sign out')}</Link>
@@ -84,12 +91,27 @@ const CreateProjectFromModal = () => {
     );
 
     return (
-        <Modal visible={modalVisible} onClose={onModalClose} width="800px" keyboard disableBackdropClick>
-            <Modal.Content>
-                <Text h1>{t('Create new project')}</Text>
-                <CreateProject />
-            </Modal.Content>
-        </Modal>
+        <DialogModal heading={t('Create new project')} visible={modalVisible} onClose={onModalClose}>
+            <CreateProject onCreate={(id) => id && router.project(id)} />
+        </DialogModal>
+    );
+};
+
+const InviteUsersFromModal = () => {
+    const nextRouter = useNextRouter();
+    const router = useRouter();
+    const t = useTranslations('users.invite');
+    const [modalVisible, setModalVisibility] = useState(false);
+    const isInviteUsersPath = nextRouter.pathname === routes.inviteUsers();
+    const showModalOrNavigate = (navigate: () => void) => (isInviteUsersPath ? navigate() : setModalVisibility(true));
+    const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
+
+    useEffect(() => tinykeys(window, createHotkeys([inviteUserKeys, () => showModalOrNavigate(router.inviteUsers)])));
+
+    return (
+        <DialogModal heading={t('Invite new user')} visible={modalVisible} onClose={onModalClose}>
+            <InviteUser onCreate={() => setModalVisibility(false)} />
+        </DialogModal>
     );
 };
 
@@ -134,6 +156,7 @@ export const Header: React.FC = () => {
             </StyledHeader>
 
             <CreateProjectFromModal />
+            <InviteUsersFromModal />
         </>
     );
 };
