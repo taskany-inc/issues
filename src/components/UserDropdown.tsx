@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from 'react';
-import styled from 'styled-components';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import styled, { css } from 'styled-components';
 import { Input, useInput, Grid, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
@@ -17,6 +17,7 @@ import {
 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { UserAnyKind } from '../../graphql/generated/genql';
+import { useKeyPress } from '../hooks/useKeyPress';
 
 interface UserDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -27,7 +28,7 @@ interface UserDropdownProps {
     onUserClick?: (user: UserAnyKind) => void;
 }
 
-const StyledUserCard = styled.div`
+const StyledUserCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
     border: 1px solid ${buttonBorderColor};
     border-radius: 6px;
@@ -43,6 +44,13 @@ const StyledUserCard = styled.div`
         border-color: ${buttonBorderColorHover};
         background-color: ${buttonBackgroundColorHover};
     }
+
+    ${({ focused }) =>
+        focused &&
+        css`
+            border-color: ${buttonBorderColorHover};
+            background-color: ${buttonBackgroundColorHover};
+        `}
 `;
 const StyledUserInfo = styled.div`
     padding-left: 4px;
@@ -55,14 +63,15 @@ const StyledUserEmail = styled.div`
     font-size: 12px;
     color: ${buttonTextColor};
 `;
-const UserCard: React.FC<{ name?: string; email: string; image?: string; onClick?: () => void }> = ({
+const UserCard: React.FC<{ name?: string; email: string; image?: string; focused?: boolean; onClick?: () => void }> = ({
     name,
     email,
     image,
+    focused,
     onClick,
 }) => {
     return (
-        <StyledUserCard onClick={onClick}>
+        <StyledUserCard onClick={onClick} focused={focused}>
             <Grid.Container gap={0}>
                 <Grid xs={3} alignItems="center" justify="center">
                     <UserPic src={image} size={24} />
@@ -100,26 +109,48 @@ const fetcher = createFetcher((_, query: string) => ({
 export const UserDropdown: React.FC<UserDropdownProps> = ({ size, text, view, userPic, onUserClick, query = '' }) => {
     const { data: session } = useSession();
     const popupRef = useRef<any>();
+    const buttonRef = useRef<any>();
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const { state: inputState, setState: setInputState, reset: inputReset, bindings: inputBindings } = useInput(query);
+    const { state: inputState, setState: setInputState, reset: inputReset, bindings: onInput } = useInput(query);
+    const downPress = useKeyPress('ArrowDown');
+    const upPress = useKeyPress('ArrowUp');
+    const [cursor, setCursor] = useState(0);
+
     const onClickOutside = () => {
         setEditMode(false);
         setPopupVisibility(false);
         inputReset();
-    }
+    };
+
     const onButtonClick = () => {
         setEditMode(true);
         setPopupVisibility(true);
     };
+
     const onInputBlur = () => {};
-    const { data, error } = useSWR(inputState, (query) => fetcher(session?.user, query));
-    const { bindings: hotkeyBindings } = useKeyboard(
+
+    const { data } = useSWR(inputState, (query) => fetcher(session?.user, query));
+
+    const { bindings: onESC } = useKeyboard(
         () => {
             popupVisible && setPopupVisibility(false);
             setEditMode(false);
         },
         [KeyCode.Escape],
+        {
+            stopPropagation: true,
+        },
+    );
+
+    const { bindings: onENTER } = useKeyboard(
+        () => {
+            if (data?.findUserAnyKind?.length) {
+                onUserCardClick(data?.findUserAnyKind[cursor])();
+                popupRef.current?.focus();
+            }
+        },
+        [KeyCode.Enter],
         {
             stopPropagation: true,
         },
@@ -132,21 +163,34 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ size, text, view, us
         setInputState(user.name || user.email || '');
     };
 
+    useEffect(() => {
+        if (data?.findUserAnyKind?.length && downPress) {
+            setCursor((prevState) => (prevState < data?.findUserAnyKind?.length! - 1 ? prevState + 1 : prevState));
+        }
+    }, [data?.findUserAnyKind, downPress]);
+
+    useEffect(() => {
+        if (data?.findUserAnyKind?.length && upPress) {
+            setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
+        }
+    }, [data?.findUserAnyKind, upPress]);
+
     return (
         <>
-            <StyledDropdownContainer ref={popupRef} {...hotkeyBindings}>
+            <StyledDropdownContainer ref={popupRef} {...onESC}>
                 {editMode ? (
                     <Input
                         placeholder="Enter name or email"
                         scale={0.8}
-                        icon={userPic}
                         autoFocus
+                        icon={userPic}
                         onBlur={onInputBlur}
-                        {...inputBindings}
+                        {...onInput}
+                        {...onENTER}
                     />
                 ) : (
                     <Button
-                        tabIndex={0}
+                        ref={buttonRef}
                         size={size}
                         view={view}
                         text={text}
@@ -169,12 +213,13 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ size, text, view, us
             >
                 {data?.findUserAnyKind?.length ? (
                     <>
-                        {data?.findUserAnyKind?.map((u) => (
+                        {data?.findUserAnyKind?.map((u, i) => (
                             <UserCard
                                 key={u.id}
                                 name={u.name}
                                 email={u.email!}
                                 image={u.image}
+                                focused={cursor === i}
                                 onClick={onUserCardClick(u)}
                             />
                         ))}
