@@ -89,13 +89,13 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
     transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
     transition-property: color, background-color, border-color;
 
-    :hover {
+    :hover, :focus {
         transition-duration: 0.1s;
     }
 
     :disabled {
         cursor: not-allowed;
-        opacity: 0.7;
+        opacity: 0.6;
         transition: none;
     }
 
@@ -143,7 +143,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonBorderColor};
             background-color: ${buttonBackgroundColor};
 
-            :hover:not([disabled]) {
+            :hover:not([disabled]), :focus:not([disabled]) {
                 color: ${buttonTextColorHover};
                 border-color: ${buttonBorderColorHover};
                 background-color: ${buttonBackgroundColorHover};
@@ -163,7 +163,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonPrimaryBorderColor};
             background-color: ${buttonPrimaryBackgroundColor};
 
-            :hover:not([disabled]) {
+            :hover:not([disabled]), :focus:not([disabled]) {
                 border-color: ${buttonPrimaryBorderColorHover};
                 background-color: ${buttonPrimaryBackgroundColorHover};
             }
@@ -181,7 +181,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonWarningBorderColor};
             background-color: ${buttonWarningBackgroundColor};
 
-            :hover:not([disabled]) {
+            :hover:not([disabled]), :focus:not([disabled]) {
                 border-color: ${buttonWarningBorderColorHover};
                 background-color: ${buttonWarningBackgroundColorHover};
             }
@@ -199,7 +199,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonDangerBorderColor};
             background-color: ${buttonDangerBackgroundColor};
 
-            :hover:not([disabled]) {
+            :hover:not([disabled]), :focus:not([disabled]) {
                 border-color: ${buttonDangerBorderColorHover};
                 background-color: ${buttonDangerBackgroundColorHover};
             }
@@ -217,7 +217,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonOutlineBorderColor};
             background-color: transparent;
 
-            :hover:not([disabled]) {
+            :hover:not([disabled]), :focus:not([disabled]) {
                 color: ${buttonOutlineTextColorHover};
                 border-color: ${buttonOutlineBorderColorHover};
                 background-color: ${buttonOutlineBackgroundColorHover};
@@ -237,7 +237,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonPrimaryOutlineBorderColor};
             background-color: ${buttonPrimaryOutlineBackgroundColor};
 
-            :hover:not([disabled]) {
+            :hover:not([disabled]), :focus:not([disabled]) {
                 color: ${buttonPrimaryOutlineTextColorHover};
                 border-color: ${buttonPrimaryOutlineBorderColorHover};
                 background-color: ${buttonPrimaryOutlineBackgroundColorHover};
@@ -257,7 +257,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonWarningOutlineBorderColor};
             background-color: ${buttonWarningOutlineBackgroundColor};
 
-            :hover:not([disabled]) {
+            :hover:not([disabled]), :focus:not([disabled]) {
                 color: ${buttonWarningOutlineTextColorHover};
                 border-color: ${buttonWarningOutlineBorderColorHover};
                 background-color: ${buttonWarningOutlineBackgroundColorHover};
@@ -277,7 +277,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonDangerOutlineBorderColor};
             background-color: ${buttonDangerOutlineBackgroundColor};
 
-            :hover:not([disabled]) {
+            :hover:not([disabled]), :focus:not([disabled]) {
                 color: ${buttonDangerOutlineTextColorHover};
                 border-color: ${buttonDangerOutlineBorderColorHover};
                 background-color: ${buttonDangerOutlineBackgroundColorHover};
