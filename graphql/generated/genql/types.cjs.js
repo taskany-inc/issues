@@ -6,7 +6,8 @@ module.exports = {
         7,
         9,
         10,
-        13
+        13,
+        15
     ],
     "types": {
         "Activity": {
@@ -64,7 +65,7 @@ module.exports = {
                         "String!"
                     ],
                     "user": [
-                        12,
+                        14,
                         "UserSession!"
                     ]
                 }
@@ -75,12 +76,16 @@ module.exports = {
                     "description": [
                         4
                     ],
+                    "owner_id": [
+                        4,
+                        "String!"
+                    ],
                     "title": [
                         4,
                         "String!"
                     ],
                     "user": [
-                        12,
+                        14,
                         "UserSession!"
                     ]
                 }
@@ -150,6 +155,18 @@ module.exports = {
                     ]
                 }
             ],
+            "findUserAnyKind": [
+                12,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        10
+                    ]
+                }
+            ],
             "projects": [
                 6,
                 {
@@ -204,6 +221,30 @@ module.exports = {
                 4
             ]
         },
+        "UserAnyKind": {
+            "activity": [
+                0
+            ],
+            "email": [
+                4
+            ],
+            "id": [
+                4
+            ],
+            "image": [
+                4
+            ],
+            "kind": [
+                13
+            ],
+            "name": [
+                4
+            ],
+            "__typename": [
+                4
+            ]
+        },
+        "UserKind": {},
         "UserSession": {
             "email": [
                 4

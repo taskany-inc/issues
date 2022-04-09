@@ -41,6 +41,7 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {
   Role: "ADMIN" | "USER"
   SortOrder: "asc" | "desc"
+  UserKind: "GHOST" | "USER"
 }
 
 export interface NexusGenScalars {
@@ -90,6 +91,14 @@ export interface NexusGenObjects {
     role: NexusGenEnums['Role']; // Role!
     updated_at: NexusGenScalars['DateTime']; // DateTime!
   }
+  UserAnyKind: { // root type
+    activity?: NexusGenRootTypes['Activity'] | null; // Activity
+    email?: string | null; // String
+    id?: string | null; // String
+    image?: string | null; // String
+    kind?: NexusGenEnums['UserKind'] | null; // UserKind
+    name?: string | null; // String
+  }
 }
 
 export interface NexusGenInterfaces {
@@ -135,6 +144,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     findGhost: Array<NexusGenRootTypes['Ghost'] | null> | null; // [Ghost]
     findUser: Array<NexusGenRootTypes['User'] | null> | null; // [User]
+    findUserAnyKind: Array<NexusGenRootTypes['UserAnyKind'] | null> | null; // [UserAnyKind]
     projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
     users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
   }
@@ -148,6 +158,14 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
     role: NexusGenEnums['Role']; // Role!
     updated_at: NexusGenScalars['DateTime']; // DateTime!
+  }
+  UserAnyKind: { // field return type
+    activity: NexusGenRootTypes['Activity'] | null; // Activity
+    email: string | null; // String
+    id: string | null; // String
+    image: string | null; // String
+    kind: NexusGenEnums['UserKind'] | null; // UserKind
+    name: string | null; // String
   }
 }
 
@@ -184,6 +202,7 @@ export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     findGhost: 'Ghost'
     findUser: 'User'
+    findUserAnyKind: 'UserAnyKind'
     projects: 'Project'
     users: 'User'
   }
@@ -198,6 +217,14 @@ export interface NexusGenFieldTypeNames {
     role: 'Role'
     updated_at: 'DateTime'
   }
+  UserAnyKind: { // field return type name
+    activity: 'Activity'
+    email: 'String'
+    id: 'String'
+    image: 'String'
+    kind: 'UserKind'
+    name: 'String'
+  }
 }
 
 export interface NexusGenArgTypes {
@@ -208,6 +235,7 @@ export interface NexusGenArgTypes {
     }
     createProject: { // args
       description?: string | null; // String
+      owner_id: string; // String!
       title: string; // String!
       user: NexusGenInputs['UserSession']; // UserSession!
     }
@@ -221,6 +249,10 @@ export interface NexusGenArgTypes {
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
     }
     findUser: { // args
+      query: string; // String!
+      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
+    }
+    findUserAnyKind: { // args
       query: string; // String!
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
     }

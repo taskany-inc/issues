@@ -27,7 +27,8 @@
       "Project's title": "Project's title",
       "And its description": "And its description",
       "Pro tip!": "Pro tip!",
-      "Press key to create the project": "Press <key></key> to create the project."
+      "Press key to create the project": "Press <key></key> to create the project.",
+      "Assign": "Assign"
     }
   }
 }

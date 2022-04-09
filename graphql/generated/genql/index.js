@@ -35,6 +35,11 @@ module.exports.enumSortOrder = {
   desc: 'desc',
 }
 
+module.exports.enumUserKind = {
+  GHOST: 'GHOST',
+  USER: 'USER',
+}
+
 module.exports.generateQueryOp = function(fields) {
   return generateGraphqlOperation('query', typeMap.Query, fields)
 }

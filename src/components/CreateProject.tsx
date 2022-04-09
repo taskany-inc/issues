@@ -12,12 +12,16 @@ import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
-import { FormActions, FormActionRight } from './FormActions';
+import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { useRouter } from '../hooks/router';
 import { accentIconColor } from '../design/@generated/themes';
+import { UserDropdown } from './UserDropdown';
+import { UserPic } from './UserPic';
+import { useState } from 'react';
+import { UserAnyKind } from '../../graphql/generated/genql';
 
 interface CreateProjectProps {
     card?: boolean;
@@ -26,6 +30,7 @@ interface CreateProjectProps {
 export const CreateProject: React.FC<CreateProjectProps> = ({ card }) => {
     const router = useRouter();
     const { data: session } = useSession();
+    const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const t = useTranslations('projects.new');
 
     const schema = z.object({
@@ -60,6 +65,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card }) => {
                     user: session!.user,
                     title,
                     description,
+                    owner_id: owner.id!,
                 },
                 {
                     id: true,
@@ -78,12 +84,15 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card }) => {
         router.project(String(res.createProject?.id));
     };
 
+    const ownerButtonText = owner?.name || owner?.email || t('Assign');
+
     const formContent = (
         <Form onSubmit={handleSubmit(createProject)}>
             <FormInput
                 {...register('title')}
                 error={isSubmitted ? errors.title : undefined}
                 placeholder={t("Project's title")}
+                autoFocus
                 flat="bottom"
             />
             <FormTextarea
@@ -93,6 +102,16 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card }) => {
                 placeholder={t('And its description')}
             />
             <FormActions flat="top">
+                <FormActionLeft>
+                    <UserDropdown
+                        size="m"
+                        view="outline"
+                        text={ownerButtonText}
+                        query={owner?.name || owner?.email}
+                        userPic={<UserPic src={owner?.image} size={16} />}
+                        onUserClick={(u) => setOwner(u)}
+                    />
+                </FormActionLeft>
                 <FormActionRight>
                     <Button
                         size="l"

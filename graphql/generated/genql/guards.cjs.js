@@ -44,3 +44,11 @@ module.exports.isUser = function(obj) {
   if (!obj || !obj.__typename) throw new Error('__typename is missing in "isUser"')
   return User_possibleTypes.includes(obj.__typename)
 }
+
+
+
+var UserAnyKind_possibleTypes = ['UserAnyKind']
+module.exports.isUserAnyKind = function(obj) {
+  if (!obj || !obj.__typename) throw new Error('__typename is missing in "isUserAnyKind"')
+  return UserAnyKind_possibleTypes.includes(obj.__typename)
+}

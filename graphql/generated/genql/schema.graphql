@@ -22,7 +22,7 @@ type Ghost {
 
 type Mutation {
   createGhost(email: String!, user: UserSession!): Ghost
-  createProject(description: String, title: String!, user: UserSession!): Project
+  createProject(description: String, owner_id: String!, title: String!, user: UserSession!): Project
   createTestUser(email: String!): User
 }
 
@@ -39,6 +39,7 @@ type Project {
 type Query {
   findGhost(query: String!, sortBy: SortOrder): [Ghost]
   findUser(query: String!, sortBy: SortOrder): [User]
+  findUserAnyKind(query: String!, sortBy: SortOrder): [UserAnyKind]
   projects(sortBy: SortOrder): [Project]
   users(sortBy: SortOrder): [User]
 }
@@ -63,6 +64,20 @@ type User {
   name: String
   role: Role!
   updated_at: DateTime!
+}
+
+type UserAnyKind {
+  activity: Activity
+  email: String
+  id: String
+  image: String
+  kind: UserKind
+  name: String
+}
+
+enum UserKind {
+  GHOST
+  USER
 }
 
 input UserSession {

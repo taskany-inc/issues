@@ -27,7 +27,8 @@
       "Project's title": "Название проекта",
       "And its description": "Можно и описание, пригодится ведь",
       "Pro tip!": "Держи совет!",
-      "Press key to create the project": "Нажми <key></key> чтобы создать проект."
+      "Press key to create the project": "Нажми <key></key> чтобы создать проект.",
+      "Assign": "Ответственный"
     }
   }
 }

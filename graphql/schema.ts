@@ -30,6 +30,10 @@ const Role = enumType({
     name: 'Role',
     members: ['USER', 'ADMIN'],
 });
+const UserKind = enumType({
+    name: 'UserKind',
+    members: ['USER', 'GHOST'],
+});
 
 const UserSession = inputObjectType({
     name: 'UserSession',
@@ -77,6 +81,18 @@ const Ghost = objectType({
         t.field(GhostModel.created_at);
         t.field(GhostModel.updated_at);
         t.field('activity', { type: Activity });
+    },
+});
+
+const UserAnyKind = objectType({
+    name: 'UserAnyKind',
+    definition(t) {
+        t.string('id');
+        t.string('email');
+        t.string('name');
+        t.string('image');
+        t.field('activity', { type: Activity });
+        t.field('kind', { type: UserKind });
     },
 });
 
@@ -152,6 +168,69 @@ const Query = queryType({
             },
         });
 
+        t.list.field('findUserAnyKind', {
+            type: UserAnyKind,
+            args: {
+                sortBy: arg({ type: 'SortOrder' }),
+                query: nonNull(stringArg()),
+            },
+            resolve: async (_, { query, sortBy }, { db }) => {
+                if (query === '') {
+                    return [];
+                }
+
+                const [ghosts, users] = await Promise.all([
+                    db.ghost.findMany({
+                        where: {
+                            email: {
+                                contains: query,
+                                mode: 'insensitive',
+                            },
+                        },
+                        include: {
+                            activity: true,
+                        },
+                        take: 5
+                    }),
+                    db.user.findMany({
+                        where: {
+                            OR: [
+                                {
+                                    email: {
+                                        contains: query,
+                                        mode: 'insensitive',
+                                    },
+                                },
+                                {
+                                    name: {
+                                        contains: query,
+                                        mode: 'insensitive',
+                                    },
+                                },
+                            ],
+                        },
+                        include: {
+                            activity: true,
+                        },
+                        take: 5
+                    }),
+                ]);
+
+                return [
+                    ...users.map((u) => {
+                        // @ts-ignore
+                        u.kind = 'USER';
+                        return u;
+                    }),
+                    ...ghosts.map((g) => {
+                        // @ts-ignore
+                        g.kind = 'GHOST';
+                        return g;
+                    }),
+                ];
+            },
+        });
+
         t.list.field('projects', {
             type: Project,
             args: {
@@ -175,19 +254,23 @@ const Mutation = mutationType({
             args: {
                 title: nonNull(stringArg()),
                 description: stringArg(),
+                owner_id: nonNull(stringArg()),
                 user: nonNull(arg({ type: 'UserSession' })),
             },
-            resolve: async (_, { user, title, description }, { db }) => {
+            resolve: async (_, { user, title, description, owner_id }, { db }) => {
                 const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
+                const projectOwner = await db.user.findUnique({ where: { id: owner_id }, include: { activity: true } });
 
                 if (!validUser) return null;
+
+                const resolvedOwnerId = projectOwner?.activity?.id || validUser.activity?.id;
 
                 try {
                     const newProject = db.project.create({
                         data: {
                             title,
                             description,
-                            owner_id: validUser.activity?.id,
+                            owner_id: resolvedOwnerId,
                         },
                     });
 
@@ -279,7 +362,7 @@ const Mutation = mutationType({
 });
 
 export const schema = makeSchema({
-    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Project, Ghost, Activity],
+    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Project, Ghost, Activity, UserAnyKind, UserKind],
     outputs: {
         schema: join(process.cwd(), 'graphql/schema.graphql'),
         typegen: join(process.cwd(), 'graphql/generated/nexus.d.ts'),

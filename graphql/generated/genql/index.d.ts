@@ -62,3 +62,8 @@ export declare const enumSortOrder: {
   readonly asc: 'asc'
   readonly desc: 'desc'
 }
+
+export declare const enumUserKind: {
+  readonly GHOST: 'GHOST'
+  readonly USER: 'USER'
+}
