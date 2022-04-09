@@ -107,6 +107,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card }) => {
                         size="m"
                         view="outline"
                         text={ownerButtonText}
+                        placeholder={t('Enter name or email')}
                         query={owner?.name || owner?.email}
                         userPic={<UserPic src={owner?.image} size={16} />}
                         onUserClick={(u) => setOwner(u)}

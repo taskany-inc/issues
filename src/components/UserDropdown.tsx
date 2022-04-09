@@ -25,6 +25,7 @@ interface UserDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
     userPic?: React.ComponentProps<typeof Button>['iconLeft'];
     query?: string;
+    placeholder?: string;
     onUserClick?: (user: UserAnyKind) => void;
 }
 
@@ -106,7 +107,15 @@ const fetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
-export const UserDropdown: React.FC<UserDropdownProps> = ({ size, text, view, userPic, onUserClick, query = '' }) => {
+export const UserDropdown: React.FC<UserDropdownProps> = ({
+    size,
+    text,
+    view,
+    userPic,
+    onUserClick,
+    query = '',
+    placeholder,
+}) => {
     const { data: session } = useSession();
     const popupRef = useRef<any>();
     const buttonRef = useRef<any>();
@@ -180,7 +189,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ size, text, view, us
             <StyledDropdownContainer ref={popupRef} {...onESC}>
                 {editMode ? (
                     <Input
-                        placeholder="Enter name or email"
+                        placeholder={placeholder}
                         scale={0.8}
                         autoFocus
                         icon={userPic}
@@ -203,7 +212,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ size, text, view, us
             <Popup
                 placement="top-start"
                 overflow="hidden"
-                visible={popupVisible}
+                visible={popupVisible && Boolean(data?.findUserAnyKind?.length)}
                 onClickOutside={onClickOutside}
                 reference={popupRef}
                 interactive
@@ -211,22 +220,18 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ size, text, view, us
                 maxWidth={250}
                 offset={[0, 4]}
             >
-                {data?.findUserAnyKind?.length ? (
-                    <>
-                        {data?.findUserAnyKind?.map((u, i) => (
-                            <UserCard
-                                key={u.id}
-                                name={u.name}
-                                email={u.email!}
-                                image={u.image}
-                                focused={cursor === i}
-                                onClick={onUserCardClick(u)}
-                            />
-                        ))}
-                    </>
-                ) : (
-                    'no body'
-                )}
+                <>
+                    {data?.findUserAnyKind?.map((u, i) => (
+                        <UserCard
+                            key={u.id}
+                            name={u.name}
+                            email={u.email!}
+                            image={u.image}
+                            focused={cursor === i}
+                            onClick={onUserCardClick(u)}
+                        />
+                    ))}
+                </>
             </Popup>
         </>
     );
