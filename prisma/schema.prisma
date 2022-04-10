@@ -126,28 +126,31 @@ model Project {
   owner        Activity?  @relation(fields: [owner_id], references: [id])
   owner_id     String?
   participants Activity[] @relation("projectParticipants")
+  goals        Goal[]     @relation("projectGoals")
 }
 
 model Goal {
   id           Int        @id @default(autoincrement())
   title        String
   description  String
-  key          Boolean
-  personal     Boolean
-  private      Boolean
+  key          Boolean?
+  personal     Boolean?
+  private      Boolean?
   year         String[]
   quarter      Quarter[]
   estimate     DateTime?
   created_at   DateTime   @default(now())
   updated_at   DateTime   @default(now()) @updatedAt
-  criteria     Criteria[]
+  criteria     Criteria[] // not implemented
+  project      Project?   @relation("projectGoals", fields: [project_id], references: [id])
+  project_id   Int?
   issuer       Activity?  @relation("goalIssuer", fields: [issuer_id], references: [id])
   issuer_id    String?
   owner        Activity?  @relation("goalOwner", fields: [owner_id], references: [id])
   owner_id     String?
   participants Activity[] @relation("goalParticipants")
-  comments     Comment[]
-  reactions    Reaction[]
+  comments     Comment[]  // not implemented
+  reactions    Reaction[] // not implemented
   dependsOn    Goal[]     @relation("dependsOn")
   blocks       Goal[]     @relation("dependsOn")
   relatedTo    Goal[]     @relation("connected")

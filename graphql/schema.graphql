@@ -24,7 +24,33 @@ type Ghost {
   user: User
 }
 
+type Goal {
+  blocks: [Goal]
+  connected: [Goal]
+  created_at: DateTime!
+  dependsOn: [Goal]
+  description: String!
+  estimate: DateTime
+  id: Int!
+  issuer: Activity
+  issuer_id: String
+  key: Boolean
+  owner: Activity
+  owner_id: String
+  participants: [Activity]
+  personal: Boolean
+  private: Boolean
+  project: [Project]
+  project_id: Int
+  quarter: [Quarter]
+  relatedTo: [Goal]
+  title: String!
+  updated_at: DateTime!
+  year: [String!]!
+}
+
 type Mutation {
+  createGoal(description: String!, key: Boolean, owner_id: String!, personal: Boolean, private: Boolean, project_id: Int!, title: String!, user: UserSession!): Goal
   createProject(description: String, owner_id: String!, title: String!, user: UserSession!): Project
   inviteUser(email: String!, user: UserSession!): Ghost
 }
@@ -37,6 +63,13 @@ type Project {
   owner_id: String
   title: String!
   updated_at: DateTime!
+}
+
+enum Quarter {
+  Q1
+  Q2
+  Q3
+  Q4
 }
 
 type Query {

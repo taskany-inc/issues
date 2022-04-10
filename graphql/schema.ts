@@ -10,6 +10,8 @@ import {
     arg,
     nonNull,
     stringArg,
+    booleanArg,
+    intArg,
 } from 'nexus';
 import { DateTimeResolver } from 'graphql-scalars';
 import {
@@ -17,6 +19,7 @@ import {
     Project as ProjectModel,
     Ghost as GhostModel,
     Activity as ActivityModel,
+    Goal as GoalModel,
 } from 'nexus-prisma';
 
 import { mailServer } from '../src/utils/mailServer';
@@ -33,6 +36,10 @@ const Role = enumType({
 const UserKind = enumType({
     name: 'UserKind',
     members: ['USER', 'GHOST'],
+});
+const Quarter = enumType({
+    name: 'Quarter',
+    members: ['Q1', 'Q2', 'Q3', 'Q4'],
 });
 
 const UserSession = inputObjectType({
@@ -109,12 +116,40 @@ const Project = objectType({
     },
 });
 
+const Goal = objectType({
+    name: GoalModel.$name,
+    definition(t) {
+        t.field(GoalModel.id);
+        t.field(GoalModel.title);
+        t.field(GoalModel.description);
+        t.field(GoalModel.key);
+        t.field(GoalModel.personal);
+        t.field(GoalModel.private);
+        t.field(GoalModel.estimate);
+        t.field(GoalModel.year);
+        t.list.field('quarter', { type: Quarter });
+        t.field(GoalModel.created_at);
+        t.field(GoalModel.updated_at);
+        t.field('issuer', { type: Activity });
+        t.field(GoalModel.issuer_id);
+        t.field('owner', { type: Activity });
+        t.field(GoalModel.owner_id);
+        t.list.field('participants', { type: Activity });
+        t.list.field('project', { type: Project });
+        t.field(GoalModel.project_id);
+        t.list.field('dependsOn', { type: Goal });
+        t.list.field('blocks', { type: Goal });
+        t.list.field('relatedTo', { type: Goal });
+        t.list.field('connected', { type: Goal });
+    },
+});
+
 const Query = queryType({
     definition(t) {
         t.list.field('users', {
             type: User,
             args: {
-                sortBy: arg({ type: 'SortOrder' }),
+                sortBy: arg({ type: SortOrder }),
             },
             resolve: async (_, { sortBy }, { db }) =>
                 db.user.findMany({
@@ -125,7 +160,7 @@ const Query = queryType({
         t.list.field('findUser', {
             type: User,
             args: {
-                sortBy: arg({ type: 'SortOrder' }),
+                sortBy: arg({ type: SortOrder }),
                 query: nonNull(stringArg()),
             },
             resolve: async (_, { query, sortBy }, { db }) => {
@@ -153,7 +188,7 @@ const Query = queryType({
         t.list.field('findGhost', {
             type: Ghost,
             args: {
-                sortBy: arg({ type: 'SortOrder' }),
+                sortBy: arg({ type: SortOrder }),
                 query: nonNull(stringArg()),
             },
             resolve: async (_, { query, sortBy }, { db }) => {
@@ -171,7 +206,7 @@ const Query = queryType({
         t.list.field('findUserAnyKind', {
             type: UserAnyKind,
             args: {
-                sortBy: arg({ type: 'SortOrder' }),
+                sortBy: arg({ type: SortOrder }),
                 query: nonNull(stringArg()),
             },
             resolve: async (_, { query, sortBy }, { db }) => {
@@ -190,7 +225,7 @@ const Query = queryType({
                         include: {
                             activity: true,
                         },
-                        take: 5
+                        take: 5,
                     }),
                     db.user.findMany({
                         where: {
@@ -212,7 +247,7 @@ const Query = queryType({
                         include: {
                             activity: true,
                         },
-                        take: 5
+                        take: 5,
                     }),
                 ]);
 
@@ -234,7 +269,7 @@ const Query = queryType({
         t.list.field('projects', {
             type: Project,
             args: {
-                sortBy: arg({ type: 'SortOrder' }),
+                sortBy: arg({ type: SortOrder }),
             },
             resolve: async (_, { sortBy }, { db }) =>
                 db.project.findMany({
@@ -255,7 +290,7 @@ const Mutation = mutationType({
                 title: nonNull(stringArg()),
                 description: stringArg(),
                 owner_id: nonNull(stringArg()),
-                user: nonNull(arg({ type: 'UserSession' })),
+                user: nonNull(arg({ type: UserSession })),
             },
             resolve: async (_, { user, title, description, owner_id }, { db }) => {
                 const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
@@ -289,10 +324,57 @@ const Mutation = mutationType({
             },
         });
 
+        t.field('createGoal', {
+            type: Goal,
+            args: {
+                title: nonNull(stringArg()),
+                description: nonNull(stringArg()),
+                project_id: nonNull(intArg()),
+                key: booleanArg(),
+                private: booleanArg(),
+                personal: booleanArg(),
+                owner_id: nonNull(stringArg()),
+                user: nonNull(arg({ type: UserSession })),
+            },
+            resolve: async (_, { user, title, description, owner_id, project_id, key, private: isPrivate, personal }, { db }) => {
+                const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
+                const goalOwner = await db.user.findUnique({ where: { id: owner_id }, include: { activity: true } });
+
+                if (!validUser) return null;
+
+                try {
+                    const newGoal = db.goal.create({
+                        data: {
+                            title,
+                            description,
+                            project_id,
+                            key: Boolean(key),
+                            private: Boolean(isPrivate),
+                            personal: Boolean(personal),
+                            owner_id: goalOwner?.activity?.id,
+                            issuer_id: validUser.activity?.id,
+                        },
+                    });
+
+                    // await mailServer.sendMail({
+                    //     from: '"Fred Foo 👻" <foo@example.com>',
+                    //     to: 'bar@example.com, baz@example.com',
+                    //     subject: 'Hello ✔',
+                    //     text: `new post '${title}'`,
+                    //     html: `new post <b>${title}</b>`,
+                    // });
+
+                    return newGoal;
+                } catch (error) {
+                    throw Error(`${error}`);
+                }
+            },
+        });
+
         t.field('inviteUser', {
             type: Ghost,
             args: {
-                user: nonNull(arg({ type: 'UserSession' })),
+                user: nonNull(arg({ type: UserSession })),
                 email: nonNull(stringArg()),
             },
             resolve: async (_, { user, email }, { db }) => {
@@ -329,7 +411,22 @@ const Mutation = mutationType({
 });
 
 export const schema = makeSchema({
-    types: [Query, Mutation, DateTime, SortOrder, Role, User, UserSession, Project, Ghost, Activity, UserAnyKind, UserKind],
+    types: [
+        Query,
+        Mutation,
+        DateTime,
+        SortOrder,
+        Role,
+        User,
+        UserSession,
+        Project,
+        Ghost,
+        Activity,
+        UserAnyKind,
+        UserKind,
+        Goal,
+        Quarter,
+    ],
     outputs: {
         schema: join(process.cwd(), 'graphql/schema.graphql'),
         typegen: join(process.cwd(), 'graphql/generated/nexus.d.ts'),

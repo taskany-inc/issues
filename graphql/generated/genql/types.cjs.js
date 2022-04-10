@@ -3,11 +3,12 @@ module.exports = {
         1,
         2,
         4,
+        6,
         7,
-        9,
         10,
+        12,
         13,
-        15
+        16
     ],
     "types": {
         "Activity": {
@@ -37,7 +38,7 @@ module.exports = {
                 4
             ],
             "host": [
-                11
+                14
             ],
             "host_id": [
                 4
@@ -49,16 +50,123 @@ module.exports = {
                 2
             ],
             "user": [
-                11
+                14
             ],
             "__typename": [
                 4
             ]
         },
         "String": {},
+        "Goal": {
+            "blocks": [
+                5
+            ],
+            "connected": [
+                5
+            ],
+            "created_at": [
+                2
+            ],
+            "dependsOn": [
+                5
+            ],
+            "description": [
+                4
+            ],
+            "estimate": [
+                2
+            ],
+            "id": [
+                6
+            ],
+            "issuer": [
+                0
+            ],
+            "issuer_id": [
+                4
+            ],
+            "key": [
+                7
+            ],
+            "owner": [
+                0
+            ],
+            "owner_id": [
+                4
+            ],
+            "participants": [
+                0
+            ],
+            "personal": [
+                7
+            ],
+            "private": [
+                7
+            ],
+            "project": [
+                9
+            ],
+            "project_id": [
+                6
+            ],
+            "quarter": [
+                10
+            ],
+            "relatedTo": [
+                5
+            ],
+            "title": [
+                4
+            ],
+            "updated_at": [
+                2
+            ],
+            "year": [
+                4
+            ],
+            "__typename": [
+                4
+            ]
+        },
+        "Int": {},
+        "Boolean": {},
         "Mutation": {
+            "createGoal": [
+                5,
+                {
+                    "description": [
+                        4,
+                        "String!"
+                    ],
+                    "key": [
+                        7
+                    ],
+                    "owner_id": [
+                        4,
+                        "String!"
+                    ],
+                    "personal": [
+                        7
+                    ],
+                    "private": [
+                        7
+                    ],
+                    "project_id": [
+                        6,
+                        "Int!"
+                    ],
+                    "title": [
+                        4,
+                        "String!"
+                    ],
+                    "user": [
+                        17,
+                        "UserSession!"
+                    ]
+                }
+            ],
             "createProject": [
-                6,
+                9,
                 {
                     "description": [
                         4
@@ -72,7 +180,7 @@ module.exports = {
                         "String!"
                     ],
                     "user": [
-                        14,
+                        17,
                         "UserSession!"
                     ]
                 }
@@ -85,7 +193,7 @@ module.exports = {
                         "String!"
                     ],
                     "user": [
-                        14,
+                        17,
                         "UserSession!"
                     ]
                 }
@@ -102,7 +210,7 @@ module.exports = {
                 4
             ],
             "id": [
-                7
+                6
             ],
             "owner": [
                 0
@@ -120,7 +228,7 @@ module.exports = {
                 4
             ]
         },
-        "Int": {},
+        "Quarter": {},
         "Query": {
             "findGhost": [
                 3,
@@ -130,47 +238,47 @@ module.exports = {
                         "String!"
                     ],
                     "sortBy": [
-                        10
+                        13
                     ]
                 }
             ],
             "findUser": [
-                11,
+                14,
                 {
                     "query": [
                         4,
                         "String!"
                     ],
                     "sortBy": [
-                        10
+                        13
                     ]
                 }
             ],
             "findUserAnyKind": [
-                12,
+                15,
                 {
                     "query": [
                         4,
                         "String!"
                     ],
                     "sortBy": [
-                        10
+                        13
                     ]
                 }
             ],
             "projects": [
-                6,
+                9,
                 {
                     "sortBy": [
-                        10
+                        13
                     ]
                 }
             ],
             "users": [
-                11,
+                14,
                 {
                     "sortBy": [
-                        10
+                        13
                     ]
                 }
             ],
@@ -203,7 +311,7 @@ module.exports = {
                 4
             ],
             "role": [
-                9
+                12
             ],
             "updated_at": [
                 2
@@ -226,7 +334,7 @@ module.exports = {
                 4
             ],
             "kind": [
-                13
+                16
             ],
             "name": [
                 4
@@ -250,12 +358,11 @@ module.exports = {
                 4
             ],
             "role": [
-                9
+                12
             ],
             "__typename": [
                 4
             ]
-        },
-        "Boolean": {}
+        }
     }
 }

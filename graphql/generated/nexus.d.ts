@@ -39,6 +39,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  Quarter: "Q1" | "Q2" | "Q3" | "Q4"
   Role: "ADMIN" | "USER"
   SortOrder: "asc" | "desc"
   UserKind: "GHOST" | "USER"
@@ -68,6 +69,30 @@ export interface NexusGenObjects {
     id: string; // ID!
     updated_at: NexusGenScalars['DateTime']; // DateTime!
     user?: NexusGenRootTypes['User'] | null; // User
+  }
+  Goal: { // root type
+    blocks?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    connected?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    dependsOn?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    description: string; // String!
+    estimate?: NexusGenScalars['DateTime'] | null; // DateTime
+    id: number; // Int!
+    issuer?: NexusGenRootTypes['Activity'] | null; // Activity
+    issuer_id?: string | null; // String
+    key?: boolean | null; // Boolean
+    owner?: NexusGenRootTypes['Activity'] | null; // Activity
+    owner_id?: string | null; // String
+    participants?: Array<NexusGenRootTypes['Activity'] | null> | null; // [Activity]
+    personal?: boolean | null; // Boolean
+    private?: boolean | null; // Boolean
+    project?: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+    project_id?: number | null; // Int
+    quarter?: Array<NexusGenEnums['Quarter'] | null> | null; // [Quarter]
+    relatedTo?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    title: string; // String!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
+    year: string[]; // [String!]!
   }
   Mutation: {};
   Project: { // root type
@@ -127,7 +152,32 @@ export interface NexusGenFieldTypes {
     updated_at: NexusGenScalars['DateTime']; // DateTime!
     user: NexusGenRootTypes['User'] | null; // User
   }
+  Goal: { // field return type
+    blocks: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    connected: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    dependsOn: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    description: string; // String!
+    estimate: NexusGenScalars['DateTime'] | null; // DateTime
+    id: number; // Int!
+    issuer: NexusGenRootTypes['Activity'] | null; // Activity
+    issuer_id: string | null; // String
+    key: boolean | null; // Boolean
+    owner: NexusGenRootTypes['Activity'] | null; // Activity
+    owner_id: string | null; // String
+    participants: Array<NexusGenRootTypes['Activity'] | null> | null; // [Activity]
+    personal: boolean | null; // Boolean
+    private: boolean | null; // Boolean
+    project: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+    project_id: number | null; // Int
+    quarter: Array<NexusGenEnums['Quarter'] | null> | null; // [Quarter]
+    relatedTo: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    title: string; // String!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
+    year: string[]; // [String!]!
+  }
   Mutation: { // field return type
+    createGoal: NexusGenRootTypes['Goal'] | null; // Goal
     createProject: NexusGenRootTypes['Project'] | null; // Project
     inviteUser: NexusGenRootTypes['Ghost'] | null; // Ghost
   }
@@ -184,7 +234,32 @@ export interface NexusGenFieldTypeNames {
     updated_at: 'DateTime'
     user: 'User'
   }
+  Goal: { // field return type name
+    blocks: 'Goal'
+    connected: 'Goal'
+    created_at: 'DateTime'
+    dependsOn: 'Goal'
+    description: 'String'
+    estimate: 'DateTime'
+    id: 'Int'
+    issuer: 'Activity'
+    issuer_id: 'String'
+    key: 'Boolean'
+    owner: 'Activity'
+    owner_id: 'String'
+    participants: 'Activity'
+    personal: 'Boolean'
+    private: 'Boolean'
+    project: 'Project'
+    project_id: 'Int'
+    quarter: 'Quarter'
+    relatedTo: 'Goal'
+    title: 'String'
+    updated_at: 'DateTime'
+    year: 'String'
+  }
   Mutation: { // field return type name
+    createGoal: 'Goal'
     createProject: 'Project'
     inviteUser: 'Ghost'
   }
@@ -227,6 +302,16 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
+    createGoal: { // args
+      description: string; // String!
+      key?: boolean | null; // Boolean
+      owner_id: string; // String!
+      personal?: boolean | null; // Boolean
+      private?: boolean | null; // Boolean
+      project_id: number; // Int!
+      title: string; // String!
+      user: NexusGenInputs['UserSession']; // UserSession!
+    }
     createProject: { // args
       description?: string | null; // String
       owner_id: string; // String!

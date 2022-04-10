@@ -15,6 +15,14 @@ module.exports.isGhost = function(obj) {
 
 
 
+var Goal_possibleTypes = ['Goal']
+module.exports.isGoal = function(obj) {
+  if (!obj || !obj.__typename) throw new Error('__typename is missing in "isGoal"')
+  return Goal_possibleTypes.includes(obj.__typename)
+}
+
+
+
 var Mutation_possibleTypes = ['Mutation']
 module.exports.isMutation = function(obj) {
   if (!obj || !obj.__typename) throw new Error('__typename is missing in "isMutation"')
