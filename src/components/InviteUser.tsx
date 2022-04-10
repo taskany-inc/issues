@@ -15,7 +15,6 @@ import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { useRouter } from '../hooks/router';
 import { accentIconColor } from '../design/@generated/themes';
 
 interface InviteUserProps {
@@ -24,7 +23,6 @@ interface InviteUserProps {
 }
 
 export const InviteUser: React.FC<InviteUserProps> = ({ card, onCreate }) => {
-    const router = useRouter();
     const { data: session } = useSession();
     const t = useTranslations('users.invite');
 
