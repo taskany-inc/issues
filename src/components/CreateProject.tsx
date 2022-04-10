@@ -16,7 +16,6 @@ import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { useRouter } from '../hooks/router';
 import { accentIconColor } from '../design/@generated/themes';
 import { UserDropdown } from './UserDropdown';
 import { UserPic } from './UserPic';
@@ -29,7 +28,6 @@ interface CreateProjectProps {
 }
 
 export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) => {
-    const router = useRouter();
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const t = useTranslations('projects.new');
