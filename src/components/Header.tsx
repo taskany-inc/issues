@@ -14,9 +14,10 @@ import { UserPic } from './UserPic';
 import { CreateProject } from './CreateProject';
 import { routes, useRouter } from '../hooks/router';
 import { secondaryTaskanyLogoColor } from '../design/@generated/themes';
-import { createProjectKeys, createHotkeys, inviteUserKeys } from '../utils/hotkeys';
+import { createProjectKeys, createHotkeys, inviteUserKeys, createGoalKeys } from '../utils/hotkeys';
 import { InviteUser } from './InviteUser';
 import { DialogModal } from './DialogModal';
+import { CreateGoal } from './CreateGoal';
 
 const StyledHeader = styled.header`
     padding: 20px 20px;
@@ -91,8 +92,26 @@ const CreateProjectFromModal = () => {
     );
 
     return (
-        <DialogModal heading={t('Create new project')} visible={modalVisible} onClose={onModalClose}>
+        <DialogModal visible={modalVisible} onClose={onModalClose}>
             <CreateProject onCreate={(id) => id && router.project(id)} />
+        </DialogModal>
+    );
+};
+
+const CreateGoalFromModal = () => {
+    const nextRouter = useNextRouter();
+    const router = useRouter();
+    const t = useTranslations('goals.new');
+    const [modalVisible, setModalVisibility] = useState(false);
+    const isCreateGoalPath = nextRouter.pathname === routes.createGoal();
+    const showModalOrNavigate = (navigate: () => void) => (isCreateGoalPath ? navigate() : setModalVisibility(true));
+    const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
+
+    useEffect(() => tinykeys(window, createHotkeys([createGoalKeys, () => showModalOrNavigate(router.createGoal)])));
+
+    return (
+        <DialogModal visible={modalVisible} onClose={onModalClose}>
+            <CreateGoal onCreate={(id) => id && router.goal(id)} />
         </DialogModal>
     );
 };
@@ -109,7 +128,7 @@ const InviteUsersFromModal = () => {
     useEffect(() => tinykeys(window, createHotkeys([inviteUserKeys, () => showModalOrNavigate(router.inviteUsers)])));
 
     return (
-        <DialogModal heading={t('Invite new user')} visible={modalVisible} onClose={onModalClose}>
+        <DialogModal visible={modalVisible} onClose={onModalClose}>
             <InviteUser onCreate={() => setModalVisibility(false)} />
         </DialogModal>
     );
@@ -156,6 +175,7 @@ export const Header: React.FC = () => {
             </StyledHeader>
 
             <CreateProjectFromModal />
+            <CreateGoalFromModal />
             <InviteUsersFromModal />
         </>
     );

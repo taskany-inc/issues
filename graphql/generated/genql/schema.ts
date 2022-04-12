@@ -77,7 +77,7 @@ export interface Query {
     findGhost?: (Ghost | undefined)[]
     findUser?: (User | undefined)[]
     findUserAnyKind?: (UserAnyKind | undefined)[]
-    projects?: (Project | undefined)[]
+    projectsCompletion?: (Project | undefined)[]
     users?: (User | undefined)[]
     __typename: 'Query'
 }
@@ -183,7 +183,7 @@ export interface QueryRequest{
     findGhost?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},GhostRequest]
     findUser?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},UserRequest]
     findUserAnyKind?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},UserAnyKindRequest]
-    projects?: [{sortBy?: (SortOrder | null)},ProjectRequest] | ProjectRequest
+    projectsCompletion?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},ProjectRequest]
     users?: [{sortBy?: (SortOrder | null)},UserRequest] | UserRequest
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -400,7 +400,7 @@ export interface QueryPromiseChain{
     findGhost: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends GhostRequest>(request: R, defaultValue?: ((FieldsSelection<Ghost, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Ghost, R> | undefined)[] | undefined)>}),
     findUser: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>}),
     findUserAnyKind: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserAnyKindRequest>(request: R, defaultValue?: ((FieldsSelection<UserAnyKind, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<UserAnyKind, R> | undefined)[] | undefined)>}),
-    projects: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Project, R> | undefined)[] | undefined)>})&({get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Project, R> | undefined)[] | undefined)>}),
+    projectsCompletion: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Project, R> | undefined)[] | undefined)>}),
     users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})
 }
 
@@ -408,7 +408,7 @@ export interface QueryObservableChain{
     findGhost: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends GhostRequest>(request: R, defaultValue?: ((FieldsSelection<Ghost, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Ghost, R> | undefined)[] | undefined)>}),
     findUser: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>}),
     findUserAnyKind: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserAnyKindRequest>(request: R, defaultValue?: ((FieldsSelection<UserAnyKind, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<UserAnyKind, R> | undefined)[] | undefined)>}),
-    projects: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Project, R> | undefined)[] | undefined)>})&({get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Project, R> | undefined)[] | undefined)>}),
+    projectsCompletion: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Project, R> | undefined)[] | undefined)>}),
     users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})
 }
 

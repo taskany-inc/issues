@@ -266,18 +266,34 @@ const Query = queryType({
             },
         });
 
-        t.list.field('projects', {
+        t.list.field('projectsCompletion', {
             type: Project,
             args: {
                 sortBy: arg({ type: SortOrder }),
+                query: nonNull(stringArg()),
             },
-            resolve: async (_, { sortBy }, { db }) =>
-                db.project.findMany({
+            resolve: async (_, { sortBy, query }, { db }) => {
+                if (query === '') {
+                    return [];
+                }
+
+                return db.project.findMany({
                     orderBy: { created_at: sortBy || undefined },
-                    include: {
-                        owner: true,
+                    where: {
+                        title: {
+                            contains: query,
+                            mode: 'insensitive',
+                        },
                     },
-                }),
+                    include: {
+                        owner: {
+                            include: {
+                                user: true,
+                            }
+                        },
+                    },
+                });
+            }
         });
     },
 });
@@ -336,7 +352,11 @@ const Mutation = mutationType({
                 owner_id: nonNull(stringArg()),
                 user: nonNull(arg({ type: UserSession })),
             },
-            resolve: async (_, { user, title, description, owner_id, project_id, key, private: isPrivate, personal }, { db }) => {
+            resolve: async (
+                _,
+                { user, title, description, owner_id, project_id, key, private: isPrivate, personal },
+                { db },
+            ) => {
                 const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
                 const goalOwner = await db.user.findUnique({ where: { id: owner_id }, include: { activity: true } });
 

@@ -194,7 +194,7 @@ export interface NexusGenFieldTypes {
     findGhost: Array<NexusGenRootTypes['Ghost'] | null> | null; // [Ghost]
     findUser: Array<NexusGenRootTypes['User'] | null> | null; // [User]
     findUserAnyKind: Array<NexusGenRootTypes['UserAnyKind'] | null> | null; // [UserAnyKind]
-    projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+    projectsCompletion: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
     users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
   }
   User: { // field return type
@@ -276,7 +276,7 @@ export interface NexusGenFieldTypeNames {
     findGhost: 'Ghost'
     findUser: 'User'
     findUserAnyKind: 'UserAnyKind'
-    projects: 'Project'
+    projectsCompletion: 'Project'
     users: 'User'
   }
   User: { // field return type name
@@ -336,7 +336,8 @@ export interface NexusGenArgTypes {
       query: string; // String!
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
     }
-    projects: { // args
+    projectsCompletion: { // args
+      query: string; // String!
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
     }
     users: { // args

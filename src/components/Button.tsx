@@ -54,6 +54,7 @@ interface ButtonProps {
     text: string;
     tabIndex?: number;
     disabled?: boolean;
+    ghost?: boolean;
     view?:
         | 'default'
         | 'primary'
@@ -71,7 +72,7 @@ interface ButtonProps {
     onClick?: React.MouseEventHandler;
 }
 
-const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLeft, ...props }) => (
+const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, ...props }) => (
     <button ref={forwardRef} {...props} />
 ))`
     position: relative;
@@ -310,6 +311,13 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
         { brick: 'center' },
         css`
             border-radius: 0;
+        `,
+    )}
+
+    ${is(
+        { ghost: true },
+        css`
+            border-color: transparent;
         `,
     )}
 `;

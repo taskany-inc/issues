@@ -1,6 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer } from '@geist-ui/core';
+import { Spacer, Text } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -77,6 +77,8 @@ export const InviteUser: React.FC<InviteUserProps> = ({ card, onCreate }) => {
 
     const formContent = (
         <Form onSubmit={handleSubmit(inviteUser)}>
+            <Text h1>{t('Invite new user')}</Text>
+
             <FormInput
                 {...register('email')}
                 error={isSubmitted ? errors.email : undefined}

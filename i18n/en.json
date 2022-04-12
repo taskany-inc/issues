@@ -47,5 +47,28 @@
       "Pro tip!": "Pro tip!",
       "Press key to send invite": "Press <key></key> to send invite"
     }
+  },
+  "goals": {
+    "new": {
+      "title": "Taskany Goals — New goal",
+      "Create new goal": "Create new goal",
+      "Goal's title is required": "Goal's title is required",
+      "Goal's title must be a string": "Goal's title must be a string",
+      "Goal's title must be longer than 10 symbols": "Goal's title must be longer than 10 symbols",
+      "Goal's description must be longer than 10 symbols": "Goal's description must be longer than 10 symbols",
+      "Goal's description is required": "Goal's description is required",
+      "Goal's description must be a string": "Goal's description must be a string",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are creating new goal...": "We are creating new goal...",
+      "Voila! Goal is here 🎉": "Voila! Goal is here 🎉",
+      "Create goal": "Create goal",
+      "Goal's title": "Goal's title",
+      "And its description": "And its description",
+      "Pro tip!": "Pro tip!",
+      "Press key to create the goal": "Press <key></key> to create the goal.",
+      "Assign": "Assign",
+      "Enter name or email": "Enter name or email",
+      "Enter project title": "Enter project title"
+    }
   }
 }

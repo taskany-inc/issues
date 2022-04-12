@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import tinykeys from 'tinykeys';
-import { createHotkeys, createGoalKeys, showHomeKeys, showProjectsKeys, showGoalsKeys } from '../utils/hotkeys';
+import { createHotkeys, showHomeKeys, showProjectsKeys, showGoalsKeys } from '../utils/hotkeys';
 
 import { useRouter } from './router';
 
@@ -11,7 +11,6 @@ export const useHotkeys = () => {
         tinykeys(
             window,
             createHotkeys(
-                [createGoalKeys, () => router.createGoal()],
                 [showHomeKeys, () => router.index()],
                 [showProjectsKeys, () => router.projects()],
                 [showGoalsKeys, () => router.goals()],

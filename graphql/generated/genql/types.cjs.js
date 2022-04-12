@@ -266,9 +266,13 @@ module.exports = {
                     ]
                 }
             ],
-            "projects": [
+            "projectsCompletion": [
                 9,
                 {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
                     "sortBy": [
                         13
                     ]
