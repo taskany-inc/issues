@@ -1,23 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
 import { Grid, Link, Spacer, Popover } from '@geist-ui/core';
-import { useRouter as useNextRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import tinykeys from 'tinykeys';
 
 import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
 import { ThemeChanger } from './ThemeChanger';
 import { UserPic } from './UserPic';
-import { CreateProject } from './CreateProject';
-import { routes, useRouter } from '../hooks/router';
+import { routes } from '../hooks/router';
 import { secondaryTaskanyLogoColor } from '../design/@generated/themes';
-import { createProjectKeys, createHotkeys, inviteUserKeys, createGoalKeys } from '../utils/hotkeys';
-import { InviteUser } from './InviteUser';
-import { DialogModal } from './DialogModal';
-import { CreateGoal } from './CreateGoal';
 
 const StyledHeader = styled.header`
     padding: 20px 20px;
@@ -78,59 +70,6 @@ const CreatorMenu = () => {
     );
 };
 
-const CreateProjectFromModal = () => {
-    const nextRouter = useNextRouter();
-    const router = useRouter();
-    const [modalVisible, setModalVisibility] = useState(false);
-    const isCreateProjectPath = nextRouter.pathname === routes.createProject();
-    const showModalOrNavigate = (navigate: () => void) => (isCreateProjectPath ? navigate() : setModalVisibility(true));
-    const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
-
-    useEffect(() =>
-        tinykeys(window, createHotkeys([createProjectKeys, () => showModalOrNavigate(router.createProject)])),
-    );
-
-    return (
-        <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <CreateProject onCreate={(id) => id && router.project(id)} />
-        </DialogModal>
-    );
-};
-
-const CreateGoalFromModal = () => {
-    const nextRouter = useNextRouter();
-    const router = useRouter();
-    const [modalVisible, setModalVisibility] = useState(false);
-    const isCreateGoalPath = nextRouter.pathname === routes.createGoal();
-    const showModalOrNavigate = (navigate: () => void) => (isCreateGoalPath ? navigate() : setModalVisibility(true));
-    const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
-
-    useEffect(() => tinykeys(window, createHotkeys([createGoalKeys, () => showModalOrNavigate(router.createGoal)])));
-
-    return (
-        <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <CreateGoal onCreate={(slug) => slug && router.goal(slug)} />
-        </DialogModal>
-    );
-};
-
-const InviteUsersFromModal = () => {
-    const nextRouter = useNextRouter();
-    const router = useRouter();
-    const [modalVisible, setModalVisibility] = useState(false);
-    const isInviteUsersPath = nextRouter.pathname === routes.inviteUsers();
-    const showModalOrNavigate = (navigate: () => void) => (isInviteUsersPath ? navigate() : setModalVisibility(true));
-    const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
-
-    useEffect(() => tinykeys(window, createHotkeys([inviteUserKeys, () => showModalOrNavigate(router.inviteUsers)])));
-
-    return (
-        <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <InviteUser onCreate={() => setModalVisibility(false)} />
-        </DialogModal>
-    );
-};
-
 export const Header: React.FC = () => {
     const { data: session } = useSession();
     const t = useTranslations('Header');
@@ -170,10 +109,6 @@ export const Header: React.FC = () => {
                     </Grid>
                 </Grid.Container>
             </StyledHeader>
-
-            <CreateProjectFromModal />
-            <CreateGoalFromModal />
-            <InviteUsersFromModal />
         </>
     );
 };
