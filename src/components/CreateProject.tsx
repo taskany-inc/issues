@@ -24,7 +24,7 @@ import { UserAnyKind } from '../../graphql/generated/genql';
 
 interface CreateProjectProps {
     card?: boolean;
-    onCreate?: (id?: string) => void;
+    onCreate?: (slug?: string) => void;
 }
 
 export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) => {
@@ -68,6 +68,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) 
                 },
                 {
                     id: true,
+                    slug: true,
                 },
             ],
         });
@@ -80,7 +81,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) 
 
         const res = await promise;
 
-        onCreate && onCreate(String(res.createProject?.id));
+        onCreate && onCreate(res.createProject?.slug);
     };
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');

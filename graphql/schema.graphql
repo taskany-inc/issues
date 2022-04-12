@@ -4,8 +4,10 @@
 
 type Activity {
   created_at: DateTime!
+  ghost: Ghost
   id: ID!
   updated_at: DateTime!
+  user: User
 }
 
 """
@@ -26,6 +28,7 @@ type Ghost {
 
 type Goal {
   blocks: [Goal]
+  computedOwner: UserAnyKind
   connected: [Goal]
   created_at: DateTime!
   dependsOn: [Goal]
@@ -56,11 +59,13 @@ type Mutation {
 }
 
 type Project {
+  computedOwner: UserAnyKind
   created_at: DateTime!
   description: String
+  goals: [Goal]
   id: Int!
   owner: Activity
-  owner_id: String
+  slug: String
   title: String!
   updated_at: DateTime!
 }
@@ -76,6 +81,8 @@ type Query {
   findGhost(query: String!, sortBy: SortOrder): [Ghost]
   findUser(query: String!, sortBy: SortOrder): [User]
   findUserAnyKind(query: String!, sortBy: SortOrder): [UserAnyKind]
+  project(slug: String!): Project
+  projectGoals(slug: String!): [Goal]
   projectsCompletion(query: String!, sortBy: SortOrder): [Project]
   users(sortBy: SortOrder): [User]
 }

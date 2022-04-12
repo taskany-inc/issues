@@ -81,7 +81,6 @@ const CreatorMenu = () => {
 const CreateProjectFromModal = () => {
     const nextRouter = useNextRouter();
     const router = useRouter();
-    const t = useTranslations('projects.new');
     const [modalVisible, setModalVisibility] = useState(false);
     const isCreateProjectPath = nextRouter.pathname === routes.createProject();
     const showModalOrNavigate = (navigate: () => void) => (isCreateProjectPath ? navigate() : setModalVisibility(true));
@@ -101,7 +100,6 @@ const CreateProjectFromModal = () => {
 const CreateGoalFromModal = () => {
     const nextRouter = useNextRouter();
     const router = useRouter();
-    const t = useTranslations('goals.new');
     const [modalVisible, setModalVisibility] = useState(false);
     const isCreateGoalPath = nextRouter.pathname === routes.createGoal();
     const showModalOrNavigate = (navigate: () => void) => (isCreateGoalPath ? navigate() : setModalVisibility(true));
@@ -111,7 +109,7 @@ const CreateGoalFromModal = () => {
 
     return (
         <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <CreateGoal onCreate={(id) => id && router.goal(id)} />
+            <CreateGoal onCreate={(slug) => slug && router.goal(slug)} />
         </DialogModal>
     );
 };
@@ -119,7 +117,6 @@ const CreateGoalFromModal = () => {
 const InviteUsersFromModal = () => {
     const nextRouter = useNextRouter();
     const router = useRouter();
-    const t = useTranslations('users.invite');
     const [modalVisible, setModalVisibility] = useState(false);
     const isInviteUsersPath = nextRouter.pathname === routes.inviteUsers();
     const showModalOrNavigate = (navigate: () => void) => (isInviteUsersPath ? navigate() : setModalVisibility(true));

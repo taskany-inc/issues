@@ -42,6 +42,7 @@
     "react-dom": "17.0.2",
     "react-hook-form": "7.29.0",
     "react-hot-toast": "2.2.0",
+    "slugify": "1.6.5",
     "styled-components": "5.3.3",
     "swr": "1.2.2",
     "teenyicons": "0.4.1",

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, Grid, useKeyboard, KeyCode } from '@geist-ui/core';
+import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
@@ -12,7 +12,6 @@ import {
     buttonBorderColor,
     buttonBorderColorHover,
     buttonIconColor,
-    buttonTextColor,
 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/generated/genql';
@@ -81,15 +80,9 @@ const fetcher = createFetcher((_, query: string) => ({
         },
         {
             id: true,
+            slug: true,
             title: true,
             description: true,
-            // owner: {
-            //     user: {
-            //         id: true,
-            //         name: true,
-            //         email: true,
-            //     },
-            // },
         },
     ],
 }));
@@ -141,7 +134,7 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
     const { bindings: onENTER } = useKeyboard(
         () => {
             if (data?.projectsCompletion?.length) {
-                onProjectCardClick(data?.projectsCompletion[cursor])();
+                onProjectCardClick(data?.projectsCompletion[cursor] as Project)();
                 popupRef.current?.focus();
             }
         },
@@ -212,7 +205,7 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
                             key={p.id}
                             title={p.title}
                             focused={cursor === i}
-                            onClick={onProjectCardClick(p)}
+                            onClick={onProjectCardClick(p as Project)}
                         />
                     ))}
                 </>

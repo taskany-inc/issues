@@ -21,8 +21,15 @@ import {
     Activity as ActivityModel,
     Goal as GoalModel,
 } from 'nexus-prisma';
+import slugify from 'slugify';
 
 import { mailServer } from '../src/utils/mailServer';
+
+const slugifyOptions = {
+    replacement: '_',
+    lower: true,
+    strict: true,
+};
 
 const DateTime = asNexusMethod(DateTimeResolver, 'DateTime');
 const SortOrder = enumType({
@@ -72,6 +79,8 @@ const Activity = objectType({
     name: ActivityModel.$name,
     definition(t) {
         t.field(ActivityModel.id);
+        t.field('user', { type: User });
+        t.field('ghost', { type: Ghost });
         t.field(ActivityModel.created_at);
         t.field(ActivityModel.updated_at);
     },
@@ -107,10 +116,12 @@ const Project = objectType({
     name: ProjectModel.$name,
     definition(t) {
         t.field(ProjectModel.id);
+        t.field(ProjectModel.slug);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
         t.field('owner', { type: Activity });
-        t.field(ProjectModel.owner_id);
+        t.field('computedOwner', { type: UserAnyKind });
+        t.list.field('goals', { type: Goal });
         t.field(ProjectModel.created_at);
         t.field(ProjectModel.updated_at);
     },
@@ -141,7 +152,21 @@ const Goal = objectType({
         t.list.field('blocks', { type: Goal });
         t.list.field('relatedTo', { type: Goal });
         t.list.field('connected', { type: Goal });
+        t.field('computedOwner', { type: UserAnyKind });
     },
+});
+
+const computeOwnerFields = {
+    include: {
+        user: true,
+        ghost: true,
+    }
+};
+
+const withComputedOwner = <T>(o: T): T => ({
+        ...o,
+        // @ts-ignore
+        computedOwner: o?.owner?.user || o?.owner?.ghost,
 });
 
 const Query = queryType({
@@ -266,6 +291,50 @@ const Query = queryType({
             },
         });
 
+        t.field('project', {
+            type: Project,
+            args: {
+                slug: nonNull(stringArg()),
+            },
+            resolve: async (_, { slug }, { db }) => {
+                const project = await db.project.findUnique({
+                    where: {
+                        slug,
+                    },
+                    include: {
+                        owner: {
+                            ...computeOwnerFields,
+                        },
+                    },
+                });
+
+                return withComputedOwner(project);
+            }
+        });
+
+        t.list.field('projectGoals', {
+            type: Goal,
+            args: {
+                slug: nonNull(stringArg()),
+            },
+            resolve: async (_, { slug }, { db }) => {
+                const goals = await db.goal.findMany({
+                    where: {
+                        project: {
+                            slug,
+                        },
+                    },
+                    include: {
+                        owner: {
+                            ...computeOwnerFields,
+                        },
+                    },
+                });
+
+                return goals.map(withComputedOwner);
+            }
+        });
+
         t.list.field('projectsCompletion', {
             type: Project,
             args: {
@@ -319,6 +388,7 @@ const Mutation = mutationType({
                 try {
                     const newProject = db.project.create({
                         data: {
+                            slug: slugify(title, slugifyOptions),
                             title,
                             description,
                             owner_id: resolvedOwnerId,

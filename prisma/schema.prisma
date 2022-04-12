@@ -117,6 +117,7 @@ model Activity {
 
 model Project {
   id           Int        @id @default(autoincrement())
+  slug         String?    @unique
   title        String
   description  String?
   created_at   DateTime   @default(now())
@@ -127,6 +128,8 @@ model Project {
   owner_id     String?
   participants Activity[] @relation("projectParticipants")
   goals        Goal[]     @relation("projectGoals")
+
+  @@index([slug])
 }
 
 model Goal {

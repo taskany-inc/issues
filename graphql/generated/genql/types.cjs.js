@@ -15,11 +15,17 @@ module.exports = {
             "created_at": [
                 2
             ],
+            "ghost": [
+                3
+            ],
             "id": [
                 1
             ],
             "updated_at": [
                 2
+            ],
+            "user": [
+                14
             ],
             "__typename": [
                 4
@@ -60,6 +66,9 @@ module.exports = {
         "Goal": {
             "blocks": [
                 5
+            ],
+            "computedOwner": [
+                15
             ],
             "connected": [
                 5
@@ -203,11 +212,17 @@ module.exports = {
             ]
         },
         "Project": {
+            "computedOwner": [
+                15
+            ],
             "created_at": [
                 2
             ],
             "description": [
                 4
+            ],
+            "goals": [
+                5
             ],
             "id": [
                 6
@@ -215,7 +230,7 @@ module.exports = {
             "owner": [
                 0
             ],
-            "owner_id": [
+            "slug": [
                 4
             ],
             "title": [
@@ -263,6 +278,24 @@ module.exports = {
                     ],
                     "sortBy": [
                         13
+                    ]
+                }
+            ],
+            "project": [
+                9,
+                {
+                    "slug": [
+                        4,
+                        "String!"
+                    ]
+                }
+            ],
+            "projectGoals": [
+                5,
+                {
+                    "slug": [
+                        4,
+                        "String!"
                     ]
                 }
             ],

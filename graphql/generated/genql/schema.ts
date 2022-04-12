@@ -10,8 +10,10 @@ export type Scalars = {
 
 export interface Activity {
     created_at: Scalars['DateTime']
+    ghost?: Ghost
     id: Scalars['ID']
     updated_at: Scalars['DateTime']
+    user?: User
     __typename: 'Activity'
 }
 
@@ -29,6 +31,7 @@ export interface Ghost {
 
 export interface Goal {
     blocks?: (Goal | undefined)[]
+    computedOwner?: UserAnyKind
     connected?: (Goal | undefined)[]
     created_at: Scalars['DateTime']
     dependsOn?: (Goal | undefined)[]
@@ -61,11 +64,13 @@ export interface Mutation {
 }
 
 export interface Project {
+    computedOwner?: UserAnyKind
     created_at: Scalars['DateTime']
     description?: Scalars['String']
+    goals?: (Goal | undefined)[]
     id: Scalars['Int']
     owner?: Activity
-    owner_id?: Scalars['String']
+    slug?: Scalars['String']
     title: Scalars['String']
     updated_at: Scalars['DateTime']
     __typename: 'Project'
@@ -77,6 +82,8 @@ export interface Query {
     findGhost?: (Ghost | undefined)[]
     findUser?: (User | undefined)[]
     findUserAnyKind?: (UserAnyKind | undefined)[]
+    project?: Project
+    projectGoals?: (Goal | undefined)[]
     projectsCompletion?: (Project | undefined)[]
     users?: (User | undefined)[]
     __typename: 'Query'
@@ -113,8 +120,10 @@ export type UserKind = 'GHOST' | 'USER'
 
 export interface ActivityRequest{
     created_at?: boolean | number
+    ghost?: GhostRequest
     id?: boolean | number
     updated_at?: boolean | number
+    user?: UserRequest
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -134,6 +143,7 @@ export interface GhostRequest{
 
 export interface GoalRequest{
     blocks?: GoalRequest
+    computedOwner?: UserAnyKindRequest
     connected?: GoalRequest
     created_at?: boolean | number
     dependsOn?: GoalRequest
@@ -168,11 +178,13 @@ export interface MutationRequest{
 }
 
 export interface ProjectRequest{
+    computedOwner?: UserAnyKindRequest
     created_at?: boolean | number
     description?: boolean | number
+    goals?: GoalRequest
     id?: boolean | number
     owner?: ActivityRequest
-    owner_id?: boolean | number
+    slug?: boolean | number
     title?: boolean | number
     updated_at?: boolean | number
     __typename?: boolean | number
@@ -183,6 +195,8 @@ export interface QueryRequest{
     findGhost?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},GhostRequest]
     findUser?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},UserRequest]
     findUserAnyKind?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},UserAnyKindRequest]
+    project?: [{slug: Scalars['String']},ProjectRequest]
+    projectGoals?: [{slug: Scalars['String']},GoalRequest]
     projectsCompletion?: [{query: Scalars['String'],sortBy?: (SortOrder | null)},ProjectRequest]
     users?: [{sortBy?: (SortOrder | null)},UserRequest] | UserRequest
     __typename?: boolean | number
@@ -282,14 +296,18 @@ export const isUserAnyKind = (obj?: { __typename?: any } | null): obj is UserAny
 
 export interface ActivityPromiseChain{
     created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>}),
+    ghost: (GhostPromiseChain & {get: <R extends GhostRequest>(request: R, defaultValue?: (FieldsSelection<Ghost, R> | undefined)) => Promise<(FieldsSelection<Ghost, R> | undefined)>}),
     id: ({get: (request?: boolean|number, defaultValue?: Scalars['ID']) => Promise<Scalars['ID']>}),
-    updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>})
+    updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>}),
+    user: (UserPromiseChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Promise<(FieldsSelection<User, R> | undefined)>})
 }
 
 export interface ActivityObservableChain{
     created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>}),
+    ghost: (GhostObservableChain & {get: <R extends GhostRequest>(request: R, defaultValue?: (FieldsSelection<Ghost, R> | undefined)) => Observable<(FieldsSelection<Ghost, R> | undefined)>}),
     id: ({get: (request?: boolean|number, defaultValue?: Scalars['ID']) => Observable<Scalars['ID']>}),
-    updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>})
+    updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>}),
+    user: (UserObservableChain & {get: <R extends UserRequest>(request: R, defaultValue?: (FieldsSelection<User, R> | undefined)) => Observable<(FieldsSelection<User, R> | undefined)>})
 }
 
 export interface GhostPromiseChain{
@@ -316,6 +334,7 @@ export interface GhostObservableChain{
 
 export interface GoalPromiseChain{
     blocks: ({get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
+    computedOwner: (UserAnyKindPromiseChain & {get: <R extends UserAnyKindRequest>(request: R, defaultValue?: (FieldsSelection<UserAnyKind, R> | undefined)) => Promise<(FieldsSelection<UserAnyKind, R> | undefined)>}),
     connected: ({get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
     created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>}),
     dependsOn: ({get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
@@ -341,6 +360,7 @@ export interface GoalPromiseChain{
 
 export interface GoalObservableChain{
     blocks: ({get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
+    computedOwner: (UserAnyKindObservableChain & {get: <R extends UserAnyKindRequest>(request: R, defaultValue?: (FieldsSelection<UserAnyKind, R> | undefined)) => Observable<(FieldsSelection<UserAnyKind, R> | undefined)>}),
     connected: ({get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
     created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>}),
     dependsOn: ({get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
@@ -377,21 +397,25 @@ export interface MutationObservableChain{
 }
 
 export interface ProjectPromiseChain{
+    computedOwner: (UserAnyKindPromiseChain & {get: <R extends UserAnyKindRequest>(request: R, defaultValue?: (FieldsSelection<UserAnyKind, R> | undefined)) => Promise<(FieldsSelection<UserAnyKind, R> | undefined)>}),
     created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>}),
     description: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
+    goals: ({get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
     id: ({get: (request?: boolean|number, defaultValue?: Scalars['Int']) => Promise<Scalars['Int']>}),
     owner: (ActivityPromiseChain & {get: <R extends ActivityRequest>(request: R, defaultValue?: (FieldsSelection<Activity, R> | undefined)) => Promise<(FieldsSelection<Activity, R> | undefined)>}),
-    owner_id: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
+    slug: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Promise<(Scalars['String'] | undefined)>}),
     title: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Promise<Scalars['String']>}),
     updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Promise<Scalars['DateTime']>})
 }
 
 export interface ProjectObservableChain{
+    computedOwner: (UserAnyKindObservableChain & {get: <R extends UserAnyKindRequest>(request: R, defaultValue?: (FieldsSelection<UserAnyKind, R> | undefined)) => Observable<(FieldsSelection<UserAnyKind, R> | undefined)>}),
     created_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>}),
     description: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
+    goals: ({get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
     id: ({get: (request?: boolean|number, defaultValue?: Scalars['Int']) => Observable<Scalars['Int']>}),
     owner: (ActivityObservableChain & {get: <R extends ActivityRequest>(request: R, defaultValue?: (FieldsSelection<Activity, R> | undefined)) => Observable<(FieldsSelection<Activity, R> | undefined)>}),
-    owner_id: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
+    slug: ({get: (request?: boolean|number, defaultValue?: (Scalars['String'] | undefined)) => Observable<(Scalars['String'] | undefined)>}),
     title: ({get: (request?: boolean|number, defaultValue?: Scalars['String']) => Observable<Scalars['String']>}),
     updated_at: ({get: (request?: boolean|number, defaultValue?: Scalars['DateTime']) => Observable<Scalars['DateTime']>})
 }
@@ -400,6 +424,8 @@ export interface QueryPromiseChain{
     findGhost: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends GhostRequest>(request: R, defaultValue?: ((FieldsSelection<Ghost, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Ghost, R> | undefined)[] | undefined)>}),
     findUser: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>}),
     findUserAnyKind: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserAnyKindRequest>(request: R, defaultValue?: ((FieldsSelection<UserAnyKind, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<UserAnyKind, R> | undefined)[] | undefined)>}),
+    project: ((args: {slug: Scalars['String']}) => ProjectPromiseChain & {get: <R extends ProjectRequest>(request: R, defaultValue?: (FieldsSelection<Project, R> | undefined)) => Promise<(FieldsSelection<Project, R> | undefined)>}),
+    projectGoals: ((args: {slug: Scalars['String']}) => {get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
     projectsCompletion: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<Project, R> | undefined)[] | undefined)>}),
     users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Promise<((FieldsSelection<User, R> | undefined)[] | undefined)>})
 }
@@ -408,6 +434,8 @@ export interface QueryObservableChain{
     findGhost: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends GhostRequest>(request: R, defaultValue?: ((FieldsSelection<Ghost, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Ghost, R> | undefined)[] | undefined)>}),
     findUser: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>}),
     findUserAnyKind: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends UserAnyKindRequest>(request: R, defaultValue?: ((FieldsSelection<UserAnyKind, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<UserAnyKind, R> | undefined)[] | undefined)>}),
+    project: ((args: {slug: Scalars['String']}) => ProjectObservableChain & {get: <R extends ProjectRequest>(request: R, defaultValue?: (FieldsSelection<Project, R> | undefined)) => Observable<(FieldsSelection<Project, R> | undefined)>}),
+    projectGoals: ((args: {slug: Scalars['String']}) => {get: <R extends GoalRequest>(request: R, defaultValue?: ((FieldsSelection<Goal, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Goal, R> | undefined)[] | undefined)>}),
     projectsCompletion: ((args: {query: Scalars['String'],sortBy?: (SortOrder | null)}) => {get: <R extends ProjectRequest>(request: R, defaultValue?: ((FieldsSelection<Project, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<Project, R> | undefined)[] | undefined)>}),
     users: ((args?: {sortBy?: (SortOrder | null)}) => {get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})&({get: <R extends UserRequest>(request: R, defaultValue?: ((FieldsSelection<User, R> | undefined)[] | undefined)) => Observable<((FieldsSelection<User, R> | undefined)[] | undefined)>})
 }
