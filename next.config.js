@@ -5,7 +5,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withBundleAnalyzer({
-    reactStrictMode: true,
+    reactStrictMode: process.env.STRICT_MODE,
     i18n: {
         locales: ['en', 'ru'],
         defaultLocale: 'en',

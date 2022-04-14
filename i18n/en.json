@@ -68,7 +68,10 @@
       "Press key to create the goal": "Press <key></key> to create the goal.",
       "Assign": "Assign",
       "Enter name or email": "Enter name or email",
-      "Enter project title": "Enter project title"
+      "Enter project title": "Enter project title",
+      "Schedule": "Schedule",
+      "Date input mask placeholder": "mm/dd/yyyy",
+      "Date input mask": "99/99/9999"
     }
   }
 }

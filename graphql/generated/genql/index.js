@@ -25,13 +25,6 @@ module.exports.createClient = function(options) {
   return createClientOriginal(optionsCopy)
 }
 
-module.exports.enumQuarter = {
-  Q1: 'Q1',
-  Q2: 'Q2',
-  Q3: 'Q3',
-  Q4: 'Q4',
-}
-
 module.exports.enumRole = {
   ADMIN: 'ADMIN',
   USER: 'USER',

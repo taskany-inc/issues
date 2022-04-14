@@ -20,6 +20,7 @@ import {
     Ghost as GhostModel,
     Activity as ActivityModel,
     Goal as GoalModel,
+    Estimate as EstimateModel,
 } from 'nexus-prisma';
 import slugify from 'slugify';
 
@@ -43,10 +44,6 @@ const Role = enumType({
 const UserKind = enumType({
     name: 'UserKind',
     members: ['USER', 'GHOST'],
-});
-const Quarter = enumType({
-    name: 'Quarter',
-    members: ['Q1', 'Q2', 'Q3', 'Q4'],
 });
 
 const UserSession = inputObjectType({
@@ -136,9 +133,7 @@ const Goal = objectType({
         t.field(GoalModel.key);
         t.field(GoalModel.personal);
         t.field(GoalModel.private);
-        t.field(GoalModel.estimate);
-        t.field(GoalModel.year);
-        t.list.field('quarter', { type: Quarter });
+        t.field('estimate', { type: Estimate });
         t.field(GoalModel.created_at);
         t.field(GoalModel.updated_at);
         t.field('issuer', { type: Activity });
@@ -153,6 +148,25 @@ const Goal = objectType({
         t.list.field('relatedTo', { type: Goal });
         t.list.field('connected', { type: Goal });
         t.field('computedOwner', { type: UserAnyKind });
+    },
+});
+
+const Estimate = objectType({
+    name: EstimateModel.$name,
+    definition(t) {
+        t.field(EstimateModel.id);
+        t.field(EstimateModel.y);
+        t.field(EstimateModel.q);
+        t.field(EstimateModel.date);
+    },
+});
+
+const GoalEstimate = inputObjectType({
+    name: 'GoalEstimate',
+    definition(t) {
+        t.field(EstimateModel.y);
+        t.field(EstimateModel.q);
+        t.field(EstimateModel.date);
     },
 });
 
@@ -421,10 +435,11 @@ const Mutation = mutationType({
                 personal: booleanArg(),
                 owner_id: nonNull(stringArg()),
                 user: nonNull(arg({ type: UserSession })),
+                estimate: arg({ type: GoalEstimate }),
             },
             resolve: async (
                 _,
-                { user, title, description, owner_id, project_id, key, private: isPrivate, personal },
+                { user, title, description, owner_id, project_id, key, private: isPrivate, personal, estimate },
                 { db },
             ) => {
                 const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
@@ -443,6 +458,9 @@ const Mutation = mutationType({
                             personal: Boolean(personal),
                             owner_id: goalOwner?.activity?.id,
                             issuer_id: validUser.activity?.id,
+                            estimate: estimate ? {
+                                create: estimate,
+                            } : undefined
                         },
                     });
 
@@ -515,7 +533,8 @@ export const schema = makeSchema({
         UserAnyKind,
         UserKind,
         Goal,
-        Quarter,
+        Estimate,
+        GoalEstimate
     ],
     outputs: {
         schema: join(process.cwd(), 'graphql/schema.graphql'),

@@ -1,6 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer, Text } from '@geist-ui/core';
+import { Spacer, Text, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -19,9 +19,11 @@ import { Keyboard } from './Keyboard';
 import { accentIconColor } from '../design/@generated/themes';
 import { UserDropdown } from './UserDropdown';
 import { ProjectDropdown } from './ProjectDropdown';
+import { EstimateDropdown } from './EstimateDropdown';
 import { UserPic } from './UserPic';
 import { useState } from 'react';
-import { UserAnyKind, Project } from '../../graphql/generated/genql';
+import { UserAnyKind, Project, GoalEstimate } from '../../graphql/generated/genql';
+import { estimatedMeta } from '../utils/dateTime';
 
 interface CreateGoalProps {
     card?: boolean;
@@ -31,6 +33,7 @@ interface CreateGoalProps {
 export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
+    const [estimate, setEstimate] = useState<GoalEstimate>();
     const [project, setProject] = useState<Partial<Project>>();
     const t = useTranslations('goals.new');
 
@@ -75,6 +78,7 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
                     description,
                     owner_id: owner.id!,
                     project_id: project?.id!,
+                    estimate,
                 },
                 {
                     id: true,
@@ -95,6 +99,7 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');
     const projectButtonText = project?.title || t('Enter project title');
+    const estimateDefault = estimatedMeta();
 
     const formContent = (
         <Form onSubmit={handleSubmit(createGoal)}>
@@ -122,15 +127,27 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
             />
             <FormActions flat="top">
                 <FormActionLeft>
-                    <UserDropdown
-                        size="m"
-                        view="outline"
-                        text={ownerButtonText}
-                        placeholder={t('Enter name or email')}
-                        query={owner?.name || owner?.email}
-                        userPic={<UserPic src={owner?.image} size={16} />}
-                        onUserClick={(u) => setOwner(u)}
-                    />
+                    <Grid.Container>
+                        <UserDropdown
+                            size="m"
+                            view="outline"
+                            text={ownerButtonText}
+                            placeholder={t('Enter name or email')}
+                            query={owner?.name || owner?.email}
+                            userPic={<UserPic src={owner?.image} size={16} />}
+                            onUserClick={(u) => setOwner(u)}
+                        />
+                        <Spacer w={0.5} />
+                        <EstimateDropdown
+                            size="m"
+                            view="outline"
+                            text={t('Schedule')}
+                            placeholder={t('Date input mask placeholder')}
+                            mask={t('Date input mask')}
+                            defaultValuePlaceholder={estimateDefault}
+                            onChange={(e) => setEstimate(e)}
+                        />
+                    </Grid.Container>
                 </FormActionLeft>
                 <FormActionRight>
                     <Button size="l" view="primary-outline" type="submit" disabled={!isValid} text={t('Create goal')} />

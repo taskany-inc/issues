@@ -15,6 +15,13 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+type Estimate {
+  date: String
+  id: Int!
+  q: String
+  y: String
+}
+
 type Ghost {
   activity: Activity
   created_at: DateTime!
@@ -33,7 +40,7 @@ type Goal {
   created_at: DateTime!
   dependsOn: [Goal]
   description: String!
-  estimate: DateTime
+  estimate: Estimate
   id: Int!
   issuer: Activity
   issuer_id: String
@@ -45,15 +52,19 @@ type Goal {
   private: Boolean
   project: [Project]
   project_id: Int
-  quarter: [Quarter]
   relatedTo: [Goal]
   title: String!
   updated_at: DateTime!
-  year: [String!]!
+}
+
+input GoalEstimate {
+  date: String
+  q: String
+  y: String
 }
 
 type Mutation {
-  createGoal(description: String!, key: Boolean, owner_id: String!, personal: Boolean, private: Boolean, project_id: Int!, title: String!, user: UserSession!): Goal
+  createGoal(description: String!, estimate: GoalEstimate, key: Boolean, owner_id: String!, personal: Boolean, private: Boolean, project_id: Int!, title: String!, user: UserSession!): Goal
   createProject(description: String, owner_id: String!, title: String!, user: UserSession!): Project
   inviteUser(email: String!, user: UserSession!): Ghost
 }
@@ -68,13 +79,6 @@ type Project {
   slug: String
   title: String!
   updated_at: DateTime!
-}
-
-enum Quarter {
-  Q1
-  Q2
-  Q3
-  Q4
 }
 
 type Query {

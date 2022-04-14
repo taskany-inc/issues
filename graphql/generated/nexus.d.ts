@@ -29,6 +29,11 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  GoalEstimate: { // input type
+    date?: string | null; // String
+    q?: string | null; // String
+    y?: string | null; // String
+  }
   UserSession: { // input type
     email: string; // String!
     id: string; // ID!
@@ -39,7 +44,6 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  Quarter: "Q1" | "Q2" | "Q3" | "Q4"
   Role: "ADMIN" | "USER"
   SortOrder: "asc" | "desc"
   UserKind: "GHOST" | "USER"
@@ -62,6 +66,12 @@ export interface NexusGenObjects {
     updated_at: NexusGenScalars['DateTime']; // DateTime!
     user?: NexusGenRootTypes['User'] | null; // User
   }
+  Estimate: { // root type
+    date?: string | null; // String
+    id: number; // Int!
+    q?: string | null; // String
+    y?: string | null; // String
+  }
   Ghost: { // root type
     activity?: NexusGenRootTypes['Activity'] | null; // Activity
     created_at: NexusGenScalars['DateTime']; // DateTime!
@@ -79,7 +89,7 @@ export interface NexusGenObjects {
     created_at: NexusGenScalars['DateTime']; // DateTime!
     dependsOn?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
     description: string; // String!
-    estimate?: NexusGenScalars['DateTime'] | null; // DateTime
+    estimate?: NexusGenRootTypes['Estimate'] | null; // Estimate
     id: number; // Int!
     issuer?: NexusGenRootTypes['Activity'] | null; // Activity
     issuer_id?: string | null; // String
@@ -91,11 +101,9 @@ export interface NexusGenObjects {
     private?: boolean | null; // Boolean
     project?: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
     project_id?: number | null; // Int
-    quarter?: Array<NexusGenEnums['Quarter'] | null> | null; // [Quarter]
     relatedTo?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
     title: string; // String!
     updated_at: NexusGenScalars['DateTime']; // DateTime!
-    year: string[]; // [String!]!
   }
   Mutation: {};
   Project: { // root type
@@ -149,6 +157,12 @@ export interface NexusGenFieldTypes {
     updated_at: NexusGenScalars['DateTime']; // DateTime!
     user: NexusGenRootTypes['User'] | null; // User
   }
+  Estimate: { // field return type
+    date: string | null; // String
+    id: number; // Int!
+    q: string | null; // String
+    y: string | null; // String
+  }
   Ghost: { // field return type
     activity: NexusGenRootTypes['Activity'] | null; // Activity
     created_at: NexusGenScalars['DateTime']; // DateTime!
@@ -166,7 +180,7 @@ export interface NexusGenFieldTypes {
     created_at: NexusGenScalars['DateTime']; // DateTime!
     dependsOn: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
     description: string; // String!
-    estimate: NexusGenScalars['DateTime'] | null; // DateTime
+    estimate: NexusGenRootTypes['Estimate'] | null; // Estimate
     id: number; // Int!
     issuer: NexusGenRootTypes['Activity'] | null; // Activity
     issuer_id: string | null; // String
@@ -178,11 +192,9 @@ export interface NexusGenFieldTypes {
     private: boolean | null; // Boolean
     project: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
     project_id: number | null; // Int
-    quarter: Array<NexusGenEnums['Quarter'] | null> | null; // [Quarter]
     relatedTo: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
     title: string; // String!
     updated_at: NexusGenScalars['DateTime']; // DateTime!
-    year: string[]; // [String!]!
   }
   Mutation: { // field return type
     createGoal: NexusGenRootTypes['Goal'] | null; // Goal
@@ -238,6 +250,12 @@ export interface NexusGenFieldTypeNames {
     updated_at: 'DateTime'
     user: 'User'
   }
+  Estimate: { // field return type name
+    date: 'String'
+    id: 'Int'
+    q: 'String'
+    y: 'String'
+  }
   Ghost: { // field return type name
     activity: 'Activity'
     created_at: 'DateTime'
@@ -255,7 +273,7 @@ export interface NexusGenFieldTypeNames {
     created_at: 'DateTime'
     dependsOn: 'Goal'
     description: 'String'
-    estimate: 'DateTime'
+    estimate: 'Estimate'
     id: 'Int'
     issuer: 'Activity'
     issuer_id: 'String'
@@ -267,11 +285,9 @@ export interface NexusGenFieldTypeNames {
     private: 'Boolean'
     project: 'Project'
     project_id: 'Int'
-    quarter: 'Quarter'
     relatedTo: 'Goal'
     title: 'String'
     updated_at: 'DateTime'
-    year: 'String'
   }
   Mutation: { // field return type name
     createGoal: 'Goal'
@@ -323,6 +339,7 @@ export interface NexusGenArgTypes {
   Mutation: {
     createGoal: { // args
       description: string; // String!
+      estimate?: NexusGenInputs['GoalEstimate'] | null; // GoalEstimate
       key?: boolean | null; // Boolean
       owner_id: string; // String!
       personal?: boolean | null; // Boolean

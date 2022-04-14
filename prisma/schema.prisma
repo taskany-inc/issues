@@ -19,13 +19,6 @@ enum Role {
   ADMIN
 }
 
-enum Quarter {
-  Q1
-  Q2
-  Q3
-  Q4
-}
-
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -73,8 +66,6 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          Role      @default(USER)
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @default(now()) @updatedAt
   invites       Ghost[]   @relation("invite")
   host          User?     @relation("invited", fields: [host_id], references: [id])
   host_id       String?
@@ -83,16 +74,19 @@ model User {
   activity      Activity? @relation(fields: [activity_id], references: [id])
   activity_id   String?   @unique
 
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 }
 
 model Ghost {
-  id         String    @id @default(cuid())
-  email      String    @unique
-  host       User      @relation("invite", fields: [host_id], references: [id])
-  host_id    String
-  activity   Activity?
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now()) @updatedAt
+  id       String    @id @default(cuid())
+  email    String    @unique
+  host     User      @relation("invite", fields: [host_id], references: [id])
+  host_id  String
+  activity Activity?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([host_id])
 }
@@ -109,8 +103,9 @@ model Activity {
   goalParticipant    Goal[]     @relation("goalParticipants")
   goalOwner          Goal[]     @relation("goalOwner")
   goalIssuer         Goal[]     @relation("goalIssuer")
-  created_at         DateTime   @default(now())
-  updated_at         DateTime   @default(now()) @updatedAt
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([ghost_id])
 }
@@ -120,8 +115,6 @@ model Project {
   slug         String?    @unique
   title        String
   description  String?
-  created_at   DateTime   @default(now())
-  updated_at   DateTime   @default(now()) @updatedAt
   parent       Project?   @relation("parentChildren", fields: [id], references: [id])
   children     Project[]  @relation("parentChildren")
   owner        Activity?  @relation(fields: [owner_id], references: [id])
@@ -129,7 +122,24 @@ model Project {
   participants Activity[] @relation("projectParticipants")
   goals        Goal[]     @relation("projectGoals")
 
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
   @@index([slug])
+}
+
+model Estimate {
+  id      Int     @id @default(autoincrement())
+  q       String?
+  y       String?
+  date    String?
+  goal    Goal    @relation(fields: [goal_id], references: [id])
+  goal_id Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index([goal_id])
 }
 
 model Goal {
@@ -139,11 +149,7 @@ model Goal {
   key          Boolean?
   personal     Boolean?
   private      Boolean?
-  year         String[]
-  quarter      Quarter[]
-  estimate     DateTime?
-  created_at   DateTime   @default(now())
-  updated_at   DateTime   @default(now()) @updatedAt
+  estimate     Estimate[]
   criteria     Criteria[] // not implemented
   project      Project?   @relation("projectGoals", fields: [project_id], references: [id])
   project_id   Int?
@@ -152,25 +158,29 @@ model Goal {
   owner        Activity?  @relation("goalOwner", fields: [owner_id], references: [id])
   owner_id     String?
   participants Activity[] @relation("goalParticipants")
-  comments     Comment[]  // not implemented
+  comments     Comment[] // not implemented
   reactions    Reaction[] // not implemented
   dependsOn    Goal[]     @relation("dependsOn")
   blocks       Goal[]     @relation("dependsOn")
   relatedTo    Goal[]     @relation("connected")
   connected    Goal[]     @relation("connected")
 
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
   @@index([owner_id])
   @@index([issuer_id])
 }
 
 model Criteria {
-  id         String   @id @default(cuid())
-  title      String
-  done       Boolean
+  id      String  @id @default(cuid())
+  title   String
+  done    Boolean
+  goal    Goal    @relation(fields: [goal_id], references: [id])
+  goal_id Int
+
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
-  goal       Goal     @relation(fields: [goal_id], references: [id])
-  goal_id    Int
 
   @@index([goal_id])
 }
@@ -183,6 +193,9 @@ model Comment {
   goal        Goal       @relation(fields: [goal_id], references: [id])
   goal_id     Int
   reactions   Reaction[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([author_id])
   @@index([goal_id])
@@ -197,6 +210,9 @@ model Reaction {
   goal_id    Int?
   comment    Comment? @relation(fields: [comment_id], references: [id])
   comment_id String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([author_id])
   @@index([goal_id])

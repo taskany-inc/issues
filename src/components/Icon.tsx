@@ -19,6 +19,8 @@ const componentsMap = {
     arrowDownSmall: dynamic(() => import('teenyicons/outline/down-small.svg')),
     clipboardPlus: dynamic(() => import('teenyicons/outline/clipboard-plus.svg')),
     clipboardTick: dynamic(() => import('teenyicons/outline/clipboard-tick.svg')),
+    calendarTick: dynamic(() => import('teenyicons/outline/calendar-tick.svg')),
+    calendar: dynamic(() => import('teenyicons/outline/calendar.svg')),
 };
 
 const sizesMap = {
