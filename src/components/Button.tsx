@@ -55,6 +55,7 @@ interface ButtonProps {
     tabIndex?: number;
     disabled?: boolean;
     ghost?: boolean;
+    checked?: boolean;
     view?:
         | 'default'
         | 'primary'
@@ -72,7 +73,7 @@ interface ButtonProps {
     onClick?: React.MouseEventHandler;
 }
 
-const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, ...props }) => (
+const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, checked, ...props }) => (
     <button ref={forwardRef} {...props} />
 ))`
     position: relative;
@@ -90,7 +91,8 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
     transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
     transition-property: color, background-color, border-color;
 
-    :hover, :focus {
+    :hover,
+    :focus {
         transition-duration: 0.1s;
     }
 
@@ -144,7 +146,8 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonBorderColor};
             background-color: ${buttonBackgroundColor};
 
-            :hover:not([disabled]), :focus:not([disabled]) {
+            :hover:not([disabled]),
+            :focus:not([disabled]) {
                 color: ${buttonTextColorHover};
                 border-color: ${buttonBorderColorHover};
                 background-color: ${buttonBackgroundColorHover};
@@ -164,7 +167,8 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonPrimaryBorderColor};
             background-color: ${buttonPrimaryBackgroundColor};
 
-            :hover:not([disabled]), :focus:not([disabled]) {
+            :hover:not([disabled]),
+            :focus:not([disabled]) {
                 border-color: ${buttonPrimaryBorderColorHover};
                 background-color: ${buttonPrimaryBackgroundColorHover};
             }
@@ -182,7 +186,8 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonWarningBorderColor};
             background-color: ${buttonWarningBackgroundColor};
 
-            :hover:not([disabled]), :focus:not([disabled]) {
+            :hover:not([disabled]),
+            :focus:not([disabled]) {
                 border-color: ${buttonWarningBorderColorHover};
                 background-color: ${buttonWarningBackgroundColorHover};
             }
@@ -200,7 +205,8 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonDangerBorderColor};
             background-color: ${buttonDangerBackgroundColor};
 
-            :hover:not([disabled]), :focus:not([disabled]) {
+            :hover:not([disabled]),
+            :focus:not([disabled]) {
                 border-color: ${buttonDangerBorderColorHover};
                 background-color: ${buttonDangerBackgroundColorHover};
             }
@@ -218,7 +224,8 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonOutlineBorderColor};
             background-color: transparent;
 
-            :hover:not([disabled]), :focus:not([disabled]) {
+            :hover:not([disabled]),
+            :focus:not([disabled]) {
                 color: ${buttonOutlineTextColorHover};
                 border-color: ${buttonOutlineBorderColorHover};
                 background-color: ${buttonOutlineBackgroundColorHover};
@@ -232,13 +239,23 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
     )}
 
     ${is(
+        { view: 'outline', checked: true },
+        css`
+            color: ${buttonOutlineTextColorHover};
+            border-color: ${buttonOutlineBorderColorHover};
+            background-color: ${buttonOutlineBackgroundColorHover};
+        `,
+    )}
+
+    ${is(
         { view: 'primary-outline' },
         css`
             color: ${buttonPrimaryOutlineTextColor};
             border-color: ${buttonPrimaryOutlineBorderColor};
             background-color: ${buttonPrimaryOutlineBackgroundColor};
 
-            :hover:not([disabled]), :focus:not([disabled]) {
+            :hover:not([disabled]),
+            :focus:not([disabled]) {
                 color: ${buttonPrimaryOutlineTextColorHover};
                 border-color: ${buttonPrimaryOutlineBorderColorHover};
                 background-color: ${buttonPrimaryOutlineBackgroundColorHover};
@@ -258,7 +275,8 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonWarningOutlineBorderColor};
             background-color: ${buttonWarningOutlineBackgroundColor};
 
-            :hover:not([disabled]), :focus:not([disabled]) {
+            :hover:not([disabled]),
+            :focus:not([disabled]) {
                 color: ${buttonWarningOutlineTextColorHover};
                 border-color: ${buttonWarningOutlineBorderColorHover};
                 background-color: ${buttonWarningOutlineBackgroundColorHover};
@@ -278,7 +296,8 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
             border-color: ${buttonDangerOutlineBorderColor};
             background-color: ${buttonDangerOutlineBackgroundColor};
 
-            :hover:not([disabled]), :focus:not([disabled]) {
+            :hover:not([disabled]),
+            :focus:not([disabled]) {
                 color: ${buttonDangerOutlineTextColorHover};
                 border-color: ${buttonDangerOutlineBorderColorHover};
                 background-color: ${buttonDangerOutlineBackgroundColorHover};

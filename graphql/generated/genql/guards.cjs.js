@@ -7,6 +7,14 @@ module.exports.isActivity = function(obj) {
 
 
 
+var Estimate_possibleTypes = ['Estimate']
+module.exports.isEstimate = function(obj) {
+  if (!obj || !obj.__typename) throw new Error('__typename is missing in "isEstimate"')
+  return Estimate_possibleTypes.includes(obj.__typename)
+}
+
+
+
 var Ghost_possibleTypes = ['Ghost']
 module.exports.isGhost = function(obj) {
   if (!obj || !obj.__typename) throw new Error('__typename is missing in "isGhost"')

@@ -53,13 +53,6 @@ export declare const generateMutationOp: (
   fields: MutationRequest & { __name?: string },
 ) => GraphqlOperation
 
-export declare const enumQuarter: {
-  readonly Q1: 'Q1'
-  readonly Q2: 'Q2'
-  readonly Q3: 'Q3'
-  readonly Q4: 'Q4'
-}
-
 export declare const enumRole: {
   readonly ADMIN: 'ADMIN'
   readonly USER: 'USER'
