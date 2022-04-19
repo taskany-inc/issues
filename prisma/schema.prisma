@@ -35,6 +35,7 @@ model Account {
   session_state            String?
   oauth_token_secret       String?
   oauth_token              String?
+  password                 String?
   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -121,6 +122,8 @@ model Project {
   owner_id     String?
   participants Activity[] @relation("projectParticipants")
   goals        Goal[]     @relation("projectGoals")
+  flow         Flow?      @relation(fields: [flow_id], references: [id])
+  flow_id      String?
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
@@ -160,10 +163,11 @@ model Goal {
   participants Activity[] @relation("goalParticipants")
   comments     Comment[] // not implemented
   reactions    Reaction[] // not implemented
-  dependsOn    Goal[]     @relation("dependsOn")
-  blocks       Goal[]     @relation("dependsOn")
-  relatedTo    Goal[]     @relation("connected")
-  connected    Goal[]     @relation("connected")
+
+  dependsOn Goal[] @relation("dependsOn")
+  blocks    Goal[] @relation("dependsOn")
+  relatedTo Goal[] @relation("connected")
+  connected Goal[] @relation("connected")
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
@@ -217,4 +221,18 @@ model Reaction {
   @@index([author_id])
   @@index([goal_id])
   @@index([comment_id])
+}
+
+model Flow {
+  id       String    @id @default(cuid())
+  title    String    @unique
+  graph    String? // [[stateId, stateId], [stateId, stateId]] — any transition allowed if undefined
+  projects Project[]
+  states   State[]
+}
+
+model State {
+  id    String @id @default(cuid())
+  title String @unique
+  flows Flow[]
 }
