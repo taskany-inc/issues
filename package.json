@@ -16,6 +16,9 @@
     "db:down": "docker-compose down",
     "test": "jest"
   },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
   "dependencies": {
     "@apollo/client": "3.5.10",
     "@geist-ui/core": "2.3.8",
