@@ -17,7 +17,7 @@ import { createFetcher } from '../utils/createFetcher';
 import { State } from '../../graphql/generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 
-interface StateCompletionProps {
+interface StateDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
     disabled?: React.ComponentProps<typeof Button>['disabled'];
@@ -90,7 +90,7 @@ const fetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-export const StateCompletion: React.FC<StateCompletionProps> = ({ size, text, view, flowId, disabled, onClick }) => {
+export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, flowId, disabled, onClick }) => {
     const { data: session } = useSession();
     const popupRef = useRef<any>();
     const buttonRef = useRef<any>();

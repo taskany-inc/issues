@@ -18,14 +18,14 @@ import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { accentIconColor } from '../design/@generated/themes';
-import { UserDropdown } from './UserDropdown';
-import { FlowDropdown } from './FlowDropdown';
+import { UserCompletion } from './UserCompletion';
+import { FlowCompletion } from './FlowCompletion';
 import { UserPic } from './UserPic';
 import { useEffect, useState } from 'react';
 import { Flow, UserAnyKind } from '../../graphql/generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 
-interface CreateProjectProps {
+interface ProjectCreateFormProps {
     card?: boolean;
     onCreate?: (slug?: string) => void;
 }
@@ -43,7 +43,7 @@ const fetcher = createFetcher(() => ({
 
 }));
 
-export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) => {
+export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const [flow, setFlow] = useState<Partial<Flow>>();
@@ -132,17 +132,17 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) 
             <FormActions flat="top">
                 <FormActionLeft>
                     <Grid.Container>
-                        <UserDropdown
+                        <UserCompletion
                             size="m"
                             view="outline"
                             text={ownerButtonText}
                             placeholder={t('Enter name or email')}
                             query={owner?.name || owner?.email}
                             userPic={<UserPic src={owner?.image} size={16} />}
-                            onUserClick={(u) => setOwner(u)}
+                            onClick={(u) => setOwner(u)}
                         />
                         <Spacer w={0.5} />
-                        <FlowDropdown
+                        <FlowCompletion
                             disabled
                             size="m"
                             view="outline"

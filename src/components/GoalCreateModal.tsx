@@ -5,9 +5,9 @@ import tinykeys from 'tinykeys';
 import { routes, useRouter } from '../hooks/router';
 import { createHotkeys, createGoalKeys } from '../utils/hotkeys';
 import { DialogModal } from './DialogModal';
-import { CreateGoal } from './CreateGoal';
+import { GoalCreateForm } from './GoalCreateForm';
 
-export const CreateGoalModal = () => {
+export const GoalCreateModal = () => {
     const nextRouter = useNextRouter();
     const router = useRouter();
     const [modalVisible, setModalVisibility] = useState(false);
@@ -19,7 +19,7 @@ export const CreateGoalModal = () => {
 
     return (
         <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <CreateGoal onCreate={(slug) => slug && router.goal(slug)} />
+            <GoalCreateForm onCreate={(slug) => slug && router.goal(slug)} />
         </DialogModal>
     );
 };

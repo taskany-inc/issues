@@ -2,7 +2,7 @@ import type { GetStaticPropsContext } from 'next';
 import { useTranslations } from 'next-intl';
 
 import { DialogPage } from '../../components/DialogPage';
-import { CreateProject } from '../../components/CreateProject';
+import { ProjectCreateForm } from '../../components/ProjectCreateForm';
 import { useRouter } from '../../hooks/router';
 
 function Page() {
@@ -11,7 +11,7 @@ function Page() {
 
     return (
         <DialogPage title={t('title')} heading={t('Create new project')}>
-            <CreateProject card onCreate={(slug) => slug && router.project(slug)} />
+            <ProjectCreateForm card onCreate={(slug) => slug && router.project(slug)} />
         </DialogPage>
     );
 }

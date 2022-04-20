@@ -14,9 +14,9 @@ import { GlobalStyle } from '../components/GlobalStyle';
 import { NextPageWithAuth } from '../types/nextPageWithAuth';
 import { backgroundColor, toastBackgroundColor, toastTextColor } from '../design/@generated/themes';
 import { useHotkeys } from '../hooks/useHotkeys';
-import { CreateProjectModal } from '../components/CreateProjectModal';
-import { CreateGoalModal } from '../components/CreateGoalModal';
-import { InviteUserModal } from '../components/InviteUserModal';
+import { ProjectCreateModal } from '../components/ProjectCreateModal';
+import { GoalCreateModal } from '../components/GoalCreateModal';
+import { UserInviteModal } from '../components/UserInviteModal';
 
 type AppPropsWithAuth = AppProps & {
     Component: NextPageWithAuth;
@@ -86,9 +86,9 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
                         <Component {...pageProps} />
                     )}
 
-                    <CreateProjectModal />
-                    <CreateGoalModal />
-                    <InviteUserModal />
+                    <ProjectCreateModal />
+                    <GoalCreateModal />
+                    <UserInviteModal />
                 </>
             </GeistProvider>
         </>

@@ -17,7 +17,7 @@ import { createFetcher } from '../utils/createFetcher';
 import { Flow } from '../../graphql/generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 
-interface FlowDropdownProps {
+interface FlowCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
     disabled?: React.ComponentProps<typeof Button>['disabled'];
@@ -92,7 +92,7 @@ const fetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
-export const FlowDropdown: React.FC<FlowDropdownProps> = ({
+export const FlowCompletion: React.FC<FlowCompletionProps> = ({
     size,
     text,
     view,
