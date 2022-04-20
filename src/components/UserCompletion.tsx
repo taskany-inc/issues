@@ -1,32 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
+import { Input, useInput, Grid, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
 import { Icon } from './Icon';
+import { UserPic } from './UserPic';
 import {
     buttonBackgroundColorHover,
     buttonBorderColor,
     buttonBorderColorHover,
     buttonIconColor,
+    buttonTextColor,
 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
-import { Project } from '../../graphql/generated/genql';
+import { UserAnyKind } from '../../graphql/generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 
-interface ProjectDropdownProps {
+interface UserCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
     text: React.ComponentProps<typeof Button>['text'];
+    userPic?: React.ComponentProps<typeof Button>['iconLeft'];
     query?: string;
     placeholder?: string;
-    onProjectClick?: (project: Project) => void;
+    onClick?: (user: UserAnyKind) => void;
 }
 
-const StyledProjectCard = styled.div<{ focused?: boolean }>`
+const StyledUserCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
     border: 1px solid ${buttonBorderColor};
     border-radius: 6px;
@@ -50,57 +53,66 @@ const StyledProjectCard = styled.div<{ focused?: boolean }>`
             background-color: ${buttonBackgroundColorHover};
         `}
 `;
-const StyledProjectInfo = styled.div`
+const StyledUserInfo = styled.div`
     padding-left: 4px;
 `;
-const StyledProjectTitle = styled.div`
+const StyledUserName = styled.div`
     font-size: 14px;
     font-weight: 600;
 `;
-const ProjectCard: React.FC<{ title?: string; focused?: boolean; onClick?: () => void }> = ({
-    title,
+const StyledUserEmail = styled.div`
+    font-size: 12px;
+    color: ${buttonTextColor};
+`;
+const UserCard: React.FC<{ name?: string; email: string; image?: string; focused?: boolean; onClick?: () => void }> = ({
+    name,
+    email,
+    image,
     focused,
     onClick,
 }) => {
     return (
-        <StyledProjectCard onClick={onClick} focused={focused}>
-            <StyledProjectInfo>
-                <StyledProjectTitle>{title}</StyledProjectTitle>
-            </StyledProjectInfo>
-        </StyledProjectCard>
+        <StyledUserCard onClick={onClick} focused={focused}>
+            <Grid.Container gap={0}>
+                <Grid xs={3} alignItems="center" justify="center">
+                    <UserPic src={image} size={24} />
+                </Grid>
+                <Grid xs={21} alignItems="center">
+                    <StyledUserInfo>
+                        <StyledUserName>{name}</StyledUserName>
+                        <StyledUserEmail>{email}</StyledUserEmail>
+                    </StyledUserInfo>
+                </Grid>
+            </Grid.Container>
+        </StyledUserCard>
     );
 };
 
 const StyledDropdownContainer = styled.div``;
 
 const fetcher = createFetcher((_, query: string) => ({
-    projectCompletion: [
+    findUserAnyKind: [
         {
             query,
         },
         {
             id: true,
-            slug: true,
-            title: true,
-            description: true,
-            flow: {
+            name: true,
+            email: true,
+            image: true,
+            activity: {
                 id: true,
-                title: true,
-                states: {
-                    id: true,
-                    title: true,
-                    default: true,
-                }
-            }
+            },
         },
     ],
 }));
 
-export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
+export const UserCompletion: React.FC<UserCompletionProps> = ({
     size,
     text,
     view,
-    onProjectClick,
+    userPic,
+    onClick,
     query = '',
     placeholder,
 }) => {
@@ -142,8 +154,8 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
 
     const { bindings: onENTER } = useKeyboard(
         () => {
-            if (data?.projectCompletion?.length) {
-                onProjectCardClick(data?.projectCompletion[cursor] as Project)();
+            if (data?.findUserAnyKind?.length) {
+                onUserCardClick(data?.findUserAnyKind[cursor])();
                 popupRef.current?.focus();
             }
         },
@@ -153,24 +165,24 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
         },
     );
 
-    const onProjectCardClick = (project: Project) => () => {
+    const onUserCardClick = (user: UserAnyKind) => () => {
         setEditMode(false);
         setPopupVisibility(false);
-        onProjectClick && onProjectClick(project);
-        setInputState(project.title || '');
+        onClick && onClick(user);
+        setInputState(user.name || user.email || '');
     };
 
     useEffect(() => {
-        if (data?.projectCompletion?.length && downPress) {
-            setCursor((prevState) => (prevState < data?.projectCompletion?.length! - 1 ? prevState + 1 : prevState));
+        if (data?.findUserAnyKind?.length && downPress) {
+            setCursor((prevState) => (prevState < data?.findUserAnyKind?.length! - 1 ? prevState + 1 : prevState));
         }
-    }, [data?.projectCompletion, downPress]);
+    }, [data?.findUserAnyKind, downPress]);
 
     useEffect(() => {
-        if (data?.projectCompletion?.length && upPress) {
+        if (data?.findUserAnyKind?.length && upPress) {
             setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
         }
-    }, [data?.projectCompletion, upPress]);
+    }, [data?.findUserAnyKind, upPress]);
 
     return (
         <>
@@ -178,20 +190,20 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
                 {editMode ? (
                     <Input
                         placeholder={placeholder}
-                        scale={0.78}
+                        scale={0.8}
                         autoFocus
+                        icon={userPic}
                         onBlur={onInputBlur}
                         {...onInput}
                         {...onENTER}
                     />
                 ) : (
                     <Button
-                        ghost
                         ref={buttonRef}
                         size={size}
                         view={view}
                         text={text}
-                        iconLeft={<Icon type="location" size="xs" color={buttonIconColor} />}
+                        iconLeft={userPic || <Icon type="user" size="xs" color={buttonIconColor} />}
                         onClick={onButtonClick}
                     />
                 )}
@@ -200,7 +212,7 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
             <Popup
                 placement="top-start"
                 overflow="hidden"
-                visible={popupVisible && Boolean(data?.projectCompletion?.length)}
+                visible={popupVisible && Boolean(data?.findUserAnyKind?.length)}
                 onClickOutside={onClickOutside}
                 reference={popupRef}
                 interactive
@@ -209,12 +221,14 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
                 offset={[0, 4]}
             >
                 <>
-                    {data?.projectCompletion?.map((p, i) => (
-                        <ProjectCard
-                            key={p.id}
-                            title={p.title}
+                    {data?.findUserAnyKind?.map((u, i) => (
+                        <UserCard
+                            key={u.id}
+                            name={u.name}
+                            email={u.email!}
+                            image={u.image}
                             focused={cursor === i}
-                            onClick={onProjectCardClick(p as Project)}
+                            onClick={onUserCardClick(u)}
                         />
                     ))}
                 </>

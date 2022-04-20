@@ -17,21 +17,21 @@ import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { accentIconColor } from '../design/@generated/themes';
-import { UserDropdown } from './UserDropdown';
-import { ProjectDropdown } from './ProjectDropdown';
+import { UserCompletion } from './UserCompletion';
+import { ProjectCompletion } from './ProjectCompletion';
 import { EstimateDropdown } from './EstimateDropdown';
-import { StateCompletion } from './StateCompletion';
+import { StateDropdown } from './StateDropdown';
 import { UserPic } from './UserPic';
 import { useState } from 'react';
 import { UserAnyKind, Project, GoalEstimate, State } from '../../graphql/generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 
-interface CreateGoalProps {
+interface GoalCreateFormProps {
     card?: boolean;
     onCreate?: (id?: string) => void;
 }
 
-export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
+export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const [estimate, setEstimate] = useState<GoalEstimate>();
@@ -107,11 +107,11 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
 
     const formContent = (
         <Form onSubmit={handleSubmit(createGoal)}>
-            <ProjectDropdown
+            <ProjectCompletion
                 text={projectButtonText}
                 placeholder={t('Enter project title')}
                 query={project?.title}
-                onProjectClick={(p) => setProject(p)}
+                onClick={(p) => setProject(p)}
             />
 
             <Text h1>{t('Create new goal')}</Text>
@@ -132,17 +132,17 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
             <FormActions flat="top">
                 <FormActionLeft>
                     <Grid.Container>
-                        <UserDropdown
+                        <UserCompletion
                             size="m"
                             view="outline"
                             text={ownerButtonText}
                             placeholder={t('Enter name or email')}
                             query={owner?.name || owner?.email}
                             userPic={<UserPic src={owner?.image} size={16} />}
-                            onUserClick={(u) => setOwner(u)}
+                            onClick={(u) => setOwner(u)}
                         />
                         <Spacer w={0.5} />
-                        <StateCompletion
+                        <StateDropdown
                             size="m"
                             view="outline"
                             text={stateButtonText}

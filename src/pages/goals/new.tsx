@@ -2,7 +2,7 @@ import type { GetStaticPropsContext } from 'next';
 import { useTranslations } from 'next-intl';
 
 import { DialogPage } from '../../components/DialogPage';
-import { CreateGoal } from '../../components/CreateGoal';
+import { GoalCreateForm } from '../../components/GoalCreateForm';
 import { useRouter } from '../../hooks/router';
 
 function Page() {
@@ -11,7 +11,7 @@ function Page() {
 
     return (
         <DialogPage title={t('title')} heading={t('Create new goal')}>
-            <CreateGoal card onCreate={(id) => id && router.goal(id)} />
+            <GoalCreateForm card onCreate={(id) => id && router.goal(id)} />
         </DialogPage>
     );
 }

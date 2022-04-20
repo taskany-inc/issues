@@ -17,12 +17,12 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { accentIconColor } from '../design/@generated/themes';
 
-interface InviteUserProps {
+interface UserInviteFormProps {
     card?: boolean;
     onCreate?: (id?: string) => void;
 }
 
-export const InviteUser: React.FC<InviteUserProps> = ({ card, onCreate }) => {
+export const UserInviteForm: React.FC<UserInviteFormProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
     const t = useTranslations('users.invite');
 

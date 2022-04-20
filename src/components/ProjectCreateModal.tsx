@@ -3,23 +3,25 @@ import { useRouter as useNextRouter } from 'next/router';
 import tinykeys from 'tinykeys';
 
 import { routes, useRouter } from '../hooks/router';
-import { createHotkeys, inviteUserKeys } from '../utils/hotkeys';
+import { createProjectKeys, createHotkeys } from '../utils/hotkeys';
 import { DialogModal } from './DialogModal';
-import { InviteUser } from './InviteUser';
+import { ProjectCreateForm } from './ProjectCreateForm';
 
-export const InviteUserModal = () => {
+export const ProjectCreateModal = () => {
     const nextRouter = useNextRouter();
     const router = useRouter();
     const [modalVisible, setModalVisibility] = useState(false);
-    const isInviteUsersPath = nextRouter.pathname === routes.inviteUsers();
-    const showModalOrNavigate = (navigate: () => void) => (isInviteUsersPath ? navigate() : setModalVisibility(true));
+    const isCreateProjectPath = nextRouter.pathname === routes.createProject();
+    const showModalOrNavigate = (navigate: () => void) => (isCreateProjectPath ? navigate() : setModalVisibility(true));
     const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
 
-    useEffect(() => tinykeys(window, createHotkeys([inviteUserKeys, () => showModalOrNavigate(router.inviteUsers)])));
+    useEffect(() =>
+        tinykeys(window, createHotkeys([createProjectKeys, () => showModalOrNavigate(router.createProject)])),
+    );
 
     return (
         <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <InviteUser onCreate={() => setModalVisibility(false)} />
+            <ProjectCreateForm onCreate={(slug) => slug && router.project(slug)} />
         </DialogModal>
     );
 };

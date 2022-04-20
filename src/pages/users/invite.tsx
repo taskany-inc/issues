@@ -2,14 +2,14 @@ import type { GetStaticPropsContext } from 'next';
 import { useTranslations } from 'next-intl';
 
 import { DialogPage } from '../../components/DialogPage';
-import { InviteUser } from '../../components/InviteUser';
+import { UserInviteForm } from '../../components/UserInviteForm';
 
 function Page() {
     const t = useTranslations('users.invite');
 
     return (
         <DialogPage title={t('title')} heading={t('Invite new user')}>
-            <InviteUser card />
+            <UserInviteForm card />
         </DialogPage>
     );
 }
