@@ -1,12 +1,12 @@
 {
-  "name": "nextjs-prisma-gql-starter",
+  "name": "taskany-goals",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint && eslint --ext .js,.ts,.tsx .",
     "types:prisma": "prisma generate",
     "generate:themes": "nodemon --exec 'node ./scripts/themes.js' --watch 'src/design/themes/*.js'",
     "generate:nexus": "nodemon --exec 'ts-node --transpile-only -P nexus.tsconfig.json src/pages/api/graphql' --ext 'ts' --watch '*/graphql/**/*.ts'",
