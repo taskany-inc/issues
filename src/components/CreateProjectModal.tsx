@@ -21,7 +21,7 @@ export const CreateProjectModal = () => {
 
     return (
         <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <CreateProject onCreate={(id) => id && router.project(id)} />
+            <CreateProject onCreate={(slug) => slug && router.project(slug)} />
         </DialogModal>
     );
 };

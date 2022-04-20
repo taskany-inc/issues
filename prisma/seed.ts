@@ -29,9 +29,11 @@ seed('Default flows and states', async () => {
     await prisma.flow.create({
         data: {
             title: 'Goal — Default',
+            recommended: true,
             states: {
                 create: ['Draft', 'inProgress', 'Blocked', 'Finished', 'Failed', 'Canceled'].map((title) => ({
                     title,
+                    default: title === 'Draft',
                 })),
             },
         },

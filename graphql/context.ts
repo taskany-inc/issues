@@ -6,13 +6,16 @@ db.$use(async (params, next) => {
     if (params.model == 'User') {
         if (params.action == 'create') {
             const newUserEmail = params.args['data'].email;
-            const connectedGhost = await db.ghost.findUnique({ where: { email: newUserEmail }, include: { activity: true } });
+            const connectedGhost = await db.ghost.findUnique({
+                where: { email: newUserEmail },
+                include: { activity: true },
+            });
 
-            params.args['data'].host_id = connectedGhost?.host_id;
-            params.args['data'].activity_id = connectedGhost?.activity?.id;
-            params.args['data'].invited_at = connectedGhost?.created_at;
+            params.args['data'].hostId = connectedGhost?.hostId;
+            params.args['data'].activityId = connectedGhost?.activity?.id;
+            params.args['data'].invitedAt = connectedGhost?.createdAt;
 
-            await db.ghost.delete({ where: { id: connectedGhost?.id }});
+            await db.ghost.delete({ where: { id: connectedGhost?.id } });
         }
     }
 

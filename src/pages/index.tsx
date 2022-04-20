@@ -13,13 +13,14 @@ const fetcher = createFetcher(() => ({
         name: true,
         email: true,
         image: true,
-        created_at: true,
+        createdAt: true,
     },
 }));
 
 const Home: NextPage = () => {
     const { data: session } = useSession();
-    const { data, error } = useSWR('users', () => fetcher());
+    // @ts-ignore
+    const { data, error } = useSWR(session?.user?.role === 'ADMIN', () => fetcher());
     const t = useTranslations('index');
 
     return (

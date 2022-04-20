@@ -19,6 +19,11 @@ enum Role {
   ADMIN
 }
 
+enum Theme {
+  dark
+  light
+}
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -68,34 +73,34 @@ model User {
   sessions      Session[]
   role          Role      @default(USER)
   invites       Ghost[]   @relation("invite")
-  host          User?     @relation("invited", fields: [host_id], references: [id])
-  host_id       String?
+  host          User?     @relation("invited", fields: [hostId], references: [id])
+  hostId        String?
   invited       User[]    @relation("invited")
-  invited_at    DateTime?
-  activity      Activity? @relation(fields: [activity_id], references: [id])
-  activity_id   String?   @unique
+  invitedAt     DateTime?
+  activity      Activity? @relation(fields: [activityId], references: [id])
+  activityId    String?   @unique
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Ghost {
   id       String    @id @default(cuid())
   email    String    @unique
-  host     User      @relation("invite", fields: [host_id], references: [id])
-  host_id  String
+  host     User      @relation("invite", fields: [hostId], references: [id])
+  hostId   String
   activity Activity?
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([host_id])
+  @@index([hostId])
 }
 
 model Activity {
   id                 String     @id @default(cuid())
-  ghost              Ghost?     @relation(fields: [ghost_id], references: [id])
-  ghost_id           String?    @unique
+  ghost              Ghost?     @relation(fields: [ghostId], references: [id])
+  ghostId            String?    @unique
   user               User?
   comments           Comment[]
   reactions          Reaction[]
@@ -104,11 +109,13 @@ model Activity {
   goalParticipant    Goal[]     @relation("goalParticipants")
   goalOwner          Goal[]     @relation("goalOwner")
   goalIssuer         Goal[]     @relation("goalIssuer")
+  settings           Settings?  @relation(fields: [settingsId], references: [id])
+  settingsId         String?    @unique
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([ghost_id])
+  @@index([ghostId])
 }
 
 model Project {
@@ -118,31 +125,31 @@ model Project {
   description  String?
   parent       Project?   @relation("parentChildren", fields: [id], references: [id])
   children     Project[]  @relation("parentChildren")
-  owner        Activity?  @relation(fields: [owner_id], references: [id])
-  owner_id     String?
+  owner        Activity?  @relation(fields: [ownerId], references: [id])
+  ownerId      String?
   participants Activity[] @relation("projectParticipants")
   goals        Goal[]     @relation("projectGoals")
-  flow         Flow?      @relation(fields: [flow_id], references: [id])
-  flow_id      String?
+  flow         Flow       @relation(fields: [flowId], references: [id])
+  flowId       String
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@index([slug])
 }
 
 model Estimate {
-  id      Int     @id @default(autoincrement())
-  q       String?
-  y       String?
-  date    String?
-  goal    Goal    @relation(fields: [goal_id], references: [id])
-  goal_id Int
+  id     Int     @id @default(autoincrement())
+  q      String?
+  y      String?
+  date   String?
+  goal   Goal    @relation(fields: [goalId], references: [id])
+  goalId Int
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([goal_id])
+  @@index([goalId])
 }
 
 model Goal {
@@ -154,12 +161,14 @@ model Goal {
   private      Boolean?
   estimate     Estimate[]
   criteria     Criteria[] // not implemented
-  project      Project?   @relation("projectGoals", fields: [project_id], references: [id])
-  project_id   Int?
-  issuer       Activity?  @relation("goalIssuer", fields: [issuer_id], references: [id])
-  issuer_id    String?
-  owner        Activity?  @relation("goalOwner", fields: [owner_id], references: [id])
-  owner_id     String?
+  project      Project?   @relation("projectGoals", fields: [projectId], references: [id])
+  projectId    Int?
+  state      State?   @relation("goalState", fields: [stateId], references: [id])
+  stateId    String?
+  issuer       Activity?  @relation("goalIssuer", fields: [issuerId], references: [id])
+  issuerId     String?
+  owner        Activity?  @relation("goalOwner", fields: [ownerId], references: [id])
+  ownerId      String?
   participants Activity[] @relation("goalParticipants")
   comments     Comment[] // not implemented
   reactions    Reaction[] // not implemented
@@ -169,70 +178,91 @@ model Goal {
   relatedTo Goal[] @relation("connected")
   connected Goal[] @relation("connected")
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([owner_id])
-  @@index([issuer_id])
+  @@index([ownerId])
+  @@index([issuerId])
 }
 
 model Criteria {
-  id      String  @id @default(cuid())
-  title   String
-  done    Boolean
-  goal    Goal    @relation(fields: [goal_id], references: [id])
-  goal_id Int
+  id     String  @id @default(cuid())
+  title  String
+  done   Boolean
+  goal   Goal    @relation(fields: [goalId], references: [id])
+  goalId Int
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([goal_id])
+  @@index([goalId])
 }
 
 model Comment {
   id          String     @id @default(cuid())
   description String
-  author      Activity   @relation(fields: [author_id], references: [id])
-  author_id   String
-  goal        Goal       @relation(fields: [goal_id], references: [id])
-  goal_id     Int
+  author      Activity   @relation(fields: [authorId], references: [id])
+  authorId    String
+  goal        Goal       @relation(fields: [goalId], references: [id])
+  goalId      Int
   reactions   Reaction[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([author_id])
-  @@index([goal_id])
+  @@index([authorId])
+  @@index([goalId])
 }
 
 model Reaction {
-  id         String   @id @default(cuid())
-  emoji      String
-  author     Activity @relation(fields: [author_id], references: [id])
-  author_id  String
-  goal       Goal?    @relation(fields: [goal_id], references: [id])
-  goal_id    Int?
-  comment    Comment? @relation(fields: [comment_id], references: [id])
-  comment_id String?
+  id        String   @id @default(cuid())
+  emoji     String
+  author    Activity @relation(fields: [authorId], references: [id])
+  authorId  String
+  goal      Goal?    @relation(fields: [goalId], references: [id])
+  goalId    Int?
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  commentId String?
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([author_id])
-  @@index([goal_id])
-  @@index([comment_id])
+  @@index([authorId])
+  @@index([goalId])
+  @@index([commentId])
 }
 
 model Flow {
-  id       String    @id @default(cuid())
-  title    String    @unique
+  id       String     @id @default(cuid())
+  title    String     @unique
   graph    String? // [[stateId, stateId], [stateId, stateId]] — any transition allowed if undefined
+  settings Settings[]
   projects Project[]
   states   State[]
+  recommended Boolean?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model State {
   id    String @id @default(cuid())
   title String @unique
   flows Flow[]
+  default Boolean?
+  goals Goal[] @relation("goalState")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Settings {
+  id       String    @id @default(cuid())
+  theme    Theme?
+  flow     Flow?     @relation(fields: [flowId], references: [id])
+  flowId   String?
+  activity Activity?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }

@@ -4,27 +4,27 @@ module.exports = {
         2,
         4,
         5,
-        8,
-        13,
+        9,
         14,
-        17
+        15,
+        19
     ],
     "types": {
         "Activity": {
-            "created_at": [
+            "createdAt": [
                 2
             ],
             "ghost": [
-                6
+                7
             ],
             "id": [
                 1
             ],
-            "updated_at": [
+            "updatedAt": [
                 2
             ],
             "user": [
-                15
+                17
             ],
             "__typename": [
                 4
@@ -51,30 +51,50 @@ module.exports = {
         },
         "String": {},
         "Int": {},
+        "Flow": {
+            "graph": [
+                4
+            ],
+            "id": [
+                1
+            ],
+            "projects": [
+                12
+            ],
+            "states": [
+                16
+            ],
+            "title": [
+                4
+            ],
+            "__typename": [
+                4
+            ]
+        },
         "Ghost": {
             "activity": [
                 0
             ],
-            "created_at": [
+            "createdAt": [
                 2
             ],
             "email": [
                 4
             ],
             "host": [
-                15
+                17
             ],
-            "host_id": [
+            "hostId": [
                 4
             ],
             "id": [
                 1
             ],
-            "updated_at": [
+            "updatedAt": [
                 2
             ],
             "user": [
-                15
+                17
             ],
             "__typename": [
                 4
@@ -82,19 +102,19 @@ module.exports = {
         },
         "Goal": {
             "blocks": [
-                7
+                8
             ],
             "computedOwner": [
-                16
+                18
             ],
             "connected": [
-                7
+                8
             ],
-            "created_at": [
+            "createdAt": [
                 2
             ],
             "dependsOn": [
-                7
+                8
             ],
             "description": [
                 4
@@ -108,40 +128,43 @@ module.exports = {
             "issuer": [
                 0
             ],
-            "issuer_id": [
+            "issuerId": [
                 4
             ],
             "key": [
-                8
+                9
             ],
             "owner": [
                 0
             ],
-            "owner_id": [
+            "ownerId": [
                 4
             ],
             "participants": [
                 0
             ],
             "personal": [
-                8
+                9
             ],
             "private": [
-                8
+                9
             ],
             "project": [
-                11
+                12
             ],
-            "project_id": [
+            "projectId": [
                 5
             ],
             "relatedTo": [
-                7
+                8
+            ],
+            "stateId": [
+                4
             ],
             "title": [
                 4
             ],
-            "updated_at": [
+            "updatedAt": [
                 2
             ],
             "__typename": [
@@ -165,49 +188,56 @@ module.exports = {
         },
         "Mutation": {
             "createGoal": [
-                7,
+                8,
                 {
                     "description": [
                         4,
                         "String!"
                     ],
                     "estimate": [
-                        9
+                        10
                     ],
                     "key": [
-                        8
+                        9
                     ],
-                    "owner_id": [
+                    "ownerId": [
                         4,
                         "String!"
                     ],
                     "personal": [
-                        8
+                        9
                     ],
                     "private": [
-                        8
+                        9
                     ],
-                    "project_id": [
+                    "projectId": [
                         5,
                         "Int!"
+                    ],
+                    "stateId": [
+                        4
                     ],
                     "title": [
                         4,
                         "String!"
                     ],
                     "user": [
-                        18,
+                        20,
                         "UserSession!"
                     ]
                 }
             ],
             "createProject": [
-                11,
+                12,
                 {
                     "description": [
                         4
                     ],
-                    "owner_id": [
+                    "flowId": [
+                        4,
+                        "String!"
+                    ],
+                    "ownerId": [
                         4,
                         "String!"
                     ],
@@ -216,20 +246,20 @@ module.exports = {
                         "String!"
                     ],
                     "user": [
-                        18,
+                        20,
                         "UserSession!"
                     ]
                 }
             ],
             "inviteUser": [
-                6,
+                7,
                 {
                     "email": [
                         4,
                         "String!"
                     ],
                     "user": [
-                        18,
+                        20,
                         "UserSession!"
                     ]
                 }
@@ -240,16 +270,19 @@ module.exports = {
         },
         "Project": {
             "computedOwner": [
-                16
+                18
             ],
-            "created_at": [
+            "createdAt": [
                 2
             ],
             "description": [
                 4
             ],
+            "flow": [
+                6
+            ],
             "goals": [
-                7
+                8
             ],
             "id": [
                 5
@@ -263,7 +296,7 @@ module.exports = {
             "title": [
                 4
             ],
-            "updated_at": [
+            "updatedAt": [
                 2
             ],
             "__typename": [
@@ -272,6 +305,51 @@ module.exports = {
         },
         "Query": {
             "findGhost": [
+                7,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        15
+                    ]
+                }
+            ],
+            "findUser": [
+                17,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        15
+                    ]
+                }
+            ],
+            "findUserAnyKind": [
+                18,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        15
+                    ]
+                }
+            ],
+            "flow": [
+                6,
+                {
+                    "id": [
+                        4,
+                        "String!"
+                    ]
+                }
+            ],
+            "flowCompletion": [
                 6,
                 {
                     "query": [
@@ -279,45 +357,36 @@ module.exports = {
                         "String!"
                     ],
                     "sortBy": [
-                        14
+                        15
                     ]
                 }
             ],
-            "findUser": [
-                15,
-                {
-                    "query": [
-                        4,
-                        "String!"
-                    ],
-                    "sortBy": [
-                        14
-                    ]
-                }
-            ],
-            "findUserAnyKind": [
-                16,
-                {
-                    "query": [
-                        4,
-                        "String!"
-                    ],
-                    "sortBy": [
-                        14
-                    ]
-                }
+            "flowRecommended": [
+                6
             ],
             "project": [
-                11,
+                12,
                 {
                     "slug": [
                         4,
                         "String!"
+                    ]
+                }
+            ],
+            "projectCompletion": [
+                12,
+                {
+                    "query": [
+                        4,
+                        "String!"
+                    ],
+                    "sortBy": [
+                        15
                     ]
                 }
             ],
             "projectGoals": [
-                7,
+                8,
                 {
                     "slug": [
                         4,
@@ -325,23 +394,11 @@ module.exports = {
                     ]
                 }
             ],
-            "projectsCompletion": [
-                11,
-                {
-                    "query": [
-                        4,
-                        "String!"
-                    ],
-                    "sortBy": [
-                        14
-                    ]
-                }
-            ],
             "users": [
-                15,
+                17,
                 {
                     "sortBy": [
-                        14
+                        15
                     ]
                 }
             ],
@@ -351,14 +408,31 @@ module.exports = {
         },
         "Role": {},
         "SortOrder": {},
+        "State": {
+            "default": [
+                9
+            ],
+            "flows": [
+                6
+            ],
+            "id": [
+                1
+            ],
+            "title": [
+                4
+            ],
+            "__typename": [
+                4
+            ]
+        },
         "User": {
             "activity": [
                 0
             ],
-            "activity_id": [
+            "activityId": [
                 4
             ],
-            "created_at": [
+            "createdAt": [
                 2
             ],
             "email": [
@@ -374,9 +448,9 @@ module.exports = {
                 4
             ],
             "role": [
-                13
+                14
             ],
-            "updated_at": [
+            "updatedAt": [
                 2
             ],
             "__typename": [
@@ -397,7 +471,7 @@ module.exports = {
                 4
             ],
             "kind": [
-                17
+                19
             ],
             "name": [
                 4
@@ -421,7 +495,7 @@ module.exports = {
                 4
             ],
             "role": [
-                13
+                14
             ],
             "__typename": [
                 4
