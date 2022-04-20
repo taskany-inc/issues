@@ -20,9 +20,10 @@ import { accentIconColor } from '../design/@generated/themes';
 import { UserDropdown } from './UserDropdown';
 import { ProjectDropdown } from './ProjectDropdown';
 import { EstimateDropdown } from './EstimateDropdown';
+import { StateCompletion } from './StateCompletion';
 import { UserPic } from './UserPic';
 import { useState } from 'react';
-import { UserAnyKind, Project, GoalEstimate } from '../../graphql/generated/genql';
+import { UserAnyKind, Project, GoalEstimate, State } from '../../graphql/generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 
 interface CreateGoalProps {
@@ -34,7 +35,8 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const [estimate, setEstimate] = useState<GoalEstimate>();
-    const [project, setProject] = useState<Partial<Project>>();
+    const [project, setProject] = useState<Project>();
+    const [state, setState] = useState<State>();
     const t = useTranslations('goals.new');
 
     const schema = z.object({
@@ -76,9 +78,10 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
                     user: session!.user,
                     title,
                     description,
-                    owner_id: owner.id!,
-                    project_id: project?.id!,
+                    ownerId: owner.id!,
+                    projectId: project?.id!,
                     estimate,
+                    stateId: state?.id,
                 },
                 {
                     id: true,
@@ -99,6 +102,7 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');
     const projectButtonText = project?.title || t('Enter project title');
+    const stateButtonText = state?.title || project?.flow?.states?.filter(s => s?.default)[0]?.title || t('State');
     const estimateDefault = estimatedMeta();
 
     const formContent = (
@@ -138,6 +142,14 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
                             onUserClick={(u) => setOwner(u)}
                         />
                         <Spacer w={0.5} />
+                        <StateCompletion
+                            size="m"
+                            view="outline"
+                            text={stateButtonText}
+                            flowId={project?.flow?.id}
+                            onClick={(s) => setState(s)}
+                        />
+                        <Spacer w={0.5} />
                         <EstimateDropdown
                             size="m"
                             view="outline"
@@ -150,7 +162,7 @@ export const CreateGoal: React.FC<CreateGoalProps> = ({ card, onCreate }) => {
                     </Grid.Container>
                 </FormActionLeft>
                 <FormActionRight>
-                    <Button size="l" view="primary-outline" type="submit" disabled={!isValid} text={t('Create goal')} />
+                    <Button size="m" view="primary-outline" type="submit" disabled={!isValid} text={t('Create goal')} />
                 </FormActionRight>
             </FormActions>
             <Spacer />

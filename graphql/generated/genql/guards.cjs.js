@@ -15,6 +15,14 @@ module.exports.isEstimate = function(obj) {
 
 
 
+var Flow_possibleTypes = ['Flow']
+module.exports.isFlow = function(obj) {
+  if (!obj || !obj.__typename) throw new Error('__typename is missing in "isFlow"')
+  return Flow_possibleTypes.includes(obj.__typename)
+}
+
+
+
 var Ghost_possibleTypes = ['Ghost']
 module.exports.isGhost = function(obj) {
   if (!obj || !obj.__typename) throw new Error('__typename is missing in "isGhost"')
@@ -51,6 +59,14 @@ var Query_possibleTypes = ['Query']
 module.exports.isQuery = function(obj) {
   if (!obj || !obj.__typename) throw new Error('__typename is missing in "isQuery"')
   return Query_possibleTypes.includes(obj.__typename)
+}
+
+
+
+var State_possibleTypes = ['State']
+module.exports.isState = function(obj) {
+  if (!obj || !obj.__typename) throw new Error('__typename is missing in "isState"')
+  return State_possibleTypes.includes(obj.__typename)
 }
 
 

@@ -1,10 +1,11 @@
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer, Text } from '@geist-ui/core';
+import { Spacer, Text, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import z from 'zod';
+import useSWR from 'swr';
 
 import { gql } from '../utils/gql';
 import { Card } from './Card';
@@ -18,19 +19,42 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { accentIconColor } from '../design/@generated/themes';
 import { UserDropdown } from './UserDropdown';
+import { FlowDropdown } from './FlowDropdown';
 import { UserPic } from './UserPic';
-import { useState } from 'react';
-import { UserAnyKind } from '../../graphql/generated/genql';
+import { useEffect, useState } from 'react';
+import { Flow, UserAnyKind } from '../../graphql/generated/genql';
+import { createFetcher } from '../utils/createFetcher';
 
 interface CreateProjectProps {
     card?: boolean;
     onCreate?: (slug?: string) => void;
 }
 
+const fetcher = createFetcher(() => ({
+    flowRecommended:
+        {
+            id: true,
+            title: true,
+            states: {
+                id: true,
+                title: true,
+            },
+        },
+
+}));
+
 export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
+    const [flow, setFlow] = useState<Partial<Flow>>();
     const t = useTranslations('projects.new');
+    const { data } = useSWR('flowRecommened', () => fetcher(session?.user));
+
+    useEffect(() => {
+        if (data?.flowRecommended) {
+            setFlow(data?.flowRecommended[0]);
+        }
+    }, [data?.flowRecommended]);
 
     const schema = z.object({
         title: z
@@ -64,7 +88,8 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) 
                     user: session!.user,
                     title,
                     description,
-                    owner_id: owner.id!,
+                    ownerId: owner.id!,
+                    flowId: flow?.id!,
                 },
                 {
                     id: true,
@@ -75,7 +100,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) 
 
         toast.promise(promise, {
             error: t('Something went wrong 😿'),
-            loading: t('We are creating new project...'),
+            loading: t('We are creating new project'),
             success: t('Voila! Project is here 🎉'),
         });
 
@@ -85,6 +110,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) 
     };
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');
+    const flowButtonText = flow?.title || t('Flow');
 
     const formContent = (
         <Form onSubmit={handleSubmit(createProject)}>
@@ -105,19 +131,31 @@ export const CreateProject: React.FC<CreateProjectProps> = ({ card, onCreate }) 
             />
             <FormActions flat="top">
                 <FormActionLeft>
-                    <UserDropdown
-                        size="m"
-                        view="outline"
-                        text={ownerButtonText}
-                        placeholder={t('Enter name or email')}
-                        query={owner?.name || owner?.email}
-                        userPic={<UserPic src={owner?.image} size={16} />}
-                        onUserClick={(u) => setOwner(u)}
-                    />
+                    <Grid.Container>
+                        <UserDropdown
+                            size="m"
+                            view="outline"
+                            text={ownerButtonText}
+                            placeholder={t('Enter name or email')}
+                            query={owner?.name || owner?.email}
+                            userPic={<UserPic src={owner?.image} size={16} />}
+                            onUserClick={(u) => setOwner(u)}
+                        />
+                        <Spacer w={0.5} />
+                        <FlowDropdown
+                            disabled
+                            size="m"
+                            view="outline"
+                            text={flowButtonText}
+                            placeholder={t('Flow or state title')}
+                            query={flow?.title}
+                            onClick={(f) => setFlow(f)}
+                        />
+                    </Grid.Container>
                 </FormActionLeft>
                 <FormActionRight>
                     <Button
-                        size="l"
+                        size="m"
                         view="primary-outline"
                         type="submit"
                         disabled={!isValid}

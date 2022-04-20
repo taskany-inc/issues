@@ -14,19 +14,20 @@ import {
     buttonIconColor,
 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
-import { Project } from '../../graphql/generated/genql';
+import { Flow } from '../../graphql/generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 
-interface ProjectDropdownProps {
+interface FlowDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
+    disabled?: React.ComponentProps<typeof Button>['disabled'];
     text: React.ComponentProps<typeof Button>['text'];
     query?: string;
     placeholder?: string;
-    onProjectClick?: (project: Project) => void;
+    onClick?: (flow: Flow) => void;
 }
 
-const StyledProjectCard = styled.div<{ focused?: boolean }>`
+const StyledItemCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
     border: 1px solid ${buttonBorderColor};
     border-radius: 6px;
@@ -50,57 +51,53 @@ const StyledProjectCard = styled.div<{ focused?: boolean }>`
             background-color: ${buttonBackgroundColorHover};
         `}
 `;
-const StyledProjectInfo = styled.div`
+const StyledItemInfo = styled.div`
     padding-left: 4px;
 `;
-const StyledProjectTitle = styled.div`
+const StyledItemTitle = styled.div`
     font-size: 14px;
     font-weight: 600;
 `;
-const ProjectCard: React.FC<{ title?: string; focused?: boolean; onClick?: () => void }> = ({
-    title,
-    focused,
-    onClick,
-}) => {
+const ItemCard: React.FC<{
+    title?: string;
+    states: Flow['states'];
+    graph?: string;
+    focused?: boolean;
+    onClick?: () => void;
+}> = ({ title, states, graph, focused, onClick }) => {
     return (
-        <StyledProjectCard onClick={onClick} focused={focused}>
-            <StyledProjectInfo>
-                <StyledProjectTitle>{title}</StyledProjectTitle>
-            </StyledProjectInfo>
-        </StyledProjectCard>
+        <StyledItemCard onClick={onClick} focused={focused}>
+            <StyledItemInfo>
+                <StyledItemTitle>{title}</StyledItemTitle>
+            </StyledItemInfo>
+        </StyledItemCard>
     );
 };
 
 const StyledDropdownContainer = styled.div``;
 
 const fetcher = createFetcher((_, query: string) => ({
-    projectCompletion: [
+    flowCompletion: [
         {
             query,
         },
         {
             id: true,
-            slug: true,
             title: true,
-            description: true,
-            flow: {
+            states: {
                 id: true,
                 title: true,
-                states: {
-                    id: true,
-                    title: true,
-                    default: true,
-                }
-            }
+            },
         },
     ],
 }));
 
-export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
+export const FlowDropdown: React.FC<FlowDropdownProps> = ({
     size,
     text,
     view,
-    onProjectClick,
+    disabled,
+    onClick,
     query = '',
     placeholder,
 }) => {
@@ -125,8 +122,6 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
         setPopupVisibility(true);
     };
 
-    const onInputBlur = () => {};
-
     const { data } = useSWR(inputState, (query) => fetcher(session?.user, query));
 
     const { bindings: onESC } = useKeyboard(
@@ -142,8 +137,8 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
 
     const { bindings: onENTER } = useKeyboard(
         () => {
-            if (data?.projectCompletion?.length) {
-                onProjectCardClick(data?.projectCompletion[cursor] as Project)();
+            if (data?.flowCompletion?.length) {
+                onItemClick(data?.flowCompletion[cursor])();
                 popupRef.current?.focus();
             }
         },
@@ -153,45 +148,38 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
         },
     );
 
-    const onProjectCardClick = (project: Project) => () => {
+    const onItemClick = (flow: Flow) => () => {
         setEditMode(false);
         setPopupVisibility(false);
-        onProjectClick && onProjectClick(project);
-        setInputState(project.title || '');
+        onClick && onClick(flow);
+        setInputState(flow.title);
     };
 
     useEffect(() => {
-        if (data?.projectCompletion?.length && downPress) {
-            setCursor((prevState) => (prevState < data?.projectCompletion?.length! - 1 ? prevState + 1 : prevState));
+        if (data?.flowCompletion?.length && downPress) {
+            setCursor((prevState) => (prevState < data?.flowCompletion?.length! - 1 ? prevState + 1 : prevState));
         }
-    }, [data?.projectCompletion, downPress]);
+    }, [data?.flowCompletion, downPress]);
 
     useEffect(() => {
-        if (data?.projectCompletion?.length && upPress) {
+        if (data?.flowCompletion?.length && upPress) {
             setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
         }
-    }, [data?.projectCompletion, upPress]);
+    }, [data?.flowCompletion, upPress]);
 
     return (
         <>
             <StyledDropdownContainer ref={popupRef} {...onESC}>
                 {editMode ? (
-                    <Input
-                        placeholder={placeholder}
-                        scale={0.78}
-                        autoFocus
-                        onBlur={onInputBlur}
-                        {...onInput}
-                        {...onENTER}
-                    />
+                    <Input placeholder={placeholder} scale={0.8} autoFocus {...onInput} {...onENTER} />
                 ) : (
                     <Button
-                        ghost
                         ref={buttonRef}
+                        disabled={disabled}
                         size={size}
                         view={view}
                         text={text}
-                        iconLeft={<Icon type="location" size="xs" color={buttonIconColor} />}
+                        iconLeft={<Icon type="flow" size="xs" color={buttonIconColor} />}
                         onClick={onButtonClick}
                     />
                 )}
@@ -200,7 +188,7 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
             <Popup
                 placement="top-start"
                 overflow="hidden"
-                visible={popupVisible && Boolean(data?.projectCompletion?.length)}
+                visible={popupVisible && Boolean(data?.flowCompletion?.length)}
                 onClickOutside={onClickOutside}
                 reference={popupRef}
                 interactive
@@ -209,12 +197,14 @@ export const ProjectDropdown: React.FC<ProjectDropdownProps> = ({
                 offset={[0, 4]}
             >
                 <>
-                    {data?.projectCompletion?.map((p, i) => (
-                        <ProjectCard
-                            key={p.id}
-                            title={p.title}
+                    {data?.flowCompletion?.map((f, i) => (
+                        <ItemCard
+                            key={f.id}
+                            title={f.title}
+                            states={f.states}
+                            graph={f.graph}
                             focused={cursor === i}
-                            onClick={onProjectCardClick(p as Project)}
+                            onClick={onItemClick(f)}
                         />
                     ))}
                 </>

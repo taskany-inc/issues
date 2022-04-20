@@ -1,8 +1,8 @@
 type Activity {
-  created_at: DateTime!
+  createdAt: DateTime!
   ghost: Ghost
   id: ID!
-  updated_at: DateTime!
+  updatedAt: DateTime!
   user: User
 }
 
@@ -18,14 +18,22 @@ type Estimate {
   y: String
 }
 
+type Flow {
+  graph: String
+  id: ID!
+  projects: [Project]
+  states: [State]
+  title: String!
+}
+
 type Ghost {
   activity: Activity
-  created_at: DateTime!
+  createdAt: DateTime!
   email: String!
   host: User
-  host_id: String!
+  hostId: String!
   id: ID!
-  updated_at: DateTime!
+  updatedAt: DateTime!
   user: User
 }
 
@@ -33,24 +41,25 @@ type Goal {
   blocks: [Goal]
   computedOwner: UserAnyKind
   connected: [Goal]
-  created_at: DateTime!
+  createdAt: DateTime!
   dependsOn: [Goal]
   description: String!
   estimate: Estimate
   id: Int!
   issuer: Activity
-  issuer_id: String
+  issuerId: String
   key: Boolean
   owner: Activity
-  owner_id: String
+  ownerId: String
   participants: [Activity]
   personal: Boolean
   private: Boolean
   project: [Project]
-  project_id: Int
+  projectId: Int
   relatedTo: [Goal]
+  stateId: String
   title: String!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 input GoalEstimate {
@@ -60,30 +69,34 @@ input GoalEstimate {
 }
 
 type Mutation {
-  createGoal(description: String!, estimate: GoalEstimate, key: Boolean, owner_id: String!, personal: Boolean, private: Boolean, project_id: Int!, title: String!, user: UserSession!): Goal
-  createProject(description: String, owner_id: String!, title: String!, user: UserSession!): Project
+  createGoal(description: String!, estimate: GoalEstimate, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, title: String!, user: UserSession!): Goal
+  createProject(description: String, flowId: String!, ownerId: String!, title: String!, user: UserSession!): Project
   inviteUser(email: String!, user: UserSession!): Ghost
 }
 
 type Project {
   computedOwner: UserAnyKind
-  created_at: DateTime!
+  createdAt: DateTime!
   description: String
+  flow: Flow
   goals: [Goal]
   id: Int!
   owner: Activity
   slug: String
   title: String!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type Query {
   findGhost(query: String!, sortBy: SortOrder): [Ghost]
   findUser(query: String!, sortBy: SortOrder): [User]
   findUserAnyKind(query: String!, sortBy: SortOrder): [UserAnyKind]
+  flow(id: String!): Flow
+  flowCompletion(query: String!, sortBy: SortOrder): [Flow]
+  flowRecommended: [Flow]
   project(slug: String!): Project
+  projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(slug: String!): [Goal]
-  projectsCompletion(query: String!, sortBy: SortOrder): [Project]
   users(sortBy: SortOrder): [User]
 }
 
@@ -97,16 +110,23 @@ enum SortOrder {
   desc
 }
 
+type State {
+  default: Boolean
+  flows: [Flow]
+  id: ID!
+  title: String!
+}
+
 type User {
   activity: Activity
-  activity_id: String
-  created_at: DateTime!
+  activityId: String
+  createdAt: DateTime!
   email: String!
   id: ID!
   image: String
   name: String
   role: Role!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type UserAnyKind {

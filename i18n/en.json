@@ -22,7 +22,7 @@
       "Project's title must be a string": "Project's title must be a string",
       "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
       "Something went wrong 😿": "Something went wrong 😿",
-      "We are creating new project...": "We are creating new project...",
+      "We are creating new project": "We are creating new project...",
       "Voila! Project is here 🎉": "Voila! Project is here 🎉",
       "Create project": "Create project",
       "Project's title": "Project's title",
@@ -30,7 +30,9 @@
       "Pro tip!": "Pro tip!",
       "Press key to create the project": "Press <key></key> to create the project.",
       "Assign": "Assign",
-      "Enter name or email": "Enter name or email"
+      "Enter name or email": "Enter name or email",
+      "Flow": "Flow",
+      "Flow or state title": "Flow or state title"
     }
   },
   "users": {
@@ -71,7 +73,8 @@
       "Enter project title": "Enter project title",
       "Schedule": "Schedule",
       "Date input mask placeholder": "mm/dd/yyyy",
-      "Date input mask": "99/99/9999"
+      "Date input mask": "99/99/9999",
+      "State": "State"
     }
   }
 }

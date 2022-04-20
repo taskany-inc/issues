@@ -21,6 +21,8 @@ import {
     Activity as ActivityModel,
     Goal as GoalModel,
     Estimate as EstimateModel,
+    Flow as FlowModel,
+    State as StateModel,
 } from 'nexus-prisma';
 import slugify from 'slugify';
 
@@ -65,10 +67,10 @@ const User = objectType({
         t.field(UserModel.name);
         t.field(UserModel.image);
         t.field('activity', { type: Activity });
-        t.field(UserModel.activity_id);
+        t.field(UserModel.activityId);
         t.field(UserModel.role);
-        t.field(UserModel.created_at);
-        t.field(UserModel.updated_at);
+        t.field(UserModel.createdAt);
+        t.field(UserModel.updatedAt);
     },
 });
 
@@ -78,8 +80,8 @@ const Activity = objectType({
         t.field(ActivityModel.id);
         t.field('user', { type: User });
         t.field('ghost', { type: Ghost });
-        t.field(ActivityModel.created_at);
-        t.field(ActivityModel.updated_at);
+        t.field(ActivityModel.createdAt);
+        t.field(ActivityModel.updatedAt);
     },
 });
 
@@ -89,10 +91,10 @@ const Ghost = objectType({
         t.field(GhostModel.id);
         t.field(GhostModel.email);
         t.field('host', { type: User });
-        t.field(GhostModel.host_id);
+        t.field(GhostModel.hostId);
         t.field('user', { type: User });
-        t.field(GhostModel.created_at);
-        t.field(GhostModel.updated_at);
+        t.field(GhostModel.createdAt);
+        t.field(GhostModel.updatedAt);
         t.field('activity', { type: Activity });
     },
 });
@@ -119,8 +121,9 @@ const Project = objectType({
         t.field('owner', { type: Activity });
         t.field('computedOwner', { type: UserAnyKind });
         t.list.field('goals', { type: Goal });
-        t.field(ProjectModel.created_at);
-        t.field(ProjectModel.updated_at);
+        t.field('flow', { type: Flow });
+        t.field(ProjectModel.createdAt);
+        t.field(ProjectModel.updatedAt);
     },
 });
 
@@ -134,15 +137,16 @@ const Goal = objectType({
         t.field(GoalModel.personal);
         t.field(GoalModel.private);
         t.field('estimate', { type: Estimate });
-        t.field(GoalModel.created_at);
-        t.field(GoalModel.updated_at);
+        t.field(GoalModel.createdAt);
+        t.field(GoalModel.updatedAt);
         t.field('issuer', { type: Activity });
-        t.field(GoalModel.issuer_id);
+        t.field(GoalModel.issuerId);
         t.field('owner', { type: Activity });
-        t.field(GoalModel.owner_id);
+        t.field(GoalModel.ownerId);
         t.list.field('participants', { type: Activity });
         t.list.field('project', { type: Project });
-        t.field(GoalModel.project_id);
+        t.field(GoalModel.projectId);
+        t.field(GoalModel.stateId);
         t.list.field('dependsOn', { type: Goal });
         t.list.field('blocks', { type: Goal });
         t.list.field('relatedTo', { type: Goal });
@@ -170,17 +174,38 @@ const GoalEstimate = inputObjectType({
     },
 });
 
+const Flow = objectType({
+    name: FlowModel.$name,
+    definition(t) {
+        t.field(FlowModel.id);
+        t.field(FlowModel.title);
+        t.field(FlowModel.graph);
+        t.list.field('projects', { type: Project });
+        t.list.field('states', { type: State });
+    },
+});
+
+const State = objectType({
+    name: StateModel.$name,
+    definition(t) {
+        t.field(StateModel.id);
+        t.field(StateModel.title);
+        t.field(StateModel.default);
+        t.list.field('flows', { type: Flow });
+    },
+});
+
 const computeOwnerFields = {
     include: {
         user: true,
         ghost: true,
-    }
+    },
 };
 
 const withComputedOwner = <T>(o: T): T => ({
-        ...o,
-        // @ts-ignore
-        computedOwner: o?.owner?.user || o?.owner?.ghost,
+    ...o,
+    // @ts-ignore
+    computedOwner: o?.owner?.user || o?.owner?.ghost,
 });
 
 const Query = queryType({
@@ -192,7 +217,7 @@ const Query = queryType({
             },
             resolve: async (_, { sortBy }, { db }) =>
                 db.user.findMany({
-                    orderBy: { created_at: sortBy || undefined },
+                    orderBy: { createdAt: sortBy || undefined },
                 }),
         });
 
@@ -323,7 +348,7 @@ const Query = queryType({
                 });
 
                 return withComputedOwner(project);
-            }
+            },
         });
 
         t.list.field('projectGoals', {
@@ -346,10 +371,10 @@ const Query = queryType({
                 });
 
                 return goals.map(withComputedOwner);
-            }
+            },
         });
 
-        t.list.field('projectsCompletion', {
+        t.list.field('projectCompletion', {
             type: Project,
             args: {
                 sortBy: arg({ type: SortOrder }),
@@ -361,7 +386,7 @@ const Query = queryType({
                 }
 
                 return db.project.findMany({
-                    orderBy: { created_at: sortBy || undefined },
+                    orderBy: { createdAt: sortBy || undefined },
                     where: {
                         title: {
                             contains: query,
@@ -372,11 +397,87 @@ const Query = queryType({
                         owner: {
                             include: {
                                 user: true,
+                            },
+                        },
+                        flow: {
+                            include: {
+                                states: true
                             }
                         },
                     },
                 });
-            }
+            },
+        });
+
+        t.list.field('flowCompletion', {
+            type: Flow,
+            args: {
+                sortBy: arg({ type: SortOrder }),
+                query: nonNull(stringArg()),
+            },
+            resolve: async (_, { sortBy, query }, { db }) => {
+                if (query === '') {
+                    return [];
+                }
+
+                return db.flow.findMany({
+                    orderBy: { createdAt: sortBy || undefined },
+                    where: {
+                        OR: [
+                            {
+                                title: {
+                                    contains: query,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                states: {
+                                    some: {
+                                        title: {
+                                            contains: query,
+                                            mode: 'insensitive',
+                                        },
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                    include: {
+                        states: true,
+                    },
+                });
+            },
+        });
+
+        t.list.field('flowRecommended', {
+            type: Flow,
+            resolve: async (_, {}, { db }) => {
+                return db.flow.findMany({
+                    where: {
+                        recommended: true,
+                    },
+                    include: {
+                        states: true,
+                    },
+                });
+            },
+        });
+
+        t.field('flow', {
+            type: Flow,
+            args: {
+                id: nonNull(stringArg()),
+            },
+            resolve: async (_, { id }, { db }) => {
+                return db.flow.findUnique({
+                    where: {
+                        id,
+                    },
+                    include: {
+                        states: true,
+                    },
+                });
+            },
         });
     },
 });
@@ -388,12 +489,13 @@ const Mutation = mutationType({
             args: {
                 title: nonNull(stringArg()),
                 description: stringArg(),
-                owner_id: nonNull(stringArg()),
+                ownerId: nonNull(stringArg()),
+                flowId: nonNull(stringArg()),
                 user: nonNull(arg({ type: UserSession })),
             },
-            resolve: async (_, { user, title, description, owner_id }, { db }) => {
+            resolve: async (_, { user, title, description, ownerId, flowId }, { db }) => {
                 const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
-                const projectOwner = await db.user.findUnique({ where: { id: owner_id }, include: { activity: true } });
+                const projectOwner = await db.user.findUnique({ where: { id: ownerId }, include: { activity: true } });
 
                 if (!validUser) return null;
 
@@ -405,7 +507,8 @@ const Mutation = mutationType({
                             slug: slugify(title, slugifyOptions),
                             title,
                             description,
-                            owner_id: resolvedOwnerId,
+                            ownerId: resolvedOwnerId,
+                            flowId,
                         },
                     });
 
@@ -429,21 +532,22 @@ const Mutation = mutationType({
             args: {
                 title: nonNull(stringArg()),
                 description: nonNull(stringArg()),
-                project_id: nonNull(intArg()),
+                projectId: nonNull(intArg()),
                 key: booleanArg(),
                 private: booleanArg(),
                 personal: booleanArg(),
-                owner_id: nonNull(stringArg()),
+                ownerId: nonNull(stringArg()),
+                stateId: stringArg(),
                 user: nonNull(arg({ type: UserSession })),
                 estimate: arg({ type: GoalEstimate }),
             },
             resolve: async (
                 _,
-                { user, title, description, owner_id, project_id, key, private: isPrivate, personal, estimate },
+                { user, title, description, ownerId, projectId, key, private: isPrivate, personal, estimate, stateId },
                 { db },
             ) => {
                 const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
-                const goalOwner = await db.user.findUnique({ where: { id: owner_id }, include: { activity: true } });
+                const goalOwner = await db.user.findUnique({ where: { id: ownerId }, include: { activity: true } });
 
                 if (!validUser) return null;
 
@@ -452,15 +556,18 @@ const Mutation = mutationType({
                         data: {
                             title,
                             description,
-                            project_id,
+                            projectId,
                             key: Boolean(key),
                             private: Boolean(isPrivate),
                             personal: Boolean(personal),
-                            owner_id: goalOwner?.activity?.id,
-                            issuer_id: validUser.activity?.id,
-                            estimate: estimate ? {
-                                create: estimate,
-                            } : undefined
+                            stateId,
+                            ownerId: goalOwner?.activity?.id,
+                            issuerId: validUser.activity?.id,
+                            estimate: estimate
+                                ? {
+                                      create: estimate,
+                                  }
+                                : undefined,
                         },
                     });
 
@@ -494,7 +601,7 @@ const Mutation = mutationType({
                     const newGhost = db.ghost.create({
                         data: {
                             email,
-                            host_id: validUser.id,
+                            hostId: validUser.id,
                             activity: {
                                 create: {},
                             },
@@ -534,7 +641,9 @@ export const schema = makeSchema({
         UserKind,
         Goal,
         Estimate,
-        GoalEstimate
+        GoalEstimate,
+        Flow,
+        State,
     ],
     outputs: {
         schema: join(process.cwd(), 'graphql/schema.graphql'),
