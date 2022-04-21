@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React from 'react';
 import dynamic from 'next/dynamic';
 
@@ -22,6 +23,7 @@ const componentsMap = {
     calendarTick: dynamic(() => import('teenyicons/outline/calendar-tick.svg')),
     calendar: dynamic(() => import('teenyicons/outline/calendar.svg')),
     flow: dynamic(() => import('teenyicons/outline/git-compare.svg')),
+    tag: dynamic(() => import('teenyicons/outline/tag.svg')),
 };
 
 const sizesMap = {
@@ -40,13 +42,15 @@ interface IconProps {
     onClick?: (e: React.MouseEvent) => void;
 }
 
-export const Icon: React.FC<IconProps> = ({ type, size, color = textColorPrimary, stroke = 1, className, onClick }) => {
-    const Component: React.ComponentType<any> = componentsMap[type];
-    const sizePx = `${sizesMap[size]}px`;
+export const Icon = React.forwardRef<HTMLSpanElement, IconProps>(
+    ({ type, size, color = textColorPrimary, stroke = 1, className, onClick }, ref) => {
+        const Component: React.ComponentType<any> = componentsMap[type];
+        const sizePx = `${sizesMap[size]}px`;
 
-    return (
-        <span className={className} style={{ lineHeight: 'initial' }} onClick={onClick}>
-            <Component width={sizePx} height={sizePx} color={color} strokeWidth={stroke} />
-        </span>
-    );
-};
+        return (
+            <span ref={ref} className={className} style={{ lineHeight: 'initial' }} onClick={onClick}>
+                <Component width={sizePx} height={sizePx} color={color} strokeWidth={stroke} />
+            </span>
+        );
+    },
+);
