@@ -3,9 +3,7 @@ import styled from 'styled-components';
 import { Input, useInput, useKeyboard, KeyCode, Grid } from '@geist-ui/core';
 import InputMask from 'react-input-mask';
 
-import { Button } from './Button';
-import { Popup } from './Popup';
-import { Icon } from './Icon';
+import { GoalEstimate } from '../../graphql/generated/genql';
 import {
     buttonDangerBackgroundColor,
     buttonDangerBackgroundColorHover,
@@ -14,8 +12,11 @@ import {
     buttonIconColor,
     secondaryTaskanyLogoColor,
 } from '../design/@generated/themes';
-import { GoalEstimate } from '../../graphql/generated/genql';
 import { createLocaleDate, quarterFromDate, yearFromDate, endOfQuarter } from '../utils/dateTime';
+
+import { Button } from './Button';
+import { Popup } from './Popup';
+import { Icon } from './Icon';
 
 interface EstimateDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
