@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { Spacer, Text, Grid } from '@geist-ui/core';
@@ -10,7 +11,7 @@ import z from 'zod';
 import { gql } from '../utils/gql';
 import { estimatedMeta } from '../utils/dateTime';
 import { accentIconColor } from '../design/@generated/themes';
-import { UserAnyKind, Project, GoalEstimate, State } from '../../graphql/generated/genql';
+import { UserAnyKind, Project, GoalEstimate, State, Tag as TagModel } from '../../graphql/generated/genql';
 
 import { Card } from './Card';
 import { Icon } from './Icon';
@@ -23,14 +24,20 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { UserCompletion } from './UserCompletion';
 import { ProjectCompletion } from './ProjectCompletion';
+import { TagCompletion } from './TagCompletion';
 import { EstimateDropdown } from './EstimateDropdown';
 import { StateDropdown } from './StateDropdown';
 import { UserPic } from './UserPic';
+import { Tag } from './Tag';
 
 interface GoalCreateFormProps {
     card?: boolean;
     onCreate?: (id?: string) => void;
 }
+
+const StyledTagsContainer = styled.div`
+    padding-left: 12px;
+`;
 
 export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
@@ -38,6 +45,17 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
     const [estimate, setEstimate] = useState<GoalEstimate>();
     const [project, setProject] = useState<Project>();
     const [state, setState] = useState<State>();
+    const [tags, setTags] = useState(new Map<string, TagModel>());
+    const addTagToState = (tag: TagModel) => {
+        const newTags = new Map(tags);
+        newTags.set(tag.id, tag);
+        setTags(newTags);
+    };
+    const removeTagFromState = (tag: TagModel) => {
+        const newTags = new Map(tags);
+        newTags.delete(tag.id);
+        setTags(newTags);
+    };
     const t = useTranslations('goals.new');
 
     const schema = z.object({
@@ -134,6 +152,25 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
             />
             <FormActions flat="top">
                 <FormActionLeft>
+                    <Grid.Container>
+                        <TagCompletion
+                            filter={Array.from(tags.keys())}
+                            placeholder={t('Enter tag title')}
+                            onClick={(t) => addTagToState(t)}
+                        />
+
+                        <StyledTagsContainer>
+                            {Array.from(tags.values()).map((t) => (
+                                <Tag
+                                    key={t.id}
+                                    title={t.title}
+                                    description={t.description}
+                                    color={t.color}
+                                    onHide={() => removeTagFromState(t)}
+                                />
+                            ))}
+                        </StyledTagsContainer>
+                    </Grid.Container>
                     <Grid.Container>
                         <UserCompletion
                             size="m"

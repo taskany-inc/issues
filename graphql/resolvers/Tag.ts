@@ -23,6 +23,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                         mode: 'insensitive',
                     },
                 },
+                take: 5,
             });
         },
     });
