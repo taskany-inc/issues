@@ -1,8 +1,7 @@
 {
     "*.{js,jsx,ts,tsx}": [
         "eslint --fix",
-        "prettier --write",
-        "stylelint"
+        "prettier --write"
     ],
     "*.md": [
         "prettier --write --parser markdown",
