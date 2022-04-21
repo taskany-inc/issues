@@ -63,6 +63,7 @@ export interface NexusGenObjects {
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     ghost?: NexusGenRootTypes['Ghost'] | null; // Ghost
     id: string; // ID!
+    tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
     user?: NexusGenRootTypes['User'] | null; // User
   }
@@ -106,10 +107,12 @@ export interface NexusGenObjects {
     participants?: Array<NexusGenRootTypes['Activity'] | null> | null; // [Activity]
     personal?: boolean | null; // Boolean
     private?: boolean | null; // Boolean
-    project?: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+    project?: NexusGenRootTypes['Project'] | null; // Project
     projectId?: number | null; // Int
     relatedTo?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    state?: NexusGenRootTypes['State'] | null; // State
     stateId?: string | null; // String
+    tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
     title: string; // String!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
@@ -123,6 +126,7 @@ export interface NexusGenObjects {
     id: number; // Int!
     owner?: NexusGenRootTypes['Activity'] | null; // Activity
     slug?: string | null; // String
+    tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
     title: string; // String!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
@@ -131,6 +135,16 @@ export interface NexusGenObjects {
     default?: boolean | null; // Boolean
     flows?: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
     id: string; // ID!
+    title: string; // String!
+  }
+  Tag: { // root type
+    activity?: NexusGenRootTypes['Activity'] | null; // Activity
+    activityId?: string | null; // String
+    color: string; // String!
+    description?: string | null; // String
+    goals?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    id: string; // ID!
+    projects?: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
     title: string; // String!
   }
   User: { // root type
@@ -169,6 +183,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     ghost: NexusGenRootTypes['Ghost'] | null; // Ghost
     id: string; // ID!
+    tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
     user: NexusGenRootTypes['User'] | null; // User
   }
@@ -212,16 +227,19 @@ export interface NexusGenFieldTypes {
     participants: Array<NexusGenRootTypes['Activity'] | null> | null; // [Activity]
     personal: boolean | null; // Boolean
     private: boolean | null; // Boolean
-    project: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+    project: NexusGenRootTypes['Project'] | null; // Project
     projectId: number | null; // Int
     relatedTo: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    state: NexusGenRootTypes['State'] | null; // State
     stateId: string | null; // String
+    tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
     title: string; // String!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
   Mutation: { // field return type
     createGoal: NexusGenRootTypes['Goal'] | null; // Goal
     createProject: NexusGenRootTypes['Project'] | null; // Project
+    createTag: NexusGenRootTypes['Tag'] | null; // Tag
     inviteUser: NexusGenRootTypes['Ghost'] | null; // Ghost
   }
   Project: { // field return type
@@ -233,12 +251,11 @@ export interface NexusGenFieldTypes {
     id: number; // Int!
     owner: NexusGenRootTypes['Activity'] | null; // Activity
     slug: string | null; // String
+    tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
     title: string; // String!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
   Query: { // field return type
-    findGhost: Array<NexusGenRootTypes['Ghost'] | null> | null; // [Ghost]
-    findUser: Array<NexusGenRootTypes['User'] | null> | null; // [User]
     findUserAnyKind: Array<NexusGenRootTypes['UserAnyKind'] | null> | null; // [UserAnyKind]
     flow: NexusGenRootTypes['Flow'] | null; // Flow
     flowCompletion: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
@@ -252,6 +269,16 @@ export interface NexusGenFieldTypes {
     default: boolean | null; // Boolean
     flows: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
     id: string; // ID!
+    title: string; // String!
+  }
+  Tag: { // field return type
+    activity: NexusGenRootTypes['Activity'] | null; // Activity
+    activityId: string | null; // String
+    color: string; // String!
+    description: string | null; // String
+    goals: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+    id: string; // ID!
+    projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
     title: string; // String!
   }
   User: { // field return type
@@ -280,6 +307,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: 'DateTime'
     ghost: 'Ghost'
     id: 'ID'
+    tags: 'Tag'
     updatedAt: 'DateTime'
     user: 'User'
   }
@@ -326,13 +354,16 @@ export interface NexusGenFieldTypeNames {
     project: 'Project'
     projectId: 'Int'
     relatedTo: 'Goal'
+    state: 'State'
     stateId: 'String'
+    tags: 'Tag'
     title: 'String'
     updatedAt: 'DateTime'
   }
   Mutation: { // field return type name
     createGoal: 'Goal'
     createProject: 'Project'
+    createTag: 'Tag'
     inviteUser: 'Ghost'
   }
   Project: { // field return type name
@@ -344,12 +375,11 @@ export interface NexusGenFieldTypeNames {
     id: 'Int'
     owner: 'Activity'
     slug: 'String'
+    tags: 'Tag'
     title: 'String'
     updatedAt: 'DateTime'
   }
   Query: { // field return type name
-    findGhost: 'Ghost'
-    findUser: 'User'
     findUserAnyKind: 'UserAnyKind'
     flow: 'Flow'
     flowCompletion: 'Flow'
@@ -363,6 +393,16 @@ export interface NexusGenFieldTypeNames {
     default: 'Boolean'
     flows: 'Flow'
     id: 'ID'
+    title: 'String'
+  }
+  Tag: { // field return type name
+    activity: 'Activity'
+    activityId: 'String'
+    color: 'String'
+    description: 'String'
+    goals: 'Goal'
+    id: 'ID'
+    projects: 'Project'
     title: 'String'
   }
   User: { // field return type name
@@ -407,20 +447,19 @@ export interface NexusGenArgTypes {
       title: string; // String!
       user: NexusGenInputs['UserSession']; // UserSession!
     }
+    createTag: { // args
+      activityId: string; // String!
+      color: string; // String!
+      description?: string | null; // String
+      title: string; // String!
+      user: NexusGenInputs['UserSession']; // UserSession!
+    }
     inviteUser: { // args
       email: string; // String!
       user: NexusGenInputs['UserSession']; // UserSession!
     }
   }
   Query: {
-    findGhost: { // args
-      query: string; // String!
-      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
-    }
-    findUser: { // args
-      query: string; // String!
-      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
-    }
     findUserAnyKind: { // args
       query: string; // String!
       sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder

@@ -111,6 +111,7 @@ model Activity {
   goalIssuer         Goal[]     @relation("goalIssuer")
   settings           Settings?  @relation(fields: [settingsId], references: [id])
   settingsId         String?    @unique
+  tags               Tag[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -131,6 +132,7 @@ model Project {
   goals        Goal[]     @relation("projectGoals")
   flow         Flow       @relation(fields: [flowId], references: [id])
   flowId       String
+  tags         Tag[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -163,8 +165,8 @@ model Goal {
   criteria     Criteria[] // not implemented
   project      Project?   @relation("projectGoals", fields: [projectId], references: [id])
   projectId    Int?
-  state      State?   @relation("goalState", fields: [stateId], references: [id])
-  stateId    String?
+  state        State?     @relation("goalState", fields: [stateId], references: [id])
+  stateId      String?
   issuer       Activity?  @relation("goalIssuer", fields: [issuerId], references: [id])
   issuerId     String?
   owner        Activity?  @relation("goalOwner", fields: [ownerId], references: [id])
@@ -172,6 +174,7 @@ model Goal {
   participants Activity[] @relation("goalParticipants")
   comments     Comment[] // not implemented
   reactions    Reaction[] // not implemented
+  tags         Tag[]
 
   dependsOn Goal[] @relation("dependsOn")
   blocks    Goal[] @relation("dependsOn")
@@ -233,12 +236,12 @@ model Reaction {
 }
 
 model Flow {
-  id       String     @id @default(cuid())
-  title    String     @unique
-  graph    String? // [[stateId, stateId], [stateId, stateId]] — any transition allowed if undefined
-  settings Settings[]
-  projects Project[]
-  states   State[]
+  id          String     @id @default(cuid())
+  title       String     @unique
+  graph       String? // [[stateId, stateId], [stateId, stateId]] — any transition allowed if undefined
+  settings    Settings[]
+  projects    Project[]
+  states      State[]
   recommended Boolean?
 
   createdAt DateTime @default(now())
@@ -246,11 +249,11 @@ model Flow {
 }
 
 model State {
-  id    String @id @default(cuid())
-  title String @unique
-  flows Flow[]
+  id      String   @id @default(cuid())
+  title   String   @unique
+  flows   Flow[]
   default Boolean?
-  goals Goal[] @relation("goalState")
+  goals   Goal[]   @relation("goalState")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -262,6 +265,21 @@ model Settings {
   flow     Flow?     @relation(fields: [flowId], references: [id])
   flowId   String?
   activity Activity?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Tag {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  color       String
+
+  goals      Goal[]
+  project    Project[]
+  activity   Activity? @relation(fields: [activityId], references: [id])
+  activityId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
