@@ -29,6 +29,7 @@
     "@tippyjs/react": "4.2.6",
     "apollo-server-micro": "3.6.4",
     "apollo-tracing": "0.15.0",
+    "color-contrast-checker": "2.1.0",
     "date-fns": "2.28.0",
     "graphql": "15.8.0",
     "graphql-scalars": "1.15.0",
