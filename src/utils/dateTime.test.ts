@@ -1,4 +1,12 @@
-import { quarterFromDate, availableYears, createLocaleDate, estimatedMeta, currentDate, endOfQuarter, quarters } from './dateTime';
+import {
+    quarterFromDate,
+    availableYears,
+    createLocaleDate,
+    estimatedMeta,
+    currentDate,
+    endOfQuarter,
+    quarters,
+} from './dateTime';
 
 test('returns right quarter', () => {
     expect(quarterFromDate(new Date(2054, 10, 2))).toBe('Q4');
@@ -29,9 +37,9 @@ test('returns available years for passed number', () => {
 });
 
 test('returns meta for passed date and default locale', () => {
-    expect(estimatedMeta(new Date(2054, 10, 2))).toStrictEqual({ quarter: 'Q4', date: '11/02/2054' });
+    expect(estimatedMeta(new Date(2054, 10, 2))).toStrictEqual({ q: 'Q4', date: '12/31/2054' });
 });
 
 test('returns meta for passed date and passed locale', () => {
-    expect(estimatedMeta(new Date(2054, 10, 2), { locale: 'ru' })).toStrictEqual({ quarter: 'Q4', date: '02.11.2054' });
+    expect(estimatedMeta(new Date(2054, 10, 2), { locale: 'ru' })).toStrictEqual({ q: 'Q4', date: '31.12.2054' });
 });
