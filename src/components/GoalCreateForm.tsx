@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { Spacer, Text, Grid } from '@geist-ui/core';
@@ -7,6 +8,10 @@ import toast from 'react-hot-toast';
 import z from 'zod';
 
 import { gql } from '../utils/gql';
+import { estimatedMeta } from '../utils/dateTime';
+import { accentIconColor } from '../design/@generated/themes';
+import { UserAnyKind, Project, GoalEstimate, State } from '../../graphql/generated/genql';
+
 import { Card } from './Card';
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -16,15 +21,11 @@ import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { accentIconColor } from '../design/@generated/themes';
 import { UserCompletion } from './UserCompletion';
 import { ProjectCompletion } from './ProjectCompletion';
 import { EstimateDropdown } from './EstimateDropdown';
 import { StateDropdown } from './StateDropdown';
 import { UserPic } from './UserPic';
-import { useState } from 'react';
-import { UserAnyKind, Project, GoalEstimate, State } from '../../graphql/generated/genql';
-import { estimatedMeta } from '../utils/dateTime';
 
 interface GoalCreateFormProps {
     card?: boolean;
@@ -72,14 +73,16 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
     });
 
     const createGoal = async ({ title, description }: FormType) => {
+        if (!session || !owner.id || !project?.id) return;
+
         const promise = gql.mutation({
             createGoal: [
                 {
-                    user: session!.user,
+                    user: session.user,
                     title,
                     description,
-                    ownerId: owner.id!,
-                    projectId: project?.id!,
+                    ownerId: owner.id,
+                    projectId: project.id,
                     estimate,
                     stateId: state?.id,
                 },
@@ -102,7 +105,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');
     const projectButtonText = project?.title || t('Enter project title');
-    const stateButtonText = state?.title || project?.flow?.states?.filter(s => s?.default)[0]?.title || t('State');
+    const stateButtonText = state?.title || project?.flow?.states?.filter((s) => s?.default)[0]?.title || t('State');
     const estimateDefault = estimatedMeta();
 
     const formContent = (
