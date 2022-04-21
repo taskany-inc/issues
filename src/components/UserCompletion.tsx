@@ -1,13 +1,9 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Input, useInput, Grid, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { Button } from './Button';
-import { Popup } from './Popup';
-import { Icon } from './Icon';
-import { UserPic } from './UserPic';
 import {
     buttonBackgroundColorHover,
     buttonBorderColor,
@@ -18,6 +14,11 @@ import {
 import { createFetcher } from '../utils/createFetcher';
 import { UserAnyKind } from '../../graphql/generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+
+import { Button } from './Button';
+import { Popup } from './Popup';
+import { Icon } from './Icon';
+import { UserPic } from './UserPic';
 
 interface UserCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -64,13 +65,13 @@ const StyledUserEmail = styled.div`
     font-size: 12px;
     color: ${buttonTextColor};
 `;
-const UserCard: React.FC<{ name?: string; email: string; image?: string; focused?: boolean; onClick?: () => void }> = ({
-    name,
-    email,
-    image,
-    focused,
-    onClick,
-}) => {
+const UserCard: React.FC<{
+    name?: string;
+    email?: string;
+    image?: string;
+    focused?: boolean;
+    onClick?: () => void;
+}> = ({ name, email, image, focused, onClick }) => {
     return (
         <StyledUserCard onClick={onClick} focused={focused}>
             <Grid.Container gap={0}>
@@ -139,7 +140,14 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
 
     const onInputBlur = () => {};
 
-    const { data } = useSWR(inputState, (query) => fetcher(session?.user, query));
+    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
+
+    const onUserCardClick = (user: UserAnyKind) => () => {
+        setEditMode(false);
+        setPopupVisibility(false);
+        onClick && onClick(user);
+        setInputState(user.name || user.email || '');
+    };
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -165,16 +173,11 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
         },
     );
 
-    const onUserCardClick = (user: UserAnyKind) => () => {
-        setEditMode(false);
-        setPopupVisibility(false);
-        onClick && onClick(user);
-        setInputState(user.name || user.email || '');
-    };
-
     useEffect(() => {
-        if (data?.findUserAnyKind?.length && downPress) {
-            setCursor((prevState) => (prevState < data?.findUserAnyKind?.length! - 1 ? prevState + 1 : prevState));
+        const findUserAnyKind = data?.findUserAnyKind;
+
+        if (findUserAnyKind?.length && downPress) {
+            setCursor((prevState) => (prevState < findUserAnyKind.length - 1 ? prevState + 1 : prevState));
         }
     }, [data?.findUserAnyKind, downPress]);
 
@@ -225,7 +228,7 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
                         <UserCard
                             key={u.id}
                             name={u.name}
-                            email={u.email!}
+                            email={u.email}
                             image={u.image}
                             focused={cursor === i}
                             onClick={onUserCardClick(u)}
