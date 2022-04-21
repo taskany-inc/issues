@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -51,7 +52,7 @@ import {
 import { is } from '../utils/styles';
 
 interface ButtonProps {
-    text: string;
+    text?: string;
     tabIndex?: number;
     disabled?: boolean;
     ghost?: boolean;
@@ -350,7 +351,7 @@ const StyledIcon = styled.span`
     vertical-align: inherit;
 `;
 
-export const Button = React.forwardRef<ButtonProps, ButtonProps>(
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ text, view = 'default', size = 'm', type = 'button', ...props }, ref) => {
         const content =
             props.iconLeft || props.iconRight ? (
