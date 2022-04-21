@@ -9,7 +9,5 @@ const StyledCard = styled.div`
 `;
 
 export const Card: React.FC<{ style?: React.CSSProperties }> = (props) => {
-    return (
-        <StyledCard {...props} />
-    );
-}
+    return <StyledCard {...props} />;
+};
