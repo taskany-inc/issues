@@ -3,495 +3,549 @@
  * Do not make changes to this file directly
  */
 
-
-import type { Context } from "./../context"
-import type { core } from "nexus"
+import type { Context } from './../context';
+import type { core } from 'nexus';
 declare global {
-  interface NexusGenCustomInputMethods<TypeName extends string> {
-    /**
-     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-     */
-    DateTime<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // "DateTime";
-  }
+    interface NexusGenCustomInputMethods<TypeName extends string> {
+        /**
+         * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+         */
+        DateTime<FieldName extends string>(
+            fieldName: FieldName,
+            opts?: core.CommonInputFieldConfig<TypeName, FieldName>,
+        ): void; // "DateTime";
+    }
 }
 declare global {
-  interface NexusGenCustomOutputMethods<TypeName extends string> {
-    /**
-     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-     */
-    DateTime<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "DateTime";
-  }
+    interface NexusGenCustomOutputMethods<TypeName extends string> {
+        /**
+         * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+         */
+        DateTime<FieldName extends string>(
+            fieldName: FieldName,
+            ...opts: core.ScalarOutSpread<TypeName, FieldName>
+        ): void; // "DateTime";
+    }
 }
 
-
 declare global {
-  interface NexusGen extends NexusGenTypes {}
+    interface NexusGen extends NexusGenTypes {}
 }
 
 export interface NexusGenInputs {
-  GoalEstimate: { // input type
-    date?: string | null; // String
-    q?: string | null; // String
-    y?: string | null; // String
-  }
-  UserSession: { // input type
-    email: string; // String!
-    id: string; // ID!
-    image?: string | null; // String
-    name?: string | null; // String
-    role: NexusGenEnums['Role']; // Role!
-  }
+    GoalEstimate: {
+        // input type
+        date?: string | null; // String
+        q?: string | null; // String
+        y?: string | null; // String
+    };
+    UserSession: {
+        // input type
+        email: string; // String!
+        id: string; // ID!
+        image?: string | null; // String
+        name?: string | null; // String
+        role: NexusGenEnums['Role']; // Role!
+    };
 }
 
 export interface NexusGenEnums {
-  Role: "ADMIN" | "USER"
-  SortOrder: "asc" | "desc"
-  UserKind: "GHOST" | "USER"
+    Role: 'ADMIN' | 'USER';
+    SortOrder: 'asc' | 'desc';
+    UserKind: 'GHOST' | 'USER';
 }
 
 export interface NexusGenScalars {
-  String: string
-  Int: number
-  Float: number
-  Boolean: boolean
-  ID: string
-  DateTime: any
+    String: string;
+    Int: number;
+    Float: number;
+    Boolean: boolean;
+    ID: string;
+    DateTime: any;
 }
 
 export interface NexusGenObjects {
-  Activity: { // root type
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    ghost?: NexusGenRootTypes['Ghost'] | null; // Ghost
-    id: string; // ID!
-    tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-    user?: NexusGenRootTypes['User'] | null; // User
-  }
-  Estimate: { // root type
-    date?: string | null; // String
-    id: number; // Int!
-    q?: string | null; // String
-    y?: string | null; // String
-  }
-  Flow: { // root type
-    graph?: string | null; // String
-    id: string; // ID!
-    projects?: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
-    states?: Array<NexusGenRootTypes['State'] | null> | null; // [State]
-    title: string; // String!
-  }
-  Ghost: { // root type
-    activity?: NexusGenRootTypes['Activity'] | null; // Activity
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    email: string; // String!
-    host?: NexusGenRootTypes['User'] | null; // User
-    hostId: string; // String!
-    id: string; // ID!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-    user?: NexusGenRootTypes['User'] | null; // User
-  }
-  Goal: { // root type
-    blocks?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    computedOwner?: NexusGenRootTypes['UserAnyKind'] | null; // UserAnyKind
-    connected?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    dependsOn?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    description: string; // String!
-    estimate?: NexusGenRootTypes['Estimate'] | null; // Estimate
-    id: number; // Int!
-    issuer?: NexusGenRootTypes['Activity'] | null; // Activity
-    issuerId?: string | null; // String
-    key?: boolean | null; // Boolean
-    owner?: NexusGenRootTypes['Activity'] | null; // Activity
-    ownerId?: string | null; // String
-    participants?: Array<NexusGenRootTypes['Activity'] | null> | null; // [Activity]
-    personal?: boolean | null; // Boolean
-    private?: boolean | null; // Boolean
-    project?: NexusGenRootTypes['Project'] | null; // Project
-    projectId?: number | null; // Int
-    relatedTo?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    state?: NexusGenRootTypes['State'] | null; // State
-    stateId?: string | null; // String
-    tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
-    title: string; // String!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-  }
-  Mutation: {};
-  Project: { // root type
-    computedOwner?: NexusGenRootTypes['UserAnyKind'] | null; // UserAnyKind
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    description?: string | null; // String
-    flow?: NexusGenRootTypes['Flow'] | null; // Flow
-    goals?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    id: number; // Int!
-    owner?: NexusGenRootTypes['Activity'] | null; // Activity
-    slug?: string | null; // String
-    tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
-    title: string; // String!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-  }
-  Query: {};
-  State: { // root type
-    default?: boolean | null; // Boolean
-    flows?: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
-    id: string; // ID!
-    title: string; // String!
-  }
-  Tag: { // root type
-    activity?: NexusGenRootTypes['Activity'] | null; // Activity
-    activityId?: string | null; // String
-    color: string; // String!
-    description?: string | null; // String
-    goals?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    id: string; // ID!
-    projects?: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
-    title: string; // String!
-  }
-  User: { // root type
-    activity?: NexusGenRootTypes['Activity'] | null; // Activity
-    activityId?: string | null; // String
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    email: string; // String!
-    id: string; // ID!
-    image?: string | null; // String
-    name?: string | null; // String
-    role: NexusGenEnums['Role']; // Role!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-  }
-  UserAnyKind: { // root type
-    activity?: NexusGenRootTypes['Activity'] | null; // Activity
-    email?: string | null; // String
-    id?: string | null; // String
-    image?: string | null; // String
-    kind?: NexusGenEnums['UserKind'] | null; // UserKind
-    name?: string | null; // String
-  }
+    Activity: {
+        // root type
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        ghost?: NexusGenRootTypes['Ghost'] | null; // Ghost
+        id: string; // ID!
+        tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+        user?: NexusGenRootTypes['User'] | null; // User
+    };
+    Estimate: {
+        // root type
+        date?: string | null; // String
+        id: number; // Int!
+        q?: string | null; // String
+        y?: string | null; // String
+    };
+    Flow: {
+        // root type
+        graph?: string | null; // String
+        id: string; // ID!
+        projects?: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+        states?: Array<NexusGenRootTypes['State'] | null> | null; // [State]
+        title: string; // String!
+    };
+    Ghost: {
+        // root type
+        activity?: NexusGenRootTypes['Activity'] | null; // Activity
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        email: string; // String!
+        host?: NexusGenRootTypes['User'] | null; // User
+        hostId: string; // String!
+        id: string; // ID!
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+        user?: NexusGenRootTypes['User'] | null; // User
+    };
+    Goal: {
+        // root type
+        blocks?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        computedOwner?: NexusGenRootTypes['UserAnyKind'] | null; // UserAnyKind
+        connected?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        dependsOn?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        description: string; // String!
+        estimate?: NexusGenRootTypes['Estimate'] | null; // Estimate
+        id: number; // Int!
+        issuer?: NexusGenRootTypes['Activity'] | null; // Activity
+        issuerId?: string | null; // String
+        key?: boolean | null; // Boolean
+        owner?: NexusGenRootTypes['Activity'] | null; // Activity
+        ownerId?: string | null; // String
+        participants?: Array<NexusGenRootTypes['Activity'] | null> | null; // [Activity]
+        personal?: boolean | null; // Boolean
+        private?: boolean | null; // Boolean
+        project?: NexusGenRootTypes['Project'] | null; // Project
+        projectId?: number | null; // Int
+        relatedTo?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        state?: NexusGenRootTypes['State'] | null; // State
+        stateId?: string | null; // String
+        tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+        title: string; // String!
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    };
+    Mutation: {};
+    Project: {
+        // root type
+        computedOwner?: NexusGenRootTypes['UserAnyKind'] | null; // UserAnyKind
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        description?: string | null; // String
+        flow?: NexusGenRootTypes['Flow'] | null; // Flow
+        goals?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        id: number; // Int!
+        owner?: NexusGenRootTypes['Activity'] | null; // Activity
+        slug?: string | null; // String
+        tags?: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+        title: string; // String!
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    };
+    Query: {};
+    State: {
+        // root type
+        default?: boolean | null; // Boolean
+        flows?: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
+        id: string; // ID!
+        title: string; // String!
+    };
+    Tag: {
+        // root type
+        activity?: NexusGenRootTypes['Activity'] | null; // Activity
+        activityId?: string | null; // String
+        color: string; // String!
+        description?: string | null; // String
+        goals?: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        id: string; // ID!
+        projects?: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+        title: string; // String!
+    };
+    User: {
+        // root type
+        activity?: NexusGenRootTypes['Activity'] | null; // Activity
+        activityId?: string | null; // String
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        email: string; // String!
+        id: string; // ID!
+        image?: string | null; // String
+        name?: string | null; // String
+        role: NexusGenEnums['Role']; // Role!
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    };
+    UserAnyKind: {
+        // root type
+        activity?: NexusGenRootTypes['Activity'] | null; // Activity
+        email?: string | null; // String
+        id?: string | null; // String
+        image?: string | null; // String
+        kind?: NexusGenEnums['UserKind'] | null; // UserKind
+        name?: string | null; // String
+    };
 }
 
-export interface NexusGenInterfaces {
-}
+export interface NexusGenInterfaces {}
 
-export interface NexusGenUnions {
-}
+export interface NexusGenUnions {}
 
-export type NexusGenRootTypes = NexusGenObjects
+export type NexusGenRootTypes = NexusGenObjects;
 
-export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums;
 
 export interface NexusGenFieldTypes {
-  Activity: { // field return type
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    ghost: NexusGenRootTypes['Ghost'] | null; // Ghost
-    id: string; // ID!
-    tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-    user: NexusGenRootTypes['User'] | null; // User
-  }
-  Estimate: { // field return type
-    date: string | null; // String
-    id: number; // Int!
-    q: string | null; // String
-    y: string | null; // String
-  }
-  Flow: { // field return type
-    graph: string | null; // String
-    id: string; // ID!
-    projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
-    states: Array<NexusGenRootTypes['State'] | null> | null; // [State]
-    title: string; // String!
-  }
-  Ghost: { // field return type
-    activity: NexusGenRootTypes['Activity'] | null; // Activity
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    email: string; // String!
-    host: NexusGenRootTypes['User'] | null; // User
-    hostId: string; // String!
-    id: string; // ID!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-    user: NexusGenRootTypes['User'] | null; // User
-  }
-  Goal: { // field return type
-    blocks: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    computedOwner: NexusGenRootTypes['UserAnyKind'] | null; // UserAnyKind
-    connected: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    dependsOn: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    description: string; // String!
-    estimate: NexusGenRootTypes['Estimate'] | null; // Estimate
-    id: number; // Int!
-    issuer: NexusGenRootTypes['Activity'] | null; // Activity
-    issuerId: string | null; // String
-    key: boolean | null; // Boolean
-    owner: NexusGenRootTypes['Activity'] | null; // Activity
-    ownerId: string | null; // String
-    participants: Array<NexusGenRootTypes['Activity'] | null> | null; // [Activity]
-    personal: boolean | null; // Boolean
-    private: boolean | null; // Boolean
-    project: NexusGenRootTypes['Project'] | null; // Project
-    projectId: number | null; // Int
-    relatedTo: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    state: NexusGenRootTypes['State'] | null; // State
-    stateId: string | null; // String
-    tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
-    title: string; // String!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-  }
-  Mutation: { // field return type
-    createGoal: NexusGenRootTypes['Goal'] | null; // Goal
-    createProject: NexusGenRootTypes['Project'] | null; // Project
-    createTag: NexusGenRootTypes['Tag'] | null; // Tag
-    inviteUser: NexusGenRootTypes['Ghost'] | null; // Ghost
-  }
-  Project: { // field return type
-    computedOwner: NexusGenRootTypes['UserAnyKind'] | null; // UserAnyKind
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    description: string | null; // String
-    flow: NexusGenRootTypes['Flow'] | null; // Flow
-    goals: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    id: number; // Int!
-    owner: NexusGenRootTypes['Activity'] | null; // Activity
-    slug: string | null; // String
-    tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
-    title: string; // String!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-  }
-  Query: { // field return type
-    findUserAnyKind: Array<NexusGenRootTypes['UserAnyKind'] | null> | null; // [UserAnyKind]
-    flow: NexusGenRootTypes['Flow'] | null; // Flow
-    flowCompletion: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
-    flowRecommended: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
-    project: NexusGenRootTypes['Project'] | null; // Project
-    projectCompletion: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
-    projectGoals: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
-  }
-  State: { // field return type
-    default: boolean | null; // Boolean
-    flows: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
-    id: string; // ID!
-    title: string; // String!
-  }
-  Tag: { // field return type
-    activity: NexusGenRootTypes['Activity'] | null; // Activity
-    activityId: string | null; // String
-    color: string; // String!
-    description: string | null; // String
-    goals: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
-    id: string; // ID!
-    projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
-    title: string; // String!
-  }
-  User: { // field return type
-    activity: NexusGenRootTypes['Activity'] | null; // Activity
-    activityId: string | null; // String
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    email: string; // String!
-    id: string; // ID!
-    image: string | null; // String
-    name: string | null; // String
-    role: NexusGenEnums['Role']; // Role!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
-  }
-  UserAnyKind: { // field return type
-    activity: NexusGenRootTypes['Activity'] | null; // Activity
-    email: string | null; // String
-    id: string | null; // String
-    image: string | null; // String
-    kind: NexusGenEnums['UserKind'] | null; // UserKind
-    name: string | null; // String
-  }
+    Activity: {
+        // field return type
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        ghost: NexusGenRootTypes['Ghost'] | null; // Ghost
+        id: string; // ID!
+        tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+        user: NexusGenRootTypes['User'] | null; // User
+    };
+    Estimate: {
+        // field return type
+        date: string | null; // String
+        id: number; // Int!
+        q: string | null; // String
+        y: string | null; // String
+    };
+    Flow: {
+        // field return type
+        graph: string | null; // String
+        id: string; // ID!
+        projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+        states: Array<NexusGenRootTypes['State'] | null> | null; // [State]
+        title: string; // String!
+    };
+    Ghost: {
+        // field return type
+        activity: NexusGenRootTypes['Activity'] | null; // Activity
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        email: string; // String!
+        host: NexusGenRootTypes['User'] | null; // User
+        hostId: string; // String!
+        id: string; // ID!
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+        user: NexusGenRootTypes['User'] | null; // User
+    };
+    Goal: {
+        // field return type
+        blocks: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        computedOwner: NexusGenRootTypes['UserAnyKind'] | null; // UserAnyKind
+        connected: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        dependsOn: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        description: string; // String!
+        estimate: NexusGenRootTypes['Estimate'] | null; // Estimate
+        id: number; // Int!
+        issuer: NexusGenRootTypes['Activity'] | null; // Activity
+        issuerId: string | null; // String
+        key: boolean | null; // Boolean
+        owner: NexusGenRootTypes['Activity'] | null; // Activity
+        ownerId: string | null; // String
+        participants: Array<NexusGenRootTypes['Activity'] | null> | null; // [Activity]
+        personal: boolean | null; // Boolean
+        private: boolean | null; // Boolean
+        project: NexusGenRootTypes['Project'] | null; // Project
+        projectId: number | null; // Int
+        relatedTo: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        state: NexusGenRootTypes['State'] | null; // State
+        stateId: string | null; // String
+        tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+        title: string; // String!
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    };
+    Mutation: {
+        // field return type
+        createGoal: NexusGenRootTypes['Goal'] | null; // Goal
+        createProject: NexusGenRootTypes['Project'] | null; // Project
+        createTag: NexusGenRootTypes['Tag'] | null; // Tag
+        inviteUser: NexusGenRootTypes['Ghost'] | null; // Ghost
+    };
+    Project: {
+        // field return type
+        computedOwner: NexusGenRootTypes['UserAnyKind'] | null; // UserAnyKind
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        description: string | null; // String
+        flow: NexusGenRootTypes['Flow'] | null; // Flow
+        goals: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        id: number; // Int!
+        owner: NexusGenRootTypes['Activity'] | null; // Activity
+        slug: string | null; // String
+        tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+        title: string; // String!
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    };
+    Query: {
+        // field return type
+        findUserAnyKind: Array<NexusGenRootTypes['UserAnyKind'] | null> | null; // [UserAnyKind]
+        flow: NexusGenRootTypes['Flow'] | null; // Flow
+        flowCompletion: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
+        flowRecommended: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
+        project: NexusGenRootTypes['Project'] | null; // Project
+        projectCompletion: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+        projectGoals: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        tagCompletion: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+        users: Array<NexusGenRootTypes['User'] | null> | null; // [User]
+    };
+    State: {
+        // field return type
+        default: boolean | null; // Boolean
+        flows: Array<NexusGenRootTypes['Flow'] | null> | null; // [Flow]
+        id: string; // ID!
+        title: string; // String!
+    };
+    Tag: {
+        // field return type
+        activity: NexusGenRootTypes['Activity'] | null; // Activity
+        activityId: string | null; // String
+        color: string; // String!
+        description: string | null; // String
+        goals: Array<NexusGenRootTypes['Goal'] | null> | null; // [Goal]
+        id: string; // ID!
+        projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
+        title: string; // String!
+    };
+    User: {
+        // field return type
+        activity: NexusGenRootTypes['Activity'] | null; // Activity
+        activityId: string | null; // String
+        createdAt: NexusGenScalars['DateTime']; // DateTime!
+        email: string; // String!
+        id: string; // ID!
+        image: string | null; // String
+        name: string | null; // String
+        role: NexusGenEnums['Role']; // Role!
+        updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    };
+    UserAnyKind: {
+        // field return type
+        activity: NexusGenRootTypes['Activity'] | null; // Activity
+        email: string | null; // String
+        id: string | null; // String
+        image: string | null; // String
+        kind: NexusGenEnums['UserKind'] | null; // UserKind
+        name: string | null; // String
+    };
 }
 
 export interface NexusGenFieldTypeNames {
-  Activity: { // field return type name
-    createdAt: 'DateTime'
-    ghost: 'Ghost'
-    id: 'ID'
-    tags: 'Tag'
-    updatedAt: 'DateTime'
-    user: 'User'
-  }
-  Estimate: { // field return type name
-    date: 'String'
-    id: 'Int'
-    q: 'String'
-    y: 'String'
-  }
-  Flow: { // field return type name
-    graph: 'String'
-    id: 'ID'
-    projects: 'Project'
-    states: 'State'
-    title: 'String'
-  }
-  Ghost: { // field return type name
-    activity: 'Activity'
-    createdAt: 'DateTime'
-    email: 'String'
-    host: 'User'
-    hostId: 'String'
-    id: 'ID'
-    updatedAt: 'DateTime'
-    user: 'User'
-  }
-  Goal: { // field return type name
-    blocks: 'Goal'
-    computedOwner: 'UserAnyKind'
-    connected: 'Goal'
-    createdAt: 'DateTime'
-    dependsOn: 'Goal'
-    description: 'String'
-    estimate: 'Estimate'
-    id: 'Int'
-    issuer: 'Activity'
-    issuerId: 'String'
-    key: 'Boolean'
-    owner: 'Activity'
-    ownerId: 'String'
-    participants: 'Activity'
-    personal: 'Boolean'
-    private: 'Boolean'
-    project: 'Project'
-    projectId: 'Int'
-    relatedTo: 'Goal'
-    state: 'State'
-    stateId: 'String'
-    tags: 'Tag'
-    title: 'String'
-    updatedAt: 'DateTime'
-  }
-  Mutation: { // field return type name
-    createGoal: 'Goal'
-    createProject: 'Project'
-    createTag: 'Tag'
-    inviteUser: 'Ghost'
-  }
-  Project: { // field return type name
-    computedOwner: 'UserAnyKind'
-    createdAt: 'DateTime'
-    description: 'String'
-    flow: 'Flow'
-    goals: 'Goal'
-    id: 'Int'
-    owner: 'Activity'
-    slug: 'String'
-    tags: 'Tag'
-    title: 'String'
-    updatedAt: 'DateTime'
-  }
-  Query: { // field return type name
-    findUserAnyKind: 'UserAnyKind'
-    flow: 'Flow'
-    flowCompletion: 'Flow'
-    flowRecommended: 'Flow'
-    project: 'Project'
-    projectCompletion: 'Project'
-    projectGoals: 'Goal'
-    users: 'User'
-  }
-  State: { // field return type name
-    default: 'Boolean'
-    flows: 'Flow'
-    id: 'ID'
-    title: 'String'
-  }
-  Tag: { // field return type name
-    activity: 'Activity'
-    activityId: 'String'
-    color: 'String'
-    description: 'String'
-    goals: 'Goal'
-    id: 'ID'
-    projects: 'Project'
-    title: 'String'
-  }
-  User: { // field return type name
-    activity: 'Activity'
-    activityId: 'String'
-    createdAt: 'DateTime'
-    email: 'String'
-    id: 'ID'
-    image: 'String'
-    name: 'String'
-    role: 'Role'
-    updatedAt: 'DateTime'
-  }
-  UserAnyKind: { // field return type name
-    activity: 'Activity'
-    email: 'String'
-    id: 'String'
-    image: 'String'
-    kind: 'UserKind'
-    name: 'String'
-  }
+    Activity: {
+        // field return type name
+        createdAt: 'DateTime';
+        ghost: 'Ghost';
+        id: 'ID';
+        tags: 'Tag';
+        updatedAt: 'DateTime';
+        user: 'User';
+    };
+    Estimate: {
+        // field return type name
+        date: 'String';
+        id: 'Int';
+        q: 'String';
+        y: 'String';
+    };
+    Flow: {
+        // field return type name
+        graph: 'String';
+        id: 'ID';
+        projects: 'Project';
+        states: 'State';
+        title: 'String';
+    };
+    Ghost: {
+        // field return type name
+        activity: 'Activity';
+        createdAt: 'DateTime';
+        email: 'String';
+        host: 'User';
+        hostId: 'String';
+        id: 'ID';
+        updatedAt: 'DateTime';
+        user: 'User';
+    };
+    Goal: {
+        // field return type name
+        blocks: 'Goal';
+        computedOwner: 'UserAnyKind';
+        connected: 'Goal';
+        createdAt: 'DateTime';
+        dependsOn: 'Goal';
+        description: 'String';
+        estimate: 'Estimate';
+        id: 'Int';
+        issuer: 'Activity';
+        issuerId: 'String';
+        key: 'Boolean';
+        owner: 'Activity';
+        ownerId: 'String';
+        participants: 'Activity';
+        personal: 'Boolean';
+        private: 'Boolean';
+        project: 'Project';
+        projectId: 'Int';
+        relatedTo: 'Goal';
+        state: 'State';
+        stateId: 'String';
+        tags: 'Tag';
+        title: 'String';
+        updatedAt: 'DateTime';
+    };
+    Mutation: {
+        // field return type name
+        createGoal: 'Goal';
+        createProject: 'Project';
+        createTag: 'Tag';
+        inviteUser: 'Ghost';
+    };
+    Project: {
+        // field return type name
+        computedOwner: 'UserAnyKind';
+        createdAt: 'DateTime';
+        description: 'String';
+        flow: 'Flow';
+        goals: 'Goal';
+        id: 'Int';
+        owner: 'Activity';
+        slug: 'String';
+        tags: 'Tag';
+        title: 'String';
+        updatedAt: 'DateTime';
+    };
+    Query: {
+        // field return type name
+        findUserAnyKind: 'UserAnyKind';
+        flow: 'Flow';
+        flowCompletion: 'Flow';
+        flowRecommended: 'Flow';
+        project: 'Project';
+        projectCompletion: 'Project';
+        projectGoals: 'Goal';
+        tagCompletion: 'Tag';
+        users: 'User';
+    };
+    State: {
+        // field return type name
+        default: 'Boolean';
+        flows: 'Flow';
+        id: 'ID';
+        title: 'String';
+    };
+    Tag: {
+        // field return type name
+        activity: 'Activity';
+        activityId: 'String';
+        color: 'String';
+        description: 'String';
+        goals: 'Goal';
+        id: 'ID';
+        projects: 'Project';
+        title: 'String';
+    };
+    User: {
+        // field return type name
+        activity: 'Activity';
+        activityId: 'String';
+        createdAt: 'DateTime';
+        email: 'String';
+        id: 'ID';
+        image: 'String';
+        name: 'String';
+        role: 'Role';
+        updatedAt: 'DateTime';
+    };
+    UserAnyKind: {
+        // field return type name
+        activity: 'Activity';
+        email: 'String';
+        id: 'String';
+        image: 'String';
+        kind: 'UserKind';
+        name: 'String';
+    };
 }
 
 export interface NexusGenArgTypes {
-  Mutation: {
-    createGoal: { // args
-      description: string; // String!
-      estimate?: NexusGenInputs['GoalEstimate'] | null; // GoalEstimate
-      key?: boolean | null; // Boolean
-      ownerId: string; // String!
-      personal?: boolean | null; // Boolean
-      private?: boolean | null; // Boolean
-      projectId: number; // Int!
-      stateId?: string | null; // String
-      title: string; // String!
-      user: NexusGenInputs['UserSession']; // UserSession!
-    }
-    createProject: { // args
-      description?: string | null; // String
-      flowId: string; // String!
-      ownerId: string; // String!
-      title: string; // String!
-      user: NexusGenInputs['UserSession']; // UserSession!
-    }
-    createTag: { // args
-      activityId: string; // String!
-      color: string; // String!
-      description?: string | null; // String
-      title: string; // String!
-      user: NexusGenInputs['UserSession']; // UserSession!
-    }
-    inviteUser: { // args
-      email: string; // String!
-      user: NexusGenInputs['UserSession']; // UserSession!
-    }
-  }
-  Query: {
-    findUserAnyKind: { // args
-      query: string; // String!
-      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
-    }
-    flow: { // args
-      id: string; // String!
-    }
-    flowCompletion: { // args
-      query: string; // String!
-      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
-    }
-    project: { // args
-      slug: string; // String!
-    }
-    projectCompletion: { // args
-      query: string; // String!
-      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
-    }
-    projectGoals: { // args
-      slug: string; // String!
-    }
-    users: { // args
-      sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
-    }
-  }
+    Mutation: {
+        createGoal: {
+            // args
+            description: string; // String!
+            estimate?: NexusGenInputs['GoalEstimate'] | null; // GoalEstimate
+            key?: boolean | null; // Boolean
+            ownerId: string; // String!
+            personal?: boolean | null; // Boolean
+            private?: boolean | null; // Boolean
+            projectId: number; // Int!
+            stateId?: string | null; // String
+            title: string; // String!
+            user: NexusGenInputs['UserSession']; // UserSession!
+        };
+        createProject: {
+            // args
+            description?: string | null; // String
+            flowId: string; // String!
+            ownerId: string; // String!
+            title: string; // String!
+            user: NexusGenInputs['UserSession']; // UserSession!
+        };
+        createTag: {
+            // args
+            activityId: string; // String!
+            color: string; // String!
+            description?: string | null; // String
+            title: string; // String!
+            user: NexusGenInputs['UserSession']; // UserSession!
+        };
+        inviteUser: {
+            // args
+            email: string; // String!
+            user: NexusGenInputs['UserSession']; // UserSession!
+        };
+    };
+    Query: {
+        findUserAnyKind: {
+            // args
+            query: string; // String!
+            sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
+        };
+        flow: {
+            // args
+            id: string; // String!
+        };
+        flowCompletion: {
+            // args
+            query: string; // String!
+            sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
+        };
+        project: {
+            // args
+            slug: string; // String!
+        };
+        projectCompletion: {
+            // args
+            query: string; // String!
+            sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
+        };
+        projectGoals: {
+            // args
+            slug: string; // String!
+        };
+        tagCompletion: {
+            // args
+            query: string; // String!
+            sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
+        };
+        users: {
+            // args
+            sortBy?: NexusGenEnums['SortOrder'] | null; // SortOrder
+        };
+    };
 }
 
-export interface NexusGenAbstractTypeMembers {
-}
+export interface NexusGenAbstractTypeMembers {}
 
-export interface NexusGenTypeInterfaces {
-}
+export interface NexusGenTypeInterfaces {}
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
 
@@ -510,51 +564,49 @@ export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 export type NexusGenAbstractsUsingStrategyResolveType = never;
 
 export type NexusGenFeaturesConfig = {
-  abstractTypeStrategies: {
-    isTypeOf: false
-    resolveType: true
-    __typename: false
-  }
-}
+    abstractTypeStrategies: {
+        isTypeOf: false;
+        resolveType: true;
+        __typename: false;
+    };
+};
 
 export interface NexusGenTypes {
-  context: Context;
-  inputTypes: NexusGenInputs;
-  rootTypes: NexusGenRootTypes;
-  inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;
-  argTypes: NexusGenArgTypes;
-  fieldTypes: NexusGenFieldTypes;
-  fieldTypeNames: NexusGenFieldTypeNames;
-  allTypes: NexusGenAllTypes;
-  typeInterfaces: NexusGenTypeInterfaces;
-  objectNames: NexusGenObjectNames;
-  inputNames: NexusGenInputNames;
-  enumNames: NexusGenEnumNames;
-  interfaceNames: NexusGenInterfaceNames;
-  scalarNames: NexusGenScalarNames;
-  unionNames: NexusGenUnionNames;
-  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
-  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
-  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
-  abstractTypeMembers: NexusGenAbstractTypeMembers;
-  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;
-  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType;
-  features: NexusGenFeaturesConfig;
+    context: Context;
+    inputTypes: NexusGenInputs;
+    rootTypes: NexusGenRootTypes;
+    inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;
+    argTypes: NexusGenArgTypes;
+    fieldTypes: NexusGenFieldTypes;
+    fieldTypeNames: NexusGenFieldTypeNames;
+    allTypes: NexusGenAllTypes;
+    typeInterfaces: NexusGenTypeInterfaces;
+    objectNames: NexusGenObjectNames;
+    inputNames: NexusGenInputNames;
+    enumNames: NexusGenEnumNames;
+    interfaceNames: NexusGenInterfaceNames;
+    scalarNames: NexusGenScalarNames;
+    unionNames: NexusGenUnionNames;
+    allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
+    allOutputTypes:
+        | NexusGenTypes['objectNames']
+        | NexusGenTypes['enumNames']
+        | NexusGenTypes['unionNames']
+        | NexusGenTypes['interfaceNames']
+        | NexusGenTypes['scalarNames'];
+    allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes'];
+    abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
+    abstractTypeMembers: NexusGenAbstractTypeMembers;
+    objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;
+    abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType;
+    features: NexusGenFeaturesConfig;
 }
 
-
 declare global {
-  interface NexusGenPluginTypeConfig<TypeName extends string> {
-  }
-  interface NexusGenPluginInputTypeConfig<TypeName extends string> {
-  }
-  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
-  }
-  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {
-  }
-  interface NexusGenPluginSchemaConfig {
-  }
-  interface NexusGenPluginArgConfig {
-  }
+    interface NexusGenPluginTypeConfig<TypeName extends string> {}
+    interface NexusGenPluginInputTypeConfig<TypeName extends string> {}
+    interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {}
+    interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {}
+    interface NexusGenPluginSchemaConfig {}
+    interface NexusGenPluginArgConfig {}
 }

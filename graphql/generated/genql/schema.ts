@@ -106,6 +106,7 @@ export interface Query {
     project?: Project;
     projectCompletion?: (Project | undefined)[];
     projectGoals?: (Goal | undefined)[];
+    tagCompletion?: (Tag | undefined)[];
     users?: (User | undefined)[];
     __typename: 'Query';
 }
@@ -302,6 +303,7 @@ export interface QueryRequest {
     project?: [{ slug: Scalars['String'] }, ProjectRequest];
     projectCompletion?: [{ query: Scalars['String']; sortBy?: SortOrder | null }, ProjectRequest];
     projectGoals?: [{ slug: Scalars['String'] }, GoalRequest];
+    tagCompletion?: [{ query: Scalars['String']; sortBy?: SortOrder | null }, TagRequest];
     users?: [{ sortBy?: SortOrder | null }, UserRequest] | UserRequest;
     __typename?: boolean | number;
     __scalar?: boolean | number;
@@ -1153,6 +1155,12 @@ export interface QueryPromiseChain {
             defaultValue?: (FieldsSelection<Goal, R> | undefined)[] | undefined,
         ) => Promise<(FieldsSelection<Goal, R> | undefined)[] | undefined>;
     };
+    tagCompletion: (args: { query: Scalars['String']; sortBy?: SortOrder | null }) => {
+        get: <R extends TagRequest>(
+            request: R,
+            defaultValue?: (FieldsSelection<Tag, R> | undefined)[] | undefined,
+        ) => Promise<(FieldsSelection<Tag, R> | undefined)[] | undefined>;
+    };
     users: ((args?: { sortBy?: SortOrder | null }) => {
         get: <R extends UserRequest>(
             request: R,
@@ -1212,6 +1220,12 @@ export interface QueryObservableChain {
             request: R,
             defaultValue?: (FieldsSelection<Goal, R> | undefined)[] | undefined,
         ) => Observable<(FieldsSelection<Goal, R> | undefined)[] | undefined>;
+    };
+    tagCompletion: (args: { query: Scalars['String']; sortBy?: SortOrder | null }) => {
+        get: <R extends TagRequest>(
+            request: R,
+            defaultValue?: (FieldsSelection<Tag, R> | undefined)[] | undefined,
+        ) => Observable<(FieldsSelection<Tag, R> | undefined)[] | undefined>;
     };
     users: ((args?: { sortBy?: SortOrder | null }) => {
         get: <R extends UserRequest>(

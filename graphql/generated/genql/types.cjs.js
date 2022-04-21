@@ -174,6 +174,13 @@ module.exports = {
                     slug: [4, 'String!'],
                 },
             ],
+            tagCompletion: [
+                17,
+                {
+                    query: [4, 'String!'],
+                    sortBy: [15],
+                },
+            ],
             users: [
                 18,
                 {
