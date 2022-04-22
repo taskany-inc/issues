@@ -44,6 +44,7 @@ interface IconProps {
 
 export const Icon = React.forwardRef<HTMLSpanElement, IconProps>(
     ({ type, size, color = textColorPrimary, stroke = 1, className, onClick }, ref) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const Component: React.ComponentType<any> = componentsMap[type];
         const sizePx = `${sizesMap[size]}px`;
 

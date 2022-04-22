@@ -478,6 +478,7 @@ export interface NexusGenArgTypes {
             private?: boolean | null; // Boolean
             projectId: number; // Int!
             stateId?: string | null; // String
+            tags?: string[] | null; // [String!]
             title: string; // String!
             user: NexusGenInputs['UserSession']; // UserSession!
         };
