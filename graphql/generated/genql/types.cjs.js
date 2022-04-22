@@ -86,6 +86,7 @@ module.exports = {
                     private: [9],
                     projectId: [5, 'Int!'],
                     stateId: [4],
+                    tags: [4, '[String!]'],
                     title: [4, 'String!'],
                     user: [21, 'UserSession!'],
                 },

@@ -249,6 +249,7 @@ export interface MutationRequest {
             private?: Scalars['Boolean'] | null;
             projectId: Scalars['Int'];
             stateId?: Scalars['String'] | null;
+            tags?: Scalars['String'][] | null;
             title: Scalars['String'];
             user: UserSession;
         },
@@ -906,6 +907,7 @@ export interface MutationPromiseChain {
         private?: Scalars['Boolean'] | null;
         projectId: Scalars['Int'];
         stateId?: Scalars['String'] | null;
+        tags?: Scalars['String'][] | null;
         title: Scalars['String'];
         user: UserSession;
     }) => GoalPromiseChain & {
@@ -959,6 +961,7 @@ export interface MutationObservableChain {
         private?: Scalars['Boolean'] | null;
         projectId: Scalars['Int'];
         stateId?: Scalars['String'] | null;
+        tags?: Scalars['String'][] | null;
         title: Scalars['String'];
         user: UserSession;
     }) => GoalObservableChain & {

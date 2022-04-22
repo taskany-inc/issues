@@ -1,9 +1,10 @@
-import { arg, nonNull, stringArg, intArg, booleanArg } from 'nexus';
+import { arg, nonNull, stringArg, intArg, booleanArg, list } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
 import { Goal, UserSession, GoalEstimate } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {};
 
 export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
@@ -20,10 +21,23 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             stateId: stringArg(),
             user: nonNull(arg({ type: UserSession })),
             estimate: arg({ type: GoalEstimate }),
+            tags: list(nonNull(stringArg())),
         },
         resolve: async (
             _,
-            { user, title, description, ownerId, projectId, key, private: isPrivate, personal, estimate, stateId },
+            {
+                user,
+                title,
+                description,
+                ownerId,
+                projectId,
+                key,
+                private: isPrivate,
+                personal,
+                estimate,
+                stateId,
+                tags,
+            },
             { db },
         ) => {
             const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
@@ -43,6 +57,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         stateId,
                         ownerId: goalOwner?.activity?.id,
                         issuerId: validUser.activity?.id,
+                        tags: {
+                            connect: tags?.map((id) => ({ id })),
+                        },
                         estimate: estimate
                             ? {
                                   create: estimate,

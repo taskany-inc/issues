@@ -103,6 +103,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                     projectId: project.id,
                     estimate,
                     stateId: state?.id,
+                    tags: Array.from(tags.keys()),
                 },
                 {
                     id: true,
@@ -156,17 +157,17 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                         <TagCompletion
                             filter={Array.from(tags.keys())}
                             placeholder={t('Enter tag title')}
-                            onClick={(t) => addTagToState(t)}
+                            onClick={(tag) => addTagToState(tag)}
                         />
 
                         <StyledTagsContainer>
-                            {Array.from(tags.values()).map((t) => (
+                            {Array.from(tags.values()).map((tag) => (
                                 <Tag
-                                    key={t.id}
-                                    title={t.title}
-                                    description={t.description}
-                                    color={t.color}
-                                    onHide={() => removeTagFromState(t)}
+                                    key={tag.id}
+                                    title={tag.title}
+                                    description={tag.description}
+                                    color={tag.color}
+                                    onHide={() => removeTagFromState(tag)}
                                 />
                             ))}
                         </StyledTagsContainer>

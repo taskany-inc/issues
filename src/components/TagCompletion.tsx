@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Input, useInput, Grid, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
@@ -28,7 +28,7 @@ const StyledTagCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
     border: 1px solid ${buttonBorderColor};
     border-radius: 6px;
-    min-width: 250px;
+    min-width: 185px;
     margin-bottom: 4px;
     cursor: pointer;
 
@@ -51,9 +51,19 @@ const StyledTagCard = styled.div<{ focused?: boolean }>`
 const StyledTagInfo = styled.div`
     padding-left: 4px;
 `;
-const StyledTagName = styled.div`
+const StyledTagTitle = styled.div`
     font-size: 14px;
     font-weight: 600;
+`;
+const StyledTagColor = styled.div<{ color: string }>`
+    width: 14px;
+    height: 14px;
+
+    border-radius: 100%;
+
+    ${({ color }) => css`
+        background-color: ${color};
+    `}
 `;
 const TagCard: React.FC<{
     title: string;
@@ -63,11 +73,14 @@ const TagCard: React.FC<{
     onClick?: () => void;
 }> = ({ title, description, color, focused, onClick }) => {
     return (
-        <StyledTagCard onClick={onClick} focused={focused}>
+        <StyledTagCard onClick={onClick} focused={focused} title={description}>
             <Grid.Container gap={0}>
+                <Grid xs={3} alignItems="center" justify="center">
+                    <StyledTagColor color={color} />
+                </Grid>
                 <Grid xs={21} alignItems="center">
                     <StyledTagInfo>
-                        <StyledTagName>{title}</StyledTagName>
+                        <StyledTagTitle>{title}</StyledTagTitle>
                     </StyledTagInfo>
                 </Grid>
             </Grid.Container>
@@ -97,31 +110,33 @@ const fetcher = createFetcher((_, query: string) => ({
 
 export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '', filter = [], placeholder }) => {
     const { data: session } = useSession();
-    const popupRef = useRef<any>();
-    const buttonRef = useRef<any>();
+    const popupRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const { state: inputState, setState: setInputState, reset: inputReset, bindings: onInput } = useInput(query);
+    const { state: inputState, reset: inputReset, bindings: onInput } = useInput(query);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
+    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
 
-    const onClickOutside = () => {
+    const onClickOutside = useCallback(() => {
         setEditMode(false);
         setPopupVisibility(false);
         inputReset();
-    };
+    }, [inputReset]);
 
-    const onButtonClick = () => {
+    const onButtonClick = useCallback(() => {
         setEditMode(true);
-        setPopupVisibility(true);
-    };
+    }, []);
 
-    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
+    const onInputBlur = useCallback(() => {
+        if (!popupVisible) {
+            setEditMode(false);
+        }
+    }, [popupVisible]);
 
     const onItemClick = (tag: Tag) => () => {
-        setEditMode(false);
-        setPopupVisibility(false);
         onClick && onClick(tag);
         inputReset();
     };
@@ -141,7 +156,9 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '
         () => {
             if (data?.tagCompletion?.length) {
                 onItemClick(data?.tagCompletion[cursor])();
-                popupRef.current?.focus();
+            } else if (inputState === '') {
+                setPopupVisibility(false);
+                setEditMode(false);
             }
         },
         [KeyCode.Enter],
@@ -149,6 +166,12 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '
             stopPropagation: true,
         },
     );
+
+    useEffect(() => {
+        if (data?.tagCompletion?.length) {
+            setPopupVisibility(true);
+        }
+    }, [data?.tagCompletion]);
 
     useEffect(() => {
         const tagCompletion = data?.tagCompletion;
@@ -178,6 +201,7 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '
                                 <Icon type="tag" size="xs" color={buttonIconColor} />
                             </span>
                         }
+                        onBlur={onInputBlur}
                         {...onInput}
                         {...onENTER}
                     />
@@ -191,7 +215,7 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '
             <Popup
                 placement="top-start"
                 overflow="hidden"
-                visible={popupVisible && Boolean(data?.tagCompletion?.length)}
+                visible={popupVisible}
                 onClickOutside={onClickOutside}
                 reference={popupRef}
                 interactive
