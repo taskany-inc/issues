@@ -1,27 +1,34 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, Grid, useKeyboard, KeyCode } from '@geist-ui/core';
+import { Input, useInput, Grid, useKeyboard, KeyCode, Link } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
+import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 import {
     buttonBackgroundColorHover,
     buttonBorderColor,
     buttonBorderColorHover,
     buttonIconColor,
+    buttonOutlineTextColor,
 } from '../design/@generated/themes';
+import { backgroundColor as darkBackgroundColor } from '../design/@generated/themes/dark.constants';
+import { backgroundColor as lightBackgroundColor } from '../design/@generated/themes/light.constants';
 import { createFetcher } from '../utils/createFetcher';
-import { Tag } from '../../graphql/generated/genql';
+import { Tag as TagModel } from '../../graphql/generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+import { randomHex } from '../utils/randomHex';
+import { gql } from '../utils/gql';
 
 import { Popup } from './Popup';
 import { Icon } from './Icon';
+import { Tag } from './Tag';
 
 interface TagCompletionProps {
-    query?: string;
     filter?: string[];
     placeholder?: string;
-    onClick?: (user: Tag) => void;
+    onClick?: (user: TagModel) => void;
 }
 
 const StyledTagCard = styled.div<{ focused?: boolean }>`
@@ -94,6 +101,14 @@ const StyledIconContainer = styled.div`
     padding: 6px 2px;
 `;
 
+const StyledNewTagForm = styled.div``;
+const StyledNewTagInfo = styled.div`
+    font-size: 12px;
+    font-weight: 600;
+    color: ${buttonOutlineTextColor};
+    padding: 2px 4px;
+`;
+
 const fetcher = createFetcher((_, query: string) => ({
     tagCompletion: [
         {
@@ -108,16 +123,25 @@ const fetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
-export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '', filter = [], placeholder }) => {
+export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = [], placeholder }) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const { state: inputState, reset: inputReset, bindings: onInput } = useInput(query);
+    const { state: inputState, reset: inputReset, bindings: inputBingings } = useInput('');
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
+    const [color, setColor] = useState(buttonBorderColor);
+    const updateColor = useCallback(() => {
+        const newColor = randomHex([darkBackgroundColor, lightBackgroundColor]);
+
+        if (newColor) {
+            setColor(newColor);
+        }
+    }, []);
+    const t = useTranslations('TagCompletion');
     const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
 
     const onClickOutside = useCallback(() => {
@@ -136,10 +160,18 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '
         }
     }, [popupVisible]);
 
-    const onItemClick = (tag: Tag) => () => {
+    const onItemClick = (tag: TagModel) => () => {
         onClick && onClick(tag);
         inputReset();
     };
+
+    const onInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setPopupVisibility(Boolean(e.target.value));
+            inputBingings.onChange(e);
+        },
+        [inputBingings],
+    );
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -167,11 +199,40 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '
         },
     );
 
-    useEffect(() => {
-        if (data?.tagCompletion?.length) {
-            setPopupVisibility(true);
-        }
-    }, [data?.tagCompletion]);
+    const createTag = useCallback(async () => {
+        if (!session) return;
+
+        const promise = gql.mutation({
+            createTag: [
+                {
+                    user: session.user,
+                    title: inputState,
+                    color,
+                },
+                {
+                    id: true,
+                    title: true,
+                    description: true,
+                    color: true,
+                },
+            ],
+        });
+
+        toast.promise(promise, {
+            error: t('Something went wrong 😿'),
+            loading: t('We are creating new tag'),
+            success: t('Voila! Tag is here 🎉'),
+        });
+
+        const res = await promise;
+
+        res.createTag && onItemClick(res.createTag as TagModel)();
+        setPopupVisibility(false);
+        setEditMode(false);
+        updateColor();
+    }, [color, inputState, onItemClick, session, t, updateColor]);
+
+    useEffect(updateColor, [updateColor]);
 
     useEffect(() => {
         const tagCompletion = data?.tagCompletion;
@@ -201,8 +262,9 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '
                                 <Icon type="tag" size="xs" color={buttonIconColor} />
                             </span>
                         }
+                        {...inputBingings}
                         onBlur={onInputBlur}
-                        {...onInput}
+                        onChange={onInputChange}
                         {...onENTER}
                     />
                 ) : (
@@ -223,20 +285,49 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, query = '
                 maxWidth={250}
                 offset={[0, 4]}
             >
-                <>
-                    {data?.tagCompletion
-                        ?.filter((t) => !filter.includes(t.id))
-                        .map((t, i) => (
-                            <TagCard
-                                key={t.id}
-                                title={t.title}
-                                description={t.description}
-                                color={t.color}
-                                focused={cursor === i}
-                                onClick={onItemClick(t)}
-                            />
-                        ))}
-                </>
+                {data?.tagCompletion?.length ? (
+                    <>
+                        {data?.tagCompletion
+                            ?.filter((t) => !filter.includes(t.id))
+                            .map((t, i) => (
+                                <TagCard
+                                    key={t.id}
+                                    title={t.title}
+                                    description={t.description}
+                                    color={t.color}
+                                    focused={cursor === i}
+                                    onClick={onItemClick(t)}
+                                />
+                            ))}
+                    </>
+                ) : (
+                    <>
+                        {inputState !== '' && (
+                            <StyledNewTagForm>
+                                <Grid.Container gap={0}>
+                                    <Grid xs={15} alignItems="center" justify="center">
+                                        <StyledNewTagInfo>
+                                            <Link
+                                                href="#"
+                                                block
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    updateColor();
+                                                }}
+                                            >
+                                                {t('Click here')}
+                                            </Link>{' '}
+                                            {t('Change color and create')}
+                                        </StyledNewTagInfo>
+                                    </Grid>
+                                    <Grid xs={9} alignItems="center" justify="center">
+                                        <Tag color={color} title={inputState} onClick={createTag} />
+                                    </Grid>
+                                </Grid.Container>
+                            </StyledNewTagForm>
+                        )}
+                    </>
+                )}
             </Popup>
         </>
     );

@@ -113,7 +113,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
 
         toast.promise(promise, {
             error: t('Something went wrong 😿'),
-            loading: t('We are creating new goal...'),
+            loading: t('We are creating new goal'),
             success: t('Voila! Goal is here 🎉'),
         });
 

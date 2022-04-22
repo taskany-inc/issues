@@ -267,7 +267,6 @@ export interface MutationRequest {
     ];
     createTag?: [
         {
-            activityId: Scalars['String'];
             color: Scalars['String'];
             description?: Scalars['String'] | null;
             title: Scalars['String'];
@@ -929,7 +928,6 @@ export interface MutationPromiseChain {
         ) => Promise<FieldsSelection<Project, R> | undefined>;
     };
     createTag: (args: {
-        activityId: Scalars['String'];
         color: Scalars['String'];
         description?: Scalars['String'] | null;
         title: Scalars['String'];
@@ -983,7 +981,6 @@ export interface MutationObservableChain {
         ) => Observable<FieldsSelection<Project, R> | undefined>;
     };
     createTag: (args: {
-        activityId: Scalars['String'];
         color: Scalars['String'];
         description?: Scalars['String'] | null;
         title: Scalars['String'];
