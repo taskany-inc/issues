@@ -16,7 +16,7 @@ import {
 import { backgroundColor as darkBackgroundColor } from '../design/@generated/themes/dark.constants';
 import { backgroundColor as lightBackgroundColor } from '../design/@generated/themes/light.constants';
 import { createFetcher } from '../utils/createFetcher';
-import { Tag as TagModel } from '../../graphql/generated/genql';
+import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 import { randomHex } from '../utils/randomHex';
 import { gql } from '../utils/gql';

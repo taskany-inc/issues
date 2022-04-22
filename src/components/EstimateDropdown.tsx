@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Input, useInput, useKeyboard, KeyCode, Grid } from '@geist-ui/core';
 import InputMask from 'react-input-mask';
 
-import { GoalEstimate } from '../../graphql/generated/genql';
+import { GoalEstimate } from '../../graphql/@generated/genql';
 import {
     buttonDangerBackgroundColor,
     buttonDangerBackgroundColorHover,

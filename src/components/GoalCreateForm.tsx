@@ -11,7 +11,7 @@ import z from 'zod';
 import { gql } from '../utils/gql';
 import { estimatedMeta } from '../utils/dateTime';
 import { accentIconColor } from '../design/@generated/themes';
-import { UserAnyKind, Project, GoalEstimate, State, Tag as TagModel } from '../../graphql/generated/genql';
+import { UserAnyKind, Project, GoalEstimate, State, Tag as TagModel } from '../../graphql/@generated/genql';
 
 import { Card } from './Card';
 import { Icon } from './Icon';

@@ -32,7 +32,7 @@ export const schema = makeSchema({
     types: [Query, Mutation, Types],
     outputs: {
         schema: join(process.cwd(), 'graphql/schema.graphql'),
-        typegen: join(process.cwd(), 'graphql/generated/nexus.d.ts'),
+        typegen: join(process.cwd(), 'graphql/@generated/nexus.d.ts'),
     },
     contextType: {
         module: join(process.cwd(), 'graphql/context.ts'),
