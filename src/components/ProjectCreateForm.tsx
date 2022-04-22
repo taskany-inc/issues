@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { Spacer, Text, Grid } from '@geist-ui/core';
@@ -8,6 +9,10 @@ import z from 'zod';
 import useSWR from 'swr';
 
 import { gql } from '../utils/gql';
+import { accentIconColor } from '../design/@generated/themes';
+import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
+import { createFetcher } from '../utils/createFetcher';
+
 import { Card } from './Card';
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -17,13 +22,9 @@ import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { accentIconColor } from '../design/@generated/themes';
 import { UserCompletion } from './UserCompletion';
 import { FlowCompletion } from './FlowCompletion';
 import { UserPic } from './UserPic';
-import { useEffect, useState } from 'react';
-import { Flow, UserAnyKind } from '../../graphql/generated/genql';
-import { createFetcher } from '../utils/createFetcher';
 
 interface ProjectCreateFormProps {
     card?: boolean;
@@ -31,16 +32,14 @@ interface ProjectCreateFormProps {
 }
 
 const fetcher = createFetcher(() => ({
-    flowRecommended:
-        {
+    flowRecommended: {
+        id: true,
+        title: true,
+        states: {
             id: true,
             title: true,
-            states: {
-                id: true,
-                title: true,
-            },
         },
-
+    },
 }));
 
 export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCreate }) => {
@@ -82,14 +81,16 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
     });
 
     const createProject = async ({ title, description }: FormType) => {
+        if (!session || !owner.id || !flow?.id) return;
+
         const promise = gql.mutation({
             createProject: [
                 {
-                    user: session!.user,
+                    user: session.user,
                     title,
                     description,
-                    ownerId: owner.id!,
-                    flowId: flow?.id!,
+                    ownerId: owner.id,
+                    flowId: flow.id,
                 },
                 {
                     id: true,

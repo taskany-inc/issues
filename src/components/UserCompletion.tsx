@@ -12,7 +12,7 @@ import {
     buttonTextColor,
 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
-import { UserAnyKind } from '../../graphql/generated/genql';
+import { UserAnyKind } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 
 import { Button } from './Button';

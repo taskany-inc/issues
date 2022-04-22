@@ -4,9 +4,6 @@ import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { Button } from './Button';
-import { Popup } from './Popup';
-import { Icon } from './Icon';
 import {
     buttonBackgroundColorHover,
     buttonBorderColor,
@@ -14,8 +11,12 @@ import {
     buttonIconColor,
 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
-import { Project } from '../../graphql/generated/genql';
+import { Project } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+
+import { Button } from './Button';
+import { Popup } from './Popup';
+import { Icon } from './Icon';
 
 interface ProjectCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -90,8 +91,8 @@ const fetcher = createFetcher((_, query: string) => ({
                     id: true,
                     title: true,
                     default: true,
-                }
-            }
+                },
+            },
         },
     ],
 }));
@@ -105,14 +106,15 @@ export const ProjectCompletion: React.FC<ProjectCompletionProps> = ({
     placeholder,
 }) => {
     const { data: session } = useSession();
-    const popupRef = useRef<any>();
-    const buttonRef = useRef<any>();
+    const popupRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const { state: inputState, setState: setInputState, reset: inputReset, bindings: onInput } = useInput(query);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
+    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
 
     const onClickOutside = () => {
         setEditMode(false);
@@ -127,7 +129,12 @@ export const ProjectCompletion: React.FC<ProjectCompletionProps> = ({
 
     const onInputBlur = () => {};
 
-    const { data } = useSWR(inputState, (query) => fetcher(session?.user, query));
+    const onProjectCardClick = (project: Project) => () => {
+        setEditMode(false);
+        setPopupVisibility(false);
+        onClick && onClick(project);
+        setInputState(project.title || '');
+    };
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -153,16 +160,11 @@ export const ProjectCompletion: React.FC<ProjectCompletionProps> = ({
         },
     );
 
-    const onProjectCardClick = (project: Project) => () => {
-        setEditMode(false);
-        setPopupVisibility(false);
-        onClick && onClick(project);
-        setInputState(project.title || '');
-    };
-
     useEffect(() => {
-        if (data?.projectCompletion?.length && downPress) {
-            setCursor((prevState) => (prevState < data?.projectCompletion?.length! - 1 ? prevState + 1 : prevState));
+        const projectCompletion = data?.projectCompletion;
+
+        if (projectCompletion?.length && downPress) {
+            setCursor((prevState) => (prevState < projectCompletion.length - 1 ? prevState + 1 : prevState));
         }
     }, [data?.projectCompletion, downPress]);
 

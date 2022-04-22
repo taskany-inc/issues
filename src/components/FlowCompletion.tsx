@@ -4,9 +4,6 @@ import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { Button } from './Button';
-import { Popup } from './Popup';
-import { Icon } from './Icon';
 import {
     buttonBackgroundColorHover,
     buttonBorderColor,
@@ -14,8 +11,12 @@ import {
     buttonIconColor,
 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
-import { Flow } from '../../graphql/generated/genql';
+import { Flow } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+
+import { Button } from './Button';
+import { Popup } from './Popup';
+import { Icon } from './Icon';
 
 interface FlowCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -64,7 +65,7 @@ const ItemCard: React.FC<{
     graph?: string;
     focused?: boolean;
     onClick?: () => void;
-}> = ({ title, states, graph, focused, onClick }) => {
+}> = ({ title, focused, onClick }) => {
     return (
         <StyledItemCard onClick={onClick} focused={focused}>
             <StyledItemInfo>
@@ -102,14 +103,15 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
     placeholder,
 }) => {
     const { data: session } = useSession();
-    const popupRef = useRef<any>();
-    const buttonRef = useRef<any>();
+    const popupRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const { state: inputState, setState: setInputState, reset: inputReset, bindings: onInput } = useInput(query);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
+    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
 
     const onClickOutside = () => {
         setEditMode(false);
@@ -122,7 +124,12 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
         setPopupVisibility(true);
     };
 
-    const { data } = useSWR(inputState, (query) => fetcher(session?.user, query));
+    const onItemClick = (flow: Flow) => () => {
+        setEditMode(false);
+        setPopupVisibility(false);
+        onClick && onClick(flow);
+        setInputState(flow.title);
+    };
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -148,16 +155,11 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
         },
     );
 
-    const onItemClick = (flow: Flow) => () => {
-        setEditMode(false);
-        setPopupVisibility(false);
-        onClick && onClick(flow);
-        setInputState(flow.title);
-    };
-
     useEffect(() => {
-        if (data?.flowCompletion?.length && downPress) {
-            setCursor((prevState) => (prevState < data?.flowCompletion?.length! - 1 ? prevState + 1 : prevState));
+        const flowCompletion = data?.flowCompletion;
+
+        if (flowCompletion?.length && downPress) {
+            setCursor((prevState) => (prevState < flowCompletion.length - 1 ? prevState + 1 : prevState));
         }
     }, [data?.flowCompletion, downPress]);
 

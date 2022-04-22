@@ -4,9 +4,6 @@ import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { Button } from './Button';
-import { Popup } from './Popup';
-import { Icon } from './Icon';
 import {
     buttonBackgroundColorHover,
     buttonBorderColor,
@@ -14,8 +11,12 @@ import {
     buttonIconColor,
 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
-import { State } from '../../graphql/generated/genql';
+import { State } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+
+import { Button } from './Button';
+import { Popup } from './Popup';
+import { Icon } from './Icon';
 
 interface StateDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -92,13 +93,14 @@ const fetcher = createFetcher((_, id: string) => ({
 
 export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, flowId, disabled, onClick }) => {
     const { data: session } = useSession();
-    const popupRef = useRef<any>();
-    const buttonRef = useRef<any>();
+    const popupRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
+    const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
 
     const onClickOutside = () => {
         setEditMode(false);
@@ -110,7 +112,11 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
         setPopupVisibility(true);
     };
 
-    const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
+    const onItemClick = (state: State) => () => {
+        setEditMode(false);
+        setPopupVisibility(false);
+        onClick && onClick(state);
+    };
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -136,15 +142,11 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
         },
     );
 
-    const onItemClick = (state: State) => () => {
-        setEditMode(false);
-        setPopupVisibility(false);
-        onClick && onClick(state);
-    };
-
     useEffect(() => {
-        if (data?.flow?.states?.length && downPress) {
-            setCursor((prevState) => (prevState < data?.flow?.states?.length! - 1 ? prevState + 1 : prevState));
+        const states = data?.flow?.states;
+
+        if (states?.length && downPress) {
+            setCursor((prevState) => (prevState < states.length - 1 ? prevState + 1 : prevState));
         }
     }, [data?.flow, downPress]);
 
