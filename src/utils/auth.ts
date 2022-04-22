@@ -30,8 +30,6 @@ export const authOptions: NextAuthOptions = {
                     },
                 });
 
-                console.log(user?.accounts);
-
                 if (!user) return null;
                 // FIXME: add salt
                 if (user?.accounts[0].password !== creds?.password) return null;
@@ -64,6 +62,19 @@ export const authOptions: NextAuthOptions = {
             };
         },
         async jwt({ token, user, account, profile, isNewUser }) {
+            if (user && isNewUser) {
+                await prisma.user.update({
+                    where: {
+                        id: user.id,
+                    },
+                    data: {
+                        activity: {
+                            create: {},
+                        },
+                    },
+                });
+            }
+
             return user
                 ? {
                       ...token,
