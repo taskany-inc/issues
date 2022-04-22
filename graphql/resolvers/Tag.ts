@@ -36,10 +36,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             title: nonNull(stringArg()),
             description: stringArg(),
             color: nonNull(stringArg()),
-            activityId: nonNull(stringArg()),
             user: nonNull(arg({ type: UserSession })),
         },
-        resolve: async (_, { user, title, description, activityId, color }, { db }) => {
+        resolve: async (_, { user, title, description, color }, { db }) => {
             const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
 
             if (!validUser) return null;
@@ -50,7 +49,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         title,
                         description,
                         color,
-                        activityId,
+                        activityId: validUser.activityId,
                     },
                 });
             } catch (error) {

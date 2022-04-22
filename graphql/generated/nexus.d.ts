@@ -492,7 +492,6 @@ export interface NexusGenArgTypes {
         };
         createTag: {
             // args
-            activityId: string; // String!
             color: string; // String!
             description?: string | null; // String
             title: string; // String!

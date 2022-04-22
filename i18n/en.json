@@ -61,7 +61,7 @@
             "Goal's description is required": "Goal's description is required",
             "Goal's description must be a string": "Goal's description must be a string",
             "Something went wrong 😿": "Something went wrong 😿",
-            "We are creating new goal...": "We are creating new goal...",
+            "We are creating new goal": "We are creating new goal...",
             "Voila! Goal is here 🎉": "Voila! Goal is here 🎉",
             "Create goal": "Create goal",
             "Goal's title": "Goal's title",
@@ -77,5 +77,12 @@
             "State": "State",
             "Enter tag title": "Enter tag title"
         }
+    },
+    "TagCompletion": {
+        "Something went wrong 😿": "Something went wrong 😿",
+        "We are creating new tag": "We are creating new tag...",
+        "Voila! Tag is here 🎉": "Voila! Tag is here 🎉",
+        "Click here": "Click here",
+        "Change color and create": "to change color. Click on it to create."
     }
 }

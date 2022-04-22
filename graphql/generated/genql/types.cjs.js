@@ -104,7 +104,6 @@ module.exports = {
             createTag: [
                 17,
                 {
-                    activityId: [4, 'String!'],
                     color: [4, 'String!'],
                     description: [4],
                     title: [4, 'String!'],

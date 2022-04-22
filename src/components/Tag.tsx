@@ -43,6 +43,7 @@ const StyledTag = styled.div<{ color: TagProps['color']; onClick: TagProps['onCl
     font-size: 12px;
     font-weight: 500;
     cursor: default;
+    user-select: none;
 
     ${({ color }) => css`
         border: 2px solid ${color};

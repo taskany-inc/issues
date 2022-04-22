@@ -5,7 +5,7 @@ const ccc = new ColorContrastChecker();
 
 const generateHex = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
-export const randomHex = (bg: [string, string], ratio = 6) => {
+export const randomHex = (bg: [string, string], ratio = 7) => {
     let generatedColor: string | null = null;
 
     const colorsMap = bg.reduce((acc, color) => {
@@ -20,8 +20,7 @@ export const randomHex = (bg: [string, string], ratio = 6) => {
             colorsMap[0] = ccc.isLevelCustom(generatedColor, bg[0], ratio);
             colorsMap[1] = ccc.isLevelCustom(generatedColor, bg[1], ratio);
         } catch (e) {
-            colorsMap[0] = ccc.isLevelCustom(generatedColor, bg[0], ratio);
-            colorsMap[1] = ccc.isLevelCustom(generatedColor, bg[1], ratio);
+            generatedColor = generateHex();
         }
     }
 
