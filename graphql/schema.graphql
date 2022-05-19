@@ -44,13 +44,14 @@ type Ghost {
 
 type Goal {
   blocks: [Goal]
+  computedIssuer: UserAnyKind
   computedOwner: UserAnyKind
   connected: [Goal]
   createdAt: DateTime!
   dependsOn: [Goal]
   description: String!
   estimate: Estimate
-  id: Int!
+  id: ID!
   issuer: Activity
   issuerId: String
   key: Boolean
@@ -77,7 +78,7 @@ input GoalEstimate {
 
 type Mutation {
   createGoal(description: String!, estimate: GoalEstimate, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!, user: UserSession!): Goal
-  createProject(description: String, flowId: String!, ownerId: String!, title: String!, user: UserSession!): Project
+  createProject(description: String, flowId: String!, key: String!, ownerId: String!, title: String!, user: UserSession!): Project
   createTag(color: String!, description: String, title: String!, user: UserSession!): Tag
   inviteUser(email: String!, user: UserSession!): Ghost
 }
@@ -89,6 +90,7 @@ type Project {
   flow: Flow
   goals: [Goal]
   id: Int!
+  key: String!
   owner: Activity
   slug: String
   tags: [Tag]
@@ -101,6 +103,8 @@ type Query {
   flow(id: String!): Flow
   flowCompletion(query: String!, sortBy: SortOrder): [Flow]
   flowRecommended: [Flow]
+  goal(id: String!): Goal
+  goalUserIndex(user: UserSession!): [Goal]
   project(slug: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(slug: String!): [Goal]

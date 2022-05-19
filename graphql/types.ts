@@ -98,6 +98,7 @@ export const Project = objectType({
     name: ProjectModel.$name,
     definition(t) {
         t.field(ProjectModel.id);
+        t.field(ProjectModel.key);
         t.field(ProjectModel.slug);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
@@ -138,6 +139,7 @@ export const Goal = objectType({
         t.list.field('relatedTo', { type: Goal });
         t.list.field('connected', { type: Goal });
         t.field('computedOwner', { type: UserAnyKind });
+        t.field('computedIssuer', { type: UserAnyKind });
     },
 });
 
@@ -195,15 +197,21 @@ export const Tag = objectType({
     },
 });
 
-export const computeOwnerFields = {
+export const computeUserFields = {
     include: {
         user: true,
         ghost: true,
     },
 };
 
-export const withComputedOwner = <T>(o: T): T => ({
-    ...o,
-    // @ts-ignore
-    computedOwner: o?.owner?.user || o?.owner?.ghost,
-});
+export const withComputedField =
+    (...args: string[]) =>
+    <T>(o: T): T => ({
+        ...o,
+        ...args.reduce((acc, field) => {
+            // @ts-ignore
+            acc[`computed${field[0].toUpperCase() + field.substring(1)}`] = o[`${field}`]?.user ?? o[`${field}`].ghost;
+
+            return acc;
+        }, {}),
+    });

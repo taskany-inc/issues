@@ -121,6 +121,7 @@ model Activity {
 
 model Project {
   id           Int        @id @default(autoincrement())
+  key          String     @unique
   slug         String?    @unique
   title        String
   description  String?
@@ -146,7 +147,7 @@ model Estimate {
   y      String?
   date   String?
   goal   Goal    @relation(fields: [goalId], references: [id])
-  goalId Int
+  goalId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -155,7 +156,7 @@ model Estimate {
 }
 
 model Goal {
-  id           Int        @id @default(autoincrement())
+  id           String        @id
   title        String
   description  String
   key          Boolean?
@@ -193,7 +194,7 @@ model Criteria {
   title  String
   done   Boolean
   goal   Goal    @relation(fields: [goalId], references: [id])
-  goalId Int
+  goalId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -207,7 +208,7 @@ model Comment {
   author      Activity   @relation(fields: [authorId], references: [id])
   authorId    String
   goal        Goal       @relation(fields: [goalId], references: [id])
-  goalId      Int
+  goalId      String
   reactions   Reaction[]
 
   createdAt DateTime @default(now())
@@ -223,7 +224,7 @@ model Reaction {
   author    Activity @relation(fields: [authorId], references: [id])
   authorId  String
   goal      Goal?    @relation(fields: [goalId], references: [id])
-  goalId    Int?
+  goalId    String?
   comment   Comment? @relation(fields: [commentId], references: [id])
   commentId String?
 

@@ -1,54 +1,62 @@
-import { Post } from '@prisma/client';
+import { Goal } from '@prisma/client';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import useSWR from 'swr';
 import { getSession, useSession } from 'next-auth/react';
 
 import { SSRPageProps, SSRProps } from '../../types/ssrProps';
 import { createFetcher } from '../../utils/createFetcher';
+import { Header } from '../../components/Header';
 
 const fetcher = createFetcher((user, id: string) => ({
-    post: [
+    goal: [
         {
             id,
-            user,
         },
         {
             id: true,
             title: true,
-            content: true,
-            created_at: true,
-            author: {
-                id: true,
-                name: true,
-            },
+            description: true,
+            createdAt: true,
+            updatedAt: true,
         },
     ],
 }));
 
-function Page({ post }: SSRPageProps<{ post: Post }>) {
+function Page({ goal }: SSRPageProps<{ goal: Goal }>) {
     const router = useRouter();
     const { id } = router.query as Record<string, string>;
     const { data: session } = useSession();
-    const { data, error } = useSWR('post', fetcher(session!.user, id));
+    const { data } = useSWR('goal', () => fetcher(session!.user, id));
 
-    const actual = data?.post ?? post;
+    const actual = data?.goal ?? goal;
 
     return (
-        <div>
-            <h1>{actual.title}</h1>
-        </div>
+        <>
+            <Head>
+                <title>{actual.title}</title>
+            </Head>
+
+            <Header />
+
+            <div>
+                <h1>{actual.title}</h1>
+            </div>
+        </>
     );
 }
 
 Page.auth = true;
 
-export const getServerSideProps: SSRProps<{ id: string }> = async ({ req, params }) => {
+export const getServerSideProps: SSRProps<{ id: string }> = async ({ locale, req, params }) => {
     const session = await getSession({ req });
-    const { post } = await fetcher(session!.user, params!.id)();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const { goal } = await fetcher(session!.user, params!.id);
 
     return {
         props: {
-            post,
+            goal,
+            i18n: (await import(`../../../i18n/${locale}.json`)).default,
         },
     };
 };
