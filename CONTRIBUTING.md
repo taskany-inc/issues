@@ -55,7 +55,7 @@ cp .env.example .env
 Add your settings to `.env` file. Then prepate database:
 
 ```sh
-npm run db:start
+npm run db:run
 npx prisma migrate dev --preview-feature
 npx prisma db seed
 ```
