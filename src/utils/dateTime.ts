@@ -4,6 +4,8 @@ import getYear from 'date-fns/getYear';
 import format from 'date-fns/format';
 import setMonth from 'date-fns/setMonth';
 import lastDayOfQuarter from 'date-fns/lastDayOfQuarter';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import ruLocale from 'date-fns/locale/ru';
 
 export const localeFormatMap = {
     ru: 'dd.MM.yyyy',
@@ -29,6 +31,9 @@ export const createLocaleDate = (date: string, { locale }: LocaleArg = localeArg
 export const yearFromDate = (date: string, { locale }: LocaleArg = localeArgDefault) =>
     getYear(createLocaleDate(date, { locale }));
 
+export const currentDate = (date = new Date(), { locale }: LocaleArg = localeArgDefault) =>
+    format(date, localeFormatMap[locale]);
+
 export const endOfQuarter = (q: string, date = new Date(), { locale }: LocaleArg = localeArgDefault) => {
     const qToM = {
         [quarters.Q1]: 2,
@@ -43,10 +48,7 @@ export const endOfQuarter = (q: string, date = new Date(), { locale }: LocaleArg
 
 export const quarterFromDate = (date = new Date()) => `Q${getQuarter(date)}` as quarters;
 
-export const currentDate = (date = new Date(), { locale }: LocaleArg = localeArgDefault) =>
-    format(date, localeFormatMap[locale]);
-
-export const availableYears = (n: number = 5, currY = new Date().getFullYear()) =>
+export const availableYears = (n = 5, currY = new Date().getFullYear()) =>
     Array(n)
         .fill(0)
         .map((_, i) => currY + i);
@@ -58,4 +60,8 @@ export const estimatedMeta = (date = new Date(), { locale }: LocaleArg = localeA
         date: endOfQuarter(q, date, { locale }),
         q,
     };
+};
+
+export const dateAgo = (date: string, { locale }: LocaleArg = localeArgDefault) => {
+    return formatDistanceToNow(new Date(date), { locale: locale === 'ru' ? ruLocale : undefined, addSuffix: true });
 };
