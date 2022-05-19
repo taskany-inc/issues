@@ -6,6 +6,7 @@ interface TagProps {
     color: string;
     title: string;
     description?: string;
+    size?: 's' | 'm';
     onClick?: () => void;
     onHide?: () => void;
 }
@@ -35,7 +36,7 @@ const StyledCleanButton = styled.div<{ color: TagProps['color'] }>`
     `}
 `;
 
-const StyledTag = styled.div<{ color: TagProps['color']; onClick: TagProps['onClick'] }>`
+const StyledTag = styled.div<{ size: TagProps['size']; color: TagProps['color']; onClick: TagProps['onClick'] }>`
     display: inline-block;
     position: relative;
     padding: 4px 12px;
@@ -65,11 +66,19 @@ const StyledTag = styled.div<{ color: TagProps['color']; onClick: TagProps['onCl
         css`
             cursor: pointer;
         `}
+
+    ${({ size }) =>
+        size === 's' &&
+        css`
+            padding: 2px 10px;
+            font-size: 12px;
+            line-height: 1.4em;
+        `}
 `;
 
-export const Tag: React.FC<TagProps> = ({ title, description, color, onClick, onHide }) => {
+export const Tag: React.FC<TagProps> = ({ title, description, color, size = 'm', onClick, onHide }) => {
     return (
-        <StyledTag color={color} onClick={onClick} title={description}>
+        <StyledTag size={size} color={color} onClick={onClick} title={description}>
             {onHide && (
                 <StyledCleanButton color={color} onClick={onHide}>
                     +
