@@ -1,59 +1,98 @@
-import type { NextPage, GetStaticPropsContext } from 'next';
-import Head from 'next/head';
-import { useSession } from 'next-auth/react';
+import React from 'react';
+import Link from 'next/link';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
+import { Grid } from '@geist-ui/core';
+import styled from 'styled-components';
 
 import { createFetcher } from '../utils/createFetcher';
-import { Header } from '../components/Header';
+import { Page } from '../components/Page';
+import { routes } from '../hooks/router';
+import { GoalItem } from '../components/GoalItem';
+import { ssrProps, ExternalPageProps } from '../utils/ssrProps';
 
-const fetcher = createFetcher(() => ({
-    users: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        createdAt: true,
-    },
+const fetcher = createFetcher((user) => ({
+    goalUserIndex: [
+        {
+            user,
+        },
+        {
+            id: true,
+            title: true,
+            description: true,
+            project: {
+                id: true,
+                title: true,
+            },
+            state: {
+                id: true,
+                title: true,
+            },
+            computedIssuer: {
+                id: true,
+                name: true,
+                email: true,
+            },
+            computedOwner: {
+                id: true,
+                name: true,
+                email: true,
+            },
+            tags: {
+                id: true,
+                title: true,
+                description: true,
+                color: true,
+            },
+            createdAt: true,
+            updatedAt: true,
+        },
+    ],
 }));
 
-const Home: NextPage = () => {
-    const { data: session } = useSession();
-    // @ts-ignore
-    const { data, error } = useSWR(session?.user?.role === 'ADMIN', () => fetcher());
+const StyledGoalsList = styled.div`
+    padding: 20px 20px 0 20px;
+`;
+
+export const getServerSideProps = ssrProps(async ({ user }) => ({
+    ssrData: await fetcher(user),
+}));
+
+const Home = ({ user, locale, ssrData }: ExternalPageProps) => {
     const t = useTranslations('index');
+    const { data } = useSWR('goalUserIndex', () => fetcher(user));
+    const actualData: typeof data = data ?? ssrData;
 
     return (
-        <>
-            <Head>
-                <title>{t('title')}</title>
-            </Head>
-
-            <Header/>
-
-            {session ? (
-                <>
-                    {session.user.role === 'ADMIN' && (
-                        <div>
-                            {data?.users && data.users.map((user) => <div key={user.id}>{JSON.stringify(user)}</div>)}
+        <Page locale={locale} title={t('title')}>
+            <StyledGoalsList>
+                <Grid.Container gap={0}>
+                    <Grid xs={1} />
+                    <Grid xs={23}>
+                        <div style={{ width: '100%' }}>
+                            {actualData?.goalUserIndex?.map((goal) => (
+                                <Link key={goal.id} href={routes.goal(goal.id)} passHref>
+                                    <a style={{ width: '100%' }}>
+                                        <GoalItem
+                                            id={goal.id}
+                                            title={goal.title}
+                                            projectTitle={goal.project?.title}
+                                            tags={goal.tags}
+                                            issuer={goal.computedIssuer}
+                                            createdAt={goal.createdAt}
+                                            updatedAt={goal.updatedAt}
+                                        />
+                                    </a>
+                                </Link>
+                            ))}
                         </div>
-                    )}
-                </>
-            ) : (
-                <>
-                    Not signed in
-                </>
-            )}
-        </>
+                    </Grid>
+                </Grid.Container>
+            </StyledGoalsList>
+
+            <pre>{JSON.stringify(actualData?.goalUserIndex, null, 2)}</pre>
+        </Page>
     );
 };
 
 export default Home;
-
-export async function getStaticProps({ locale }: GetStaticPropsContext) {
-    return {
-        props: {
-            i18n: (await import(`../../i18n/${locale}.json`)).default,
-        },
-    };
-}
