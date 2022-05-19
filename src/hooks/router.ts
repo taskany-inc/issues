@@ -2,15 +2,16 @@ import { useRouter as NextRouter } from 'next/router';
 
 export const routes = {
     index: () => '/',
-    goals: () => `/goals`,
+    goals: () => '/goals',
     createGoal: () => '/goals/new',
     goal: (id: string) => `/goals/${id}`,
     editGoal: (id: string) => `/goals/${id}/edit`,
     createProject: () => '/projects/new',
-    projects: () => `/projects`,
+    projects: () => '/projects',
     project: (id: string) => `/projects/${id}`,
     editProject: (id: string) => `/projects/${id}/edit`,
     inviteUsers: () => '/users/invite',
+    signIn: () => '/api/auth/signin',
 };
 
 export const useRouter = () => {

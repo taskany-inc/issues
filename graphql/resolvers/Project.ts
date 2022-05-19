@@ -2,7 +2,7 @@ import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 import slugify from 'slugify';
 
-import { SortOrder, Project, computeOwnerFields, withComputedOwner, Goal, UserSession } from '../types';
+import { SortOrder, Project, computeUserFields, withComputedField, Goal, UserSession } from '../types';
 
 const slugifyOptions = {
     replacement: '_',
@@ -23,12 +23,12 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
                 include: {
                     owner: {
-                        ...computeOwnerFields,
+                        ...computeUserFields,
                     },
                 },
             });
 
-            return withComputedOwner(project);
+            return withComputedField('owner')(project);
         },
     });
 
@@ -46,12 +46,15 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
                 include: {
                     owner: {
-                        ...computeOwnerFields,
+                        ...computeUserFields,
+                    },
+                    issuer: {
+                        ...computeUserFields,
                     },
                 },
             });
 
-            return goals.map(withComputedOwner);
+            return goals.map(withComputedField('owner', 'issuer'));
         },
     });
 
@@ -95,13 +98,14 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('createProject', {
         type: Project,
         args: {
+            key: nonNull(stringArg()),
             title: nonNull(stringArg()),
             description: stringArg(),
             ownerId: nonNull(stringArg()),
             flowId: nonNull(stringArg()),
             user: nonNull(arg({ type: UserSession })),
         },
-        resolve: async (_, { user, title, description, ownerId, flowId }, { db }) => {
+        resolve: async (_, { key, user, title, description, ownerId, flowId }, { db }) => {
             const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
             const projectOwner = await db.user.findUnique({ where: { id: ownerId }, include: { activity: true } });
 
@@ -112,6 +116,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 const newProject = db.project.create({
                     data: {
+                        key,
                         slug: slugify(title, slugifyOptions),
                         title,
                         description,

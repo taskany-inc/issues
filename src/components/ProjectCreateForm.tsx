@@ -7,11 +7,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import z from 'zod';
 import useSWR from 'swr';
+import styled from 'styled-components';
 
 import { gql } from '../utils/gql';
 import { accentIconColor } from '../design/@generated/themes';
 import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
+import { keyPredictor } from '../utils/keyPredictor';
 
 import { Card } from './Card';
 import { Icon } from './Icon';
@@ -25,6 +27,7 @@ import { Keyboard } from './Keyboard';
 import { UserCompletion } from './UserCompletion';
 import { FlowCompletion } from './FlowCompletion';
 import { UserPic } from './UserPic';
+import { ProjectKeyInput } from './ProjectKeyInput';
 
 interface ProjectCreateFormProps {
     card?: boolean;
@@ -42,10 +45,22 @@ const fetcher = createFetcher(() => ({
     },
 }));
 
+const StyledProjectTitleContainer = styled.div`
+    position: relative;
+`;
+
+const StyledProjectKeyContainer = styled.div`
+    position: absolute;
+    top: 10px;
+    right: 20px;
+`;
+
 export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const [flow, setFlow] = useState<Partial<Flow>>();
+    const [projectKey, setProjectKey] = useState('');
+    const [isKeyByUser, setIsKeyByUser] = useState(false);
     const t = useTranslations('projects.new');
     const { data } = useSWR('flowRecommened', () => fetcher(session?.user));
 
@@ -72,6 +87,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
     const {
         register,
         handleSubmit,
+        watch,
         formState: { errors, isValid, isSubmitted },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
@@ -80,12 +96,32 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
         shouldFocusError: true,
     });
 
+    const projectTitleValue = watch('title');
+    useEffect(() => {
+        if (!isKeyByUser && projectTitleValue) {
+            setProjectKey(keyPredictor(projectTitleValue));
+        }
+    }, [projectTitleValue, isKeyByUser]);
+
+    const onProjectKeyChange = (k: string) => {
+        setIsKeyByUser(true);
+        setProjectKey(k);
+    };
+
+    const onProjectKeyEdited = (k: string) => {
+        if (k === '') {
+            setIsKeyByUser(false);
+            setProjectKey(keyPredictor(projectTitleValue));
+        }
+    };
+
     const createProject = async ({ title, description }: FormType) => {
         if (!session || !owner.id || !flow?.id) return;
 
         const promise = gql.mutation({
             createProject: [
                 {
+                    key: projectKey,
                     user: session.user,
                     title,
                     description,
@@ -117,13 +153,20 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
         <Form onSubmit={handleSubmit(createProject)}>
             <Text h1>{t('Create new project')}</Text>
 
-            <FormInput
-                {...register('title')}
-                error={isSubmitted ? errors.title : undefined}
-                placeholder={t("Project's title")}
-                autoFocus
-                flat="bottom"
-            />
+            <StyledProjectTitleContainer>
+                <FormInput
+                    {...register('title')}
+                    error={isSubmitted ? errors.title : undefined}
+                    placeholder={t("Project's title")}
+                    autoFocus
+                    flat="bottom"
+                />
+
+                <StyledProjectKeyContainer>
+                    <ProjectKeyInput value={projectKey} onChange={onProjectKeyChange} onBlur={onProjectKeyEdited} />
+                </StyledProjectKeyContainer>
+            </StyledProjectTitleContainer>
+
             <FormTextarea
                 {...register('description')}
                 error={isSubmitted ? errors.description : undefined}

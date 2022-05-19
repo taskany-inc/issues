@@ -1,10 +1,12 @@
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import useSWR from 'swr';
 import { getSession, useSession } from 'next-auth/react';
 
 import { SSRPageProps, SSRProps } from '../../types/ssrProps';
 import { createFetcher } from '../../utils/createFetcher';
 import { Goal, Project } from '../../../graphql/@generated/genql';
+import { Header } from '../../components/Header';
 
 const fetcher = createFetcher((user, slug: string) => ({
     project: [
@@ -15,7 +17,7 @@ const fetcher = createFetcher((user, slug: string) => ({
             id: true,
             title: true,
             description: true,
-            created_at: true,
+            createdAt: true,
             computedOwner: {
                 id: true,
                 name: true,
@@ -31,6 +33,8 @@ const fetcher = createFetcher((user, slug: string) => ({
             id: true,
             title: true,
             description: true,
+            createdAt: true,
+            updatedAt: true,
             computedOwner: {
                 id: true,
                 name: true,
@@ -40,7 +44,7 @@ const fetcher = createFetcher((user, slug: string) => ({
     ],
 }));
 
-function Page({ project, projectGoals }: SSRPageProps<{ project: Project; projectGoals: Goal }>) {
+function Page({ project, projectGoals }: SSRPageProps<{ project: Project; projectGoals: Goal[] }>) {
     const router = useRouter();
     const { slug } = router.query as Record<string, string>;
     const { data: session } = useSession();
@@ -50,18 +54,26 @@ function Page({ project, projectGoals }: SSRPageProps<{ project: Project; projec
     const actualGoals = data?.projectGoals ?? projectGoals;
 
     return (
-        <div>
-            <h1>{actualProject.title}</h1>
+        <>
+            <Head>
+                <title>{actualProject.title}</title>
+            </Head>
 
-            <div>{JSON.stringify(actualProject)}</div>
-            <div>{JSON.stringify(actualGoals)}</div>
-        </div>
+            <Header />
+
+            <div>
+                <h1>{actualProject.title}</h1>
+
+                <div>{JSON.stringify(actualProject)}</div>
+                <div>{JSON.stringify(actualGoals)}</div>
+            </div>
+        </>
     );
 }
 
 Page.auth = true;
 
-export const getServerSideProps: SSRProps<{ slug: string }> = async ({ req, params }) => {
+export const getServerSideProps: SSRProps<{ slug: string }> = async ({ locale, req, params }) => {
     const session = await getSession({ req });
     const { project, projectGoals } = await fetcher(session?.user, params!.slug);
 
@@ -69,6 +81,7 @@ export const getServerSideProps: SSRProps<{ slug: string }> = async ({ req, para
         props: {
             project,
             projectGoals,
+            i18n: (await import(`../../../i18n/${locale}.json`)).default,
         },
     };
 };
