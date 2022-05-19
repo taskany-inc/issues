@@ -95,14 +95,14 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
     );
 };
 
-const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithAuth) => {
+const App = ({ Component, pageProps }: AppPropsWithAuth) => {
     return (
         <>
             <Head>
                 <link rel="icon" href="/favicon.png" />
             </Head>
 
-            <SessionProvider session={session}>
+            <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
                 <ApolloProvider client={apolloClient}>
                     <NextIntlProvider messages={pageProps.i18n}>
                         <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
