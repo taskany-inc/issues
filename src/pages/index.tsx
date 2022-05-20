@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { createFetcher } from '../utils/createFetcher';
 import { Page } from '../components/Page';
 import { routes } from '../hooks/router';
-import { ssrProps, ExternalPageProps } from '../utils/ssrProps';
+import { declareSsrProps, ExternalPageProps } from '../utils/declareSsrProps';
 
 const fetcher = createFetcher((user) => ({
     goalUserIndex: [
@@ -51,7 +51,7 @@ const StyledGoalsList = styled.div`
     padding: 20px 20px 0 20px;
 `;
 
-export const getServerSideProps = ssrProps(async ({ user }) => ({
+export const getServerSideProps = declareSsrProps(async ({ user }) => ({
     ssrData: await fetcher(user),
 }));
 

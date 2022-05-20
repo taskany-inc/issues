@@ -8,15 +8,22 @@ interface SSRProps {
     user: Session['user'];
     locale: 'en' | 'ru';
     req: GetServerSidePropsContext['req'];
+    params: Record<string, string>;
 }
 
+<<<<<<< HEAD
 export interface ExternalPageProps extends SSRProps {
     ssrData: any;
+=======
+export interface ExternalPageProps<D = unknown, P = unknown> extends SSRProps<P> {
+    ssrData: D;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+>>>>>>> a2d88e8 (helper)
     [key: string]: any;
 }
 
-export function ssrProps<T = ExternalPageProps>(cb: ({ user, locale, req }: SSRProps) => T) {
-    return async ({ locale, req }: GetServerSidePropsContext) => {
+export function declareSsrProps<T = ExternalPageProps>(cb: ({ user, locale, req, params }: SSRProps) => T) {
+    return async ({ locale, req, params = {} }: GetServerSidePropsContext) => {
         const session = await getSession({ req });
 
         if (!session) {
@@ -28,12 +35,18 @@ export function ssrProps<T = ExternalPageProps>(cb: ({ user, locale, req }: SSRP
             };
         }
 
-        const resProps = await cb({ user: session.user, locale: locale as SSRProps['locale'], req });
+        const resProps = await cb({
+            req,
+            user: session.user,
+            locale: locale as SSRProps['locale'],
+            params: params as Record<string, string>,
+        });
 
         return {
             props: {
                 ...resProps,
                 locale,
+                params: params as Record<string, string>,
                 user: session.user,
                 i18n: (await import(`../../i18n/${locale}.json`)).default,
             },

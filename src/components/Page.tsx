@@ -3,7 +3,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 
 import { pageContext } from '../utils/pageContext';
-import { ExternalPageProps } from '../utils/ssrProps';
+import { ExternalPageProps } from '../utils/declareSsrProps';
 
 import { Header } from './Header';
 import { Footer } from './Footer';
