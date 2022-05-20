@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import { createFetcher } from '../utils/createFetcher';
 import { Page } from '../components/Page';
 import { routes } from '../hooks/router';
-import { GoalItem } from '../components/GoalItem';
 import { ssrProps, ExternalPageProps } from '../utils/ssrProps';
 
 const fetcher = createFetcher((user) => ({
@@ -73,7 +72,7 @@ const Home = ({ user, locale, ssrData }: ExternalPageProps) => {
                             {actualData?.goalUserIndex?.map((goal) => (
                                 <Link key={goal.id} href={routes.goal(goal.id)} passHref>
                                     <a style={{ width: '100%' }}>
-                                        <GoalItem
+                                        {/* <GoalItem
                                             id={goal.id}
                                             title={goal.title}
                                             projectTitle={goal.project?.title}
@@ -81,7 +80,7 @@ const Home = ({ user, locale, ssrData }: ExternalPageProps) => {
                                             issuer={goal.computedIssuer}
                                             createdAt={goal.createdAt}
                                             updatedAt={goal.updatedAt}
-                                        />
+                                        /> */}
                                     </a>
                                 </Link>
                             ))}
