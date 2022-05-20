@@ -1,14 +1,11 @@
-import { Goal } from '@prisma/client';
-import { useRouter } from 'next/router';
-import Head from 'next/head';
 import useSWR from 'swr';
-import { getSession, useSession } from 'next-auth/react';
 
-import { SSRPageProps, SSRProps } from '../../types/ssrProps';
 import { createFetcher } from '../../utils/createFetcher';
-import { Header } from '../../components/Header';
+import { declareSsrProps } from '../../utils/declareSsrProps';
+import { Page } from '../../components/Page';
+import { declarePage } from '../../utils/declarePage';
 
-const fetcher = createFetcher((user, id: string) => ({
+const fetcher = createFetcher((_, id: string) => ({
     goal: [
         {
             id,
@@ -19,46 +16,32 @@ const fetcher = createFetcher((user, id: string) => ({
             description: true,
             createdAt: true,
             updatedAt: true,
+            project: {
+                slug: true,
+                title: true,
+                description: true,
+            },
         },
     ],
 }));
 
-function Page({ goal }: SSRPageProps<{ goal: Goal }>) {
-    const router = useRouter();
-    const { id } = router.query as Record<string, string>;
-    const { data: session } = useSession();
-    const { data } = useSWR('goal', () => fetcher(session!.user, id));
+export const getServerSideProps = declareSsrProps(async ({ user, params }) => ({
+    ssrData: await fetcher(user, params.id),
+}));
 
-    const actual = data?.goal ?? goal;
+export default declarePage(
+    ({ user, locale, ssrData, params: { id } }) => {
+        const { data } = useSWR('goal', () => fetcher(user, id));
 
-    return (
-        <>
-            <Head>
-                <title>{actual.title}</title>
-            </Head>
+        const goal = data?.goal ?? ssrData;
 
-            <Header />
+        return (
+            <Page locale={locale} title={goal.title}>
+                <h1>{goal.title}</h1>
 
-            <div>
-                <h1>{actual.title}</h1>
-            </div>
-        </>
-    );
-}
-
-Page.auth = true;
-
-export const getServerSideProps: SSRProps<{ id: string }> = async ({ locale, req, params }) => {
-    const session = await getSession({ req });
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { goal } = await fetcher(session!.user, params!.id);
-
-    return {
-        props: {
-            goal,
-            i18n: (await import(`../../../i18n/${locale}.json`)).default,
-        },
-    };
-};
-
-export default Page;
+                <pre>{JSON.stringify(goal, null, 2)}</pre>
+            </Page>
+        );
+    },
+    { private: true },
+);
