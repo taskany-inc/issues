@@ -13,7 +13,9 @@
     "generate": "concurrently \"npm run generate:nexus\" \"npm run generate:genql\" \"npm run generate:themes\"",
     "db:run": "docker-compose up -d",
     "db:down": "docker-compose down",
-    "test": "jest"
+    "test": "jest",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "prisma": {
     "seed": "ts-node -r dotenv/config --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -54,8 +56,17 @@
     "zod": "3.14.3"
   },
   "devDependencies": {
+    "@babel/core": "7.18.0",
     "@genql/cli": "2.9.0",
     "@next/bundle-analyzer": "12.1.1",
+    "@storybook/addon-actions": "6.5.3",
+    "@storybook/addon-essentials": "6.5.3",
+    "@storybook/addon-interactions": "6.5.3",
+    "@storybook/addon-links": "6.5.3",
+    "@storybook/builder-webpack5": "6.5.3",
+    "@storybook/manager-webpack5": "6.5.3",
+    "@storybook/react": "6.5.3",
+    "@storybook/testing-library": "0.0.11",
     "@svgr/webpack": "6.2.1",
     "@types/graphql": "14.5.0",
     "@types/jest": "27.4.1",
@@ -67,6 +78,7 @@
     "@typescript-eslint/eslint-plugin": "5.14.0",
     "@typescript-eslint/parser": "5.14.0",
     "babel-eslint": "10.1.0",
+    "babel-loader": "8.2.5",
     "change-case": "4.1.2",
     "concurrently": "7.0.0",
     "dotenv": "16.0.0",
@@ -80,6 +92,7 @@
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-react": "7.29.4",
     "eslint-plugin-react-hooks": "4.3.0",
+    "eslint-plugin-storybook": "0.5.12",
     "husky": "7.0.4",
     "jest": "27.5.1",
     "lint-staged": "12.3.5",

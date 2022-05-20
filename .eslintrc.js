@@ -5,6 +5,7 @@ module.exports = {
         'airbnb-base',
         'plugin:@typescript-eslint/eslint-recommended',
         'plugin:@typescript-eslint/recommended',
+        'plugin:storybook/recommended',
     ],
     parser: '@typescript-eslint/parser',
     plugins: ['import', 'prettier'],
@@ -12,7 +13,14 @@ module.exports = {
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
         'no-restricted-syntax': 'off',
-        'spaced-comment': ['error', 'always', { markers: ['/'] }], // ts-require directive
+        'spaced-comment': [
+            'error',
+            'always',
+            {
+                markers: ['/'],
+            },
+        ],
+        // ts-require directive
         'comma-dangle': ['error', 'always-multiline'],
         'arrow-parens': ['error', 'always'],
         indent: 'off',
@@ -41,14 +49,15 @@ module.exports = {
         'space-before-function-paren': 'off',
         'consistent-return': 'off',
         'prettier/prettier': 'error',
-
         '@typescript-eslint/explicit-function-return-type': 'off',
-
-        'import/prefer-default-export': 'off', // https://humanwhocodes.com/blog/2019/01/stop-using-default-exports-javascript-module/
+        'import/prefer-default-export': 'off',
+        // https://humanwhocodes.com/blog/2019/01/stop-using-default-exports-javascript-module/
         'import/order': [
             'error',
             {
-                groups: [['builtin', 'external'], 'internal', 'parent', 'sibling', 'index'],
+                groups: [
+                    ['builtin', 'external'], 'internal', 'parent', 'sibling', 'index'
+                ],
                 'newlines-between': 'always',
             },
         ],
