@@ -1,9 +1,10 @@
 import React from 'react';
 import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core';
-import { ThemeProvider, useTheme } from 'next-themes';
-import { backgroundColor, toastBackgroundColor, toastTextColor } from '../src/design/@generated/themes'; //design/@generated/themes
+import { ThemeProvider } from 'next-themes';
+import { backgroundColor } from '../src/design/@generated/themes';
 import { GlobalStyle } from '../src/components/GlobalStyle';
 import { Theme } from '../src/components/Theme';
+import { SessionProvider } from 'next-auth/react';
 
 
 export const parameters = {
@@ -18,8 +19,6 @@ export const parameters = {
 
 export const decorators = [
     (Story, context) => {
-
-
         const customGeistDarkTheme = Themes.createFromDark({
             type: 'custom-dark',
             palette: {
@@ -39,35 +38,45 @@ export const decorators = [
             light: 'custom-light',
         };
 
+        const session = {
+            user: {
+                id: "example_id",
+                name: "Name",
+                email: "example@mail.test",
+                image: null,
+                role: "ADMIN",
+            }
+        }
+
         const themeType = context.globals.theme;
         return (
-            <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
-                <GeistProvider themes={[customGeistDarkTheme, customGeistLightTheme]} themeType={geistThemesMap[themeType]}>
-                    <CssBaseline />
+            <SessionProvider session={session} refetchOnWindowFocus={true}>
+                <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
+                    <GeistProvider themes={[customGeistDarkTheme, customGeistLightTheme]} themeType={geistThemesMap[themeType]}>
+                        <CssBaseline />
 
-                    <GlobalStyle />
+                        <GlobalStyle />
 
-                    <Theme theme={themeType} />
-                    <Story />
-                </GeistProvider>
-            </ThemeProvider>
+                        <Theme theme={themeType} />
+                        <Story />
+                    </GeistProvider>
+                </ThemeProvider>
+            </SessionProvider>
         );
     },
 ];
 
 export const globalTypes = {
     theme: {
-      name: 'Theme',
-      description: 'Global theme for components',
-      defaultValue: 'light',
-      toolbar: {
-        icon: 'circlehollow',
-        // Array of plain string values or MenuItem shape (see below)
-        items: ['light', 'dark'],
-        // Property that specifies if the name of the item will be displayed
-        showName: true,
-        // Change title based on selected value
-        dynamicTitle: true,
-      },
+        name: 'Theme',
+        description: 'Global theme for components',
+        defaultValue: 'light',
+        toolbar: {
+            icon: 'circlehollow',
+            items: [
+                { value: 'light', icon: "circlehollow", title: "Light" },
+                { value: 'dark', icon: "circle", title: "Dark" }],
+            showName: true,
+        },
     },
-  };
+};
