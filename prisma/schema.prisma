@@ -156,7 +156,7 @@ model Estimate {
 }
 
 model Goal {
-  id           String        @id
+  id           String     @id
   title        String
   description  String
   key          Boolean?
@@ -254,6 +254,7 @@ model State {
   title   String   @unique
   flows   Flow[]
   default Boolean?
+  color   String   @default("rgba(255, 255, 255, 0.1)")
   goals   Goal[]   @relation("goalState")
 
   createdAt DateTime @default(now())
