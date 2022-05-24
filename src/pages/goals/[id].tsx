@@ -1,9 +1,12 @@
-import useSWR from 'swr';
+import { useEffect, useState } from 'react';
+import useSWR, { unstable_serialize } from 'swr';
 
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 import { Page } from '../../components/Page';
 import { declarePage } from '../../utils/declarePage';
+
+const refreshInterval = 3000;
 
 const fetcher = createFetcher((_, id: string) => ({
     goal: [
@@ -25,15 +28,28 @@ const fetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-export const getServerSideProps = declareSsrProps(async ({ user, params }) => ({
-    ssrData: await fetcher(user, params.id),
+export const getServerSideProps = declareSsrProps(async ({ user, params: { id } }) => ({
+    ssrData: await fetcher(user, id),
 }));
 
 export default declarePage(
     ({ user, locale, ssrData, params: { id } }) => {
-        const { data } = useSWR('goal', () => fetcher(user, id));
+        const [mounted, setMounted] = useState(false);
 
-        const goal = data?.goal ?? ssrData;
+        useEffect(() => {
+            const lazySubsTimer = setTimeout(() => setMounted(true), refreshInterval);
+
+            return () => clearInterval(lazySubsTimer);
+        }, []);
+
+        const { data } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
+            fallback: {
+                [unstable_serialize([user, id])]: ssrData,
+            },
+            refreshInterval,
+        });
+
+        const { goal } = data ?? ssrData;
 
         return (
             <Page locale={locale} title={goal.title}>
