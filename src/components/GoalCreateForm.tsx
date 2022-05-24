@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
@@ -51,6 +51,14 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
         newTags.set(tag.id, tag);
         setTags(newTags);
     };
+
+    useEffect(() => {
+        const defaultState = project?.flow?.states?.filter((s) => s?.default)[0];
+        if (defaultState) {
+            setState(defaultState);
+        }
+    }, [project]);
+
     const removeTagFromState = (tag: TagModel) => {
         const newTags = new Map(tags);
         newTags.delete(tag.id);
@@ -124,7 +132,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');
     const projectButtonText = project?.title || t('Enter project title');
-    const stateButtonText = state?.title || project?.flow?.states?.filter((s) => s?.default)[0]?.title || t('State');
+    const stateButtonText = state?.title || t('State');
     const estimateDefault = estimatedMeta();
 
     const formContent = (
