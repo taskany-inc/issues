@@ -43,7 +43,7 @@ export const FormActionRight: React.FC = ({ children }) => (
     </StyledFormActionRight>
 );
 
-export const StyledFormActionLeft= styled.div`
+export const StyledFormActionLeft = styled.div`
     display: flex;
     justify-content: flex-start;
 `;

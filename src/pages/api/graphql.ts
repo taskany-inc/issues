@@ -1,3 +1,5 @@
+/* eslint-disable global-require */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ApolloServer } from 'apollo-server-micro';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
@@ -5,7 +7,8 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import { context } from '../../../graphql/context';
 import { schema } from '../../../graphql/schema';
 
-const Cors = require('micro-cors'); // https://studio.apollographql.com/
+const Cors = require('micro-cors');
+// https://studio.apollographql.com/
 const cors = Cors();
 const apolloServer = new ApolloServer({
     schema,
@@ -16,14 +19,14 @@ const apolloServer = new ApolloServer({
 });
 const startServer = apolloServer.start();
 
-export default cors(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default cors(async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'OPTIONS') {
         res.end();
         return false;
     }
 
     await startServer;
-    return await apolloServer.createHandler({
+    return apolloServer.createHandler({
         path: '/api/graphql',
     })(req, res);
 });

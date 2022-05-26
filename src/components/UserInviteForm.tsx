@@ -7,6 +7,8 @@ import toast from 'react-hot-toast';
 import z from 'zod';
 
 import { gql } from '../utils/gql';
+import { accentIconColor } from '../design/@generated/themes';
+
 import { Card } from './Card';
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -15,7 +17,6 @@ import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { accentIconColor } from '../design/@generated/themes';
 
 interface UserInviteFormProps {
     card?: boolean;

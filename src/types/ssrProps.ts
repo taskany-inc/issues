@@ -5,4 +5,4 @@ type ParserQuery = Record<string, string>;
 
 export type SSRProps<Q extends ParserQuery = ParserQuery> = GetServerSideProps<R, Q>;
 
-export type SSRPageProps<P = {}> = P;
+export type SSRPageProps<P = unknown> = P;

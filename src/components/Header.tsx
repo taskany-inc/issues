@@ -4,12 +4,13 @@ import NextLink from 'next/link';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
+import { routes } from '../hooks/router';
+import { secondaryTaskanyLogoColor } from '../design/@generated/themes';
+
 import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
 import { ThemeChanger } from './ThemeChanger';
 import { UserPic } from './UserPic';
-import { routes } from '../hooks/router';
-import { secondaryTaskanyLogoColor } from '../design/@generated/themes';
 
 const StyledHeader = styled.header`
     padding: 20px 20px;

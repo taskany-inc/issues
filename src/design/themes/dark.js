@@ -70,5 +70,5 @@ module.exports = {
 
     keyboardTextColor: 'rgba(255, 255, 255, .8)',
     keyboardBackgroundColor: 'rgba(255, 255, 255, .05)',
-    keyboardBorderColor: 'rgba(255, 255, 255, .1)'
+    keyboardBorderColor: 'rgba(255, 255, 255, .1)',
 };

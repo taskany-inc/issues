@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
