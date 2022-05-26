@@ -1,11 +1,11 @@
 import styled from 'styled-components';
-import { TaskanyLogo } from './TaskanyLogo';
+import { SheepLogo } from './SheepLogo';
 
 const StyledFooter = styled.footer`
     padding: 20px 20px;
     display: flex;
     justify-content: start;
-    min-height: 20px;
+    max-height: 60px;
 `;
 
 const StyledFooterText = styled.span`
@@ -14,12 +14,13 @@ const StyledFooterText = styled.span`
 `;
 
 export const Footer: React.FC = () => {
-
     return (
         <>
             <StyledFooter>
-                <TaskanyLogo />
-                <StyledFooterText>{`© ${new Date().getFullYear()} Taskany, Inc.`}</StyledFooterText>
+                <StyledFooterText>
+                    {`© ${new Date().getFullYear()} Taskany, Inc.`}
+                        <SheepLogo />
+                </StyledFooterText>
             </StyledFooter>
         </>
     );
