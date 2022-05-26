@@ -14,7 +14,7 @@ interface PageProps {
 }
 
 const StyledContent = styled.div`
-    min-height: calc(100vh - 120px);
+    min-height: calc(100vh - 160px);
 `;
 
 export const Page: React.FC<PageProps> = ({ title, locale, children }) => {
