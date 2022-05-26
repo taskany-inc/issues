@@ -9,11 +9,12 @@ type HotkeyDeclaration = [string[], () => void];
 export const createHotkeys = (...args: HotkeyDeclaration[]): Record<string, () => void> => {
     const declarations: Record<string, () => void> = {};
 
-    args.forEach(decl => {
-        decl[0].forEach(key => {
+    args.forEach((decl) => {
+        decl[0].forEach((key) => {
+            // eslint-disable-next-line prefer-destructuring
             declarations[key] = decl[1];
         });
     });
 
     return declarations;
-}
+};

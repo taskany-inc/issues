@@ -30,9 +30,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({ children, visible, onC
             <StyledCross onClick={onClose}>
                 <Icon type="cross" size="s" />
             </StyledCross>
-            <Modal.Content style={{ paddingTop: 0, paddingBottom: 0 }}>
-                {children}
-            </Modal.Content>
+            <Modal.Content style={{ paddingTop: 0, paddingBottom: 0 }}>{children}</Modal.Content>
         </Modal>
     );
 };

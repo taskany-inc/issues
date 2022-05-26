@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import tinykeys from 'tinykeys';
+
 import { createHotkeys, showHomeKeys, showProjectsKeys, showGoalsKeys } from '../utils/hotkeys';
 
 import { useRouter } from './router';

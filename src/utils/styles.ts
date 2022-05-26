@@ -8,6 +8,6 @@ export const compare = (expected: any, actual: any) =>
         return ao === eo;
     });
 
-export const is = (predicate: Record<string, unknown>, styles: FlattenSimpleInterpolation) => (
-    props: Record<string, unknown>,
-) => (compare(predicate, props) ? styles : null);
+export const is =
+    (predicate: Record<string, unknown>, styles: FlattenSimpleInterpolation) => (props: Record<string, unknown>) =>
+        compare(predicate, props) ? styles : null;

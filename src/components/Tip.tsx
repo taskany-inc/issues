@@ -21,8 +21,7 @@ const StyledTipTitle = styled.span`
     margin-right: 6px;
 `;
 
-const StyledTipText = styled.span`
-`;
+const StyledTipText = styled.span``;
 
 export const Tip: React.FC<TipProps> = ({ children, title, icon }) => {
     return (
@@ -32,4 +31,4 @@ export const Tip: React.FC<TipProps> = ({ children, title, icon }) => {
             <StyledTipText>{children}</StyledTipText>
         </StyledTip>
     );
-}
+};

@@ -35,7 +35,9 @@ const Page = () => {
             <Header />
 
             {data?.projects ? (
-                <div>{data?.projects && data.projects.map((team) => <div key={team.id}>{JSON.stringify(team)}</div>)}</div>
+                <div>
+                    {data?.projects && data.projects.map((team) => <div key={team.id}>{JSON.stringify(team)}</div>)}
+                </div>
             ) : null}
         </>
     );

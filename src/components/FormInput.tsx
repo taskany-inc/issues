@@ -1,8 +1,10 @@
+/* eslint-disable react/display-name */
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import { formInputBackgroundColor, formInputErrorColor, textColorPrimary } from '../design/@generated/themes';
+
 import { Popup } from './Popup';
 
 interface FormInputProps {
