@@ -23,6 +23,7 @@ export default createGlobalStyle`
         --gap-xl: 4rem;
         --background-color: #121212;
         --text-color-primary: #fff;
+        --text-color-secondary: rgba(255, 255, 255, .4);
         --card-border-color: rgba(255, 255, 255, .1);
         --form-input-background-color: rgba(0, 0, 0, .35);
         --form-input-error-color: #e00;
@@ -82,5 +83,6 @@ export default createGlobalStyle`
         --keyboard-text-color: rgba(255, 255, 255, .8);
         --keyboard-background-color: rgba(255, 255, 255, .05);
         --keyboard-border-color: rgba(255, 255, 255, .1);
+        --link-text-color: #00C2FF;
     }
 `;
