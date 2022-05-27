@@ -3,6 +3,7 @@ import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core';
 import { ThemeProvider } from 'next-themes';
 import { backgroundColor } from '../src/design/@generated/themes';
 import { GlobalStyle } from '../src/components/GlobalStyle';
+import { TextStyle } from '../src/components/Text';
 import { Theme } from '../src/components/Theme';
 import { SessionProvider } from 'next-auth/react';
 
@@ -56,6 +57,7 @@ export const decorators = [
                         <CssBaseline />
 
                         <GlobalStyle />
+                        <TextStyle />
 
                         <Theme theme={themeType} />
                         <Story />
