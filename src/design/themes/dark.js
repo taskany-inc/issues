@@ -5,6 +5,14 @@ module.exports = {
     ...dark,
     fontDisplay:
         '-apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Fira Sans", Roboto, Ubuntu, "Droid Sans", "Arial", sans-serif',
+
+    gapXs: '0.25rem',
+    gapS: '0.5rem',
+    gapSm: '0.75rem',
+    gapM: '1rem',
+    gapL: '2rem',
+    gapXl: '4rem',
+
     backgroundColor: '#121212',
     textColorPrimary: '#fff',
     cardBorderColor: 'rgba(255, 255, 255, .1)',
