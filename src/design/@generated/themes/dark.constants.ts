@@ -10,6 +10,7 @@ export const gray7 = 'hsl(1, 0%, 28%)';
 export const gray8 = 'hsl(1, 0%, 36%)';
 export const gray9 = 'hsl(1, 0%, 47%)';
 export const gray10 = 'hsl(1, 0%, 63%)';
+export const fontDisplay = '-apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Fira Sans", Roboto, Ubuntu, "Droid Sans", "Arial", sans-serif';
 export const backgroundColor = '#121212';
 export const textColorPrimary = '#fff';
 export const cardBorderColor = 'rgba(255, 255, 255, .1)';
