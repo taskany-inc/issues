@@ -10,6 +10,7 @@ export const gray7 = 'var(--gray7)';
 export const gray8 = 'var(--gray8)';
 export const gray9 = 'var(--gray9)';
 export const gray10 = 'var(--gray10)';
+export const fontDisplay = 'var(--font-display)';
 export const backgroundColor = 'var(--background-color)';
 export const textColorPrimary = 'var(--text-color-primary)';
 export const cardBorderColor = 'var(--card-border-color)';

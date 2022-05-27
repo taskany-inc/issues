@@ -14,6 +14,7 @@ export default createGlobalStyle`
         --gray8: hsl(1, 0%, 36%);
         --gray9: hsl(1, 0%, 47%);
         --gray10: hsl(1, 0%, 63%);
+        --font-display: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Fira Sans", Roboto, Ubuntu, "Droid Sans", "Arial", sans-serif;
         --background-color: #121212;
         --text-color-primary: #fff;
         --card-border-color: rgba(255, 255, 255, .1);

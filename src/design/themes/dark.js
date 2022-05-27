@@ -3,6 +3,8 @@ const { dark } = require('../palette');
 
 module.exports = {
     ...dark,
+    fontDisplay:
+        '-apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Fira Sans", Roboto, Ubuntu, "Droid Sans", "Arial", sans-serif',
     backgroundColor: '#121212',
     textColorPrimary: '#fff',
     cardBorderColor: 'rgba(255, 255, 255, .1)',
