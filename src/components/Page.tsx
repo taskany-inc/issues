@@ -1,12 +1,12 @@
 import React from 'react';
 import Head from 'next/head';
+import styled from 'styled-components';
 
 import { pageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/ssrProps';
 
 import { Header } from './Header';
 import { Footer } from './Footer';
-import styled from 'styled-components';
 
 interface PageProps {
     locale: ExternalPageProps['locale'];
@@ -14,6 +14,7 @@ interface PageProps {
 }
 
 const StyledContent = styled.div`
+    /* presses the footer to the bottom*/
     min-height: calc(100vh - 160px);
 `;
 
