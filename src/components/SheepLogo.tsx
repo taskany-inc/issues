@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const SheepLogo = () => {
+export const SheepLogo: React.FC = () => {
     return (
         <svg width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M25.407 19.633h-3.714v7.815h3.714v-7.815Z" fill="#EAB67D" />
