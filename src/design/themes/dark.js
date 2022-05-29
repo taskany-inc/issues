@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const { dark } = require('../palette');
+
 module.exports = {
+    ...dark,
     backgroundColor: '#121212',
     textColorPrimary: '#fff',
     cardBorderColor: 'rgba(255, 255, 255, .1)',
