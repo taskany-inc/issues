@@ -3,6 +3,17 @@ import { createGlobalStyle } from 'styled-components';
 
 export default createGlobalStyle`
     :root {
+        --text-color: hsl(0, 0%, 90%);
+        --gray1: hsl(1, 0%, 4%);
+        --gray2: hsl(1, 0%, 6%);
+        --gray3: hsl(1, 0%, 8%);
+        --gray4: hsl(1, 0%, 12%);
+        --gray5: hsl(1, 0%, 16%);
+        --gray6: hsl(1, 0%, 21%);
+        --gray7: hsl(1, 0%, 28%);
+        --gray8: hsl(1, 0%, 36%);
+        --gray9: hsl(1, 0%, 47%);
+        --gray10: hsl(1, 0%, 63%);
         --background-color: #121212;
         --text-color-primary: #fff;
         --card-border-color: rgba(255, 255, 255, .1);
