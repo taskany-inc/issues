@@ -1,6 +1,6 @@
 import styled, { css, createGlobalStyle } from 'styled-components';
 
-import { fontDisplay, gapM, gapS, gapXl } from '../design/@generated/themes';
+import { fontDisplay, gapL, gapM, gapS, gapSm, gapXl, gapXs } from '../design/@generated/themes';
 
 const textSizes = {
     xxs: '0.5rem',
@@ -47,6 +47,12 @@ export const Text = styled.div<TextProps>`
     font-family: ${fontDisplay};
 
     ${({ size }) => size && calcTextSize(size)}
+
+    ${({ size }) =>
+        size === 'xxl' &&
+        css`
+            letter-spacing: -0.015em;
+        `}
 
     ${({ weight }) =>
         weight &&
@@ -104,5 +110,38 @@ export const TextStyle = createGlobalStyle`
         ${calcTextSize('m', 'regular')}
         padding-top: ${gapS};
         padding-bottom: ${gapS};
+    }
+
+    p,
+    ul,
+    ol {
+        ${calcTextSize('m', 'regular')}
+        padding-top: ${gapXs};
+        padding-bottom: ${gapSm};
+        &:first-child {
+            padding-top: 0;
+        }
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    li {
+        ${calcTextSize('m', 'regular')}
+        padding-bottom: ${gapXs};
+        &:first-child {
+            padding-top: 0;
+        }
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    blockquote {
+        padding: ${gapSm} ${gapSm} ${gapSm} ${gapL};
+    }
+
+    strong {
+        font-weight: var(--weight-bold) !important;
     }
 `;
