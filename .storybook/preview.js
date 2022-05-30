@@ -1,5 +1,5 @@
 import React from 'react';
-import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core';
+import { GeistProvider, Themes } from '@geist-ui/core';
 import { ThemeProvider } from 'next-themes';
 import { backgroundColor } from '../src/design/@generated/themes';
 import { GlobalStyle } from '../src/components/GlobalStyle';
@@ -54,8 +54,6 @@ export const decorators = [
             <SessionProvider session={session} refetchOnWindowFocus={true}>
                 <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
                     <GeistProvider themes={[customGeistDarkTheme, customGeistLightTheme]} themeType={geistThemesMap[themeType]}>
-                        <CssBaseline />
-
                         <GlobalStyle />
                         <TextStyle />
 

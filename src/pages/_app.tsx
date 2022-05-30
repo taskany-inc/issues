@@ -6,11 +6,12 @@ import { SessionProvider, useSession, signIn } from 'next-auth/react';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { NextIntlProvider } from 'next-intl';
-import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core';
+import { GeistProvider, Themes } from '@geist-ui/core';
 
 import { Theme } from '../components/Theme';
 import { apolloClient } from '../utils/apolloClient';
 import { GlobalStyle } from '../components/GlobalStyle';
+import { TextStyle } from '../components/Text';
 import { NextPageWithAuth } from '../types/nextPageWithAuth';
 import { backgroundColor, toastBackgroundColor, toastTextColor } from '../design/@generated/themes';
 import { useHotkeys } from '../hooks/useHotkeys';
@@ -64,9 +65,8 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
     return (
         <>
             <GeistProvider themes={[customGeistDarkTheme, customGeistLightTheme]} themeType={geistThemesMap[themeType]}>
-                <CssBaseline />
-
                 <GlobalStyle />
+                <TextStyle />
 
                 <Theme theme={themeType} />
 
