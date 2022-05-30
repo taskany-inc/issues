@@ -1,6 +1,5 @@
 import Document, { DocumentContext } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
-import { CssBaseline } from '@geist-ui/core';
 
 export default class MyDocument extends Document {
     static async getInitialProps(ctx: DocumentContext) {
@@ -14,14 +13,12 @@ export default class MyDocument extends Document {
                 });
 
             const initialProps = await Document.getInitialProps(ctx);
-            const styles = CssBaseline.flush();
 
             return {
                 ...initialProps,
                 styles: (
                     <>
                         {initialProps.styles}
-                        {styles}
                         {sheet.getStyleElement()}
                     </>
                 ),

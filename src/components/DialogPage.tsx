@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import styled from 'styled-components';
-import { Text, Grid } from '@geist-ui/core';
+import { Grid } from '@geist-ui/core';
 
 import { Header } from './Header';
 
@@ -31,7 +31,7 @@ export const DialogPage: React.FC<DialogPageProps> = ({ title, heading, children
                     <Grid xs={1} />
                     <Grid xs={23}>
                         <CleanFlexContainer>
-                            {heading && <Text h1>{heading}</Text>}
+                            {heading && <h1>{heading}</h1>}
                             {children}
                         </CleanFlexContainer>
                     </Grid>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer, Text, Grid } from '@geist-ui/core';
+import { Spacer, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -144,7 +144,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                 onClick={(p) => setProject(p)}
             />
 
-            <Text h1>{t('Create new goal')}</Text>
+            <h2>{t('Create new goal')}</h2>
 
             <FormInput
                 {...register('title')}

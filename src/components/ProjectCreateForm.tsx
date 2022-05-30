@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer, Text, Grid } from '@geist-ui/core';
+import { Spacer, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -151,7 +151,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
 
     const formContent = (
         <Form onSubmit={handleSubmit(createProject)}>
-            <Text h1>{t('Create new project')}</Text>
+            <h2>{t('Create new project')}</h2>
 
             <StyledProjectTitleContainer>
                 <FormInput
