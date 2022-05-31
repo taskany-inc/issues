@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer, Grid } from '@geist-ui/core';
+import NextLink from 'next/link';
+import { Spacer, Grid, Link } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -12,6 +13,7 @@ import { gql } from '../utils/gql';
 import { estimatedMeta } from '../utils/dateTime';
 import { accentIconColor } from '../design/@generated/themes';
 import { UserAnyKind, Project, GoalEstimate, State, Tag as TagModel } from '../../graphql/@generated/genql';
+import { routes } from '../hooks/router';
 
 import { Card } from './Card';
 import { Icon } from './Icon';
@@ -211,7 +213,17 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                     </Grid.Container>
                 </FormActionLeft>
                 <FormActionRight>
-                    <Button size="m" view="primary-outline" type="submit" disabled={!isValid} text={t('Create goal')} />
+                    <NextLink href={routes.goals()}>
+                        <Link>
+                            <Button
+                                size="m"
+                                view="primary-outline"
+                                type="submit"
+                                disabled={!isValid}
+                                text={t('Create goal')}
+                            />
+                        </Link>
+                    </NextLink>
                 </FormActionRight>
             </FormActions>
             <Spacer />

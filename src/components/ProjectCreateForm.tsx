@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer, Grid } from '@geist-ui/core';
+import NextLink from 'next/link';
+import { Spacer, Grid, Link } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -14,6 +15,7 @@ import { accentIconColor } from '../design/@generated/themes';
 import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
+import { routes } from '../hooks/router';
 
 import { Card } from './Card';
 import { Icon } from './Icon';
@@ -198,13 +200,17 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
                     </Grid.Container>
                 </FormActionLeft>
                 <FormActionRight>
-                    <Button
-                        size="m"
-                        view="primary-outline"
-                        type="submit"
-                        disabled={!isValid}
-                        text={t('Create project')}
-                    />
+                    <NextLink href={routes.projects()}>
+                        <Link>
+                            <Button
+                                size="m"
+                                view="primary-outline"
+                                type="submit"
+                                disabled={!isValid}
+                                text={t('Create project')}
+                            />
+                        </Link>
+                    </NextLink>
                 </FormActionRight>
             </FormActions>
             <Spacer />
