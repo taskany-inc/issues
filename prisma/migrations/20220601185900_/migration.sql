@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "State" ALTER COLUMN "hue" SET DEFAULT 1;
