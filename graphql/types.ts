@@ -188,7 +188,6 @@ export const Tag = objectType({
         t.field(TagModel.id);
         t.field(TagModel.title);
         t.field(TagModel.description);
-        t.field(TagModel.color);
         t.field(TagModel.activityId);
         t.field('activity', { type: Activity });
         t.list.field('goals', { type: Goal });

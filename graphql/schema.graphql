@@ -79,7 +79,7 @@ input GoalEstimate {
 type Mutation {
   createGoal(description: String!, estimate: GoalEstimate, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!, user: UserSession!): Goal
   createProject(description: String, flowId: String!, key: String!, ownerId: String!, title: String!, user: UserSession!): Project
-  createTag(color: String!, description: String, title: String!, user: UserSession!): Tag
+  createTag(description: String, title: String!, user: UserSession!): Tag
   inviteUser(email: String!, user: UserSession!): Ghost
 }
 
@@ -131,7 +131,6 @@ type State {
 type Tag {
   activity: Activity
   activityId: String
-  color: String!
   description: String
   goals: [Goal]
   id: ID!
