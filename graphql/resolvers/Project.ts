@@ -1,25 +1,18 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
-import slugify from 'slugify';
 
 import { SortOrder, Project, computeUserFields, withComputedField, Goal, UserSession } from '../types';
-
-const slugifyOptions = {
-    replacement: '_',
-    lower: true,
-    strict: true,
-};
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('project', {
         type: Project,
         args: {
-            slug: nonNull(stringArg()),
+            key: nonNull(stringArg()),
         },
-        resolve: async (_, { slug }, { db }) => {
+        resolve: async (_, { key }, { db }) => {
             const project = await db.project.findUnique({
                 where: {
-                    slug,
+                    key,
                 },
                 include: {
                     owner: {
@@ -35,13 +28,13 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('projectGoals', {
         type: Goal,
         args: {
-            slug: nonNull(stringArg()),
+            key: nonNull(stringArg()),
         },
-        resolve: async (_, { slug }, { db }) => {
+        resolve: async (_, { key }, { db }) => {
             const goals = await db.goal.findMany({
                 where: {
                     project: {
-                        slug,
+                        key,
                     },
                 },
                 include: {
@@ -64,6 +57,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             sortBy: arg({ type: SortOrder }),
             query: nonNull(stringArg()),
         },
+        // eslint-disable-next-line no-shadow
         resolve: async (_, { sortBy, query }, { db }) => {
             if (query === '') {
                 return [];
@@ -117,7 +111,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 const newProject = db.project.create({
                     data: {
                         key,
-                        slug: slugify(title, slugifyOptions),
                         title,
                         description,
                         ownerId: resolvedOwnerId,

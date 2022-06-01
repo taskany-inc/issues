@@ -122,7 +122,6 @@ model Activity {
 model Project {
   id           Int        @id @default(autoincrement())
   key          String     @unique
-  slug         String?    @unique
   title        String
   description  String?
   parent       Project?   @relation("parentChildren", fields: [id], references: [id])
@@ -138,7 +137,7 @@ model Project {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([slug])
+  @@index([key])
 }
 
 model Estimate {

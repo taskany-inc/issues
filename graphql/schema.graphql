@@ -92,7 +92,6 @@ type Project {
   id: Int!
   key: String!
   owner: Activity
-  slug: String
   tags: [Tag]
   title: String!
   updatedAt: DateTime!
@@ -105,9 +104,9 @@ type Query {
   flowRecommended: [Flow]
   goal(id: String!): Goal
   goalUserIndex(user: UserSession!): [Goal]
-  project(slug: String!): Project
+  project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
-  projectGoals(slug: String!): [Goal]
+  projectGoals(key: String!): [Goal]
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
   users(sortBy: SortOrder): [User]
 }

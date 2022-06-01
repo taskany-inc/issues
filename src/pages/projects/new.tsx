@@ -11,7 +11,7 @@ function Page() {
 
     return (
         <DialogPage title={t('title')}>
-            <ProjectCreateForm card onCreate={(slug) => slug && router.project(slug)} />
+            <ProjectCreateForm card onCreate={(key) => key && router.project(key)} />
         </DialogPage>
     );
 }
