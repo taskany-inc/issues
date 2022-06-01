@@ -24,6 +24,7 @@ const componentsMap = {
     calendar: dynamic(() => import('teenyicons/outline/calendar.svg')),
     flow: dynamic(() => import('teenyicons/outline/git-compare.svg')),
     tag: dynamic(() => import('teenyicons/outline/tag.svg')),
+    search: dynamic(() => import('teenyicons/outline/search.svg')),
 };
 
 const sizesMap = {

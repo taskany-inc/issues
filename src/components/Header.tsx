@@ -5,44 +5,98 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { routes } from '../hooks/router';
-import { secondaryTaskanyLogoColor, textColorPrimary } from '../design/@generated/themes';
+import {
+    secondaryTaskanyLogoColor,
+    textColor,
+    textColorPrimary,
+    gray7,
+    backgroundColor,
+} from '../design/@generated/themes';
 
 import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
-import { ThemeChanger } from './ThemeChanger';
 import { UserPic } from './UserPic';
 import { Popup } from './Popup';
 
 const StyledHeader = styled.header`
     display: grid;
-    grid-template-columns: 40px 10fr 1fr;
+    grid-template-columns: 20px 11fr 100px;
     align-items: center;
     padding: 20px 20px;
 `;
 
 const StyledUserMenu = styled.div`
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     justify-items: center;
     align-items: center;
+    align-self: end;
 `;
 
 const StyledPopupContent = styled.div`
     min-width: 120px;
 `;
 
-const StyledIcon = styled(Icon)`
+const StyledNav = styled.nav`
+    padding-left: 40px;
+`;
+
+const StyledPlusButton = styled.span`
+    display: inline-block;
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+
+    font-size: 13px;
+    line-height: 14px;
+    text-align: center;
+    font-weight: 400;
+
+    border: 1px solid ${secondaryTaskanyLogoColor};
+    color: ${secondaryTaskanyLogoColor};
+
+    border-radius: 100%;
+
     cursor: pointer;
+
+    transition: background-color, color 250ms ease-in-out;
+
+    &:hover {
+        font-weight: 500;
+        font-size: 14px;
+        background-color: ${secondaryTaskanyLogoColor};
+        color: ${backgroundColor};
+    }
+`;
+
+const StyledSearch = styled.div`
+    position: relative;
+    display: inline-block;
+    margin-left: 30px;
+    top: 3px;
 `;
 
 const StyledHeaderNavLink = styled.a`
+    display: inline-block;
+    padding-bottom: 2px;
+    margin-top: 3px;
+
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
+    color: ${textColor};
     text-decoration: none;
-    color: ${textColorPrimary};
+
+    border-bottom: 1px solid transparent;
+
+    transition: color, border-color 250ms ease-in-out;
+
+    &:hover {
+        color: ${textColorPrimary};
+        border-color: ${secondaryTaskanyLogoColor};
+    }
 
     & + & {
-        margin-left: 20px;
+        margin-left: 24px;
     }
 `;
 
@@ -59,13 +113,9 @@ const CreatorMenu = () => {
     return (
         <>
             <span ref={popupRef}>
-                <StyledIcon
-                    ref={buttonRef}
-                    onClick={() => setPopupVisibility(!popupVisible)}
-                    color={secondaryTaskanyLogoColor}
-                    type="plus"
-                    size="s"
-                />
+                <StyledPlusButton ref={buttonRef} onClick={() => setPopupVisibility(!popupVisible)}>
+                    +
+                </StyledPlusButton>
             </span>
 
             <Popup
@@ -110,23 +160,27 @@ export const Header: React.FC = () => {
         <StyledHeader>
             <HeaderLogo />
 
-            <div>
+            <StyledNav>
                 <NextLink href={routes.goals()} passHref>
                     <StyledHeaderNavLink>{t('Goals')}</StyledHeaderNavLink>
                 </NextLink>
-                <NextLink href={routes.projects()} passHref>
-                    <StyledHeaderNavLink>{t('Projects')}</StyledHeaderNavLink>
+                <NextLink href={'#'} passHref>
+                    <StyledHeaderNavLink>{t('Issues')}</StyledHeaderNavLink>
                 </NextLink>
                 <NextLink href={'#'} passHref>
                     <StyledHeaderNavLink>{t('Boards')}</StyledHeaderNavLink>
                 </NextLink>
-            </div>
+                <NextLink href={'#'} passHref>
+                    <StyledHeaderNavLink>{t('Explore')}</StyledHeaderNavLink>
+                </NextLink>
+
+                <StyledSearch>
+                    <Icon type="search" size="s" color={gray7} />
+                </StyledSearch>
+            </StyledNav>
 
             <StyledUserMenu>
-                <ThemeChanger />
-
                 <CreatorMenu />
-
                 <UserPic src={session?.user.image} size={32} />
             </StyledUserMenu>
         </StyledHeader>
