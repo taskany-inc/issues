@@ -177,6 +177,7 @@ export const State = objectType({
     definition(t) {
         t.field(StateModel.id);
         t.field(StateModel.title);
+        t.field(StateModel.hue);
         t.field(StateModel.default);
         t.list.field('flows', { type: Flow });
     },
