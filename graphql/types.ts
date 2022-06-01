@@ -99,7 +99,6 @@ export const Project = objectType({
     definition(t) {
         t.field(ProjectModel.id);
         t.field(ProjectModel.key);
-        t.field(ProjectModel.slug);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
         t.field('owner', { type: Activity });

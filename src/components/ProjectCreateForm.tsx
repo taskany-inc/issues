@@ -129,7 +129,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
                 },
                 {
                     id: true,
-                    slug: true,
+                    key: true,
                 },
             ],
         });
@@ -142,7 +142,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
 
         const res = await promise;
 
-        onCreate && onCreate(res.createProject?.slug);
+        onCreate && onCreate(res.createProject?.key);
     };
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');

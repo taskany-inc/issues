@@ -22,7 +22,7 @@ export const ProjectCreateModal = () => {
 
     return (
         <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <ProjectCreateForm onCreate={(slug) => slug && router.project(slug)} />
+            <ProjectCreateForm onCreate={(key) => key && router.project(key)} />
         </DialogModal>
     );
 };

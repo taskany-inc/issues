@@ -8,10 +8,10 @@ import { createFetcher } from '../../utils/createFetcher';
 import { Goal, Project } from '../../../graphql/@generated/genql';
 import { Header } from '../../components/Header';
 
-const fetcher = createFetcher((user, slug: string) => ({
+const fetcher = createFetcher((_, key: string) => ({
     project: [
         {
-            slug,
+            key,
         },
         {
             id: true,
@@ -27,7 +27,7 @@ const fetcher = createFetcher((user, slug: string) => ({
     ],
     projectGoals: [
         {
-            slug,
+            key,
         },
         {
             id: true,
@@ -73,9 +73,9 @@ function Page({ project, projectGoals }: SSRPageProps<{ project: Project; projec
 
 Page.auth = true;
 
-export const getServerSideProps: SSRProps<{ slug: string }> = async ({ locale, req, params }) => {
+export const getServerSideProps: SSRProps<{ key: string }> = async ({ locale, req, params }) => {
     const session = await getSession({ req });
-    const { project, projectGoals } = await fetcher(session?.user, params!.slug);
+    const { project, projectGoals } = await fetcher(session?.user, params!.key);
 
     return {
         props: {
