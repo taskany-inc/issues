@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -18,7 +17,7 @@ import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
-import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
+import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
@@ -160,61 +159,57 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                 placeholder={t('And its description')}
             />
             <FormActions flat="top">
-                <FormActionLeft>
-                    <Grid.Container>
-                        <TagCompletion
-                            filter={Array.from(tags.keys())}
-                            placeholder={t('Enter tag title')}
-                            onClick={(tag) => addTagToState(tag)}
-                        />
+                <FormAction left inline>
+                    <UserCompletion
+                        size="m"
+                        view="outline"
+                        text={ownerButtonText}
+                        placeholder={t('Enter name or email')}
+                        query={owner?.name || owner?.email}
+                        userPic={<UserPic src={owner?.image} size={16} />}
+                        onClick={(u) => setOwner(u)}
+                    />
 
-                        <StyledTagsContainer>
-                            {Array.from(tags.values()).map((tag) => (
-                                <Tag
-                                    key={tag.id}
-                                    title={tag.title}
-                                    description={tag.description}
-                                    color={tag.color}
-                                    onHide={() => removeTagFromState(tag)}
-                                />
-                            ))}
-                        </StyledTagsContainer>
-                    </Grid.Container>
-                    <Grid.Container>
-                        <UserCompletion
-                            size="m"
-                            view="outline"
-                            text={ownerButtonText}
-                            placeholder={t('Enter name or email')}
-                            query={owner?.name || owner?.email}
-                            userPic={<UserPic src={owner?.image} size={16} />}
-                            onClick={(u) => setOwner(u)}
-                        />
-                        <Spacer w={0.5} />
-                        <StateDropdown
-                            size="m"
-                            view="outline"
-                            text={stateButtonText}
-                            flowId={project?.flow?.id}
-                            onClick={(s) => setState(s)}
-                        />
-                        <Spacer w={0.5} />
-                        <EstimateDropdown
-                            size="m"
-                            view="outline"
-                            text={t('Schedule')}
-                            placeholder={t('Date input mask placeholder')}
-                            mask={t('Date input mask')}
-                            defaultValuePlaceholder={estimateDefault}
-                            onChange={(e) => setEstimate(e)}
-                        />
-                    </Grid.Container>
-                </FormActionLeft>
-                <FormActionRight>
+                    <StateDropdown
+                        size="m"
+                        view="outline"
+                        text={stateButtonText}
+                        flowId={project?.flow?.id}
+                        onClick={(s) => setState(s)}
+                    />
+
+                    <EstimateDropdown
+                        size="m"
+                        view="outline"
+                        text={t('Schedule')}
+                        placeholder={t('Date input mask placeholder')}
+                        mask={t('Date input mask')}
+                        defaultValuePlaceholder={estimateDefault}
+                        onChange={(e) => setEstimate(e)}
+                    />
+
+                    <TagCompletion
+                        filter={Array.from(tags.keys())}
+                        placeholder={t('Enter tag title')}
+                        onClick={(tag) => addTagToState(tag)}
+                    />
+
+                    <StyledTagsContainer>
+                        {Array.from(tags.values()).map((tag) => (
+                            <Tag
+                                key={tag.id}
+                                title={tag.title}
+                                description={tag.description}
+                                color={tag.color}
+                                onHide={() => removeTagFromState(tag)}
+                            />
+                        ))}
+                    </StyledTagsContainer>
+                </FormAction>
+                <FormAction right inline>
                     <Button size="m" view="primary-outline" type="submit" disabled={!isValid} text={t('Create goal')} />
-                </FormActionRight>
+                </FormAction>
             </FormActions>
-            <Spacer />
         </Form>
     );
 

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer, Grid } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -20,7 +19,7 @@ import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
-import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
+import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
@@ -174,30 +173,28 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
                 placeholder={t('And its description')}
             />
             <FormActions flat="top">
-                <FormActionLeft>
-                    <Grid.Container>
-                        <UserCompletion
-                            size="m"
-                            view="outline"
-                            text={ownerButtonText}
-                            placeholder={t('Enter name or email')}
-                            query={owner?.name || owner?.email}
-                            userPic={<UserPic src={owner?.image} size={16} />}
-                            onClick={(u) => setOwner(u)}
-                        />
-                        <Spacer w={0.5} />
-                        <FlowCompletion
-                            disabled
-                            size="m"
-                            view="outline"
-                            text={flowButtonText}
-                            placeholder={t('Flow or state title')}
-                            query={flow?.title}
-                            onClick={(f) => setFlow(f)}
-                        />
-                    </Grid.Container>
-                </FormActionLeft>
-                <FormActionRight>
+                <FormAction left inline>
+                    <UserCompletion
+                        size="m"
+                        view="outline"
+                        text={ownerButtonText}
+                        placeholder={t('Enter name or email')}
+                        query={owner?.name || owner?.email}
+                        userPic={<UserPic src={owner?.image} size={16} />}
+                        onClick={(u) => setOwner(u)}
+                    />
+
+                    <FlowCompletion
+                        disabled
+                        size="m"
+                        view="outline"
+                        text={flowButtonText}
+                        placeholder={t('Flow or state title')}
+                        query={flow?.title}
+                        onClick={(f) => setFlow(f)}
+                    />
+                </FormAction>
+                <FormAction right inline>
                     <Button
                         size="m"
                         view="primary-outline"
@@ -205,9 +202,8 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
                         disabled={!isValid}
                         text={t('Create project')}
                     />
-                </FormActionRight>
+                </FormAction>
             </FormActions>
-            <Spacer />
         </Form>
     );
 

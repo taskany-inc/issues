@@ -1,11 +1,11 @@
-import { Grid, Link, Spacer, Popover } from '@geist-ui/core';
+import { Popover } from '@geist-ui/core';
 import { useSession, signOut } from 'next-auth/react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { routes } from '../hooks/router';
-import { secondaryTaskanyLogoColor } from '../design/@generated/themes';
+import { secondaryTaskanyLogoColor, textColorPrimary } from '../design/@generated/themes';
 
 import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
@@ -13,15 +13,17 @@ import { ThemeChanger } from './ThemeChanger';
 import { UserPic } from './UserPic';
 
 const StyledHeader = styled.header`
+    display: grid;
+    grid-template-columns: 40px 10fr 1fr;
+    align-items: center;
     padding: 20px 20px;
 `;
 
 const StyledUserMenu = styled.div`
-    display: flex;
-    align-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
     align-items: center;
-    justify-content: flex-end;
-    width: 100%;
 `;
 
 const StyledPopoverContent = styled.div`
@@ -32,9 +34,15 @@ const StyledIcon = styled(Icon)`
     cursor: pointer;
 `;
 
-const StyledHeaderNavLink = styled(Link)`
-    font-size: 18px !important;
-    font-weight: 600;
+const StyledHeaderNavLink = styled.a`
+    font-size: 18px;
+    font-weight: 500;
+    text-decoration: none;
+    color: ${textColorPrimary};
+
+    & + & {
+        margin-left: 20px;
+    }
 `;
 
 const CreatorMenu = () => {
@@ -44,22 +52,22 @@ const CreatorMenu = () => {
         <StyledPopoverContent>
             <Popover.Item>
                 <NextLink href={routes.createGoal()}>
-                    <Link>{t('New goal')}</Link>
+                    <a>{t('New goal')}</a>
                 </NextLink>
             </Popover.Item>
             <Popover.Item>
                 <NextLink href={routes.createProject()}>
-                    <Link>{t('New project')}</Link>
+                    <a>{t('New project')}</a>
                 </NextLink>
             </Popover.Item>
             <Popover.Item>
                 <NextLink href={routes.inviteUsers()}>
-                    <Link>{t('Invite users')}</Link>
+                    <a>{t('Invite users')}</a>
                 </NextLink>
             </Popover.Item>
             <Popover.Item line />
             <Popover.Item>
-                <Link onClick={() => signOut()}>{t('Sign out')}</Link>
+                <a onClick={() => signOut()}>{t('Sign out')}</a>
             </Popover.Item>
         </StyledPopoverContent>
     );
@@ -76,40 +84,28 @@ export const Header: React.FC = () => {
     const t = useTranslations('Header');
 
     return (
-        <>
-            <StyledHeader>
-                <Grid.Container gap={0}>
-                    <Grid xs={1}>
-                        <NextLink href={routes.index()}>
-                            <Link>
-                                <HeaderLogo />
-                            </Link>
-                        </NextLink>
-                    </Grid>
-                    <Grid xs={19}>
-                        <NextLink href={routes.goals()}>
-                            <StyledHeaderNavLink>{t('Goals')}</StyledHeaderNavLink>
-                        </NextLink>
-                        <Spacer w={2} />
-                        <NextLink href={routes.projects()}>
-                            <StyledHeaderNavLink>{t('Projects')}</StyledHeaderNavLink>
-                        </NextLink>
-                        <Spacer w={2} />
-                        <NextLink href={'#'}>
-                            <StyledHeaderNavLink>{t('Boards')}</StyledHeaderNavLink>
-                        </NextLink>
-                    </Grid>
-                    <Grid xs={4}>
-                        <StyledUserMenu>
-                            <ThemeChanger />
-                            <Spacer w={1} />
-                            <CreatorMenu />
-                            <Spacer w={1} />
-                            <UserPic src={session?.user.image} size={32} />
-                        </StyledUserMenu>
-                    </Grid>
-                </Grid.Container>
-            </StyledHeader>
-        </>
+        <StyledHeader>
+            <HeaderLogo />
+
+            <div>
+                <NextLink href={routes.goals()} passHref>
+                    <StyledHeaderNavLink>{t('Goals')}</StyledHeaderNavLink>
+                </NextLink>
+                <NextLink href={routes.projects()} passHref>
+                    <StyledHeaderNavLink>{t('Projects')}</StyledHeaderNavLink>
+                </NextLink>
+                <NextLink href={'#'} passHref>
+                    <StyledHeaderNavLink>{t('Boards')}</StyledHeaderNavLink>
+                </NextLink>
+            </div>
+
+            <StyledUserMenu>
+                <ThemeChanger />
+
+                <CreatorMenu />
+
+                <UserPic src={session?.user.image} size={32} />
+            </StyledUserMenu>
+        </StyledHeader>
     );
 };

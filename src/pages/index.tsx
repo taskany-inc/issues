@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
-import { Grid } from '@geist-ui/core';
 import styled from 'styled-components';
 
 import { createFetcher } from '../utils/createFetcher';
@@ -65,14 +64,11 @@ const Home = ({ user, locale, ssrData }: ExternalPageProps) => {
     return (
         <Page locale={locale} title={t('title')}>
             <StyledGoalsList>
-                <Grid.Container gap={0}>
-                    <Grid xs={1} />
-                    <Grid xs={23}>
-                        <div style={{ width: '100%' }}>
-                            {actualData?.goalUserIndex?.map((goal) => (
-                                <Link key={goal.id} href={routes.goal(goal.id)} passHref>
-                                    <a style={{ width: '100%' }}>
-                                        {/* <GoalItem
+                <div style={{ width: '100%' }}>
+                    {actualData?.goalUserIndex?.map((goal) => (
+                        <Link key={goal.id} href={routes.goal(goal.id)} passHref>
+                            <a style={{ width: '100%' }}>
+                                {/* <GoalItem
                                             id={goal.id}
                                             title={goal.title}
                                             projectTitle={goal.project?.title}
@@ -81,12 +77,10 @@ const Home = ({ user, locale, ssrData }: ExternalPageProps) => {
                                             createdAt={goal.createdAt}
                                             updatedAt={goal.updatedAt}
                                         /> */}
-                                    </a>
-                                </Link>
-                            ))}
-                        </div>
-                    </Grid>
-                </Grid.Container>
+                            </a>
+                        </Link>
+                    ))}
+                </div>
             </StyledGoalsList>
 
             <pre>{JSON.stringify(actualData?.goalUserIndex, null, 2)}</pre>

@@ -10,7 +10,7 @@ function Page() {
     const router = useRouter();
 
     return (
-        <DialogPage title={t('title')} heading={t('Create new project')}>
+        <DialogPage title={t('title')}>
             <ProjectCreateForm card onCreate={(slug) => slug && router.project(slug)} />
         </DialogPage>
     );

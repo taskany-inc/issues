@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, Grid, useKeyboard, KeyCode, Link } from '@geist-ui/core';
+import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
@@ -32,11 +32,17 @@ interface TagCompletionProps {
 }
 
 const StyledTagCard = styled.div<{ focused?: boolean }>`
+    display: grid;
+    grid-template-columns: 2fr 10fr;
+    justify-content: center;
+    align-items: center;
+    min-width: 185px;
+
     padding: 6px;
+    margin-bottom: 4px;
     border: 1px solid ${buttonBorderColor};
     border-radius: 6px;
-    min-width: 185px;
-    margin-bottom: 4px;
+
     cursor: pointer;
 
     &:last-child {
@@ -81,16 +87,10 @@ const TagCard: React.FC<{
 }> = ({ title, description, color, focused, onClick }) => {
     return (
         <StyledTagCard onClick={onClick} focused={focused} title={description}>
-            <Grid.Container gap={0}>
-                <Grid xs={3} alignItems="center" justify="center">
-                    <StyledTagColor color={color} />
-                </Grid>
-                <Grid xs={21} alignItems="center">
-                    <StyledTagInfo>
-                        <StyledTagTitle>{title}</StyledTagTitle>
-                    </StyledTagInfo>
-                </Grid>
-            </Grid.Container>
+            <StyledTagColor color={color} />
+            <StyledTagInfo>
+                <StyledTagTitle>{title}</StyledTagTitle>
+            </StyledTagInfo>
         </StyledTagCard>
     );
 };
@@ -101,7 +101,12 @@ const StyledIconContainer = styled.div`
     padding: 6px 2px;
 `;
 
-const StyledNewTagForm = styled.div``;
+const StyledNewTagForm = styled.div`
+    display: grid;
+    grid-template-columns: 8fr 4fr;
+    justify-content: center;
+    align-items: center;
+`;
 const StyledNewTagInfo = styled.div`
     font-size: 12px;
     font-weight: 600;
@@ -304,26 +309,20 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                     <>
                         {inputState !== '' && (
                             <StyledNewTagForm>
-                                <Grid.Container gap={0}>
-                                    <Grid xs={15} alignItems="center" justify="center">
-                                        <StyledNewTagInfo>
-                                            <Link
-                                                href="#"
-                                                block
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    updateColor();
-                                                }}
-                                            >
-                                                {t('Click here')}
-                                            </Link>{' '}
-                                            {t('Change color and create')}
-                                        </StyledNewTagInfo>
-                                    </Grid>
-                                    <Grid xs={9} alignItems="center" justify="center">
-                                        <Tag color={color} title={inputState} onClick={createTag} />
-                                    </Grid>
-                                </Grid.Container>
+                                <StyledNewTagInfo>
+                                    <a
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            updateColor();
+                                        }}
+                                    >
+                                        {t('Click here')}
+                                    </a>{' '}
+                                    {t('Change color and create')}
+                                </StyledNewTagInfo>
+
+                                <Tag color={color} title={inputState} onClick={createTag} />
                             </StyledNewTagForm>
                         )}
                     </>

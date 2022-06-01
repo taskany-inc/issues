@@ -1,4 +1,3 @@
-import { Tooltip } from '@geist-ui/core';
 import React from 'react';
 import styled from 'styled-components';
 import { signIn } from 'next-auth/react';
@@ -13,6 +12,7 @@ interface UserPicProps {
 const StyledImage = styled.img`
     border: 0;
     border-radius: 100%;
+    justify-self: center;
 `;
 
 export const UserPic: React.FC<UserPicProps> = ({ src, size = 32 }) => {

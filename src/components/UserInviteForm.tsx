@@ -1,6 +1,5 @@
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Spacer } from '@geist-ui/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
@@ -13,7 +12,7 @@ import { Card } from './Card';
 import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
-import { FormActions, FormActionRight, FormActionLeft } from './FormActions';
+import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
@@ -88,12 +87,11 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ card, onCreate }
                 flat="bottom"
             />
             <FormActions flat="top">
-                <FormActionLeft />
-                <FormActionRight>
+                <FormAction left />
+                <FormAction right inline>
                     <Button size="l" view="primary-outline" type="submit" disabled={!isValid} text={t('Send invite')} />
-                </FormActionRight>
+                </FormAction>
             </FormActions>
-            <Spacer />
         </Form>
     );
 

@@ -2,19 +2,17 @@ import styled, { css } from 'styled-components';
 
 import { formInputBackgroundColor, textColorPrimary } from '../design/@generated/themes';
 
-interface FormActionsProps {
-    style?: React.CSSProperties;
-    flat?: 'top' | 'bottom';
-}
-
-const StyledFormActions = styled(({ flat, ...props }) => <div {...props} />)`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ flat?: 'top' | 'bottom' }>`
     border-radius: 4px;
     background-color: ${formInputBackgroundColor};
     color: ${textColorPrimary};
+
     padding: 8px 10px 12px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+
+    display: grid;
+    grid-template-columns: 8fr 4fr;
+    align-items: end;
 
     ${({ flat }) =>
         flat === 'top' &&
@@ -31,29 +29,38 @@ const StyledFormActions = styled(({ flat, ...props }) => <div {...props} />)`
         `}
 `;
 
-export const StyledFormActionRight = styled.div`
-    display: flex;
-    justify-content: flex-end;
+export const FormAction = styled.div<{ left?: boolean; right?: boolean; columns?: number; inline?: boolean }>`
+    ${({ left }) =>
+        left &&
+        css`
+            justify-self: start;
+            text-align: left;
+        `}
+
+    ${({ right }) =>
+        right &&
+        css`
+            justify-self: end;
+            text-align: right;
+        `}
+
+    ${({ columns }) =>
+        columns &&
+        css`
+            display: grid;
+            align-items: center;
+            grid-template-columns: repeat(${columns}, 1fr);
+        `}
+
+    ${({ inline }) =>
+        inline &&
+        css`
+            & > * {
+                display: inline-block;
+            }
+
+            & > * + * {
+                margin-left: 6px;
+            }
+        `}
 `;
-
-// TODO: rewrite with Grid.Container
-export const FormActionRight: React.FC = ({ children }) => (
-    <StyledFormActionRight>
-        <div>{children}</div>
-    </StyledFormActionRight>
-);
-
-export const StyledFormActionLeft = styled.div`
-    display: flex;
-    justify-content: flex-start;
-`;
-
-export const FormActionLeft: React.FC = ({ children }) => (
-    <StyledFormActionLeft>
-        <div>{children}</div>
-    </StyledFormActionLeft>
-);
-
-export const FormActions: React.FC<FormActionsProps> = (props) => {
-    return <StyledFormActions {...props} />;
-};

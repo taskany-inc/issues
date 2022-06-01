@@ -10,7 +10,7 @@ function Page() {
     const router = useRouter();
 
     return (
-        <DialogPage title={t('title')} heading={t('Create new goal')}>
+        <DialogPage title={t('title')}>
             <GoalCreateForm card onCreate={(id) => id && router.goal(id)} />
         </DialogPage>
     );
