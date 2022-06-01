@@ -10,6 +10,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             sortBy: arg({ type: SortOrder }),
             query: nonNull(stringArg()),
         },
+        // eslint-disable-next-line no-shadow
         resolve: async (_, { sortBy, query }, { db }) => {
             if (query === '') {
                 return [];
@@ -35,10 +36,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             title: nonNull(stringArg()),
             description: stringArg(),
-            color: nonNull(stringArg()),
             user: nonNull(arg({ type: UserSession })),
         },
-        resolve: async (_, { user, title, description, color }, { db }) => {
+        resolve: async (_, { user, title, description }, { db }) => {
             const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
 
             if (!validUser) return null;
@@ -48,7 +48,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                     data: {
                         title,
                         description,
-                        color,
                         activityId: validUser.activityId,
                     },
                 });

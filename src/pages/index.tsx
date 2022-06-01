@@ -40,7 +40,6 @@ const fetcher = createFetcher((user) => ({
                 id: true,
                 title: true,
                 description: true,
-                color: true,
             },
             createdAt: true,
             updatedAt: true,
