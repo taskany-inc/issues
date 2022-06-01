@@ -2,6 +2,8 @@
     "Header": {
         "Projects": "Projects",
         "Goals": "Goals",
+        "Issues": "Issues",
+        "Explore": "Explore",
         "Boards": "Boards",
         "New goal": "New goal",
         "New project": "New project",

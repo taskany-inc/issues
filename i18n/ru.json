@@ -2,6 +2,8 @@
     "Header": {
         "Projects": "Проекты",
         "Goals": "Цели",
+        "Issues": "Задачи",
+        "Explore": "Обзор",
         "Boards": "Доски",
         "New goal": "Новая цель",
         "New project": "Новый проект",
