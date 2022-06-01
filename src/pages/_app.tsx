@@ -18,6 +18,7 @@ import { useHotkeys } from '../hooks/useHotkeys';
 import { ProjectCreateModal } from '../components/ProjectCreateModal';
 import { GoalCreateModal } from '../components/GoalCreateModal';
 import { UserInviteModal } from '../components/UserInviteModal';
+import { pageContext } from '../utils/pageContext';
 
 type AppPropsWithAuth = AppProps & {
     Component: NextPageWithAuth;
@@ -77,7 +78,7 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
                     position="bottom-center"
                 />
 
-                <>
+                <pageContext.Provider value={{ theme: themeType }}>
                     {Component.auth ? (
                         <Auth>
                             <Component {...pageProps} />
@@ -89,7 +90,7 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
                     <ProjectCreateModal />
                     <GoalCreateModal />
                     <UserInviteModal />
-                </>
+                </pageContext.Provider>
             </GeistProvider>
         </>
     );

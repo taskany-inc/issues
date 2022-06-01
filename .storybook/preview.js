@@ -1,12 +1,13 @@
 import React from 'react';
 import { GeistProvider, Themes } from '@geist-ui/core';
 import { ThemeProvider } from 'next-themes';
+import { SessionProvider } from 'next-auth/react';
+
+import { pageContext } from '../src/utils/pageContext';
 import { backgroundColor } from '../src/design/@generated/themes';
 import { GlobalStyle } from '../src/components/GlobalStyle';
 import { TextStyle } from '../src/components/Text';
 import { Theme } from '../src/components/Theme';
-import { SessionProvider } from 'next-auth/react';
-
 
 export const parameters = {
     actions: { argTypesRegex: '^on[A-Z].*' },
@@ -41,24 +42,30 @@ export const decorators = [
 
         const session = {
             user: {
-                id: "example_id",
-                name: "Name",
-                email: "example@mail.test",
+                id: 'example_id',
+                name: 'Name',
+                email: 'example@mail.test',
                 image: null,
-                role: "ADMIN",
-            }
-        }
+                role: 'ADMIN',
+            },
+        };
 
         const themeType = context.globals.theme;
         return (
             <SessionProvider session={session} refetchOnWindowFocus={true}>
                 <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
-                    <GeistProvider themes={[customGeistDarkTheme, customGeistLightTheme]} themeType={geistThemesMap[themeType]}>
+                    <GeistProvider
+                        themes={[customGeistDarkTheme, customGeistLightTheme]}
+                        themeType={geistThemesMap[themeType]}
+                    >
                         <GlobalStyle />
                         <TextStyle />
 
                         <Theme theme={themeType} />
-                        <Story />
+
+                        <pageContext.Provider value={{ theme: themeType }}>
+                            <Story />
+                        </pageContext.Provider>
                     </GeistProvider>
                 </ThemeProvider>
             </SessionProvider>
@@ -74,8 +81,9 @@ export const globalTypes = {
         toolbar: {
             icon: 'circlehollow',
             items: [
-                { value: 'light', icon: "circlehollow", title: "Light" },
-                { value: 'dark', icon: "circle", title: "Dark" }],
+                { value: 'light', icon: 'circlehollow', title: 'Light' },
+                { value: 'dark', icon: 'circle', title: 'Dark' },
+            ],
             showName: true,
         },
     },
