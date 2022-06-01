@@ -1,6 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
 
-import { fontDisplay } from '../design/@generated/themes';
+import { backgroundColor, fontDisplay } from '../design/@generated/themes';
 
 export const GlobalStyle = createGlobalStyle`
     html, body {
@@ -13,5 +13,7 @@ export const GlobalStyle = createGlobalStyle`
 
         width: 100%;
         height: 100%;
+
+        background-color: ${backgroundColor};
     }
 `;
