@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 import colorLayer from 'color-layer';
 
-import { gray10, gray3, gray5, gray6, gray7, gray8, gray9 } from '../design/@generated/themes';
 import { pageContext } from '../utils/pageContext';
 
 interface StateProps {
