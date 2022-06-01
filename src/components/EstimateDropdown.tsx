@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Input, useInput, useKeyboard, KeyCode, Grid } from '@geist-ui/core';
+import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import InputMask from 'react-input-mask';
 
 import { GoalEstimate } from '../../graphql/@generated/genql';
@@ -36,7 +36,11 @@ interface EstimateDropdownProps {
 }
 
 const StyledButtonsContainer = styled.div`
-    margin: 6px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 2;
+    grid-gap: 6px;
+    margin: 6px;
 `;
 
 const StyledCleanButton = styled.div`
@@ -54,7 +58,7 @@ const StyledCleanButton = styled.div`
     cursor: pointer;
     background-color: ${buttonDangerBackgroundColor};
     color: ${buttonDangerTextColor};
-    pointerevents: none;
+    pointer-events: none;
 
     &:hover {
         background-color: ${buttonDangerBackgroundColorHover};
@@ -212,26 +216,8 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
                 offset={[0, 4]}
             >
                 <>
-                    <StyledButtonsContainer>
-                        <Grid.Container width="100%">
-                            <Grid xs={12} justify="center">
-                                {renderQButton('Q1')}
-                            </Grid>
-                            <Grid xs={12} justify="center">
-                                {renderQButton('Q2')}
-                            </Grid>
-                        </Grid.Container>
-                    </StyledButtonsContainer>
-                    <StyledButtonsContainer>
-                        <Grid.Container width="100%">
-                            <Grid xs={12} justify="center">
-                                {renderQButton('Q3')}
-                            </Grid>
-                            <Grid xs={12} justify="center">
-                                {renderQButton('Q4')}
-                            </Grid>
-                        </Grid.Container>
-                    </StyledButtonsContainer>
+                    <StyledButtonsContainer>{['Q1', 'Q2', 'Q3', 'Q4'].map(renderQButton)}</StyledButtonsContainer>
+
                     <InputMask mask={mask} maskPlaceholder={null} {...{ ...onInput, onChange: onInputChange }}>
                         {(props: any) => (
                             <Input

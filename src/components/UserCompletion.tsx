@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, Grid, useKeyboard, KeyCode } from '@geist-ui/core';
+import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
@@ -31,11 +31,18 @@ interface UserCompletionProps {
 }
 
 const StyledUserCard = styled.div<{ focused?: boolean }>`
+    display: grid;
+    grid-template-columns: 2fr 10fr;
+    justify-content: center;
+    align-items: center;
+    min-width: 250px;
+
     padding: 6px;
+    margin-bottom: 4px;
+
     border: 1px solid ${buttonBorderColor};
     border-radius: 6px;
-    min-width: 250px;
-    margin-bottom: 4px;
+
     cursor: pointer;
 
     &:last-child {
@@ -74,17 +81,12 @@ const UserCard: React.FC<{
 }> = ({ name, email, image, focused, onClick }) => {
     return (
         <StyledUserCard onClick={onClick} focused={focused}>
-            <Grid.Container gap={0}>
-                <Grid xs={3} alignItems="center" justify="center">
-                    <UserPic src={image} size={24} />
-                </Grid>
-                <Grid xs={21} alignItems="center">
-                    <StyledUserInfo>
-                        <StyledUserName>{name}</StyledUserName>
-                        <StyledUserEmail>{email}</StyledUserEmail>
-                    </StyledUserInfo>
-                </Grid>
-            </Grid.Container>
+            <UserPic src={image} size={24} />
+
+            <StyledUserInfo>
+                <StyledUserName>{name}</StyledUserName>
+                <StyledUserEmail>{email}</StyledUserEmail>
+            </StyledUserInfo>
         </StyledUserCard>
     );
 };
