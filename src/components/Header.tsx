@@ -1,4 +1,4 @@
-import { Popover } from '@geist-ui/core';
+import { useCallback, useRef, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
@@ -11,6 +11,7 @@ import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
 import { ThemeChanger } from './ThemeChanger';
 import { UserPic } from './UserPic';
+import { Popup } from './Popup';
 
 const StyledHeader = styled.header`
     display: grid;
@@ -26,7 +27,7 @@ const StyledUserMenu = styled.div`
     align-items: center;
 `;
 
-const StyledPopoverContent = styled.div`
+const StyledPopupContent = styled.div`
     min-width: 120px;
 `;
 
@@ -47,35 +48,57 @@ const StyledHeaderNavLink = styled.a`
 
 const CreatorMenu = () => {
     const t = useTranslations('Header');
+    const popupRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLDivElement>(null);
+    const [popupVisible, setPopupVisibility] = useState(false);
 
-    const content = () => (
-        <StyledPopoverContent>
-            <Popover.Item>
-                <NextLink href={routes.createGoal()}>
-                    <a>{t('New goal')}</a>
-                </NextLink>
-            </Popover.Item>
-            <Popover.Item>
-                <NextLink href={routes.createProject()}>
-                    <a>{t('New project')}</a>
-                </NextLink>
-            </Popover.Item>
-            <Popover.Item>
-                <NextLink href={routes.inviteUsers()}>
-                    <a>{t('Invite users')}</a>
-                </NextLink>
-            </Popover.Item>
-            <Popover.Item line />
-            <Popover.Item>
-                <a onClick={() => signOut()}>{t('Sign out')}</a>
-            </Popover.Item>
-        </StyledPopoverContent>
-    );
+    const onClickOutside = useCallback(() => {
+        setPopupVisibility(false);
+    }, []);
 
     return (
-        <Popover content={content} hideArrow>
-            <StyledIcon type="plus" size="s" color={secondaryTaskanyLogoColor} />
-        </Popover>
+        <>
+            <span ref={popupRef}>
+                <StyledIcon
+                    ref={buttonRef}
+                    onClick={() => setPopupVisibility(!popupVisible)}
+                    color={secondaryTaskanyLogoColor}
+                    type="plus"
+                    size="s"
+                />
+            </span>
+
+            <Popup
+                overflow="hidden"
+                visible={popupVisible}
+                onClickOutside={onClickOutside}
+                reference={popupRef}
+                interactive
+                minWidth={150}
+                maxWidth={250}
+            >
+                <StyledPopupContent>
+                    <div>
+                        <NextLink href={routes.createGoal()}>
+                            <a>{t('New goal')}</a>
+                        </NextLink>
+                    </div>
+                    <div>
+                        <NextLink href={routes.createProject()}>
+                            <a>{t('New project')}</a>
+                        </NextLink>
+                    </div>
+                    <div>
+                        <NextLink href={routes.inviteUsers()}>
+                            <a>{t('Invite users')}</a>
+                        </NextLink>
+                    </div>
+                    <div>
+                        <a onClick={() => signOut()}>{t('Sign out')}</a>
+                    </div>
+                </StyledPopupContent>
+            </Popup>
+        </>
     );
 };
 
