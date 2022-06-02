@@ -1,6 +1,6 @@
 import styled, { css, createGlobalStyle } from 'styled-components';
 
-import { fontDisplay, gapL, gapM, gapS, gapSm, gapXl, gapXs } from '../design/@generated/themes';
+import { fontDisplay, gapL, gapM, gapS, gapSm, gapXl, gapXs, textColor } from '../design/@generated/themes';
 
 const textSizes = {
     xxs: '0.5rem',
@@ -45,6 +45,7 @@ interface TextProps {
 export const Text = styled.div<TextProps>`
     font-size: 16px;
     font-family: ${fontDisplay};
+    color: ${textColor};
 
     ${({ size }) => size && calcTextSize(size)}
 

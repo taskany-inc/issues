@@ -1,12 +1,13 @@
 import { createGlobalStyle } from 'styled-components';
 
-import { backgroundColor, fontDisplay } from '../design/@generated/themes';
+import { backgroundColor, fontDisplay, textColor } from '../design/@generated/themes';
 
 export const GlobalStyle = createGlobalStyle`
     html, body {
         box-sizing: border-box;
 
         font-family: ${fontDisplay};
+        color: ${textColor};
 
         margin: 0;
         padding: 0;
