@@ -4,10 +4,12 @@ import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 
+import { Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
-import { Page } from '../components/Page';
+import { declareSsrProps } from '../utils/declareSsrProps';
+import { declarePage } from '../utils/declarePage';
 import { routes } from '../hooks/router';
-import { declareSsrProps, ExternalPageProps } from '../utils/declareSsrProps';
+import { Page } from '../components/Page';
 
 const fetcher = createFetcher((user) => ({
     goalUserIndex: [
@@ -55,16 +57,16 @@ export const getServerSideProps = declareSsrProps(async ({ user }) => ({
     ssrData: await fetcher(user),
 }));
 
-const Home = ({ user, locale, ssrData }: ExternalPageProps) => {
+export default declarePage<{ goalUserIndex: Goal[] }>(({ user, locale, ssrData }) => {
     const t = useTranslations('index');
     const { data } = useSWR('goalUserIndex', () => fetcher(user));
-    const actualData: typeof data = data ?? ssrData;
+    const goals = data?.goalUserIndex ?? ssrData.goalUserIndex;
 
     return (
         <Page locale={locale} title={t('title')}>
             <StyledGoalsList>
                 <div style={{ width: '100%' }}>
-                    {actualData?.goalUserIndex?.map((goal) => (
+                    {goals.map((goal) => (
                         <Link key={goal.id} href={routes.goal(goal.id)} passHref>
                             <a style={{ width: '100%' }}>
                                 {/* <GoalItem
@@ -82,9 +84,7 @@ const Home = ({ user, locale, ssrData }: ExternalPageProps) => {
                 </div>
             </StyledGoalsList>
 
-            <pre>{JSON.stringify(actualData?.goalUserIndex, null, 2)}</pre>
+            <pre>{JSON.stringify(goals, null, 2)}</pre>
         </Page>
     );
-};
-
-export default Home;
+});
