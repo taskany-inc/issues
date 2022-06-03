@@ -12,7 +12,7 @@ import { estimatedMeta } from '../utils/dateTime';
 import { accentIconColor } from '../design/@generated/themes';
 import { UserAnyKind, Project, GoalEstimate, State, Tag as TagModel } from '../../graphql/@generated/genql';
 
-import { Card } from './Card';
+import { FormCard } from './FormCard';
 import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
@@ -200,7 +200,6 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                                 key={tag.id}
                                 title={tag.title}
                                 description={tag.description}
-                                color={tag.color}
                                 onHide={() => removeTagFromState(tag)}
                             />
                         ))}
@@ -215,7 +214,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
 
     return (
         <>
-            {card ? <Card style={{ maxWidth: '800px' }}>{formContent}</Card> : formContent}
+            {card ? <FormCard style={{ maxWidth: '800px' }}>{formContent}</FormCard> : formContent}
             <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={accentIconColor} />}>
                 {t.rich('Press key to create the goal', {
                     key: () => <Keyboard command enter />,
