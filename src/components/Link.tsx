@@ -33,6 +33,7 @@ const StyledLink = styled(({ forwardRef, inline, ...props }) => <a ref={forwardR
         `}
 `;
 
+// eslint-disable-next-line react/display-name
 export const Link = React.forwardRef<HTMLLinkElement, LinkProps>(({ as, ...props }, ref) => {
     return <StyledLink {...props} forwardRef={ref} />;
 });
