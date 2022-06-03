@@ -22,7 +22,7 @@ const StyledHeader = styled.header`
     display: grid;
     grid-template-columns: 20px 11fr 100px;
     align-items: center;
-    padding: 20px 20px;
+    padding: 20px 40px;
 `;
 
 const StyledUserMenu = styled.div`
