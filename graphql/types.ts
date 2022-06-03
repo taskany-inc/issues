@@ -179,6 +179,7 @@ export const State = objectType({
         t.field(StateModel.title);
         t.field(StateModel.hue);
         t.field(StateModel.default);
+        t.field(StateModel.color);
         t.list.field('flows', { type: Flow });
     },
 });
