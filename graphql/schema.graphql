@@ -122,7 +122,6 @@ enum SortOrder {
 }
 
 type State {
-  color: String!
   default: Boolean
   flows: [Flow]
   hue: Int!
