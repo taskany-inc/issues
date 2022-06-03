@@ -7,9 +7,9 @@ const textSizes = {
     xs: '0.75rem',
     s: '0.875rem',
     m: '1rem',
-    l: '1.5rem',
-    xl: '2rem',
-    xxl: '4rem',
+    l: '1.25rem',
+    xl: '1.75rem',
+    xxl: '3rem',
 };
 
 const lineHeight = {
@@ -40,6 +40,7 @@ const calcTextSize = (size: keyof typeof textSizes, weight: keyof typeof textWei
 interface TextProps {
     size?: keyof typeof textSizes;
     weight?: keyof typeof textWeight;
+    color?: string;
 }
 
 export const Text = styled.div<TextProps>`
@@ -59,6 +60,12 @@ export const Text = styled.div<TextProps>`
         weight &&
         css`
             font-weight: ${textWeight[weight]} !important;
+        `}
+
+    ${({ color }) =>
+        color &&
+        css`
+            color: ${color};
         `}
 `;
 
