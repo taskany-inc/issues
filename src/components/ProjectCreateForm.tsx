@@ -14,7 +14,7 @@ import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
 
-import { Card } from './Card';
+import { FormCard } from './FormCard';
 import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
@@ -209,7 +209,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
 
     return (
         <>
-            {card ? <Card style={{ maxWidth: '800px' }}>{formContent}</Card> : formContent}
+            {card ? <FormCard style={{ maxWidth: '800px' }}>{formContent}</FormCard> : formContent}
             <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={accentIconColor} />}>
                 {t.rich('Press key to create the project', {
                     key: () => <Keyboard command enter />,
