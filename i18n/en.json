@@ -1,93 +1,102 @@
 {
-    "Header": {
-        "Projects": "Projects",
-        "Goals": "Goals",
-        "Issues": "Issues",
-        "Explore": "Explore",
-        "Boards": "Boards",
-        "New goal": "New goal",
-        "New project": "New project",
-        "Invite users": "Invite users",
-        "Sign out": "Sign out"
-    },
+  "Header": {
+    "Projects": "Projects",
+    "Goals": "Goals",
+    "Issues": "Issues",
+    "Explore": "Explore",
+    "Boards": "Boards",
+    "New goal": "New goal",
+    "New project": "New project",
+    "Invite users": "Invite users",
+    "Sign out": "Sign out"
+  },
+  "index": {
+    "title": "Taskany Goals — Personal bundle"
+  },
+  "projects": {
     "index": {
-        "title": "Taskany Goals — Personal bundle"
+      "title": "Taskany Goals — Projects"
     },
-    "projects": {
-        "index": {
-            "title": "Taskany Goals — Projects"
-        },
-        "new": {
-            "title": "Taskany Goals — New project",
-            "Create new project": "Create new project",
-            "Project's title is required": "Project's title is required",
-            "Project's title must be a string": "Project's title must be a string",
-            "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
-            "Something went wrong 😿": "Something went wrong 😿",
-            "We are creating new project": "We are creating new project...",
-            "Voila! Project is here 🎉": "Voila! Project is here 🎉",
-            "Create project": "Create project",
-            "Project's title": "Project's title",
-            "And its description": "And its description",
-            "Pro tip!": "Pro tip!",
-            "Press key to create the project": "Press <key></key> to create the project.",
-            "Assign": "Assign",
-            "Enter name or email": "Enter name or email",
-            "Flow": "Flow",
-            "Flow or state title": "Flow or state title"
-        }
-    },
-    "users": {
-        "invite": {
-            "title": "Taskany Goals — Invite new user",
-            "Invite new user": "Invite new user",
-            "User email is required": "User email is required",
-            "User email must be a string": "User email must be a string",
-            "Something went wrong 😿": "Something went wrong 😿",
-            "We are creating invite...": "We are creating invite...",
-            "Voila! User with email {email} invited 🎉": "Voila! User with email {email} invited 🎉",
-            "Send invite": "Send invite",
-            "User email": "User email",
-            "Pro tip!": "Pro tip!",
-            "Press key to send invite": "Press <key></key> to send invite"
-        }
-    },
-    "goals": {
-        "new": {
-            "title": "Taskany Goals — New goal",
-            "Create new goal": "Create new goal",
-            "Goal's title is required": "Goal's title is required",
-            "Goal's title must be a string": "Goal's title must be a string",
-            "Goal's title must be longer than 10 symbols": "Goal's title must be longer than 10 symbols",
-            "Goal's description must be longer than 10 symbols": "Goal's description must be longer than 10 symbols",
-            "Goal's description is required": "Goal's description is required",
-            "Goal's description must be a string": "Goal's description must be a string",
-            "Something went wrong 😿": "Something went wrong 😿",
-            "We are creating new goal": "We are creating new goal...",
-            "Voila! Goal is here 🎉": "Voila! Goal is here 🎉",
-            "Create goal": "Create goal",
-            "Goal's title": "Goal's title",
-            "And its description": "And its description",
-            "Pro tip!": "Pro tip!",
-            "Press key to create the goal": "Press <key></key> to create the goal.",
-            "Assign": "Assign",
-            "Enter name or email": "Enter name or email",
-            "Enter project title": "Enter project title",
-            "Schedule": "Schedule",
-            "Date input mask placeholder": "mm/dd/yyyy",
-            "Date input mask": "99/99/9999",
-            "State": "State",
-            "Enter tag title": "Enter tag title"
-        }
-    },
-    "TagCompletion": {
-        "Something went wrong 😿": "Something went wrong 😿",
-        "We are creating new tag": "We are creating new tag...",
-        "Voila! Tag is here 🎉": "Voila! Tag is here 🎉",
-        "Click here": "Click here",
-        "Change color and create": "to change color. Click on it to create."
-    },
-    "IssueHeader": {
-      "Project": "Project"
+    "new": {
+      "title": "Taskany Goals — New project",
+      "Create new project": "Create new project",
+      "Project's title is required": "Project's title is required",
+      "Project's title must be a string": "Project's title must be a string",
+      "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are creating new project": "We are creating new project...",
+      "Voila! Project is here 🎉": "Voila! Project is here 🎉",
+      "Create project": "Create project",
+      "Project's title": "Project's title",
+      "And its description": "And its description",
+      "Pro tip!": "Pro tip!",
+      "Press key to create the project": "Press <key></key> to create the project.",
+      "Assign": "Assign",
+      "Enter name or email": "Enter name or email",
+      "Flow": "Flow",
+      "Flow or state title": "Flow or state title"
     }
+  },
+  "users": {
+    "invite": {
+      "title": "Taskany Goals — Invite new user",
+      "Invite new user": "Invite new user",
+      "User email is required": "User email is required",
+      "User email must be a string": "User email must be a string",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are creating invite...": "We are creating invite...",
+      "Voila! User with email {email} invited 🎉": "Voila! User with email {email} invited 🎉",
+      "Send invite": "Send invite",
+      "User email": "User email",
+      "Pro tip!": "Pro tip!",
+      "Press key to send invite": "Press <key></key> to send invite"
+    }
+  },
+  "goals": {
+    "new": {
+      "title": "Taskany Goals — New goal",
+      "Create new goal": "Create new goal",
+      "Goal's title is required": "Goal's title is required",
+      "Goal's title must be a string": "Goal's title must be a string",
+      "Goal's title must be longer than 10 symbols": "Goal's title must be longer than 10 symbols",
+      "Goal's description must be longer than 10 symbols": "Goal's description must be longer than 10 symbols",
+      "Goal's description is required": "Goal's description is required",
+      "Goal's description must be a string": "Goal's description must be a string",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are creating new goal": "We are creating new goal...",
+      "Voila! Goal is here 🎉": "Voila! Goal is here 🎉",
+      "Create goal": "Create goal",
+      "Goal's title": "Goal's title",
+      "And its description": "And its description",
+      "Pro tip!": "Pro tip!",
+      "Press key to create the goal": "Press <key></key> to create the goal.",
+      "Assign": "Assign",
+      "Enter name or email": "Enter name or email",
+      "Enter project title": "Enter project title",
+      "Schedule": "Schedule",
+      "Date input mask placeholder": "mm/dd/yyyy",
+      "Date input mask": "99/99/9999",
+      "State": "State",
+      "Enter tag title": "Enter tag title"
+    }
+  },
+  "TagCompletion": {
+    "Something went wrong 😿": "Something went wrong 😿",
+    "We are creating new tag": "We are creating new tag...",
+    "Voila! Tag is here 🎉": "Voila! Tag is here 🎉",
+    "Click here": "Click here",
+    "Change color and create": "to change color. Click on it to create."
+  },
+  "IssueTitle": {
+    "Project": "Project"
+  },
+  "IssueStats": {
+    "comments": "comments"
+  },
+  "RelativeTime": {
+    "Updated": "Updated",
+    "Created": "Created",
+    "updated": "updated",
+    "created": "created"
+  }
 }
