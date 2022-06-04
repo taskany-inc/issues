@@ -17,6 +17,7 @@ import { IssueTitle } from '../../components/IssueTitle';
 import { IssueKey } from '../../components/IssueKey';
 import { IssueStats } from '../../components/IssueStats';
 import { RelativeTime } from '../../components/RelativeTime';
+import { MD } from '../../components/MD';
 
 const refreshInterval = 3000;
 
@@ -29,6 +30,7 @@ const fetcher = createFetcher((_, id: string) => ({
             id: true,
             title: true,
             description: true,
+            descriptionHtml: true,
             state: {
                 title: true,
                 hue: true,
@@ -133,7 +135,9 @@ export default declarePage<{ goal: Goal }, { id: string }>(
                 <PageSep />
 
                 <IssueContent>
-                    <Card info={issuedBy}>{goal.description}</Card>
+                    <Card info={issuedBy}>
+                        <MD>{goal.descriptionHtml ?? goal.description}</MD>
+                    </Card>
                 </IssueContent>
 
                 <PageContent>
