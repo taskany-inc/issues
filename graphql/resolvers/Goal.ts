@@ -2,6 +2,7 @@ import { arg, nonNull, stringArg, intArg, booleanArg, list } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
 import { Goal, UserSession, GoalEstimate, computeUserFields, withComputedField } from '../types';
+import { md } from '../../src/utils/md';
 // import { mailServer } from '../src/utils/mailServer';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -129,6 +130,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         id: newGoalId,
                         title,
                         description,
+                        descriptionHtml: md(description),
                         projectId,
                         key: Boolean(key),
                         private: Boolean(isPrivate),
