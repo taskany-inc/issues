@@ -176,7 +176,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
                 <FormAction left inline>
                     <UserCompletion
                         size="m"
-                        view="outline"
+                        // view="outline"
                         text={ownerButtonText}
                         placeholder={t('Enter name or email')}
                         query={owner?.name || owner?.email}
@@ -187,7 +187,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
                     <FlowCompletion
                         disabled
                         size="m"
-                        view="outline"
+                        // view="outline"
                         text={flowButtonText}
                         placeholder={t('Flow or state title')}
                         query={flow?.title}
@@ -195,13 +195,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
                     />
                 </FormAction>
                 <FormAction right inline>
-                    <Button
-                        size="m"
-                        view="primary-outline"
-                        type="submit"
-                        disabled={!isValid}
-                        text={t('Create project')}
-                    />
+                    <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Create project')} />
                 </FormAction>
             </FormActions>
         </Form>

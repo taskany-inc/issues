@@ -162,7 +162,6 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                 <FormAction left inline>
                     <UserCompletion
                         size="m"
-                        view="outline"
                         text={ownerButtonText}
                         placeholder={t('Enter name or email')}
                         query={owner?.name || owner?.email}
@@ -172,7 +171,6 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
 
                     <StateDropdown
                         size="m"
-                        view="outline"
                         text={stateButtonText}
                         flowId={project?.flow?.id}
                         onClick={(s) => setState(s)}
@@ -180,7 +178,6 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
 
                     <EstimateDropdown
                         size="m"
-                        view="outline"
                         text={t('Schedule')}
                         placeholder={t('Date input mask placeholder')}
                         mask={t('Date input mask')}
@@ -206,7 +203,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                     </StyledTagsContainer>
                 </FormAction>
                 <FormAction right inline>
-                    <Button size="m" view="primary-outline" type="submit" disabled={!isValid} text={t('Create goal')} />
+                    <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Create goal')} />
                 </FormAction>
             </FormActions>
         </Form>

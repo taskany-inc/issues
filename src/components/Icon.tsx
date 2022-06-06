@@ -2,8 +2,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
-import { textColorPrimary } from '../design/@generated/themes';
-
 const componentsMap = {
     plus: dynamic(() => import('teenyicons/outline/plus-circle.svg')),
     user: dynamic(() => import('teenyicons/outline/user.svg')),
@@ -36,22 +34,26 @@ const sizesMap = {
 
 interface IconProps {
     type: keyof typeof componentsMap;
-    size: keyof typeof sizesMap;
+    size: keyof typeof sizesMap | number;
     color?: string;
     stroke?: number;
     className?: string;
+    noWrap?: boolean;
     onClick?: (e: React.MouseEvent) => void;
 }
 
 export const Icon = React.forwardRef<HTMLSpanElement, IconProps>(
-    ({ type, size, color = textColorPrimary, stroke = 1, className, onClick }, ref) => {
+    ({ type, size, color = 'inherit', stroke = 1, className, onClick, noWrap }, ref) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const Component: React.ComponentType<any> = componentsMap[type];
-        const sizePx = `${sizesMap[size]}px`;
+        const sizePx = `${typeof size === 'string' ? sizesMap[size] : size}px`;
+        const content = <Component width={sizePx} height={sizePx} color={color} strokeWidth={stroke} />;
 
-        return (
+        return noWrap ? (
+            content
+        ) : (
             <span ref={ref} className={className} style={{ lineHeight: 'initial' }} onClick={onClick}>
-                <Component width={sizePx} height={sizePx} color={color} strokeWidth={stroke} />
+                {content}
             </span>
         );
     },

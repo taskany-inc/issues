@@ -2,14 +2,33 @@
 /* eslint-disable prefer-destructuring */
 const colorLayer = require('color-layer');
 
+const sharedConstants = {
+    fontDisplay:
+        '-apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Fira Sans", Roboto, Ubuntu, "Droid Sans", "Arial", sans-serif',
+    gapXs: '0.25rem',
+    gapS: '0.5rem',
+    gapSm: '0.75rem',
+    gapM: '1rem',
+    gapL: '2rem',
+    gapXl: '4rem',
+    brandColor: '#17b978',
+    colorPrimary: '#108858',
+    colorPrimaryAccent: '#17b978',
+    textColorPrimary: '#fff',
+};
+
 // 0 - light,
 // 1 - dark
 const themes = [
     {
-        textColor: 'hsl(0, 0%, 5%)',
+        ...sharedConstants,
+        textColor: 'hsl(0, 0%, 15%)',
+        backgroundColor: '#f6f9fc',
     },
     {
+        ...sharedConstants,
         textColor: 'hsl(0, 0%, 90%)',
+        backgroundColor: '#121212',
     },
 ];
 
@@ -18,9 +37,8 @@ const levelsNumber = [...Array(11).keys()];
 // [name, [hue, saturation]]
 const colorsOptions = [
     ['gray', [1, 0]],
-    ['accent', [156]],
-    ['warn', [37]],
-    ['danger', [360]],
+    ['warn', [30, 100]],
+    ['danger', [360, 100]],
 ];
 
 colorsOptions.forEach(([name, [h, s]]) => {

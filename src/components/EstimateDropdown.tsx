@@ -4,14 +4,7 @@ import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import InputMask from 'react-input-mask';
 
 import { GoalEstimate } from '../../graphql/@generated/genql';
-import {
-    buttonDangerBackgroundColor,
-    buttonDangerBackgroundColorHover,
-    buttonDangerOutlineTextColorHover,
-    buttonDangerTextColor,
-    buttonIconColor,
-    secondaryTaskanyLogoColor,
-} from '../design/@generated/themes';
+import { colorPrimary } from '../design/@generated/themes';
 import { createLocaleDate, quarterFromDate, yearFromDate, endOfQuarter } from '../utils/dateTime';
 
 import { Button } from './Button';
@@ -56,14 +49,14 @@ const StyledCleanButton = styled.div`
     font-size: 12px;
     border-radius: 100%;
     cursor: pointer;
-    background-color: ${buttonDangerBackgroundColor};
+    /* background-color: ${buttonDangerBackgroundColor};
     color: ${buttonDangerTextColor};
     pointer-events: none;
 
     &:hover {
         background-color: ${buttonDangerBackgroundColorHover};
         color: ${buttonDangerOutlineTextColorHover};
-    }
+    } */
 `;
 
 const StyledDropdownContainer = styled.div`
@@ -177,18 +170,17 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
 
     const renderQButton = (qValue: string) => (
         <Button
-            ghost
             size="s"
             key={qValue}
             view={view}
             text={qValue}
-            checked={qValue === selectedQ}
+            // checked={qValue === selectedQ}
             onClick={onQButtonClick(qValue)}
         />
     );
 
     const iconType: React.ComponentProps<typeof Icon>['type'] = changed ? 'calendarTick' : 'calendar';
-    const iconColor = changed ? secondaryTaskanyLogoColor : buttonIconColor;
+    const iconColor = changed ? colorPrimary : 'inherit';
 
     return (
         <>
