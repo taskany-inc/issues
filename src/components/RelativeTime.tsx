@@ -14,7 +14,7 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
 
     return (
         <>
-            {kind ? `${t('Updated')} ` : ''}
+            {kind ? `${t(kind)} ` : ''}
             <Light title={currentDate(new Date(date))}>{dateAgo(date)}</Light>
         </>
     );
