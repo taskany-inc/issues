@@ -2,7 +2,8 @@
 /* eslint-disable prefer-destructuring */
 const colorLayer = require('color-layer');
 
-// 0 - light, 1 - dark
+// 0 - light,
+// 1 - dark
 const themes = [
     {
         textColor: 'hsl(0, 0%, 5%)',
@@ -12,12 +13,22 @@ const themes = [
     },
 ];
 
-// gray levels
-// @ts-ignore
-[...Array(10).keys()].forEach((i) => {
-    const palette = colorLayer.default(1, i + 1, 0);
-    themes[0][`gray${i + 1}`] = palette[0];
-    themes[1][`gray${i + 1}`] = palette[1];
+// from 0 to 10
+const levelsNumber = [...Array(11).keys()];
+// [name, [hue, saturation]]
+const colorsOptions = [
+    ['gray', [1, 0]],
+    ['accent', [156]],
+    ['warn', [37]],
+    ['danger', [360]],
+];
+
+colorsOptions.forEach(([name, [h, s]]) => {
+    levelsNumber.forEach((i) => {
+        const [light, dark] = colorLayer.default(h, i, s);
+        themes[0][`${name}${i}`] = light;
+        themes[1][`${name}${i}`] = dark;
+    });
 });
 
 const [light, dark] = themes;
