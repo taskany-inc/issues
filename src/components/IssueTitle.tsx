@@ -17,8 +17,11 @@ interface IssueTitleProps {
 }
 
 const StyledIssueTitle = styled.div``;
-const StyledIssueProjectTitle = styled.div`
-    padding-top: 16px;
+const StyledIssueProjectTitle = styled(Text)`
+    padding-top: 24px;
+`;
+const StyledIssueTitleText = styled(Text)`
+    padding-top: 10px;
 `;
 
 export const IssueTitle: React.FC<IssueTitleProps> = ({ title, project }) => {
@@ -27,18 +30,16 @@ export const IssueTitle: React.FC<IssueTitleProps> = ({ title, project }) => {
     return (
         <StyledIssueTitle>
             {project ? (
-                <StyledIssueProjectTitle>
-                    <Text size="l" weight="bold" color={gray9}>
-                        {t('Project')} —{' '}
-                        <NextLink passHref href={routes.project(project.key)}>
-                            <Link inline>{project.title}</Link>
-                        </NextLink>
-                    </Text>
+                <StyledIssueProjectTitle size="l" weight="bold" color={gray9}>
+                    {t('Project')} —{' '}
+                    <NextLink passHref href={routes.project(project.key)}>
+                        <Link inline>{project.title}</Link>
+                    </NextLink>
                 </StyledIssueProjectTitle>
             ) : null}
-            <Text size="xxl" weight="bolder">
+            <StyledIssueTitleText size="xxl" weight="bolder">
                 {title}
-            </Text>
+            </StyledIssueTitleText>
         </StyledIssueTitle>
     );
 };
