@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { keyboardBackgroundColor, keyboardBorderColor, keyboardTextColor } from '../design/@generated/themes';
+import { gray4, gray8, textColor } from '../design/@generated/themes';
 
 interface KeyboardProps {
     command?: boolean;
@@ -15,11 +15,11 @@ const StyledKeyboard = styled.kbd`
     line-height: 1.1em;
     text-align: center;
     display: inline-block;
-    color: ${keyboardTextColor};
-    background-color: ${keyboardBackgroundColor};
+    color: ${textColor};
+    background-color: ${gray4};
     font-family: sans-serif;
     border-radius: 4px;
-    border: 1px solid ${keyboardBorderColor};
+    border: 1px solid ${gray8};
     padding: 4px 6px;
 
     span {
