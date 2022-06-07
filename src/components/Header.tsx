@@ -5,13 +5,7 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { routes } from '../hooks/router';
-import {
-    secondaryTaskanyLogoColor,
-    textColor,
-    textColorPrimary,
-    gray7,
-    backgroundColor,
-} from '../design/@generated/themes';
+import { textColor, gray7, backgroundColor, colorPrimary, brandColor } from '../design/@generated/themes';
 
 import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
@@ -52,8 +46,8 @@ const StyledPlusButton = styled.span`
     text-align: center;
     font-weight: 400;
 
-    border: 1px solid ${secondaryTaskanyLogoColor};
-    color: ${secondaryTaskanyLogoColor};
+    border: 1px solid ${colorPrimary};
+    color: ${brandColor};
 
     border-radius: 100%;
 
@@ -64,7 +58,7 @@ const StyledPlusButton = styled.span`
     &:hover {
         font-weight: 500;
         font-size: 14px;
-        background-color: ${secondaryTaskanyLogoColor};
+        background-color: ${colorPrimary};
         color: ${backgroundColor};
     }
 `;
@@ -91,8 +85,8 @@ const StyledHeaderNavLink = styled.a`
     transition: color, border-color 250ms ease-in-out;
 
     &:hover {
-        color: ${textColorPrimary};
-        border-color: ${secondaryTaskanyLogoColor};
+        color: ${textColor};
+        border-color: ${colorPrimary};
     }
 
     & + & {

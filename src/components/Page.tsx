@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 
@@ -23,8 +23,10 @@ export const PageContent = styled.div`
 `;
 
 export const Page: React.FC<PageProps> = ({ title, locale, children }) => {
+    const ctx = useContext(pageContext);
+
     return (
-        <pageContext.Provider value={{ locale }}>
+        <pageContext.Provider value={{ ...ctx, locale }}>
             <Head>
                 <title>{title}</title>
             </Head>
