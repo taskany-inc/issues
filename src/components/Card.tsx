@@ -10,6 +10,7 @@ interface CardProps {
 }
 
 const StyledCard = styled.div`
+    box-sizing: border-box;
     position: relative;
     overflow: hidden;
     border: 1px solid ${gray4};
@@ -18,12 +19,23 @@ const StyledCard = styled.div`
 `;
 
 const StyledCardContent = styled.div`
-    padding: 12px 20px;
+    box-sizing: border-box;
+    padding: 12px 14px;
 `;
 
 const StyledCardInfo = styled.div`
-    padding: 4px 20px;
+    box-sizing: border-box;
+    padding: 4px 14px;
     background-color: ${gray4};
+`;
+
+export const CardActions = styled.div`
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    padding: 20px 12px 10px;
 `;
 
 export const Card: React.FC<CardProps> = ({ info, children }) => {

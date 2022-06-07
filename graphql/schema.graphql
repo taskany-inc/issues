@@ -76,11 +76,24 @@ input GoalEstimate {
   y: String
 }
 
+input GoalInput {
+  description: String
+  id: ID!
+  key: Boolean
+  ownerId: String
+  personal: Boolean
+  private: Boolean
+  projectId: Int
+  stateId: String
+  title: String
+}
+
 type Mutation {
   createGoal(description: String!, estimate: GoalEstimate, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!, user: UserSession!): Goal
   createProject(description: String, flowId: String!, key: String!, ownerId: String!, title: String!, user: UserSession!): Project
   createTag(description: String, title: String!, user: UserSession!): Tag
   inviteUser(email: String!, user: UserSession!): Ghost
+  updateGoal(data: GoalInput!, user: UserSession!): Goal
 }
 
 type Project {

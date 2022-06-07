@@ -78,6 +78,12 @@
       "Date input mask": "99/99/9999",
       "State": "State",
       "Enter tag title": "Enter tag title"
+    },
+    "id": {
+      "Set owner": "Set owner",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are updating the goal": "We are updating the goal...",
+      "Voila! Goal is up to date 🎉": "Voila! Goal is up to date 🎉"
     }
   },
   "TagCompletion": {

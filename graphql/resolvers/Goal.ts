@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg, intArg, booleanArg, list } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Goal, UserSession, GoalEstimate, computeUserFields, withComputedField } from '../types';
+import { Goal, GoalInput, UserSession, GoalEstimate, computeUserFields, withComputedField } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -156,6 +156,36 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 // });
 
                 return newGoal;
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('updateGoal', {
+        type: Goal,
+        args: {
+            data: nonNull(arg({ type: GoalInput })),
+            user: nonNull(arg({ type: UserSession })),
+        },
+        resolve: async (_, { user, data }, { db }) => {
+            const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
+
+            if (!validUser) return null;
+
+            try {
+                // @ts-ignore incompatible types of Goal and GoalInput, title & description are required for Goal model
+                const goal = await db.goal.update({ where: { id: data.id }, data });
+
+                // await mailServer.sendMail({
+                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+
+                return goal;
             } catch (error) {
                 throw Error(`${error}`);
             }

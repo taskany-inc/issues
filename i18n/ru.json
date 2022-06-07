@@ -78,6 +78,12 @@
       "Date input mask": "99.99.9999",
       "State": "Статус",
       "Enter tag title": "Название тэга"
+    },
+    "id": {
+      "Set owner": "Set owner",
+      "Something went wrong 😿": "Упс! Что-то пошло не так 😿",
+      "We are updating new goal": "Погоди немного, обновляем цель...",
+      "Voila! Goal is up to date 🎉": "Ура! Цель обновлена 🎉"
     }
   },
   "TagCompletion": {
