@@ -14,7 +14,7 @@ interface IssueStatsProps {
 }
 
 const StyledIssueStats = styled.div`
-    padding-top: 8px;
+    padding-top: 12px;
 `;
 
 const StyledIssueInfo = styled.span`
