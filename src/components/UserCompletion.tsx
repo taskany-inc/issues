@@ -4,20 +4,13 @@ import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import {
-    buttonBackgroundColorHover,
-    buttonBorderColor,
-    buttonBorderColorHover,
-    buttonIconColor,
-    buttonTextColor,
-} from '../design/@generated/themes';
+import { gray6, gray7, gray8, textColor } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { UserAnyKind } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
-import { Icon } from './Icon';
 import { UserPic } from './UserPic';
 
 interface UserCompletionProps {
@@ -27,10 +20,12 @@ interface UserCompletionProps {
     userPic?: React.ComponentProps<typeof Button>['iconLeft'];
     query?: string;
     placeholder?: string;
+    title?: string;
     onClick?: (user: UserAnyKind) => void;
 }
 
 const StyledUserCard = styled.div<{ focused?: boolean }>`
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 2fr 10fr;
     justify-content: center;
@@ -40,7 +35,7 @@ const StyledUserCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
     margin-bottom: 4px;
 
-    border: 1px solid ${buttonBorderColor};
+    border: 1px solid ${gray7};
     border-radius: 6px;
 
     cursor: pointer;
@@ -50,15 +45,15 @@ const StyledUserCard = styled.div<{ focused?: boolean }>`
     }
 
     &:hover {
-        border-color: ${buttonBorderColorHover};
-        background-color: ${buttonBackgroundColorHover};
+        border-color: ${gray8};
+        background-color: ${gray6};
     }
 
     ${({ focused }) =>
         focused &&
         css`
-            border-color: ${buttonBorderColorHover};
-            background-color: ${buttonBackgroundColorHover};
+            border-color: ${gray8};
+            background-color: ${gray6};
         `}
 `;
 const StyledUserInfo = styled.div`
@@ -70,7 +65,7 @@ const StyledUserName = styled.div`
 `;
 const StyledUserEmail = styled.div`
     font-size: 12px;
-    color: ${buttonTextColor};
+    color: ${textColor};
 `;
 const UserCard: React.FC<{
     name?: string;
@@ -111,17 +106,18 @@ const fetcher = createFetcher((_, query: string) => ({
 }));
 
 export const UserCompletion: React.FC<UserCompletionProps> = ({
-    size,
+    size = 'm',
     text,
     view,
     userPic,
     onClick,
     query = '',
+    title,
     placeholder,
 }) => {
     const { data: session } = useSession();
-    const popupRef = useRef<any>();
-    const buttonRef = useRef<any>();
+    const popupRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const { state: inputState, setState: setInputState, reset: inputReset, bindings: onInput } = useInput(query);
@@ -208,7 +204,8 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
                         size={size}
                         view={view}
                         text={text}
-                        iconLeft={userPic || <Icon type="user" size="xs" color={buttonIconColor} />}
+                        title={title}
+                        iconLeft={userPic}
                         onClick={onButtonClick}
                     />
                 )}

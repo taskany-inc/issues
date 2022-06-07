@@ -27,6 +27,7 @@ import { is } from '../utils/styles';
 
 interface ButtonProps {
     text?: string;
+    title?: string;
     tabIndex?: number;
     disabled?: boolean;
     ghost?: boolean;

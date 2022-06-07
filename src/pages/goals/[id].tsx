@@ -1,22 +1,28 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useSWR, { unstable_serialize } from 'swr';
 import styled from 'styled-components';
+import { useTranslations } from 'next-intl';
+import toast from 'react-hot-toast';
 
+import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 import { declarePage } from '../../utils/declarePage';
-import { Goal } from '../../../graphql/@generated/genql';
+import { Goal, UserAnyKind } from '../../../graphql/@generated/genql';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
 import { State } from '../../components/State';
 import { Link } from '../../components/Link';
-import { Card } from '../../components/Card';
+import { Card, CardActions } from '../../components/Card';
 import { IssueTitle } from '../../components/IssueTitle';
 import { IssueKey } from '../../components/IssueKey';
 import { IssueStats } from '../../components/IssueStats';
 import { RelativeTime } from '../../components/RelativeTime';
+import { Md } from '../../components/Md';
+import { UserCompletion } from '../../components/UserCompletion';
+import { UserPic } from '../../components/UserPic';
 
 const refreshInterval = 3000;
 
@@ -49,6 +55,7 @@ const fetcher = createFetcher((_, id: string) => ({
                 id: true,
                 name: true,
                 email: true,
+                image: true,
             },
             tags: {
                 id: true,
@@ -87,6 +94,7 @@ export const getServerSideProps = declareSsrProps(async ({ user, params: { id } 
 
 export default declarePage<{ goal: Goal }, { id: string }>(
     ({ user, locale, ssrData, params: { id } }) => {
+        const t = useTranslations('goals.id');
         const [mounted, setMounted] = useState(false);
 
         useEffect(() => {
@@ -103,6 +111,39 @@ export default declarePage<{ goal: Goal }, { id: string }>(
         });
 
         const goal = data?.goal ?? ssrData.goal;
+        const isUserAllowedToEdit = user?.id === goal?.computedIssuer?.id || user?.id === goal?.computedOwner?.id;
+
+        const [issueOwner, setIssueOwner] = useState(goal.computedOwner);
+        const issueOwnerName = issueOwner?.name || issueOwner?.email;
+        const onIssueOwnerChange = useCallback(
+            async (owner: UserAnyKind) => {
+                setIssueOwner(owner);
+
+                const promise = gql.mutation({
+                    updateGoal: [
+                        {
+                            user,
+                            data: {
+                                id: goal.id,
+                                ownerId: owner.activity?.id,
+                            },
+                        },
+                        {
+                            id: true,
+                        },
+                    ],
+                });
+
+                toast.promise(promise, {
+                    error: t('Something went wrong 😿'),
+                    loading: t('We are updating new goal'),
+                    success: t('Voila! Goal is up to date 🎉'),
+                });
+
+                await promise;
+            },
+            [goal, t, user],
+        );
 
         const issuedBy = (
             <>
@@ -133,7 +174,20 @@ export default declarePage<{ goal: Goal }, { id: string }>(
                 <PageSep />
 
                 <IssueContent>
-                    <Card info={issuedBy}>{goal.description}</Card>
+                    <Card info={issuedBy}>
+                        <Md>{goal.description}</Md>
+
+                        <CardActions>
+                            <UserCompletion
+                                text={issueOwnerName}
+                                placeholder={t('Set owner')}
+                                title={t('Set owner')}
+                                query={issueOwnerName}
+                                userPic={<UserPic src={issueOwner?.image} size={16} />}
+                                onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
+                            />
+                        </CardActions>
+                    </Card>
                 </IssueContent>
 
                 <PageContent>
