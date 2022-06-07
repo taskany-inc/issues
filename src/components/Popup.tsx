@@ -11,7 +11,6 @@ const Tippy = dynamic(() => import('@tippyjs/react/headless'));
  */
 interface PopupProps {
     placement?: ComponentProps<typeof Tippy>['placement'];
-    trigger?: ComponentProps<typeof Tippy>['trigger'];
     interactive?: ComponentProps<typeof Tippy>['interactive'];
     hideOnClick?: ComponentProps<typeof Tippy>['hideOnClick'];
     reference?: ComponentProps<typeof Tippy>['reference'];
@@ -143,7 +142,6 @@ export const Popup: React.FC<PopupProps> = ({
     placement = 'auto',
     children,
     target,
-    trigger,
     overflow,
     minWidth,
     maxWidth,

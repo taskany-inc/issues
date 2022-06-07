@@ -4,12 +4,7 @@ import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import {
-    buttonBackgroundColorHover,
-    buttonBorderColor,
-    buttonBorderColorHover,
-    buttonIconColor,
-} from '../design/@generated/themes';
+import { gray6, gray7, gray8 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
@@ -29,7 +24,7 @@ interface ProjectCompletionProps {
 
 const StyledProjectCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
-    border: 1px solid ${buttonBorderColor};
+    border: 1px solid ${gray7};
     border-radius: 6px;
     min-width: 250px;
     margin-bottom: 4px;
@@ -40,15 +35,15 @@ const StyledProjectCard = styled.div<{ focused?: boolean }>`
     }
 
     &:hover {
-        border-color: ${buttonBorderColorHover};
-        background-color: ${buttonBackgroundColorHover};
+        border-color: ${gray8};
+        background-color: ${gray6};
     }
 
     ${({ focused }) =>
         focused &&
         css`
-            border-color: ${buttonBorderColorHover};
-            background-color: ${buttonBackgroundColorHover};
+            border-color: ${gray8};
+            background-color: ${gray6};
         `}
 `;
 const StyledProjectInfo = styled.div`
@@ -193,7 +188,7 @@ export const ProjectCompletion: React.FC<ProjectCompletionProps> = ({
                         size={size}
                         view={view}
                         text={text}
-                        iconLeft={<Icon type="location" size="xs" color={buttonIconColor} />}
+                        iconLeft={<Icon type="location" size="xs" />}
                         onClick={onButtonClick}
                     />
                 )}
