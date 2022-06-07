@@ -4,12 +4,7 @@ import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import {
-    buttonBackgroundColorHover,
-    buttonBorderColor,
-    buttonBorderColorHover,
-    buttonIconColor,
-} from '../design/@generated/themes';
+import { gray6, gray7, gray8 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { State } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
@@ -29,7 +24,7 @@ interface StateDropdownProps {
 
 const StyledItemCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
-    border: 1px solid ${buttonBorderColor};
+    border: 1px solid ${gray7};
     border-radius: 6px;
     min-width: 250px;
     margin-bottom: 4px;
@@ -40,15 +35,15 @@ const StyledItemCard = styled.div<{ focused?: boolean }>`
     }
 
     &:hover {
-        border-color: ${buttonBorderColorHover};
-        background-color: ${buttonBackgroundColorHover};
+        border-color: ${gray8};
+        background-color: ${gray6};
     }
 
     ${({ focused }) =>
         focused &&
         css`
-            border-color: ${buttonBorderColorHover};
-            background-color: ${buttonBackgroundColorHover};
+            border-color: ${gray8};
+            background-color: ${gray6};
         `}
 `;
 const StyledItemInfo = styled.div`
@@ -165,7 +160,7 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
                     size={size}
                     view={view}
                     text={text}
-                    iconLeft={<Icon type="flow" size="xs" color={buttonIconColor} />}
+                    iconLeft={<Icon type="flow" size="xs" />}
                     onClick={onButtonClick}
                 />
             </StyledDropdownContainer>

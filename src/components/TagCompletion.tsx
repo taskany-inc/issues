@@ -6,19 +6,10 @@ import useSWR from 'swr';
 import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
 
-import {
-    buttonBackgroundColorHover,
-    buttonBorderColor,
-    buttonBorderColorHover,
-    buttonIconColor,
-    buttonOutlineTextColor,
-} from '../design/@generated/themes';
-import { backgroundColor as darkBackgroundColor } from '../design/@generated/themes/dark.constants';
-import { backgroundColor as lightBackgroundColor } from '../design/@generated/themes/light.constants';
+import { gray6, gray7, gray8 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
-import { randomHex } from '../utils/randomHex';
 import { gql } from '../utils/gql';
 
 import { Popup } from './Popup';
@@ -40,7 +31,7 @@ const StyledTagCard = styled.div<{ focused?: boolean }>`
 
     padding: 6px;
     margin-bottom: 4px;
-    border: 1px solid ${buttonBorderColor};
+    border: 1px solid ${gray7};
     border-radius: 6px;
 
     cursor: pointer;
@@ -50,15 +41,15 @@ const StyledTagCard = styled.div<{ focused?: boolean }>`
     }
 
     &:hover {
-        border-color: ${buttonBorderColorHover};
-        background-color: ${buttonBackgroundColorHover};
+        border-color: ${gray8};
+        background-color: ${gray6};
     }
 
     ${({ focused }) =>
         focused &&
         css`
-            border-color: ${buttonBorderColorHover};
-            background-color: ${buttonBackgroundColorHover};
+            border-color: ${gray8};
+            background-color: ${gray6};
         `}
 `;
 const StyledTagInfo = styled.div`
@@ -68,26 +59,21 @@ const StyledTagTitle = styled.div`
     font-size: 14px;
     font-weight: 600;
 `;
-const StyledTagColor = styled.div<{ color: string }>`
+const StyledTagColor = styled.div`
     width: 14px;
     height: 14px;
 
     border-radius: 100%;
-
-    ${({ color }) => css`
-        background-color: ${color};
-    `}
 `;
 const TagCard: React.FC<{
     title: string;
     description?: string;
-    color: string;
     focused?: boolean;
     onClick?: () => void;
-}> = ({ title, description, color, focused, onClick }) => {
+}> = ({ title, description, focused, onClick }) => {
     return (
         <StyledTagCard onClick={onClick} focused={focused} title={description}>
-            <StyledTagColor color={color} />
+            <StyledTagColor />
             <StyledTagInfo>
                 <StyledTagTitle>{title}</StyledTagTitle>
             </StyledTagInfo>
@@ -106,12 +92,6 @@ const StyledNewTagForm = styled.div`
     grid-template-columns: 8fr 4fr;
     justify-content: center;
     align-items: center;
-`;
-const StyledNewTagInfo = styled.div`
-    font-size: 12px;
-    font-weight: 600;
-    color: ${buttonOutlineTextColor};
-    padding: 2px 4px;
 `;
 
 const fetcher = createFetcher((_, query: string) => ({
@@ -138,14 +118,7 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
-    const [color, setColor] = useState(buttonBorderColor);
-    const updateColor = useCallback(() => {
-        const newColor = randomHex([darkBackgroundColor, lightBackgroundColor]);
 
-        if (newColor) {
-            setColor(newColor);
-        }
-    }, []);
     const t = useTranslations('TagCompletion');
     const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
 
@@ -212,13 +185,10 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                 {
                     user: session.user,
                     title: inputState,
-                    color,
                 },
                 {
                     id: true,
                     title: true,
-                    description: true,
-                    color: true,
                 },
             ],
         });
@@ -234,10 +204,7 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
         res.createTag && onItemClick(res.createTag as TagModel)();
         setPopupVisibility(false);
         setEditMode(false);
-        updateColor();
-    }, [color, inputState, onItemClick, session, t, updateColor]);
-
-    useEffect(updateColor, [updateColor]);
+    }, [inputState, onItemClick, session, t]);
 
     useEffect(() => {
         const tagCompletion = data?.tagCompletion;
@@ -264,7 +231,7 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                         icon={
                             // FIXME: https://github.com/taskany-inc/goals/issues/14
                             <span style={{ display: 'inline-block', position: 'relative', top: '1px' }}>
-                                <Icon type="tag" size="xs" color={buttonIconColor} />
+                                <Icon type="tag" size="xs" />
                             </span>
                         }
                         {...inputBingings}
@@ -274,7 +241,7 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                     />
                 ) : (
                     <StyledIconContainer>
-                        <Icon ref={buttonRef} type="tag" size="xs" color={buttonIconColor} onClick={onButtonClick} />
+                        <Icon ref={buttonRef} type="tag" size="xs" onClick={onButtonClick} />
                     </StyledIconContainer>
                 )}
             </StyledDropdownContainer>
@@ -299,7 +266,6 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                                     key={t.id}
                                     title={t.title}
                                     description={t.description}
-                                    color={t.color}
                                     focused={cursor === i}
                                     onClick={onItemClick(t)}
                                 />
@@ -309,20 +275,7 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                     <>
                         {inputState !== '' && (
                             <StyledNewTagForm>
-                                <StyledNewTagInfo>
-                                    <a
-                                        href="#"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            updateColor();
-                                        }}
-                                    >
-                                        {t('Click here')}
-                                    </a>{' '}
-                                    {t('Change color and create')}
-                                </StyledNewTagInfo>
-
-                                <Tag color={color} title={inputState} onClick={createTag} />
+                                <Tag title={inputState} onClick={createTag} />
                             </StyledNewTagForm>
                         )}
                     </>
