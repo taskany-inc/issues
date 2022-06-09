@@ -11,7 +11,7 @@ import { declareSsrProps } from '../../utils/declareSsrProps';
 import { declarePage } from '../../utils/declarePage';
 import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
-import { Goal, GoalEstimate, GoalInput, UserAnyKind } from '../../../graphql/@generated/genql';
+import { Goal, EstimateInput, GoalInput, UserAnyKind } from '../../../graphql/@generated/genql';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
@@ -157,11 +157,11 @@ export default declarePage<{ goal: Goal }, { id: string }>(
             [triggerUpdate, goal],
         );
 
-        const [issueEstimate, setIssueEstimate] = useState<GoalEstimate | undefined>(
+        const [issueEstimate, setIssueEstimate] = useState<EstimateInput | undefined>(
             goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
         );
         const onIssueEstimateChange = useCallback(
-            async (estimate?: GoalEstimate) => {
+            async (estimate?: EstimateInput) => {
                 setIssueEstimate(estimate);
 
                 await triggerUpdate({

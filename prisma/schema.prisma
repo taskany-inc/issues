@@ -107,6 +107,8 @@ model Activity {
   projects           Project[]
   projectParticipant Project[]  @relation("projectParticipants")
   goalParticipant    Goal[]     @relation("goalParticipants")
+  goalWatchers       Goal[]     @relation("goalWatchers")
+  goalStargizers     Goal[]     @relation("goalStargizers")
   goalOwner          Goal[]     @relation("goalOwner")
   goalIssuer         Goal[]     @relation("goalIssuer")
   settings           Settings?  @relation(fields: [settingsId], references: [id])
@@ -141,11 +143,11 @@ model Project {
 }
 
 model Estimate {
-  id     Int     @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
   q      String
   y      String
   date   String
-  goal   Goal    @relation(fields: [goalId], references: [id])
+  goal   Goal   @relation(fields: [goalId], references: [id])
   goalId String
 
   createdAt DateTime @default(now())
@@ -172,6 +174,8 @@ model Goal {
   owner        Activity?  @relation("goalOwner", fields: [ownerId], references: [id])
   ownerId      String?
   participants Activity[] @relation("goalParticipants")
+  watchers     Activity[] @relation("goalWatchers")
+  stargizers   Activity[] @relation("goalStargizers")
   comments     Comment[] // not implemented
   reactions    Reaction[] // not implemented
   tags         Tag[]
