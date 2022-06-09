@@ -116,7 +116,7 @@ type Query {
   flowCompletion(query: String!, sortBy: SortOrder): [Flow]
   flowRecommended: [Flow]
   goal(id: String!): Goal
-  goalUserIndex(user: UserSession!): [Goal]
+  goalUserIndex(offset: Int!, pageSize: Int!, user: UserSession!): [Goal]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(key: String!): [Goal]
