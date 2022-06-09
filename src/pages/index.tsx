@@ -5,8 +5,7 @@ import styled from 'styled-components';
 
 import { Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
-import { declareSsrProps } from '../utils/declareSsrProps';
-import { declarePage } from '../utils/declarePage';
+import { declareSsrProps, ExternalPageProps } from '../utils/declareSsrProps';
 import { Page } from '../components/Page';
 import { GoalItem } from '../components/GoalItem';
 import { Button } from '../components/Button';
@@ -65,7 +64,7 @@ export const getServerSideProps = declareSsrProps(async ({ user }) => ({
     ssrData: await fetcher(user),
 }));
 
-export default declarePage<{ goalUserIndex: Goal[] }>(({ user, locale, ssrData }) => {
+const HomePage = ({ user, locale, ssrData }: ExternalPageProps<{ goalUserIndex: Goal[] }>) => {
     const t = useTranslations('index');
 
     const { data, setSize, size } = useSWRInfinite(
@@ -104,4 +103,6 @@ export default declarePage<{ goalUserIndex: Goal[] }>(({ user, locale, ssrData }
             </StyledGoalsList>
         </Page>
     );
-});
+};
+
+export default HomePage;
