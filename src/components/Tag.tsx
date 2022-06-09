@@ -7,6 +7,7 @@ interface TagProps {
     title: string;
     description?: string;
     size?: 's' | 'm';
+    className?: string;
     onClick?: () => void;
     onHide?: () => void;
 }
@@ -67,10 +68,6 @@ const StyledTag = styled.div<{ size: TagProps['size']; onClick: TagProps['onClic
         }
     }
 
-    & + & {
-        margin-left: 6px;
-    }
-
     ${({ onClick }) =>
         onClick &&
         css`
@@ -85,7 +82,7 @@ const StyledTag = styled.div<{ size: TagProps['size']; onClick: TagProps['onClic
         `}
 `;
 
-export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClick, onHide }) => {
+export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClick, onHide, className }) => {
     const onHideClick = useCallback(
         (e: React.MouseEvent) => {
             e.preventDefault();
@@ -97,7 +94,7 @@ export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClic
     );
 
     return (
-        <StyledTag size={size} onClick={onClick} title={description}>
+        <StyledTag size={size} onClick={onClick} title={description} className={className}>
             {onHide && <StyledCleanButton onClick={onHideClick}>+</StyledCleanButton>}
             {title}
         </StyledTag>

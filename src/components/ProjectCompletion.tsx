@@ -76,7 +76,6 @@ const fetcher = createFetcher((_, query: string) => ({
         },
         {
             id: true,
-            slug: true,
             title: true,
             description: true,
             flow: {
