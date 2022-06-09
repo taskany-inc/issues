@@ -139,9 +139,11 @@ export default declarePage<{ goal: Goal }, { id: string }>(
 
         const isUserAllowedToEdit = user?.id === goal?.computedIssuer?.id || user?.id === goal?.computedOwner?.id;
         // @ts-ignore unexpectable trouble with filter
-        const isUserWatcher = goal.watchers?.filter(({ id }) => id === user.activityId).length > 0;
-        // @ts-ignore unexpectable trouble with filter
-        const isUserStargizer = goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0;
+        const [watcher, setWatcher] = useState(goal.watchers?.filter(({ id }) => id === user.activityId).length > 0);
+        const [stargizer, setStargizer] = useState(
+            // @ts-ignore unexpectable trouble with filter
+            goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
+        );
 
         const triggerUpdate = useCallback(
             (input: GoalInput) => {
@@ -198,18 +200,22 @@ export default declarePage<{ goal: Goal }, { id: string }>(
         );
 
         const onWatchToggle = useCallback(async () => {
+            setWatcher((w) => !w);
+
             await triggerUpdate({
                 id: goal.id,
-                watch: !isUserWatcher,
+                watch: !watcher,
             });
-        }, [triggerUpdate, goal, isUserWatcher]);
+        }, [triggerUpdate, goal, watcher]);
 
         const onStarToggle = useCallback(async () => {
+            setStargizer((s) => !s);
+
             await triggerUpdate({
                 id: goal.id,
-                star: !isUserStargizer,
+                star: !stargizer,
             });
-        }, [triggerUpdate, goal, isUserStargizer]);
+        }, [triggerUpdate, goal, stargizer]);
 
         const issuedBy = (
             <>
@@ -240,13 +246,13 @@ export default declarePage<{ goal: Goal }, { id: string }>(
 
                     <StyledIssueInfo align="right">
                         <ActionButton
-                            text={isUserWatcher ? 'Unwatch' : 'Watch'}
-                            iconLeft={<Icon type={isUserWatcher ? 'eye' : 'eyeClosed'} size="s" />}
+                            text={watcher ? 'Unwatch' : 'Watch'}
+                            iconLeft={<Icon type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
                             onClick={onWatchToggle}
                         />
                         <ActionButton
-                            text={isUserStargizer ? 'Unstar' : 'Star'}
-                            iconLeft={<Icon type={isUserStargizer ? 'starFilled' : 'star'} size="s" />}
+                            text={stargizer ? 'Unstar' : 'Star'}
+                            iconLeft={<Icon type={stargizer ? 'starFilled' : 'star'} size="s" />}
                             onClick={onStarToggle}
                         />
                     </StyledIssueInfo>
