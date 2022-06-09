@@ -76,6 +76,8 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     state: true,
                     project: true,
                     estimate: true,
+                    watchers: true,
+                    stargizers: true,
                 },
             });
 
@@ -174,10 +176,16 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             data: nonNull(arg({ type: GoalInput })),
             user: nonNull(arg({ type: UserSession })),
         },
-        resolve: async (_, { user, data }, { db }) => {
+        resolve: async (_, { user, data: { watch, star, ...data } }, { db }) => {
             const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
 
             if (!validUser) return null;
+
+            const connection = { id: validUser.activityId! };
+            const connectionMap: Record<string, string> = {
+                true: 'connect',
+                false: 'disconnect',
+            };
 
             try {
                 const goal = await db.goal.update({
@@ -190,6 +198,8 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                                   create: data.estimate,
                               }
                             : undefined,
+                        watchers: watch !== undefined ? { [connectionMap[String(watch)]]: connection } : undefined,
+                        stargizers: star !== undefined ? { [connectionMap[String(star)]]: connection } : undefined,
                     },
                 });
 
