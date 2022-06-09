@@ -36,6 +36,9 @@ export const CardActions = styled.div`
     bottom: 0;
     left: 0;
     padding: 20px 12px 10px;
+
+    display: flex;
+    align-items: center;
 `;
 
 export const Card: React.FC<CardProps> = ({ info, children }) => {

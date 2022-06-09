@@ -30,6 +30,7 @@ interface ButtonProps {
     title?: string;
     tabIndex?: number;
     disabled?: boolean;
+    checked?: boolean;
     ghost?: boolean;
     view?: 'default' | 'primary' | 'warning' | 'danger';
     outline?: boolean;
@@ -38,6 +39,7 @@ interface ButtonProps {
     iconLeft?: React.ReactNode;
     iconRight?: React.ReactNode;
     brick?: 'left' | 'right' | 'center';
+    className?: string;
     onClick?: React.MouseEventHandler;
 }
 
@@ -48,7 +50,7 @@ const StyledIcon = styled.span`
 const StyledText = styled.span``;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLeft, ...props }) => (
+const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, checked, ...props }) => (
     <button ref={forwardRef} {...props} />
 ))`
     position: relative;

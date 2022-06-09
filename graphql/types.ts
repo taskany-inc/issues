@@ -120,7 +120,7 @@ export const Goal = objectType({
         t.field(GoalModel.key);
         t.field(GoalModel.personal);
         t.field(GoalModel.private);
-        t.field('estimate', { type: Estimate });
+        t.list.field('estimate', { type: Estimate });
         t.field(GoalModel.createdAt);
         t.field(GoalModel.updatedAt);
         t.field('issuer', { type: Activity });
@@ -151,7 +151,7 @@ export const GoalInput = inputObjectType({
         t.field(GoalModel.key);
         t.field(GoalModel.personal);
         t.field(GoalModel.private);
-        // t.field('estimate', { type: Estimate });
+        t.field('estimate', { type: GoalEstimate });
         t.field(GoalModel.ownerId);
         // t.list.field('participants', { type: Activity });
         t.field(GoalModel.projectId);
@@ -231,7 +231,7 @@ export const withComputedField =
         ...o,
         ...args.reduce((acc, field) => {
             // @ts-ignore
-            acc[`computed${field[0].toUpperCase() + field.substring(1)}`] = o[`${field}`]?.user ?? o[`${field}`].ghost;
+            acc[`computed${field[0].toUpperCase() + field.substring(1)}`] = o[`${field}`]?.user ?? o[`${field}`]?.ghost;
 
             return acc;
         }, {}),

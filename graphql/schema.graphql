@@ -17,10 +17,10 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Estimate {
-  date: String
+  date: String!
   id: Int!
-  q: String
-  y: String
+  q: String!
+  y: String!
 }
 
 type Flow {
@@ -50,7 +50,7 @@ type Goal {
   createdAt: DateTime!
   dependsOn: [Goal]
   description: String!
-  estimate: Estimate
+  estimate: [Estimate]
   id: ID!
   issuer: Activity
   issuerId: String
@@ -71,13 +71,14 @@ type Goal {
 }
 
 input GoalEstimate {
-  date: String
-  q: String
-  y: String
+  date: String!
+  q: String!
+  y: String!
 }
 
 input GoalInput {
   description: String
+  estimate: GoalEstimate
   id: ID!
   key: Boolean
   ownerId: String

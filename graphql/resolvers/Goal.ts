@@ -47,6 +47,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     tags: true,
                     state: true,
                     project: true,
+                    estimate: true,
                 },
             });
 
@@ -74,6 +75,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     tags: true,
                     state: true,
                     project: true,
+                    estimate: true,
                 },
             });
 
@@ -178,8 +180,18 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             if (!validUser) return null;
 
             try {
-                // @ts-ignore incompatible types of Goal and GoalInput, title & description are required for Goal model
-                const goal = await db.goal.update({ where: { id: data.id }, data });
+                const goal = await db.goal.update({
+                    where: { id: data.id },
+                    // @ts-ignore incompatible types of Goal and GoalInput
+                    data: {
+                        ...data,
+                        estimate: data.estimate
+                            ? {
+                                  create: data.estimate,
+                              }
+                            : undefined,
+                    },
+                });
 
                 // await mailServer.sendMail({
                 //     from: '"Fred Foo 👻" <foo@example.com>',
