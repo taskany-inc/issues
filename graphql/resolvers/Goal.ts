@@ -9,13 +9,17 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         type: Goal,
         args: {
             user: nonNull(UserSession),
+            pageSize: nonNull(intArg()),
+            offset: nonNull(intArg()),
         },
-        resolve: async (_, { user }, { db }) => {
+        resolve: async (_, { user, offset, pageSize }, { db }) => {
             const validUser = await db.user.findUnique({ where: { id: user.id } });
 
             if (!validUser || !validUser.activityId) return null;
 
             const goals = await db.goal.findMany({
+                take: pageSize,
+                skip: offset,
                 where: {
                     OR: [
                         {

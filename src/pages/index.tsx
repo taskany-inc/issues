@@ -1,6 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
-import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 
@@ -8,13 +7,18 @@ import { Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { declareSsrProps } from '../utils/declareSsrProps';
 import { declarePage } from '../utils/declarePage';
-import { routes } from '../hooks/router';
 import { Page } from '../components/Page';
+import { GoalItem } from '../components/GoalItem';
+import { Button } from '../components/Button';
 
-const fetcher = createFetcher((user) => ({
+const PAGE_SIZE = 5;
+
+const fetcher = createFetcher((user, offset: number | undefined = 0) => ({
     goalUserIndex: [
         {
             user,
+            offset,
+            pageSize: PAGE_SIZE,
         },
         {
             id: true,
@@ -53,38 +57,51 @@ const StyledGoalsList = styled.div`
     padding: 20px 20px 0 20px;
 `;
 
+const StyledLoadMore = styled.div`
+    margin: 50px 40px;
+`;
+
 export const getServerSideProps = declareSsrProps(async ({ user }) => ({
     ssrData: await fetcher(user),
 }));
 
 export default declarePage<{ goalUserIndex: Goal[] }>(({ user, locale, ssrData }) => {
     const t = useTranslations('index');
-    const { data } = useSWR('goalUserIndex', () => fetcher(user));
-    const goals = data?.goalUserIndex ?? ssrData.goalUserIndex;
+
+    const { data, setSize, size } = useSWRInfinite(
+        (index: number) => ({ offset: index * PAGE_SIZE }),
+        ({ offset }) => fetcher(user, offset),
+    );
+
+    const shouldRenderMoreButton = data?.[data.length - 1]?.goalUserIndex?.length === PAGE_SIZE;
+
+    // FIXME: https://github.com/taskany-inc/issues/issues/107
+    const goals = data?.map((chunk) => chunk.goalUserIndex).flat() ?? ssrData.goalUserIndex;
 
     return (
         <Page locale={locale} title={t('title')}>
             <StyledGoalsList>
                 <div style={{ width: '100%' }}>
-                    {goals.map((goal) => (
-                        <Link key={goal.id} href={routes.goal(goal.id)} passHref>
-                            <a style={{ width: '100%' }}>
-                                {/* <GoalItem
-                                            id={goal.id}
-                                            title={goal.title}
-                                            projectTitle={goal.project?.title}
-                                            tags={goal.tags}
-                                            issuer={goal.computedIssuer}
-                                            createdAt={goal.createdAt}
-                                            updatedAt={goal.updatedAt}
-                                        /> */}
-                            </a>
-                        </Link>
-                    ))}
+                    {goals?.map(
+                        (goal) =>
+                            goal && (
+                                <GoalItem
+                                    createdAt={goal.createdAt}
+                                    id={goal.id}
+                                    state={goal.state}
+                                    title={goal.title}
+                                    issuer={goal.computedIssuer}
+                                    owner={goal.computedOwner}
+                                    key={goal.id}
+                                />
+                            ),
+                    )}
                 </div>
-            </StyledGoalsList>
 
-            <pre>{JSON.stringify(goals, null, 2)}</pre>
+                <StyledLoadMore>
+                    {shouldRenderMoreButton && <Button text={t('Load more')} onClick={() => setSize(size + 1)} />}
+                </StyledLoadMore>
+            </StyledGoalsList>
         </Page>
     );
 });
