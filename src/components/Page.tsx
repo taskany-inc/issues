@@ -9,6 +9,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { ProjectCreateModal } from './ProjectCreateModal';
 import { GoalCreateModal } from './GoalCreateModal';
+import { UserInviteModal } from './UserInviteModal';
 
 interface PageProps {
     locale: ExternalPageProps['locale'];
@@ -39,6 +40,7 @@ export const Page: React.FC<PageProps> = ({ title, locale, children }) => {
 
             <ProjectCreateModal />
             <GoalCreateModal />
+            <UserInviteModal />
             <Footer />
         </pageContext.Provider>
     );

@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { ApolloProvider } from '@apollo/client';
-import { SessionProvider, useSession, signIn } from 'next-auth/react';
+import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { NextIntlProvider } from 'next-intl';
@@ -12,30 +12,11 @@ import { Theme } from '../components/Theme';
 import { apolloClient } from '../utils/apolloClient';
 import { GlobalStyle } from '../components/GlobalStyle';
 import { TextStyle } from '../components/Text';
-import { NextPageWithAuth } from '../types/nextPageWithAuth';
 import { backgroundColor, toastBackgroundColor, toastTextColor } from '../design/@generated/themes';
 import { useHotkeys } from '../hooks/useHotkeys';
-import { UserInviteModal } from '../components/UserInviteModal';
 import { pageContext } from '../utils/pageContext';
 
-type AppPropsWithAuth = AppProps & {
-    Component: NextPageWithAuth;
-};
-
-const Auth = ({ children }: { children: React.ReactNode }) => {
-    const { data: session, status } = useSession();
-
-    const isUser = !!session?.user;
-
-    useEffect(() => {
-        if (status === 'loading') return;
-        if (!isUser) signIn();
-    }, [isUser, status]);
-
-    return isUser ? <>{children}</> : null;
-};
-
-const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps: any }) => {
+const Root = ({ Component, pageProps }: { Component: NextPage; pageProps: any }) => {
     const { theme } = useTheme();
 
     useHotkeys();
@@ -77,22 +58,14 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
                 />
 
                 <pageContext.Provider value={{ theme: themeType }}>
-                    {Component.auth ? (
-                        <Auth>
-                            <Component {...pageProps} />
-                        </Auth>
-                    ) : (
-                        <Component {...pageProps} />
-                    )}
-
-                    <UserInviteModal />
+                    <Component {...pageProps} />
                 </pageContext.Provider>
             </GeistProvider>
         </>
     );
 };
 
-const App = ({ Component, pageProps }: AppPropsWithAuth) => {
+const App = ({ Component, pageProps }: AppProps) => {
     return (
         <>
             <Head>

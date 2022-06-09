@@ -8,8 +8,7 @@ import toast from 'react-hot-toast';
 import { Goal, EstimateInput, GoalInput, UserAnyKind } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
-import { declareSsrProps } from '../../utils/declareSsrProps';
-import { declarePage } from '../../utils/declarePage';
+import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
 import { useMounted } from '../../hooks/useMounted';
@@ -118,184 +117,185 @@ const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
     </StyledIssueTags>
 );
 
-export const getServerSideProps = declareSsrProps(async ({ user, params: { id } }) => ({
-    ssrData: await fetcher(user, id),
-}));
-
-export default declarePage<{ goal: Goal }, { id: string }>(
-    ({ user, locale, ssrData, params: { id } }) => {
-        const t = useTranslations('goals.id');
-        const mounted = useMounted(refreshInterval);
-
-        const { data } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
-            fallback: {
-                [unstable_serialize([user, id])]: ssrData,
-            },
-            refreshInterval,
-        });
-
-        // this line is compensation for first render before delayed swr will bring updates
-        const goal = data?.goal ?? ssrData.goal;
-
-        const isUserAllowedToEdit = user?.id === goal?.computedIssuer?.id || user?.id === goal?.computedOwner?.id;
-        // @ts-ignore unexpectable trouble with filter
-        const [watcher, setWatcher] = useState(goal.watchers?.filter(({ id }) => id === user.activityId).length > 0);
-        const [stargizer, setStargizer] = useState(
-            // @ts-ignore unexpectable trouble with filter
-            goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
-        );
-
-        const triggerUpdate = useCallback(
-            (input: GoalInput) => {
-                const promise = gql.mutation({
-                    updateGoal: [
-                        {
-                            user,
-                            data: input,
-                        },
-                        {
-                            id: true,
-                        },
-                    ],
-                });
-
-                toast.promise(promise, {
-                    error: t('Something went wrong 😿'),
-                    loading: t('We are updating the goal'),
-                    success: t('Voila! Goal is up to date 🎉'),
-                });
-
-                return promise;
-            },
-            [user, t],
-        );
-
-        const [issueOwner, setIssueOwner] = useState(goal.computedOwner);
-        const issueOwnerName = issueOwner?.name || issueOwner?.email;
-        const onIssueOwnerChange = useCallback(
-            async (owner: UserAnyKind) => {
-                setIssueOwner(owner);
-
-                await triggerUpdate({
-                    id: goal.id,
-                    ownerId: owner.activity?.id,
-                });
-            },
-            [triggerUpdate, goal],
-        );
-
-        const [issueEstimate, setIssueEstimate] = useState<EstimateInput | undefined>(
-            goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
-        );
-        const onIssueEstimateChange = useCallback(
-            async (estimate?: EstimateInput) => {
-                setIssueEstimate(estimate);
-
-                await triggerUpdate({
-                    id: goal.id,
-                    estimate,
-                });
-            },
-            [triggerUpdate, goal],
-        );
-
-        const onWatchToggle = useCallback(async () => {
-            setWatcher((w) => !w);
-
-            await triggerUpdate({
-                id: goal.id,
-                watch: !watcher,
-            });
-        }, [triggerUpdate, goal, watcher]);
-
-        const onStarToggle = useCallback(async () => {
-            setStargizer((s) => !s);
-
-            await triggerUpdate({
-                id: goal.id,
-                star: !stargizer,
-            });
-        }, [triggerUpdate, goal, stargizer]);
-
-        const issuedBy = (
-            <>
-                Issued by <Link inline>{goal.computedIssuer!.name}</Link>
-                {' — '}
-                <RelativeTime date={goal.createdAt} />
-            </>
-        );
-
-        return (
-            <Page locale={locale} title={goal.title}>
-                <IssueHeader>
-                    <StyledIssueInfo align="left">
-                        <IssueKey id={goal.id}>
-                            <IssueTags tags={goal.tags} />
-                        </IssueKey>
-
-                        <IssueTitle title={goal.title} project={goal.project} />
-
-                        <IssueStats
-                            state={nullable(goal.state, (s) => (
-                                <State title={s.title} hue={s.hue} />
-                            ))}
-                            comments={0}
-                            updatedAt={goal.updatedAt}
-                        />
-                    </StyledIssueInfo>
-
-                    <StyledIssueInfo align="right">
-                        <ActionButton
-                            text={watcher ? 'Unwatch' : 'Watch'}
-                            iconLeft={<Icon type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
-                            onClick={onWatchToggle}
-                        />
-                        <ActionButton
-                            text={stargizer ? 'Unstar' : 'Star'}
-                            iconLeft={<Icon type={stargizer ? 'starFilled' : 'star'} size="s" />}
-                            onClick={onStarToggle}
-                        />
-                    </StyledIssueInfo>
-                </IssueHeader>
-
-                <PageSep />
-
-                <IssueContent>
-                    <Card info={issuedBy}>
-                        <Md>{goal.description}</Md>
-
-                        <CardActions>
-                            <IssueAction>
-                                <UserCompletion
-                                    text={issueOwnerName}
-                                    placeholder={t('Set owner')}
-                                    title={t('Set owner')}
-                                    query={issueOwnerName}
-                                    userPic={<UserPic src={issueOwner?.image} size={16} />}
-                                    onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
-                                />
-                            </IssueAction>
-
-                            <IssueAction>
-                                <EstimateDropdown
-                                    size="m"
-                                    text={t('Schedule')}
-                                    placeholder={t('Date input mask placeholder')}
-                                    mask={t('Date input mask')}
-                                    value={issueEstimate}
-                                    defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
-                                    onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
-                                />
-                            </IssueAction>
-                        </CardActions>
-                    </Card>
-                </IssueContent>
-
-                <PageContent>
-                    <pre>{JSON.stringify(goal, null, 2)}</pre>
-                </PageContent>
-            </Page>
-        );
+export const getServerSideProps = declareSsrProps(
+    async ({ user, params: { id } }) => ({
+        ssrData: await fetcher(user, id),
+    }),
+    {
+        private: true,
     },
-    { private: true },
 );
+
+const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{ goal: Goal }, { id: string }>) => {
+    const t = useTranslations('goals.id');
+    const mounted = useMounted(refreshInterval);
+
+    const { data } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
+        refreshInterval,
+    });
+
+    // this line is compensation for first render before delayed swr will bring updates
+    const goal = data?.goal ?? ssrData.goal;
+
+    const isUserAllowedToEdit = user?.id === goal?.computedIssuer?.id || user?.id === goal?.computedOwner?.id;
+    // @ts-ignore unexpectable trouble with filter
+    const [watcher, setWatcher] = useState(goal.watchers?.filter(({ id }) => id === user.activityId).length > 0);
+    const [stargizer, setStargizer] = useState(
+        // @ts-ignore unexpectable trouble with filter
+        goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
+    );
+
+    const triggerUpdate = useCallback(
+        (input: GoalInput) => {
+            const promise = gql.mutation({
+                updateGoal: [
+                    {
+                        user: user!,
+                        data: input,
+                    },
+                    {
+                        id: true,
+                    },
+                ],
+            });
+
+            toast.promise(promise, {
+                error: t('Something went wrong 😿'),
+                loading: t('We are updating the goal'),
+                success: t('Voila! Goal is up to date 🎉'),
+            });
+
+            return promise;
+        },
+        [user, t],
+    );
+
+    const [issueOwner, setIssueOwner] = useState(goal.computedOwner);
+    const issueOwnerName = issueOwner?.name || issueOwner?.email;
+    const onIssueOwnerChange = useCallback(
+        async (owner: UserAnyKind) => {
+            setIssueOwner(owner);
+
+            await triggerUpdate({
+                id: goal.id,
+                ownerId: owner.activity?.id,
+            });
+        },
+        [triggerUpdate, goal],
+    );
+
+    const [issueEstimate, setIssueEstimate] = useState<EstimateInput | undefined>(
+        goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
+    );
+    const onIssueEstimateChange = useCallback(
+        async (estimate?: EstimateInput) => {
+            setIssueEstimate(estimate);
+
+            await triggerUpdate({
+                id: goal.id,
+                estimate,
+            });
+        },
+        [triggerUpdate, goal],
+    );
+
+    const onWatchToggle = useCallback(async () => {
+        setWatcher((w) => !w);
+
+        await triggerUpdate({
+            id: goal.id,
+            watch: !watcher,
+        });
+    }, [triggerUpdate, goal, watcher]);
+
+    const onStarToggle = useCallback(async () => {
+        setStargizer((s) => !s);
+
+        await triggerUpdate({
+            id: goal.id,
+            star: !stargizer,
+        });
+    }, [triggerUpdate, goal, stargizer]);
+
+    const issuedBy = (
+        <>
+            Issued by <Link inline>{goal.computedIssuer!.name}</Link>
+            {' — '}
+            <RelativeTime date={goal.createdAt} />
+        </>
+    );
+
+    return (
+        <Page locale={locale} title={goal.title}>
+            <IssueHeader>
+                <StyledIssueInfo align="left">
+                    <IssueKey id={goal.id}>
+                        <IssueTags tags={goal.tags} />
+                    </IssueKey>
+
+                    <IssueTitle title={goal.title} project={goal.project} />
+
+                    <IssueStats
+                        state={nullable(goal.state, (s) => (
+                            <State title={s.title} hue={s.hue} />
+                        ))}
+                        comments={0}
+                        updatedAt={goal.updatedAt}
+                    />
+                </StyledIssueInfo>
+
+                <StyledIssueInfo align="right">
+                    <ActionButton
+                        text={watcher ? 'Unwatch' : 'Watch'}
+                        iconLeft={<Icon type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
+                        onClick={onWatchToggle}
+                    />
+                    <ActionButton
+                        text={stargizer ? 'Unstar' : 'Star'}
+                        iconLeft={<Icon type={stargizer ? 'starFilled' : 'star'} size="s" />}
+                        onClick={onStarToggle}
+                    />
+                </StyledIssueInfo>
+            </IssueHeader>
+
+            <PageSep />
+
+            <IssueContent>
+                <Card info={issuedBy}>
+                    <Md>{goal.description}</Md>
+
+                    <CardActions>
+                        <IssueAction>
+                            <UserCompletion
+                                text={issueOwnerName}
+                                placeholder={t('Set owner')}
+                                title={t('Set owner')}
+                                query={issueOwnerName}
+                                userPic={<UserPic src={issueOwner?.image} size={16} />}
+                                onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
+                            />
+                        </IssueAction>
+
+                        <IssueAction>
+                            <EstimateDropdown
+                                size="m"
+                                text={t('Schedule')}
+                                placeholder={t('Date input mask placeholder')}
+                                mask={t('Date input mask')}
+                                value={issueEstimate}
+                                defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
+                                onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
+                            />
+                        </IssueAction>
+                    </CardActions>
+                </Card>
+            </IssueContent>
+
+            <PageContent>
+                <pre>{JSON.stringify(goal, null, 2)}</pre>
+            </PageContent>
+        </Page>
+    );
+};
+
+export default GoalPage;
