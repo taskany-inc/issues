@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
 import InputMask from 'react-input-mask';
 
-import { GoalEstimate } from '../../graphql/@generated/genql';
+import { EstimateInput } from '../../graphql/@generated/genql';
 import { colorPrimary, danger8, danger9, gray6, textColor } from '../design/@generated/themes';
 import { createLocaleDate, quarterFromDate, yearFromDate, endOfQuarter } from '../utils/dateTime';
 import { is } from '../utils/styles';
@@ -28,8 +28,8 @@ interface EstimateDropdownProps {
     };
     placeholder?: string;
     mask: string;
-    onChange?: (estimate?: GoalEstimate) => void;
-    onClose?: (estimate?: GoalEstimate) => void;
+    onChange?: (estimate?: EstimateInput) => void;
+    onClose?: (estimate?: EstimateInput) => void;
 }
 
 const StyledButtonsContainer = styled.div`

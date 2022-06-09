@@ -142,41 +142,10 @@ export const Goal = objectType({
     },
 });
 
-export const GoalInput = inputObjectType({
-    name: 'GoalInput',
-    definition(t) {
-        t.field(GoalModel.id);
-        t.string('title');
-        t.string('description');
-        t.field(GoalModel.key);
-        t.field(GoalModel.personal);
-        t.field(GoalModel.private);
-        t.field('estimate', { type: GoalEstimate });
-        t.field(GoalModel.ownerId);
-        // t.list.field('participants', { type: Activity });
-        t.field(GoalModel.projectId);
-        t.field(GoalModel.stateId);
-        // t.list.field('tags', { type: Tag });
-        // t.list.field('dependsOn', { type: Goal });
-        // t.list.field('blocks', { type: Goal });
-        // t.list.field('relatedTo', { type: Goal });
-        // t.list.field('connected', { type: Goal });
-    },
-});
-
 export const Estimate = objectType({
     name: EstimateModel.$name,
     definition(t) {
         t.field(EstimateModel.id);
-        t.field(EstimateModel.y);
-        t.field(EstimateModel.q);
-        t.field(EstimateModel.date);
-    },
-});
-
-export const GoalEstimate = inputObjectType({
-    name: 'GoalEstimate',
-    definition(t) {
         t.field(EstimateModel.y);
         t.field(EstimateModel.q);
         t.field(EstimateModel.date);
@@ -215,6 +184,46 @@ export const Tag = objectType({
         t.field('activity', { type: Activity });
         t.list.field('goals', { type: Goal });
         t.list.field('projects', { type: Project });
+    },
+});
+
+export const GoalInput = inputObjectType({
+    name: 'GoalInput',
+    definition(t) {
+        t.field(GoalModel.id);
+        t.string('title');
+        t.string('description');
+        t.field(GoalModel.key);
+        t.field(GoalModel.personal);
+        t.field(GoalModel.private);
+        t.field('estimate', { type: EstimateInput });
+        t.field(GoalModel.ownerId);
+        t.field(GoalModel.projectId);
+        t.field(GoalModel.stateId);
+        t.list.field('watchers', { type: ActivityInput });
+        t.list.field('stars', { type: ActivityInput });
+        // t.list.field('participants', { type: Activity });
+        // t.list.field('tags', { type: Tag });
+        // t.list.field('dependsOn', { type: Goal });
+        // t.list.field('blocks', { type: Goal });
+        // t.list.field('relatedTo', { type: Goal });
+        // t.list.field('connected', { type: Goal });
+    },
+});
+
+export const EstimateInput = inputObjectType({
+    name: 'EstimateInput',
+    definition(t) {
+        t.field(EstimateModel.y);
+        t.field(EstimateModel.q);
+        t.field(EstimateModel.date);
+    },
+});
+
+export const ActivityInput = inputObjectType({
+    name: 'ActivityInput',
+    definition(t) {
+        t.field(ActivityModel.id);
     },
 });
 

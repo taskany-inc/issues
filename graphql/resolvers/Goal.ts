@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg, intArg, booleanArg, list } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Goal, GoalInput, UserSession, GoalEstimate, computeUserFields, withComputedField } from '../types';
+import { Goal, GoalInput, UserSession, EstimateInput, computeUserFields, withComputedField } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -97,7 +97,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             ownerId: nonNull(stringArg()),
             stateId: stringArg(),
             user: nonNull(arg({ type: UserSession })),
-            estimate: arg({ type: GoalEstimate }),
+            estimate: arg({ type: EstimateInput }),
             tags: list(nonNull(stringArg())),
         },
         resolve: async (

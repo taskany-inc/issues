@@ -11,6 +11,10 @@ type Activity {
   user: User
 }
 
+input ActivityInput {
+  id: ID!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -19,6 +23,12 @@ scalar DateTime
 type Estimate {
   date: String!
   id: Int!
+  q: String!
+  y: String!
+}
+
+input EstimateInput {
+  date: String!
   q: String!
   y: String!
 }
@@ -63,34 +73,32 @@ type Goal {
   project: Project
   projectId: Int
   relatedTo: [Goal]
+  stargizers: [Activity]
   state: State
   stateId: String
   tags: [Tag]
   title: String!
   updatedAt: DateTime!
-}
-
-input GoalEstimate {
-  date: String!
-  q: String!
-  y: String!
+  watchers: [Activity]
 }
 
 input GoalInput {
   description: String
-  estimate: GoalEstimate
+  estimate: EstimateInput
   id: ID!
   key: Boolean
   ownerId: String
   personal: Boolean
   private: Boolean
   projectId: Int
+  star: Boolean
   stateId: String
   title: String
+  watch: Boolean
 }
 
 type Mutation {
-  createGoal(description: String!, estimate: GoalEstimate, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!, user: UserSession!): Goal
+  createGoal(description: String!, estimate: EstimateInput, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!, user: UserSession!): Goal
   createProject(description: String, flowId: String!, key: String!, ownerId: String!, title: String!, user: UserSession!): Project
   createTag(description: String, title: String!, user: UserSession!): Tag
   inviteUser(email: String!, user: UserSession!): Ghost
@@ -180,6 +188,7 @@ enum UserKind {
 }
 
 input UserSession {
+  activityId: String
   email: String!
   id: ID!
   image: String
