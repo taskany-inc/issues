@@ -84,7 +84,10 @@
       "Set owner": "Set owner",
       "Something went wrong 😿": "Something went wrong 😿",
       "We are updating the goal": "We are updating the goal...",
-      "Voila! Goal is up to date 🎉": "Voila! Goal is up to date 🎉"
+      "Voila! Goal is up to date 🎉": "Voila! Goal is up to date 🎉",
+      "Schedule": "Schedule",
+      "Date input mask placeholder": "mm/dd/yyyy",
+      "Date input mask": "99/99/9999"
     },
     "item": {
       "by": "by"

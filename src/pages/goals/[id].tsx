@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import useSWR, { unstable_serialize } from 'swr';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
@@ -9,7 +9,9 @@ import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 import { declarePage } from '../../utils/declarePage';
-import { Goal, UserAnyKind } from '../../../graphql/@generated/genql';
+import { estimatedMeta } from '../../utils/dateTime';
+import { nullable } from '../../utils/nullable';
+import { Goal, GoalEstimate, GoalInput, UserAnyKind } from '../../../graphql/@generated/genql';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
@@ -22,7 +24,9 @@ import { IssueStats } from '../../components/IssueStats';
 import { RelativeTime } from '../../components/RelativeTime';
 import { Md } from '../../components/Md';
 import { UserCompletion } from '../../components/UserCompletion';
+import { EstimateDropdown } from '../../components/EstimateDropdown';
 import { UserPic } from '../../components/UserPic';
+import { useMounted } from '../../hooks/useMounted';
 
 const refreshInterval = 3000;
 
@@ -38,6 +42,11 @@ const fetcher = createFetcher((_, id: string) => ({
             state: {
                 title: true,
                 hue: true,
+            },
+            estimate: {
+                date: true,
+                q: true,
+                y: true,
             },
             createdAt: true,
             updatedAt: true,
@@ -84,7 +93,7 @@ const StyledIssueTags = styled.span`
 
 const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
     <StyledIssueTags>
-        {tags?.map((t) => (t ? <Tag key={t.id} title={t.title} description={t.description} /> : null))}
+        {tags?.map((tag) => nullable(tag, (t) => <Tag key={t.id} title={t.title} description={t.description} />))}
     </StyledIssueTags>
 );
 
@@ -95,13 +104,7 @@ export const getServerSideProps = declareSsrProps(async ({ user, params: { id } 
 export default declarePage<{ goal: Goal }, { id: string }>(
     ({ user, locale, ssrData, params: { id } }) => {
         const t = useTranslations('goals.id');
-        const [mounted, setMounted] = useState(false);
-
-        useEffect(() => {
-            const lazySubsTimer = setTimeout(() => setMounted(true), refreshInterval);
-
-            return () => clearInterval(lazySubsTimer);
-        }, []);
+        const mounted = useMounted(refreshInterval);
 
         const { data } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
             fallback: {
@@ -110,23 +113,18 @@ export default declarePage<{ goal: Goal }, { id: string }>(
             refreshInterval,
         });
 
+        // this line is compensation for first render before delayed swr will bring updates
         const goal = data?.goal ?? ssrData.goal;
+
         const isUserAllowedToEdit = user?.id === goal?.computedIssuer?.id || user?.id === goal?.computedOwner?.id;
 
-        const [issueOwner, setIssueOwner] = useState(goal.computedOwner);
-        const issueOwnerName = issueOwner?.name || issueOwner?.email;
-        const onIssueOwnerChange = useCallback(
-            async (owner: UserAnyKind) => {
-                setIssueOwner(owner);
-
+        const triggerUpdate = useCallback(
+            (input: GoalInput) => {
                 const promise = gql.mutation({
                     updateGoal: [
                         {
                             user,
-                            data: {
-                                id: goal.id,
-                                ownerId: owner.activity?.id,
-                            },
+                            data: input,
                         },
                         {
                             id: true,
@@ -136,13 +134,42 @@ export default declarePage<{ goal: Goal }, { id: string }>(
 
                 toast.promise(promise, {
                     error: t('Something went wrong 😿'),
-                    loading: t('We are updating new goal'),
+                    loading: t('We are updating the goal'),
                     success: t('Voila! Goal is up to date 🎉'),
                 });
 
-                await promise;
+                return promise;
             },
-            [goal, t, user],
+            [user, t],
+        );
+
+        const [issueOwner, setIssueOwner] = useState(goal.computedOwner);
+        const issueOwnerName = issueOwner?.name || issueOwner?.email;
+        const onIssueOwnerChange = useCallback(
+            async (owner: UserAnyKind) => {
+                setIssueOwner(owner);
+
+                await triggerUpdate({
+                    id: goal.id,
+                    ownerId: owner.activity?.id,
+                });
+            },
+            [triggerUpdate, goal],
+        );
+
+        const [issueEstimate, setIssueEstimate] = useState<GoalEstimate | undefined>(
+            goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
+        );
+        const onIssueEstimateChange = useCallback(
+            async (estimate?: GoalEstimate) => {
+                setIssueEstimate(estimate);
+
+                await triggerUpdate({
+                    id: goal.id,
+                    estimate,
+                });
+            },
+            [triggerUpdate, goal],
         );
 
         const issuedBy = (
@@ -164,7 +191,9 @@ export default declarePage<{ goal: Goal }, { id: string }>(
                         <IssueTitle title={goal.title} project={goal.project} />
 
                         <IssueStats
-                            state={goal.state ? <State title={goal.state.title} hue={goal.state.hue} /> : null}
+                            state={nullable(goal.state, (s) => (
+                                <State title={s.title} hue={s.hue} />
+                            ))}
                             comments={0}
                             updatedAt={goal.updatedAt}
                         />
@@ -185,6 +214,16 @@ export default declarePage<{ goal: Goal }, { id: string }>(
                                 query={issueOwnerName}
                                 userPic={<UserPic src={issueOwner?.image} size={16} />}
                                 onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
+                            />
+
+                            <EstimateDropdown
+                                size="m"
+                                text={t('Schedule')}
+                                placeholder={t('Date input mask placeholder')}
+                                mask={t('Date input mask')}
+                                value={issueEstimate}
+                                defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
+                                onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
                             />
                         </CardActions>
                     </Card>
