@@ -15,8 +15,6 @@ import { TextStyle } from '../components/Text';
 import { NextPageWithAuth } from '../types/nextPageWithAuth';
 import { backgroundColor, toastBackgroundColor, toastTextColor } from '../design/@generated/themes';
 import { useHotkeys } from '../hooks/useHotkeys';
-import { ProjectCreateModal } from '../components/ProjectCreateModal';
-import { GoalCreateModal } from '../components/GoalCreateModal';
 import { UserInviteModal } from '../components/UserInviteModal';
 import { pageContext } from '../utils/pageContext';
 
@@ -87,8 +85,6 @@ const Root = ({ Component, pageProps }: { Component: NextPageWithAuth; pageProps
                         <Component {...pageProps} />
                     )}
 
-                    <ProjectCreateModal />
-                    <GoalCreateModal />
                     <UserInviteModal />
                 </pageContext.Provider>
             </GeistProvider>
