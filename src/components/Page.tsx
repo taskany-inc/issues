@@ -7,6 +7,8 @@ import { ExternalPageProps } from '../utils/declareSsrProps';
 
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { ProjectCreateModal } from './ProjectCreateModal';
+import { GoalCreateModal } from './GoalCreateModal';
 
 interface PageProps {
     locale: ExternalPageProps['locale'];
@@ -35,6 +37,8 @@ export const Page: React.FC<PageProps> = ({ title, locale, children }) => {
 
             <StyledContent>{children}</StyledContent>
 
+            <ProjectCreateModal />
+            <GoalCreateModal />
             <Footer />
         </pageContext.Provider>
     );
