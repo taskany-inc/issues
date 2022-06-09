@@ -20,7 +20,7 @@ export const GoalCreateModal = () => {
 
     return (
         <DialogModal visible={modalVisible} onClose={onModalClose}>
-            <GoalCreateForm onCreate={(slug) => slug && router.goal(slug)} />
+            <GoalCreateForm onCreate={(id) => id && router.goal(id)} />
         </DialogModal>
     );
 };

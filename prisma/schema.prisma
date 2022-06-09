@@ -142,9 +142,9 @@ model Project {
 
 model Estimate {
   id     Int     @id @default(autoincrement())
-  q      String?
-  y      String?
-  date   String?
+  q      String
+  y      String
+  date   String
   goal   Goal    @relation(fields: [goalId], references: [id])
   goalId String
 
