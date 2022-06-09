@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, useState } from 'react';
 import useSWR, { unstable_serialize } from 'swr';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
+import { Goal, EstimateInput, GoalInput, UserAnyKind } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 import { declarePage } from '../../utils/declarePage';
 import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
-import { Goal, EstimateInput, GoalInput, UserAnyKind } from '../../../graphql/@generated/genql';
+import { useMounted } from '../../hooks/useMounted';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
@@ -26,7 +27,9 @@ import { Md } from '../../components/Md';
 import { UserCompletion } from '../../components/UserCompletion';
 import { EstimateDropdown } from '../../components/EstimateDropdown';
 import { UserPic } from '../../components/UserPic';
-import { useMounted } from '../../hooks/useMounted';
+import { Button } from '../../components/Button';
+import { Icon } from '../../components/Icon';
+import { gapS } from '../../design/@generated/themes';
 
 const refreshInterval = 3000;
 
@@ -71,6 +74,12 @@ const fetcher = createFetcher((_, id: string) => ({
                 title: true,
                 description: true,
             },
+            watchers: {
+                id: true,
+            },
+            stargizers: {
+                id: true,
+            },
         },
     ],
 }));
@@ -85,7 +94,19 @@ const IssueContent = styled(PageContent)`
     grid-template-columns: 7fr 5fr;
 `;
 
-const StyledIssueInfo = styled.div``;
+const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
+    ${({ align }) => css`
+        justify-self: ${align};
+    `}
+`;
+
+const ActionButton = styled(Button)`
+    margin-right: ${gapS};
+`;
+
+const IssueAction = styled.div`
+    margin-right: ${gapS};
+`;
 
 const StyledIssueTags = styled.span`
     padding-left: 12px;
@@ -117,6 +138,10 @@ export default declarePage<{ goal: Goal }, { id: string }>(
         const goal = data?.goal ?? ssrData.goal;
 
         const isUserAllowedToEdit = user?.id === goal?.computedIssuer?.id || user?.id === goal?.computedOwner?.id;
+        // @ts-ignore unexpectable trouble with filter
+        const isUserWatcher = goal.watchers?.filter(({ id }) => id === user.activityId).length > 0;
+        // @ts-ignore unexpectable trouble with filter
+        const isUserStargizer = goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0;
 
         const triggerUpdate = useCallback(
             (input: GoalInput) => {
@@ -172,6 +197,20 @@ export default declarePage<{ goal: Goal }, { id: string }>(
             [triggerUpdate, goal],
         );
 
+        const onWatchToggle = useCallback(async () => {
+            await triggerUpdate({
+                id: goal.id,
+                watch: !isUserWatcher,
+            });
+        }, [triggerUpdate, goal, isUserWatcher]);
+
+        const onStarToggle = useCallback(async () => {
+            await triggerUpdate({
+                id: goal.id,
+                star: !isUserStargizer,
+            });
+        }, [triggerUpdate, goal, isUserStargizer]);
+
         const issuedBy = (
             <>
                 Issued by <Link inline>{goal.computedIssuer!.name}</Link>
@@ -183,7 +222,7 @@ export default declarePage<{ goal: Goal }, { id: string }>(
         return (
             <Page locale={locale} title={goal.title}>
                 <IssueHeader>
-                    <StyledIssueInfo>
+                    <StyledIssueInfo align="left">
                         <IssueKey id={goal.id}>
                             <IssueTags tags={goal.tags} />
                         </IssueKey>
@@ -198,6 +237,19 @@ export default declarePage<{ goal: Goal }, { id: string }>(
                             updatedAt={goal.updatedAt}
                         />
                     </StyledIssueInfo>
+
+                    <StyledIssueInfo align="right">
+                        <ActionButton
+                            text={isUserWatcher ? 'Unwatch' : 'Watch'}
+                            iconLeft={<Icon type={isUserWatcher ? 'eye' : 'eyeClosed'} size="s" />}
+                            onClick={onWatchToggle}
+                        />
+                        <ActionButton
+                            text={isUserStargizer ? 'Unstar' : 'Star'}
+                            iconLeft={<Icon type={isUserStargizer ? 'starFilled' : 'star'} size="s" />}
+                            onClick={onStarToggle}
+                        />
+                    </StyledIssueInfo>
                 </IssueHeader>
 
                 <PageSep />
@@ -207,24 +259,28 @@ export default declarePage<{ goal: Goal }, { id: string }>(
                         <Md>{goal.description}</Md>
 
                         <CardActions>
-                            <UserCompletion
-                                text={issueOwnerName}
-                                placeholder={t('Set owner')}
-                                title={t('Set owner')}
-                                query={issueOwnerName}
-                                userPic={<UserPic src={issueOwner?.image} size={16} />}
-                                onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
-                            />
+                            <IssueAction>
+                                <UserCompletion
+                                    text={issueOwnerName}
+                                    placeholder={t('Set owner')}
+                                    title={t('Set owner')}
+                                    query={issueOwnerName}
+                                    userPic={<UserPic src={issueOwner?.image} size={16} />}
+                                    onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
+                                />
+                            </IssueAction>
 
-                            <EstimateDropdown
-                                size="m"
-                                text={t('Schedule')}
-                                placeholder={t('Date input mask placeholder')}
-                                mask={t('Date input mask')}
-                                value={issueEstimate}
-                                defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
-                                onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
-                            />
+                            <IssueAction>
+                                <EstimateDropdown
+                                    size="m"
+                                    text={t('Schedule')}
+                                    placeholder={t('Date input mask placeholder')}
+                                    mask={t('Date input mask')}
+                                    value={issueEstimate}
+                                    defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
+                                    onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
+                                />
+                            </IssueAction>
                         </CardActions>
                     </Card>
                 </IssueContent>

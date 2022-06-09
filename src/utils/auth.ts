@@ -40,6 +40,7 @@ export const authOptions: NextAuthOptions = {
                     email: user.email,
                     image: user.image,
                     role: user.role,
+                    activityId: user.activityId,
                 };
             },
         }),
@@ -52,12 +53,20 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         // @ts-ignore — black magic of adding user data to session
         async session({ session, token, user }) {
+            const id = (session.user.id || token?.id || user.id) as string;
+            const dbUser = await prisma.user.findUnique({
+                where: {
+                    id,
+                },
+            });
+
             return {
                 ...session,
                 user: {
                     ...session.user,
-                    id: session.user.id || token?.id || user.id,
+                    id,
                     role: token?.role || user.role,
+                    activityId: dbUser?.activityId,
                 },
             };
         },
@@ -80,6 +89,7 @@ export const authOptions: NextAuthOptions = {
                       ...token,
                       id: user.id,
                       role: user.role,
+                      activityId: user.activityId,
                   }
                 : token;
         },
@@ -94,6 +104,7 @@ declare module 'next-auth' {
             email: string;
             image?: string | null;
             role: Role;
+            activityId: string;
         };
     }
 

@@ -25,6 +25,10 @@ const componentsMap = {
     search: dynamic(() => import('teenyicons/outline/search.svg')),
     gitFork: dynamic(() => import('teenyicons/outline/git-fork.svg')),
     message: dynamic(() => import('teenyicons/outline/message.svg')),
+    eye: dynamic(() => import('teenyicons/outline/eye.svg')),
+    eyeClosed: dynamic(() => import('teenyicons/outline/eye-closed.svg')),
+    star: dynamic(() => import('teenyicons/outline/star.svg')),
+    starFilled: dynamic(() => import('teenyicons/solid/star.svg')),
 };
 
 const sizesMap = {

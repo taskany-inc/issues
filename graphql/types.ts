@@ -38,6 +38,7 @@ export const UserSession = inputObjectType({
         t.field(UserModel.name);
         t.field(UserModel.image);
         t.field(UserModel.role);
+        t.string('activityId');
     },
 });
 
@@ -128,6 +129,8 @@ export const Goal = objectType({
         t.field('owner', { type: Activity });
         t.field(GoalModel.ownerId);
         t.list.field('participants', { type: Activity });
+        t.list.field('watchers', { type: Activity });
+        t.list.field('stargizers', { type: Activity });
         t.field(GoalModel.projectId);
         t.field('project', { type: Project });
         t.field(GoalModel.stateId);
@@ -200,8 +203,8 @@ export const GoalInput = inputObjectType({
         t.field(GoalModel.ownerId);
         t.field(GoalModel.projectId);
         t.field(GoalModel.stateId);
-        t.list.field('watchers', { type: ActivityInput });
-        t.list.field('stars', { type: ActivityInput });
+        t.boolean('watch');
+        t.boolean('star');
         // t.list.field('participants', { type: Activity });
         // t.list.field('tags', { type: Tag });
         // t.list.field('dependsOn', { type: Goal });
