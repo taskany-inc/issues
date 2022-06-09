@@ -6,8 +6,12 @@ import { SessionProvider } from 'next-auth/react';
 import { pageContext } from '../src/utils/pageContext';
 import { backgroundColor } from '../src/design/@generated/themes';
 import { GlobalStyle } from '../src/components/GlobalStyle';
-import { TextStyle } from '../src/components/Text';
 import { Theme } from '../src/components/Theme';
+import { TextStyle } from '../src/components/Text';
+
+
+import { NextIntlProvider } from 'next-intl';
+import en from '../i18n/en.json';
 
 export const parameters = {
     actions: { argTypesRegex: '^on[A-Z].*' },
@@ -51,23 +55,27 @@ export const decorators = [
         };
 
         const themeType = context.globals.theme;
+
         return (
             <SessionProvider session={session} refetchOnWindowFocus={true}>
-                <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
-                    <GeistProvider
-                        themes={[customGeistDarkTheme, customGeistLightTheme]}
-                        themeType={geistThemesMap[themeType]}
-                    >
-                        <GlobalStyle />
-                        <TextStyle />
+                <NextIntlProvider messages={en} locale="en">
 
-                        <Theme theme={themeType} />
+                    <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
+                        <GeistProvider
+                            themes={[customGeistDarkTheme, customGeistLightTheme]}
+                            themeType={geistThemesMap[themeType]}
+                        >
+                            <GlobalStyle />
+                            <TextStyle />
 
-                        <pageContext.Provider value={{ theme: themeType }}>
-                            <Story />
-                        </pageContext.Provider>
-                    </GeistProvider>
-                </ThemeProvider>
+                            <Theme theme={themeType} />
+
+                            <pageContext.Provider value={{ theme: themeType }}>
+                                <Story />
+                            </pageContext.Provider>
+                        </GeistProvider>
+                    </ThemeProvider>
+                </NextIntlProvider>
             </SessionProvider>
         );
     },
@@ -77,7 +85,7 @@ export const globalTypes = {
     theme: {
         name: 'Theme',
         description: 'Global theme for components',
-        defaultValue: 'light',
+        defaultValue: 'dark',
         toolbar: {
             icon: 'circlehollow',
             items: [

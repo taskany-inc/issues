@@ -23,6 +23,8 @@ const componentsMap = {
     flow: dynamic(() => import('teenyicons/outline/git-compare.svg')),
     tag: dynamic(() => import('teenyicons/outline/tag.svg')),
     search: dynamic(() => import('teenyicons/outline/search.svg')),
+    gitFork: dynamic(() => import('teenyicons/outline/git-fork.svg')),
+    message: dynamic(() => import('teenyicons/outline/message.svg')),
 };
 
 const sizesMap = {
