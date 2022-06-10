@@ -87,7 +87,11 @@
       "Voila! Goal is up to date 🎉": "Voila! Goal is up to date 🎉",
       "Schedule": "Schedule",
       "Date input mask placeholder": "mm/dd/yyyy",
-      "Date input mask": "99/99/9999"
+      "Date input mask": "99/99/9999",
+      "Watch": "Watch",
+      "Unwatch": "Unwatch",
+      "Star": "Star",
+      "Unstar": "Unstar"
     },
     "item": {
       "by": "by"

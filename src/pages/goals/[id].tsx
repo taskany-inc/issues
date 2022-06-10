@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, useState } from 'react';
-import useSWR, { unstable_serialize } from 'swr';
+import useSWR from 'swr';
 import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
@@ -17,7 +17,7 @@ import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
 import { State } from '../../components/State';
 import { Link } from '../../components/Link';
-import { Card, CardActions } from '../../components/Card';
+import { Card, CardInfo, CardContent, CardActions } from '../../components/Card';
 import { IssueTitle } from '../../components/IssueTitle';
 import { IssueKey } from '../../components/IssueKey';
 import { IssueStats } from '../../components/IssueStats';
@@ -217,14 +217,6 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         });
     }, [triggerUpdate, goal, stargizer]);
 
-    const issuedBy = (
-        <>
-            Issued by <Link inline>{goal.computedIssuer!.name}</Link>
-            {' — '}
-            <RelativeTime date={goal.createdAt} />
-        </>
-    );
-
     return (
         <Page locale={locale} title={goal.title}>
             <IssueHeader>
@@ -246,12 +238,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
                 <StyledIssueInfo align="right">
                     <ActionButton
-                        text={watcher ? 'Unwatch' : 'Watch'}
+                        text={t(watcher ? 'Unwatch' : 'Watch')}
                         iconLeft={<Icon type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
                         onClick={onWatchToggle}
                     />
                     <ActionButton
-                        text={stargizer ? 'Unstar' : 'Star'}
+                        text={t(stargizer ? 'Unstar' : 'Star')}
                         iconLeft={<Icon type={stargizer ? 'starFilled' : 'star'} size="s" />}
                         onClick={onStarToggle}
                     />
@@ -261,8 +253,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             <PageSep />
 
             <IssueContent>
-                <Card info={issuedBy}>
-                    <Md>{goal.description}</Md>
+                <Card>
+                    <CardInfo>
+                        <Link inline>{goal.computedIssuer!.name}</Link> <RelativeTime date={goal.createdAt} />
+                    </CardInfo>
+
+                    <CardContent>
+                        <Md>{goal.description}</Md>
+                    </CardContent>
 
                     <CardActions>
                         <IssueAction>

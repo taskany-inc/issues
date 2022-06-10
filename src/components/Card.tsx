@@ -4,12 +4,7 @@ import { gray4, gray8 } from '../design/@generated/themes';
 
 import { Text } from './Text';
 
-interface CardProps {
-    info?: React.ReactNode;
-    addons?: React.ReactNode;
-}
-
-const StyledCard = styled.div`
+export const Card = styled.div`
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
@@ -18,7 +13,7 @@ const StyledCard = styled.div`
     min-height: 180px;
 `;
 
-const StyledCardContent = styled.div`
+export const CardContent = styled.div`
     box-sizing: border-box;
     padding: 12px 14px;
 `;
@@ -28,6 +23,14 @@ const StyledCardInfo = styled.div`
     padding: 4px 14px;
     background-color: ${gray4};
 `;
+
+export const CardInfo: React.FC = ({ children }) => (
+    <StyledCardInfo>
+        <Text size="xs" weight="bold" color={gray8}>
+            {children}
+        </Text>
+    </StyledCardInfo>
+);
 
 export const CardActions = styled.div`
     box-sizing: border-box;
@@ -40,18 +43,3 @@ export const CardActions = styled.div`
     display: flex;
     align-items: center;
 `;
-
-export const Card: React.FC<CardProps> = ({ info, children }) => {
-    return (
-        <StyledCard>
-            {info ? (
-                <StyledCardInfo>
-                    <Text size="xs" weight="bold" color={gray8}>
-                        {info}
-                    </Text>
-                </StyledCardInfo>
-            ) : null}
-            <StyledCardContent>{children}</StyledCardContent>
-        </StyledCard>
-    );
-};
