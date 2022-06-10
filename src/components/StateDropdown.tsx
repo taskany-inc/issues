@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
@@ -8,6 +7,7 @@ import { gray6, gray7, gray8 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { State } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
@@ -112,24 +112,18 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
         [onClick],
     );
 
-    const { bindings: onESC } = useKeyboard(
-        () => {
-            popupVisible && setPopupVisibility(false);
-        },
-        [KeyCode.Escape],
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => popupVisible && setPopupVisibility(false), {
+        stopPropagation: true,
+    });
 
-    const { bindings: onENTER } = useKeyboard(
+    const [onENTER] = useKeyboard(
+        [KeyCode.Enter],
         () => {
             if (data?.flow?.states?.length) {
                 onItemClick(data?.flow?.states[cursor])();
                 popupRef.current?.focus();
             }
         },
-        [KeyCode.Enter],
         {
             stopPropagation: true,
         },

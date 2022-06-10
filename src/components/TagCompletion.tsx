@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
@@ -10,6 +9,7 @@ import { gray6, gray7, gray8 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { gql } from '../utils/gql';
 
 import { Popup } from './Popup';
@@ -152,18 +152,19 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
         setInputState(e.target.value);
     }, []);
 
-    const { bindings: onESC } = useKeyboard(
+    const [onESC] = useKeyboard(
+        [KeyCode.Escape],
         () => {
             popupVisible && setPopupVisibility(false);
             setEditMode(false);
         },
-        [KeyCode.Escape],
         {
             stopPropagation: true,
         },
     );
 
-    const { bindings: onENTER } = useKeyboard(
+    const [onENTER] = useKeyboard(
+        [KeyCode.Enter],
         () => {
             if (data?.tagCompletion?.length) {
                 onItemClick(data?.tagCompletion[cursor])();
@@ -172,7 +173,6 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                 setEditMode(false);
             }
         },
-        [KeyCode.Enter],
         {
             stopPropagation: true,
         },

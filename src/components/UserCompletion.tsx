@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
@@ -8,6 +7,7 @@ import { gray6, gray7, gray8, textColor } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { UserAnyKind } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
@@ -153,25 +153,25 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
         [onClick],
     );
 
-    const { bindings: onESC } = useKeyboard(
+    const [onESC] = useKeyboard(
+        [KeyCode.Escape],
         () => {
             popupVisible && setPopupVisibility(false);
             setEditMode(false);
         },
-        [KeyCode.Escape],
         {
             stopPropagation: true,
         },
     );
 
-    const { bindings: onENTER } = useKeyboard(
+    const [onENTER] = useKeyboard(
+        [KeyCode.Enter],
         () => {
             if (data?.findUserAnyKind?.length) {
                 onUserCardClick(data?.findUserAnyKind[cursor])();
                 popupRef.current?.focus();
             }
         },
-        [KeyCode.Enter],
         {
             stopPropagation: true,
         },

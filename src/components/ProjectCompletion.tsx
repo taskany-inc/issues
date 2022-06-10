@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
@@ -8,6 +7,7 @@ import { gray6, gray7, gray8 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
+import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
@@ -136,25 +136,25 @@ export const ProjectCompletion: React.FC<ProjectCompletionProps> = ({
         setInputState(e.target.value);
     }, []);
 
-    const { bindings: onESC } = useKeyboard(
+    const [onESC] = useKeyboard(
+        [KeyCode.Escape],
         () => {
             popupVisible && setPopupVisibility(false);
             setEditMode(false);
         },
-        [KeyCode.Escape],
         {
             stopPropagation: true,
         },
     );
 
-    const { bindings: onENTER } = useKeyboard(
+    const [onENTER] = useKeyboard(
+        [KeyCode.Enter],
         () => {
             if (data?.projectCompletion?.length) {
                 onProjectCardClick(data?.projectCompletion[cursor] as Project)();
                 popupRef.current?.focus();
             }
         },
-        [KeyCode.Enter],
         {
             stopPropagation: true,
         },
