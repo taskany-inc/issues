@@ -6,7 +6,7 @@ const themes = {
     light: dynamic(() => import('../design/@generated/themes/light')),
 };
 
-export const Theme: React.FC<{ theme: keyof typeof themes }> = ({ theme }) => {
+export const Theme: React.FC<{ theme: keyof typeof themes }> = ({ theme = 'dark' }) => {
     const ThemeComponent = themes[theme];
 
     return <ThemeComponent />;

@@ -51,11 +51,8 @@ export default createGlobalStyle`
         --danger10: hsl(360, 90%, 63%);
         --form-input-background-color: rgba(0, 0, 0, .35);
         --form-input-error-color: #e00;
-        --toast-text-color: #fff;
-        --toast-background-color: rgba(0, 0, 0, .2);
         --popup-danger-background-color: #e00;
         --popup-warning-background-color: #f5a623;
-        --accent-icon-color: #ffed00;
         --link-text-color: #00C2FF;
     }
 `;
