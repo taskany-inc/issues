@@ -89,7 +89,8 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ card, onCreate }
             <FormActions flat="top">
                 <FormAction left />
                 <FormAction right inline>
-                    <Button size="l" view="primary" type="submit" disabled={!isValid} text={t('Send invite')} />
+                    {/* @ts-ignore FIXME: https://github.com/taskany-inc/issues/issues/25  */}
+                    <Button size="l" view="primary-outline" type="submit" disabled={!isValid} text={t('Send invite')} />
                 </FormAction>
             </FormActions>
         </Form>

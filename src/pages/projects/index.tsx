@@ -7,40 +7,43 @@ import { useTranslations } from 'next-intl';
 import { createFetcher } from '../../utils/createFetcher';
 import { Header } from '../../components/Header';
 
+// @ts-ignore FIXME: https://github.com/taskany-inc/issues/issues/25
 const fetcher = createFetcher(() => ({
-    projects: {
-        id: true,
-        title: true,
-        description: true,
-        // owner: {
-        //     id: true,
-        //     name: true,
-        //     email: true,
-        // },
-        created_at: true,
-    },
+    // projects: {
+    //     id: true,
+    //     title: true,
+    //     description: true,
+    //     // owner: {
+    //     //     id: true,
+    //     //     name: true,
+    //     //     email: true,
+    //     // },
+    //     created_at: true,
+    // },
 }));
 
 const Page = () => {
-    const { data: session } = useSession();
-    const { data, error } = useSWR('teams', fetcher());
-    const t = useTranslations('index');
+    // const { data: session } = useSession();
+    // // @ts-ignore
+    // const { data, error } = useSWR('teams', fetcher());
+    // const t = useTranslations('index');
 
-    return (
-        <>
-            <Head>
-                <title>{t('title')}</title>
-            </Head>
+    return null;
+    //         <>
+    //             <Head>
+    //                 <title>{t('title')}</title>
+    //             </Head>
 
-            <Header />
+    //             <Header />
 
-            {data?.projects ? (
-                <div>
-                    {data?.projects && data.projects.map((team) => <div key={team.id}>{JSON.stringify(team)}</div>)}
-                </div>
-            ) : null}
-        </>
-    );
+    //             {data?.projects ? (
+    //                 <div>
+    //                     {/*
+    //  // @ts-ignore */}
+    //                 {data?.projects && data.projects.map((team) => <div key={team.id}>{JSON.stringify(team)}</div>)}
+    //                 </div>
+    //             ) : null}
+    //         </>
 };
 
 Page.auth = true;
