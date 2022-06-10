@@ -12,6 +12,7 @@ import { Icon } from './Icon';
 interface ModalProps {
     visible: boolean;
     onClose?: () => void;
+    width?: number;
 }
 
 const StyledModalSurface = styled.div`
@@ -33,10 +34,10 @@ const StyledModalSurface = styled.div`
 `;
 
 const StyledModal = styled.div`
+    box-sizing: border-box;
     position: absolute;
     z-index: 101;
 
-    display: flex;
     padding: 20px;
 
     min-width: 300px;
@@ -65,7 +66,7 @@ const StyledCross = styled.div`
 
 const Portal: React.FC<{ id: string }> = ({ id, children }) => createPortal(children, usePortal(id));
 
-export const Modal: React.FC<ModalProps> = ({ visible, onClose, children }) => {
+export const Modal: React.FC<ModalProps> = ({ visible, onClose, children, width = 800 }) => {
     const [onESC] = useKeyboard([KeyCode.Escape], () => onClose && onClose(), {
         stopPropagation: true,
     });
@@ -83,7 +84,7 @@ export const Modal: React.FC<ModalProps> = ({ visible, onClose, children }) => {
     return nullable(visible, () => (
         <Portal id="modal">
             <StyledModalSurface>
-                <StyledModal {...onESC}>
+                <StyledModal style={{ width: `${width}px` }} {...onESC}>
                     <StyledCross onClick={onClose}>
                         <Icon type="cross" size="s" />
                     </StyledCross>
