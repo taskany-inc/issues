@@ -3,7 +3,7 @@ import React from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { formInputBackgroundColor, textColorPrimary } from '../design/@generated/themes';
+import { gray3, textColor } from '../design/@generated/themes';
 
 interface FormTextareaProps {
     id?: string;
@@ -30,15 +30,14 @@ const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea 
     outline: none;
     border: 0;
     border-radius: 4px;
-    background-color: ${formInputBackgroundColor};
-    color: ${textColorPrimary};
+    background-color: ${gray3};
+    color: ${textColor};
     font-weight: 600;
     font-size: 16px;
     padding: 8px 16px;
     width: 100%;
     min-height: 200px;
     resize: none;
-    margin-bottom: -6px; // WTF?
 
     ${({ flat }) =>
         flat === 'top' &&

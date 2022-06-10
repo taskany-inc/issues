@@ -1,12 +1,12 @@
 import styled, { css } from 'styled-components';
 
-import { formInputBackgroundColor, textColorPrimary } from '../design/@generated/themes';
+import { gray3, textColor } from '../design/@generated/themes';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ flat?: 'top' | 'bottom' }>`
     border-radius: 4px;
-    background-color: ${formInputBackgroundColor};
-    color: ${textColorPrimary};
+    background-color: ${gray3};
+    color: ${textColor};
 
     padding: 8px 10px 12px 10px;
 
