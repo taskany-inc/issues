@@ -211,7 +211,7 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
                     size={size}
                     view={view}
                     text={buttonText}
-                    iconLeft={<Icon type={iconType} size="xs" color={iconColor} />}
+                    iconLeft={<Icon noWrap type={iconType} size="xs" color={iconColor} />}
                     onClick={onButtonClick}
                 />
             </StyledDropdownContainer>
