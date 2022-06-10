@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
@@ -91,32 +91,30 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
-    const [editMode, setEditMode] = useState(false);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
     const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
 
-    const onClickOutside = () => {
-        setEditMode(false);
+    const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
-    };
+    }, []);
 
-    const onButtonClick = () => {
-        setEditMode(true);
+    const onButtonClick = useCallback(() => {
         setPopupVisibility(true);
-    };
+    }, []);
 
-    const onItemClick = (state: State) => () => {
-        setEditMode(false);
-        setPopupVisibility(false);
-        onClick && onClick(state);
-    };
+    const onItemClick = useCallback(
+        (state: State) => () => {
+            setPopupVisibility(false);
+            onClick && onClick(state);
+        },
+        [onClick],
+    );
 
     const { bindings: onESC } = useKeyboard(
         () => {
             popupVisible && setPopupVisibility(false);
-            setEditMode(false);
         },
         [KeyCode.Escape],
         {

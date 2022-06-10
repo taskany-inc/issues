@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
+import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
@@ -12,6 +12,7 @@ import { useKeyPress } from '../hooks/useKeyPress';
 import { Button } from './Button';
 import { Popup } from './Popup';
 import { UserPic } from './UserPic';
+import { Input } from './Input';
 
 interface UserCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -120,32 +121,37 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const { state: inputState, setState: setInputState, reset: inputReset, bindings: onInput } = useInput(query);
+    const [inputState, setInputState] = useState(query);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
 
-    const onClickOutside = () => {
+    const onClickOutside = useCallback(() => {
         setEditMode(false);
         setPopupVisibility(false);
-        inputReset();
-    };
+        setInputState(query);
+    }, [query]);
 
-    const onButtonClick = () => {
+    const onButtonClick = useCallback(() => {
         setEditMode(true);
         setPopupVisibility(true);
-    };
+    }, []);
 
-    const onInputBlur = () => {};
+    const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputState(e.target.value);
+    }, []);
 
     const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
 
-    const onUserCardClick = (user: UserAnyKind) => () => {
-        setEditMode(false);
-        setPopupVisibility(false);
-        onClick && onClick(user);
-        setInputState(user.name || user.email || '');
-    };
+    const onUserCardClick = useCallback(
+        (user: UserAnyKind) => () => {
+            setEditMode(false);
+            setPopupVisibility(false);
+            onClick && onClick(user);
+            setInputState(user.name || user.email || '');
+        },
+        [onClick],
+    );
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -190,12 +196,10 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
             <StyledDropdownContainer ref={popupRef} {...onESC}>
                 {editMode ? (
                     <Input
-                        placeholder={placeholder}
-                        scale={0.8}
                         autoFocus
-                        icon={userPic}
-                        onBlur={onInputBlur}
-                        {...onInput}
+                        placeholder={placeholder}
+                        value={inputState}
+                        onChange={onInputChange}
                         {...onENTER}
                     />
                 ) : (

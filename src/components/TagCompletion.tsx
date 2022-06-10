@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
+import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
@@ -15,6 +15,7 @@ import { gql } from '../utils/gql';
 import { Popup } from './Popup';
 import { Icon } from './Icon';
 import { Tag } from './Tag';
+import { Input } from './Input';
 
 interface TagCompletionProps {
     filter?: string[];
@@ -114,7 +115,7 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const { state: inputState, reset: inputReset, bindings: inputBingings } = useInput('');
+    const [inputState, setInputState] = useState('');
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
@@ -125,8 +126,8 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
     const onClickOutside = useCallback(() => {
         setEditMode(false);
         setPopupVisibility(false);
-        inputReset();
-    }, [inputReset]);
+        setInputState('');
+    }, []);
 
     const onButtonClick = useCallback(() => {
         setEditMode(true);
@@ -138,18 +139,18 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
         }
     }, [popupVisible]);
 
-    const onItemClick = (tag: TagModel) => () => {
-        onClick && onClick(tag);
-        inputReset();
-    };
-
-    const onInputChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            setPopupVisibility(Boolean(e.target.value));
-            inputBingings.onChange(e);
+    const onItemClick = useCallback(
+        (tag: TagModel) => () => {
+            onClick && onClick(tag);
+            setInputState('');
         },
-        [inputBingings],
+        [onClick],
     );
+
+    const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setPopupVisibility(Boolean(e.target.value));
+        setInputState(e.target.value);
+    }, []);
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -225,16 +226,9 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
             <StyledDropdownContainer ref={popupRef} {...onESC}>
                 {editMode ? (
                     <Input
-                        placeholder={placeholder}
-                        scale={0.8}
                         autoFocus
-                        icon={
-                            // FIXME: https://github.com/taskany-inc/goals/issues/14
-                            <span style={{ display: 'inline-block', position: 'relative', top: '1px' }}>
-                                <Icon type="tag" size="xs" />
-                            </span>
-                        }
-                        {...inputBingings}
+                        placeholder={placeholder}
+                        value={inputState}
                         onBlur={onInputBlur}
                         onChange={onInputChange}
                         {...onENTER}
