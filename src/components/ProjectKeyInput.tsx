@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { useKeyboard, KeyCode } from '@geist-ui/core';
+
+import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Button } from './Button';
 import { Input } from './Input';
@@ -27,12 +28,12 @@ export const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
     const [editMode, setEditMode] = useState(false);
     const [inputState, setInputState] = useState(value);
 
-    const { bindings: onENTER } = useKeyboard(
+    const [onENTER] = useKeyboard(
+        [KeyCode.Enter],
         () => {
             setEditMode(false);
             onBlur && onBlur(inputState);
         },
-        [KeyCode.Enter],
         {
             stopPropagation: true,
         },

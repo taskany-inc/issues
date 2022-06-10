@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useKeyboard, KeyCode } from '@geist-ui/core';
 import InputMask from 'react-input-mask';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
 import { colorPrimary, danger8, danger9, gray6, textColor } from '../design/@generated/themes';
 import { createLocaleDate, quarterFromDate, yearFromDate, endOfQuarter } from '../utils/dateTime';
 import { is } from '../utils/styles';
+import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
@@ -135,11 +135,11 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
         setInputState(e.target.value);
     }, []);
 
-    const { bindings: onESC } = useKeyboard(
+    const [onESC] = useKeyboard(
+        [KeyCode.Escape],
         () => {
             popupVisible && setPopupVisibility(false);
         },
-        [KeyCode.Escape],
         {
             stopPropagation: true,
         },

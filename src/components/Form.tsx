@@ -1,5 +1,6 @@
-import { KeyCode, KeyMod, useKeyboard } from '@geist-ui/core';
 import styled from 'styled-components';
+
+import { KeyCode, KeyMod, useKeyboard } from '../hooks/useKeyboard';
 
 interface FormProps {
     onSubmit?: () => void;
@@ -14,12 +15,12 @@ export const Form: React.FC<FormProps> = ({ onSubmit, children }) => {
         if (onSubmit) onSubmit();
     };
 
-    const { bindings: keyboardBindings } = useKeyboard(() => handleSubmit(), [KeyMod.CtrlCmd, KeyCode.Enter], {
+    const [keyboard] = useKeyboard([KeyMod.CtrlCmd, KeyCode.Enter], () => handleSubmit(), {
         disableGlobalEvent: true,
     });
 
     return (
-        <StyledFormContainer {...keyboardBindings}>
+        <StyledFormContainer {...keyboard}>
             <form onSubmit={handleSubmit}>{children}</form>
         </StyledFormContainer>
     );
