@@ -8,6 +8,7 @@ function Page() {
     const t = useTranslations('users.invite');
 
     return (
+        // @ts-ignore FIXME: https://github.com/taskany-inc/issues/issues/25
         <DialogPage title={t('title')} heading={t('Invite new user')}>
             <UserInviteForm card />
         </DialogPage>
