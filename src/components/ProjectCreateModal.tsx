@@ -5,7 +5,7 @@ import tinykeys from 'tinykeys';
 import { routes, useRouter } from '../hooks/router';
 import { createProjectKeys, createHotkeys } from '../utils/hotkeys';
 
-import { DialogModal } from './DialogModal';
+import { Modal } from './Modal';
 import { ProjectCreateForm } from './ProjectCreateForm';
 
 export const ProjectCreateModal = () => {
@@ -21,8 +21,8 @@ export const ProjectCreateModal = () => {
     );
 
     return (
-        <DialogModal visible={modalVisible} onClose={onModalClose}>
+        <Modal visible={modalVisible} onClose={onModalClose}>
             <ProjectCreateForm onCreate={(key) => key && router.project(key)} />
-        </DialogModal>
+        </Modal>
     );
 };
