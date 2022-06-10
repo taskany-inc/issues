@@ -87,7 +87,11 @@
       "Voila! Goal is up to date 🎉": "Ура! Цель обновлена 🎉",
       "Schedule": "Срок",
       "Date input mask placeholder": "dd.mm.yyyy",
-      "Date input mask": "99.99.9999"
+      "Date input mask": "99.99.9999",
+      "Watch": "Следить",
+      "Unwatch": "Отписаться",
+      "Star": "В избранное",
+      "Unstar": "Избранное"
     },
     "item": {
       "by": ""
