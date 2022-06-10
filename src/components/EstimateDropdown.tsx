@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
+import { useKeyboard, KeyCode } from '@geist-ui/core';
 import InputMask from 'react-input-mask';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
@@ -11,6 +11,7 @@ import { is } from '../utils/styles';
 import { Button } from './Button';
 import { Popup } from './Popup';
 import { Icon } from './Icon';
+import { Input } from './Input';
 
 interface EstimateDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -105,11 +106,7 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
-    const {
-        state: inputState,
-        setState: setInputState,
-        bindings: onInput,
-    } = useInput(value?.date || defaultValuePlaceholder?.date || '');
+    const [inputState, setInputState] = useState(value?.date || defaultValuePlaceholder?.date || '');
     const [selectedQ, setSelectedQ] = useState(value?.q || defaultValuePlaceholder?.q);
     const [changed, setChanged] = useState(false);
     const [buttonText, setButtonText] = useState(text);
@@ -133,13 +130,10 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
         [inputState, setInputState],
     );
 
-    const onInputChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            setChanged(true);
-            onInput.onChange(e);
-        },
-        [onInput],
-    );
+    const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setChanged(true);
+        setInputState(e.target.value);
+    }, []);
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -230,16 +224,9 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
                 <div {...onESC}>
                     <StyledButtonsContainer>{['Q1', 'Q2', 'Q3', 'Q4'].map(renderQButton)}</StyledButtonsContainer>
 
-                    <InputMask mask={mask} maskPlaceholder={null} {...{ ...onInput, onChange: onInputChange }}>
+                    <InputMask mask={mask} maskPlaceholder={null} onChange={onInputChange} value={inputState}>
                         {(props: { value: string; onChange: () => void }) => (
-                            <Input
-                                placeholder={placeholder}
-                                scale={0.78}
-                                width="100%"
-                                autoFocus
-                                value={props.value}
-                                onChange={props.onChange}
-                            />
+                            <Input autoFocus placeholder={placeholder} value={props.value} onChange={props.onChange} />
                         )}
                     </InputMask>
                 </div>

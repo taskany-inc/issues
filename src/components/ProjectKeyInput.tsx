@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
+import { useKeyboard, KeyCode } from '@geist-ui/core';
 
 import { Button } from './Button';
+import { Input } from './Input';
 
 interface ProjectKeyInputProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -24,7 +25,7 @@ export const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
     placeholder,
 }) => {
     const [editMode, setEditMode] = useState(false);
-    const { state: inputState, setState: setInputState } = useInput(value);
+    const [inputState, setInputState] = useState(value);
 
     const { bindings: onENTER } = useKeyboard(
         () => {
@@ -46,20 +47,19 @@ export const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
         [setInputState, onChange],
     );
 
-    const onButtonClick = () => setEditMode(true);
-    const onInputBlur = () => {
+    const onButtonClick = useCallback(() => setEditMode(true), []);
+    const onInputBlur = useCallback(() => {
         setEditMode(false);
         onBlur && onBlur(inputState);
-    };
+    }, [onBlur, inputState]);
 
     return (
         <>
             <StyledContainer>
                 {editMode ? (
                     <Input
-                        placeholder={placeholder}
-                        scale={0.78}
                         autoFocus
+                        placeholder={placeholder}
                         value={value}
                         onChange={onInputChange}
                         onBlur={onInputBlur}

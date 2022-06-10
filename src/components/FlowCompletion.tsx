@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Input, useInput, useKeyboard, KeyCode } from '@geist-ui/core';
+import { useKeyboard, KeyCode } from '@geist-ui/core';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
@@ -12,6 +12,7 @@ import { useKeyPress } from '../hooks/useKeyPress';
 import { Button } from './Button';
 import { Popup } from './Popup';
 import { Icon } from './Icon';
+import { Input } from './Input';
 
 interface FlowCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -102,29 +103,36 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const { state: inputState, setState: setInputState, reset: inputReset, bindings: onInput } = useInput(query);
+    const [inputState, setInputState] = useState(query);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
     const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
 
-    const onClickOutside = () => {
+    const onClickOutside = useCallback(() => {
         setEditMode(false);
         setPopupVisibility(false);
-        inputReset();
-    };
+        setInputState(query);
+    }, [query]);
 
-    const onButtonClick = () => {
+    const onButtonClick = useCallback(() => {
         setEditMode(true);
         setPopupVisibility(true);
-    };
+    }, []);
 
-    const onItemClick = (flow: Flow) => () => {
-        setEditMode(false);
-        setPopupVisibility(false);
-        onClick && onClick(flow);
-        setInputState(flow.title);
-    };
+    const onItemClick = useCallback(
+        (flow: Flow) => () => {
+            setEditMode(false);
+            setPopupVisibility(false);
+            onClick && onClick(flow);
+            setInputState(flow.title);
+        },
+        [onClick],
+    );
+
+    const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputState(e.target.value);
+    }, []);
 
     const { bindings: onESC } = useKeyboard(
         () => {
@@ -168,7 +176,13 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
         <>
             <StyledDropdownContainer ref={popupRef} {...onESC}>
                 {editMode ? (
-                    <Input placeholder={placeholder} scale={0.8} autoFocus {...onInput} {...onENTER} />
+                    <Input
+                        autoFocus
+                        placeholder={placeholder}
+                        value={inputState}
+                        onChange={onInputChange}
+                        {...onENTER}
+                    />
                 ) : (
                     <Button
                         ref={buttonRef}
