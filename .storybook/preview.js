@@ -1,14 +1,11 @@
 import React from 'react';
-import { GeistProvider, Themes } from '@geist-ui/core';
 import { ThemeProvider } from 'next-themes';
 import { SessionProvider } from 'next-auth/react';
 
 import { pageContext } from '../src/utils/pageContext';
-import { backgroundColor } from '../src/design/@generated/themes';
 import { GlobalStyle } from '../src/components/GlobalStyle';
 import { Theme } from '../src/components/Theme';
 import { TextStyle } from '../src/components/Text';
-
 
 import { NextIntlProvider } from 'next-intl';
 import en from '../i18n/en.json';
@@ -25,25 +22,6 @@ export const parameters = {
 
 export const decorators = [
     (Story, context) => {
-        const customGeistDarkTheme = Themes.createFromDark({
-            type: 'custom-dark',
-            palette: {
-                background: backgroundColor,
-            },
-        });
-
-        const customGeistLightTheme = Themes.createFromLight({
-            type: 'custom-light',
-            palette: {
-                background: backgroundColor,
-            },
-        });
-
-        const geistThemesMap = {
-            dark: 'custom-dark',
-            light: 'custom-light',
-        };
-
         const session = {
             user: {
                 id: 'example_id',
@@ -59,21 +37,14 @@ export const decorators = [
         return (
             <SessionProvider session={session} refetchOnWindowFocus={true}>
                 <NextIntlProvider messages={en} locale="en">
-
                     <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
-                        <GeistProvider
-                            themes={[customGeistDarkTheme, customGeistLightTheme]}
-                            themeType={geistThemesMap[themeType]}
-                        >
-                            <GlobalStyle />
-                            <TextStyle />
+                        <GlobalStyle />
+                        <TextStyle />
+                        <Theme theme={themeType} />
 
-                            <Theme theme={themeType} />
-
-                            <pageContext.Provider value={{ theme: themeType }}>
-                                <Story />
-                            </pageContext.Provider>
-                        </GeistProvider>
+                        <pageContext.Provider value={{ theme: themeType, locale: 'en' }}>
+                            <Story />
+                        </pageContext.Provider>
                     </ThemeProvider>
                 </NextIntlProvider>
             </SessionProvider>

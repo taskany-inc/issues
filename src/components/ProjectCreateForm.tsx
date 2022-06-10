@@ -9,7 +9,7 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 
 import { gql } from '../utils/gql';
-import { accentIconColor } from '../design/@generated/themes';
+import { gray10 } from '../design/@generated/themes';
 import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
@@ -204,7 +204,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
     return (
         <>
             {card ? <FormCard style={{ maxWidth: '800px' }}>{formContent}</FormCard> : formContent}
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={accentIconColor} />}>
+            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                 {t.rich('Press key to create the project', {
                     key: () => <Keyboard command enter />,
                 })}

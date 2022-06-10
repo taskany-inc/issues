@@ -1,10 +1,17 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
+import { useTheme } from 'next-themes';
+import { Toaster } from 'react-hot-toast';
 
+import { gray4, textColor } from '../design/@generated/themes';
 import { pageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/declareSsrProps';
+import { useHotkeys } from '../hooks/useHotkeys';
 
+import { Theme } from './Theme';
+import { GlobalStyle } from './GlobalStyle';
+import { TextStyle } from './Text';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { ProjectCreateModal } from './ProjectCreateModal';
@@ -26,13 +33,26 @@ export const PageContent = styled.div`
 `;
 
 export const Page: React.FC<PageProps> = ({ title, locale, children }) => {
-    const ctx = useContext(pageContext);
+    useHotkeys();
+
+    const { theme } = useTheme();
 
     return (
-        <pageContext.Provider value={{ ...ctx, locale }}>
+        <pageContext.Provider value={{ theme, locale }}>
             <Head>
                 <title>{title}</title>
             </Head>
+
+            <GlobalStyle />
+            <TextStyle />
+            <Theme theme={theme} />
+
+            <Toaster
+                toastOptions={{
+                    style: { borderRadius: '6px', background: gray4, color: textColor },
+                }}
+                position="bottom-center"
+            />
 
             <Header />
 

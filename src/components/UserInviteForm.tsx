@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import z from 'zod';
 
 import { gql } from '../utils/gql';
-import { accentIconColor } from '../design/@generated/themes';
+import { gray10 } from '../design/@generated/themes';
 
 import { Card } from './Card';
 import { Icon } from './Icon';
@@ -99,7 +99,7 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ card, onCreate }
     return (
         <>
             {card ? <Card style={{ maxWidth: '800px' }}>{formContent}</Card> : formContent}
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={accentIconColor} />}>
+            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                 {t.rich('Press key to send invite', {
                     key: () => <Keyboard command enter />,
                 })}
