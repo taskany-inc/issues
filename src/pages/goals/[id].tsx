@@ -239,12 +239,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                 <StyledIssueInfo align="right">
                     <ActionButton
                         text={t(watcher ? 'Unwatch' : 'Watch')}
-                        iconLeft={<Icon type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
+                        iconLeft={<Icon noWrap type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
                         onClick={onWatchToggle}
                     />
                     <ActionButton
                         text={t(stargizer ? 'Unstar' : 'Star')}
-                        iconLeft={<Icon type={stargizer ? 'starFilled' : 'star'} size="s" />}
+                        iconLeft={<Icon noWrap type={stargizer ? 'starFilled' : 'star'} size="s" />}
                         onClick={onStarToggle}
                     />
                 </StyledIssueInfo>

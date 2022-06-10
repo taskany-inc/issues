@@ -46,6 +46,7 @@ interface ButtonProps {
 const StyledIcon = styled.span`
     display: flex;
     align-items: center;
+    align-self: baseline;
 `;
 const StyledText = styled.span``;
 
@@ -182,18 +183,18 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
     ${is(
         { size: 'm' },
         css`
-            padding: 7px 16px;
+            padding: 5px 16px;
 
-            font-size: 14px;
+            font-size: 13px;
 
             ${StyledIcon} {
-                width: 16px;
-                height: 16px;
+                width: 15px;
+                height: 15px;
             }
 
             ${StyledIcon} + ${StyledText},
             ${StyledText} + ${StyledIcon} {
-                padding-left: 6px;
+                padding-left: 8px;
             }
         `,
     )}
@@ -202,7 +203,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
         size === 'm' &&
         (iconRight || iconLeft) &&
         css`
-            padding: 7px 10px;
+            padding: 5px 10px;
         `}
 
     ${is(
