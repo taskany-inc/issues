@@ -43,7 +43,8 @@ interface TextProps {
     color?: string;
 }
 
-export const Text = styled.div<TextProps>`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const Text: React.FC<TextProps> = styled(({ color, weight, size, ...props }: TextProps) => <div {...props} />)`
     font-size: 16px;
     font-family: ${fontDisplay};
     color: ${textColor};
@@ -59,7 +60,7 @@ export const Text = styled.div<TextProps>`
     ${({ weight }) =>
         weight &&
         css`
-            font-weight: ${textWeight[weight]} !important;
+            font-weight: ${textWeight[weight]};
         `}
 
     ${({ color }) =>
