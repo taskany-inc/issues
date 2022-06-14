@@ -91,7 +91,10 @@
       "Watch": "Watch",
       "Unwatch": "Unwatch",
       "Star": "Star",
-      "Unstar": "Unstar"
+      "Unstar": "Unstar",
+      "Depends on": "Depends on",
+      "Blocks": "Blocks",
+      "Related": "Related"
     },
     "item": {
       "by": "by"

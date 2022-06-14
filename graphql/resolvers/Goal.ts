@@ -48,6 +48,21 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     state: true,
                     project: true,
                     estimate: true,
+                    dependsOn: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    relatedTo: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    blocks: {
+                        include: {
+                            state: true,
+                        },
+                    },
                 },
             });
 
@@ -78,6 +93,21 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     estimate: true,
                     watchers: true,
                     stargizers: true,
+                    dependsOn: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    relatedTo: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    blocks: {
+                        include: {
+                            state: true,
+                        },
+                    },
                 },
             });
 

@@ -184,7 +184,7 @@ model Goal {
   dependsOn Goal[] @relation("dependsOn")
   blocks    Goal[] @relation("dependsOn")
   relatedTo Goal[] @relation("connected")
-  connected Goal[] @relation("connected")
+  connected Goal[] @relation("connected") // same as relatedTo?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
