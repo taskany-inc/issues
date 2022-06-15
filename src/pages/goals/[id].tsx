@@ -12,6 +12,7 @@ import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps'
 import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
 import { useMounted } from '../../hooks/useMounted';
+import { gapS } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
@@ -21,6 +22,8 @@ import { Card, CardInfo, CardContent, CardActions } from '../../components/Card'
 import { IssueTitle } from '../../components/IssueTitle';
 import { IssueKey } from '../../components/IssueKey';
 import { IssueStats } from '../../components/IssueStats';
+import { IssueMeta } from '../../components/IssueMeta';
+import { IssueListItem } from '../../components/IssueListItem';
 import { RelativeTime } from '../../components/RelativeTime';
 import { Md } from '../../components/Md';
 import { UserCompletion } from '../../components/UserCompletion';
@@ -28,7 +31,6 @@ import { EstimateDropdown } from '../../components/EstimateDropdown';
 import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
-import { gapS } from '../../design/@generated/themes';
 
 const refreshInterval = 3000;
 
@@ -79,6 +81,33 @@ const fetcher = createFetcher((_, id: string) => ({
             stargizers: {
                 id: true,
             },
+            dependsOn: {
+                id: true,
+                title: true,
+                state: {
+                    id: true,
+                    title: true,
+                    hue: true,
+                },
+            },
+            relatedTo: {
+                id: true,
+                title: true,
+                state: {
+                    id: true,
+                    title: true,
+                    hue: true,
+                },
+            },
+            blocks: {
+                id: true,
+                title: true,
+                state: {
+                    id: true,
+                    title: true,
+                    hue: true,
+                },
+            },
         },
     ],
 }));
@@ -116,6 +145,8 @@ const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
         {tags?.map((tag) => nullable(tag, (t) => <Tag key={t.id} title={t.title} description={t.description} />))}
     </StyledIssueTags>
 );
+
+const StyledIssueDeps = styled.div``;
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { id } }) => ({
@@ -255,7 +286,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             <IssueContent>
                 <Card>
                     <CardInfo>
-                        <Link inline>{goal.computedIssuer!.name}</Link> <RelativeTime date={goal.createdAt} />
+                        <Link inline>{goal.computedIssuer!.name}</Link> — <RelativeTime date={goal.createdAt} />
                     </CardInfo>
 
                     <CardContent>
@@ -287,6 +318,30 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                         </IssueAction>
                     </CardActions>
                 </Card>
+
+                <StyledIssueDeps>
+                    {nullable(goal.dependsOn?.length, () => (
+                        <IssueMeta title={t('Depends on')}>
+                            {goal.dependsOn?.map((d) =>
+                                nullable(d, (dep) => <IssueListItem key={d?.id} issue={dep} />),
+                            )}
+                        </IssueMeta>
+                    ))}
+
+                    {nullable(goal.blocks?.length, () => (
+                        <IssueMeta title={t('Blocks')}>
+                            {goal.blocks?.map((d) => nullable(d, (dep) => <IssueListItem key={d?.id} issue={dep} />))}
+                        </IssueMeta>
+                    ))}
+
+                    {nullable(goal.relatedTo?.length, () => (
+                        <IssueMeta title={t('Related')}>
+                            {goal.relatedTo?.map((d) =>
+                                nullable(d, (dep) => <IssueListItem key={d?.id} issue={dep} />),
+                            )}
+                        </IssueMeta>
+                    ))}
+                </StyledIssueDeps>
             </IssueContent>
 
             <PageContent>

@@ -11,6 +11,7 @@ import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
 import { UserPic } from './UserPic';
 import { Popup } from './Popup';
+import { Plus } from './Plus';
 
 const StyledHeader = styled.header`
     display: grid;
@@ -33,34 +34,6 @@ const StyledPopupContent = styled.div`
 
 const StyledNav = styled.nav`
     padding-left: 40px;
-`;
-
-const StyledPlusButton = styled.span`
-    display: inline-block;
-    box-sizing: border-box;
-    width: 18px;
-    height: 18px;
-
-    font-size: 13px;
-    line-height: 14px;
-    text-align: center;
-    font-weight: 400;
-
-    border: 1px solid ${colorPrimary};
-    color: ${brandColor};
-
-    border-radius: 100%;
-
-    cursor: pointer;
-
-    transition: background-color, color 250ms ease-in-out;
-
-    &:hover {
-        font-weight: 500;
-        font-size: 14px;
-        background-color: ${colorPrimary};
-        color: ${backgroundColor};
-    }
 `;
 
 const StyledSearch = styled.div`
@@ -107,9 +80,7 @@ const CreatorMenu = () => {
     return (
         <>
             <span ref={popupRef}>
-                <StyledPlusButton ref={buttonRef} onClick={() => setPopupVisibility(!popupVisible)}>
-                    +
-                </StyledPlusButton>
+                <Plus action ref={buttonRef} onClick={() => setPopupVisibility(!popupVisible)} />
             </span>
 
             <Popup

@@ -2,7 +2,7 @@ import React, { ComponentProps } from 'react';
 import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { backgroundColor, popupDangerBackgroundColor, popupWarningBackgroundColor } from '../design/@generated/themes';
+import { backgroundColor, danger10, warn10 } from '../design/@generated/themes';
 
 const Tippy = dynamic(() => import('@tippyjs/react/headless'));
 
@@ -87,13 +87,13 @@ const StyledPopupContainer = styled.div<{
     ${({ view }) =>
         view === 'danger' &&
         css`
-            background-color: ${popupDangerBackgroundColor};
+            background-color: ${danger10};
         `}
 
     ${({ view }) =>
         view === 'warning' &&
         css`
-            background-color: ${popupWarningBackgroundColor};
+            background-color: ${warn10};
         `}
 
     ${({ overflow }) =>

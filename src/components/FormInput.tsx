@@ -3,7 +3,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { formInputBackgroundColor, formInputErrorColor, textColorPrimary } from '../design/@generated/themes';
+import { danger10, gray3, textColor } from '../design/@generated/themes';
 
 import { Popup } from './Popup';
 
@@ -37,7 +37,7 @@ const StyledErrorTrigger = styled.div`
     width: 6px;
     height: 6px;
     border-radius: 100%;
-    background-color: ${formInputErrorColor};
+    background-color: ${danger10};
     top: 45%;
     left: -2px;
 `;
@@ -46,8 +46,8 @@ const StyledFormInput = styled(({ flat, error, forwardRef, ...props }) => <input
     outline: none;
     border: 0;
     border-radius: 4px;
-    background-color: ${formInputBackgroundColor};
-    color: ${textColorPrimary};
+    background-color: ${gray3};
+    color: ${textColor};
     font-weight: 600;
     font-size: 22px;
     padding: 8px 16px;

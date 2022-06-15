@@ -5,6 +5,7 @@ import colorLayer from 'color-layer';
 import { pageContext } from '../utils/pageContext';
 
 interface StateDotProps {
+    title?: string;
     hue?: number;
     size?: 's' | 'm';
     onClick?: () => void;
@@ -59,8 +60,16 @@ const StyledStateDot = styled.div<{
         `}
 `;
 
-export const StateDot: React.FC<StateDotProps> = ({ hue = 1, size = 'm', onClick }) => {
+export const StateDot: React.FC<StateDotProps> = ({ title, hue = 1, size = 'm', onClick }) => {
     const { theme } = useContext(pageContext);
 
-    return <StyledStateDot size={size} hue={hue} onClick={onClick} themeId={theme ? mapThemeOnId[theme] : 1} />;
+    return (
+        <StyledStateDot
+            title={title}
+            size={size}
+            hue={hue}
+            onClick={onClick}
+            themeId={theme ? mapThemeOnId[theme] : 1}
+        />
+    );
 };

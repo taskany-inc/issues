@@ -40,3 +40,5 @@ yarn-error.log*
 
 postgres
 @generated
+/cypress/videos
+/cypress/screenshots

@@ -5,7 +5,7 @@ import tinykeys from 'tinykeys';
 import { routes, useRouter } from '../hooks/router';
 import { createHotkeys, inviteUserKeys } from '../utils/hotkeys';
 
-import { DialogModal } from './DialogModal';
+import { Modal } from './Modal';
 import { UserInviteForm } from './UserInviteForm';
 
 export const UserInviteModal = () => {
@@ -19,8 +19,8 @@ export const UserInviteModal = () => {
     useEffect(() => tinykeys(window, createHotkeys([inviteUserKeys, () => showModalOrNavigate(router.inviteUsers)])));
 
     return (
-        <DialogModal visible={modalVisible} onClose={onModalClose}>
+        <Modal visible={modalVisible} onClose={onModalClose}>
             <UserInviteForm onCreate={() => setModalVisibility(false)} />
-        </DialogModal>
+        </Modal>
     );
 };

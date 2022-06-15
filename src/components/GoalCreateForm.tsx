@@ -9,8 +9,8 @@ import z from 'zod';
 
 import { gql } from '../utils/gql';
 import { estimatedMeta } from '../utils/dateTime';
-import { accentIconColor } from '../design/@generated/themes';
-import { UserAnyKind, Project, GoalEstimate, State, Tag as TagModel } from '../../graphql/@generated/genql';
+import { gray10 } from '../design/@generated/themes';
+import { UserAnyKind, Project, EstimateInput, State, Tag as TagModel } from '../../graphql/@generated/genql';
 
 import { FormCard } from './FormCard';
 import { Icon } from './Icon';
@@ -41,7 +41,7 @@ const StyledTagsContainer = styled.div`
 export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
-    const [estimate, setEstimate] = useState<GoalEstimate>();
+    const [estimate, setEstimate] = useState<EstimateInput>();
     const [project, setProject] = useState<Project>();
     const [state, setState] = useState<State>();
     const [tags, setTags] = useState(new Map<string, TagModel>());
@@ -211,7 +211,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
     return (
         <>
             {card ? <FormCard style={{ maxWidth: '800px' }}>{formContent}</FormCard> : formContent}
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={accentIconColor} />}>
+            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                 {t.rich('Press key to create the goal', {
                     key: () => <Keyboard command enter />,
                 })}
