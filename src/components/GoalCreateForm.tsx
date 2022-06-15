@@ -175,7 +175,6 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
                         flowId={project?.flow?.id}
                         onClick={(s) => setState(s)}
                     />
-
                     <EstimateDropdown
                         size="m"
                         text={t('Schedule')}

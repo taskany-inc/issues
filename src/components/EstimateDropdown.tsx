@@ -4,7 +4,7 @@ import InputMask from 'react-input-mask';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
 import { colorPrimary, danger8, danger9, gray6, textColor } from '../design/@generated/themes';
-import { createLocaleDate, quarterFromDate, yearFromDate, endOfQuarter } from '../utils/dateTime';
+import { createLocaleDate, quarterFromDate, yearFromDate, endOfQuarter, isPastDate } from '../utils/dateTime';
 import { is } from '../utils/styles';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
@@ -15,7 +15,6 @@ import { Input } from './Input';
 
 interface EstimateDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
-    view?: React.ComponentProps<typeof Button>['view'];
     text: React.ComponentProps<typeof Button>['text'];
     value?: {
         date: string;
@@ -86,6 +85,7 @@ const CheckableButton = styled(Button)`
 `;
 
 const isValidDate = (d: string) => !d.includes('_');
+
 const createValue = (str: string) => ({
     q: quarterFromDate(createLocaleDate(str)),
     y: String(yearFromDate(str)),
@@ -95,7 +95,6 @@ const createValue = (str: string) => ({
 export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     size = 'm',
     text,
-    view,
     onChange,
     onClose,
     value,
@@ -112,10 +111,13 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     const [buttonText, setButtonText] = useState(text);
     const [nextValue, setNextValue] = useState(value);
 
+    const isPast = isPastDate(nextValue?.date || '');
+
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
+        if (isPast) return;
         nextValue?.date !== value?.date && onClose && onClose(nextValue);
-    }, [onClose, nextValue, value]);
+    }, [onClose, nextValue, value, isPast]);
 
     const onButtonClick = useCallback(() => {
         setPopupVisibility(true);
@@ -127,7 +129,7 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
             setInputState(endOfQuarter(nextQ, createLocaleDate(inputState)));
             setChanged(true);
         },
-        [inputState, setInputState],
+        [inputState],
     );
 
     const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -186,7 +188,6 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
         <CheckableButton
             size="s"
             key={qValue}
-            view={view}
             text={qValue}
             checked={qValue === selectedQ}
             onClick={onQButtonClick(qValue)}
@@ -203,7 +204,7 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
                 <Button
                     ref={buttonRef}
                     size={size}
-                    view={view}
+                    view={isPast ? 'warning' : undefined}
                     text={buttonText}
                     iconLeft={<Icon noWrap type={iconType} size="xs" color={iconColor} />}
                     onClick={onButtonClick}

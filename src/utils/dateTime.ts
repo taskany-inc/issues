@@ -6,6 +6,7 @@ import setMonth from 'date-fns/setMonth';
 import lastDayOfQuarter from 'date-fns/lastDayOfQuarter';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import ruLocale from 'date-fns/locale/ru';
+import isPast from 'date-fns/isPast';
 
 export const localeFormatMap = {
     ru: 'dd.MM.yyyy',
@@ -65,3 +66,7 @@ export const estimatedMeta = (date = new Date(), { locale }: LocaleArg = localeA
 export const dateAgo = (date: string, { locale }: LocaleArg = localeArgDefault) => {
     return formatDistanceToNow(new Date(date), { locale: locale === 'ru' ? ruLocale : undefined, addSuffix: true });
 };
+
+export const isPastDate = (date: string): boolean => {
+    return isPast(new Date(date))
+}
