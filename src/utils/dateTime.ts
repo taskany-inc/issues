@@ -68,5 +68,5 @@ export const dateAgo = (date: string, { locale }: LocaleArg = localeArgDefault) 
 };
 
 export const isPastDate = (date: string): boolean => {
-    return isPast(new Date(date))
-}
+    return isPast(new Date(date));
+};
