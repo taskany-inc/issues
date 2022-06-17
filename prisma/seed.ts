@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import assert from 'assert';
 
 import { prisma } from '../src/utils/prisma';
@@ -37,8 +38,17 @@ seed('Default flows and states', async () => {
             title: 'Goal — Default',
             recommended: true,
             states: {
-                create: ['Draft', 'inProgress', 'Blocked', 'Finished', 'Failed', 'Canceled'].map((title) => ({
-                    title,
+                create: [
+                    ['Draft', 1],
+                    ['inProgress', 194],
+                    ['Blocked', 30],
+                    ['Finished', 158],
+                    ['Failed', 360],
+                    ['Canceled', 274],
+                    ['AtRisk', 14],
+                ].map(([title, hue]) => ({
+                    title: title as string,
+                    hue: hue as number,
                     default: title === 'Draft',
                 })),
             },
