@@ -1,0 +1,23 @@
+name: e2e tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_run_e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build the stack
+        run: docker-compose up -d
+
+      - name: Test
+        run: sh ./healthcheck.sh app 30
+
+      - name: run e2e
+        uses: cypress-io/github-action@v4
+
