@@ -14,6 +14,7 @@ FROM node:16-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ENV DATABASE_URL=postgresql://prisma:hilly-sand-pit@localhost:5432/prisma?schema=prisma-pg-test
 RUN npx prisma generate
 RUN npm run build
 

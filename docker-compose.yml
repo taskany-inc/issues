@@ -17,8 +17,9 @@ services:
     ports:
       - "1080:1080"
       - "1025:1025"
-  nextjs:
+  app:
     stdin_open: true
+    container_name: app
     ports:
       - 3000:3000
     build:
@@ -28,24 +29,12 @@ services:
       - db
     environment:
       - DATABASE_URL=postgresql://prisma:hilly-sand-pit@db:5432/prisma?schema=prisma-pg-test
-    env_file:
-      - .env
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=ololo
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/auth/signin"]
       interval: 20s
       timeout: 10s
       retries: 10
       start_period: 40s
-  cypress:
-    # the Docker image to use from https://github.com/cypress-io/cypress-docker-images
-    image: "cypress/included:10.0.3"
-    depends_on:
-      db:
-        condition: service_started
-      nextjs:
-        condition: service_healthy
-    environment:
-      - CYPRESS_baseUrl=http://nextjs:3000
-    working_dir: /e2e
-    volumes:
-      - ./:/e2e
