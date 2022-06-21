@@ -20,11 +20,6 @@ enum Role {
   ADMIN
 }
 
-enum Theme {
-  dark
-  light
-}
-
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -66,7 +61,7 @@ model VerificationToken {
 model User {
   id            String    @id @default(cuid())
   active        Boolean   @default(true)
-  nickname      String?    @unique
+  nickname      String?   @unique
   name          String?
   email         String    @unique
   emailVerified DateTime?
@@ -268,7 +263,7 @@ model State {
 
 model Settings {
   id       String    @id @default(cuid())
-  theme    Theme?
+  theme    String    @default("system")
   flow     Flow?     @relation(fields: [flowId], references: [id])
   flowId   String?
   activity Activity?

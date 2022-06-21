@@ -97,7 +97,11 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         email,
                         hostId: validUser.id,
                         activity: {
-                            create: {},
+                            create: {
+                                settings: {
+                                    create: {},
+                                },
+                            },
                         },
                     },
                 });

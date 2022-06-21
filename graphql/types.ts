@@ -11,6 +11,7 @@ import {
     Flow as FlowModel,
     State as StateModel,
     Tag as TagModel,
+    Settings as SettingsModel,
 } from 'nexus-prisma';
 
 export const DateTime = asNexusMethod(DateTimeResolver, 'DateTime');
@@ -189,6 +190,23 @@ export const Tag = objectType({
         t.field('activity', { type: Activity });
         t.list.field('goals', { type: Goal });
         t.list.field('projects', { type: Project });
+    },
+});
+
+export const Settings = objectType({
+    name: SettingsModel.$name,
+    definition(t) {
+        t.field(SettingsModel.id);
+        t.field(SettingsModel.theme);
+        t.field('activity', { type: Activity });
+    },
+});
+
+export const SettingsInput = inputObjectType({
+    name: 'SettingsInput',
+    definition(t) {
+        t.field(SettingsModel.id);
+        t.field(SettingsModel.theme);
     },
 });
 
