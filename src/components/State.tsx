@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import colorLayer from 'color-layer';
 
 import { pageContext } from '../utils/pageContext';
+import { radiusXl } from '../design/@generated/themes';
 
 interface StateProps {
     title: string;
@@ -22,7 +23,7 @@ const StyledState = styled.div<{
     display: inline-block;
     padding: 6px 14px;
 
-    border-radius: 20px;
+    border-radius: ${radiusXl};
 
     font-size: 14px;
     line-height: 14px;

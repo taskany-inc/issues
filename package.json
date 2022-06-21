@@ -10,7 +10,7 @@
     "generate:themes": "node ./scripts/themes.js",
     "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json src/pages/api/graphql",
     "generate:genql": "genql --schema ./graphql/schema.graphql --output ./graphql/@generated/genql",
-    "watch:themes":"nodemon --exec 'npm run  generate:themes' --watch 'src/design/palette.js'",
+    "watch:themes":"nodemon --exec 'npm run  generate:themes' --watch 'src/design/*.js'",
     "watch:nexus": "nodemon --exec 'npm run generate:nexus' --ext 'ts' --watch '*/graphql/**/*.ts' -r dotenv/config",
     "watch:genql": "nodemon --exec 'npm run generate:genql'  --watch 'graphql/schema.graphql'",
     "generate": "concurrently \"npm run generate:nexus\" \"npm run generate:genql\" \"npm run generate:themes\"",

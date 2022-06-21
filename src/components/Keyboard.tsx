@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { gray4, gray8, textColor } from '../design/@generated/themes';
+import { gray4, gray8, radiusS, textColor } from '../design/@generated/themes';
 
 interface KeyboardProps {
     command?: boolean;
@@ -18,7 +18,7 @@ const StyledKeyboard = styled.kbd`
     color: ${textColor};
     background-color: ${gray4};
     font-family: sans-serif;
-    border-radius: 4px;
+    border-radius: ${radiusS};
     border: 1px solid ${gray8};
     padding: 4px 6px;
 

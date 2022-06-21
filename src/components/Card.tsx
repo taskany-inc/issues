@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { gray4, gray8 } from '../design/@generated/themes';
+import { gray4, gray8, radiusM } from '../design/@generated/themes';
 
 import { Text } from './Text';
 
@@ -9,7 +9,7 @@ export const Card = styled.div`
     position: relative;
     overflow: hidden;
     border: 1px solid ${gray4};
-    border-radius: 6px;
+    border-radius: ${radiusM};
     min-height: 180px;
 `;
 

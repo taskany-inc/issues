@@ -2,7 +2,7 @@ import React, { ComponentProps } from 'react';
 import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { backgroundColor, danger10, warn10 } from '../design/@generated/themes';
+import { backgroundColor, danger10, radiusS, warn10 } from '../design/@generated/themes';
 
 const Tippy = dynamic(() => import('@tippyjs/react/headless'));
 
@@ -75,7 +75,7 @@ const StyledPopupContainer = styled.div<{
 
     background: ${backgroundColor};
 
-    border-radius: 4px;
+    border-radius: ${radiusS};
 
     ${({ tooltip }) =>
         tooltip &&

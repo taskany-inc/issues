@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { gray6, gray7, gray8 } from '../design/@generated/themes';
+import { gray6, gray7, gray8, radiusM } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
@@ -26,7 +26,7 @@ interface ProjectCompletionProps {
 const StyledProjectCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
     border: 1px solid ${gray7};
-    border-radius: 6px;
+    border-radius: ${radiusM};
     min-width: 250px;
     margin-bottom: 4px;
     cursor: pointer;

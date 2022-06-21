@@ -22,6 +22,7 @@ import {
     gray4,
     danger1,
     danger2,
+    radiusM,
 } from '../design/@generated/themes';
 import { is } from '../utils/styles';
 
@@ -65,7 +66,7 @@ const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLef
     appearance: none;
 
     border: 1px solid;
-    border-radius: 6px;
+    border-radius: ${radiusM};
 
     transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
     transition-property: color, background-color, border-color;

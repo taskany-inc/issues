@@ -2,7 +2,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { gray10, gray3, gray4, gray6, gray7, textColor } from '../design/@generated/themes';
+import { gray10, gray3, gray4, gray6, gray7, radiusM, textColor } from '../design/@generated/themes';
 
 interface InputProps {
     id?: string;
@@ -32,7 +32,7 @@ const StyledInput = styled(({ forwardRef, size, view, ...props }) => <input ref=
 
     outline: none;
     border: 1px solid;
-    border-radius: 6px;
+    border-radius: ${radiusM};
 
     transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
     transition-property: color, background-color, border-color;

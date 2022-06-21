@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { gray6, gray7, gray8, textColor } from '../design/@generated/themes';
+import { gray6, gray7, gray8, radiusM, textColor } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { UserAnyKind } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
@@ -37,7 +37,7 @@ const StyledUserCard = styled.div<{ focused?: boolean }>`
     margin-bottom: 4px;
 
     border: 1px solid ${gray7};
-    border-radius: 6px;
+    border-radius: ${radiusM};
 
     cursor: pointer;
 

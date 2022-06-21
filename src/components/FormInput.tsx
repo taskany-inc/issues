@@ -3,7 +3,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { danger10, gray3, textColor } from '../design/@generated/themes';
+import { danger10, gray3, radiusS, textColor } from '../design/@generated/themes';
 
 import { Popup } from './Popup';
 
@@ -42,10 +42,11 @@ const StyledErrorTrigger = styled.div`
     left: -2px;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledFormInput = styled(({ flat, error, forwardRef, ...props }) => <input ref={forwardRef} {...props} />)`
     outline: none;
     border: 0;
-    border-radius: 4px;
+    border-radius: ${radiusS};
     background-color: ${gray3};
     color: ${textColor};
     font-weight: 600;
