@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl", "debian-openssl-1.1.x"]
 }
 
@@ -66,6 +66,7 @@ model VerificationToken {
 model User {
   id            String    @id @default(cuid())
   active        Boolean   @default(true)
+  nickname      String?    @unique
   name          String?
   email         String    @unique
   emailVerified DateTime?

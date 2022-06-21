@@ -169,6 +169,7 @@ type User {
   id: ID!
   image: String
   name: String
+  nickname: String
   role: Role!
   updatedAt: DateTime!
 }
@@ -193,5 +194,6 @@ input UserSession {
   id: ID!
   image: String
   name: String
+  nickname: String
   role: Role!
 }
