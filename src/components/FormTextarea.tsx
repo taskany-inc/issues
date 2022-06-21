@@ -3,7 +3,7 @@ import React from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { gray3, radiusS, textColor } from '../design/@generated/themes';
+import { gray2, gray3, radiusS, textColor } from '../design/@generated/themes';
 
 interface FormTextareaProps {
     id?: string;
@@ -15,7 +15,6 @@ interface FormTextareaProps {
     autoComplete?: string;
     placeholder?: string;
     disabled?: boolean;
-    style?: React.CSSProperties;
     flat?: 'top' | 'bottom' | 'both';
 
     onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
@@ -28,6 +27,7 @@ interface FormTextareaProps {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea ref={forwardRef} {...props} />)`
+    box-sizing: border-box;
     outline: none;
     border: 0;
     border-radius: ${radiusS};
@@ -39,6 +39,13 @@ const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea 
     width: 100%;
     min-height: 200px;
     resize: none;
+
+    transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
+    transition-property: color, background-color, border-color;
+
+    :focus:not([disabled]) {
+        background-color: ${gray2};
+    }
 
     ${({ flat }) =>
         flat === 'top' &&
