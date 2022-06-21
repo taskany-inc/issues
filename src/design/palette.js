@@ -39,6 +39,8 @@ const colorsOptions = [
     ['gray', [1, 0]],
     ['warn', [30, 100]],
     ['danger', [360, 100]],
+    ['link', [213, 100]],
+    ['star', [43, 100]],
 ];
 
 colorsOptions.forEach(([name, [h, s]]) => {

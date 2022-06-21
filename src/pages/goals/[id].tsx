@@ -12,7 +12,7 @@ import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps'
 import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
 import { useMounted } from '../../hooks/useMounted';
-import { gapS } from '../../design/@generated/themes';
+import { gapS, star10 } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
@@ -275,7 +275,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     />
                     <ActionButton
                         text={t(stargizer ? 'Unstar' : 'Star')}
-                        iconLeft={<Icon noWrap type={stargizer ? 'starFilled' : 'star'} size="s" />}
+                        iconLeft={
+                            <Icon
+                                noWrap
+                                type={stargizer ? 'starFilled' : 'star'}
+                                color={stargizer ? star10 : undefined}
+                                size="s"
+                            />
+                        }
                         onClick={onStarToggle}
                     />
                 </StyledIssueInfo>

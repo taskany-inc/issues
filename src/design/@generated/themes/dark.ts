@@ -49,6 +49,27 @@ export default createGlobalStyle`
         --danger8: hsl(360, 90%, 36%);
         --danger9: hsl(360, 90%, 47%);
         --danger10: hsl(360, 90%, 63%);
-        --link-text-color: #00C2FF;
+        --link0: hsl(213, 90%, 50%);
+        --link1: hsl(213, 90%, 4%);
+        --link2: hsl(213, 90%, 6%);
+        --link3: hsl(213, 90%, 8%);
+        --link4: hsl(213, 90%, 12%);
+        --link5: hsl(213, 90%, 16%);
+        --link6: hsl(213, 90%, 21%);
+        --link7: hsl(213, 90%, 28%);
+        --link8: hsl(213, 90%, 36%);
+        --link9: hsl(213, 90%, 47%);
+        --link10: hsl(213, 90%, 63%);
+        --star0: hsl(43, 90%, 50%);
+        --star1: hsl(43, 90%, 4%);
+        --star2: hsl(43, 90%, 6%);
+        --star3: hsl(43, 90%, 8%);
+        --star4: hsl(43, 90%, 12%);
+        --star5: hsl(43, 90%, 16%);
+        --star6: hsl(43, 90%, 21%);
+        --star7: hsl(43, 90%, 28%);
+        --star8: hsl(43, 90%, 36%);
+        --star9: hsl(43, 90%, 47%);
+        --star10: hsl(43, 90%, 63%);
     }
 `;
