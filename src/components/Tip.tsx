@@ -1,13 +1,17 @@
 import styled from 'styled-components';
 
+import { gray7 } from '../design/@generated/themes';
+import { nullable } from '../utils/nullable';
+
+import { Text } from './Text';
+
 interface TipProps {
     title?: string;
     icon?: React.ReactNode;
 }
 
-const StyledTip = styled.div`
+const StyledTip = styled(Text)`
     padding: 12px 0;
-    font-size: 13px;
 `;
 
 const StyledTipIcon = styled.span`
@@ -16,19 +20,24 @@ const StyledTipIcon = styled.span`
     margin-right: 6px;
 `;
 
-const StyledTipTitle = styled.span`
-    font-weight: 600;
+const StyledTipTitle = styled(Text)`
     margin-right: 6px;
 `;
 
-const StyledTipText = styled.span``;
-
 export const Tip: React.FC<TipProps> = ({ children, title, icon }) => {
     return (
-        <StyledTip>
-            {icon && <StyledTipIcon>{icon}</StyledTipIcon>}
-            {title && <StyledTipTitle>{title}</StyledTipTitle>}
-            <StyledTipText>{children}</StyledTipText>
+        <StyledTip size="s" color={gray7}>
+            {nullable(icon, (i) => (
+                <StyledTipIcon>{i}</StyledTipIcon>
+            ))}
+
+            {nullable(title, (t) => (
+                <StyledTipTitle as="span" size="s" weight="bold" color={gray7}>
+                    {t}
+                </StyledTipTitle>
+            ))}
+
+            {children}
         </StyledTip>
     );
 };
