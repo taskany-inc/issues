@@ -10,7 +10,7 @@ interface PlusProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledPlus = styled(({ action, ...props }) => <span {...props} />)<PlusProps>`
+const StyledPlus = styled(({ action, forwardRef, ...props }) => <span ref={forwardRef} {...props} />)<PlusProps>`
     display: inline-block;
     box-sizing: border-box;
     width: 18px;
