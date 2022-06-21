@@ -4,15 +4,17 @@ import { gray3, radiusS, textColor } from '../design/@generated/themes';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ flat?: 'top' | 'bottom' }>`
-    border-radius: ${radiusS};
-    background-color: ${gray3};
-    color: ${textColor};
-
+    box-sizing: border-box;
     padding: 8px 10px 12px 10px;
-
     display: grid;
     grid-template-columns: 8fr 4fr;
     align-items: end;
+
+    border-radius: ${radiusS};
+
+    background-color: ${gray3};
+
+    color: ${textColor};
 
     ${({ flat }) =>
         flat === 'top' &&
@@ -30,6 +32,8 @@ export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ 
 `;
 
 export const FormAction = styled.div<{ left?: boolean; right?: boolean; columns?: number; inline?: boolean }>`
+    box-sizing: border-box;
+
     ${({ left }) =>
         left &&
         css`
