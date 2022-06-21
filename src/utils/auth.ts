@@ -81,7 +81,11 @@ export const authOptions: NextAuthOptions = {
                     },
                     data: {
                         activity: {
-                            create: {},
+                            create: {
+                                settings: {
+                                    create: {},
+                                },
+                            },
                         },
                     },
                 });

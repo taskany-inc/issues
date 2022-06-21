@@ -103,6 +103,7 @@ type Mutation {
   createTag(description: String, title: String!, user: UserSession!): Tag
   inviteUser(email: String!, user: UserSession!): Ghost
   updateGoal(data: GoalInput!, user: UserSession!): Goal
+  updateSettings(data: SettingsInput!): Settings
   updateUser(data: UserInput!): User
 }
 
@@ -130,6 +131,7 @@ type Query {
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(key: String!): [Goal]
+  settings(activityId: String!): Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
   users(sortBy: SortOrder): [User]
 }
@@ -137,6 +139,17 @@ type Query {
 enum Role {
   ADMIN
   USER
+}
+
+type Settings {
+  activity: Activity
+  id: ID!
+  theme: String!
+}
+
+input SettingsInput {
+  id: ID!
+  theme: String!
 }
 
 enum SortOrder {

@@ -35,17 +35,17 @@ export const PageContent = styled.div`
 export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children }) => {
     useHotkeys();
 
-    const { theme } = useTheme();
+    const { resolvedTheme } = useTheme();
 
     return (
-        <pageContext.Provider value={{ theme, locale }}>
+        <pageContext.Provider value={{ theme: resolvedTheme, locale }}>
             <Head>
                 <title>{title}</title>
             </Head>
 
             <GlobalStyle />
             <TextStyle />
-            <Theme theme={theme} />
+            <Theme theme={resolvedTheme} />
 
             <Toaster
                 toastOptions={{

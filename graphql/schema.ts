@@ -7,6 +7,7 @@ import * as Project from './resolvers/Project';
 import * as Flow from './resolvers/Flow';
 import * as Goal from './resolvers/Goal';
 import * as Tag from './resolvers/Tag';
+import * as Settings from './resolvers/Settings';
 
 const Query = queryType({
     definition(t) {
@@ -15,6 +16,7 @@ const Query = queryType({
         Flow.query(t);
         Goal.query(t);
         Tag.query(t);
+        Settings.query(t);
     },
 });
 
@@ -25,6 +27,7 @@ const Mutation = mutationType({
         Flow.mutation(t);
         Goal.mutation(t);
         Tag.mutation(t);
+        Settings.mutation(t);
     },
 });
 

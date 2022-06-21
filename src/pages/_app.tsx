@@ -17,7 +17,7 @@ const App = ({ Component, pageProps }: AppProps) => {
             <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
                 <ApolloProvider client={apolloClient}>
                     <NextIntlProvider messages={pageProps.i18n}>
-                        <ThemeProvider themes={['light', 'dark']} defaultTheme="dark">
+                        <ThemeProvider themes={['light', 'dark']}>
                             <Component {...pageProps} />
                         </ThemeProvider>
                     </NextIntlProvider>
