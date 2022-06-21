@@ -66,10 +66,12 @@ export const authOptions: NextAuthOptions = {
                     ...session.user,
                     id,
                     role: token?.role || user.role,
+                    nickname: token?.nickname || dbUser?.nickname,
                     activityId: dbUser?.activityId,
                 },
             };
         },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         async jwt({ token, user, account, profile, isNewUser }) {
             if (user && isNewUser) {
                 await prisma.user.update({
@@ -89,6 +91,7 @@ export const authOptions: NextAuthOptions = {
                       ...token,
                       id: user.id,
                       role: user.role,
+                      nickname: user.nickname,
                       activityId: user.activityId,
                   }
                 : token;
@@ -100,7 +103,8 @@ declare module 'next-auth' {
     interface Session {
         user: {
             id: string;
-            name: string;
+            name?: string;
+            nickname?: string;
             email: string;
             image?: string | null;
             role: Role;

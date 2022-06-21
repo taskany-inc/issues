@@ -35,6 +35,7 @@ export const UserSession = inputObjectType({
     definition(t) {
         t.field(UserModel.id);
         t.field(UserModel.email);
+        t.field(UserModel.nickname);
         t.field(UserModel.name);
         t.field(UserModel.image);
         t.field(UserModel.role);
@@ -47,6 +48,7 @@ export const User = objectType({
     definition(t) {
         t.field(UserModel.id);
         t.field(UserModel.email);
+        t.field(UserModel.nickname);
         t.field(UserModel.name);
         t.field(UserModel.image);
         t.field('activity', { type: Activity });
