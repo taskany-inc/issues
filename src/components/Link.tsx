@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { linkTextColor } from '../design/@generated/themes';
+import { link10 } from '../design/@generated/themes';
 
 interface LinkProps extends React.HTMLProps<HTMLLinkElement> {
     inline?: boolean;
@@ -9,10 +9,10 @@ interface LinkProps extends React.HTMLProps<HTMLLinkElement> {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledLink = styled(({ forwardRef, inline, ...props }) => <a ref={forwardRef} {...props} />)`
-    color: ${linkTextColor};
+    color: ${link10};
 
     transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
-    transition-property: color, background-color, border-color;
+    transition-property: color;
 
     cursor: pointer;
 
@@ -28,7 +28,7 @@ const StyledLink = styled(({ forwardRef, inline, ...props }) => <a ref={forwardR
             text-decoration: none;
 
             &:hover {
-                color: ${linkTextColor};
+                color: ${link10};
             }
         `}
 `;
