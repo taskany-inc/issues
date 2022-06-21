@@ -66,7 +66,8 @@ export const authOptions: NextAuthOptions = {
                     ...session.user,
                     id,
                     role: token?.role || user.role,
-                    nickname: token?.nickname || dbUser?.nickname,
+                    name: dbUser?.name,
+                    nickname: dbUser?.nickname,
                     activityId: dbUser?.activityId,
                 },
             };

@@ -103,6 +103,7 @@ type Mutation {
   createTag(description: String, title: String!, user: UserSession!): Tag
   inviteUser(email: String!, user: UserSession!): Ghost
   updateGoal(data: GoalInput!, user: UserSession!): Goal
+  updateUser(data: UserInput!): User
 }
 
 type Project {
@@ -120,7 +121,7 @@ type Project {
 }
 
 type Query {
-  findUserAnyKind(query: String!, sortBy: SortOrder): [UserAnyKind]
+  findUserAnyKind(query: String!): [UserAnyKind]
   flow(id: String!): Flow
   flowCompletion(query: String!, sortBy: SortOrder): [Flow]
   flowRecommended: [Flow]
@@ -181,6 +182,12 @@ type UserAnyKind {
   image: String
   kind: UserKind
   name: String
+}
+
+input UserInput {
+  id: ID!
+  name: String
+  nickname: String
 }
 
 enum UserKind {

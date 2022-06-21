@@ -232,6 +232,15 @@ export const ActivityInput = inputObjectType({
     },
 });
 
+export const UserInput = inputObjectType({
+    name: 'UserInput',
+    definition(t) {
+        t.field(UserModel.id);
+        t.field(UserModel.nickname);
+        t.field(UserModel.name);
+    },
+});
+
 export const computeUserFields = {
     include: {
         user: true,
