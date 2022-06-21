@@ -20,7 +20,7 @@ import { UserInviteModal } from './UserInviteModal';
 
 interface PageProps {
     locale: ExternalPageProps['locale'];
-    title: string;
+    title?: string;
 }
 
 const StyledContent = styled.div`
@@ -32,7 +32,7 @@ export const PageContent = styled.div`
     padding: 10px 40px 0 40px;
 `;
 
-export const Page: React.FC<PageProps> = ({ title, locale, children }) => {
+export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children }) => {
     useHotkeys();
 
     const { theme } = useTheme();
