@@ -11,6 +11,7 @@ export const routes = {
     project: (id: string) => `/projects/${id}`,
     editProject: (id: string) => `/projects/${id}/edit`,
     inviteUsers: () => '/users/invite',
+    userSettings: () => '/users/settings',
     signIn: () => '/api/auth/signin',
 };
 
@@ -28,5 +29,6 @@ export const useRouter = () => {
         createGoal: () => router.push(routes.createGoal()),
         editGoal: (id: string) => router.push(routes.editGoal(id)),
         inviteUsers: () => router.push(routes.inviteUsers()),
+        userSettings: () => router.push(routes.userSettings()),
     };
 };

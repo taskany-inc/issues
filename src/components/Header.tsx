@@ -12,6 +12,7 @@ import { Icon } from './Icon';
 import { UserPic } from './UserPic';
 import { Popup } from './Popup';
 import { Plus } from './Plus';
+import { Link } from './Link';
 
 const StyledHeader = styled.header`
     display: grid;
@@ -148,7 +149,11 @@ export const Header: React.FC = () => {
 
             <StyledUserMenu>
                 <CreatorMenu />
-                <UserPic src={session?.user.image} size={32} />
+                <NextLink href={routes.userSettings()} passHref>
+                    <Link inline>
+                        <UserPic src={session?.user.image} size={32} />
+                    </Link>
+                </NextLink>
             </StyledUserMenu>
         </StyledHeader>
     );
