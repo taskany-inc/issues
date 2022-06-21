@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable global-require */
 /* eslint-disable guard-for-in */
@@ -11,10 +12,7 @@ const mkdirpAsync = promisify(mkdir);
 const writeToShadowDir = (file, content) =>
     mkdirpAsync(dirname(file), { recursive: true }).then(() => writeFileAsync(file, content, 'utf-8'));
 const themesFolder = join(process.cwd(), 'src', 'design', '@generated', 'themes');
-const themes = {
-    dark: require('../src/design/themes/dark'),
-    light: require('../src/design/themes/light'),
-};
+const themes = require('../src/design/palette');
 
 const jsToken = (token, value, { noVar } = {}) =>
     `export const ${camelCase(token)} = '${noVar ? value : `var(--${paramCase(token)})`}';`;
@@ -52,6 +50,7 @@ const cssTokensFile = (theme, file, tabs = 4) => {
 (async (t) => {
     const writers = [];
 
+    // eslint-disable-next-line no-shadow
     const themes = Object.keys(t);
     for (const theme in t) {
         for (const token in t[theme]) {
@@ -66,18 +65,10 @@ const cssTokensFile = (theme, file, tabs = 4) => {
 
     for (const theme in t) {
         writers.push(cssTokensFile(t[theme], join(themesFolder, `${theme}.ts`)));
-        writers.push(jsTokensFile(t[theme], join(themesFolder, `${theme}.constants.ts`), { noVar: true }));
     }
 
     const tokensSchema = t[themes[0]];
     writers.push(jsTokensFile(tokensSchema, join(themesFolder, 'index.ts')));
 
     await Promise.all(writers);
-})({
-    dark: {
-        ...themes.dark,
-    },
-    light: {
-        ...themes.light,
-    },
-});
+})(themes);
