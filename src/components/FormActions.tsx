@@ -1,10 +1,10 @@
 import styled, { css } from 'styled-components';
 
-import { gray3, textColor } from '../design/@generated/themes';
+import { gray3, radiusS, textColor } from '../design/@generated/themes';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ flat?: 'top' | 'bottom' }>`
-    border-radius: 4px;
+    border-radius: ${radiusS};
     background-color: ${gray3};
     color: ${textColor};
 

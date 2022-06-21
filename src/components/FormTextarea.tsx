@@ -3,7 +3,7 @@ import React from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { gray3, textColor } from '../design/@generated/themes';
+import { gray3, radiusS, textColor } from '../design/@generated/themes';
 
 interface FormTextareaProps {
     id?: string;
@@ -26,10 +26,11 @@ interface FormTextareaProps {
     error?: FieldError;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea ref={forwardRef} {...props} />)`
     outline: none;
     border: 0;
-    border-radius: 4px;
+    border-radius: ${radiusS};
     background-color: ${gray3};
     color: ${textColor};
     font-weight: 600;

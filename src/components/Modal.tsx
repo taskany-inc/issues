@@ -2,7 +2,7 @@ import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
-import { backgroundColor } from '../design/@generated/themes';
+import { backgroundColor, radiusM } from '../design/@generated/themes';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { usePortal } from '../hooks/usePortal';
 import { nullable } from '../utils/nullable';
@@ -43,7 +43,7 @@ const StyledModal = styled.div`
     min-width: 300px;
     min-height: 300px;
 
-    border-radius: 6px;
+    border-radius: ${radiusM};
 
     background-color: ${backgroundColor};
 `;

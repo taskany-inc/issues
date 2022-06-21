@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { gray10, gray5, gray6, gray7, gray8, gray9 } from '../design/@generated/themes';
+import { gray10, gray5, gray6, gray7, gray8, gray9, radiusL } from '../design/@generated/themes';
 
 interface TagProps {
     title: string;
@@ -44,7 +44,7 @@ const StyledTag = styled.div<{ size: TagProps['size']; onClick: TagProps['onClic
     position: relative;
     padding: 4px 12px 5px;
 
-    border-radius: 12px;
+    border-radius: ${radiusL};
 
     font-size: 12px;
     line-height: 12px;

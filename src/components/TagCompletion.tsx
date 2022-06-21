@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
 
-import { gray6, gray7, gray8 } from '../design/@generated/themes';
+import { gray6, gray7, gray8, radiusM } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
@@ -33,7 +33,7 @@ const StyledTagCard = styled.div<{ focused?: boolean }>`
     padding: 6px;
     margin-bottom: 4px;
     border: 1px solid ${gray7};
-    border-radius: 6px;
+    border-radius: ${radiusM};
 
     cursor: pointer;
 

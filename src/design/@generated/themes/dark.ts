@@ -10,6 +10,10 @@ export default createGlobalStyle`
         --gap-m: 1rem;
         --gap-l: 2rem;
         --gap-xl: 4rem;
+        --radius-s: 4px;
+        --radius-m: 6px;
+        --radius-l: 12px;
+        --radius-xl: 20px;
         --brand-color: #17b978;
         --color-primary: #108858;
         --color-primary-accent: #17b978;
