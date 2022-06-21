@@ -5,7 +5,7 @@ import { getSession } from 'next-auth/react';
 import { routes } from '../hooks/router';
 
 interface SSRProps<P = Record<string, string>> {
-    user?: Session['user'];
+    user: Session['user'];
     locale: 'en' | 'ru';
     req: GetServerSidePropsContext['req'];
     params: P;
@@ -35,7 +35,9 @@ export function declareSsrProps<T = ExternalPageProps>(
 
         const resProps = await cb({
             req,
-            user: session?.user,
+            // look at session check in previous condition
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            user: session!.user,
             locale: locale as SSRProps['locale'],
             params: params as Record<string, string>,
         });
