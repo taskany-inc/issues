@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { routes } from '../hooks/router';
-import { textColor, gray7, backgroundColor, colorPrimary, brandColor } from '../design/@generated/themes';
+import { textColor, gray7, colorPrimary, gray3 } from '../design/@generated/themes';
 
 import { HeaderLogo } from './HeaderLogo';
 import { Icon } from './Icon';
@@ -18,6 +18,8 @@ const StyledHeader = styled.header`
     grid-template-columns: 20px 11fr 100px;
     align-items: center;
     padding: 20px 40px;
+
+    background-color: ${gray3};
 `;
 
 const StyledUserMenu = styled.div`
