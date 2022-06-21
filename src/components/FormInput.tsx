@@ -3,13 +3,16 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { danger10, gray3, radiusS, textColor } from '../design/@generated/themes';
+import { danger10, gray2, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
+import { nullable } from '../utils/nullable';
 
 import { Popup } from './Popup';
+import { Text } from './Text';
 
 interface FormInputProps {
     id?: string;
     name?: string;
+    label?: string;
     value?: string | number;
     defaultValue?: string | number;
     tabIndex?: number;
@@ -17,7 +20,6 @@ interface FormInputProps {
     autoComplete?: string;
     placeholder?: string;
     disabled?: boolean;
-    style?: React.CSSProperties;
     flat?: 'top' | 'bottom' | 'both';
 
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -28,31 +30,15 @@ interface FormInputProps {
     error?: FieldError;
 }
 
-const StyledFormInputContainer = styled.div`
+const StyledFormInputContainer = styled.div<{ flat: FormInputProps['flat'] }>`
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
     position: relative;
-`;
 
-const StyledErrorTrigger = styled.div`
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 100%;
-    background-color: ${danger10};
-    top: 45%;
-    left: -2px;
-`;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledFormInput = styled(({ flat, error, forwardRef, ...props }) => <input ref={forwardRef} {...props} />)`
-    outline: none;
-    border: 0;
     border-radius: ${radiusS};
+
     background-color: ${gray3};
-    color: ${textColor};
-    font-weight: 600;
-    font-size: 22px;
-    padding: 8px 16px;
-    width: 100%;
 
     ${({ flat }) =>
         flat === 'top' &&
@@ -75,10 +61,56 @@ const StyledFormInput = styled(({ flat, error, forwardRef, ...props }) => <input
         `}
 `;
 
+const StyledErrorTrigger = styled.div`
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 100%;
+    background-color: ${danger10};
+    top: 45%;
+    left: -2px;
+`;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledFormInput = styled(({ flat, error, label, forwardRef, ...props }) => <input ref={forwardRef} {...props} />)`
+    box-sizing: border-box;
+    outline: none;
+    width: 100%;
+    padding: 8px 16px;
+
+    border: 0;
+    border-radius: ${radiusS};
+
+    background-color: transparent;
+
+    color: ${textColor};
+    font-weight: 600;
+    font-size: 22px;
+
+    transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
+    transition-property: color, background-color, border-color;
+
+    :focus:not([disabled]) {
+        background-color: ${gray2};
+    }
+
+    ${({ disabled }) =>
+        disabled &&
+        css`
+            color: ${gray8};
+        `}
+`;
+
+const StyledLabel = styled(Text)`
+    padding: 8px 8px 8px 16px;
+
+    background-color: transparent;
+`;
+
 export const FormInput = React.forwardRef<FormInputProps, FormInputProps>((props, ref) => {
     const [popupVisible, setPopupVisibility] = useState(false);
     const [inputFocused, setInputFocus] = useState(false);
-    const popupRef = useRef<any>();
+    const popupRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
         if (props.error && inputFocused) {
@@ -98,7 +130,7 @@ export const FormInput = React.forwardRef<FormInputProps, FormInputProps>((props
                 props.onFocus(e);
             }
         },
-        [props.onFocus, props.error, setPopupVisibility, setInputFocus],
+        [props, setPopupVisibility, setInputFocus],
     );
 
     const onBlur = useCallback(
@@ -113,14 +145,20 @@ export const FormInput = React.forwardRef<FormInputProps, FormInputProps>((props
                 props.onBlur(e);
             }
         },
-        [props.onBlur, props.error, setPopupVisibility, setInputFocus],
+        [props, setPopupVisibility, setInputFocus],
     );
 
     const onClickOutside = useCallback(() => setPopupVisibility(false), [setPopupVisibility]);
 
     return (
-        <StyledFormInputContainer>
-            {props.error ? (
+        <StyledFormInputContainer flat={props.flat}>
+            {nullable(props.label, (l) => (
+                <StyledLabel as="label" htmlFor={props.id || props.name} size="m" color={gray8} weight="bold">
+                    {l}:
+                </StyledLabel>
+            ))}
+
+            {nullable(props.error, (err) => (
                 <>
                     <StyledErrorTrigger
                         ref={popupRef}
@@ -135,11 +173,18 @@ export const FormInput = React.forwardRef<FormInputProps, FormInputProps>((props
                         onClickOutside={onClickOutside}
                         reference={popupRef}
                     >
-                        {props.error.message}
+                        {err.message}
                     </Popup>
                 </>
-            ) : null}
-            <StyledFormInput forwardRef={ref} {...props} onFocus={onFocus} onBlur={onBlur} />
+            ))}
+
+            <StyledFormInput
+                forwardRef={ref}
+                {...props}
+                id={props.id || props.name}
+                onFocus={onFocus}
+                onBlur={onBlur}
+            />
         </StyledFormInputContainer>
     );
 });
