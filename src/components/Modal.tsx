@@ -82,16 +82,20 @@ export const Modal: React.FC<ModalProps> = ({ visible, onClose, children, width 
         };
     }, [visible]);
 
-    return nullable(visible, () => (
-        <Portal id="modal">
-            <StyledModalSurface>
-                <StyledModal style={{ width: `${width}px` }} {...onESC}>
-                    <StyledCross onClick={onClose}>
-                        <Icon type="cross" size="s" />
-                    </StyledCross>
-                    {children}
-                </StyledModal>
-            </StyledModalSurface>
-        </Portal>
-    ));
+    return (
+        <>
+            {nullable(visible, () => (
+                <Portal id="modal">
+                    <StyledModalSurface>
+                        <StyledModal style={{ width: `${width}px` }} {...onESC}>
+                            <StyledCross onClick={onClose}>
+                                <Icon type="cross" size="s" />
+                            </StyledCross>
+                            {children}
+                        </StyledModal>
+                    </StyledModalSurface>
+                </Portal>
+            ))}
+        </>
+    );
 };

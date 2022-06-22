@@ -11,5 +11,11 @@ const themes = {
 export const Theme: React.FC<{ theme: keyof typeof themes }> = ({ theme = 'dark' }) => {
     const ThemeComponent = themes[theme];
 
-    return nullable(ThemeComponent, () => <ThemeComponent />);
+    return (
+        <>
+            {nullable(ThemeComponent, () => (
+                <ThemeComponent />
+            ))}
+        </>
+    );
 };
