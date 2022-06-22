@@ -88,9 +88,11 @@ export const Modal: React.FC<ModalProps> = ({ visible, onClose, children, width 
                 <Portal id="modal">
                     <StyledModalSurface>
                         <StyledModal style={{ width: `${width}px` }} {...onESC}>
-                            <StyledCross onClick={onClose}>
-                                <Icon type="cross" size="s" />
-                            </StyledCross>
+                            {nullable(onClose, () => (
+                                <StyledCross onClick={onClose}>
+                                    <Icon type="cross" size="s" />
+                                </StyledCross>
+                            ))}
                             {children}
                         </StyledModal>
                     </StyledModalSurface>
