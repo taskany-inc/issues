@@ -137,7 +137,7 @@ const IssueAction = styled.div`
 `;
 
 const StyledIssueTags = styled.span`
-    padding-left: 12px;
+    padding-left: ${gapS};
 `;
 
 const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (

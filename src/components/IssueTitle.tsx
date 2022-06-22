@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 
-import { gray9 } from '../design/@generated/themes';
+import { gapM, gapS, gray9 } from '../design/@generated/themes';
 import { routes } from '../hooks/router';
 
 import { Text } from './Text';
@@ -18,10 +18,10 @@ interface IssueTitleProps {
 
 const StyledIssueTitle = styled.div``;
 const StyledIssueProjectTitle = styled(Text)`
-    padding-top: 24px;
+    padding-top: ${gapM};
 `;
 const StyledIssueTitleText = styled(Text)`
-    padding-top: 10px;
+    padding-top: ${gapS};
 `;
 
 export const IssueTitle: React.FC<IssueTitleProps> = ({ title, project }) => {

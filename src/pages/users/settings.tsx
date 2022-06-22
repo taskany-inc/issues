@@ -12,7 +12,7 @@ import { gql } from '../../utils/gql';
 import { shallowEqual } from '../../utils/shallowEqual';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
-import { gray9, star10 } from '../../design/@generated/themes';
+import { gapM, gapS, gray9, star10 } from '../../design/@generated/themes';
 import { Settings, User } from '../../../graphql/@generated/genql';
 import { useMounted } from '../../hooks/useMounted';
 import { Page, PageContent } from '../../components/Page';
@@ -32,11 +32,11 @@ import { FormRadio, FormRadioInput } from '../../components/FormRadio';
 const refreshInterval = 3000;
 
 const StyledUserName = styled(Text)`
-    padding-top: 24px;
+    padding-top: ${gapM};
 `;
 
 const StyledPageTitle = styled(Text)`
-    padding-top: 10px;
+    padding-top: ${gapS};
 `;
 
 const StyledUserContent = styled(PageContent)`
@@ -47,7 +47,7 @@ const StyledUserContent = styled(PageContent)`
 const StyledSettingsCards = styled.div``;
 const StyledFormCard = styled(FormCard)`
     & + & {
-        margin-top: 20px;
+        margin-top: ${gapM};
     }
 `;
 
