@@ -5,7 +5,7 @@ export const showProjectsKeys = ['g p', 'п з'];
 export const showGoalsKeys = ['g g', 'п п'];
 export const inviteUserKeys = ['c u', 'с г'];
 
-function isEventTargetInputOrTextArea(eventTarget: EventTarget | null) {
+export function isEventTargetInputOrTextArea(eventTarget: EventTarget | null) {
     if (eventTarget === null) return false;
 
     const eventTargetTagName = (eventTarget as HTMLElement).tagName.toLowerCase();
