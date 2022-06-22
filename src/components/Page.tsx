@@ -1,10 +1,11 @@
 import React from 'react';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 
-import { gray4, textColor } from '../design/@generated/themes';
+import { gray4, radiusM, textColor } from '../design/@generated/themes';
 import { pageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/declareSsrProps';
 import { useHotkeys } from '../hooks/useHotkeys';
@@ -14,9 +15,10 @@ import { GlobalStyle } from './GlobalStyle';
 import { TextStyle } from './Text';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { ProjectCreateModal } from './ProjectCreateModal';
-import { GoalCreateModal } from './GoalCreateModal';
-import { UserInviteModal } from './UserInviteModal';
+
+const ProjectCreateModal = dynamic(() => import('./ProjectCreateModal'));
+const GoalCreateModal = dynamic(() => import('./GoalCreateModal'));
+const UserInviteModal = dynamic(() => import('./UserInviteModal'));
 
 interface PageProps {
     locale: ExternalPageProps['locale'];
@@ -49,7 +51,7 @@ export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children
 
             <Toaster
                 toastOptions={{
-                    style: { borderRadius: '6px', background: gray4, color: textColor },
+                    style: { borderRadius: radiusM, background: gray4, color: textColor },
                 }}
                 position="bottom-center"
             />

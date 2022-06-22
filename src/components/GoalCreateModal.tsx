@@ -8,15 +8,21 @@ import { createHotkeys, createGoalKeys } from '../utils/hotkeys';
 import { Modal } from './Modal';
 import { GoalCreateForm } from './GoalCreateForm';
 
-export const GoalCreateModal = () => {
+const GoalCreateModal = () => {
     const nextRouter = useNextRouter();
     const router = useRouter();
     const [modalVisible, setModalVisibility] = useState(false);
     const isCreateGoalPath = nextRouter.pathname === routes.createGoal();
-    const showModalOrNavigate = (navigate: () => void) => (isCreateGoalPath ? navigate() : setModalVisibility(true));
+    const showModalOrNavigate = useCallback(
+        (navigate: () => void) => (isCreateGoalPath ? navigate() : setModalVisibility(true)),
+        [isCreateGoalPath],
+    );
     const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
 
-    useEffect(() => tinykeys(window, createHotkeys([createGoalKeys, () => showModalOrNavigate(router.createGoal)])));
+    useEffect(
+        () => tinykeys(window, createHotkeys([createGoalKeys, () => showModalOrNavigate(router.createGoal)])),
+        [router.createGoal, showModalOrNavigate],
+    );
 
     return (
         <Modal visible={modalVisible} onClose={onModalClose}>
@@ -24,3 +30,5 @@ export const GoalCreateModal = () => {
         </Modal>
     );
 };
+
+export default GoalCreateModal;
