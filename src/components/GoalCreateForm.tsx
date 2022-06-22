@@ -9,7 +9,7 @@ import z from 'zod';
 
 import { gql } from '../utils/gql';
 import { estimatedMeta } from '../utils/dateTime';
-import { gray10 } from '../design/@generated/themes';
+import { gapS, gray10 } from '../design/@generated/themes';
 import { UserAnyKind, Project, EstimateInput, State, Tag as TagModel } from '../../graphql/@generated/genql';
 
 import { FormCard } from './FormCard';
@@ -35,7 +35,7 @@ interface GoalCreateFormProps {
 }
 
 const StyledTagsContainer = styled.div`
-    padding-left: 12px;
+    padding-left: ${gapS};
 `;
 
 export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }) => {
