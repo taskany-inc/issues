@@ -18,7 +18,7 @@ export interface ExternalPageProps<D = unknown, P = unknown> extends SSRProps<P>
 }
 
 export function declareSsrProps<T = ExternalPageProps>(
-    cb: ({ user, locale, req, params }: SSRProps) => T,
+    cb?: ({ user, locale, req, params }: SSRProps) => T,
     options?: { private: boolean },
 ) {
     return async ({ locale, req, params = {} }: GetServerSidePropsContext) => {
@@ -33,21 +33,23 @@ export function declareSsrProps<T = ExternalPageProps>(
             };
         }
 
-        const resProps = await cb({
-            req,
-            // look at session check in previous condition
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            user: session!.user,
-            locale: locale as SSRProps['locale'],
-            params: params as Record<string, string>,
-        });
+        const resProps = cb
+            ? await cb({
+                  req,
+                  // look at session check in previous condition
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  user: session!.user,
+                  locale: locale as SSRProps['locale'],
+                  params: params as Record<string, string>,
+              })
+            : {};
 
         return {
             props: {
                 ...resProps,
                 locale,
                 params: params as Record<string, string>,
-                user: session?.user,
+                user: session ? session.user : null,
                 i18n: (await import(`../../i18n/${locale}.json`)).default,
             },
         };

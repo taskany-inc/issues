@@ -1,18 +1,6 @@
 {
-  "Header": {
-    "Projects": "Projects",
-    "Goals": "Goals",
-    "Issues": "Issues",
-    "Explore": "Explore",
-    "Boards": "Boards",
-    "New goal": "New goal",
-    "New project": "New project",
-    "Invite users": "Invite users",
-    "Sign out": "Sign out"
-  },
   "index": {
-    "title": "Taskany Goals — Personal bundle",
-    "Load more": "Load more"
+    "title": "Taskany"
   },
   "projects": {
     "index": {
@@ -68,6 +56,10 @@
     }
   },
   "goals": {
+    "index": {
+      "title": "Taskany Goals — Personal bundle",
+      "Load more": "Load more"
+    },
     "new": {
       "title": "Taskany Goals — New goal",
       "Create new goal": "Create new goal",
@@ -113,6 +105,17 @@
     "item": {
       "by": "by"
     }
+  },
+  "Header": {
+    "Projects": "Projects",
+    "Goals": "Goals",
+    "Issues": "Issues",
+    "Explore": "Explore",
+    "Boards": "Boards",
+    "New goal": "New goal",
+    "New project": "New project",
+    "Invite users": "Invite users",
+    "Sign out": "Sign out"
   },
   "TagCompletion": {
     "Something went wrong 😿": "Something went wrong 😿",
