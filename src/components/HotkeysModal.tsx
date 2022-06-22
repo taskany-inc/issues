@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { gray8, gapM, gray9, gapS } from '../design/@generated/themes';
+import { isEventTargetInputOrTextArea } from '../utils/hotkeys';
 
 import { Text } from './Text';
 import { Modal } from './Modal';
@@ -28,22 +29,35 @@ const HotkeysModal = () => {
     const t = useTranslations('HotkeysModal');
     const [modalVisible, setModalVisibility] = useState(false);
     const timer = useRef<NodeJS.Timeout | null>();
+    const isLongPress = useRef<boolean>(false);
+    const [action, setAction] = useState<'shortpress' | 'longpress'>('shortpress');
+
+    function startPressTimer() {
+        isLongPress.current = false;
+        setAction('shortpress');
+        timer.current = setTimeout(() => {
+            isLongPress.current = true;
+            setAction('longpress');
+        }, 500);
+    }
+
     const keydownListener = useCallback((e: KeyboardEvent) => {
-        if (e.code === 'KeyH' && !timer.current) {
-            timer.current = setTimeout(() => {
-                setModalVisibility(true);
-            }, 200);
+        if (!isEventTargetInputOrTextArea(e.target) && e.code === 'KeyH' && !timer.current) {
+            startPressTimer();
         }
     }, []);
+
     const keyupListener = useCallback(() => {
-        timer.current = setTimeout(() => {
-            clearTimeout(Number(timer.current));
-            timer.current = null;
-            setModalVisibility(false);
-        }, 50);
+        clearTimeout(Number(timer.current));
+        timer.current = null;
+        setModalVisibility(false);
     }, []);
 
-    useEffect(() => () => clearTimeout(Number(timer.current)), []);
+    useEffect(() => {
+        if (action === 'longpress') {
+            setModalVisibility(true);
+        }
+    }, [action]);
 
     useEffect(() => {
         window.addEventListener('keydown', keydownListener, true);
@@ -80,6 +94,9 @@ const HotkeysModal = () => {
                 </StyledHotkeyRow>
                 <StyledHotkeyRow color={gray9}>
                     <Keyboard>g</Keyboard>, <Keyboard>h</Keyboard> — {t('home page')}
+                </StyledHotkeyRow>
+                <StyledHotkeyRow color={gray9}>
+                    <Keyboard>g</Keyboard>, <Keyboard>g</Keyboard> — {t('goals page')}
                 </StyledHotkeyRow>
                 <StyledHotkeyRow color={gray9}>
                     <Keyboard>h</Keyboard> — {t('shows this instruction')}
