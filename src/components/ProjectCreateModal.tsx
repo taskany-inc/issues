@@ -8,16 +8,20 @@ import { createProjectKeys, createHotkeys } from '../utils/hotkeys';
 import { Modal } from './Modal';
 import { ProjectCreateForm } from './ProjectCreateForm';
 
-export const ProjectCreateModal = () => {
+const ProjectCreateModal = () => {
     const nextRouter = useNextRouter();
     const router = useRouter();
     const [modalVisible, setModalVisibility] = useState(false);
     const isCreateProjectPath = nextRouter.pathname === routes.createProject();
-    const showModalOrNavigate = (navigate: () => void) => (isCreateProjectPath ? navigate() : setModalVisibility(true));
+    const showModalOrNavigate = useCallback(
+        (navigate: () => void) => (isCreateProjectPath ? navigate() : setModalVisibility(true)),
+        [isCreateProjectPath],
+    );
     const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
 
-    useEffect(() =>
-        tinykeys(window, createHotkeys([createProjectKeys, () => showModalOrNavigate(router.createProject)])),
+    useEffect(
+        () => tinykeys(window, createHotkeys([createProjectKeys, () => showModalOrNavigate(router.createProject)])),
+        [router.createProject, showModalOrNavigate],
     );
 
     return (
@@ -26,3 +30,5 @@ export const ProjectCreateModal = () => {
         </Modal>
     );
 };
+
+export default ProjectCreateModal;
