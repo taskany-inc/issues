@@ -8,16 +8,18 @@ import { useRouter } from './router';
 export const useHotkeys = () => {
     const router = useRouter();
 
-    useEffect(() =>
-        tinykeys(
+    useEffect(() => {
+        const unsubscribe = tinykeys(
             window,
             createHotkeys(
                 [showHomeKeys, () => router.index()],
                 [showProjectsKeys, () => router.projects()],
                 [showGoalsKeys, () => router.goals()],
             ),
-        ),
-    );
+        );
+
+        return () => unsubscribe();
+    });
 };
 
 export const useHotkey = (key: string, cb: () => void) => {
