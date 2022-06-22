@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
@@ -11,8 +11,9 @@ import { Icon } from './Icon';
 
 interface ModalProps {
     visible: boolean;
-    onClose?: () => void;
     width?: number;
+
+    onClose?: () => void;
 }
 
 const StyledModalSurface = styled.div`
@@ -71,7 +72,7 @@ export const Modal: React.FC<ModalProps> = ({ visible, onClose, children, width 
         stopPropagation: true,
     });
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (visible) {
             document.body.style.overflow = 'hidden';
         }

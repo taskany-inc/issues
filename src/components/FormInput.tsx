@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
@@ -112,7 +112,7 @@ export const FormInput = React.forwardRef<FormInputProps, FormInputProps>((props
     const [inputFocused, setInputFocus] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (props.error && inputFocused) {
             setPopupVisibility(true);
         }
