@@ -132,5 +132,15 @@
     "Created": "Создано",
     "updated": "обновлено",
     "created": "создано"
+  },
+  "HotkeysModal": {
+    "Available hotkeys": "Доступные горячие клавишы",
+    "Any hotkey available on any page": "Все горячие клавиши достпны на любых страница. Разделитель в виде запятой значит последовательное нажатие.",
+    "create project": "создать проект",
+    "create goal": "создать цель",
+    "create issue": "создать задачу",
+    "invite user": "пригласить пользователя",
+    "home page": "главная страница",
+    "shows this instruction": "показывает эту инструкцию"
   }
 }

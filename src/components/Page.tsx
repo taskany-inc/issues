@@ -19,6 +19,7 @@ import { Footer } from './Footer';
 const ProjectCreateModal = dynamic(() => import('./ProjectCreateModal'));
 const GoalCreateModal = dynamic(() => import('./GoalCreateModal'));
 const UserInviteModal = dynamic(() => import('./UserInviteModal'));
+const HotkeysModal = dynamic(() => import('./HotkeysModal'));
 
 interface PageProps {
     locale: ExternalPageProps['locale'];
@@ -63,6 +64,7 @@ export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children
             <ProjectCreateModal />
             <GoalCreateModal />
             <UserInviteModal />
+            <HotkeysModal />
             <Footer />
         </pageContext.Provider>
     );
