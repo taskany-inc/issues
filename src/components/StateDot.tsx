@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import colorLayer from 'color-layer';
 
@@ -15,9 +15,11 @@ const mapThemeOnId = { light: 0, dark: 1 };
 
 const StyledStateDot = styled.div<{
     size: StateDotProps['size'];
-    hue: StateDotProps['hue'];
     onClick: StateDotProps['onClick'];
-    themeId: number;
+    colors: {
+        bkg: string;
+        bkgHover: string;
+    };
 }>`
     width: 14px;
     height: 14px;
@@ -29,22 +31,13 @@ const StyledStateDot = styled.div<{
         margin-left: 6px;
     }
 
-    ${({ hue = 1, themeId }) => {
-        const sat = hue === 1 ? 0 : undefined;
-        const bkg = colorLayer(hue, 9, sat)[themeId];
-        const bkgHover = colorLayer(hue, 10, sat)[themeId];
+    ${({ colors }) => css`
+        background-color: ${colors.bkg};
 
-        return (
-            hue &&
-            css`
-                background-color: ${bkg};
-
-                &:hover {
-                    background-color: ${bkgHover};
-                }
-            `
-        );
-    }}
+        &:hover {
+            background-color: ${colors.bkgHover};
+        }
+    `}
 
     ${({ onClick }) =>
         onClick &&
@@ -60,16 +53,23 @@ const StyledStateDot = styled.div<{
         `}
 `;
 
-export const StateDot: React.FC<StateDotProps> = ({ title, hue = 1, size = 'm', onClick }) => {
+// eslint-disable-next-line react/display-name
+export const StateDot: React.FC<StateDotProps> = React.memo(({ title, hue = 1, size = 'm', onClick }) => {
     const { theme } = useContext(pageContext);
+    const [themeId, setThemeId] = useState(0); // default: dark
 
-    return (
-        <StyledStateDot
-            title={title}
-            size={size}
-            hue={hue}
-            onClick={onClick}
-            themeId={theme ? mapThemeOnId[theme] : 1}
-        />
-    );
-};
+    useEffect(() => {
+        theme && setThemeId(mapThemeOnId[theme]);
+    }, [theme]);
+
+    const colors = useMemo(() => {
+        const sat = hue === 1 ? 0 : undefined;
+
+        return {
+            bkg: colorLayer(hue, 9, sat)[themeId],
+            bkgHover: colorLayer(hue, 10, sat)[themeId],
+        };
+    }, [hue, themeId]);
+
+    return <StyledStateDot title={title} size={size} onClick={onClick} colors={colors} />;
+});
