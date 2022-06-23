@@ -12,7 +12,6 @@ import { estimatedMeta } from '../utils/dateTime';
 import { gapS, gray10 } from '../design/@generated/themes';
 import { UserAnyKind, Project, EstimateInput, State, Tag as TagModel } from '../../graphql/@generated/genql';
 
-import { FormCard } from './FormCard';
 import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
@@ -30,7 +29,6 @@ import { UserPic } from './UserPic';
 import { Tag } from './Tag';
 
 interface GoalCreateFormProps {
-    card?: boolean;
     onCreate?: (id?: string) => void;
 }
 
@@ -38,7 +36,7 @@ const StyledTagsContainer = styled.div`
     padding-left: ${gapS};
 `;
 
-export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }) => {
+export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const [estimate, setEstimate] = useState<EstimateInput>();
@@ -134,83 +132,80 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ card, onCreate }
     const stateButtonText = state?.title || t('State');
     const estimateDefault = estimatedMeta();
 
-    const formContent = (
-        <Form onSubmit={handleSubmit(createGoal)}>
-            <ProjectCompletion
-                text={projectButtonText}
-                placeholder={t('Enter project title')}
-                query={project?.title}
-                onClick={(p) => setProject(p)}
-            />
-
-            <h2>{t('Create new goal')}</h2>
-
-            <FormInput
-                {...register('title')}
-                error={isSubmitted ? errors.title : undefined}
-                placeholder={t("Goal's title")}
-                autoFocus
-                flat="bottom"
-            />
-            <FormTextarea
-                {...register('description')}
-                error={isSubmitted ? errors.description : undefined}
-                flat="both"
-                placeholder={t('And its description')}
-            />
-            <FormActions flat="top">
-                <FormAction left inline>
-                    <UserCompletion
-                        size="m"
-                        text={ownerButtonText}
-                        placeholder={t('Enter name or email')}
-                        query={owner?.name || owner?.email}
-                        userPic={<UserPic src={owner?.image} size={16} />}
-                        onClick={(u) => setOwner(u)}
-                    />
-
-                    <StateDropdown
-                        size="m"
-                        text={stateButtonText}
-                        flowId={project?.flow?.id}
-                        onClick={(s) => setState(s)}
-                    />
-                    <EstimateDropdown
-                        size="m"
-                        text={t('Schedule')}
-                        placeholder={t('Date input mask placeholder')}
-                        mask={t('Date input mask')}
-                        defaultValuePlaceholder={estimateDefault}
-                        onChange={(e) => setEstimate(e)}
-                    />
-
-                    <TagCompletion
-                        filter={Array.from(tags.keys())}
-                        placeholder={t('Enter tag title')}
-                        onClick={(tag) => addTagToState(tag)}
-                    />
-
-                    <StyledTagsContainer>
-                        {Array.from(tags.values()).map((tag) => (
-                            <Tag
-                                key={tag.id}
-                                title={tag.title}
-                                description={tag.description}
-                                onHide={() => removeTagFromState(tag)}
-                            />
-                        ))}
-                    </StyledTagsContainer>
-                </FormAction>
-                <FormAction right inline>
-                    <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Create goal')} />
-                </FormAction>
-            </FormActions>
-        </Form>
-    );
-
     return (
         <>
-            {card ? <FormCard style={{ maxWidth: '800px' }}>{formContent}</FormCard> : formContent}
+            <Form onSubmit={handleSubmit(createGoal)}>
+                <ProjectCompletion
+                    text={projectButtonText}
+                    placeholder={t('Enter project title')}
+                    query={project?.title}
+                    onClick={(p) => setProject(p)}
+                />
+
+                <h2>{t('Create new goal')}</h2>
+
+                <FormInput
+                    {...register('title')}
+                    error={isSubmitted ? errors.title : undefined}
+                    placeholder={t("Goal's title")}
+                    autoFocus
+                    flat="bottom"
+                />
+                <FormTextarea
+                    {...register('description')}
+                    error={isSubmitted ? errors.description : undefined}
+                    flat="both"
+                    placeholder={t('And its description')}
+                />
+                <FormActions flat="top">
+                    <FormAction left inline>
+                        <UserCompletion
+                            size="m"
+                            text={ownerButtonText}
+                            placeholder={t('Enter name or email')}
+                            query={owner?.name || owner?.email}
+                            userPic={<UserPic src={owner?.image} size={16} />}
+                            onClick={(u) => setOwner(u)}
+                        />
+
+                        <StateDropdown
+                            size="m"
+                            text={stateButtonText}
+                            flowId={project?.flow?.id}
+                            onClick={(s) => setState(s)}
+                        />
+                        <EstimateDropdown
+                            size="m"
+                            text={t('Schedule')}
+                            placeholder={t('Date input mask placeholder')}
+                            mask={t('Date input mask')}
+                            defaultValuePlaceholder={estimateDefault}
+                            onChange={(e) => setEstimate(e)}
+                        />
+
+                        <TagCompletion
+                            filter={Array.from(tags.keys())}
+                            placeholder={t('Enter tag title')}
+                            onClick={(tag) => addTagToState(tag)}
+                        />
+
+                        <StyledTagsContainer>
+                            {Array.from(tags.values()).map((tag) => (
+                                <Tag
+                                    key={tag.id}
+                                    title={tag.title}
+                                    description={tag.description}
+                                    onHide={() => removeTagFromState(tag)}
+                                />
+                            ))}
+                        </StyledTagsContainer>
+                    </FormAction>
+                    <FormAction right inline>
+                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Create goal')} />
+                    </FormAction>
+                </FormActions>
+            </Form>
+
             <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                 {t.rich('Press key to create the goal', {
                     key: () => <Keyboard command enter />,

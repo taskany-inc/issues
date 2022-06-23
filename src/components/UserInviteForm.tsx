@@ -8,7 +8,6 @@ import z from 'zod';
 import { gql } from '../utils/gql';
 import { gray10 } from '../design/@generated/themes';
 
-import { Card } from './Card';
 import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
@@ -18,11 +17,10 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 
 interface UserInviteFormProps {
-    card?: boolean;
     onCreate?: (id?: string) => void;
 }
 
-export const UserInviteForm: React.FC<UserInviteFormProps> = ({ card, onCreate }) => {
+export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
     const { data: session } = useSession();
     const t = useTranslations('users.invite');
 
@@ -75,30 +73,26 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ card, onCreate }
         onCreate && onCreate(res.inviteUser?.id);
     };
 
-    const formContent = (
-        <Form onSubmit={handleSubmit(inviteUser)}>
-            <h2>{t('Invite new user')}</h2>
-
-            <FormInput
-                {...register('email')}
-                error={isSubmitted ? errors.email : undefined}
-                placeholder={t('User email')}
-                autoFocus
-                flat="bottom"
-            />
-            <FormActions flat="top">
-                <FormAction left />
-                <FormAction right inline>
-                    {/* @ts-ignore FIXME: https://github.com/taskany-inc/issues/issues/25  */}
-                    <Button size="l" view="primary-outline" type="submit" disabled={!isValid} text={t('Send invite')} />
-                </FormAction>
-            </FormActions>
-        </Form>
-    );
-
     return (
         <>
-            {card ? <Card style={{ maxWidth: '800px' }}>{formContent}</Card> : formContent}
+            <Form onSubmit={handleSubmit(inviteUser)}>
+                <h2>{t('Invite new user')}</h2>
+
+                <FormInput
+                    {...register('email')}
+                    error={isSubmitted ? errors.email : undefined}
+                    placeholder={t('User email')}
+                    autoFocus
+                    flat="bottom"
+                />
+                <FormActions flat="top">
+                    <FormAction left />
+                    <FormAction right inline>
+                        <Button size="l" type="submit" disabled={!isValid} text={t('Send invite')} />
+                    </FormAction>
+                </FormActions>
+            </Form>
+
             <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                 {t.rich('Press key to send invite', {
                     key: () => <Keyboard command enter />,

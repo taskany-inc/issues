@@ -14,7 +14,6 @@ import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
 
-import { FormCard } from './FormCard';
 import { Icon } from './Icon';
 import { Button } from './Button';
 import { FormInput } from './FormInput';
@@ -29,7 +28,6 @@ import { UserPic } from './UserPic';
 import { ProjectKeyInput } from './ProjectKeyInput';
 
 interface ProjectCreateFormProps {
-    card?: boolean;
     onCreate?: (slug?: string) => void;
 }
 
@@ -54,7 +52,7 @@ const StyledProjectKeyContainer = styled.div`
     right: 20px;
 `;
 
-export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCreate }) => {
+export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const [flow, setFlow] = useState<Partial<Flow>>();
@@ -148,62 +146,59 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ card, onCr
     const ownerButtonText = owner?.name || owner?.email || t('Assign');
     const flowButtonText = flow?.title || t('Flow');
 
-    const formContent = (
-        <Form onSubmit={handleSubmit(createProject)}>
-            <h2>{t('Create new project')}</h2>
-
-            <StyledProjectTitleContainer>
-                <FormInput
-                    {...register('title')}
-                    error={isSubmitted ? errors.title : undefined}
-                    placeholder={t("Project's title")}
-                    autoFocus
-                    flat="bottom"
-                />
-
-                <StyledProjectKeyContainer>
-                    <ProjectKeyInput value={projectKey} onChange={onProjectKeyChange} onBlur={onProjectKeyEdited} />
-                </StyledProjectKeyContainer>
-            </StyledProjectTitleContainer>
-
-            <FormTextarea
-                {...register('description')}
-                error={isSubmitted ? errors.description : undefined}
-                flat="both"
-                placeholder={t('And its description')}
-            />
-            <FormActions flat="top">
-                <FormAction left inline>
-                    <UserCompletion
-                        size="m"
-                        // view="outline"
-                        text={ownerButtonText}
-                        placeholder={t('Enter name or email')}
-                        query={owner?.name || owner?.email}
-                        userPic={<UserPic src={owner?.image} size={16} />}
-                        onClick={(u) => setOwner(u)}
-                    />
-
-                    <FlowCompletion
-                        disabled
-                        size="m"
-                        // view="outline"
-                        text={flowButtonText}
-                        placeholder={t('Flow or state title')}
-                        query={flow?.title}
-                        onClick={(f) => setFlow(f)}
-                    />
-                </FormAction>
-                <FormAction right inline>
-                    <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Create project')} />
-                </FormAction>
-            </FormActions>
-        </Form>
-    );
-
     return (
         <>
-            {card ? <FormCard style={{ maxWidth: '800px' }}>{formContent}</FormCard> : formContent}
+            <Form onSubmit={handleSubmit(createProject)}>
+                <h2>{t('Create new project')}</h2>
+
+                <StyledProjectTitleContainer>
+                    <FormInput
+                        {...register('title')}
+                        error={isSubmitted ? errors.title : undefined}
+                        placeholder={t("Project's title")}
+                        autoFocus
+                        flat="bottom"
+                    />
+
+                    <StyledProjectKeyContainer>
+                        <ProjectKeyInput value={projectKey} onChange={onProjectKeyChange} onBlur={onProjectKeyEdited} />
+                    </StyledProjectKeyContainer>
+                </StyledProjectTitleContainer>
+
+                <FormTextarea
+                    {...register('description')}
+                    error={isSubmitted ? errors.description : undefined}
+                    flat="both"
+                    placeholder={t('And its description')}
+                />
+                <FormActions flat="top">
+                    <FormAction left inline>
+                        <UserCompletion
+                            size="m"
+                            // view="outline"
+                            text={ownerButtonText}
+                            placeholder={t('Enter name or email')}
+                            query={owner?.name || owner?.email}
+                            userPic={<UserPic src={owner?.image} size={16} />}
+                            onClick={(u) => setOwner(u)}
+                        />
+
+                        <FlowCompletion
+                            disabled
+                            size="m"
+                            // view="outline"
+                            text={flowButtonText}
+                            placeholder={t('Flow or state title')}
+                            query={flow?.title}
+                            onClick={(f) => setFlow(f)}
+                        />
+                    </FormAction>
+                    <FormAction right inline>
+                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Create project')} />
+                    </FormAction>
+                </FormActions>
+            </Form>
+
             <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                 {t.rich('Press key to create the project', {
                     key: () => <Keyboard command enter />,
