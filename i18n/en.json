@@ -111,7 +111,9 @@
     "Goals": "Goals",
     "Issues": "Issues",
     "Explore": "Explore",
-    "Boards": "Boards",
+    "Boards": "Boards"
+  },
+  "HeaderMenu": {
     "New goal": "New goal",
     "New project": "New project",
     "Invite users": "Invite users",

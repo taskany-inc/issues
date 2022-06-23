@@ -1,5 +1,3 @@
-import { useCallback, useRef, useState } from 'react';
-import { useSession, signOut } from 'next-auth/react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
@@ -8,11 +6,8 @@ import { routes } from '../hooks/router';
 import { textColor, gray7, colorPrimary, gray3 } from '../design/@generated/themes';
 
 import { HeaderLogo } from './HeaderLogo';
+import { HeaderMenu } from './HeaderMenu';
 import { Icon } from './Icon';
-import { UserPic } from './UserPic';
-import { Popup } from './Popup';
-import { Plus } from './Plus';
-import { Link } from './Link';
 
 const StyledHeader = styled.header`
     display: grid;
@@ -21,18 +16,6 @@ const StyledHeader = styled.header`
     padding: 20px 40px;
 
     background-color: ${gray3};
-`;
-
-const StyledUserMenu = styled.div`
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    justify-items: center;
-    align-items: center;
-    align-self: end;
-`;
-
-const StyledPopupContent = styled.div`
-    min-width: 120px;
 `;
 
 const StyledNav = styled.nav`
@@ -70,58 +53,7 @@ const StyledHeaderNavLink = styled.a`
     }
 `;
 
-const CreatorMenu = () => {
-    const t = useTranslations('Header');
-    const popupRef = useRef<HTMLDivElement>(null);
-    const buttonRef = useRef<HTMLDivElement>(null);
-    const [popupVisible, setPopupVisibility] = useState(false);
-
-    const onClickOutside = useCallback(() => {
-        setPopupVisibility(false);
-    }, []);
-
-    return (
-        <>
-            <span ref={popupRef}>
-                <Plus action ref={buttonRef} onClick={() => setPopupVisibility(!popupVisible)} />
-            </span>
-
-            <Popup
-                overflow="hidden"
-                visible={popupVisible}
-                onClickOutside={onClickOutside}
-                reference={popupRef}
-                interactive
-                minWidth={150}
-                maxWidth={250}
-            >
-                <StyledPopupContent>
-                    <div>
-                        <NextLink href={routes.createGoal()}>
-                            <a>{t('New goal')}</a>
-                        </NextLink>
-                    </div>
-                    <div>
-                        <NextLink href={routes.createProject()}>
-                            <a>{t('New project')}</a>
-                        </NextLink>
-                    </div>
-                    <div>
-                        <NextLink href={routes.inviteUsers()}>
-                            <a>{t('Invite users')}</a>
-                        </NextLink>
-                    </div>
-                    <div>
-                        <a onClick={() => signOut()}>{t('Sign out')}</a>
-                    </div>
-                </StyledPopupContent>
-            </Popup>
-        </>
-    );
-};
-
 export const Header: React.FC = () => {
-    const { data: session } = useSession();
     const t = useTranslations('Header');
 
     return (
@@ -147,14 +79,7 @@ export const Header: React.FC = () => {
                 </StyledSearch>
             </StyledNav>
 
-            <StyledUserMenu>
-                <CreatorMenu />
-                <NextLink href={routes.userSettings()} passHref>
-                    <Link inline>
-                        <UserPic src={session?.user.image} size={32} />
-                    </Link>
-                </NextLink>
-            </StyledUserMenu>
+            <HeaderMenu notifications />
         </StyledHeader>
     );
 };
