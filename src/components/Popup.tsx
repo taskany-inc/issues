@@ -2,7 +2,7 @@ import React, { ComponentProps } from 'react';
 import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { backgroundColor, danger10, radiusS, warn10 } from '../design/@generated/themes';
+import { backgroundColor, danger10, gapXs, gray3, gray4, radiusS, warn10 } from '../design/@generated/themes';
 
 const Tippy = dynamic(() => import('@tippyjs/react/headless'));
 
@@ -102,7 +102,7 @@ const StyledPopupContainer = styled.div<{
                   overflow: hidden;
               `
             : css`
-                  padding: 4px 8px;
+                  padding: ${gapXs};
               `}
 
 
@@ -131,6 +131,34 @@ const StyledPopupContainer = styled.div<{
 
     &[data-placement^='right'] > ${StyledPopupArrow} {
         left: -4px;
+    }
+
+    &:before {
+        content: '';
+        z-index: -1;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: linear-gradient(-45deg, ${gray3} 0%, ${gray4} 100%);
+        transform: translate3d(0px, 5px, 0) scale(0.95);
+        filter: blur(10px);
+        opacity: var(0.7);
+        transition: opacity 0.3s;
+        border-radius: inherit;
+    }
+
+    &:after {
+        content: '';
+        z-index: -1;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: inherit;
+        border-radius: inherit;
     }
 `;
 
