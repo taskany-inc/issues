@@ -111,7 +111,9 @@
     "Goals": "Цели",
     "Issues": "Задачи",
     "Explore": "Обзор",
-    "Boards": "Доски",
+    "Boards": "Доски"
+  },
+  "HeaderMenu": {
     "New goal": "Новая цель",
     "New project": "Новый проект",
     "Invite users": "Пригласить",

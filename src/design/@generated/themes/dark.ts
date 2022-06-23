@@ -75,5 +75,16 @@ export default createGlobalStyle`
         --star8: hsl(43, 90%, 36%);
         --star9: hsl(43, 90%, 47%);
         --star10: hsl(43, 90%, 63%);
+        --accent0: hsl(324, 90%, 50%);
+        --accent1: hsl(324, 90%, 4%);
+        --accent2: hsl(324, 90%, 6%);
+        --accent3: hsl(324, 90%, 8%);
+        --accent4: hsl(324, 90%, 12%);
+        --accent5: hsl(324, 90%, 16%);
+        --accent6: hsl(324, 90%, 21%);
+        --accent7: hsl(324, 90%, 28%);
+        --accent8: hsl(324, 90%, 36%);
+        --accent9: hsl(324, 90%, 47%);
+        --accent10: hsl(324, 90%, 63%);
     }
 `;
