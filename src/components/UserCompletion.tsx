@@ -17,6 +17,7 @@ import { Input } from './Input';
 interface UserCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
+    tabIndex?: React.ComponentProps<typeof Button>['tabIndex'];
     text: React.ComponentProps<typeof Button>['text'];
     userPic?: React.ComponentProps<typeof Button>['iconLeft'];
     query?: string;
@@ -110,6 +111,7 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
     size = 'm',
     text,
     view,
+    tabIndex,
     userPic,
     onClick,
     query = '',
@@ -200,6 +202,7 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
                         placeholder={placeholder}
                         value={inputState}
                         onChange={onInputChange}
+                        tabIndex={tabIndex}
                         {...onENTER}
                     />
                 ) : (
@@ -211,6 +214,7 @@ export const UserCompletion: React.FC<UserCompletionProps> = ({
                         title={title}
                         iconLeft={userPic}
                         onClick={onButtonClick}
+                        tabIndex={tabIndex}
                     />
                 )}
             </StyledDropdownContainer>
