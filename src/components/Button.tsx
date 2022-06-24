@@ -41,7 +41,10 @@ interface ButtonProps {
     iconRight?: React.ReactNode;
     brick?: 'left' | 'right' | 'center';
     className?: string;
+
     onClick?: React.MouseEventHandler;
+    onMouseEnter?: React.MouseEventHandler;
+    onMouseLeave?: React.MouseEventHandler;
 }
 
 const StyledIcon = styled.span`
@@ -51,10 +54,12 @@ const StyledIcon = styled.span`
 `;
 const StyledText = styled.span``;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledButton = styled(({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, checked, ...props }) => (
-    <button ref={forwardRef} {...props} />
-))`
+const StyledButton = styled(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, checked, outline, ...props }) => (
+        <button ref={forwardRef} {...props} />
+    ),
+)`
     position: relative;
     box-sizing: border-box;
 
