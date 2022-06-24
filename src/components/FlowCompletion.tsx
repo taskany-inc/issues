@@ -17,6 +17,7 @@ import { Input } from './Input';
 interface FlowCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
+    tabIndex?: React.ComponentProps<typeof Button>['tabIndex'];
     disabled?: React.ComponentProps<typeof Button>['disabled'];
     text: React.ComponentProps<typeof Button>['text'];
     query?: string;
@@ -93,6 +94,7 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
     size,
     text,
     view,
+    tabIndex,
     disabled,
     onClick,
     query = '',
@@ -181,6 +183,7 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
                         placeholder={placeholder}
                         value={inputState}
                         onChange={onInputChange}
+                        tabIndex={tabIndex}
                         {...onENTER}
                     />
                 ) : (
@@ -192,6 +195,7 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
                         text={text}
                         iconLeft={<Icon type="flow" size="xs" />}
                         onClick={onButtonClick}
+                        tabIndex={tabIndex}
                     />
                 )}
             </StyledDropdownContainer>
