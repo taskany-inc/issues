@@ -2,7 +2,16 @@ import React, { ComponentProps } from 'react';
 import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { backgroundColor, danger10, gapXs, gray3, gray4, radiusS, warn10 } from '../design/@generated/themes';
+import {
+    backgroundColor,
+    colorPrimary,
+    danger0,
+    gapXs,
+    gray3,
+    gray4,
+    radiusS,
+    warn0,
+} from '../design/@generated/themes';
 
 const Tippy = dynamic(() => import('@tippyjs/react/headless'));
 
@@ -21,7 +30,7 @@ interface PopupProps {
     minWidth?: number;
     maxWidth?: number;
     tooltip?: boolean;
-    view?: 'warning' | 'danger' | 'success';
+    view?: 'warning' | 'danger' | 'primary';
     offset?: number[];
 
     onTrigger?: ComponentProps<typeof Tippy>['onTrigger'];
@@ -85,15 +94,21 @@ const StyledPopupContainer = styled.div<{
         `}
 
     ${({ view }) =>
+        view === 'primary' &&
+        css`
+            background-color: ${colorPrimary};
+        `}
+
+    ${({ view }) =>
         view === 'danger' &&
         css`
-            background-color: ${danger10};
+            background-color: ${danger0};
         `}
 
     ${({ view }) =>
         view === 'warning' &&
         css`
-            background-color: ${warn10};
+            background-color: ${warn0};
         `}
 
     ${({ overflow }) =>
@@ -105,12 +120,16 @@ const StyledPopupContainer = styled.div<{
                   padding: ${gapXs};
               `}
 
-
-
     ${({ maxWidth }) =>
         maxWidth &&
         css`
             max-width: ${maxWidth}px;
+        `}
+
+    ${({ minWidth }) =>
+        minWidth &&
+        css`
+            min-width: ${minWidth}px;
         `}
 
     &[data-placement^='top'] > ${StyledPopupArrow} {
