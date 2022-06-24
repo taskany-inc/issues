@@ -1,14 +1,14 @@
 import styled, { css } from 'styled-components';
 
-import { gray3, radiusS, textColor } from '../design/@generated/themes';
+import { gapS, gray3, radiusS, textColor } from '../design/@generated/themes';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ flat?: 'top' | 'bottom' }>`
     box-sizing: border-box;
-    padding: 8px 10px 12px 10px;
+    padding: ${gapS};
     display: grid;
     grid-template-columns: 8fr 4fr;
-    align-items: end;
+    align-items: center;
 
     border-radius: ${radiusS};
 
@@ -33,6 +33,8 @@ export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ 
 
 export const FormAction = styled.div<{ left?: boolean; right?: boolean; columns?: number; inline?: boolean }>`
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
 
     ${({ left }) =>
         left &&
