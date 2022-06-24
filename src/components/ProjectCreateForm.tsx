@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
@@ -8,11 +8,13 @@ import z from 'zod';
 import useSWR from 'swr';
 import styled from 'styled-components';
 
-import { gql } from '../utils/gql';
-import { gray10 } from '../design/@generated/themes';
+import { gapS, star0 } from '../design/@generated/themes';
 import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
+import { nullable } from '../utils/nullable';
+import { gql } from '../utils/gql';
+import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -26,12 +28,14 @@ import { UserCompletion } from './UserCompletion';
 import { FlowCompletion } from './FlowCompletion';
 import { UserPic } from './UserPic';
 import { ProjectKeyInput } from './ProjectKeyInput';
+import { FormTitle } from './FormTitle';
+import { Text } from './Text';
 
 interface ProjectCreateFormProps {
     onCreate?: (slug?: string) => void;
 }
 
-const fetcher = createFetcher(() => ({
+const fetcher = createFetcher((_, key: string) => ({
     flowRecommended: {
         id: true,
         title: true,
@@ -40,6 +44,14 @@ const fetcher = createFetcher(() => ({
             title: true,
         },
     },
+    project: [
+        {
+            key,
+        },
+        {
+            title: true,
+        },
+    ],
 }));
 
 const StyledProjectTitleContainer = styled.div`
@@ -48,9 +60,12 @@ const StyledProjectTitleContainer = styled.div`
 
 const StyledProjectKeyContainer = styled.div`
     position: absolute;
-    top: 10px;
-    right: 20px;
+    top: 6px;
+    right: ${gapS};
 `;
+
+const defaultIndexesFlow = [0, -1, 0, 1, 2, 3];
+const backIndexesFlow = [1, 2, 3, 4, 5, 6];
 
 export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }) => {
     const { data: session } = useSession();
@@ -58,8 +73,9 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }
     const [flow, setFlow] = useState<Partial<Flow>>();
     const [projectKey, setProjectKey] = useState('');
     const [isKeyByUser, setIsKeyByUser] = useState(false);
+    const [indexes, setIndexes] = useState(defaultIndexesFlow);
     const t = useTranslations('projects.new');
-    const { data } = useSWR('flowRecommened', () => fetcher(session?.user));
+    const { data } = useSWR([session?.user, projectKey], (...args) => fetcher(...args));
 
     useEffect(() => {
         if (data?.flowRecommended) {
@@ -85,6 +101,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }
         register,
         handleSubmit,
         watch,
+        setFocus,
         formState: { errors, isValid, isSubmitted },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
@@ -94,11 +111,31 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }
     });
 
     const projectTitleValue = watch('title');
+    useDebouncedEffect(
+        () => {
+            if (!isKeyByUser && projectTitleValue) {
+                setProjectKey(keyPredictor(projectTitleValue));
+            }
+
+            if (projectTitleValue === '') {
+                setProjectKey('');
+            }
+        },
+        500,
+        [projectTitleValue, isKeyByUser],
+    );
+
     useEffect(() => {
-        if (!isKeyByUser && projectTitleValue) {
-            setProjectKey(keyPredictor(projectTitleValue));
-        }
-    }, [projectTitleValue, isKeyByUser]);
+        setTimeout(() => setFocus('title'), 0);
+    }, [setFocus]);
+
+    const onInputFocus = useCallback(() => {
+        setIndexes(defaultIndexesFlow);
+    }, []);
+
+    const onTextareaFocus = useCallback(() => {
+        setIndexes(backIndexesFlow);
+    }, []);
 
     const onProjectKeyChange = (k: string) => {
         setIsKeyByUser(true);
@@ -145,61 +182,95 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }
 
     const ownerButtonText = owner?.name || owner?.email || t('Assign');
     const flowButtonText = flow?.title || t('Flow');
+    const isProjectKeyAvailable = Boolean(data?.project === null);
+    const richProps = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        b: (c: any) => (
+            <Text as="span" size="s" weight="bolder">
+                {c}
+            </Text>
+        ),
+        key: () => projectKey,
+    };
 
     return (
         <>
-            <Form onSubmit={handleSubmit(createProject)}>
-                <h2>{t('Create new project')}</h2>
+            <FormTitle>{t('Create new project')}</FormTitle>
 
+            <Form onSubmit={handleSubmit(createProject)}>
                 <StyledProjectTitleContainer>
                     <FormInput
                         {...register('title')}
-                        error={isSubmitted ? errors.title : undefined}
                         placeholder={t("Project's title")}
-                        autoFocus
                         flat="bottom"
+                        tabIndex={indexes[0]}
+                        error={isSubmitted ? errors.title : undefined}
+                        onFocus={onInputFocus}
                     />
 
-                    <StyledProjectKeyContainer>
-                        <ProjectKeyInput value={projectKey} onChange={onProjectKeyChange} onBlur={onProjectKeyEdited} />
-                    </StyledProjectKeyContainer>
+                    {nullable(isValid && projectKey, () => (
+                        <StyledProjectKeyContainer>
+                            <ProjectKeyInput
+                                value={projectKey}
+                                onChange={onProjectKeyChange}
+                                onBlur={onProjectKeyEdited}
+                                available={isProjectKeyAvailable}
+                                tooltip={
+                                    isProjectKeyAvailable
+                                        ? t.rich('Perfect! Issues in your project will looks like', richProps)
+                                        : t.rich('Project with key already exists', richProps)
+                                }
+                                tabIndex={indexes[1]}
+                            />
+                        </StyledProjectKeyContainer>
+                    ))}
                 </StyledProjectTitleContainer>
 
                 <FormTextarea
                     {...register('description')}
-                    error={isSubmitted ? errors.description : undefined}
-                    flat="both"
                     placeholder={t('And its description')}
+                    flat="both"
+                    tabIndex={indexes[2]}
+                    error={isSubmitted ? errors.description : undefined}
+                    onFocus={onTextareaFocus}
                 />
+
                 <FormActions flat="top">
                     <FormAction left inline>
                         <UserCompletion
                             size="m"
-                            // view="outline"
                             text={ownerButtonText}
                             placeholder={t('Enter name or email')}
                             query={owner?.name || owner?.email}
                             userPic={<UserPic src={owner?.image} size={16} />}
                             onClick={(u) => setOwner(u)}
+                            tabIndex={indexes[3]}
                         />
 
                         <FlowCompletion
                             disabled
                             size="m"
-                            // view="outline"
                             text={flowButtonText}
                             placeholder={t('Flow or state title')}
                             query={flow?.title}
                             onClick={(f) => setFlow(f)}
+                            tabIndex={indexes[4]}
                         />
                     </FormAction>
                     <FormAction right inline>
-                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Create project')} />
+                        <Button
+                            size="m"
+                            view="primary"
+                            type="submit"
+                            disabled={!(isValid && isProjectKeyAvailable)}
+                            text={t('Create project')}
+                            tabIndex={indexes[5]}
+                        />
                     </FormAction>
                 </FormActions>
             </Form>
 
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
+            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
                 {t.rich('Press key to create the project', {
                     key: () => <Keyboard command enter />,
                 })}
