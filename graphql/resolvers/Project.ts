@@ -21,6 +21,8 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
             });
 
+            if (!project) return null;
+
             return withComputedField('owner')(project);
         },
     });
