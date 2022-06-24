@@ -52,12 +52,17 @@ const StyledModal = styled.div`
 const StyledCross = styled.div`
     position: absolute;
     z-index: 102;
+    right: ${gapM};
+    top: ${gapM};
+
     width: 20px;
     height: 20px;
-    right: 20px;
-    top: 12px;
+
     opacity: 0.6;
+
     cursor: pointer;
+
+    text-align: center;
 
     &:hover {
         opacity: 1;
