@@ -1,12 +1,15 @@
 import styled from 'styled-components';
 
+import { gray3 } from '../design/@generated/themes';
 import { KeyCode, KeyMod, useKeyboard } from '../hooks/useKeyboard';
 
 interface FormProps {
     onSubmit?: () => void;
 }
 
-const StyledFormContainer = styled.div``;
+const StyledFormContainer = styled.div`
+    background-color: ${gray3};
+`;
 
 export const Form: React.FC<FormProps> = ({ onSubmit, children }) => {
     const handleSubmit = (e?: React.SyntheticEvent) => {
