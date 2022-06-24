@@ -72,7 +72,9 @@ const StyledErrorTrigger = styled.div`
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledFormInput = styled(({ flat, error, label, forwardRef, ...props }) => <input ref={forwardRef} {...props} />)`
+const StyledFormInput = styled(({ flat, error, label, forwardRef, ...props }) => (
+    <input ref={forwardRef} {...props} />
+))<{ flat: FormInputProps['flat'] }>`
     box-sizing: border-box;
     outline: none;
     width: 100%;
@@ -94,6 +96,26 @@ const StyledFormInput = styled(({ flat, error, label, forwardRef, ...props }) =>
         background-color: ${gray2};
     }
 
+    ${({ flat }) =>
+        flat === 'top' &&
+        css`
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        `}
+
+    ${({ flat }) =>
+        flat === 'bottom' &&
+        css`
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        `}
+
+    ${({ flat }) =>
+        flat === 'both' &&
+        css`
+            border-radius: 0;
+        `}
+
     ${({ disabled }) =>
         disabled &&
         css`
@@ -107,7 +129,7 @@ const StyledLabel = styled(Text)`
     background-color: transparent;
 `;
 
-export const FormInput = React.forwardRef<FormInputProps, FormInputProps>((props, ref) => {
+export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>((props, ref) => {
     const [popupVisible, setPopupVisibility] = useState(false);
     const [inputFocused, setInputFocus] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
