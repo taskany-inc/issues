@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { gapS, gray7 } from '../design/@generated/themes';
+import { gapM, gapS, gray7, gray8 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { Text } from './Text';
@@ -11,17 +11,17 @@ interface TipProps {
 }
 
 const StyledTip = styled(Text)`
-    padding: ${gapS} 0;
+    padding: ${gapM} ${gapS} 0;
 `;
 
 const StyledTipIcon = styled.span`
     display: inline-block;
     vertical-align: middle;
-    margin-right: 6px;
+    margin-right: ${gapS};
 `;
 
 const StyledTipTitle = styled(Text)`
-    margin-right: 6px;
+    margin-right: ${gapS};
 `;
 
 export const Tip: React.FC<TipProps> = ({ children, title, icon }) => {
@@ -32,7 +32,7 @@ export const Tip: React.FC<TipProps> = ({ children, title, icon }) => {
             ))}
 
             {nullable(title, (t) => (
-                <StyledTipTitle as="span" size="s" weight="bold" color={gray7}>
+                <StyledTipTitle as="span" size="s" weight="bold" color={gray8}>
                     {t}
                 </StyledTipTitle>
             ))}
