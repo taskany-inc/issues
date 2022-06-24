@@ -16,6 +16,7 @@ interface InputProps {
     disabled?: boolean;
     view?: 'default' | 'primary' | 'warning' | 'danger';
     size?: 's' | 'm' | 'l';
+    className?: string;
 
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
     onInput?: React.ChangeEventHandler<HTMLInputElement>;
@@ -62,7 +63,7 @@ const StyledInput = styled(({ forwardRef, size, view, ...props }) => <input ref=
 `;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ view = 'default', size = 'm', ...props }, ref) => {
-        return <StyledInput forwardRef={ref} view={view} size={size} {...props} />;
-    },
+    ({ view = 'default', size = 'm', ...props }, ref) => (
+        <StyledInput forwardRef={ref} view={view} size={size} {...props} />
+    ),
 );
