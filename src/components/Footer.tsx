@@ -1,25 +1,26 @@
 import styled from 'styled-components';
 
+import { gray0 } from '../design/@generated/themes';
+
 import { SheepLogo } from './SheepLogo';
 
 const StyledFooter = styled.footer`
-    padding: 20px 20px;
-    display: flex;
-    justify-content: start;
-    height: 60px;
+    display: grid;
+    grid-template-columns: 0.25fr 2fr;
+    align-items: end;
+    padding: 20px 40px;
 `;
 
-const StyledFooterText = styled.span`
-    color: rgba(255, 255, 255, 0.6);
+const StyledFooterText = styled.div`
+    color: ${gray0};
 `;
 
 export const Footer: React.FC = () => {
     return (
         <StyledFooter>
-            <StyledFooterText>
-                {`© ${new Date().getFullYear()} Taskany, Inc.`}
-                <SheepLogo />
-            </StyledFooterText>
+            <StyledFooterText>{`© ${new Date().getFullYear()} Taskany, Inc.`}</StyledFooterText>
+
+            <SheepLogo />
         </StyledFooter>
     );
 };
