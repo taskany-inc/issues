@@ -1,99 +1,33 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
+import React, { useCallback, useRef, useState } from 'react';
+import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
 
-import { gray6, gray7, gray8, radiusM } from '../design/@generated/themes';
+import { gapS, gapXs } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
-import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { gql } from '../utils/gql';
 
+import { Button } from './Button';
 import { Popup } from './Popup';
 import { Icon } from './Icon';
 import { Tag } from './Tag';
 import { Input } from './Input';
 
 interface TagCompletionProps {
+    size?: React.ComponentProps<typeof Button>['size'];
+    view?: React.ComponentProps<typeof Button>['view'];
+    disabled?: React.ComponentProps<typeof Button>['disabled'];
+    text: React.ComponentProps<typeof Button>['text'];
     filter?: string[];
     placeholder?: string;
-    onClick?: (user: TagModel) => void;
+
+    onAdd?: (tag: TagModel) => void;
+    onChange?: (title: string) => void;
 }
-
-const StyledTagCard = styled.div<{ focused?: boolean }>`
-    display: grid;
-    grid-template-columns: 2fr 10fr;
-    justify-content: center;
-    align-items: center;
-    min-width: 185px;
-
-    padding: 6px;
-    margin-bottom: 4px;
-    border: 1px solid ${gray7};
-    border-radius: ${radiusM};
-
-    cursor: pointer;
-
-    &:last-child {
-        margin-bottom: 0;
-    }
-
-    &:hover {
-        border-color: ${gray8};
-        background-color: ${gray6};
-    }
-
-    ${({ focused }) =>
-        focused &&
-        css`
-            border-color: ${gray8};
-            background-color: ${gray6};
-        `}
-`;
-const StyledTagInfo = styled.div`
-    padding-left: 4px;
-`;
-const StyledTagTitle = styled.div`
-    font-size: 14px;
-    font-weight: 600;
-`;
-const StyledTagColor = styled.div`
-    width: 14px;
-    height: 14px;
-
-    border-radius: 100%;
-`;
-const TagCard: React.FC<{
-    title: string;
-    description?: string;
-    focused?: boolean;
-    onClick?: () => void;
-}> = ({ title, description, focused, onClick }) => {
-    return (
-        <StyledTagCard onClick={onClick} focused={focused} title={description}>
-            <StyledTagColor />
-            <StyledTagInfo>
-                <StyledTagTitle>{title}</StyledTagTitle>
-            </StyledTagInfo>
-        </StyledTagCard>
-    );
-};
-
-const StyledDropdownContainer = styled.div``;
-
-const StyledIconContainer = styled.div`
-    padding: 6px 2px;
-`;
-
-const StyledNewTagForm = styled.div`
-    display: grid;
-    grid-template-columns: 8fr 4fr;
-    justify-content: center;
-    align-items: center;
-`;
 
 const fetcher = createFetcher((_, query: string) => ({
     tagCompletion: [
@@ -104,21 +38,30 @@ const fetcher = createFetcher((_, query: string) => ({
             id: true,
             title: true,
             description: true,
-            color: true,
         },
     ],
 }));
 
-export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = [], placeholder }) => {
+const StyledTags = styled.div`
+    padding: ${gapXs} ${gapS};
+`;
+
+export const TagCompletion: React.FC<TagCompletionProps> = ({
+    size,
+    view,
+    text,
+    disabled,
+    filter = [],
+    placeholder,
+    onAdd,
+    onChange,
+}) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [inputState, setInputState] = useState('');
-    const downPress = useKeyPress('ArrowDown');
-    const upPress = useKeyPress('ArrowUp');
-    const [cursor, setCursor] = useState(0);
 
     const t = useTranslations('TagCompletion');
     const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
@@ -141,37 +84,28 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
 
     const onItemClick = useCallback(
         (tag: TagModel) => () => {
-            onClick && onClick(tag);
+            onAdd && onAdd(tag);
             setInputState('');
+            setPopupVisibility(false);
+            setEditMode(false);
         },
-        [onClick],
+        [onAdd],
     );
 
-    const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setPopupVisibility(Boolean(e.target.value));
-        setInputState(e.target.value);
-    }, []);
+    const onInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setPopupVisibility(Boolean(e.target.value));
+            setInputState(e.target.value);
+            onChange && onChange(e.target.value);
+        },
+        [onChange],
+    );
 
     const [onESC] = useKeyboard(
         [KeyCode.Escape],
         () => {
             popupVisible && setPopupVisibility(false);
             setEditMode(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
-
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.tagCompletion?.length) {
-                onItemClick(data?.tagCompletion[cursor])();
-            } else if (inputState === '') {
-                setPopupVisibility(false);
-                setEditMode(false);
-            }
         },
         {
             stopPropagation: true,
@@ -207,23 +141,19 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
         setEditMode(false);
     }, [inputState, onItemClick, session, t]);
 
-    useEffect(() => {
-        const tagCompletion = data?.tagCompletion;
-
-        if (tagCompletion?.length && downPress) {
-            setCursor((prevState) => (prevState < tagCompletion.length - 1 ? prevState + 1 : prevState));
-        }
-    }, [data?.tagCompletion, downPress]);
-
-    useEffect(() => {
-        if (data?.tagCompletion?.length && upPress) {
-            setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
-        }
-    }, [data?.tagCompletion, upPress]);
+    const [onENTER] = useKeyboard(
+        [KeyCode.Enter],
+        async () => {
+            await createTag();
+        },
+        {
+            stopPropagation: true,
+        },
+    );
 
     return (
         <>
-            <StyledDropdownContainer ref={popupRef} {...onESC}>
+            <span ref={popupRef} {...onESC}>
                 {editMode ? (
                     <Input
                         autoFocus
@@ -234,11 +164,17 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                         {...onENTER}
                     />
                 ) : (
-                    <StyledIconContainer>
-                        <Icon ref={buttonRef} type="tag" size="xs" onClick={onButtonClick} />
-                    </StyledIconContainer>
+                    <Button
+                        ref={buttonRef}
+                        disabled={disabled}
+                        size={size}
+                        view={view}
+                        text={text}
+                        iconLeft={<Icon noWrap type="tag" size="xs" />}
+                        onClick={onButtonClick}
+                    />
                 )}
-            </StyledDropdownContainer>
+            </span>
 
             <Popup
                 placement="top-start"
@@ -251,29 +187,22 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({ onClick, filter = 
                 maxWidth={250}
                 offset={[0, 4]}
             >
-                {data?.tagCompletion?.length ? (
-                    <>
-                        {data?.tagCompletion
-                            ?.filter((t) => !filter.includes(t.id))
-                            .map((t, i) => (
-                                <TagCard
-                                    key={t.id}
-                                    title={t.title}
-                                    description={t.description}
-                                    focused={cursor === i}
-                                    onClick={onItemClick(t)}
-                                />
-                            ))}
-                    </>
-                ) : (
-                    <>
-                        {inputState !== '' && (
-                            <StyledNewTagForm>
-                                <Tag title={inputState} onClick={createTag} />
-                            </StyledNewTagForm>
-                        )}
-                    </>
-                )}
+                <StyledTags>
+                    {data?.tagCompletion?.length
+                        ? data?.tagCompletion
+                              // eslint-disable-next-line no-shadow
+                              ?.filter((t) => !filter.includes(t.id))
+                              // eslint-disable-next-line no-shadow
+                              .map((t) => (
+                                  <Tag
+                                      key={t.id}
+                                      title={t.title}
+                                      description={t.description}
+                                      onClick={onItemClick(t)}
+                                  />
+                              ))
+                        : inputState !== '' && <Tag title={inputState} onClick={createTag} />}
+                </StyledTags>
             </Popup>
         </>
     );

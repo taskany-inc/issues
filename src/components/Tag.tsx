@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { gray10, gray5, gray6, gray7, gray8, gray9, radiusL } from '../design/@generated/themes';
+import { gapXs, gray10, gray5, gray6, gray7, gray8, gray9, radiusL } from '../design/@generated/themes';
 
 interface TagProps {
     title: string;
@@ -39,7 +39,7 @@ const StyledCleanButton = styled.div`
     }
 `;
 
-const StyledTag = styled.div<{ size: TagProps['size']; onClick: TagProps['onClick'] }>`
+const StyledTag = styled.div<{ size: TagProps['size']; onClick: TagProps['onClick']; onHide: TagProps['onHide'] }>`
     display: inline-block;
     position: relative;
     padding: 4px 12px 5px;
@@ -58,13 +58,25 @@ const StyledTag = styled.div<{ size: TagProps['size']; onClick: TagProps['onClic
 
     transition: background-color, color 300ms ease-in-out;
 
+    & + & {
+        margin-left: ${gapXs};
+    }
+
+    ${({ onHide }) =>
+        !onHide &&
+        css`
+            &:hover {
+                color: ${gray10};
+
+                background-color: ${gray6};
+            }
+        `}
+
     &:hover {
-        color: ${gray10};
-
-        background-color: ${gray6};
-
         ${StyledCleanButton} {
             visibility: visible;
+
+            cursor: pointer;
         }
     }
 
@@ -94,7 +106,7 @@ export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClic
     );
 
     return (
-        <StyledTag size={size} onClick={onClick} title={description} className={className}>
+        <StyledTag size={size} onClick={onClick} onHide={onHide} title={description} className={className}>
             {onHide && <StyledCleanButton onClick={onHideClick}>+</StyledCleanButton>}
             {title}
         </StyledTag>
