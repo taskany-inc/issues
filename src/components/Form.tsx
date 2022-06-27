@@ -20,6 +20,7 @@ export const Form: React.FC<FormProps> = ({ onSubmit, children }) => {
 
     const [keyboard] = useKeyboard([KeyMod.CtrlCmd, KeyCode.Enter], () => handleSubmit(), {
         disableGlobalEvent: true,
+        stopPropagation: true,
     });
 
     return (
