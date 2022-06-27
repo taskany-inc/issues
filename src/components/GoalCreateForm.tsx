@@ -9,7 +9,7 @@ import z from 'zod';
 
 import { gql } from '../utils/gql';
 import { estimatedMeta } from '../utils/dateTime';
-import { gapS, gray10 } from '../design/@generated/themes';
+import { gapS, star0 } from '../design/@generated/themes';
 import { UserAnyKind, Project, EstimateInput, State, Tag as TagModel } from '../../graphql/@generated/genql';
 
 import { Icon } from './Icon';
@@ -87,6 +87,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onCreate }) => {
     const {
         register,
         handleSubmit,
+        setFocus,
         formState: { errors, isValid, isSubmitted },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
@@ -127,6 +128,10 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onCreate }) => {
         onCreate && onCreate(String(res.createGoal?.id));
     };
 
+    useEffect(() => {
+        setTimeout(() => setFocus('title'), 0);
+    }, [setFocus]);
+
     const ownerButtonText = owner?.name || owner?.email || t('Assign');
     const projectButtonText = project?.title || t('Enter project title');
     const stateButtonText = state?.title || t('State');
@@ -134,16 +139,9 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onCreate }) => {
 
     return (
         <>
+            <h2>{t('Create new goal')}</h2>
+
             <Form onSubmit={handleSubmit(createGoal)}>
-                <ProjectCompletion
-                    text={projectButtonText}
-                    placeholder={t('Enter project title')}
-                    query={project?.title}
-                    onClick={(p) => setProject(p)}
-                />
-
-                <h2>{t('Create new goal')}</h2>
-
                 <FormInput
                     {...register('title')}
                     error={isSubmitted ? errors.title : undefined}
@@ -151,12 +149,25 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onCreate }) => {
                     autoFocus
                     flat="bottom"
                 />
+
                 <FormTextarea
                     {...register('description')}
                     error={isSubmitted ? errors.description : undefined}
                     flat="both"
                     placeholder={t('And its description')}
                 />
+
+                <StyledTagsContainer>
+                    {Array.from(tags.values()).map((tag) => (
+                        <Tag
+                            key={tag.id}
+                            title={tag.title}
+                            description={tag.description}
+                            onHide={() => removeTagFromState(tag)}
+                        />
+                    ))}
+                </StyledTagsContainer>
+
                 <FormActions flat="top">
                     <FormAction left inline>
                         <UserCompletion
@@ -168,12 +179,21 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onCreate }) => {
                             onClick={(u) => setOwner(u)}
                         />
 
+                        <ProjectCompletion
+                            text={projectButtonText}
+                            placeholder={t('Enter project title')}
+                            query={project?.title}
+                            onClick={(p) => setProject(p)}
+                        />
+
                         <StateDropdown
                             size="m"
                             text={stateButtonText}
                             flowId={project?.flow?.id}
+                            state={state}
                             onClick={(s) => setState(s)}
                         />
+
                         <EstimateDropdown
                             size="m"
                             text={t('Schedule')}
@@ -184,29 +204,25 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onCreate }) => {
                         />
 
                         <TagCompletion
+                            text="Tags"
                             filter={Array.from(tags.keys())}
                             placeholder={t('Enter tag title')}
-                            onClick={(tag) => addTagToState(tag)}
+                            onAdd={(tag) => addTagToState(tag)}
                         />
-
-                        <StyledTagsContainer>
-                            {Array.from(tags.values()).map((tag) => (
-                                <Tag
-                                    key={tag.id}
-                                    title={tag.title}
-                                    description={tag.description}
-                                    onHide={() => removeTagFromState(tag)}
-                                />
-                            ))}
-                        </StyledTagsContainer>
                     </FormAction>
                     <FormAction right inline>
-                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Create goal')} />
+                        <Button
+                            size="m"
+                            view="primary"
+                            type="submit"
+                            disabled={!(isValid && project)}
+                            text={t('Create goal')}
+                        />
                     </FormAction>
                 </FormActions>
             </Form>
 
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
+            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
                 {t.rich('Press key to create the goal', {
                     key: () => <Keyboard command enter />,
                 })}
