@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { gray6, gray7, gray8, radiusM } from '../design/@generated/themes';
+import { gapS, gapXs, gray4, radiusM } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
@@ -11,8 +11,8 @@ import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
-import { Icon } from './Icon';
 import { Input } from './Input';
+import { Text } from './Text';
 
 interface ProjectCompletionProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -20,15 +20,18 @@ interface ProjectCompletionProps {
     text: React.ComponentProps<typeof Button>['text'];
     query?: string;
     placeholder?: string;
+
     onClick?: (project: Project) => void;
 }
 
 const StyledProjectCard = styled.div<{ focused?: boolean }>`
-    padding: 6px;
-    border: 1px solid ${gray7};
+    box-sizing: border-box;
+    padding: ${gapXs} ${gapS};
+    margin-bottom: ${gapS};
+    min-width: 200px;
+
     border-radius: ${radiusM};
-    min-width: 250px;
-    margin-bottom: 4px;
+
     cursor: pointer;
 
     &:last-child {
@@ -36,24 +39,16 @@ const StyledProjectCard = styled.div<{ focused?: boolean }>`
     }
 
     &:hover {
-        border-color: ${gray8};
-        background-color: ${gray6};
+        background-color: ${gray4};
     }
 
     ${({ focused }) =>
         focused &&
         css`
-            border-color: ${gray8};
-            background-color: ${gray6};
+            background-color: ${gray4};
         `}
 `;
-const StyledProjectInfo = styled.div`
-    padding-left: 4px;
-`;
-const StyledProjectTitle = styled.div`
-    font-size: 14px;
-    font-weight: 600;
-`;
+
 const ProjectCard: React.FC<{ title?: string; focused?: boolean; onClick?: () => void }> = ({
     title,
     focused,
@@ -61,14 +56,12 @@ const ProjectCard: React.FC<{ title?: string; focused?: boolean; onClick?: () =>
 }) => {
     return (
         <StyledProjectCard onClick={onClick} focused={focused}>
-            <StyledProjectInfo>
-                <StyledProjectTitle>{title}</StyledProjectTitle>
-            </StyledProjectInfo>
+            <Text size="s" weight="bold">
+                {title}
+            </Text>
         </StyledProjectCard>
     );
 };
-
-const StyledDropdownContainer = styled.div``;
 
 const fetcher = createFetcher((_, query: string) => ({
     projectCompletion: [
@@ -176,7 +169,7 @@ export const ProjectCompletion: React.FC<ProjectCompletionProps> = ({
 
     return (
         <>
-            <StyledDropdownContainer ref={popupRef} {...onESC}>
+            <span ref={popupRef} {...onESC}>
                 {editMode ? (
                     <Input
                         autoFocus
@@ -186,17 +179,9 @@ export const ProjectCompletion: React.FC<ProjectCompletionProps> = ({
                         {...onENTER}
                     />
                 ) : (
-                    <Button
-                        ghost
-                        ref={buttonRef}
-                        size={size}
-                        view={view}
-                        text={text}
-                        iconLeft={<Icon type="location" size="xs" />}
-                        onClick={onButtonClick}
-                    />
+                    <Button ref={buttonRef} size={size} view={view} text={text} onClick={onButtonClick} />
                 )}
-            </StyledDropdownContainer>
+            </span>
 
             <Popup
                 placement="top-start"
