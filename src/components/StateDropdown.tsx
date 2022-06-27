@@ -1,10 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
+import colorLayer from 'color-layer';
 
-import { gray6, gray7, gray8, radiusM } from '../design/@generated/themes';
+import { gapS, gapXs, gray3, radiusM } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
+import { pageContext } from '../utils/pageContext';
 import { State } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
@@ -12,22 +14,33 @@ import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { Button } from './Button';
 import { Popup } from './Popup';
 import { Icon } from './Icon';
+import { StateDot } from './StateDot';
+import { Text } from './Text';
 
 interface StateDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
     disabled?: React.ComponentProps<typeof Button>['disabled'];
     text: React.ComponentProps<typeof Button>['text'];
+    state?: State;
     flowId?: string;
+
     onClick?: (state: State) => void;
 }
 
-const StyledItemCard = styled.div<{ focused?: boolean }>`
-    padding: 6px;
-    border: 1px solid ${gray7};
+const mapThemeOnId = { light: 0, dark: 1 };
+
+const StyledItemCard = styled.div<{ focused?: boolean; hoverColor?: string }>`
+    display: flex;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: ${gapXs} ${gapS};
+    margin-bottom: ${gapS};
+    min-width: 150px;
+
     border-radius: ${radiusM};
-    min-width: 250px;
-    margin-bottom: 4px;
+
     cursor: pointer;
 
     &:last-child {
@@ -35,39 +48,51 @@ const StyledItemCard = styled.div<{ focused?: boolean }>`
     }
 
     &:hover {
-        border-color: ${gray8};
-        background-color: ${gray6};
+        background-color: ${gray3};
     }
 
     ${({ focused }) =>
         focused &&
         css`
-            border-color: ${gray8};
-            background-color: ${gray6};
+            background-color: ${gray3};
+        `}
+
+    ${({ hoverColor }) =>
+        hoverColor &&
+        css`
+            &:hover {
+                background-color: ${hoverColor};
+            }
+        `}
+
+    ${({ hoverColor, focused }) =>
+        hoverColor &&
+        focused &&
+        css`
+            background-color: ${hoverColor};
         `}
 `;
-const StyledItemInfo = styled.div`
-    padding-left: 4px;
+
+const StyledItemInfo = styled(Text)`
+    padding-left: ${gapS};
 `;
-const StyledItemTitle = styled.div`
-    font-size: 14px;
-    font-weight: 600;
-`;
+
 const ItemCard: React.FC<{
+    hue?: number;
     title?: string;
+    hoverColor?: string;
     focused?: boolean;
     onClick?: () => void;
-}> = ({ title, focused, onClick }) => {
+}> = ({ hoverColor, hue, title, focused, onClick }) => {
     return (
-        <StyledItemCard onClick={onClick} focused={focused}>
-            <StyledItemInfo>
-                <StyledItemTitle>{title}</StyledItemTitle>
+        <StyledItemCard hoverColor={hoverColor} focused={focused} onClick={onClick}>
+            <StateDot hue={hue} />
+            <StyledItemInfo size="s" weight="bold">
+                {title}
             </StyledItemInfo>
         </StyledItemCard>
     );
 };
-
-const StyledDropdownContainer = styled.div``;
 
 const fetcher = createFetcher((_, id: string) => ({
     flow: [
@@ -80,13 +105,14 @@ const fetcher = createFetcher((_, id: string) => ({
             states: {
                 id: true,
                 title: true,
+                hue: true,
                 default: true,
             },
         },
     ],
 }));
 
-export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, flowId, disabled, onClick }) => {
+export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state, view, flowId, disabled, onClick }) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -95,6 +121,17 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
     const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
+    const { theme } = useContext(pageContext);
+    const [themeId, setThemeId] = useState(0); // default: dark
+
+    useEffect(() => {
+        theme && setThemeId(mapThemeOnId[theme]);
+    }, [theme]);
+
+    const colors = useMemo(
+        () => data?.flow?.states?.map((f) => colorLayer(f.hue, 5, f.hue === 1 ? 0 : undefined)[themeId]) || [],
+        [themeId, data?.flow?.states],
+    );
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
@@ -105,9 +142,9 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
     }, []);
 
     const onItemClick = useCallback(
-        (state: State) => () => {
+        (s: State) => () => {
             setPopupVisibility(false);
-            onClick && onClick(state);
+            onClick && onClick(s);
         },
         [onClick],
     );
@@ -145,17 +182,17 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
 
     return (
         <>
-            <StyledDropdownContainer ref={popupRef} {...onESC} {...onENTER}>
+            <span ref={popupRef} {...onESC} {...onENTER}>
                 <Button
                     ref={buttonRef}
                     disabled={disabled}
                     size={size}
                     view={view}
                     text={text}
-                    iconLeft={<Icon type="flow" size="xs" />}
+                    iconLeft={state ? <StateDot hue={state.hue} /> : <Icon noWrap type="flow" size="xs" />}
                     onClick={onButtonClick}
                 />
-            </StyledDropdownContainer>
+            </span>
 
             <Popup
                 placement="top-start"
@@ -170,7 +207,14 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, view, 
             >
                 <>
                     {data?.flow?.states?.map((s, i) => (
-                        <ItemCard key={s.id} title={s.title} focused={cursor === i} onClick={onItemClick(s)} />
+                        <ItemCard
+                            key={s.id}
+                            hue={s.hue}
+                            title={s.title}
+                            hoverColor={colors[i]}
+                            focused={cursor === i}
+                            onClick={onItemClick(s)}
+                        />
                     ))}
                 </>
             </Popup>
