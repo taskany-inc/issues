@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, useState } from 'react';
+import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
@@ -11,8 +12,9 @@ import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
-import { gapS, star10 } from '../../design/@generated/themes';
+import { gapS, star0 } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
@@ -32,6 +34,8 @@ import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
 
+const GoalEditModal = dynamic(() => import('../../components/GoalEditModal'));
+
 const refreshInterval = 3000;
 
 const fetcher = createFetcher((_, id: string) => ({
@@ -44,6 +48,7 @@ const fetcher = createFetcher((_, id: string) => ({
             title: true,
             description: true,
             state: {
+                id: true,
                 title: true,
                 hue: true,
             },
@@ -55,9 +60,13 @@ const fetcher = createFetcher((_, id: string) => ({
             createdAt: true,
             updatedAt: true,
             project: {
+                id: true,
                 key: true,
                 title: true,
                 description: true,
+                flow: {
+                    id: true,
+                },
             },
             computedIssuer: {
                 id: true,
@@ -136,6 +145,11 @@ const IssueAction = styled.div`
     margin-right: ${gapS};
 `;
 
+const IssueBaseActions = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
 const StyledIssueTags = styled.span`
     padding-left: ${gapS};
 `;
@@ -161,7 +175,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     const t = useTranslations('goals.id');
     const mounted = useMounted(refreshInterval);
 
-    const { data } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
+    const { data, mutate } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
         refreshInterval,
     });
 
@@ -175,6 +189,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         // @ts-ignore unexpectable trouble with filter
         goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
     );
+
+    const refresh = useCallback(() => mutate(), [mutate]);
 
     const triggerUpdate = useCallback(
         (input: GoalInput) => {
@@ -279,7 +295,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                             <Icon
                                 noWrap
                                 type={stargizer ? 'starFilled' : 'star'}
-                                color={stargizer ? star10 : undefined}
+                                color={stargizer ? star0 : undefined}
                                 size="s"
                             />
                         }
@@ -301,28 +317,34 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     </CardContent>
 
                     <CardActions>
-                        <IssueAction>
-                            <UserCompletion
-                                text={issueOwnerName}
-                                placeholder={t('Set owner')}
-                                title={t('Set owner')}
-                                query={issueOwnerName}
-                                userPic={<UserPic src={issueOwner?.image} size={16} />}
-                                onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
-                            />
-                        </IssueAction>
+                        <IssueBaseActions>
+                            <IssueAction>
+                                <UserCompletion
+                                    text={issueOwnerName}
+                                    placeholder={t('Set owner')}
+                                    title={t('Set owner')}
+                                    query={issueOwnerName}
+                                    userPic={<UserPic src={issueOwner?.image} size={16} />}
+                                    onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
+                                />
+                            </IssueAction>
 
-                        <IssueAction>
-                            <EstimateDropdown
-                                size="m"
-                                text={t('Schedule')}
-                                placeholder={t('Date input mask placeholder')}
-                                mask={t('Date input mask')}
-                                value={issueEstimate}
-                                defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
-                                onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
-                            />
-                        </IssueAction>
+                            <IssueAction>
+                                <EstimateDropdown
+                                    size="m"
+                                    text={t('Schedule')}
+                                    placeholder={t('Date input mask placeholder')}
+                                    mask={t('Date input mask')}
+                                    value={issueEstimate}
+                                    defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
+                                    onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
+                                />
+                            </IssueAction>
+                        </IssueBaseActions>
+
+                        {nullable(isUserAllowedToEdit, () => (
+                            <Button text={t('Edit goal')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
+                        ))}
                     </CardActions>
                 </Card>
 
@@ -354,6 +376,10 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             <PageContent>
                 <pre>{JSON.stringify(goal, null, 2)}</pre>
             </PageContent>
+
+            {nullable(isUserAllowedToEdit, () => (
+                <GoalEditModal goal={goal} onSubmit={refresh} />
+            ))}
         </Page>
     );
 };

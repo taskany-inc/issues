@@ -119,7 +119,7 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
     const [popupVisible, setPopupVisibility] = useState(false);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
-    const [cursor, setCursor] = useState(0);
+    const [cursor, setCursor] = useState<number>();
     const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
     const { theme } = useContext(pageContext);
     const [themeId, setThemeId] = useState(0); // default: dark
@@ -156,12 +156,13 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
     const [onENTER] = useKeyboard(
         [KeyCode.Enter],
         () => {
-            if (data?.flow?.states?.length) {
+            if (data?.flow?.states?.length && cursor) {
                 onItemClick(data?.flow?.states[cursor])();
-                popupRef.current?.focus();
+                setPopupVisibility(false);
             }
         },
         {
+            disableGlobalEvent: true,
             stopPropagation: true,
         },
     );
@@ -170,15 +171,26 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
         const states = data?.flow?.states;
 
         if (states?.length && downPress) {
-            setCursor((prevState) => (prevState < states.length - 1 ? prevState + 1 : prevState));
+            setCursor((prevState = 0) => (prevState < states.length - 1 ? prevState + 1 : prevState));
         }
     }, [data?.flow, downPress]);
 
     useEffect(() => {
         if (data?.flow?.states?.length && upPress) {
-            setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
+            setCursor((prevState = 0) => (prevState > 0 ? prevState - 1 : prevState));
         }
     }, [data?.flow, upPress]);
+
+    useEffect(() => {
+        if (data?.flow?.states?.length && state) {
+            for (let currCursor = 0; currCursor < data?.flow?.states.length; currCursor++) {
+                if (data?.flow?.states[currCursor].id === state.id) {
+                    setCursor(currCursor);
+                    break;
+                }
+            }
+        }
+    }, [data?.flow, state]);
 
     return (
         <>
@@ -212,7 +224,7 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
                             hue={s.hue}
                             title={s.title}
                             hoverColor={colors[i]}
-                            focused={cursor === i}
+                            focused={s.id === state?.id || cursor === i}
                             onClick={onItemClick(s)}
                         />
                     ))}

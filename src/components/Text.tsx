@@ -100,7 +100,7 @@ export const TextStyle = createGlobalStyle`
     }
 
     h2 {
-        ${calcTextSize('xl', 'bold')}
+        ${calcTextSize('xl', 'bolder')}
         padding-top: ${gapS};
         padding-bottom: ${gapM};
     }
