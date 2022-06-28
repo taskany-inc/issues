@@ -8,6 +8,7 @@ interface TagProps {
     description?: string;
     size?: 's' | 'm';
     className?: string;
+
     onClick?: () => void;
     onHide?: () => void;
 }
@@ -39,7 +40,12 @@ const StyledCleanButton = styled.div`
     }
 `;
 
-const StyledTag = styled.div<{ size: TagProps['size']; onClick: TagProps['onClick']; onHide: TagProps['onHide'] }>`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledTag = styled(({ onHide, ...props }) => <div {...props} />)<{
+    size: TagProps['size'];
+    onClick: TagProps['onClick'];
+    onHide: TagProps['onHide'];
+}>`
     display: inline-block;
     position: relative;
     padding: 4px 12px 5px;

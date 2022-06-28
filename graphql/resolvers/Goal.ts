@@ -89,7 +89,11 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     },
                     tags: true,
                     state: true,
-                    project: true,
+                    project: {
+                        include: {
+                            flow: true,
+                        },
+                    },
                     estimate: true,
                     watchers: true,
                     stargizers: true,
