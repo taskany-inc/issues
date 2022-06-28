@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import tinykeys from 'tinykeys';
 
 import { useRouter } from '../hooks/router';
+import { ModalEvent } from '../utils/dispatchModal';
 import { createProjectKeys, createHotkeys } from '../utils/hotkeys';
 
 import { Modal } from './Modal';
@@ -16,16 +17,23 @@ const ProjectCreateModal = () => {
 
     const globalListener = () => setModalVisibility(true);
     useEffect(() => {
-        window.addEventListener('ProjectCreateModal', globalListener);
+        window.addEventListener(ModalEvent.ProjectCreateModal, globalListener);
 
         return () => {
-            window.removeEventListener('ProjectCreateModal', globalListener);
+            window.removeEventListener(ModalEvent.ProjectCreateModal, globalListener);
         };
     }, []);
 
+    const onFormSubmit = useCallback(
+        (key?: string) => {
+            key && router.project(key);
+        },
+        [router],
+    );
+
     return (
         <Modal visible={modalVisible} onClose={onModalClose}>
-            <ProjectCreateForm onCreate={(key) => key && router.project(key)} />
+            <ProjectCreateForm onCreate={onFormSubmit} />
         </Modal>
     );
 };

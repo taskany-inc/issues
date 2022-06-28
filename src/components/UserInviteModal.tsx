@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import tinykeys from 'tinykeys';
 
+import { ModalEvent } from '../utils/dispatchModal';
 import { createHotkeys, inviteUserKeys } from '../utils/hotkeys';
 
 import { Modal } from './Modal';
@@ -14,16 +15,20 @@ const UserInviteModal = () => {
 
     const globalListener = () => setModalVisibility(true);
     useEffect(() => {
-        window.addEventListener('UserInviteModal', globalListener);
+        window.addEventListener(ModalEvent.UserInviteModal, globalListener);
 
         return () => {
-            window.removeEventListener('UserInviteModal', globalListener);
+            window.removeEventListener(ModalEvent.UserInviteModal, globalListener);
         };
+    }, []);
+
+    const onFormSubmit = useCallback(() => {
+        setModalVisibility(false);
     }, []);
 
     return (
         <Modal visible={modalVisible} onClose={onModalClose}>
-            <UserInviteForm onCreate={() => setModalVisibility(false)} />
+            <UserInviteForm onCreate={onFormSubmit} />
         </Modal>
     );
 };

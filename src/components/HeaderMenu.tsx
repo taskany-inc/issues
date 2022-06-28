@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 
 import { nullable } from '../utils/nullable';
+import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { routes } from '../hooks/router';
 import {
     backgroundColor,
@@ -103,17 +104,14 @@ export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
         setPopupVisibility(false);
     }, []);
 
-    const dispathModalEvent = useCallback(
-        (e: string) => () => {
-            window.dispatchEvent(new Event(e));
-        },
-        [],
-    );
+    const togglePopup = useCallback(() => {
+        setPopupVisibility(!popupVisible);
+    }, [popupVisible]);
 
     return (
         <StyledHeaderMenu>
             <span ref={popupRef}>
-                <StyledPlus ref={buttonRef} onClick={() => setPopupVisibility(!popupVisible)}>
+                <StyledPlus ref={buttonRef} onClick={togglePopup}>
                     +
                 </StyledPlus>
             </span>
@@ -128,17 +126,17 @@ export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
             >
                 <StyledPopupContent>
                     <StyledMenuItem>
-                        <Link inline onClick={dispathModalEvent('GoalCreateModal')}>
+                        <Link inline onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}>
                             {t('New goal')}
                         </Link>
                     </StyledMenuItem>
                     <StyledMenuItem>
-                        <Link inline onClick={dispathModalEvent('ProjectCreateModal')}>
+                        <Link inline onClick={dispatchModalEvent(ModalEvent.ProjectCreateModal)}>
                             {t('New project')}
                         </Link>
                     </StyledMenuItem>
                     <StyledMenuItem>
-                        <Link inline onClick={dispathModalEvent('UserInviteModal')}>
+                        <Link inline onClick={dispatchModalEvent(ModalEvent.UserInviteModal)}>
                             {t('Invite users')}
                         </Link>
                     </StyledMenuItem>

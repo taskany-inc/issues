@@ -3,6 +3,7 @@ import tinykeys from 'tinykeys';
 
 import { useRouter } from '../hooks/router';
 import { createHotkeys, createGoalKeys } from '../utils/hotkeys';
+import { ModalEvent } from '../utils/dispatchModal';
 
 import { Modal } from './Modal';
 import { GoalCreateForm } from './GoalCreateForm';
@@ -16,16 +17,23 @@ const GoalCreateModal = () => {
 
     const globalListener = () => setModalVisibility(true);
     useEffect(() => {
-        window.addEventListener('GoalCreateModal', globalListener);
+        window.addEventListener(ModalEvent.GoalCreateModal, globalListener);
 
         return () => {
-            window.removeEventListener('GoalCreateModal', globalListener);
+            window.removeEventListener(ModalEvent.GoalCreateModal, globalListener);
         };
     }, []);
 
+    const onFormSubmit = useCallback(
+        (id?: string) => {
+            id && router.goal(id);
+        },
+        [router],
+    );
+
     return (
         <Modal visible={modalVisible} onClose={onModalClose}>
-            <GoalCreateForm onCreate={(id) => id && router.goal(id)} />
+            <GoalCreateForm onSubmit={onFormSubmit} />
         </Modal>
     );
 };
