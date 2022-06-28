@@ -27,6 +27,7 @@ const ProjectCreateModal = () => {
     const onFormSubmit = useCallback(
         (key?: string) => {
             key && router.project(key);
+            setModalVisibility(false);
         },
         [router],
     );
