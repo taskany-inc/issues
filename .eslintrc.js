@@ -45,7 +45,7 @@ module.exports = {
         'no-confusing-arrow': 'off',
         'function-paren-newline': 'off',
         'no-param-reassign': 'off',
-        'no-shadow': 'warn',
+        'no-shadow': 'off',
         'space-before-function-paren': 'off',
         'consistent-return': 'off',
         'prettier/prettier': 'error',
