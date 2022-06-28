@@ -135,10 +135,20 @@ const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
     ${({ align }) => css`
         justify-self: ${align};
     `}
+
+    ${({ align }) =>
+        align === 'right' &&
+        css`
+            display: grid;
+            justify-items: end;
+            align-content: space-between;
+        `}
 `;
 
+const StyledIssueInfoRow = styled.div``;
+
 const ActionButton = styled(Button)`
-    margin-right: ${gapS};
+    margin-left: ${gapS};
 `;
 
 const IssueAction = styled.div`
@@ -284,23 +294,35 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                 </StyledIssueInfo>
 
                 <StyledIssueInfo align="right">
-                    <ActionButton
-                        text={t(watcher ? 'Unwatch' : 'Watch')}
-                        iconLeft={<Icon noWrap type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
-                        onClick={onWatchToggle}
-                    />
-                    <ActionButton
-                        text={t(stargizer ? 'Unstar' : 'Star')}
-                        iconLeft={
-                            <Icon
-                                noWrap
-                                type={stargizer ? 'starFilled' : 'star'}
-                                color={stargizer ? star0 : undefined}
-                                size="s"
-                            />
-                        }
-                        onClick={onStarToggle}
-                    />
+                    <StyledIssueInfoRow>
+                        <ActionButton
+                            text={t(watcher ? 'Unwatch' : 'Watch')}
+                            iconLeft={<Icon noWrap type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
+                            onClick={onWatchToggle}
+                        />
+                        <ActionButton
+                            text={t(stargizer ? 'Unstar' : 'Star')}
+                            iconLeft={
+                                <Icon
+                                    noWrap
+                                    type={stargizer ? 'starFilled' : 'star'}
+                                    color={stargizer ? star0 : undefined}
+                                    size="s"
+                                />
+                            }
+                            onClick={onStarToggle}
+                        />
+                    </StyledIssueInfoRow>
+
+                    {/* TODO: set curr project in form */}
+                    {/* TODO: open create form with `C` hotkey */}
+                    <StyledIssueInfoRow>
+                        <Button
+                            view="primary"
+                            text={t('New goal')}
+                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                        />
+                    </StyledIssueInfoRow>
                 </StyledIssueInfo>
             </IssueHeader>
 
