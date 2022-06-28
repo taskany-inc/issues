@@ -27,6 +27,7 @@ const GoalCreateModal = () => {
     const onFormSubmit = useCallback(
         (id?: string) => {
             id && router.goal(id);
+            setModalVisibility(false);
         },
         [router],
     );
