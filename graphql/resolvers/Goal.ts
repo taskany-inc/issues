@@ -186,6 +186,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                                   create: estimate,
                               }
                             : undefined,
+                        watchers: {
+                            connect: [validUser.activity, goalOwner?.activity].map((a) => ({ id: a!.id })),
+                        },
                     },
                 });
 
