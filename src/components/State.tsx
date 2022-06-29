@@ -70,27 +70,29 @@ const StyledState = styled.div<{
 `;
 
 // eslint-disable-next-line react/display-name
-export const State: React.FC<StateProps> = React.memo(({ title, hue = 1, size = 'm', onClick }) => {
-    const { theme } = useContext(pageContext);
-    const [themeId, setThemeId] = useState(0); // default: dark
+export const State = React.memo(
+    React.forwardRef<HTMLDivElement, StateProps>(({ title, hue = 1, size = 'm', onClick }, ref) => {
+        const { theme } = useContext(pageContext);
+        const [themeId, setThemeId] = useState(0); // default: dark
 
-    useEffect(() => {
-        theme && setThemeId(mapThemeOnId[theme]);
-    }, [theme]);
+        useEffect(() => {
+            theme && setThemeId(mapThemeOnId[theme]);
+        }, [theme]);
 
-    const colors = useMemo(() => {
-        const sat = hue === 1 ? 0 : undefined;
-        return {
-            bkg: colorLayer(hue, 3, sat)[themeId],
-            stroke: colorLayer(hue, 9, sat)[themeId],
-            bkgHover: colorLayer(hue, 4, sat)[themeId],
-            strokeHover: colorLayer(hue, 10, sat)[themeId],
-        };
-    }, [hue, themeId]);
+        const colors = useMemo(() => {
+            const sat = hue === 1 ? 0 : undefined;
+            return {
+                bkg: colorLayer(hue, 3, sat)[themeId],
+                stroke: colorLayer(hue, 9, sat)[themeId],
+                bkgHover: colorLayer(hue, 4, sat)[themeId],
+                strokeHover: colorLayer(hue, 10, sat)[themeId],
+            };
+        }, [hue, themeId]);
 
-    return (
-        <StyledState size={size} onClick={onClick} colors={colors}>
-            {title}
-        </StyledState>
-    );
-});
+        return (
+            <StyledState ref={ref} size={size} onClick={onClick} colors={colors}>
+                {title}
+            </StyledState>
+        );
+    }),
+);

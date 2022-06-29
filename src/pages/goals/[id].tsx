@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
-import { Goal, EstimateInput, GoalInput, UserAnyKind } from '../../../graphql/@generated/genql';
+import { Goal, EstimateInput, GoalInput, UserAnyKind, State } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
@@ -18,7 +18,6 @@ import { gapS, star0 } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
-import { State } from '../../components/State';
 import { Link } from '../../components/Link';
 import { Card, CardInfo, CardContent, CardActions } from '../../components/Card';
 import { IssueTitle } from '../../components/IssueTitle';
@@ -33,6 +32,7 @@ import { EstimateDropdown } from '../../components/EstimateDropdown';
 import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
+import { StateSwitch } from '../../components/StateSwitch';
 
 const GoalEditModal = dynamic(() => import('../../components/GoalEditModal'));
 
@@ -190,7 +190,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     });
 
     // this line is compensation for first render before delayed swr will bring updates
-    const goal = data?.goal ?? ssrData.goal;
+    const goal: Goal = data?.goal ?? ssrData.goal;
 
     const isUserAllowedToEdit = user?.id === goal?.computedIssuer?.id || user?.id === goal?.computedOwner?.id;
     // @ts-ignore unexpectable trouble with filter
@@ -241,6 +241,21 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         [triggerUpdate, goal],
     );
 
+    const [issueState, setIssueState] = useState(goal.state);
+    const onIssueStateChange = useCallback(
+        async (state: State) => {
+            setIssueState(state);
+
+            await triggerUpdate({
+                id: goal.id,
+                stateId: state.id,
+            });
+
+            refresh();
+        },
+        [triggerUpdate, goal, refresh],
+    );
+
     const [issueEstimate, setIssueEstimate] = useState<EstimateInput | undefined>(
         goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
     );
@@ -285,8 +300,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     <IssueTitle title={goal.title} project={goal.project} />
 
                     <IssueStats
-                        state={nullable(goal.state, (s) => (
-                            <State title={s.title} hue={s.hue} />
+                        state={nullable(issueState, (s) => (
+                            <StateSwitch state={s} flowId={goal.project?.flow?.id} onClick={onIssueStateChange} />
                         ))}
                         comments={0}
                         updatedAt={goal.updatedAt}
