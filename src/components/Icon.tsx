@@ -29,9 +29,10 @@ const componentsMap = {
     eyeClosed: dynamic(() => import('teenyicons/outline/eye-closed.svg')),
     star: dynamic(() => import('teenyicons/outline/star.svg')),
     starFilled: dynamic(() => import('teenyicons/solid/star.svg')),
+    emoji: dynamic(() => import('teenyicons/outline/mood-tongue.svg')),
 };
 
-const sizesMap = {
+export const sizesMap = {
     xs: 14,
     s: 15,
     m: 32,
@@ -45,6 +46,7 @@ interface IconProps {
     stroke?: number;
     className?: string;
     noWrap?: boolean;
+
     onClick?: (e: React.MouseEvent) => void;
 }
 
