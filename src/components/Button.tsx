@@ -263,11 +263,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             props.iconLeft || props.iconRight ? (
                 <>
                     {props.iconLeft ? <StyledIcon>{props.iconLeft}</StyledIcon> : null}
-                    <StyledText>{text}</StyledText>
+                    {text ? <StyledText>{text}</StyledText> : null}
                     {props.iconRight ? <StyledIcon>{props.iconRight}</StyledIcon> : null}
                 </>
             ) : (
-                <StyledText>{text}</StyledText>
+                <>{text ? <StyledText>{text}</StyledText> : null}</>
             );
 
         return (

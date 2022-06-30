@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface PageContext {
+export interface PageContext {
     locale?: 'en' | 'ru';
     theme?: 'light' | 'dark';
 }
