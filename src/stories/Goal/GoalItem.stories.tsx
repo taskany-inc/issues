@@ -27,6 +27,7 @@ const Template: ComponentStory<typeof GoalItem> = (args) => <GoalItem {...args} 
 const createTags = (tagsNumber: number): Tag[] => {
     return new Array(tagsNumber).fill('').map((tag, index) => ({
         id: `tag-${index}`,
+        activityId: '1234',
         title: Math.random() > 0.5 ? 'short tag' : 'logn long long tag',
         __typename: 'Tag',
     }));

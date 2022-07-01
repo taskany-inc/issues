@@ -40,8 +40,8 @@ export const User = objectType({
         t.field(UserModel.nickname);
         t.field(UserModel.name);
         t.field(UserModel.image);
-        t.field('activity', { type: Activity });
         t.field(UserModel.activityId);
+        t.field('activity', { type: Activity });
         t.field(UserModel.role);
         t.field(UserModel.createdAt);
         t.field(UserModel.updatedAt);
@@ -94,8 +94,9 @@ export const Project = objectType({
         t.field(ProjectModel.key);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
-        t.field('owner', { type: Activity });
-        t.field('computedOwner', { type: UserAnyKind });
+        t.field(ProjectModel.activityId);
+        t.field('activity', { type: Activity });
+        t.field('computedActivity', { type: UserAnyKind });
         t.list.field('goals', { type: Goal });
         t.field('flow', { type: Flow });
         t.list.field('tags', { type: Tag });
@@ -116,8 +117,8 @@ export const Goal = objectType({
         t.list.field('estimate', { type: Estimate });
         t.field(GoalModel.createdAt);
         t.field(GoalModel.updatedAt);
-        t.field('issuer', { type: Activity });
-        t.field(GoalModel.issuerId);
+        t.field(GoalModel.activityId);
+        t.field('activity', { type: Activity });
         t.field('owner', { type: Activity });
         t.field(GoalModel.ownerId);
         t.list.field('participants', { type: Activity });
@@ -134,7 +135,7 @@ export const Goal = objectType({
         t.list.field('relatedTo', { type: Goal });
         t.list.field('connected', { type: Goal });
         t.field('computedOwner', { type: UserAnyKind });
-        t.field('computedIssuer', { type: UserAnyKind });
+        t.field('computedActivity', { type: UserAnyKind });
     },
 });
 
@@ -145,6 +146,8 @@ export const Estimate = objectType({
         t.field(EstimateModel.y);
         t.field(EstimateModel.q);
         t.field(EstimateModel.date);
+        t.field(EstimateModel.activityId);
+        t.field('activity', { type: Activity });
     },
 });
 
@@ -188,8 +191,8 @@ export const Reaction = objectType({
     definition(t) {
         t.field(ReactionModel.id);
         t.field(ReactionModel.emoji);
-        t.field(ReactionModel.authorId);
-        t.field('author', { type: Activity });
+        t.field(ReactionModel.activityId);
+        t.field('activity', { type: Activity });
         t.field(ReactionModel.goalId);
         t.field('goal', { type: Goal });
         t.field(ReactionModel.createdAt);

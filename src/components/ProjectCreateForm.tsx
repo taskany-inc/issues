@@ -156,10 +156,8 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }
             createProject: [
                 {
                     key: projectKey,
-                    user: session.user,
                     title,
                     description,
-                    ownerId: owner.id,
                     flowId: flow.id,
                 },
                 {

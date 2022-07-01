@@ -16,7 +16,7 @@ const fetcher = createFetcher((_, key: string) => ({
             title: true,
             description: true,
             createdAt: true,
-            computedOwner: {
+            computedActivity: {
                 id: true,
                 name: true,
                 email: true,

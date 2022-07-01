@@ -19,7 +19,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 where: { emoji, goalId, commentId },
             });
 
-            const isUserReaction = existingReaction && existingReaction.authorId === activity.id;
+            const isUserReaction = existingReaction && existingReaction.activityId === activity.id;
             const isReactionForCurrentGoal = isUserReaction && existingReaction.goalId === goalId;
             const isReactionForCurrentComment = isUserReaction && existingReaction.commentId === commentId;
 
@@ -37,7 +37,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         emoji,
                         goalId,
                         commentId,
-                        authorId: activity.id,
+                        activityId: activity.id,
                     },
                 });
             } catch (error) {
@@ -46,7 +46,3 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
     });
 };
-
-// FIXME:
-// activity and activityId everywhere
-// add nullable, Ex: nullable(date.estimate, (create) => ({ create }))

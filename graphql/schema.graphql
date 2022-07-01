@@ -22,6 +22,8 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Estimate {
+  activity: Activity
+  activityId: String!
   date: String!
   id: Int!
   q: String!
@@ -54,8 +56,10 @@ type Ghost {
 }
 
 type Goal {
+  activity: Activity
+  activityId: String
   blocks: [Goal]
-  computedIssuer: UserAnyKind
+  computedActivity: UserAnyKind
   computedOwner: UserAnyKind
   connected: [Goal]
   createdAt: DateTime!
@@ -63,8 +67,6 @@ type Goal {
   description: String!
   estimate: [Estimate]
   id: ID!
-  issuer: Activity
-  issuerId: String
   key: Boolean
   owner: Activity
   ownerId: String
@@ -101,7 +103,7 @@ input GoalInput {
 
 type Mutation {
   createGoal(description: String!, estimate: EstimateInput, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!): Goal
-  createProject(description: String, flowId: String!, key: String!, ownerId: String!, title: String!): Project
+  createProject(description: String, flowId: String!, key: String!, title: String!): Project
   createTag(description: String, title: String!): Tag
   inviteUser(email: String!): Ghost
   toggleReaction(reaction: ReactionInput!): Reaction
@@ -111,14 +113,15 @@ type Mutation {
 }
 
 type Project {
-  computedOwner: UserAnyKind
+  activity: Activity
+  activityId: String!
+  computedActivity: UserAnyKind
   createdAt: DateTime!
   description: String
   flow: Flow
   goals: [Goal]
   id: Int!
   key: String!
-  owner: Activity
   tags: [Tag]
   title: String!
   updatedAt: DateTime!
@@ -140,8 +143,8 @@ type Query {
 }
 
 type Reaction {
-  author: Activity
-  authorId: String!
+  activity: Activity
+  activityId: String!
   computedAuthor: UserAnyKind
   createdAt: DateTime!
   emoji: String!
@@ -188,7 +191,7 @@ type State {
 
 type Tag {
   activity: Activity
-  activityId: String
+  activityId: String!
   description: String
   goals: [Goal]
   id: ID!
