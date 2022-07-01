@@ -33,6 +33,7 @@ import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
 import { StateSwitch } from '../../components/StateSwitch';
+import { Reactions } from '../../components/Reactions';
 
 const GoalEditModal = dynamic(() => import('../../components/GoalEditModal'));
 
@@ -83,6 +84,16 @@ const fetcher = createFetcher((_, id: string) => ({
                 id: true,
                 title: true,
                 description: true,
+            },
+            reactions: {
+                id: true,
+                emoji: true,
+                author: {
+                    user: {
+                        id: true,
+                        name: true,
+                    },
+                },
             },
             watchers: {
                 id: true,
@@ -203,12 +214,11 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     const refresh = useCallback(() => mutate(), [mutate]);
 
     const triggerUpdate = useCallback(
-        (input: GoalInput) => {
+        (goal: GoalInput) => {
             const promise = gql.mutation({
                 updateGoal: [
                     {
-                        user: user!,
-                        data: input,
+                        goal,
                     },
                     {
                         id: true,
@@ -224,7 +234,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
             return promise;
         },
-        [user, t],
+        [t],
     );
 
     const [issueOwner, setIssueOwner] = useState(goal.computedOwner);
@@ -288,6 +298,29 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             star: !stargizer,
         });
     }, [triggerUpdate, goal, stargizer]);
+
+    const onReactionsToggle = useCallback(
+        async (emoji?: string) => {
+            if (!emoji) return;
+
+            await gql.mutation({
+                toggleReaction: [
+                    {
+                        reaction: {
+                            emoji,
+                            goalId: goal.id,
+                        },
+                    },
+                    {
+                        id: true,
+                    },
+                ],
+            });
+
+            refresh();
+        },
+        [goal, refresh],
+    );
 
     return (
         <Page locale={locale} title={goal.title}>
@@ -376,6 +409,9 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                     defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
                                     onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
                                 />
+                            </IssueAction>
+                            <IssueAction>
+                                <Reactions reactions={goal.reactions} onClick={onReactionsToggle} />
                             </IssueAction>
                         </IssueBaseActions>
 

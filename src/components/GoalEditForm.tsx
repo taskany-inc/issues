@@ -65,8 +65,7 @@ export const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) =>
         const promise = gql.mutation({
             updateGoal: [
                 {
-                    user: session.user,
-                    data: {
+                    goal: {
                         id: goal.id,
                         title,
                         description,

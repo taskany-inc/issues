@@ -174,7 +174,7 @@ model Goal {
   watchers     Activity[] @relation("goalWatchers")
   stargizers   Activity[] @relation("goalStargizers")
   comments     Comment[] // not implemented
-  reactions    Reaction[] // not implemented
+  reactions    Reaction[]
   tags         Tag[]
 
   dependsOn Goal[] @relation("dependsOn")
