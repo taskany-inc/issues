@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { ReactionsDropdown } from '../components/ReactionsDropdown';
+import ReactionsDropdown from '../components/ReactionsDropdown';
 
 export default {
     title: 'Taskany/ReactionsDropdown',

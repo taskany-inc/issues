@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { createPicker, EmojiPicker, NativeRenderer, darkTheme, lightTheme, EmojiSelection } from 'picmo';
+import type { EmojiSelection, EmojiPicker } from 'picmo';
 
 import { pageContext, PageContext } from '../utils/pageContext';
 import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '../design/@generated/themes';
@@ -9,15 +9,8 @@ import { Popup } from './Popup';
 import { ReactionsButton } from './ReactionsButton';
 
 interface ReactionsDropdownProps {
-    emoji?: React.ComponentProps<typeof ReactionsButton>['emoji'];
-
     onClick?: (emoji: string) => void;
 }
-
-const mapThemeOnPicmoTheme: Record<NonNullable<PageContext['theme']>, string> = {
-    dark: darkTheme,
-    light: lightTheme,
-};
 
 const StyledPicker = styled.div`
     .taskany-picker {
@@ -37,45 +30,61 @@ const StyledPicker = styled.div`
     }
 `;
 
-export const ReactionsDropdown = ({ emoji, onClick }: ReactionsDropdownProps) => {
+const ReactionsDropdown = ({ onClick }: ReactionsDropdownProps) => {
     const { theme } = useContext(pageContext);
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const rootElement = useRef<HTMLDivElement>(null);
     const picker = useRef<EmojiPicker>();
-    const [selectedEmoji, setSelectedEmoji] = useState(emoji);
+    const [picmo, setPicmo] = useState<typeof import('picmo')>();
 
     const listener = useCallback(
         (selection: EmojiSelection) => {
-            setSelectedEmoji(selection.emoji);
+            setPopupVisibility(false);
             onClick && onClick(selection.emoji);
         },
         [onClick],
     );
 
     useEffect(() => {
-        if (popupVisible && rootElement.current && theme) {
-            picker.current = createPicker({
-                rootElement: rootElement.current,
-                className: 'taskany-picker',
-                theme: mapThemeOnPicmoTheme[theme],
-                renderer: new NativeRenderer(),
-                emojiSize: '20px',
-                visibleRows: 4,
-                showPreview: false,
-                showCategoryTabs: false,
-            });
+        const loader = async () => {
+            if (!picmo) {
+                const picmoModule = await import('picmo');
 
-            picker.current.addEventListener('emoji:select', listener);
-        }
+                setPicmo(picmoModule);
+            }
+
+            if (picmo && popupVisible && rootElement.current && theme) {
+                const mapThemeOnPicmoTheme: Record<NonNullable<PageContext['theme']>, string> = {
+                    dark: picmo.darkTheme,
+                    light: picmo.lightTheme,
+                };
+
+                picker.current = picmo.createPicker({
+                    rootElement: rootElement.current,
+                    className: 'taskany-picker',
+                    theme: mapThemeOnPicmoTheme[theme],
+                    renderer: new picmo.NativeRenderer(),
+                    emojiSize: '20px',
+                    showPreview: false,
+                    showCategoryTabs: false,
+                });
+            }
+
+            if (picker.current) {
+                picker.current.addEventListener('emoji:select', listener);
+            }
+        };
+
+        loader();
 
         return () => {
             if (picker.current) {
                 picker.current.removeEventListener('emoji:select', listener);
             }
         };
-    }, [rootElement, theme, listener, popupVisible]);
+    }, [rootElement, theme, listener, popupVisible, picmo]);
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
@@ -88,7 +97,7 @@ export const ReactionsDropdown = ({ emoji, onClick }: ReactionsDropdownProps) =>
     return (
         <>
             <span ref={popupRef}>
-                <ReactionsButton ref={buttonRef} emoji={selectedEmoji} onClick={onButtonClick} />
+                <ReactionsButton ref={buttonRef} onClick={onButtonClick} />
             </span>
 
             <Popup
@@ -107,3 +116,5 @@ export const ReactionsDropdown = ({ emoji, onClick }: ReactionsDropdownProps) =>
         </>
     );
 };
+
+export default ReactionsDropdown;

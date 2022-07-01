@@ -3,6 +3,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ApolloServer } from 'apollo-server-micro';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import { getSession } from 'next-auth/react';
 
 import { context } from '../../../graphql/context';
 import { schema } from '../../../graphql/schema';
@@ -33,6 +34,9 @@ export default cors(async (req: NextApiRequest, res: NextApiResponse) => {
         res.end();
         return false;
     }
+
+    const session = await getSession({ req });
+    req.headers['x-id'] = req.headers['x-id'] || session?.user.id;
 
     await startServer;
     return apolloServer.createHandler({

@@ -7,7 +7,6 @@ import { Text } from './Text';
 export const Card = styled.div`
     box-sizing: border-box;
     position: relative;
-    overflow: hidden;
     border: 1px solid ${gray4};
     border-radius: ${radiusM};
     min-height: 180px;
