@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { SortOrder, Project, computeUserFields, withComputedField, Goal, UserSession } from '../types';
+import { SortOrder, Project, computeUserFields, withComputedField, Goal } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('project', {
@@ -9,7 +9,9 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         args: {
             key: nonNull(stringArg()),
         },
-        resolve: async (_, { key }, { db }) => {
+        resolve: async (_, { key }, { db, activity }) => {
+            if (!activity) return null;
+
             const project = await db.project.findUnique({
                 where: {
                     key,
@@ -32,7 +34,9 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         args: {
             key: nonNull(stringArg()),
         },
-        resolve: async (_, { key }, { db }) => {
+        resolve: async (_, { key }, { db, activity }) => {
+            if (!activity) return null;
+
             const goals = await db.goal.findMany({
                 where: {
                     project: {
@@ -99,18 +103,15 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             description: stringArg(),
             ownerId: nonNull(stringArg()),
             flowId: nonNull(stringArg()),
-            user: nonNull(arg({ type: UserSession })),
         },
-        resolve: async (_, { key, user, title, description, ownerId, flowId }, { db }) => {
-            const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
+        resolve: async (_, { key, title, description, ownerId, flowId }, { db, activity }) => {
+            if (!activity) return null;
+
             const projectOwner = await db.user.findUnique({ where: { id: ownerId }, include: { activity: true } });
-
-            if (!validUser) return null;
-
-            const resolvedOwnerId = projectOwner?.activity?.id || validUser.activity?.id;
+            const resolvedOwnerId = projectOwner?.activity?.id || activity.id;
 
             try {
-                const newProject = db.project.create({
+                return db.project.create({
                     data: {
                         key,
                         title,
@@ -127,8 +128,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 //     text: `new post '${title}'`,
                 //     html: `new post <b>${title}</b>`,
                 // });
-
-                return newProject;
             } catch (error) {
                 throw Error(`${error}`);
             }

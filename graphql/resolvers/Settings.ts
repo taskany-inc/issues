@@ -1,4 +1,4 @@
-import { arg, nonNull, stringArg } from 'nexus';
+import { arg, nonNull } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
 import { Settings, SettingsInput } from '../types';
@@ -6,22 +6,21 @@ import { Settings, SettingsInput } from '../types';
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('settings', {
         type: Settings,
-        args: {
-            activityId: nonNull(stringArg()),
-        },
-        resolve: async (_, { activityId }, { db }) => {
-            const activity = await db.activity.findUnique({
+        resolve: async (_, __, { db, activity }) => {
+            if (!activity) return null;
+
+            const activityWithSettings = await db.activity.findUnique({
                 where: {
-                    id: activityId,
+                    id: activity.id,
                 },
                 include: {
                     settings: true,
                 },
             });
 
-            if (!activity) return null;
+            if (!activityWithSettings) return null;
 
-            return activity.settings;
+            return activityWithSettings.settings;
         },
     });
 };
@@ -34,7 +33,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { data: { id, ...data } }, { db }) => {
             try {
-                const updatedSettings = await db.settings.update({
+                return db.settings.update({
                     where: { id },
                     data,
                 });
@@ -46,8 +45,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 //     text: `new post '${title}'`,
                 //     html: `new post <b>${title}</b>`,
                 // });
-
-                return updatedSettings;
             } catch (error) {
                 throw Error(`${error}`);
             }

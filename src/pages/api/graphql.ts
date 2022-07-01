@@ -12,8 +12,17 @@ const Cors = require('micro-cors');
 const cors = Cors();
 const apolloServer = new ApolloServer({
     schema,
-    context: ({ req }) => {
-        return { ...context, req };
+    context: async ({ req }) => {
+        const user = req.headers['x-id']
+            ? await context.db.user.findUnique({
+                  where: { id: req.headers['x-id'] },
+                  include: {
+                      activity: true,
+                  },
+              })
+            : null;
+
+        return { ...context, req, user, activity: user?.activity };
     },
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground(), require('apollo-tracing').plugin()],
 });

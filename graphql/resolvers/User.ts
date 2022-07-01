@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { User, SortOrder, UserAnyKind, Ghost, UserSession, UserInput } from '../types';
+import { User, SortOrder, UserAnyKind, Ghost, UserInput } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('users', {
@@ -83,19 +83,16 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('inviteUser', {
         type: Ghost,
         args: {
-            user: nonNull(arg({ type: UserSession })),
             email: nonNull(stringArg()),
         },
-        resolve: async (_, { user, email }, { db }) => {
-            const validUser = await db.user.findUnique({ where: { id: user.id } });
-
-            if (!validUser) return null;
+        resolve: async (_, { email }, { db, user }) => {
+            if (!user) return null;
 
             try {
                 const newGhost = db.ghost.create({
                     data: {
                         email,
-                        hostId: validUser.id,
+                        hostId: user.id,
                         activity: {
                             create: {
                                 settings: {
@@ -128,7 +125,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { data: { id, ...data } }, { db }) => {
             try {
-                const updatedUser = await db.user.update({
+                return db.user.update({
                     where: { id },
                     data,
                 });
@@ -140,8 +137,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 //     text: `new post '${title}'`,
                 //     html: `new post <b>${title}</b>`,
                 // });
-
-                return updatedUser;
             } catch (error) {
                 throw Error(`${error}`);
             }

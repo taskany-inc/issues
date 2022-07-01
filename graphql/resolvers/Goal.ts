@@ -1,21 +1,18 @@
 import { arg, nonNull, stringArg, intArg, booleanArg, list } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Goal, GoalInput, UserSession, EstimateInput, computeUserFields, withComputedField } from '../types';
+import { Goal, GoalInput, EstimateInput, computeUserFields, withComputedField } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('goalUserIndex', {
         type: Goal,
         args: {
-            user: nonNull(UserSession),
             pageSize: nonNull(intArg()),
             offset: nonNull(intArg()),
         },
-        resolve: async (_, { user, offset, pageSize }, { db }) => {
-            const validUser = await db.user.findUnique({ where: { id: user.id } });
-
-            if (!validUser || !validUser.activityId) return null;
+        resolve: async (_, { offset, pageSize }, { db, activity }) => {
+            if (!activity) return null;
 
             const goals = await db.goal.findMany({
                 take: pageSize,
@@ -23,15 +20,15 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 where: {
                     OR: [
                         {
-                            issuerId: validUser.activityId,
+                            issuerId: activity.id,
                         },
                         {
-                            ownerId: validUser.activityId,
+                            ownerId: activity.id,
                         },
                         {
                             participants: {
                                 some: {
-                                    id: validUser.activityId,
+                                    id: activity.id,
                                 },
                             },
                         },
@@ -75,7 +72,9 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         args: {
             id: nonNull(stringArg()),
         },
-        resolve: async (_, { id }, { db }) => {
+        resolve: async (_, { id }, { db, activity }) => {
+            if (!activity) return null;
+
             const goal = await db.goal.findUnique({
                 where: {
                     id,
@@ -92,6 +91,13 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     project: {
                         include: {
                             flow: true,
+                        },
+                    },
+                    reactions: {
+                        include: {
+                            author: {
+                                ...computeUserFields,
+                            },
                         },
                     },
                     estimate: true,
@@ -132,30 +138,15 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             personal: booleanArg(),
             ownerId: nonNull(stringArg()),
             stateId: stringArg(),
-            user: nonNull(arg({ type: UserSession })),
             estimate: arg({ type: EstimateInput }),
             tags: list(nonNull(stringArg())),
         },
         resolve: async (
             _,
-            {
-                user,
-                title,
-                description,
-                ownerId,
-                projectId,
-                key,
-                private: isPrivate,
-                personal,
-                estimate,
-                stateId,
-                tags,
-            },
-            { db },
+            { title, description, ownerId, projectId, key, private: isPrivate, personal, estimate, stateId, tags },
+            { db, activity },
         ) => {
-            const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
-
-            if (!validUser) return null;
+            if (!activity) return null;
 
             const [goalOwner, project, goalsCount] = await Promise.all([
                 db.user.findUnique({ where: { id: ownerId }, include: { activity: true } }),
@@ -163,12 +154,10 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 db.goal.count(),
             ]);
 
-            const newGoalId = `${project?.key}-${goalsCount + 1}`;
-
             try {
-                const newGoal = db.goal.create({
+                return db.goal.create({
                     data: {
-                        id: newGoalId,
+                        id: `${project?.key}-${goalsCount + 1}`,
                         title,
                         description,
                         projectId,
@@ -177,7 +166,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         personal: Boolean(personal),
                         stateId,
                         ownerId: goalOwner?.activity?.id,
-                        issuerId: validUser.activity?.id,
+                        issuerId: activity.id,
                         tags: {
                             connect: tags?.map((id) => ({ id })),
                         },
@@ -187,7 +176,8 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                               }
                             : undefined,
                         watchers: {
-                            connect: [validUser.activity, goalOwner?.activity].map((a) => ({ id: a!.id })),
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            connect: [activity, goalOwner?.activity].map((a) => ({ id: a!.id })),
                         },
                     },
                 });
@@ -199,8 +189,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 //     text: `new post '${title}'`,
                 //     html: `new post <b>${title}</b>`,
                 // });
-
-                return newGoal;
             } catch (error) {
                 throw Error(`${error}`);
             }
@@ -210,29 +198,26 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('updateGoal', {
         type: Goal,
         args: {
-            data: nonNull(arg({ type: GoalInput })),
-            user: nonNull(arg({ type: UserSession })),
+            goal: nonNull(arg({ type: GoalInput })),
         },
-        resolve: async (_, { user, data: { watch, star, ...data } }, { db }) => {
-            const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
+        resolve: async (_, { goal: { watch, star, ...goal } }, { db, activity }) => {
+            if (!activity) return null;
 
-            if (!validUser) return null;
-
-            const connection = { id: validUser.activityId! };
+            const connection = { id: activity.id };
             const connectionMap: Record<string, string> = {
                 true: 'connect',
                 false: 'disconnect',
             };
 
             try {
-                const goal = await db.goal.update({
-                    where: { id: data.id },
+                return db.goal.update({
+                    where: { id: goal.id },
                     // @ts-ignore incompatible types of Goal and GoalInput
                     data: {
-                        ...data,
-                        estimate: data.estimate
+                        ...goal,
+                        estimate: goal.estimate
                             ? {
-                                  create: data.estimate,
+                                  create: goal.estimate,
                               }
                             : undefined,
                         watchers: watch !== undefined ? { [connectionMap[String(watch)]]: connection } : undefined,
@@ -247,8 +232,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 //     text: `new post '${title}'`,
                 //     html: `new post <b>${title}</b>`,
                 // });
-
-                return goal;
             } catch (error) {
                 throw Error(`${error}`);
             }

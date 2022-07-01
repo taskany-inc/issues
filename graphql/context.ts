@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User, Activity } from '@prisma/client';
+import { NextApiRequest } from 'next';
 
 const db = new PrismaClient();
 
@@ -24,6 +25,9 @@ db.$use(async (params, next) => {
 
 export type Context = {
     db: PrismaClient;
+    req: NextApiRequest;
+    user: User | null;
+    activity: Activity | null;
 };
 
 export const context = {
