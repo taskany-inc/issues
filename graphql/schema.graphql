@@ -6,6 +6,7 @@ type Activity {
   createdAt: DateTime!
   ghost: Ghost
   id: ID!
+  settings: Settings
   tags: [Tag]
   updatedAt: DateTime!
   user: User
@@ -72,6 +73,7 @@ type Goal {
   private: Boolean
   project: Project
   projectId: Int
+  reactions: [Reaction]
   relatedTo: [Goal]
   stargizers: [Activity]
   state: State
@@ -98,11 +100,12 @@ input GoalInput {
 }
 
 type Mutation {
-  createGoal(description: String!, estimate: EstimateInput, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!, user: UserSession!): Goal
-  createProject(description: String, flowId: String!, key: String!, ownerId: String!, title: String!, user: UserSession!): Project
-  createTag(description: String, title: String!, user: UserSession!): Tag
-  inviteUser(email: String!, user: UserSession!): Ghost
-  updateGoal(data: GoalInput!, user: UserSession!): Goal
+  createGoal(description: String!, estimate: EstimateInput, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!): Goal
+  createProject(description: String, flowId: String!, key: String!, ownerId: String!, title: String!): Project
+  createTag(description: String, title: String!): Tag
+  inviteUser(email: String!): Ghost
+  toggleReaction(reaction: ReactionInput!): Reaction
+  updateGoal(goal: GoalInput!): Goal
   updateSettings(data: SettingsInput!): Settings
   updateUser(data: UserInput!): User
 }
@@ -127,13 +130,31 @@ type Query {
   flowCompletion(query: String!, sortBy: SortOrder): [Flow]
   flowRecommended: [Flow]
   goal(id: String!): Goal
-  goalUserIndex(offset: Int!, pageSize: Int!, user: UserSession!): [Goal]
+  goalUserIndex(offset: Int!, pageSize: Int!): [Goal]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(key: String!): [Goal]
-  settings(activityId: String!): Settings
+  settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
   users(sortBy: SortOrder): [User]
+}
+
+type Reaction {
+  author: Activity
+  authorId: String!
+  computedAuthor: UserAnyKind
+  createdAt: DateTime!
+  emoji: String!
+  goal: Goal
+  goalId: String
+  id: ID!
+  updatedAt: DateTime!
+}
+
+input ReactionInput {
+  commentId: String
+  emoji: String!
+  goalId: String
 }
 
 enum Role {
@@ -206,14 +227,4 @@ input UserInput {
 enum UserKind {
   GHOST
   USER
-}
-
-input UserSession {
-  activityId: String
-  email: String!
-  id: ID!
-  image: String
-  name: String
-  nickname: String
-  role: Role!
 }

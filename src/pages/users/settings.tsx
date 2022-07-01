@@ -51,16 +51,11 @@ const StyledFormCard = styled(FormCard)`
     }
 `;
 
-const fetcher = createFetcher((user) => ({
-    settings: [
-        {
-            activityId: user.activityId,
-        },
-        {
-            id: true,
-            theme: true,
-        },
-    ],
+const fetcher = createFetcher(() => ({
+    settings: {
+        id: true,
+        theme: true,
+    },
 }));
 
 export const getServerSideProps = declareSsrProps(
@@ -137,7 +132,7 @@ const UserSettingsPage = ({ user, locale, ssrData }: ExternalPageProps<{ setting
     };
 
     const mounted = useMounted(refreshInterval);
-    const { data: settingsData } = useSWR(mounted ? [user] : null, (...args) => fetcher(...args), {
+    const { data: settingsData } = useSWR(mounted ? 'settings' : null, () => fetcher(), {
         refreshInterval,
     });
 

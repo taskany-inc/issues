@@ -1,12 +1,10 @@
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import useSWR from 'swr';
-import { getSession, useSession } from 'next-auth/react';
 
-import { SSRPageProps, SSRProps } from '../../types/ssrProps';
 import { createFetcher } from '../../utils/createFetcher';
 import { Goal, Project } from '../../../graphql/@generated/genql';
 import { Header } from '../../components/Header';
+import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 
 const fetcher = createFetcher((_, key: string) => ({
     project: [
@@ -44,14 +42,24 @@ const fetcher = createFetcher((_, key: string) => ({
     ],
 }));
 
-function Page({ project, projectGoals }: SSRPageProps<{ project: Project; projectGoals: Goal[] }>) {
-    const router = useRouter();
-    const { slug } = router.query as Record<string, string>;
-    const { data: session } = useSession();
-    const { data } = useSWR('project', () => fetcher(session?.user, slug));
+export const getServerSideProps = declareSsrProps(
+    async ({ user, params: { key } }) => ({
+        ssrData: await fetcher(user, key),
+    }),
+    {
+        private: true,
+    },
+);
 
-    const actualProject = data?.project ?? project;
-    const actualGoals = data?.projectGoals ?? projectGoals;
+function Page({
+    user,
+    ssrData,
+    params: { key },
+}: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) {
+    const { data } = useSWR('project', () => fetcher(user, key));
+
+    const actualProject = data?.project ?? ssrData.project;
+    const actualGoals = data?.projectGoals ?? ssrData.projectGoals;
 
     return (
         <>
@@ -70,20 +78,5 @@ function Page({ project, projectGoals }: SSRPageProps<{ project: Project; projec
         </>
     );
 }
-
-Page.auth = true;
-
-export const getServerSideProps: SSRProps<{ key: string }> = async ({ locale, req, params }) => {
-    const session = await getSession({ req });
-    const { project, projectGoals } = await fetcher(session?.user, params!.key);
-
-    return {
-        props: {
-            project,
-            projectGoals,
-            i18n: (await import(`../../../i18n/${locale}.json`)).default,
-        },
-    };
-};
 
 export default Page;

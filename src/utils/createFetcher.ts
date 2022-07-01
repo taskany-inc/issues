@@ -1,9 +1,22 @@
 import { Session } from 'next-auth';
 
-import { QueryRequest } from '../../graphql/@generated/genql';
+import { createClient, QueryRequest } from '../../graphql/@generated/genql';
 
-import { gql } from './gql';
+export function createFetcher<T>(cb: (user?: Session['user'], ...args: T[]) => QueryRequest) {
+    return (user?: Session['user'], ...rest: T[]) => {
+        const gql = createClient({
+            fetcher: (operation) =>
+                fetch(`${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/graphql`, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        ...(user ? { 'x-id': user.id } : {}),
+                    },
+                    body: JSON.stringify(operation),
+                }).then((response) => response.json()),
+        });
 
-export function createFetcher<T>(cb: (user: Session['user'], ...args: T[]) => QueryRequest) {
-    return (user?: Session['user'], ...rest: T[]) => gql.query(cb(user!, ...rest));
+        return gql.query(cb(user, ...rest));
+    };
 }

@@ -12,10 +12,9 @@ import { Button } from '../../components/Button';
 
 const PAGE_SIZE = 5;
 
-const fetcher = createFetcher((user, offset: number | undefined = 0) => ({
+const fetcher = createFetcher((_, offset: number | undefined = 0) => ({
     goalUserIndex: [
         {
-            user,
             offset,
             pageSize: PAGE_SIZE,
         },
@@ -61,8 +60,8 @@ const StyledLoadMore = styled.div`
 `;
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user }) => ({
-        ssrData: await fetcher(user),
+    async () => ({
+        ssrData: await fetcher(),
     }),
     {
         private: true,

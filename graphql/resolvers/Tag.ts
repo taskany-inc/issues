@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { UserSession, Tag, SortOrder } from '../types';
+import { Tag, SortOrder } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('tagCompletion', {
@@ -36,19 +36,16 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             title: nonNull(stringArg()),
             description: stringArg(),
-            user: nonNull(arg({ type: UserSession })),
         },
-        resolve: async (_, { user, title, description }, { db }) => {
-            const validUser = await db.user.findUnique({ where: { id: user.id }, include: { activity: true } });
-
-            if (!validUser) return null;
+        resolve: async (_, { title, description }, { db, activity }) => {
+            if (!activity) return null;
 
             try {
                 return db.tag.create({
                     data: {
                         title,
                         description,
-                        activityId: validUser.activityId,
+                        activityId: activity.id,
                     },
                 });
             } catch (error) {

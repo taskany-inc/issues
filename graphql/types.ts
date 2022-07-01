@@ -12,6 +12,7 @@ import {
     State as StateModel,
     Tag as TagModel,
     Settings as SettingsModel,
+    Reaction as ReactionModel,
 } from 'nexus-prisma';
 
 export const DateTime = asNexusMethod(DateTimeResolver, 'DateTime');
@@ -29,19 +30,6 @@ export const Role = enumType({
 const UserKind = enumType({
     name: 'UserKind',
     members: ['USER', 'GHOST'],
-});
-
-export const UserSession = inputObjectType({
-    name: 'UserSession',
-    definition(t) {
-        t.field(UserModel.id);
-        t.field(UserModel.email);
-        t.field(UserModel.nickname);
-        t.field(UserModel.name);
-        t.field(UserModel.image);
-        t.field(UserModel.role);
-        t.string('activityId');
-    },
 });
 
 export const User = objectType({
@@ -66,6 +54,7 @@ export const Activity = objectType({
         t.field(ActivityModel.id);
         t.field('user', { type: User });
         t.field('ghost', { type: Ghost });
+        t.field('settings', { type: Settings });
         t.list.field('tags', { type: Tag });
         t.field(ActivityModel.createdAt);
         t.field(ActivityModel.updatedAt);
@@ -134,6 +123,7 @@ export const Goal = objectType({
         t.list.field('participants', { type: Activity });
         t.list.field('watchers', { type: Activity });
         t.list.field('stargizers', { type: Activity });
+        t.list.field('reactions', { type: Reaction });
         t.field(GoalModel.projectId);
         t.field('project', { type: Project });
         t.field(GoalModel.stateId);
@@ -190,6 +180,21 @@ export const Tag = objectType({
         t.field('activity', { type: Activity });
         t.list.field('goals', { type: Goal });
         t.list.field('projects', { type: Project });
+    },
+});
+
+export const Reaction = objectType({
+    name: ReactionModel.$name,
+    definition(t) {
+        t.field(ReactionModel.id);
+        t.field(ReactionModel.emoji);
+        t.field(ReactionModel.authorId);
+        t.field('author', { type: Activity });
+        t.field(ReactionModel.goalId);
+        t.field('goal', { type: Goal });
+        t.field(ReactionModel.createdAt);
+        t.field(ReactionModel.updatedAt);
+        t.field('computedAuthor', { type: UserAnyKind });
     },
 });
 
@@ -256,6 +261,15 @@ export const UserInput = inputObjectType({
         t.field(UserModel.id);
         t.field(UserModel.nickname);
         t.field(UserModel.name);
+    },
+});
+
+export const ReactionInput = inputObjectType({
+    name: 'ReactionInput',
+    definition(t) {
+        t.field(ReactionModel.emoji);
+        t.field(ReactionModel.goalId);
+        t.field(ReactionModel.commentId);
     },
 });
 
