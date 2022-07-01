@@ -48,6 +48,8 @@ const fetcher = createFetcher((_, id: string) => ({
             id: true,
             title: true,
             description: true,
+            activityId: true,
+            ownerId: true,
             state: {
                 id: true,
                 title: true,
@@ -69,7 +71,7 @@ const fetcher = createFetcher((_, id: string) => ({
                     id: true,
                 },
             },
-            computedIssuer: {
+            computedActivity: {
                 id: true,
                 name: true,
                 email: true,
@@ -88,7 +90,7 @@ const fetcher = createFetcher((_, id: string) => ({
             reactions: {
                 id: true,
                 emoji: true,
-                author: {
+                activity: {
                     user: {
                         id: true,
                         name: true,
@@ -203,7 +205,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     // this line is compensation for first render before delayed swr will bring updates
     const goal: Goal = data?.goal ?? ssrData.goal;
 
-    const isUserAllowedToEdit = user?.id === goal?.computedIssuer?.id || user?.id === goal?.computedOwner?.id;
+    const isUserAllowedToEdit = user?.activityId === goal?.activityId || user?.activityId === goal?.ownerId;
     // @ts-ignore unexpectable trouble with filter
     const [watcher, setWatcher] = useState(goal.watchers?.filter(({ id }) => id === user.activityId).length > 0);
     const [stargizer, setStargizer] = useState(
@@ -214,11 +216,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     const refresh = useCallback(() => mutate(), [mutate]);
 
     const triggerUpdate = useCallback(
-        (goal: GoalInput) => {
+        (data: Partial<GoalInput>) => {
             const promise = gql.mutation({
                 updateGoal: [
                     {
-                        goal,
+                        goal: {
+                            ...data,
+                            id: goal.id,
+                        },
                     },
                     {
                         id: true,
@@ -234,7 +239,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
             return promise;
         },
-        [t],
+        [t, goal],
     );
 
     const [issueOwner, setIssueOwner] = useState(goal.computedOwner);
@@ -244,11 +249,10 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             setIssueOwner(owner);
 
             await triggerUpdate({
-                id: goal.id,
                 ownerId: owner.activity?.id,
             });
         },
-        [triggerUpdate, goal],
+        [triggerUpdate],
     );
 
     const [issueState, setIssueState] = useState(goal.state);
@@ -257,13 +261,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             setIssueState(state);
 
             await triggerUpdate({
-                id: goal.id,
                 stateId: state.id,
             });
 
             refresh();
         },
-        [triggerUpdate, goal, refresh],
+        [triggerUpdate, refresh],
     );
 
     const [issueEstimate, setIssueEstimate] = useState<EstimateInput | undefined>(
@@ -274,30 +277,27 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             setIssueEstimate(estimate);
 
             await triggerUpdate({
-                id: goal.id,
                 estimate,
             });
         },
-        [triggerUpdate, goal],
+        [triggerUpdate],
     );
 
     const onWatchToggle = useCallback(async () => {
         setWatcher((w) => !w);
 
         await triggerUpdate({
-            id: goal.id,
             watch: !watcher,
         });
-    }, [triggerUpdate, goal, watcher]);
+    }, [triggerUpdate, watcher]);
 
     const onStarToggle = useCallback(async () => {
         setStargizer((s) => !s);
 
         await triggerUpdate({
-            id: goal.id,
             star: !stargizer,
         });
-    }, [triggerUpdate, goal, stargizer]);
+    }, [triggerUpdate, stargizer]);
 
     const onReactionsToggle = useCallback(
         async (emoji?: string) => {
@@ -379,7 +379,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             <IssueContent>
                 <Card>
                     <CardInfo>
-                        <Link inline>{goal.computedIssuer!.name}</Link> — <RelativeTime date={goal.createdAt} />
+                        <Link inline>{goal.computedActivity!.name}</Link> — <RelativeTime date={goal.createdAt} />
                     </CardInfo>
 
                     <CardContent>

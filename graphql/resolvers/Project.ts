@@ -17,7 +17,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     key,
                 },
                 include: {
-                    owner: {
+                    activity: {
                         ...computeUserFields,
                     },
                 },
@@ -25,7 +25,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
 
             if (!project) return null;
 
-            return withComputedField('owner')(project);
+            return withComputedField('activity')(project);
         },
     });
 
@@ -47,13 +47,13 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     owner: {
                         ...computeUserFields,
                     },
-                    issuer: {
+                    activity: {
                         ...computeUserFields,
                     },
                 },
             });
 
-            return goals.map(withComputedField('owner', 'issuer'));
+            return goals.map(withComputedField('owner', 'activity'));
         },
     });
 
@@ -78,7 +78,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     },
                 },
                 include: {
-                    owner: {
+                    activity: {
                         include: {
                             user: true,
                         },
@@ -101,14 +101,10 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             key: nonNull(stringArg()),
             title: nonNull(stringArg()),
             description: stringArg(),
-            ownerId: nonNull(stringArg()),
             flowId: nonNull(stringArg()),
         },
-        resolve: async (_, { key, title, description, ownerId, flowId }, { db, activity }) => {
+        resolve: async (_, { key, title, description, flowId }, { db, activity }) => {
             if (!activity) return null;
-
-            const projectOwner = await db.user.findUnique({ where: { id: ownerId }, include: { activity: true } });
-            const resolvedOwnerId = projectOwner?.activity?.id || activity.id;
 
             try {
                 return db.project.create({
@@ -116,7 +112,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         key,
                         title,
                         description,
-                        ownerId: resolvedOwnerId,
+                        activityId: activity.id,
                         flowId,
                     },
                 });

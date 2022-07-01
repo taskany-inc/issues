@@ -32,7 +32,7 @@ export const Reactions = React.memo(({ reactions, onClick }: ReactionsProps) => 
                 acc[curr.emoji] = acc[curr.emoji]
                     ? {
                           count: acc[curr.emoji].count + 1,
-                          authors: acc[curr.emoji].authors.add(curr.authorId),
+                          authors: acc[curr.emoji].authors.add(curr.activityId),
                       }
                     : {
                           count: 1,

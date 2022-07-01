@@ -54,12 +54,11 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onSubmit }) => {
     }, [project]);
 
     const createGoal = async ({ title, description }: GoalFormType) => {
-        if (!session || !owner.id || !project?.id) return;
+        if (!owner.id || !project?.id) return;
 
         const promise = gql.mutation({
             createGoal: [
                 {
-                    user: session.user,
                     title,
                     description,
                     ownerId: owner.id,

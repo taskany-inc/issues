@@ -30,7 +30,7 @@ const fetcher = createFetcher((_, offset: number | undefined = 0) => ({
                 id: true,
                 title: true,
             },
-            computedIssuer: {
+            computedActivity: {
                 id: true,
                 name: true,
                 email: true,
@@ -93,7 +93,7 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ goalUserIndex:
                                     id={goal.id}
                                     state={goal.state}
                                     title={goal.title}
-                                    issuer={goal.computedIssuer}
+                                    issuer={goal.computedActivity}
                                     owner={goal.computedOwner}
                                     key={goal.id}
                                 />

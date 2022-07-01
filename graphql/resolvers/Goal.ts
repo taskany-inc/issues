@@ -20,7 +20,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 where: {
                     OR: [
                         {
-                            issuerId: activity.id,
+                            activityId: activity.id,
                         },
                         {
                             ownerId: activity.id,
@@ -38,7 +38,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     owner: {
                         ...computeUserFields,
                     },
-                    issuer: {
+                    activity: {
                         ...computeUserFields,
                     },
                     tags: true,
@@ -63,7 +63,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
             });
 
-            return goals.map(withComputedField('owner', 'issuer'));
+            return goals.map(withComputedField('owner', 'activity'));
         },
     });
 
@@ -83,7 +83,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     owner: {
                         ...computeUserFields,
                     },
-                    issuer: {
+                    activity: {
                         ...computeUserFields,
                     },
                     tags: true,
@@ -95,7 +95,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     },
                     reactions: {
                         include: {
-                            author: {
+                            activity: {
                                 ...computeUserFields,
                             },
                         },
@@ -121,7 +121,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
             });
 
-            return withComputedField('owner', 'issuer')(goal);
+            return withComputedField('owner', 'activity')(goal);
         },
     });
 };
@@ -166,13 +166,16 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         personal: Boolean(personal),
                         stateId,
                         ownerId: goalOwner?.activity?.id,
-                        issuerId: activity.id,
+                        activityId: activity.id,
                         tags: {
                             connect: tags?.map((id) => ({ id })),
                         },
                         estimate: estimate
                             ? {
-                                  create: estimate,
+                                  create: {
+                                      ...estimate,
+                                      activityId: activity.id,
+                                  },
                               }
                             : undefined,
                         watchers: {
@@ -217,7 +220,10 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         ...goal,
                         estimate: goal.estimate
                             ? {
-                                  create: goal.estimate,
+                                  create: {
+                                      ...goal.estimate,
+                                      activityId: activity.id,
+                                  },
                               }
                             : undefined,
                         watchers: watch !== undefined ? { [connectionMap[String(watch)]]: connection } : undefined,
