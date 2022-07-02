@@ -131,9 +131,21 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             state: true,
                         },
                     },
+                    comments: {
+                        include: {
+                            activity: {
+                                ...computeUserFields,
+                            },
+                            reactions: true,
+                        },
+                    },
                 },
             });
 
+            const computedCommentAuthor = goal.comments.map((comment) => withComputedField('author')(comment));
+            if (goal && computedCommentAuthor) {
+                goal.comments = computedCommentAuthor;
+            }
             return withComputedField('owner', 'activity')(goal);
         },
     });

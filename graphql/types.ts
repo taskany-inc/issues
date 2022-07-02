@@ -13,6 +13,7 @@ import {
     Tag as TagModel,
     Settings as SettingsModel,
     Reaction as ReactionModel,
+    Comment as CommentModel,
 } from 'nexus-prisma';
 
 export const DateTime = asNexusMethod(DateTimeResolver, 'DateTime');
@@ -136,6 +137,7 @@ export const Goal = objectType({
         t.list.field('connected', { type: Goal });
         t.field('computedOwner', { type: UserAnyKind });
         t.field('computedActivity', { type: UserAnyKind });
+        t.list.field('comments', { type: Comment });
     },
 });
 
@@ -330,3 +332,25 @@ export const withComputedField =
             return acc;
         }, {}),
     });
+
+export const Comment = objectType({
+    name: 'Comment',
+    definition(t) {
+        t.field(CommentModel.id);
+        t.field(CommentModel.description);
+        t.field('author', { type: UserAnyKind });
+        t.field('computedAuthor', { type: UserAnyKind });
+        // t.field(CommentModel.reactions);
+        t.field(CommentModel.createdAt);
+        t.field(CommentModel.updatedAt);
+    },
+});
+
+export const CommentInputType = inputObjectType({
+    name: 'CommentInput',
+    definition(t) {
+        t.field(CommentModel.description);
+        t.field(CommentModel.goalId);
+        t.field(CommentModel.activityId);
+    },
+});
