@@ -8,6 +8,7 @@ import { Text } from './Text';
 interface TipProps {
     title?: string;
     icon?: React.ReactNode;
+    className?: string;
 }
 
 const StyledTip = styled(Text)`

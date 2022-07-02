@@ -1,8 +1,13 @@
+import { Children } from 'react';
 import styled from 'styled-components';
 
 import { gray4, gray8, radiusM } from '../design/@generated/themes';
 
 import { Text } from './Text';
+
+interface CardInfoProps {
+    className?: string;
+}
 
 export const Card = styled.div`
     box-sizing: border-box;
@@ -23,8 +28,8 @@ const StyledCardInfo = styled.div`
     background-color: ${gray4};
 `;
 
-export const CardInfo: React.FC = ({ children }) => (
-    <StyledCardInfo>
+export const CardInfo: React.FC<CardInfoProps> = ({ children, className }) => (
+    <StyledCardInfo className={className}>
         <Text size="xs" weight="bold" color={gray8}>
             {children}
         </Text>

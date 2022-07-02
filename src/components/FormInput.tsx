@@ -39,6 +39,12 @@ const StyledFormInputContainer = styled.div<{ flat: FormInputProps['flat'] }>`
     border-radius: ${radiusS};
 
     background-color: ${gray3};
+    color: ${textColor};
+    font-weight: 600;
+    font-size: 22px;
+    padding: 8px 16px;
+    width: 100%;
+    box-sizing: border-box;
 
     ${({ flat }) =>
         flat === 'top' &&
