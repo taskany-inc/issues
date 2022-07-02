@@ -30,6 +30,8 @@ const componentsMap = {
     star: dynamic(() => import('teenyicons/outline/star.svg')),
     starFilled: dynamic(() => import('teenyicons/solid/star.svg')),
     emoji: dynamic(() => import('teenyicons/outline/mood-tongue.svg')),
+    markdown: dynamic(() => import('teenyicons/outline/markdown.svg')),
+    question: dynamic(() => import('teenyicons/outline/question-circle.svg')),
 };
 
 export const sizesMap = {
