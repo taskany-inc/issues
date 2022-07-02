@@ -16,6 +16,21 @@ input ActivityInput {
   id: ID!
 }
 
+type Comment {
+  author: UserAnyKind
+  computedAuthor: UserAnyKind
+  createdAt: DateTime!
+  description: String!
+  id: ID!
+  updatedAt: DateTime!
+}
+
+input CommentInput {
+  activityId: String!
+  description: String!
+  goalId: String!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -59,6 +74,7 @@ type Goal {
   activity: Activity
   activityId: String
   blocks: [Goal]
+  comments: [Comment]
   computedActivity: UserAnyKind
   computedOwner: UserAnyKind
   connected: [Goal]
@@ -119,6 +135,7 @@ input GoalSubscriptionInput {
 }
 
 type Mutation {
+  createComment(authorId: String!, description: String!, goalId: String!): Comment
   createGoal(goal: GoalCreateInput!): Goal
   createProject(description: String, flowId: String!, key: String!, title: String!): Project
   createTag(description: String, title: String!): Tag
@@ -152,6 +169,7 @@ type Query {
   flowCompletion(query: String!, sortBy: SortOrder): [Flow]
   flowRecommended: [Flow]
   goal(id: String!): Goal
+  goalComment(goalId: String!): [Comment]
   goalUserIndex(offset: Int!, pageSize: Int!): [Goal]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
