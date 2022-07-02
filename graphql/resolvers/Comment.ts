@@ -15,7 +15,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     goalId,
                 },
                 include: {
-                    author: {
+                    activity: {
                         ...computeUserFields,
                     },
                     reactions: true,
@@ -48,7 +48,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 const newComment = db.comment.create({
                     data: {
                         description,
-                        authorId: commentAuthor.activity.id,
+                        activityId: commentAuthor.activity.id,
                         goalId,
                     },
                 });

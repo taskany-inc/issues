@@ -142,7 +142,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
             });
 
-            const computedCommentAuthor = goal.comments.map((comment) => withComputedField('author')(comment));
+            const computedCommentAuthor = goal?.comments.map((comment) => withComputedField('author')(comment));
             if (goal && computedCommentAuthor) {
                 goal.comments = computedCommentAuthor;
             }
