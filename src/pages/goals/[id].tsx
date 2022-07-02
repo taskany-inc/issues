@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled, { css } from 'styled-components';
@@ -35,6 +35,8 @@ import { Icon } from '../../components/Icon';
 import { StateSwitch } from '../../components/StateSwitch';
 import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
+import { CommentCreationForm } from '../../components/CommentCreationForm';
+import { CommentItem } from '../../components/CommentItem';
 
 const GoalEditModal = dynamic(() => import('../../components/GoalEditModal'));
 
@@ -131,6 +133,15 @@ const fetcher = createFetcher((_, id: string) => ({
                     hue: true,
                 },
             },
+            comments: {
+                id: true,
+                description: true,
+                createdAt: true,
+                computedAuthor: {
+                    image: true,
+                    name: true,
+                },
+            },
         },
     ],
 }));
@@ -143,6 +154,7 @@ const IssueHeader = styled(PageContent)`
 const IssueContent = styled(PageContent)`
     display: grid;
     grid-template-columns: 7fr 5fr;
+    row-gap: 30px;
 `;
 
 const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
@@ -176,6 +188,11 @@ const IssueBaseActions = styled.div`
 
 const StyledIssueTags = styled.span`
     padding-left: ${gapS};
+`;
+
+const StyledActivityFeed = styled.div`
+    display: grid;
+    row-gap: 25px;
 `;
 
 const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
@@ -213,6 +230,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         // @ts-ignore unexpectable trouble with filter
         goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
     );
+
+    const commentsRef = useRef(goal.comments?.map((comment) => comment?.id));
 
     const refresh = useCallback(() => mutate(), [mutate]);
 
@@ -360,6 +379,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         },
         [goal, refresh],
     );
+    console.log(commentsRef.current);
+    console.log(goal.comments);
 
     return (
         <Page locale={locale} title={goal.title}>
@@ -375,7 +396,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                         state={nullable(issueState, (s) => (
                             <StateSwitch state={s} flowId={goal.project?.flow?.id} onClick={onIssueStateChange} />
                         ))}
-                        comments={0}
+                        comments={goal.comments?.length || 0}
                         updatedAt={goal.updatedAt}
                     />
                 </StyledIssueInfo>
@@ -477,6 +498,21 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                         </IssueMeta>
                     ))}
                 </StyledIssueDeps>
+                <StyledActivityFeed>
+                    {goal.comments?.map(
+                        (comment) =>
+                            comment && (
+                                <CommentItem
+                                    author={comment.computedAuthor}
+                                    comment={comment.description}
+                                    key={comment.id}
+                                    createdAt={comment.createdAt}
+                                    isNew={!commentsRef.current?.includes(comment.id)}
+                                />
+                            ),
+                    )}
+                    <CommentCreationForm goalId={goal.id} user={user} />
+                </StyledActivityFeed>
             </IssueContent>
 
             <PageContent>

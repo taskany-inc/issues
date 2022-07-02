@@ -23,7 +23,11 @@ const StyledComment = styled.div`
     column-gap: 15px;
 `;
 
-const StyledCommentForm = styled<{ props }>(Card)`
+interface StyledCommentFormProps {
+    isNew?: boolean;
+}
+
+const StyledCommentForm = styled(Card)<StyledCommentFormProps>`
     ${(props) =>
         props.isNew &&
         css`
@@ -63,8 +67,6 @@ const StyledUserPic = styled.div`
 `;
 
 export const CommentItem: FC<CommentItemProps> = ({ author, comment, createdAt, isNew }) => {
-    console.log(isNew);
-
     return (
         <StyledComment>
             <StyledUserPic>
