@@ -179,5 +179,18 @@
     "home page": "home page",
     "goals page": "goals page",
     "shows this instruction": "shows this instruction"
+  },
+  "Comments": {
+    "new": {
+      "Comments's description is required": "Comments's description is required",
+      "Comments's description must be a string": "Comments's description must be a string",
+      "Comments's description must be longer than 10 symbols": "Comments's description must be longer than 10 symbols",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are creating new Comment": "We are creating new Comment",
+      "Voila! Comment is here 🎉": "Voila! Comment is here 🎉",
+      "Leave a comment": "Leave a comment. Write and select some text to style it. \nYou can attach files by dragging & dropping, selecting or pasting them.",
+      "Styling with markdown is supported": "Styling with markdown is supported. But not now> In future. Maybe. We're trying!",
+      "Comment": "Comment"
+    }
   }
 }
