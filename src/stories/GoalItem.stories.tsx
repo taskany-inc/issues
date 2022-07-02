@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { GoalItem } from '../../components/GoalItem';
-import { Tag } from '../../../graphql/@generated/genql';
+import { GoalItem } from '../components/GoalItem';
+import { Tag } from '../../graphql/@generated/genql';
 
 export default {
     title: 'Taskany/GoalItem',

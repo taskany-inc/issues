@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { EstimateDropdown } from '../../components/EstimateDropdown';
-import { estimatedMeta } from '../../utils/dateTime';
+import { EstimateDropdown } from '../components/EstimateDropdown';
+import { estimatedMeta } from '../utils/dateTime';
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
