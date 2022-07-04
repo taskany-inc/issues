@@ -233,7 +233,7 @@ export const GoalCreateInput = inputObjectType({
         t.field(GoalModel.projectId);
         t.field(GoalModel.stateId);
         t.list.field('tags', { type: TagInput });
-        // t.list.field('participants', { type: Activity });
+        t.list.field('participants', { type: ActivityInput });
         // t.list.field('dependsOn', { type: Goal });
         // t.list.field('blocks', { type: Goal });
         // t.list.field('relatedTo', { type: Goal });
@@ -255,7 +255,7 @@ export const GoalInput = inputObjectType({
         t.field(GoalModel.projectId);
         t.field(GoalModel.stateId);
         t.list.field('tags', { type: TagInput });
-        // t.list.field('participants', { type: Activity });
+        t.list.field('participants', { type: ActivityInput });
         // t.list.field('dependsOn', { type: Goal });
         // t.list.field('blocks', { type: Goal });
         // t.list.field('relatedTo', { type: Goal });
