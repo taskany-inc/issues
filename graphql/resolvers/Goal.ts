@@ -1,8 +1,21 @@
 import { arg, nonNull, stringArg, intArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Goal, GoalInput, computeUserFields, withComputedField, GoalCreateInput } from '../types';
+import {
+    Goal,
+    GoalInput,
+    computeUserFields,
+    withComputedField,
+    GoalCreateInput,
+    GoalSubscriptionInput,
+    Activity,
+} from '../types';
 // import { mailServer } from '../src/utils/mailServer';
+
+const connectionMap: Record<string, string> = {
+    true: 'connect',
+    false: 'disconnect',
+};
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('goalUserIndex', {
@@ -186,14 +199,8 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             goal: nonNull(arg({ type: GoalInput })),
         },
-        resolve: async (_, { goal: { watch, star, ...goal } }, { db, activity }) => {
+        resolve: async (_, { goal }, { db, activity }) => {
             if (!activity) return null;
-
-            const connection = { id: activity.id };
-            const connectionMap: Record<string, string> = {
-                true: 'connect',
-                false: 'disconnect',
-            };
 
             try {
                 return db.goal.update({
@@ -214,8 +221,68 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                                   connect: goal.tags.map((t) => ({ id: t!.id })),
                               }
                             : undefined,
-                        watchers: watch !== undefined ? { [connectionMap[String(watch)]]: connection } : undefined,
-                        stargizers: star !== undefined ? { [connectionMap[String(star)]]: connection } : undefined,
+                    },
+                });
+
+                // await mailServer.sendMail({
+                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('toggleGoalStargizer', {
+        type: Activity,
+        args: {
+            toggle: nonNull(arg({ type: GoalSubscriptionInput })),
+        },
+        resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
+            if (!activity) return null;
+
+            const connection = { id };
+
+            try {
+                return db.activity.update({
+                    where: { id: activity.id },
+                    data: {
+                        goalStargizers: { [connectionMap[String(direction)]]: connection },
+                    },
+                });
+
+                // await mailServer.sendMail({
+                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('toggleGoalWatcher', {
+        type: Activity,
+        args: {
+            toggle: nonNull(arg({ type: GoalSubscriptionInput })),
+        },
+        resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
+            if (!activity) return null;
+
+            const connection = { id };
+
+            try {
+                return db.activity.update({
+                    where: { id: activity.id },
+                    data: {
+                        goalWatchers: { [connectionMap[String(direction)]]: connection },
                     },
                 });
 
