@@ -34,6 +34,7 @@ import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
 import { StateSwitch } from '../../components/StateSwitch';
 import { Reactions } from '../../components/Reactions';
+import { Badge } from '../../components/Badge';
 
 const GoalEditModal = dynamic(() => import('../../components/GoalEditModal'));
 
@@ -344,20 +345,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                 <StyledIssueInfo align="right">
                     <StyledIssueInfoRow>
                         <ActionButton
-                            text={t(watcher ? 'Unwatch' : 'Watch')}
+                            text={t(watcher ? 'Watching' : 'Watch')}
                             iconLeft={<Icon noWrap type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
                             onClick={onWatchToggle}
                         />
                         <ActionButton
-                            text={t(stargizer ? 'Unstar' : 'Star')}
-                            iconLeft={
-                                <Icon
-                                    noWrap
-                                    type={stargizer ? 'starFilled' : 'star'}
-                                    color={stargizer ? star0 : undefined}
-                                    size="s"
-                                />
-                            }
+                            text={t(stargizer ? 'Starred' : 'Stars')}
+                            iconLeft={<Icon noWrap type={stargizer ? 'starFilled' : 'star'} size="s" />}
+                            iconRight={<Badge>{goal.stargizers?.length}</Badge>}
                             onClick={onStarToggle}
                         />
                     </StyledIssueInfoRow>
