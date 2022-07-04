@@ -1,7 +1,7 @@
-import { arg, nonNull, stringArg, intArg, booleanArg, list } from 'nexus';
+import { arg, nonNull, stringArg, intArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Goal, GoalInput, EstimateInput, computeUserFields, withComputedField } from '../types';
+import { Goal, GoalInput, computeUserFields, withComputedField, GoalCreateInput } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -130,57 +130,40 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('createGoal', {
         type: Goal,
         args: {
-            title: nonNull(stringArg()),
-            description: nonNull(stringArg()),
-            projectId: nonNull(intArg()),
-            key: booleanArg(),
-            private: booleanArg(),
-            personal: booleanArg(),
-            ownerId: nonNull(stringArg()),
-            stateId: stringArg(),
-            estimate: arg({ type: EstimateInput }),
-            tags: list(nonNull(stringArg())),
+            goal: nonNull(arg({ type: GoalCreateInput })),
         },
-        resolve: async (
-            _,
-            { title, description, ownerId, projectId, key, private: isPrivate, personal, estimate, stateId, tags },
-            { db, activity },
-        ) => {
+        resolve: async (_, { goal }, { db, activity }) => {
             if (!activity) return null;
+            if (!goal.projectId) return null;
+            if (!goal.ownerId) return null;
 
-            const [goalOwner, project, goalsCount] = await Promise.all([
-                db.user.findUnique({ where: { id: ownerId }, include: { activity: true } }),
-                db.project.findUnique({ where: { id: projectId } }),
+            const [project, goalsCount] = await Promise.all([
+                db.project.findUnique({ where: { id: goal.projectId } }),
                 db.goal.count(),
             ]);
 
             try {
                 return db.goal.create({
                     data: {
+                        ...goal,
                         id: `${project?.key}-${goalsCount + 1}`,
-                        title,
-                        description,
-                        projectId,
-                        key: Boolean(key),
-                        private: Boolean(isPrivate),
-                        personal: Boolean(personal),
-                        stateId,
-                        ownerId: goalOwner?.activity?.id,
                         activityId: activity.id,
-                        tags: {
-                            connect: tags?.map((id) => ({ id })),
-                        },
-                        estimate: estimate
+                        tags: goal.tags
+                            ? {
+                                  connect: goal.tags.map((t) => ({ id: t!.id })),
+                              }
+                            : undefined,
+                        estimate: goal.estimate
                             ? {
                                   create: {
-                                      ...estimate,
+                                      ...goal.estimate,
                                       activityId: activity.id,
                                   },
                               }
                             : undefined,
                         watchers: {
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            connect: [activity, goalOwner?.activity].map((a) => ({ id: a!.id })),
+                            connect: [activity.id, goal.ownerId].map((id) => ({ id })),
                         },
                     },
                 });
@@ -224,6 +207,11 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                                       ...goal.estimate,
                                       activityId: activity.id,
                                   },
+                              }
+                            : undefined,
+                        tags: goal.tags
+                            ? {
+                                  connect: goal.tags.map((t) => ({ id: t!.id })),
                               }
                             : undefined,
                         watchers: watch !== undefined ? { [connectionMap[String(watch)]]: connection } : undefined,
