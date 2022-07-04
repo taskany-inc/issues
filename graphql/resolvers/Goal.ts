@@ -150,10 +150,13 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             if (!goal.projectId) return null;
             if (!goal.ownerId) return null;
 
-            const [project, goalsCount] = await Promise.all([
+            const [owner, project, goalsCount] = await Promise.all([
+                db.user.findUnique({ where: { id: goal.ownerId } }),
                 db.project.findUnique({ where: { id: goal.projectId } }),
                 db.goal.count(),
             ]);
+
+            if (!owner?.activityId) return null;
 
             try {
                 return db.goal.create({
@@ -161,7 +164,8 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         ...goal,
                         id: `${project?.key}-${goalsCount + 1}`,
                         activityId: activity.id,
-                        tags: goal.tags
+                        ownerId: owner?.activityId,
+                        tags: goal.tags?.length
                             ? {
                                   connect: goal.tags.map((t) => ({ id: t!.id })),
                               }
@@ -176,7 +180,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                             : undefined,
                         watchers: {
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            connect: [activity.id, goal.ownerId].map((id) => ({ id })),
+                            connect: [activity.id, owner.activityId].map((id) => ({ id })),
                         },
                     },
                 });
