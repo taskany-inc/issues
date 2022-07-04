@@ -86,6 +86,19 @@ type Goal {
   watchers: [Activity]
 }
 
+input GoalCreateInput {
+  description: String!
+  estimate: EstimateInput
+  key: Boolean
+  ownerId: String
+  personal: Boolean
+  private: Boolean
+  projectId: Int
+  stateId: String
+  tags: [TagInput]
+  title: String!
+}
+
 input GoalInput {
   description: String
   estimate: EstimateInput
@@ -97,12 +110,13 @@ input GoalInput {
   projectId: Int
   star: Boolean
   stateId: String
+  tags: [TagInput]
   title: String
   watch: Boolean
 }
 
 type Mutation {
-  createGoal(description: String!, estimate: EstimateInput, key: Boolean, ownerId: String!, personal: Boolean, private: Boolean, projectId: Int!, stateId: String, tags: [String!], title: String!): Goal
+  createGoal(goal: GoalCreateInput!): Goal
   createProject(description: String, flowId: String!, key: String!, title: String!): Project
   createTag(description: String, title: String!): Tag
   inviteUser(email: String!): Ghost
@@ -196,6 +210,12 @@ type Tag {
   goals: [Goal]
   id: ID!
   projects: [Project]
+  title: String!
+}
+
+input TagInput {
+  description: String
+  id: ID!
   title: String!
 }
 

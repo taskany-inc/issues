@@ -59,13 +59,15 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onSubmit }) => {
         const promise = gql.mutation({
             createGoal: [
                 {
-                    title,
-                    description,
-                    ownerId: owner.id,
-                    projectId: project.id,
-                    estimate,
-                    stateId: state?.id,
-                    tags: Array.from(tags.keys()),
+                    goal: {
+                        title,
+                        description,
+                        ownerId: owner.id,
+                        projectId: project.id,
+                        estimate,
+                        stateId: state?.id,
+                        tags: Array.from(tags.values()),
+                    },
                 },
                 {
                     id: true,

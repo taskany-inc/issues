@@ -73,7 +73,7 @@ export const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) =>
                         projectId: project.id,
                         estimate,
                         stateId: state?.id,
-                        // tags: Array.from(tags.keys()),
+                        tags: Array.from(tags.values()),
                     },
                 },
                 {

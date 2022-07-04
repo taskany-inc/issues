@@ -218,6 +218,27 @@ export const SettingsInput = inputObjectType({
     },
 });
 
+export const GoalCreateInput = inputObjectType({
+    name: 'GoalCreateInput',
+    definition(t) {
+        t.field(GoalModel.title);
+        t.field(GoalModel.description);
+        t.field(GoalModel.key);
+        t.field(GoalModel.personal);
+        t.field(GoalModel.private);
+        t.field('estimate', { type: EstimateInput });
+        t.field(GoalModel.ownerId);
+        t.field(GoalModel.projectId);
+        t.field(GoalModel.stateId);
+        t.list.field('tags', { type: TagInput });
+        // t.list.field('participants', { type: Activity });
+        // t.list.field('dependsOn', { type: Goal });
+        // t.list.field('blocks', { type: Goal });
+        // t.list.field('relatedTo', { type: Goal });
+        // t.list.field('connected', { type: Goal });
+    },
+});
+
 export const GoalInput = inputObjectType({
     name: 'GoalInput',
     definition(t) {
@@ -233,8 +254,8 @@ export const GoalInput = inputObjectType({
         t.field(GoalModel.stateId);
         t.boolean('watch');
         t.boolean('star');
+        t.list.field('tags', { type: TagInput });
         // t.list.field('participants', { type: Activity });
-        // t.list.field('tags', { type: Tag });
         // t.list.field('dependsOn', { type: Goal });
         // t.list.field('blocks', { type: Goal });
         // t.list.field('relatedTo', { type: Goal });
@@ -273,6 +294,15 @@ export const ReactionInput = inputObjectType({
         t.field(ReactionModel.emoji);
         t.field(ReactionModel.goalId);
         t.field(ReactionModel.commentId);
+    },
+});
+
+export const TagInput = inputObjectType({
+    name: 'TagInput',
+    definition(t) {
+        t.field(TagModel.id);
+        t.field(TagModel.title);
+        t.field(TagModel.description);
     },
 });
 

@@ -118,7 +118,6 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({
         const promise = gql.mutation({
             createTag: [
                 {
-                    user: session.user,
                     title: inputState,
                 },
                 {
