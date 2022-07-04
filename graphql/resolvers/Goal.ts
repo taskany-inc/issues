@@ -191,7 +191,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                               }
                             : undefined,
                         watchers: {
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            connect: [activity.id, owner.activityId].map((id) => ({ id })),
+                        },
+                        participants: {
                             connect: [activity.id, owner.activityId].map((id) => ({ id })),
                         },
                     },
