@@ -45,7 +45,6 @@ const colorsOptions = [
     ['danger', [360, 100]],
     ['link', [213, 100]],
     ['star', [43, 100]],
-    ['accent', [324, 100]],
 ];
 
 colorsOptions.forEach(([name, [h, s]]) => {

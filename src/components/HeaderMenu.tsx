@@ -7,16 +7,7 @@ import NextLink from 'next/link';
 import { nullable } from '../utils/nullable';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { routes } from '../hooks/router';
-import {
-    backgroundColor,
-    brandColor,
-    gapM,
-    gray3,
-    textColor,
-    gray8,
-    gapXs,
-    accent10,
-} from '../design/@generated/themes';
+import { backgroundColor, brandColor, gapM, gray3, textColor, gray8, gapXs, link10 } from '../design/@generated/themes';
 
 import { UserPic } from './UserPic';
 import { Popup } from './Popup';
@@ -82,10 +73,10 @@ const StyledNotifier = styled.div`
     user-select: none;
 
     box-shadow: 0 0 0 2px ${gray3};
-    background-color: ${accent10};
+    background-color: ${link10};
 
     &:hover {
-        box-shadow: 0px 0px 0px 2px ${accent10}, 1px 1px 2px 0px ${textColor};
+        box-shadow: 0px 0px 0px 2px ${link10}, 1px 1px 2px 0px ${textColor};
     }
 `;
 
