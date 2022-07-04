@@ -50,7 +50,6 @@ interface ButtonProps {
 const StyledIcon = styled.span`
     display: flex;
     align-items: center;
-    align-self: baseline;
 `;
 const StyledText = styled.span``;
 
