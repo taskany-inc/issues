@@ -14,7 +14,7 @@ import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
-import { gapS, star0 } from '../../design/@generated/themes';
+import { gapS } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
