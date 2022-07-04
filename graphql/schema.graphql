@@ -91,6 +91,7 @@ input GoalCreateInput {
   estimate: EstimateInput
   key: Boolean
   ownerId: String
+  participants: [ActivityInput]
   personal: Boolean
   private: Boolean
   projectId: Int
@@ -105,6 +106,7 @@ input GoalInput {
   id: ID!
   key: Boolean
   ownerId: String
+  participants: [ActivityInput]
   personal: Boolean
   private: Boolean
   projectId: Int
