@@ -108,11 +108,14 @@ input GoalInput {
   personal: Boolean
   private: Boolean
   projectId: Int
-  star: Boolean
   stateId: String
   tags: [TagInput]
   title: String
-  watch: Boolean
+}
+
+input GoalSubscriptionInput {
+  direction: Boolean
+  id: ID!
 }
 
 type Mutation {
@@ -120,6 +123,8 @@ type Mutation {
   createProject(description: String, flowId: String!, key: String!, title: String!): Project
   createTag(description: String, title: String!): Tag
   inviteUser(email: String!): Ghost
+  toggleGoalStargizer(toggle: GoalSubscriptionInput!): Activity
+  toggleGoalWatcher(toggle: GoalSubscriptionInput!): Activity
   toggleReaction(reaction: ReactionInput!): Reaction
   updateGoal(goal: GoalInput!): Goal
   updateSettings(data: SettingsInput!): Settings

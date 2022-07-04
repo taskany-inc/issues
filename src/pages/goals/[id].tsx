@@ -285,20 +285,58 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     );
 
     const onWatchToggle = useCallback(async () => {
+        const promise = gql.mutation({
+            toggleGoalWatcher: [
+                {
+                    toggle: {
+                        id: goal.id,
+                        direction: !watcher,
+                    },
+                },
+                {
+                    id: true,
+                },
+            ],
+        });
+
+        toast.promise(promise, {
+            error: t('Something went wrong 😿'),
+            loading: t('We are calling owner'),
+            success: t(!watcher ? 'Voila! You are watcher now 🎉' : 'So sad! Goal will miss you'),
+        });
+
         setWatcher((w) => !w);
 
-        await triggerUpdate({
-            watch: !watcher,
-        });
-    }, [triggerUpdate, watcher]);
+        await promise;
+        refresh();
+    }, [watcher, goal, refresh, t]);
 
     const onStarToggle = useCallback(async () => {
+        const promise = gql.mutation({
+            toggleGoalStargizer: [
+                {
+                    toggle: {
+                        id: goal.id,
+                        direction: !stargizer,
+                    },
+                },
+                {
+                    id: true,
+                },
+            ],
+        });
+
+        toast.promise(promise, {
+            error: t('Something went wrong 😿'),
+            loading: t('We are calling owner'),
+            success: t(!stargizer ? 'Voila! You are stargizer now 🎉' : 'So sad! Goal will miss you'),
+        });
+
         setStargizer((s) => !s);
 
-        await triggerUpdate({
-            star: !stargizer,
-        });
-    }, [triggerUpdate, stargizer]);
+        await promise;
+        refresh();
+    }, [stargizer, goal, refresh, t]);
 
     const onReactionsToggle = useCallback(
         async (emoji?: string) => {

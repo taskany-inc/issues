@@ -252,8 +252,6 @@ export const GoalInput = inputObjectType({
         t.field(GoalModel.ownerId);
         t.field(GoalModel.projectId);
         t.field(GoalModel.stateId);
-        t.boolean('watch');
-        t.boolean('star');
         t.list.field('tags', { type: TagInput });
         // t.list.field('participants', { type: Activity });
         // t.list.field('dependsOn', { type: Goal });
@@ -303,6 +301,14 @@ export const TagInput = inputObjectType({
         t.field(TagModel.id);
         t.field(TagModel.title);
         t.field(TagModel.description);
+    },
+});
+
+export const GoalSubscriptionInput = inputObjectType({
+    name: 'GoalSubscriptionInput',
+    definition(t) {
+        t.field(GoalModel.id);
+        t.boolean('direction');
     },
 });
 
