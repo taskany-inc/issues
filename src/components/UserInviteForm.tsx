@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import z from 'zod';
 
 import { gql } from '../utils/gql';
-import { gray10 } from '../design/@generated/themes';
+import { gray10, star0 } from '../design/@generated/themes';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -15,6 +15,7 @@ import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
+import { FormTitle } from './FormTitle';
 
 interface UserInviteFormProps {
     onCreate?: (id?: string) => void;
@@ -75,9 +76,9 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
 
     return (
         <>
-            <Form onSubmit={handleSubmit(inviteUser)}>
-                <h2>{t('Invite new user')}</h2>
+            <FormTitle>{t('Invite new user')}</FormTitle>
 
+            <Form onSubmit={handleSubmit(inviteUser)}>
                 <FormInput
                     {...register('email')}
                     error={isSubmitted ? errors.email : undefined}
@@ -85,15 +86,16 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
                     autoFocus
                     flat="bottom"
                 />
+
                 <FormActions flat="top">
                     <FormAction left />
                     <FormAction right inline>
-                        <Button size="l" type="submit" disabled={!isValid} text={t('Send invite')} />
+                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Send invite')} />
                     </FormAction>
                 </FormActions>
             </Form>
 
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
+            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
                 {t.rich('Press key to send invite', {
                     key: () => <Keyboard command enter />,
                 })}
