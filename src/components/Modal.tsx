@@ -42,7 +42,7 @@ const StyledModal = styled.div`
     padding: ${gapM};
 
     min-width: 300px;
-    min-height: 300px;
+    min-height: 200px;
 
     border-radius: ${radiusM};
 
