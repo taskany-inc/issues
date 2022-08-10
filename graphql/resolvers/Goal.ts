@@ -139,6 +139,9 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             reactions: true,
                         },
                     },
+                    participants: {
+                        ...computeUserFields,
+                    },
                 },
             });
 

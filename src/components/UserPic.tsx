@@ -6,6 +6,8 @@ import { Icon } from './Icon';
 interface UserPicProps {
     src?: string | null;
     size?: number;
+    className?: string;
+
     onClick?: () => void;
 }
 
@@ -14,12 +16,12 @@ const StyledImage = styled.img`
     border-radius: 100%;
 `;
 
-export const UserPic: React.FC<UserPicProps> = ({ src, size = 32, onClick }) => {
+export const UserPic: React.FC<UserPicProps> = ({ src, size = 32, className, onClick }) => {
     const sizePx = `${size}px`;
 
     return src ? (
-        <StyledImage src={src} height={sizePx} width={sizePx} />
+        <StyledImage className={className} src={src} height={sizePx} width={sizePx} />
     ) : (
-        <Icon type="user" size={size} onClick={onClick} />
+        <Icon className={className} type="user" size={size} onClick={onClick} />
     );
 };

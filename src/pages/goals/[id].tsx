@@ -142,6 +142,17 @@ const fetcher = createFetcher((_, id: string) => ({
                     name: true,
                 },
             },
+            participants: {
+                id: true,
+                user: {
+                    email: true,
+                    name: true,
+                    image: true,
+                },
+                ghost: {
+                    email: true,
+                },
+            },
         },
     ],
 }));
@@ -202,6 +213,11 @@ const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
 );
 
 const StyledIssueDeps = styled.div``;
+
+const StyledParticipant = styled(UserPic)`
+    margin-top: ${gapS};
+    margin-right: ${gapS};
+`;
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { id } }) => ({
@@ -476,6 +492,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                 </Card>
 
                 <StyledIssueDeps>
+                    {nullable(goal.participants?.length, () => (
+                        <IssueMeta title={t('Participants')}>
+                            {goal.participants?.map((p) =>
+                                nullable(p, (pa) => <StyledParticipant src={pa.user?.image} size={24} />),
+                            )}
+                        </IssueMeta>
+                    ))}
+
                     {nullable(goal.dependsOn?.length, () => (
                         <IssueMeta title={t('Depends on')}>
                             {goal.dependsOn?.map((d) =>
