@@ -1,4 +1,3 @@
-import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,7 +5,7 @@ import toast from 'react-hot-toast';
 import z from 'zod';
 
 import { gql } from '../utils/gql';
-import { gray10, star0 } from '../design/@generated/themes';
+import { star0 } from '../design/@generated/themes';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -22,7 +21,6 @@ interface UserInviteFormProps {
 }
 
 export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
-    const { data: session } = useSession();
     const t = useTranslations('users.invite');
 
     const schema = z.object({
@@ -53,7 +51,6 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
         const promise = gql.mutation({
             inviteUser: [
                 {
-                    user: session!.user,
                     email,
                 },
                 {
