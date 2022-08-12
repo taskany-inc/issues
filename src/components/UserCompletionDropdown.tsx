@@ -14,7 +14,7 @@ import { Popup } from './Popup';
 import { UserPic } from './UserPic';
 import { Input } from './Input';
 
-interface UserCompletionProps {
+interface UserCompletionDropdownProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
     tabIndex?: React.ComponentProps<typeof Button>['tabIndex'];
@@ -107,7 +107,7 @@ const fetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
-export const UserCompletion: React.FC<UserCompletionProps> = ({
+export const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
     size = 'm',
     text,
     view,

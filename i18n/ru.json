@@ -193,5 +193,11 @@
       "Styling with markdown is supported": "Текст можно стилизовать через Markdown. Правда не сейчас, в будущем. Мы стараемся!",
       "Comment": "Откомментировать"
     }
+  },
+  "IssueParticipantsForm": {
+    "Edit participants": "Состав участников",
+    "Already participating": "Уже участвуют",
+    "Save": "Сохранить",
+    "Add participants": "Добавить участников"
   }
 }

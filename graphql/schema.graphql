@@ -122,7 +122,7 @@ input GoalInput {
   id: ID!
   key: Boolean
   ownerId: String
-  participants: [ActivityInput]
+  participants: [String]
   personal: Boolean
   private: Boolean
   projectId: Int

@@ -1,7 +1,9 @@
 import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { gapXs, gray10, gray5, gray6, gray7, gray8, gray9, radiusL } from '../design/@generated/themes';
+import { gapXs, gray10, gray5, gray6, gray9, radiusL } from '../design/@generated/themes';
+
+import { CleanButton } from './CleanButton';
 
 interface TagProps {
     title: string;
@@ -13,32 +15,7 @@ interface TagProps {
     onHide?: () => void;
 }
 
-const StyledCleanButton = styled.div`
-    visibility: hidden;
-    position: absolute;
-    transform: rotate(45deg);
-    top: -4px;
-    right: -4px;
-    width: 14px;
-    height: 14px;
-
-    text-align: center;
-    line-height: 12px;
-    font-size: 12px;
-    color: ${gray10};
-
-    border-radius: 100%;
-
-    cursor: pointer;
-
-    background-color: ${gray7};
-
-    transition: background-color 300ms ease-in-out;
-
-    &:hover {
-        background-color: ${gray8};
-    }
-`;
+const StyledCleanButton = styled(CleanButton)``;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledTag = styled(({ onHide, ...props }) => <div {...props} />)<{
@@ -113,7 +90,7 @@ export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClic
 
     return (
         <StyledTag size={size} onClick={onClick} onHide={onHide} title={description} className={className}>
-            {onHide && <StyledCleanButton onClick={onHideClick}>+</StyledCleanButton>}
+            {onHide && <StyledCleanButton onClick={onHideClick} />}
             {title}
         </StyledTag>
     );

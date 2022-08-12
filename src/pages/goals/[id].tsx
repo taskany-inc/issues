@@ -27,7 +27,7 @@ import { IssueMeta } from '../../components/IssueMeta';
 import { IssueListItem } from '../../components/IssueListItem';
 import { RelativeTime } from '../../components/RelativeTime';
 import { Md } from '../../components/Md';
-import { UserCompletion } from '../../components/UserCompletion';
+import { UserCompletionDropdown } from '../../components/UserCompletionDropdown';
 import { EstimateDropdown } from '../../components/EstimateDropdown';
 import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
@@ -39,6 +39,7 @@ import { CommentCreationForm } from '../../components/CommentCreationForm';
 import { CommentItem } from '../../components/CommentItem';
 
 const GoalEditModal = dynamic(() => import('../../components/GoalEditModal'));
+const GoalParticipantsModal = dynamic(() => import('../../components/IssueParticipantsModal'));
 
 const refreshInterval = 3000;
 
@@ -398,6 +399,19 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     console.log(commentsRef.current);
     console.log(goal.comments);
 
+    const onParticipantsChange = useCallback(
+        async (participants: string[]) => {
+            console.log(participants);
+
+            await triggerUpdate({
+                participants,
+            });
+
+            refresh();
+        },
+        [refresh, triggerUpdate],
+    );
+
     return (
         <Page locale={locale} title={goal.title}>
             <IssueHeader>
@@ -459,7 +473,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     <CardActions>
                         <IssueBaseActions>
                             <IssueAction>
-                                <UserCompletion
+                                <UserCompletionDropdown
                                     text={issueOwnerName}
                                     placeholder={t('Set owner')}
                                     title={t('Set owner')}
@@ -493,9 +507,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
                 <StyledIssueDeps>
                     {nullable(goal.participants?.length, () => (
-                        <IssueMeta title={t('Participants')}>
+                        <IssueMeta
+                            title={t('Participants')}
+                            onAdd={dispatchModalEvent(ModalEvent.IssueParticipantsModal)}
+                        >
                             {goal.participants?.map((p) =>
-                                nullable(p, (pa) => <StyledParticipant src={pa.user?.image} size={24} />),
+                                nullable(p, (pa) => <StyledParticipant key={pa.id} src={pa.user?.image} size={24} />),
                             )}
                         </IssueMeta>
                     ))}
@@ -544,7 +561,10 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             </PageContent>
 
             {nullable(isUserAllowedToEdit, () => (
-                <GoalEditModal goal={goal} onSubmit={refresh} />
+                <>
+                    <GoalEditModal goal={goal} onSubmit={refresh} />
+                    <GoalParticipantsModal issue={goal} onChange={onParticipantsChange} />
+                </>
             ))}
         </Page>
     );

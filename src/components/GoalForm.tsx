@@ -14,7 +14,7 @@ import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
 import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
-import { UserCompletion } from './UserCompletion';
+import { UserCompletionDropdown } from './UserCompletionDropdown';
 import { ProjectCompletion } from './ProjectCompletion';
 import { TagCompletion } from './TagCompletion';
 import { EstimateDropdown } from './EstimateDropdown';
@@ -176,7 +176,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
                 <FormActions flat="top">
                     <FormAction left inline>
-                        <UserCompletion
+                        <UserCompletionDropdown
                             size="m"
                             text={ownerButtonText}
                             placeholder={t('Enter name or email')}
