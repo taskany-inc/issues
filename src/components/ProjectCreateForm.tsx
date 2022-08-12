@@ -24,7 +24,7 @@ import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { UserCompletion } from './UserCompletion';
+import { UserCompletionDropdown } from './UserCompletionDropdown';
 import { FlowCompletion } from './FlowCompletion';
 import { UserPic } from './UserPic';
 import { ProjectKeyInput } from './ProjectKeyInput';
@@ -235,7 +235,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }
 
                 <FormActions flat="top">
                     <FormAction left inline>
-                        <UserCompletion
+                        <UserCompletionDropdown
                             size="m"
                             text={ownerButtonText}
                             placeholder={t('Enter name or email')}

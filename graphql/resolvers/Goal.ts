@@ -222,6 +222,16 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { goal }, { db, activity }) => {
             if (!activity) return null;
+            const actualGoal = await db.goal.findUnique({ where: { id: goal.id }, include: { participants: true } });
+
+            let participantsToDisconnect: Array<{ id: string }> = [];
+
+            if (goal.participants) {
+                participantsToDisconnect =
+                    actualGoal?.participants
+                        ?.filter((p) => !goal.participants?.includes(p!.id))
+                        .map((a) => ({ id: a.id })) || [];
+            }
 
             try {
                 return db.goal.update({
@@ -240,6 +250,13 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         tags: goal.tags
                             ? {
                                   connect: goal.tags.map((t) => ({ id: t!.id })),
+                              }
+                            : undefined,
+                        // @ts-ignore
+                        participants: goal.participants
+                            ? {
+                                  connect: goal.participants.map((id) => ({ id })),
+                                  disconnect: participantsToDisconnect,
                               }
                             : undefined,
                     },

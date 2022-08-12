@@ -193,5 +193,11 @@
       "Styling with markdown is supported": "Styling with markdown is supported. But not now> In future. Maybe. We're trying!",
       "Comment": "Comment"
     }
+  },
+  "IssueParticipantsForm": {
+    "Edit participants": "Edit participants",
+    "Already participating": "Already participating",
+    "Save": "Save",
+    "Add participants": "Add participants"
   }
 }
