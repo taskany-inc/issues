@@ -535,6 +535,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                         </IssueMeta>
                     ))}
                 </StyledIssueDeps>
+
                 <StyledActivityFeed>
                     {goal.comments?.map(
                         (comment) =>
