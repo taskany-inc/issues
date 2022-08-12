@@ -42,7 +42,6 @@ const StyledFormInputContainer = styled.div<{ flat: FormInputProps['flat'] }>`
     color: ${textColor};
     font-weight: 600;
     font-size: 22px;
-    padding: 8px 16px;
     width: 100%;
     box-sizing: border-box;
 
