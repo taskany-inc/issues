@@ -6,6 +6,49 @@ import { Role } from '@prisma/client';
 
 import { prisma } from './prisma';
 
+const providers: NextAuthOptions['providers'] = [
+    CredentialsProvider({
+        name: 'Credentials',
+        credentials: {
+            email: { label: 'email', type: 'text', placeholder: 'admin@taskany.org' },
+            password: { label: 'password', type: 'password' },
+        },
+        async authorize(creds) {
+            const user = await prisma.user.findUnique({
+                where: {
+                    email: creds?.email,
+                },
+                include: {
+                    accounts: true,
+                },
+            });
+
+            if (!user) return null;
+            // FIXME: add salt
+            if (user?.accounts[0].password !== creds?.password) return null;
+
+            return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                image: user.image,
+                role: user.role,
+                activityId: user.activityId,
+            };
+        },
+    }),
+];
+
+if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+    providers.push(
+        // https://next-auth.js.org/configuration/providers/oauth
+        GitHubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID!,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+        }),
+    );
+}
+
 // https://next-auth.js.org/configuration/options
 export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
@@ -13,43 +56,7 @@ export const authOptions: NextAuthOptions = {
     session: {
         strategy: 'jwt', // required for CredentialsProvider
     },
-    providers: [
-        CredentialsProvider({
-            name: 'Credentials',
-            credentials: {
-                email: { label: 'email', type: 'text', placeholder: 'admin@taskany.org' },
-                password: { label: 'password', type: 'password' },
-            },
-            async authorize(creds) {
-                const user = await prisma.user.findUnique({
-                    where: {
-                        email: creds?.email,
-                    },
-                    include: {
-                        accounts: true,
-                    },
-                });
-
-                if (!user) return null;
-                // FIXME: add salt
-                if (user?.accounts[0].password !== creds?.password) return null;
-
-                return {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    image: user.image,
-                    role: user.role,
-                    activityId: user.activityId,
-                };
-            },
-        }),
-        // https://next-auth.js.org/configuration/providers/oauth
-        GitHubProvider({
-            clientId: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        }),
-    ],
+    providers,
     callbacks: {
         // @ts-ignore — black magic of adding user data to session
         async session({ session, token, user }) {
