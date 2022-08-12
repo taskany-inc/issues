@@ -396,13 +396,9 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         },
         [goal, refresh],
     );
-    console.log(commentsRef.current);
-    console.log(goal.comments);
 
     const onParticipantsChange = useCallback(
         async (participants: string[]) => {
-            console.log(participants);
-
             await triggerUpdate({
                 participants,
             });
