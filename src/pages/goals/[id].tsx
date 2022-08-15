@@ -14,7 +14,7 @@ import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
-import { gapS } from '../../design/@generated/themes';
+import { gapM, gapS } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
@@ -23,8 +23,6 @@ import { Card, CardInfo, CardContent, CardActions } from '../../components/Card'
 import { IssueTitle } from '../../components/IssueTitle';
 import { IssueKey } from '../../components/IssueKey';
 import { IssueStats } from '../../components/IssueStats';
-import { IssueMeta } from '../../components/IssueMeta';
-import { IssueListItem } from '../../components/IssueListItem';
 import { RelativeTime } from '../../components/RelativeTime';
 import { Md } from '../../components/Md';
 import { UserCompletionDropdown } from '../../components/UserCompletionDropdown';
@@ -37,9 +35,10 @@ import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
 import { CommentCreationForm } from '../../components/CommentCreationForm';
 import { CommentItem } from '../../components/CommentItem';
+import { IssueDependencies } from '../../components/IssueDependencies';
+import { IssueParticipants } from '../../components/IssueParticipants';
 
 const GoalEditModal = dynamic(() => import('../../components/GoalEditModal'));
-const GoalParticipantsModal = dynamic(() => import('../../components/IssueParticipantsModal'));
 
 const refreshInterval = 3000;
 
@@ -213,11 +212,8 @@ const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
     </StyledIssueTags>
 );
 
-const StyledIssueDeps = styled.div``;
-
-const StyledParticipant = styled(UserPic)`
-    margin-top: ${gapS};
-    margin-right: ${gapS};
+const StyledIssueDeps = styled.div`
+    padding: 0 ${gapM};
 `;
 
 export const getServerSideProps = declareSsrProps(
@@ -408,6 +404,17 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         [refresh, triggerUpdate],
     );
 
+    const onDependenciesChange = useCallback(
+        async (dependencies: string[]) => {
+            // await triggerUpdate({
+            //     participants,
+            // });
+
+            refresh();
+        },
+        [refresh, triggerUpdate],
+    );
+
     return (
         <Page locale={locale} title={goal.title}>
             <IssueHeader>
@@ -502,38 +509,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                 </Card>
 
                 <StyledIssueDeps>
-                    {nullable(goal.participants?.length, () => (
-                        <IssueMeta
-                            title={t('Participants')}
-                            onAdd={dispatchModalEvent(ModalEvent.IssueParticipantsModal)}
-                        >
-                            {goal.participants?.map((p) =>
-                                nullable(p, (pa) => <StyledParticipant key={pa.id} src={pa.user?.image} size={24} />),
-                            )}
-                        </IssueMeta>
-                    ))}
-
-                    {nullable(goal.dependsOn?.length, () => (
-                        <IssueMeta title={t('Depends on')}>
-                            {goal.dependsOn?.map((d) =>
-                                nullable(d, (dep) => <IssueListItem key={d?.id} issue={dep} />),
-                            )}
-                        </IssueMeta>
-                    ))}
-
-                    {nullable(goal.blocks?.length, () => (
-                        <IssueMeta title={t('Blocks')}>
-                            {goal.blocks?.map((d) => nullable(d, (dep) => <IssueListItem key={d?.id} issue={dep} />))}
-                        </IssueMeta>
-                    ))}
-
-                    {nullable(goal.relatedTo?.length, () => (
-                        <IssueMeta title={t('Related')}>
-                            {goal.relatedTo?.map((d) =>
-                                nullable(d, (dep) => <IssueListItem key={d?.id} issue={dep} />),
-                            )}
-                        </IssueMeta>
-                    ))}
+                    <IssueParticipants issue={goal} onChange={isUserAllowedToEdit ? onParticipantsChange : undefined} />
+                    <IssueDependencies issue={goal} onChange={isUserAllowedToEdit ? onDependenciesChange : undefined} />
                 </StyledIssueDeps>
 
                 <StyledActivityFeed>
@@ -553,15 +530,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                 </StyledActivityFeed>
             </IssueContent>
 
-            <PageContent>
-                <pre>{JSON.stringify(goal, null, 2)}</pre>
-            </PageContent>
-
             {nullable(isUserAllowedToEdit, () => (
-                <>
-                    <GoalEditModal goal={goal} onSubmit={refresh} />
-                    <GoalParticipantsModal issue={goal} onChange={onParticipantsChange} />
-                </>
+                <GoalEditModal goal={goal} onSubmit={refresh} />
             ))}
         </Page>
     );

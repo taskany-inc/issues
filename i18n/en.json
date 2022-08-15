@@ -127,12 +127,8 @@
       "Watching": "Watching",
       "Stars": "Stars",
       "Starred": "Starred",
-      "Depends on": "Depends on",
-      "Blocks": "Blocks",
-      "Related": "Related",
       "Edit goal": "Edit goal",
-      "New goal": "New goal",
-      "Participants": "Participants"
+      "New goal": "New goal"
     },
     "item": {
       "by": "by"
@@ -194,10 +190,20 @@
       "Comment": "Comment"
     }
   },
-  "IssueParticipantsForm": {
+  "IssueParticipants": {
+    "Participants": "Participants",
     "Edit participants": "Edit participants",
     "Already participating": "Already participating",
     "Save": "Save",
     "Add participants": "Add participants"
+  },
+  "IssueDependencies": {
+    "Edit dependencies": "Edit dependencies",
+    "Depends on": "Depends on",
+    "Blocks": "Blocks",
+    "Related": "Related",
+    "Does issue have dependencies": "Does issue have dependencies",
+    "Add one": "Add one",
+    "Add dependency": "Add dependency"
   }
 }

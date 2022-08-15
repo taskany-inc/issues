@@ -1,31 +1,53 @@
 import styled from 'styled-components';
 
-import { gapM, gapS, gray4, gray9 } from '../design/@generated/themes';
+import { gapS, gapXs, gray4, gray9, textColor } from '../design/@generated/themes';
+import { nullable } from '../utils/nullable';
 
 import { Text } from './Text';
-import { Plus } from './Plus';
+import { Icon } from './Icon';
 
 interface IssueMetaProps {
     title: string;
-    onAdd?: () => void;
+
+    onEdit?: () => void | null;
 }
 
 const StyledIssueMeta = styled.div`
-    padding: ${gapS} ${gapM};
+    padding: ${gapS} 0;
     max-width: 300px;
 `;
+
 const StyledIssueMetaTitle = styled(Text)`
     border-bottom: 1px solid ${gray4};
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    margin-bottom: ${gapXs};
 `;
 
-export const IssueMeta: React.FC<IssueMetaProps> = ({ title, onAdd, children }) => {
+const EditButton = styled.span`
+    display: inline-block;
+
+    cursor: pointer;
+
+    transition: color 250ms ease-in-out;
+
+    &:hover {
+        color: ${textColor};
+    }
+`;
+
+export const IssueMeta: React.FC<IssueMetaProps> = ({ title, onEdit, children }) => {
     return (
         <StyledIssueMeta>
             <StyledIssueMetaTitle size="s" weight="bold" color={gray9}>
-                {title} <Plus onClick={onAdd} />
+                {title}{' '}
+                {nullable(onEdit, () => (
+                    <EditButton>
+                        <Icon type="editCircle" size="s" onClick={onEdit} />
+                    </EditButton>
+                ))}
             </StyledIssueMetaTitle>
 
             {children}
