@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import NextLink from 'next/link';
 
-import { gapS } from '../design/@generated/themes';
+import { gapM, gapS } from '../design/@generated/themes';
 import { routes } from '../hooks/router';
 
 import { StateDot } from './StateDot';
@@ -20,7 +20,7 @@ interface IssueListItemProps {
 }
 
 const StyledIssueListItem = styled.div`
-    padding: ${gapS} 0;
+    padding: ${gapS} ${gapM} ${gapS} 0;
     display: flex;
     align-items: center;
 `;

@@ -127,12 +127,8 @@
       "Watching": "Отписаться",
       "Stars": "В избранное",
       "Starred": "Избранное",
-      "Depends on": "Зависит от",
-      "Blocks": "Заблокировано",
-      "Related": "Связано",
       "Edit goal": "Редактировать",
-      "New goal": "Создать цель",
-      "Participants": "В главных ролях"
+      "New goal": "Создать цель"
     },
     "item": {
       "by": ""
@@ -194,10 +190,20 @@
       "Comment": "Откомментировать"
     }
   },
-  "IssueParticipantsForm": {
+  "IssueParticipants": {
+    "Participants": "В главных ролях",
     "Edit participants": "Состав участников",
     "Already participating": "Уже участвуют",
     "Save": "Сохранить",
     "Add participants": "Добавить участников"
+  },
+  "IssueDependencies": {
+    "Edit dependencies": "Зависимости",
+    "Depends on": "Зависит от",
+    "Blocks": "Заблокировано",
+    "Related": "Связано",
+    "Does issue have dependencies": "Ни от чего не зависит?",
+    "Add one": "Добавить",
+    "Add dependency": "Добавить зависимость"
   }
 }

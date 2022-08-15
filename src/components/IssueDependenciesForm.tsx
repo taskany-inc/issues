@@ -7,9 +7,9 @@ import { Goal, UserAnyKind } from '../../graphql/@generated/genql';
 
 import { FormTitle } from './FormTitle';
 import { UserCompletionInput } from './UserCompletionInput';
-import { IssueParticipantsList } from './IssueParticipantsList';
+import { IssueDependenciesList } from './IssueDependenciesList';
 
-interface IssueParticipantsFormProps {
+interface IssueDependenciesFormProps {
     issue: Goal;
 
     onChange?: (activities: string[]) => void;
@@ -19,13 +19,12 @@ const StyledCompletion = styled.div`
     padding: ${gapL} 0 ${gapM};
 `;
 
-export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ issue, onChange }) => {
-    const t = useTranslations('IssueParticipants');
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+export const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
+    const t = useTranslations('IssueDependencies');
     const activities = useMemo(() => new Set<string>(issue.participants?.map((p) => p!.id)), [issue]);
 
-    const onParticipantDelete = useCallback(
-        (id: string) => {
+    const onDependencyDelete = useCallback(
+        (id: string) => () => {
             activities.delete(id);
             onChange && onChange(Array.from(activities));
         },
@@ -45,16 +44,18 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ is
 
     return (
         <>
-            <FormTitle>{t('Edit participants')}</FormTitle>
+            <FormTitle>{t('Edit dependencies')}</FormTitle>
 
-            <IssueParticipantsList
-                title={t('Participants')}
-                participants={issue.participants}
-                onDelete={onParticipantDelete}
+            <IssueDependenciesList
+                title={t('Depends on')}
+                dependencies={issue.dependsOn}
+                onDelete={onDependencyDelete}
             />
+            <IssueDependenciesList title={t('Blocks')} dependencies={issue.blocks} onDelete={onDependencyDelete} />
+            <IssueDependenciesList title={t('Related')} dependencies={issue.relatedTo} onDelete={onDependencyDelete} />
 
             <StyledCompletion>
-                <UserCompletionInput placeholder={t('Add participants')} onClick={onParticipantAdd} />
+                <UserCompletionInput placeholder={t('Add dependency')} onClick={onParticipantAdd} />
             </StyledCompletion>
         </>
     );

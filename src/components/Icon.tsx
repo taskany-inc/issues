@@ -32,6 +32,7 @@ const componentsMap = {
     emoji: dynamic(() => import('teenyicons/outline/mood-tongue.svg')),
     markdown: dynamic(() => import('teenyicons/outline/markdown.svg')),
     question: dynamic(() => import('teenyicons/outline/question-circle.svg')),
+    editCircle: dynamic(() => import('teenyicons/outline/edit-circle.svg')),
 };
 
 export const sizesMap = {
