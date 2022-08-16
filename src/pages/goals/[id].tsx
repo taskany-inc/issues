@@ -21,7 +21,7 @@ import { estimatedMeta } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
-import { gapM, gapS } from '../../design/@generated/themes';
+import { gapL, gapM, gapS } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
 import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
@@ -144,9 +144,12 @@ const fetcher = createFetcher((_, id: string) => ({
                 id: true,
                 description: true,
                 createdAt: true,
-                computedAuthor: {
-                    image: true,
-                    name: true,
+                activity: {
+                    user: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    },
                 },
             },
             participants: {
@@ -172,7 +175,7 @@ const IssueHeader = styled(PageContent)`
 const IssueContent = styled(PageContent)`
     display: grid;
     grid-template-columns: 7fr 5fr;
-    row-gap: 30px;
+    gap: ${gapM};
 `;
 
 const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
@@ -210,7 +213,8 @@ const StyledIssueTags = styled.span`
 
 const StyledActivityFeed = styled.div`
     display: grid;
-    row-gap: 25px;
+    padding-top: ${gapL};
+    row-gap: ${gapM};
 `;
 
 const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
@@ -219,9 +223,7 @@ const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
     </StyledIssueTags>
 );
 
-const StyledIssueDeps = styled.div`
-    padding: 0 ${gapM};
-`;
+const StyledIssueDeps = styled.div``;
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { id } }) => ({
@@ -483,70 +485,72 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             <PageSep />
 
             <IssueContent>
-                <Card>
-                    <CardInfo>
-                        <Link inline>{goal.computedActivity!.name}</Link> — <RelativeTime date={goal.createdAt} />
-                    </CardInfo>
+                <div>
+                    <Card>
+                        <CardInfo>
+                            <Link inline>{goal.computedActivity!.name}</Link> — <RelativeTime date={goal.createdAt} />
+                        </CardInfo>
 
-                    <CardContent>
-                        <Md>{goal.description}</Md>
-                    </CardContent>
+                        <CardContent>
+                            <Md>{goal.description}</Md>
+                        </CardContent>
 
-                    <CardActions>
-                        <IssueBaseActions>
-                            <IssueAction>
-                                <UserCompletionDropdown
-                                    text={issueOwnerName}
-                                    placeholder={t('Set owner')}
-                                    title={t('Set owner')}
-                                    query={issueOwnerName}
-                                    userPic={<UserPic src={issueOwner?.image} size={16} />}
-                                    onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
-                                />
-                            </IssueAction>
+                        <CardActions>
+                            <IssueBaseActions>
+                                <IssueAction>
+                                    <UserCompletionDropdown
+                                        text={issueOwnerName}
+                                        placeholder={t('Set owner')}
+                                        title={t('Set owner')}
+                                        query={issueOwnerName}
+                                        userPic={<UserPic src={issueOwner?.image} size={16} />}
+                                        onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
+                                    />
+                                </IssueAction>
 
-                            <IssueAction>
-                                <EstimateDropdown
-                                    size="m"
-                                    text={t('Schedule')}
-                                    placeholder={t('Date input mask placeholder')}
-                                    mask={t('Date input mask')}
-                                    value={issueEstimate}
-                                    defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
-                                    onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
-                                />
-                            </IssueAction>
-                            <IssueAction>
-                                <Reactions reactions={goal.reactions} onClick={onReactionsToggle} />
-                            </IssueAction>
-                        </IssueBaseActions>
+                                <IssueAction>
+                                    <EstimateDropdown
+                                        size="m"
+                                        text={t('Schedule')}
+                                        placeholder={t('Date input mask placeholder')}
+                                        mask={t('Date input mask')}
+                                        value={issueEstimate}
+                                        defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
+                                        onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
+                                    />
+                                </IssueAction>
+                                <IssueAction>
+                                    <Reactions reactions={goal.reactions} onClick={onReactionsToggle} />
+                                </IssueAction>
+                            </IssueBaseActions>
 
-                        {nullable(isUserAllowedToEdit, () => (
-                            <Button text={t('Edit goal')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
-                        ))}
-                    </CardActions>
-                </Card>
+                            {nullable(isUserAllowedToEdit, () => (
+                                <Button text={t('Edit goal')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
+                            ))}
+                        </CardActions>
+                    </Card>
+
+                    <StyledActivityFeed>
+                        {goal.comments?.map(
+                            (comment) =>
+                                comment && (
+                                    <CommentItem
+                                        key={comment.id}
+                                        author={comment.activity?.user}
+                                        comment={comment.description}
+                                        createdAt={comment.createdAt}
+                                        isNew={!commentsRef.current?.includes(comment.id)}
+                                    />
+                                ),
+                        )}
+                        <CommentCreationForm goalId={goal.id} user={user} />
+                    </StyledActivityFeed>
+                </div>
 
                 <StyledIssueDeps>
                     <IssueParticipants issue={goal} onChange={isUserAllowedToEdit ? onParticipantsChange : undefined} />
                     <IssueDependencies issue={goal} onChange={isUserAllowedToEdit ? onDependenciesChange : undefined} />
                 </StyledIssueDeps>
-
-                <StyledActivityFeed>
-                    {goal.comments?.map(
-                        (comment) =>
-                            comment && (
-                                <CommentItem
-                                    author={comment.computedAuthor}
-                                    comment={comment.description}
-                                    key={comment.id}
-                                    createdAt={comment.createdAt}
-                                    isNew={!commentsRef.current?.includes(comment.id)}
-                                />
-                            ),
-                    )}
-                    <CommentCreationForm goalId={goal.id} user={user} />
-                </StyledActivityFeed>
             </IssueContent>
 
             {nullable(isUserAllowedToEdit, () => (

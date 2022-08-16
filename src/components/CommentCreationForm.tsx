@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { Session } from 'next-auth';
 
 import { gql } from '../utils/gql';
-import { backgroundColor, gray4, gray6 } from '../design/@generated/themes';
+import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
 
 import { Form } from './Form';
 import { FormCard } from './FormCard';
@@ -16,7 +16,7 @@ import { FormTextarea } from './FormTextarea';
 import { UserPic } from './UserPic';
 import { Icon } from './Icon';
 import { Text } from './Text';
-import { FormAction } from './FormActions';
+import { FormAction, FormActions } from './FormActions';
 import { Button } from './Button';
 import { Tip } from './Tip';
 import { Link } from './Link';
@@ -33,35 +33,33 @@ const StyledComment = styled.div`
     column-gap: 15px;
 `;
 
-const StyledUserPic = styled.div`
-    padding-top: 11px;
-`;
-
 const StyledFormBottom = styled.div`
-    padding-left: 14px;
-    padding-top: 9px;
-    display: grid;
-    grid-template-columns: 1fr 15px;
-    column-gap: 5px;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+
+    padding: ${gapS} ${gapS} 0 ${gapS};
 `;
 
 const StyledCommentForm = styled(FormCard)`
-    position: relative;
-    z-index: 2;
     &::before {
         position: absolute;
+        z-index: 0;
+
         content: '';
-        width: 20px;
-        height: 20px;
+
+        width: 14px;
+        height: 14px;
+
         background-color: ${backgroundColor};
+
         border-left: 1px solid ${gray4};
         border-top: 1px solid ${gray4};
         border-radius: 2px;
-        z-index: 3;
+
         transform: rotate(-45deg);
-        top: 14px;
-        left: -10px;
+        top: 10px;
+        left: -8px;
     }
 `;
 
@@ -70,7 +68,7 @@ const StyledTip = styled(Tip)`
 `;
 
 const StyledFormTextarea = styled(FormTextarea)`
-    min-height: 100px;
+    min-height: 60px;
 `;
 
 export const CommentCreationForm: React.FC<CommentProps> = ({ user, onCreate, goalId }) => {
@@ -129,9 +127,8 @@ export const CommentCreationForm: React.FC<CommentProps> = ({ user, onCreate, go
 
     return (
         <StyledComment>
-            <StyledUserPic>
-                <UserPic size={32} src={user?.image} />
-            </StyledUserPic>
+            <UserPic size={32} src={user?.image} />
+
             <StyledCommentForm>
                 <Form onSubmit={handleSubmit(createComment)}>
                     <StyledFormTextarea
@@ -140,16 +137,19 @@ export const CommentCreationForm: React.FC<CommentProps> = ({ user, onCreate, go
                         placeholder={t('Leave a comment')}
                         flat="both"
                     />
-                    <FormAction right inline>
-                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Comment')} />
-                    </FormAction>
+                    <FormActions>
+                        <FormAction left inline />
+                        <FormAction right inline>
+                            <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Comment')} />
+                        </FormAction>
+                    </FormActions>
                 </Form>
+
                 <StyledFormBottom>
                     <StyledTip icon={<Icon type="markdown" size="s" color={gray6} />}>
-                        <Text as="span" color={gray6}>
-                            {t('Styling with markdown is supported')}
-                        </Text>
+                        {t('Styling with markdown is supported')}
                     </StyledTip>
+
                     <Link href="/help">
                         <Icon type="question" size="s" color={gray6} />
                     </Link>
