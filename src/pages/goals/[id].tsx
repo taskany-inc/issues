@@ -6,7 +6,14 @@ import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
-import { Goal, EstimateInput, GoalInput, UserAnyKind, State } from '../../../graphql/@generated/genql';
+import {
+    Goal,
+    EstimateInput,
+    GoalInput,
+    UserAnyKind,
+    State,
+    GoalDependencyInput,
+} from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
@@ -405,14 +412,29 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     );
 
     const onDependenciesChange = useCallback(
-        async (dependencies: string[]) => {
-            // await triggerUpdate({
-            //     participants,
-            // });
+        async (toggle: GoalDependencyInput) => {
+            const promise = gql.mutation({
+                toggleGoalDependency: [
+                    {
+                        toggle,
+                    },
+                    {
+                        id: true,
+                    },
+                ],
+            });
+
+            toast.promise(promise, {
+                error: t('Something went wrong 😿'),
+                loading: t('We are updating the goal'),
+                success: t('Voila! Goal is up to date 🎉'),
+            });
+
+            await promise;
 
             refresh();
         },
-        [refresh, triggerUpdate],
+        [refresh, t],
     );
 
     return (

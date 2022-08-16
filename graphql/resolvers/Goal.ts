@@ -9,6 +9,8 @@ import {
     GoalCreateInput,
     GoalSubscriptionInput,
     Activity,
+    GoalDependencyInput,
+    dependencyKind,
 } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
@@ -150,6 +152,99 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 goal.comments = computedCommentAuthor;
             }
             return withComputedField('owner', 'activity')(goal);
+        },
+    });
+
+    t.list.string('goalDependencyKind', {
+        resolve: async (_, _args, { activity }) => {
+            if (!activity) return null;
+
+            return dependencyKind;
+        },
+    });
+
+    t.list.field('findGoal', {
+        type: Goal,
+        args: {
+            query: nonNull(stringArg()),
+        },
+        resolve: async (_, { query }, { db, activity }) => {
+            if (!activity) return null;
+
+            if (query === '') {
+                return [];
+            }
+
+            return db.goal.findMany({
+                where: {
+                    OR: [
+                        {
+                            id: {
+                                contains: query,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            title: {
+                                contains: query,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                },
+                take: 5,
+                include: {
+                    owner: {
+                        ...computeUserFields,
+                    },
+                    activity: {
+                        ...computeUserFields,
+                    },
+                    tags: true,
+                    state: true,
+                    project: {
+                        include: {
+                            flow: true,
+                        },
+                    },
+                    reactions: {
+                        include: {
+                            activity: {
+                                ...computeUserFields,
+                            },
+                        },
+                    },
+                    estimate: true,
+                    watchers: true,
+                    stargizers: true,
+                    dependsOn: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    relatedTo: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    blocks: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    comments: {
+                        include: {
+                            activity: {
+                                ...computeUserFields,
+                            },
+                            reactions: true,
+                        },
+                    },
+                    participants: {
+                        ...computeUserFields,
+                    },
+                },
+            });
         },
     });
 };
@@ -321,6 +416,37 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                     where: { id: activity.id },
                     data: {
                         goalWatchers: { [connectionMap[String(direction)]]: connection },
+                    },
+                });
+
+                // await mailServer.sendMail({
+                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('toggleGoalDependency', {
+        type: Goal,
+        args: {
+            toggle: nonNull(arg({ type: GoalDependencyInput })),
+        },
+        resolve: async (_, { toggle: { id, target, dependency, direction } }, { db, activity }) => {
+            if (!activity) return null;
+
+            const connection = { id: target };
+
+            try {
+                return db.goal.update({
+                    where: { id },
+                    data: {
+                        [String(dependency)]: { [connectionMap[String(direction)]]: connection },
                     },
                 });
 

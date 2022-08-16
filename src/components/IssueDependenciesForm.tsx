@@ -1,61 +1,103 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 
 import { gapL, gapM } from '../design/@generated/themes';
-import { Goal, UserAnyKind } from '../../graphql/@generated/genql';
+import { Dependency, enumDependency, Goal, GoalDependencyInput } from '../../graphql/@generated/genql';
 
 import { FormTitle } from './FormTitle';
-import { UserCompletionInput } from './UserCompletionInput';
 import { IssueDependenciesList } from './IssueDependenciesList';
+import { IssueDependencyKindDropdown } from './IssueDependencyKindDropdown';
+import { IssueSearchInput } from './IssueSearchInput';
 
 interface IssueDependenciesFormProps {
     issue: Goal;
 
-    onChange?: (activities: string[]) => void;
+    onChange?: (input: GoalDependencyInput) => void;
 }
 
 const StyledCompletion = styled.div`
-    padding: ${gapL} 0 ${gapM};
+    position: relative;
+    padding: 0 0 ${gapM};
+    margin-top: ${gapL};
+`;
+
+const StyledDropdownContainer = styled.div`
+    position: absolute;
+    right: 8px;
+    top: 8px;
 `;
 
 export const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
     const t = useTranslations('IssueDependencies');
-    const activities = useMemo(() => new Set<string>(issue.participants?.map((p) => p!.id)), [issue]);
+    const [kind, setKind] = useState<Dependency>();
+    const [target, setTarget] = useState<Goal>();
+    const [query, setQuery] = useState('');
 
     const onDependencyDelete = useCallback(
-        (id: string) => () => {
-            activities.delete(id);
-            onChange && onChange(Array.from(activities));
+        (dependency: keyof typeof enumDependency) => (id: string) => {
+            onChange &&
+                onChange({
+                    id: issue.id,
+                    target: id,
+                    direction: false,
+                    dependency,
+                });
         },
-        [activities, onChange],
+        [onChange, issue],
     );
 
-    const onParticipantAdd = useCallback(
-        (u: UserAnyKind) => {
-            if (u.activity) {
-                activities.add(u.activity.id);
+    const onDependencyAdd = useCallback((g: Goal) => {
+        setTarget(g);
+        setQuery(g.id);
+    }, []);
+
+    const onKindChange = useCallback(
+        (kind: Dependency) => {
+            if (!target) {
+                return;
             }
 
-            onChange && onChange(Array.from(activities));
+            setKind(kind);
+            setQuery('');
+
+            onChange &&
+                onChange({
+                    id: issue.id,
+                    target: target.id,
+                    direction: true,
+                    dependency: kind,
+                });
         },
-        [activities, onChange],
+        [onChange, issue.id, target],
     );
+
+    const disabled = !target;
 
     return (
         <>
             <FormTitle>{t('Edit dependencies')}</FormTitle>
 
-            <IssueDependenciesList
-                title={t('Depends on')}
-                dependencies={issue.dependsOn}
-                onDelete={onDependencyDelete}
-            />
-            <IssueDependenciesList title={t('Blocks')} dependencies={issue.blocks} onDelete={onDependencyDelete} />
-            <IssueDependenciesList title={t('Related')} dependencies={issue.relatedTo} onDelete={onDependencyDelete} />
+            {Object.values(enumDependency).map((dependency) => (
+                <IssueDependenciesList
+                    key={dependency}
+                    title={t(dependency)}
+                    dependencies={issue[dependency]}
+                    onDelete={onDependencyDelete(dependency)}
+                />
+            ))}
 
             <StyledCompletion>
-                <UserCompletionInput placeholder={t('Add dependency')} onClick={onParticipantAdd} />
+                <IssueSearchInput query={query} placeholder={t('Add dependency')} onClick={onDependencyAdd} />
+
+                <StyledDropdownContainer>
+                    <IssueDependencyKindDropdown
+                        disabled={disabled}
+                        view="primary"
+                        text={(kind && t(kind)) || t('Kind')}
+                        onClick={onKindChange}
+                    />
+                </StyledDropdownContainer>
             </StyledCompletion>
         </>
     );
