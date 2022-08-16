@@ -53,12 +53,15 @@ export const IssueDependenciesList: React.FC<IssueDependenciesListProps> = ({
                 <IssueMeta title={title} onEdit={onEdit}>
                     {dependencies?.map((d) =>
                         nullable(d, (dep) => (
-                            <StyledDependency key={d?.id}>
-                                {nullable(onDelete, () => (
-                                    <StyledCleanButton onClick={onDependencyDelete(dep.id)} />
-                                ))}
-                                <IssueListItem issue={dep} />
-                            </StyledDependency>
+                            <React.Fragment key={d?.id}>
+                                <StyledDependency>
+                                    {nullable(onDelete, () => (
+                                        <StyledCleanButton onClick={onDependencyDelete(dep.id)} />
+                                    ))}
+                                    <IssueListItem issue={dep} />
+                                </StyledDependency>
+                                <br />
+                            </React.Fragment>
                         )),
                     )}
                 </IssueMeta>

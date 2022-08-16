@@ -25,9 +25,9 @@ const StyledTipTitle = styled(Text)`
     margin-right: ${gapS};
 `;
 
-export const Tip: React.FC<TipProps> = ({ children, title, icon }) => {
+export const Tip: React.FC<TipProps> = ({ children, title, icon, className }) => {
     return (
-        <StyledTip size="s" color={gray7}>
+        <StyledTip size="s" color={gray7} className={className}>
             {nullable(icon, (i) => (
                 <StyledTipIcon>{i}</StyledTipIcon>
             ))}

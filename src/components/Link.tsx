@@ -5,6 +5,7 @@ import { link10 } from '../design/@generated/themes';
 
 interface LinkProps extends React.HTMLProps<HTMLLinkElement> {
     inline?: boolean;
+    className?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

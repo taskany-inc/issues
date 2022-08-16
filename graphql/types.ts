@@ -356,6 +356,7 @@ export const Comment = objectType({
         t.field(CommentModel.description);
         t.field('author', { type: UserAnyKind });
         t.field('computedAuthor', { type: UserAnyKind });
+        t.field('activity', { type: Activity });
         // t.field(CommentModel.reactions);
         t.field(CommentModel.createdAt);
         t.field(CommentModel.updatedAt);

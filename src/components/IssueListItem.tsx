@@ -32,7 +32,7 @@ const StyledIssueListItemTitle = styled(Text)`
 export const IssueListItem: React.FC<IssueListItemProps> = ({ issue }) => {
     return (
         <NextLink passHref href={routes.goal(issue.id)}>
-            <Link inline>
+            <Link inline style={{ display: 'inline-block' }}>
                 <StyledIssueListItem>
                     <StateDot {...issue.state} />
                     <StyledIssueListItemTitle size="s" weight="bold" color="inherit">

@@ -17,6 +17,7 @@ input ActivityInput {
 }
 
 type Comment {
+  activity: Activity
   author: UserAnyKind
   computedAuthor: UserAnyKind
   createdAt: DateTime!

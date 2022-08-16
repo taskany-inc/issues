@@ -3,7 +3,7 @@ import React from 'react';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { gray2, gray3, radiusS, textColor } from '../design/@generated/themes';
+import { gray2, gray3, gray7, radiusS, textColor } from '../design/@generated/themes';
 
 interface FormTextareaProps {
     id?: string;
@@ -67,6 +67,11 @@ const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea 
         css`
             border-radius: 0;
         `}
+
+    ::placeholder {
+        font-weight: 400;
+        color: ${gray7};
+    }
 `;
 
 export const FormTextarea = React.forwardRef<FormTextareaProps, FormTextareaProps>((props, ref) => {
