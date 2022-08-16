@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
-import { Goal } from '../../graphql/@generated/genql';
+import { enumDependency, Goal } from '../../graphql/@generated/genql';
 import { gapM, gapS, gray8 } from '../design/@generated/themes';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { nullable } from '../utils/nullable';
@@ -49,21 +49,14 @@ export const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onC
                 </StyledActionNotice>
             ) : (
                 <>
-                    <IssueDependenciesList
-                        title={t('Depends on')}
-                        dependencies={issue.dependsOn}
-                        onEdit={onDependenciesEdit}
-                    />
-                    <IssueDependenciesList
-                        title={t('Blocks')}
-                        dependencies={issue.blocks}
-                        onEdit={onDependenciesEdit}
-                    />
-                    <IssueDependenciesList
-                        title={t('Related')}
-                        dependencies={issue.relatedTo}
-                        onEdit={onDependenciesEdit}
-                    />
+                    {Object.values(enumDependency).map((dependency) => (
+                        <IssueDependenciesList
+                            key={dependency}
+                            title={t(dependency)}
+                            dependencies={issue[dependency]}
+                            onEdit={onDependenciesEdit}
+                        />
+                    ))}
                 </>
             )}
 

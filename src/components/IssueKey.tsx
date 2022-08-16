@@ -4,11 +4,12 @@ import { Text } from './Text';
 
 interface IssueKeyProps {
     id: string;
+    size?: React.ComponentProps<typeof Text>['size'];
 }
 
-export const IssueKey: React.FC<IssueKeyProps> = ({ id, children }) => {
+export const IssueKey: React.FC<IssueKeyProps> = ({ id, size = 'm', children }) => {
     return (
-        <Text size="m" weight="bold" color={gray6}>
+        <Text size={size} weight="bold" color={gray6}>
             #{id} {children}
         </Text>
     );

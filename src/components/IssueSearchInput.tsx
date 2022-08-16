@@ -3,29 +3,28 @@ import styled, { css } from 'styled-components';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { gray6, gray7, gray8, radiusM, textColor } from '../design/@generated/themes';
+import { gapXs, gray4, gray7, gray8, radiusM } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
-import { UserAnyKind } from '../../graphql/@generated/genql';
+import { Goal } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
+import { Text } from './Text';
 import { Popup } from './Popup';
-import { UserPic } from './UserPic';
 import { FormInput } from './FormInput';
+import { IssueKey } from './IssueKey';
 
-interface UserCompletionInputProps {
+interface IssueSearchInputProps {
     query?: string;
     placeholder?: string;
     filter?: string[];
     title?: string;
 
-    onClick?: (user: UserAnyKind) => void;
+    onClick?: (issue: Goal) => void;
 }
 
-const StyledUserCard = styled.div<{ focused?: boolean }>`
+const StyledIssueCard = styled.div<{ focused?: boolean }>`
     box-sizing: border-box;
-    display: grid;
-    grid-template-columns: 2fr 10fr;
     justify-content: center;
     align-items: center;
     min-width: 250px;
@@ -44,74 +43,125 @@ const StyledUserCard = styled.div<{ focused?: boolean }>`
 
     &:hover {
         border-color: ${gray8};
-        background-color: ${gray6};
+        background-color: ${gray4};
     }
 
     ${({ focused }) =>
         focused &&
         css`
             border-color: ${gray8};
-            background-color: ${gray6};
+            background-color: ${gray4};
         `}
 `;
-const StyledUserInfo = styled.div`
-    padding-left: 4px;
+
+const StyledIssueTitleText = styled(Text)`
+    padding-top: ${gapXs};
 `;
-const StyledUserName = styled.div`
-    font-size: 14px;
-    font-weight: 600;
-`;
-const StyledUserEmail = styled.div`
-    font-size: 12px;
-    color: ${textColor};
-`;
-const UserCard: React.FC<{
-    name?: string;
-    email?: string;
-    image?: string;
+
+const IssueCard: React.FC<{
+    id: string;
+    title?: string;
+    project?: boolean;
     focused?: boolean;
     onClick?: () => void;
-}> = ({ name, email, image, focused, onClick }) => {
+}> = ({ id, title, focused, onClick }) => {
     return (
-        <StyledUserCard onClick={onClick} focused={focused}>
-            <UserPic src={image} size={24} />
-
-            <StyledUserInfo>
-                <StyledUserName>{name}</StyledUserName>
-                <StyledUserEmail>{email}</StyledUserEmail>
-            </StyledUserInfo>
-        </StyledUserCard>
+        <StyledIssueCard onClick={onClick} focused={focused}>
+            <IssueKey id={id} size="xs" />
+            <StyledIssueTitleText size="m" weight="bold">
+                {title}
+            </StyledIssueTitleText>
+        </StyledIssueCard>
     );
 };
 
 const StyledDropdownContainer = styled.div``;
 
 const fetcher = createFetcher((_, query: string) => ({
-    findUserAnyKind: [
+    findGoal: [
         {
             query,
         },
         {
             id: true,
-            name: true,
-            email: true,
-            image: true,
-            activity: {
+            title: true,
+            description: true,
+            activityId: true,
+            ownerId: true,
+            state: {
                 id: true,
+                title: true,
+                hue: true,
+            },
+            estimate: {
+                date: true,
+                q: true,
+                y: true,
+            },
+            createdAt: true,
+            updatedAt: true,
+            project: {
+                id: true,
+                key: true,
+                title: true,
+                description: true,
+                flow: {
+                    id: true,
+                },
+            },
+            computedActivity: {
+                id: true,
+                name: true,
+                email: true,
+            },
+            computedOwner: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+            },
+            tags: {
+                id: true,
+                title: true,
+                description: true,
+            },
+            watchers: {
+                id: true,
+            },
+            stargizers: {
+                id: true,
+            },
+            comments: {
+                id: true,
+            },
+            participants: {
+                id: true,
+                user: {
+                    email: true,
+                    name: true,
+                    image: true,
+                },
+                ghost: {
+                    email: true,
+                },
             },
         },
     ],
 }));
 
-export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClick, query = '', placeholder }) => {
+export const IssueSearchInput: React.FC<IssueSearchInputProps> = ({ onClick, query = '', placeholder }) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
-    const [inputState, setInputState] = useState(query);
+    const [inputState, setInputState] = useState('');
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState(0);
+
+    useEffect(() => {
+        setInputState(query);
+    }, [query]);
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
@@ -122,20 +172,19 @@ export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClic
 
     const onInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (data?.findUserAnyKind?.length) {
+            if (data?.findGoal?.length) {
                 setPopupVisibility(true);
             }
 
             setInputState(e.target.value);
         },
-        [data?.findUserAnyKind],
+        [data?.findGoal],
     );
 
-    const onUserCardClick = useCallback(
-        (user: UserAnyKind) => () => {
+    const onIssueCardClick = useCallback(
+        (issue: Goal) => () => {
             setPopupVisibility(false);
-            onClick && onClick(user);
-            setInputState('');
+            onClick && onClick(issue);
         },
         [onClick],
     );
@@ -153,8 +202,8 @@ export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClic
     const [onENTER] = useKeyboard(
         [KeyCode.Enter],
         () => {
-            if (data?.findUserAnyKind?.length) {
-                onUserCardClick(data?.findUserAnyKind[cursor])();
+            if (data?.findGoal?.length) {
+                onIssueCardClick(data?.findGoal[cursor])();
                 popupRef.current?.focus();
             }
         },
@@ -164,18 +213,18 @@ export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClic
     );
 
     useEffect(() => {
-        const findUserAnyKind = data?.findUserAnyKind;
+        const findGoal = data?.findGoal;
 
-        if (findUserAnyKind?.length && downPress) {
-            setCursor((prevState) => (prevState < findUserAnyKind.length - 1 ? prevState + 1 : prevState));
+        if (findGoal?.length && downPress) {
+            setCursor((prevState) => (prevState < findGoal.length - 1 ? prevState + 1 : prevState));
         }
-    }, [data?.findUserAnyKind, downPress]);
+    }, [data?.findGoal, downPress]);
 
     useEffect(() => {
-        if (data?.findUserAnyKind?.length && upPress) {
+        if (data?.findGoal?.length && upPress) {
             setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
         }
-    }, [data?.findUserAnyKind, upPress]);
+    }, [data?.findGoal, upPress]);
 
     return (
         <>
@@ -193,7 +242,7 @@ export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClic
             <Popup
                 placement="top-start"
                 overflow="hidden"
-                visible={popupVisible && Boolean(data?.findUserAnyKind?.length)}
+                visible={popupVisible && Boolean(data?.findGoal?.length)}
                 onClickOutside={onClickOutside}
                 reference={popupRef}
                 interactive
@@ -202,14 +251,13 @@ export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClic
                 offset={[0, 4]}
             >
                 <>
-                    {data?.findUserAnyKind?.map((u, i) => (
-                        <UserCard
-                            key={u.id}
-                            name={u.name}
-                            email={u.email}
-                            image={u.image}
+                    {data?.findGoal?.map((g, i) => (
+                        <IssueCard
+                            key={g.id}
+                            id={g.id}
+                            title={g.title}
                             focused={cursor === i}
-                            onClick={onUserCardClick(u)}
+                            onClick={onIssueCardClick(g)}
                         />
                     ))}
                 </>

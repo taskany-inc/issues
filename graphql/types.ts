@@ -33,6 +33,12 @@ const UserKind = enumType({
     members: ['USER', 'GHOST'],
 });
 
+export const dependencyKind = ['dependsOn', 'blocks', 'relatedTo'];
+export const Dependency = enumType({
+    name: 'Dependency',
+    members: dependencyKind,
+});
+
 export const User = objectType({
     name: UserModel.$name,
     definition(t) {
@@ -310,6 +316,16 @@ export const GoalSubscriptionInput = inputObjectType({
     name: 'GoalSubscriptionInput',
     definition(t) {
         t.field(GoalModel.id);
+        t.boolean('direction');
+    },
+});
+
+export const GoalDependencyInput = inputObjectType({
+    name: 'GoalDependencyInput',
+    definition(t) {
+        t.field(GoalModel.id);
+        t.string('target');
+        t.field('dependency', { type: Dependency });
         t.boolean('direction');
     },
 });

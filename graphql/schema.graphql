@@ -36,6 +36,12 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+enum Dependency {
+  blocks
+  dependsOn
+  relatedTo
+}
+
 type Estimate {
   activity: Activity
   activityId: String!
@@ -116,6 +122,13 @@ input GoalCreateInput {
   title: String!
 }
 
+input GoalDependencyInput {
+  dependency: Dependency
+  direction: Boolean
+  id: ID!
+  target: String
+}
+
 input GoalInput {
   description: String
   estimate: EstimateInput
@@ -142,6 +155,7 @@ type Mutation {
   createProject(description: String, flowId: String!, key: String!, title: String!): Project
   createTag(description: String, title: String!): Tag
   inviteUser(email: String!): Ghost
+  toggleGoalDependency(toggle: GoalDependencyInput!): Goal
   toggleGoalStargizer(toggle: GoalSubscriptionInput!): Activity
   toggleGoalWatcher(toggle: GoalSubscriptionInput!): Activity
   toggleReaction(reaction: ReactionInput!): Reaction
@@ -166,12 +180,14 @@ type Project {
 }
 
 type Query {
+  findGoal(query: String!): [Goal]
   findUserAnyKind(query: String!): [UserAnyKind]
   flow(id: String!): Flow
   flowCompletion(query: String!, sortBy: SortOrder): [Flow]
   flowRecommended: [Flow]
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
+  goalDependencyKind: [String]
   goalUserIndex(offset: Int!, pageSize: Int!): [Goal]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]

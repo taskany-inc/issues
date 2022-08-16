@@ -199,11 +199,12 @@
   },
   "IssueDependencies": {
     "Edit dependencies": "Зависимости",
-    "Depends on": "Зависит от",
-    "Blocks": "Заблокировано",
-    "Related": "Связано",
+    "dependsOn": "Зависит от",
+    "blocks": "Заблокировано",
+    "relatedTo": "Связано",
     "Does issue have dependencies": "Ни от чего не зависит?",
     "Add one": "Добавить",
-    "Add dependency": "Добавить зависимость"
+    "Add dependency": "Добавить зависимость",
+    "Kind": "Тип зависимости"
   }
 }
