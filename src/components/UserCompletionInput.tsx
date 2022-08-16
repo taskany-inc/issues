@@ -140,28 +140,16 @@ export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClic
         [onClick],
     );
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+    });
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.findUserAnyKind?.length) {
-                onUserCardClick(data?.findUserAnyKind[cursor])();
-                popupRef.current?.focus();
-            }
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        if (data?.findUserAnyKind?.length) {
+            onUserCardClick(data?.findUserAnyKind[cursor])();
+            popupRef.current?.focus();
+        }
+    });
 
     useEffect(() => {
         const findUserAnyKind = data?.findUserAnyKind;

@@ -189,28 +189,16 @@ export const IssueSearchInput: React.FC<IssueSearchInputProps> = ({ onClick, que
         [onClick],
     );
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+    });
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.findGoal?.length) {
-                onIssueCardClick(data?.findGoal[cursor])();
-                popupRef.current?.focus();
-            }
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        if (data?.findGoal?.length) {
+            onIssueCardClick(data?.findGoal[cursor])();
+            popupRef.current?.focus();
+        }
+    });
 
     useEffect(() => {
         const findGoal = data?.findGoal;

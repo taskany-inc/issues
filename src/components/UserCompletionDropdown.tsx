@@ -155,29 +155,17 @@ export const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
         [onClick],
     );
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-            setEditMode(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+        setEditMode(false);
+    });
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.findUserAnyKind?.length) {
-                onUserCardClick(data?.findUserAnyKind[cursor])();
-                popupRef.current?.focus();
-            }
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        if (data?.findUserAnyKind?.length) {
+            onUserCardClick(data?.findUserAnyKind[cursor])();
+            popupRef.current?.focus();
+        }
+    });
 
     useEffect(() => {
         const findUserAnyKind = data?.findUserAnyKind;

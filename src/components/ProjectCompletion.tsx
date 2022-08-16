@@ -129,29 +129,17 @@ export const ProjectCompletion: React.FC<ProjectCompletionProps> = ({
         setInputState(e.target.value);
     }, []);
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-            setEditMode(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+        setEditMode(false);
+    });
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.projectCompletion?.length) {
-                onProjectCardClick(data?.projectCompletion[cursor] as Project)();
-                popupRef.current?.focus();
-            }
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        if (data?.projectCompletion?.length) {
+            onProjectCardClick(data?.projectCompletion[cursor] as Project)();
+            popupRef.current?.focus();
+        }
+    });
 
     useEffect(() => {
         const projectCompletion = data?.projectCompletion;

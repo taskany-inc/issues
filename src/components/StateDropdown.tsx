@@ -149,23 +149,14 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
         [onClick],
     );
 
-    const [onESC] = useKeyboard([KeyCode.Escape], () => popupVisible && setPopupVisibility(false), {
-        stopPropagation: true,
-    });
+    const [onESC] = useKeyboard([KeyCode.Escape], () => popupVisible && setPopupVisibility(false));
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.flow?.states?.length && cursor) {
-                onItemClick(data?.flow?.states[cursor])();
-                setPopupVisibility(false);
-            }
-        },
-        {
-            disableGlobalEvent: true,
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        if (data?.flow?.states?.length && cursor) {
+            onItemClick(data?.flow?.states[cursor])();
+            setPopupVisibility(false);
+        }
+    });
 
     useEffect(() => {
         const states = data?.flow?.states;

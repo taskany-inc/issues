@@ -73,9 +73,7 @@ const StyledCross = styled.div`
 const Portal: React.FC<{ id: string }> = ({ id, children }) => createPortal(children, usePortal(id));
 
 export const Modal: React.FC<ModalProps> = ({ visible, onClose, children, width = 800 }) => {
-    const [onESC] = useKeyboard([KeyCode.Escape], () => onClose && onClose(), {
-        stopPropagation: true,
-    });
+    const [onESC] = useKeyboard([KeyCode.Escape], () => onClose && onClose());
 
     useEffect(() => {
         if (visible) {

@@ -136,29 +136,17 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
         setInputState(e.target.value);
     }, []);
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-            setEditMode(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+        setEditMode(false);
+    });
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.flowCompletion?.length) {
-                onItemClick(data?.flowCompletion[cursor])();
-                popupRef.current?.focus();
-            }
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        if (data?.flowCompletion?.length) {
+            onItemClick(data?.flowCompletion[cursor])();
+            popupRef.current?.focus();
+        }
+    });
 
     useEffect(() => {
         const flowCompletion = data?.flowCompletion;

@@ -97,28 +97,16 @@ export const IssueDependencyKindDropdown: React.FC<IssueDependencyKindDropdownPr
         [onClick],
     );
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+    });
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.goalDependencyKind?.length) {
-                onCardClick(data?.goalDependencyKind[cursor] as Dependency)();
-                popupRef.current?.focus();
-            }
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        if (data?.goalDependencyKind?.length) {
+            onCardClick(data?.goalDependencyKind[cursor] as Dependency)();
+            popupRef.current?.focus();
+        }
+    });
 
     useEffect(() => {
         const goalDependencyKind = data?.goalDependencyKind;
