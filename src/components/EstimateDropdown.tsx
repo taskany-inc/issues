@@ -137,15 +137,9 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
         setInputState(e.target.value);
     }, []);
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+    });
 
     useEffect(() => {
         setSelectedQ(quarterFromDate(createLocaleDate(inputState)));

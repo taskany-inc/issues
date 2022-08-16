@@ -101,16 +101,10 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({
         [onChange],
     );
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-            setEditMode(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+        setEditMode(false);
+    });
 
     const createTag = useCallback(async () => {
         if (!session) return;
@@ -140,15 +134,9 @@ export const TagCompletion: React.FC<TagCompletionProps> = ({
         setEditMode(false);
     }, [inputState, onItemClick, session, t]);
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        async () => {
-            await createTag();
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], async () => {
+        await createTag();
+    });
 
     return (
         <>

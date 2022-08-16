@@ -9,6 +9,7 @@ import { GoalEditForm } from './GoalEditForm';
 
 interface GoalEditModalProps {
     goal: React.ComponentProps<typeof GoalEditForm>['goal'];
+
     onSubmit?: (id: string) => void;
 }
 

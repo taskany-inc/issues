@@ -67,23 +67,14 @@ export const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick
         [onClick],
     );
 
-    const [onESC] = useKeyboard([KeyCode.Escape], () => popupVisible && setPopupVisibility(false), {
-        stopPropagation: true,
-    });
+    const [onESC] = useKeyboard([KeyCode.Escape], () => popupVisible && setPopupVisibility(false));
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            if (data?.flow?.states?.length && cursor) {
-                onItemClick(data?.flow?.states[cursor])();
-                setPopupVisibility(false);
-            }
-        },
-        {
-            disableGlobalEvent: true,
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        if (data?.flow?.states?.length && cursor) {
+            onItemClick(data?.flow?.states[cursor])();
+            setPopupVisibility(false);
+        }
+    });
 
     useEffect(() => {
         const states = data?.flow?.states;
@@ -128,7 +119,7 @@ export const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick
                 <StyledStates>
                     {data?.flow?.states
                         ?.filter((s) => s.id !== state.id)
-                        .map((s, i) => (
+                        .map((s) => (
                             <State
                                 key={s.id}
                                 hue={s.hue}

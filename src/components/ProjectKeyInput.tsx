@@ -45,27 +45,15 @@ export const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
     const [editMode, setEditMode] = useState(false);
     const [inputState, setInputState] = useState(value);
 
-    const [onENTER] = useKeyboard(
-        [KeyCode.Enter],
-        () => {
-            setEditMode(false);
-            onBlur && onBlur(inputState);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onENTER] = useKeyboard([KeyCode.Enter], () => {
+        setEditMode(false);
+        onBlur && onBlur(inputState);
+    });
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        () => {
-            popupVisible && setPopupVisibility(false);
-            setEditMode(false);
-        },
-        {
-            stopPropagation: true,
-        },
-    );
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        popupVisible && setPopupVisibility(false);
+        setEditMode(false);
+    });
 
     const onInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {

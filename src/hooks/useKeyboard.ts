@@ -137,9 +137,9 @@ export const useKeyboard = (
     bindings: Array<number>,
     handler: (event: React.KeyboardEvent | KeyboardEvent) => void,
     {
-        disableGlobalEvent = false,
+        disableGlobalEvent = true,
         capture = false,
-        stopPropagation = false,
+        stopPropagation = true,
         preventDefault = true,
         event = 'keydown',
     }: KeyboardOptions = {},
