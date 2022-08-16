@@ -295,11 +295,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         [triggerUpdate],
     );
 
-    const [issueState, setIssueState] = useState(goal.state);
     const onIssueStateChange = useCallback(
         async (state: State) => {
-            setIssueState(state);
-
             await triggerUpdate({
                 stateId: state.id,
             });
@@ -448,7 +445,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     <IssueTitle title={goal.title} project={goal.project} />
 
                     <IssueStats
-                        state={nullable(issueState, (s) => (
+                        state={nullable(goal.state, (s) => (
                             <StateSwitch state={s} flowId={goal.project?.flow?.id} onClick={onIssueStateChange} />
                         ))}
                         comments={goal.comments?.length || 0}
