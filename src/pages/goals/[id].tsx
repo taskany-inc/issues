@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled, { css } from 'styled-components';
@@ -40,8 +40,8 @@ import { Icon } from '../../components/Icon';
 import { StateSwitch } from '../../components/StateSwitch';
 import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
-import { CommentCreationForm } from '../../components/CommentCreationForm';
-import { CommentItem } from '../../components/CommentItem';
+import { CommentCreateForm } from '../../components/CommentCreateForm';
+import { CommentItem } from '../../components/Comment';
 import { IssueDependencies } from '../../components/IssueDependencies';
 import { IssueParticipants } from '../../components/IssueParticipants';
 
@@ -241,6 +241,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     const { data, mutate } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
         refreshInterval,
     });
+    const refresh = useCallback(() => mutate(), [mutate]);
 
     // this line is compensation for first render before delayed swr will bring updates
     const goal: Goal = data?.goal ?? ssrData.goal;
@@ -252,10 +253,19 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         // @ts-ignore unexpectable trouble with filter
         goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
     );
+    const [highlightCommentId, setHighlightCommentId] = useState<string | null>(null);
+    useEffect(() => {
+        let tId: NodeJS.Timeout;
+        if (highlightCommentId) {
+            tId = setTimeout(() => {
+                setHighlightCommentId(null);
+            }, 1000);
+        }
 
-    const commentsRef = useRef(goal.comments?.map((comment) => comment?.id));
-
-    const refresh = useCallback(() => mutate(), [mutate]);
+        return () => {
+            clearInterval(tId);
+        };
+    }, [highlightCommentId]);
 
     const triggerUpdate = useCallback(
         (data: Partial<GoalInput>) => {
@@ -436,6 +446,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         [refresh, t],
     );
 
+    const onCommentPublish = useCallback(
+        (id) => {
+            refresh();
+            setHighlightCommentId(id);
+        },
+        [refresh, setHighlightCommentId],
+    );
+
     return (
         <Page locale={locale} title={goal.title}>
             <IssueHeader>
@@ -531,19 +549,18 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     </Card>
 
                     <StyledActivityFeed>
-                        {goal.comments?.map(
-                            (comment) =>
-                                comment && (
-                                    <CommentItem
-                                        key={comment.id}
-                                        author={comment.activity?.user}
-                                        comment={comment.description}
-                                        createdAt={comment.createdAt}
-                                        isNew={!commentsRef.current?.includes(comment.id)}
-                                    />
-                                ),
+                        {goal.comments?.map((comment) =>
+                            nullable(comment, (c) => (
+                                <CommentItem
+                                    key={c.id}
+                                    author={c.activity?.user}
+                                    description={c.description}
+                                    createdAt={c.createdAt}
+                                    isNew={c.id === highlightCommentId}
+                                />
+                            )),
                         )}
-                        <CommentCreationForm goalId={goal.id} user={user} />
+                        <CommentCreateForm goalId={goal.id} user={user} onCreate={onCommentPublish} />
                     </StyledActivityFeed>
                 </div>
 

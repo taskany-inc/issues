@@ -446,6 +446,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 return db.goal.update({
                     where: { id },
                     data: {
+                        id, // this is hack to force updatedAt field
                         [String(dependency)]: { [connectionMap[String(direction)]]: connection },
                     },
                 });

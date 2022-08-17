@@ -15,16 +15,16 @@ import { FormCard } from './FormCard';
 import { FormTextarea } from './FormTextarea';
 import { UserPic } from './UserPic';
 import { Icon } from './Icon';
-import { Text } from './Text';
 import { FormAction, FormActions } from './FormActions';
 import { Button } from './Button';
 import { Tip } from './Tip';
 import { Link } from './Link';
 
-interface CommentProps {
+interface CommentCreateFormProps {
     goalId: string;
-    onCreate?: (CommentsId?: string) => void;
     user?: Session['user'];
+
+    onCreate?: (CommentsId?: string) => void;
 }
 
 const StyledComment = styled.div`
@@ -71,7 +71,7 @@ const StyledFormTextarea = styled(FormTextarea)`
     min-height: 60px;
 `;
 
-export const CommentCreationForm: React.FC<CommentProps> = ({ user, onCreate, goalId }) => {
+export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId }) => {
     const t = useTranslations('Comments.new');
 
     const schema = z.object({
@@ -90,6 +90,7 @@ export const CommentCreationForm: React.FC<CommentProps> = ({ user, onCreate, go
     const {
         register,
         handleSubmit,
+        resetField,
         formState: { errors, isValid, isSubmitted },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
@@ -104,8 +105,8 @@ export const CommentCreationForm: React.FC<CommentProps> = ({ user, onCreate, go
         const promise = gql.mutation({
             createComment: [
                 {
-                    description: comment,
                     goalId,
+                    description: comment,
                     authorId: user.id,
                 },
                 {
@@ -120,9 +121,11 @@ export const CommentCreationForm: React.FC<CommentProps> = ({ user, onCreate, go
             success: t('Voila! Comment is here 🎉'),
         });
 
-        await promise;
+        const data = await promise;
 
-        onCreate && onCreate();
+        onCreate && onCreate(data.createComment?.id);
+
+        resetField('comment');
     };
 
     return (
