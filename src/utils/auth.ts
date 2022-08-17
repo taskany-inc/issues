@@ -1,6 +1,7 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import KeycloakProvider from 'next-auth/providers/keycloak';
 import type { NextAuthOptions } from 'next-auth';
 import { Role } from '@prisma/client';
 
@@ -45,6 +46,17 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
         GitHubProvider({
             clientId: process.env.GITHUB_CLIENT_ID!,
             clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+        }),
+    );
+}
+
+if (process.env.KEYCLOAK_ID && process.env.KEYCLOAK_SECRET && process.env.KEYCLOAK_ISSUER) {
+    providers.push(
+        // https://next-auth.js.org/providers/keycloak
+        KeycloakProvider({
+            clientId: process.env.KEYCLOAK_ID!,
+            clientSecret: process.env.KEYCLOAK_SECRET!,
+            issuer: process.env.KEYCLOAK_ISSUER!,
         }),
     );
 }
