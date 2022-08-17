@@ -4,7 +4,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { CommentCreateForm } from '../components/CommentCreateForm';
 
 export default {
-    title: 'Taskany/CommentCreationForm',
+    title: 'Taskany/CommentCreateForm',
     component: CommentCreateForm,
 } as ComponentMeta<typeof CommentCreateForm>;
 const Template: ComponentStory<typeof CommentCreateForm> = (args) => <CommentCreateForm {...args} />;
