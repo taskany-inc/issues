@@ -41,7 +41,7 @@ import { StateSwitch } from '../../components/StateSwitch';
 import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
 import { CommentCreateForm } from '../../components/CommentCreateForm';
-import { CommentItem } from '../../components/Comment';
+import { Comment } from '../../components/Comment';
 import { IssueDependencies } from '../../components/IssueDependencies';
 import { IssueParticipants } from '../../components/IssueParticipants';
 
@@ -551,7 +551,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     <StyledActivityFeed>
                         {goal.comments?.map((comment) =>
                             nullable(comment, (c) => (
-                                <CommentItem
+                                <Comment
                                     key={c.id}
                                     author={c.activity?.user}
                                     description={c.description}

@@ -62,7 +62,7 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
     }
 `;
 
-export const CommentItem: FC<CommentItemProps> = ({ author, description, createdAt, isNew }) => {
+export const Comment: FC<CommentItemProps> = ({ author, description, createdAt, isNew }) => {
     return (
         <StyledComment>
             <UserPic size={32} src={author?.image} />
