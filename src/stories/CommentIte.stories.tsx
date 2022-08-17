@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { CommentItem } from '../components/CommentItem';
+import { CommentItem } from '../components/Comment';
 
 export default {
     title: 'Taskany/CommentItem',

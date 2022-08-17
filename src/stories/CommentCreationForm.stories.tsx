@@ -1,12 +1,12 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { CommentCreationForm } from '../components/CommentCreationForm';
+import { CommentCreateForm } from '../components/CommentCreateForm';
 
 export default {
     title: 'Taskany/CommentCreationForm',
-    component: CommentCreationForm,
-} as ComponentMeta<typeof CommentCreationForm>;
-const Template: ComponentStory<typeof CommentCreationForm> = (args) => <CommentCreationForm {...args} />;
+    component: CommentCreateForm,
+} as ComponentMeta<typeof CommentCreateForm>;
+const Template: ComponentStory<typeof CommentCreateForm> = (args) => <CommentCreateForm {...args} />;
 
 export const Default = Template.bind({});
