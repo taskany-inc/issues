@@ -37,7 +37,6 @@ import { EstimateDropdown } from '../../components/EstimateDropdown';
 import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
-import { StateSwitch } from '../../components/StateSwitch';
 import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
 import { CommentCreateForm } from '../../components/CommentCreateForm';
@@ -243,7 +242,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     });
     const refresh = useCallback(() => mutate(), [mutate]);
 
-    // this line is compensation for first render before delayed swr will bring updates
+    // NB: this line is compensation for first render before delayed swr will bring updates
     const goal: Goal = data?.goal ?? ssrData.goal;
 
     const isUserAllowedToEdit = user?.activityId === goal?.activityId || user?.activityId === goal?.ownerId;
@@ -253,18 +252,15 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         // @ts-ignore unexpectable trouble with filter
         goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
     );
+    const [commentFormFocus, setCommentFormFocus] = useState(false);
     const [highlightCommentId, setHighlightCommentId] = useState<string | null>(null);
     useEffect(() => {
         let tId: NodeJS.Timeout;
         if (highlightCommentId) {
-            tId = setTimeout(() => {
-                setHighlightCommentId(null);
-            }, 1000);
+            tId = setTimeout(() => setHighlightCommentId(null), 1000);
         }
 
-        return () => {
-            clearInterval(tId);
-        };
+        return () => clearInterval(tId);
     }, [highlightCommentId]);
 
     const triggerUpdate = useCallback(
@@ -450,9 +446,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         (id) => {
             refresh();
             setHighlightCommentId(id);
+            setCommentFormFocus(false);
         },
         [refresh, setHighlightCommentId],
     );
+
+    const onCommentLinkClick = useCallback(() => {
+        setCommentFormFocus(true);
+    }, []);
 
     return (
         <Page locale={locale} title={goal.title}>
@@ -465,11 +466,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     <IssueTitle title={goal.title} project={goal.project} />
 
                     <IssueStats
-                        state={nullable(goal.state, (s) => (
-                            <StateSwitch state={s} flowId={goal.project?.flow?.id} onClick={onIssueStateChange} />
-                        ))}
+                        flow={goal.project?.flow?.id}
+                        state={goal.state}
                         comments={goal.comments?.length || 0}
                         updatedAt={goal.updatedAt}
+                        onStateChange={onIssueStateChange}
+                        onCommentsClick={onCommentLinkClick}
                     />
                 </StyledIssueInfo>
 
@@ -549,6 +551,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     </Card>
 
                     <StyledActivityFeed>
+                        <div id="comments" />
+
                         {goal.comments?.map((comment) =>
                             nullable(comment, (c) => (
                                 <Comment
@@ -560,7 +564,13 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                 />
                             )),
                         )}
-                        <CommentCreateForm goalId={goal.id} user={user} onCreate={onCommentPublish} />
+
+                        <CommentCreateForm
+                            goalId={goal.id}
+                            user={user}
+                            setFocus={commentFormFocus}
+                            onCreate={onCommentPublish}
+                        />
                     </StyledActivityFeed>
                 </div>
 

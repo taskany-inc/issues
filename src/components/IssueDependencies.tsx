@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
 import { enumDependency, Goal } from '../../graphql/@generated/genql';
-import { gapM, gapS, gray8 } from '../design/@generated/themes';
+import { gapS, gray8 } from '../design/@generated/themes';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { nullable } from '../utils/nullable';
 
@@ -22,7 +22,7 @@ interface IssueDependenciesProps {
 }
 
 const StyledActionNotice = styled.div`
-    padding: ${gapS} ${gapM};
+    padding: ${gapS} 0;
 `;
 
 export const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onChange }) => {
