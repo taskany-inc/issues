@@ -31,16 +31,16 @@
   "users": {
     "invite": {
       "title": "Taskany Goals — Invite new user",
-      "Invite new user": "Invite new user",
-      "User email is required": "User email is required",
-      "User email must be a string": "User email must be a string",
+      "Invite new users": "Invite new users",
+      "User email is required": "Incorrect email",
       "Something went wrong 😿": "Something went wrong 😿",
       "We are creating invite...": "We are creating invite...",
-      "Voila! User with email {email} invited 🎉": "Voila! User with email {email} invited 🎉",
-      "Send invite": "Send invite",
-      "User email": "User email",
+      "Voila! Users invited 🎉": "Voila! Users invited 🎉",
+      "Send invites": "Send invites",
+      "Users emails": "Users emails",
       "Pro tip!": "Pro tip!",
-      "Press key to send invite": "Press <key></key> to send invite"
+      "Press key to send invites": "Press <key></key> to send invites.",
+      "Start typing users emails": "Start typing users emails. Press <key1></key1> or <key2></key2> then."
     },
     "settings": {
       "Settings": "Settings",
