@@ -158,7 +158,8 @@
     "Project": "Project"
   },
   "IssueStats": {
-    "comments": "comments"
+    "comments": "comments",
+    "Add comment": "Add comment"
   },
   "RelativeTime": {
     "Updated": "Updated",

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,6 +23,7 @@ import { Link } from './Link';
 interface CommentCreateFormProps {
     goalId: string;
     user?: Session['user'];
+    setFocus?: boolean;
 
     onCreate?: (CommentsId?: string) => void;
 }
@@ -71,7 +72,7 @@ const StyledFormTextarea = styled(FormTextarea)`
     min-height: 60px;
 `;
 
-export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId }) => {
+export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId, setFocus }) => {
     const t = useTranslations('Comments.new');
 
     const schema = z.object({
@@ -91,6 +92,7 @@ export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCr
         register,
         handleSubmit,
         resetField,
+        setFocus: setFieldFocus,
         formState: { errors, isValid, isSubmitted },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
@@ -98,6 +100,12 @@ export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCr
         reValidateMode: 'onChange',
         shouldFocusError: true,
     });
+
+    useEffect(() => {
+        if (setFocus) {
+            setFieldFocus('comment');
+        }
+    }, [setFocus, setFieldFocus]);
 
     const createComment = async ({ comment }: FormType) => {
         if (!user) return;

@@ -158,7 +158,8 @@
     "Project": "Проект"
   },
   "IssueStats": {
-    "comments": "комментариев"
+    "comments": "комментариев",
+    "Add comment": "Комментировать"
   },
   "RelativeTime": {
     "Updated": "Обновлено",

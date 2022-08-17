@@ -2,15 +2,23 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { gapS, gapXs, gray8 } from '../design/@generated/themes';
+import { State } from '../../graphql/@generated/genql';
+import { nullable } from '../utils/nullable';
 
 import { Text } from './Text';
 import { Dot } from './Dot';
+import { Link } from './Link';
 import { RelativeTime } from './RelativeTime';
+import { StateSwitch } from './StateSwitch';
 
 interface IssueStatsProps {
-    state?: React.ReactNode;
+    state?: State;
+    flow?: string;
     updatedAt: string;
     comments: number;
+
+    onStateChange?: (state: State) => void;
+    onCommentsClick?: () => void;
 }
 
 const StyledIssueStats = styled.div`
@@ -21,26 +29,36 @@ const StyledIssueInfo = styled.span`
     padding-left: ${gapXs};
 `;
 
-export const IssueStats: React.FC<IssueStatsProps> = ({ state, updatedAt, comments }) => {
+export const IssueStats: React.FC<IssueStatsProps> = ({
+    state,
+    flow,
+    comments,
+    updatedAt,
+    onStateChange,
+    onCommentsClick,
+}) => {
     const t = useTranslations('IssueStats');
 
     return (
         <StyledIssueStats>
-            {state ? (
-                <>
-                    {state}
-                    <Text as="span" size="m" color={gray8}>
-                        <StyledIssueInfo>
-                            <Dot /> <RelativeTime kind="updated" date={updatedAt} /> <Dot /> <b>{comments}</b>{' '}
-                            {t('comments')}
-                        </StyledIssueInfo>
-                    </Text>
-                </>
-            ) : (
-                <Text as="span" size="m" color={gray8}>
-                    <RelativeTime kind="Updated" date={updatedAt} /> <Dot /> <b>{comments}</b> {t('comments')}
-                </Text>
-            )}
+            {nullable(state, (s) => (
+                <StateSwitch state={s} flowId={flow} onClick={onStateChange} />
+            ))}
+
+            <Text as="span" size="m" color={gray8}>
+                <StyledIssueInfo>
+                    {state ? <Dot /> : null} <RelativeTime kind="updated" date={updatedAt} /> <Dot />{' '}
+                    {comments ? (
+                        <Link inline href="#comments">
+                            <b>{comments}</b> {t('comments')}
+                        </Link>
+                    ) : (
+                        <Link inline onClick={onCommentsClick}>
+                            {t('Add comment')}
+                        </Link>
+                    )}
+                </StyledIssueInfo>
+            </Text>
         </StyledIssueStats>
     );
 };
