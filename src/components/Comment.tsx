@@ -10,13 +10,16 @@ import { Md } from './Md';
 import { RelativeTime } from './RelativeTime';
 import { UserPic } from './UserPic';
 
-interface CommentItemProps {
+interface CommentProps {
+    id: string;
     description: string;
     createdAt: Scalars['DateTime'];
     updatedAt?: Scalars['DateTime']; // https://github.com/taskany-inc/issues/issues/217
     author?: User;
     isNew?: boolean;
 }
+
+export const commentMask = 'comment-';
 
 const StyledComment = styled.div`
     display: grid;
@@ -27,6 +30,8 @@ const StyledComment = styled.div`
 const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
     position: relative;
     min-height: 90px;
+
+    transition: border-color 200ms ease-in-out;
 
     ${({ isNew }) =>
         isNew &&
@@ -50,6 +55,7 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
         border-radius: 2px;
 
         transform: rotate(-45deg);
+        transition: border-color 200ms ease-in-out;
 
         top: 8px;
         left: -6px;
@@ -62,15 +68,17 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
     }
 `;
 
-export const Comment: FC<CommentItemProps> = ({ author, description, createdAt, isNew }) => {
+export const Comment: FC<CommentProps> = ({ id, author, description, createdAt, isNew }) => {
     return (
-        <StyledComment>
+        <StyledComment id={`${commentMask}${id}`}>
             <UserPic size={32} src={author?.image} />
 
             <StyledCommentCard isNew={isNew}>
                 <CardInfo>
-                    {/* https://github.com/taskany-inc/issues/issues/218 */}
-                    <Link inline>{author?.name}</Link> — <RelativeTime date={createdAt} />
+                    <Link inline>{author?.name}</Link> —{' '}
+                    <Link inline href={`#${commentMask}${id}`}>
+                        <RelativeTime date={createdAt} />
+                    </Link>
                 </CardInfo>
 
                 <CardContent>

@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/router';
 
 import {
     Goal,
@@ -40,7 +41,7 @@ import { Icon } from '../../components/Icon';
 import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
 import { CommentCreateForm } from '../../components/CommentCreateForm';
-import { Comment } from '../../components/Comment';
+import { Comment, commentMask } from '../../components/Comment';
 import { IssueDependencies } from '../../components/IssueDependencies';
 import { IssueParticipants } from '../../components/IssueParticipants';
 
@@ -236,6 +237,7 @@ export const getServerSideProps = declareSsrProps(
 const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{ goal: Goal }, { id: string }>) => {
     const t = useTranslations('goals.id');
     const mounted = useMounted(refreshInterval);
+    const { asPath } = useRouter();
 
     const { data, mutate } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
         refreshInterval,
@@ -254,6 +256,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     );
     const [commentFormFocus, setCommentFormFocus] = useState(false);
     const [highlightCommentId, setHighlightCommentId] = useState<string | null>(null);
+
     useEffect(() => {
         let tId: NodeJS.Timeout;
         if (highlightCommentId) {
@@ -262,6 +265,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
         return () => clearInterval(tId);
     }, [highlightCommentId]);
+
+    useEffect(() => {
+        const targetComment = asPath.split(`#${commentMask}`)[1];
+
+        if (targetComment) {
+            setHighlightCommentId(targetComment);
+        }
+    }, [asPath]);
 
     const triggerUpdate = useCallback(
         (data: Partial<GoalInput>) => {
@@ -557,6 +568,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                             nullable(comment, (c) => (
                                 <Comment
                                     key={c.id}
+                                    id={c.id}
                                     author={c.activity?.user}
                                     description={c.description}
                                     createdAt={c.createdAt}
