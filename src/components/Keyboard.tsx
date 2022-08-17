@@ -9,6 +9,7 @@ interface KeyboardProps {
     option?: boolean;
     ctrl?: boolean;
     enter?: boolean;
+    space?: boolean;
 }
 
 const StyledKeyboard = styled.kbd`
@@ -49,7 +50,7 @@ const StyledKeyboard = styled.kbd`
     }
 `;
 
-export const Keyboard: React.FC<KeyboardProps> = ({ command, shift, option, ctrl, enter, children }) => {
+export const Keyboard: React.FC<KeyboardProps> = ({ command, shift, option, ctrl, enter, space, children }) => {
     return (
         <StyledKeyboard>
             {command && <span>⌘</span>}
@@ -57,6 +58,7 @@ export const Keyboard: React.FC<KeyboardProps> = ({ command, shift, option, ctrl
             {option && <span>⌥</span>}
             {ctrl && <span>⌃</span>}
             {enter && <span>⏎</span>}
+            {space && <span>Space</span>}
             {children && <span>{children}</span>}
         </StyledKeyboard>
     );
