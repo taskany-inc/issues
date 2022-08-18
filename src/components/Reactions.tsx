@@ -14,6 +14,8 @@ interface ReactionsProps {
     onClick?: React.ComponentProps<typeof ReactionsButton>['onClick'];
 }
 
+const reactionsGroupsLimit = 10;
+
 const StyledReactions = styled.div`
     display: flex;
     align-items: center;
@@ -44,8 +46,10 @@ export const Reactions = React.memo(({ reactions, onClick }: ReactionsProps) => 
         [reactions],
     );
 
+    const reactionsGroupsNames = Object.keys(grouppedReactions || {});
+
     const existingReactions = nullable(grouppedReactions, (gr) =>
-        Object.keys(gr).map((r) =>
+        reactionsGroupsNames.map((r) =>
             nullable(r, (reaction) => (
                 <ReactionsButton key={reaction} emoji={reaction} count={gr[reaction].count} onClick={onClick} />
             )),
@@ -56,7 +60,7 @@ export const Reactions = React.memo(({ reactions, onClick }: ReactionsProps) => 
         <StyledReactions>
             {existingReactions}
 
-            <ReactionsDropdown onClick={onClick} />
+            {reactionsGroupsNames.length < reactionsGroupsLimit ? <ReactionsDropdown onClick={onClick} /> : null}
         </StyledReactions>
     );
 });
