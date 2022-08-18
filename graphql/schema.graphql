@@ -155,7 +155,6 @@ type Mutation {
   createGoal(goal: GoalCreateInput!): Goal
   createProject(description: String, flowId: String!, key: String!, title: String!): Project
   createTag(description: String, title: String!): Tag
-  inviteUser(email: String!): Ghost
   toggleGoalDependency(toggle: GoalDependencyInput!): Goal
   toggleGoalStargizer(toggle: GoalSubscriptionInput!): Activity
   toggleGoalWatcher(toggle: GoalSubscriptionInput!): Activity
@@ -163,6 +162,7 @@ type Mutation {
   updateGoal(goal: GoalInput!): Goal
   updateSettings(data: SettingsInput!): Settings
   updateUser(data: UserInput!): User
+  usersInvites(input: UserInvitesInput!): [Ghost]
 }
 
 type Project {
@@ -287,6 +287,10 @@ input UserInput {
   id: ID!
   name: String
   nickname: String
+}
+
+input UserInvitesInput {
+  emails: [String]
 }
 
 enum UserKind {

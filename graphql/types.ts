@@ -218,6 +218,20 @@ export const Settings = objectType({
     },
 });
 
+export const Comment = objectType({
+    name: 'Comment',
+    definition(t) {
+        t.field(CommentModel.id);
+        t.field(CommentModel.description);
+        t.field('author', { type: UserAnyKind });
+        t.field('computedAuthor', { type: UserAnyKind });
+        t.field('activity', { type: Activity });
+        // t.field(CommentModel.reactions);
+        t.field(CommentModel.createdAt);
+        t.field(CommentModel.updatedAt);
+    },
+});
+
 export const SettingsInput = inputObjectType({
     name: 'SettingsInput',
     definition(t) {
@@ -330,6 +344,22 @@ export const GoalDependencyInput = inputObjectType({
     },
 });
 
+export const UserInvitesInput = inputObjectType({
+    name: 'UserInvitesInput',
+    definition(t) {
+        t.list.string('emails');
+    },
+});
+
+export const CommentInputType = inputObjectType({
+    name: 'CommentInput',
+    definition(t) {
+        t.field(CommentModel.description);
+        t.field(CommentModel.goalId);
+        t.field(CommentModel.activityId);
+    },
+});
+
 export const computeUserFields = {
     include: {
         user: true,
@@ -348,26 +378,3 @@ export const withComputedField =
             return acc;
         }, {}),
     });
-
-export const Comment = objectType({
-    name: 'Comment',
-    definition(t) {
-        t.field(CommentModel.id);
-        t.field(CommentModel.description);
-        t.field('author', { type: UserAnyKind });
-        t.field('computedAuthor', { type: UserAnyKind });
-        t.field('activity', { type: Activity });
-        // t.field(CommentModel.reactions);
-        t.field(CommentModel.createdAt);
-        t.field(CommentModel.updatedAt);
-    },
-});
-
-export const CommentInputType = inputObjectType({
-    name: 'CommentInput',
-    definition(t) {
-        t.field(CommentModel.description);
-        t.field(CommentModel.goalId);
-        t.field(CommentModel.activityId);
-    },
-});

@@ -21,7 +21,7 @@ import { Tag } from './Tag';
 import { Text } from './Text';
 
 interface UserInviteFormProps {
-    onCreate?: (id?: string) => void;
+    onCreate?: () => void;
 }
 
 const StyledEmails = styled.div`
@@ -38,11 +38,17 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
         message: t('User email is required'),
     });
 
-    const inviteUser = async () => {
+    const inviteUser = useCallback(async () => {
+        if (inputRef.current?.value === '' || emails.length === 0) {
+            return;
+        }
+
         const promise = gql.mutation({
-            inviteUser: [
+            usersInvites: [
                 {
-                    emails,
+                    input: {
+                        emails,
+                    },
                 },
                 {
                     id: true,
@@ -53,14 +59,14 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
 
         toast.promise(promise, {
             error: t('Something went wrong 😿'),
-            loading: t('We are creating invite...'),
+            loading: t('We are creating invite'),
             success: t('Voila! Users invited 🎉'),
         });
 
-        const res = await promise;
+        await promise;
 
-        onCreate && onCreate(res.inviteUser?.id);
-    };
+        onCreate && onCreate();
+    }, [emails, onCreate, t]);
 
     const onInputChange = useCallback(() => {
         setError(undefined);
@@ -75,9 +81,13 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
 
     const onInputKeyDown = useCallback(
         (e: React.KeyboardEvent) => {
-            if ((e.keyCode === KeyCode.Enter || e.keyCode === KeyCode.Space) && inputRef.current) {
+            if ((e.keyCode === KeyCode.Enter || e.keyCode === KeyCode.Space) && inputRef.current && !e.metaKey) {
                 e.preventDefault();
                 const possibleEmail = inputRef.current.value;
+
+                if (possibleEmail === '') {
+                    return;
+                }
 
                 try {
                     emailSchema.parse(possibleEmail);
@@ -118,7 +128,7 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
                 )}
             </StyledEmails>
 
-            <Form onSubmit={() => inviteUser}>
+            <Form onSubmit={inviteUser}>
                 <FormInput
                     ref={inputRef}
                     error={error}
@@ -132,7 +142,14 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
                 <FormActions flat="top">
                     <FormAction left />
                     <FormAction right inline>
-                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Send invites')} />
+                        <Button
+                            size="m"
+                            view="primary"
+                            type="submit"
+                            disabled={!isValid}
+                            text={t('Send invites')}
+                            onClick={inviteUser}
+                        />
                     </FormAction>
                 </FormActions>
             </Form>
