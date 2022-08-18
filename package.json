@@ -52,10 +52,18 @@
     "react-hook-form": "7.29.0",
     "react-hot-toast": "2.2.0",
     "react-input-mask": "2.0.4",
+    "rehype-katex": "6.0.2",
+    "rehype-stringify": "9.0.3",
+    "remark-emoji": "3.0.2",
+    "remark-gfm": "3.0.1",
+    "remark-math": "5.1.1",
+    "remark-parse": "10.0.1",
+    "remark-rehype": "10.1.0",
     "styled-components": "5.3.3",
     "swr": "1.2.2",
     "teenyicons": "0.4.1",
     "tinykeys": "1.4.0",
+    "unified": "10.1.2",
     "zod": "3.14.3"
   },
   "devDependencies": {

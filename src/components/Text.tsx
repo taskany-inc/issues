@@ -153,6 +153,7 @@ export const TextStyle = createGlobalStyle`
     }
 
     strong {
-        font-weight: var(--weight-bold) !important;
+        background: transparent;
+        font-weight: ${textWeight.bolder};
     }
 `;
