@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { User, SortOrder, UserAnyKind, Ghost, UserInput } from '../types';
+import { User, SortOrder, UserAnyKind, Ghost, UserInput, UserInvitesInput } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('users', {
@@ -80,28 +80,35 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
 };
 
 export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
-    t.field('inviteUser', {
+    t.list.field('usersInvites', {
         type: Ghost,
         args: {
-            email: nonNull(stringArg()),
+            input: nonNull(arg({ type: UserInvitesInput })),
         },
-        resolve: async (_, { email }, { db, user }) => {
+        resolve: async (_, { input }, { db, user }) => {
             if (!user) return null;
+            if (!input.emails?.length) return null;
+
+            const emails = input.emails.filter(Boolean) as string[];
 
             try {
-                const newGhost = db.ghost.create({
-                    data: {
-                        email,
-                        hostId: user.id,
-                        activity: {
-                            create: {
-                                settings: {
-                                    create: {},
+                const newGhosts = Promise.all(
+                    emails.map((email) =>
+                        db.ghost.create({
+                            data: {
+                                email,
+                                hostId: user.id,
+                                activity: {
+                                    create: {
+                                        settings: {
+                                            create: {},
+                                        },
+                                    },
                                 },
                             },
-                        },
-                    },
-                });
+                        }),
+                    ),
+                );
 
                 // await mailServer.sendMail({
                 //     from: '"Fred Foo 👻" <foo@example.com>',
@@ -111,7 +118,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 //     html: `new post <b>${title}</b>`,
                 // });
 
-                return newGhost;
+                return newGhosts;
             } catch (error) {
                 throw Error(`${error}`);
             }
