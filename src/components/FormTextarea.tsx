@@ -39,7 +39,6 @@ const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea 
     width: 100%;
     min-height: 200px;
     resize: none;
-    box-sizing: border-box;
 
     transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
     transition-property: color, background-color, border-color;
