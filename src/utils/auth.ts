@@ -57,6 +57,10 @@ if (process.env.KEYCLOAK_ID && process.env.KEYCLOAK_SECRET && process.env.KEYCLO
             clientId: process.env.KEYCLOAK_ID!,
             clientSecret: process.env.KEYCLOAK_SECRET!,
             issuer: process.env.KEYCLOAK_ISSUER!,
+            client: {
+                authorization_signed_response_alg: process.env.JWS_ALGORITHM,
+                id_token_signed_response_alg: process.env.JWS_ALGORITHM,
+            },
         }),
     );
 }
