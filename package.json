@@ -27,6 +27,7 @@
     "@apollo/client": "3.5.10",
     "@genql/runtime": "2.9.0",
     "@hookform/resolvers": "2.8.8",
+    "@monaco-editor/react": "4.4.5",
     "@next-auth/prisma-adapter": "1.0.1",
     "@prisma/client": "3.10.0",
     "@tippyjs/react": "4.2.6",

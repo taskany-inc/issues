@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
@@ -12,13 +12,13 @@ import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes
 
 import { Form } from './Form';
 import { FormCard } from './FormCard';
-import { FormTextarea } from './FormTextarea';
 import { UserPic } from './UserPic';
 import { Icon } from './Icon';
 import { FormAction, FormActions } from './FormActions';
 import { Button } from './Button';
 import { Tip } from './Tip';
 import { Link } from './Link';
+import { FormEditor } from './FormEditor';
 
 interface CommentCreateFormProps {
     goalId: string;
@@ -68,10 +68,6 @@ const StyledTip = styled(Tip)`
     padding: 0;
 `;
 
-const StyledFormTextarea = styled(FormTextarea)`
-    min-height: 60px;
-`;
-
 export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId, setFocus }) => {
     const t = useTranslations('Comments.new');
 
@@ -89,7 +85,7 @@ export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCr
     type FormType = z.infer<typeof schema>;
 
     const {
-        register,
+        control,
         handleSubmit,
         resetField,
         setFocus: setFieldFocus,
@@ -142,12 +138,13 @@ export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCr
 
             <StyledCommentForm>
                 <Form onSubmit={handleSubmit(createComment)}>
-                    <StyledFormTextarea
-                        {...register('comment')}
-                        error={isSubmitted ? errors.comment : undefined}
-                        placeholder={t('Leave a comment')}
-                        flat="both"
+                    {/* https://github.com/taskany-inc/issues/issues/234 t('Leave a comment') */}
+                    <Controller
+                        name="comment"
+                        control={control}
+                        render={({ field }) => <FormEditor height="60px" flat="both" {...field} />}
                     />
+
                     <FormActions>
                         <FormAction left inline />
                         <FormAction right inline>

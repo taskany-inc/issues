@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
@@ -11,7 +11,6 @@ import { estimatedMeta } from '../utils/dateTime';
 
 import { Button } from './Button';
 import { FormInput } from './FormInput';
-import { FormTextarea } from './FormTextarea';
 import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { UserCompletionDropdown } from './UserCompletionDropdown';
@@ -21,6 +20,7 @@ import { EstimateDropdown } from './EstimateDropdown';
 import { StateDropdown } from './StateDropdown';
 import { UserPic } from './UserPic';
 import { Tag } from './Tag';
+import { FormEditor } from './FormEditor';
 
 const schemaProvider = (t: (key: string) => string) =>
     z.object({
@@ -95,6 +95,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     const schema = schemaProvider(t);
 
     const {
+        control,
         register,
         handleSubmit,
         watch,
@@ -156,11 +157,11 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                     flat="bottom"
                 />
 
-                <FormTextarea
-                    {...register('description')}
-                    error={isSubmitted ? errors.description : undefined}
-                    placeholder={t('And its description')}
-                    flat="both"
+                {/* https://github.com/taskany-inc/issues/issues/234 t('And its description') */}
+                <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => <FormEditor flat="both" {...field} />}
                 />
 
                 <StyledTagsContainer>
