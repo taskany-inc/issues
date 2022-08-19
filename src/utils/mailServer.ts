@@ -6,7 +6,7 @@ export const mailServer = nodemailer.createTransport({
     port: process.env.MAIL_PORT || 1025,
     secure: false,
     auth: {
-        user: process.env.MAIL_USER || 'hello@hello.com',
+        user: process.env.MAIL_USER || 'admin@taskany.org',
         pass: process.env.MAIL_PASS || 'undefined',
     },
     tls: { rejectUnauthorized: false },
