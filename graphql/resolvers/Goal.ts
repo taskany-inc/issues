@@ -298,7 +298,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 });
 
                 // await mailServer.sendMail({
-                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
                 //     to: 'bar@example.com, baz@example.com',
                 //     subject: 'Hello ✔',
                 //     text: `new post '${title}'`,
@@ -358,7 +358,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 });
 
                 // await mailServer.sendMail({
-                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
                 //     to: 'bar@example.com, baz@example.com',
                 //     subject: 'Hello ✔',
                 //     text: `new post '${title}'`,
@@ -389,7 +389,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 });
 
                 // await mailServer.sendMail({
-                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
                 //     to: 'bar@example.com, baz@example.com',
                 //     subject: 'Hello ✔',
                 //     text: `new post '${title}'`,
@@ -420,7 +420,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 });
 
                 // await mailServer.sendMail({
-                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
                 //     to: 'bar@example.com, baz@example.com',
                 //     subject: 'Hello ✔',
                 //     text: `new post '${title}'`,
@@ -452,7 +452,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 });
 
                 // await mailServer.sendMail({
-                //     from: '"Fred Foo 👻" <foo@example.com>',
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
                 //     to: 'bar@example.com, baz@example.com',
                 //     subject: 'Hello ✔',
                 //     text: `new post '${title}'`,

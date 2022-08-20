@@ -55,7 +55,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 });
 
                 await mailServer.sendMail({
-                    from: '"Taskany Issues" <notify@taskany.org>',
+                    from: `"Taskany Issues" <${process.env.MAIL_USER}>`,
                     to: goal.participants.map((p) => p.user?.email).join(' ,'),
                     subject: 'Hello ✔',
                     text: `new comment for ${process.env.NEXTAUTH_URL}/goals/${goalId}#comment-${newComment.id}`,
