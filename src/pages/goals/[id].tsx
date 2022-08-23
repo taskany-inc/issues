@@ -44,8 +44,10 @@ import { CommentCreateForm } from '../../components/CommentCreateForm';
 import { Comment, commentMask } from '../../components/Comment';
 import { IssueDependencies } from '../../components/IssueDependencies';
 import { IssueParticipants } from '../../components/IssueParticipants';
+import { editGoalKeys } from '../../utils/hotkeys';
+import ModalOnEvent from '../../components/ModalOnEvent';
 
-const GoalEditModal = dynamic(() => import('../../components/GoalEditModal'));
+const GoalEditForm = dynamic(() => import('../../components/GoalEditForm'));
 
 const refreshInterval = 3000;
 
@@ -466,6 +468,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         setCommentFormFocus(true);
     }, []);
 
+    const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
+    const onGoalEdit = useCallback(() => {
+        refresh();
+        setGoalEditModalVisible(false);
+    }, [refresh]);
+
     return (
         <Page locale={locale} title={goal.title}>
             <IssueHeader>
@@ -594,7 +602,9 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             </IssueContent>
 
             {nullable(isUserAllowedToEdit, () => (
-                <GoalEditModal goal={goal} onSubmit={refresh} />
+                <ModalOnEvent event={ModalEvent.GoalEditModal} hotkeys={editGoalKeys} visible={goalEditModalVisible}>
+                    <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
+                </ModalOnEvent>
             ))}
         </Page>
     );

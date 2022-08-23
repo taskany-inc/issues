@@ -2,21 +2,35 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
+import styled from 'styled-components';
 
 import { gql } from '../utils/gql';
-import { star0 } from '../design/@generated/themes';
+import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { UserAnyKind, Project, EstimateInput, State, Tag as TagModel } from '../../graphql/@generated/genql';
+import { routes } from '../hooks/router';
+import { TLocale } from '../types/locale';
 
 import { Icon } from './Icon';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { GoalForm, GoalFormType } from './GoalForm';
+import { Link } from './Link';
 
 interface GoalCreateFormProps {
-    onSubmit: (id?: string) => void;
+    locale: TLocale;
+
+    onCreate: (id?: string) => void;
 }
 
-export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onSubmit }) => {
+const StyledFormBottom = styled.div`
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    padding: ${gapS} ${gapS} 0 ${gapS};
+`;
+
+const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => {
     const t = useTranslations('goals.new');
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
@@ -83,7 +97,7 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onSubmit }) => {
 
         const res = await promise;
 
-        onSubmit(res.createGoal?.id);
+        onCreate(res.createGoal?.id);
     };
 
     return (
@@ -103,11 +117,19 @@ export const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ onSubmit }) => {
             onTagAdd={onTagAdd}
             onTagDelete={onTagDelete}
         >
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
-                {t.rich('Press key to create the goal', {
-                    key: () => <Keyboard command enter />,
-                })}
-            </Tip>
+            <StyledFormBottom>
+                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                    {t.rich('Press key to create the goal', {
+                        key: () => <Keyboard command enter />,
+                    })}
+                </Tip>
+
+                <Link href={routes.help(locale, 'goals')}>
+                    <Icon type="question" size="s" color={gray6} />
+                </Link>
+            </StyledFormBottom>
         </GoalForm>
     );
 };
+
+export default GoalCreateForm;

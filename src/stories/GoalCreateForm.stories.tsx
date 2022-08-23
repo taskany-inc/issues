@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { GoalCreateForm } from '../components/GoalCreateForm';
+import GoalCreateForm from '../components/GoalCreateForm';
 
 export default {
     title: 'Taskany/GoalCreateForm',

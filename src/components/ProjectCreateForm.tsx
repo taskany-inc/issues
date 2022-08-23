@@ -8,13 +8,15 @@ import z from 'zod';
 import useSWR from 'swr';
 import styled from 'styled-components';
 
-import { gapS, star0 } from '../design/@generated/themes';
+import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
 import { nullable } from '../utils/nullable';
 import { gql } from '../utils/gql';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
+import { TLocale } from '../types/locale';
+import { routes } from '../hooks/router';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -30,8 +32,11 @@ import { UserPic } from './UserPic';
 import { ProjectKeyInput } from './ProjectKeyInput';
 import { FormTitle } from './FormTitle';
 import { Text } from './Text';
+import { Link } from './Link';
 
 interface ProjectCreateFormProps {
+    locale: TLocale;
+
     onCreate?: (slug?: string) => void;
 }
 
@@ -64,10 +69,18 @@ const StyledProjectKeyContainer = styled.div`
     right: ${gapS};
 `;
 
+const StyledFormBottom = styled.div`
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    padding: ${gapS} ${gapS} 0 ${gapS};
+`;
+
 const defaultIndexesFlow = [0, -1, 0, 1, 2, 3];
 const backIndexesFlow = [1, 2, 3, 4, 5, 6];
 
-export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }) => {
+const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate }) => {
     const { data: session } = useSession();
     const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
     const [flow, setFlow] = useState<Partial<Flow>>();
@@ -268,11 +281,19 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ onCreate }
                 </FormActions>
             </Form>
 
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
-                {t.rich('Press key to create the project', {
-                    key: () => <Keyboard command enter />,
-                })}
-            </Tip>
+            <StyledFormBottom>
+                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                    {t.rich('Press key to create the project', {
+                        key: () => <Keyboard command enter />,
+                    })}
+                </Tip>
+
+                <Link href={routes.help(locale, 'projects')}>
+                    <Icon type="question" size="s" color={gray6} />
+                </Link>
+            </StyledFormBottom>
         </>
     );
 };
+
+export default ProjectCreateForm;

@@ -13,7 +13,7 @@ interface GoalEditFormProps {
     onSubmit: (id?: string) => void;
 }
 
-export const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
+const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const t = useTranslations('goals.edit');
     const { data: session } = useSession();
     const [title, setTitle] = useState(goal.title);
@@ -116,3 +116,5 @@ export const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) =>
         />
     );
 };
+
+export default GoalEditForm;
