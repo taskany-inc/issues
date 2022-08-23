@@ -5,12 +5,13 @@ import NextLink from 'next/link';
 import { ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page } from '../../../components/Page';
 import { Md } from '../../../components/Md';
+import { TLocale } from '../../../types/locale';
+import { routes } from '../../../hooks/router';
+import { AvailableHelpPages } from '../../../types/@generated/help';
 
-type TLocale = 'en' | 'ru';
 const safeUrl = (url: string) => url.replace('/', '__');
 const sourcesDir = (locale: TLocale) => `${process.cwd()}/src/pages/help/source/${locale}`;
 const sourcesExt = '.md';
-const getLink = (locale: TLocale, slug: string) => `/help/${locale}/${slug}`;
 
 interface YmlProps {
     title: string;
@@ -42,8 +43,8 @@ export async function getStaticProps({ params: { locale, slug } }: { params: { l
     const stat = JSON.parse(JSON.stringify(fs.statSync(filePath)));
     const { data: yml, content: source } = matter(orig);
     const menu = fs.readdirSync(sourcesDir(locale)).map((fileName) => {
-        const linkSlug = fileName.replace(sourcesExt, '');
-        return { slug: linkSlug, link: getLink(locale, linkSlug) };
+        const linkSlug = fileName.replace(sourcesExt, '') as AvailableHelpPages;
+        return { slug: linkSlug, link: routes.help(locale, linkSlug) };
     });
 
     return {

@@ -3,10 +3,11 @@ import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 
 import { routes } from '../hooks/router';
+import { TLocale } from '../types/locale';
 
 interface SSRProps<P = Record<string, string>> {
     user: Session['user'];
-    locale: 'en' | 'ru';
+    locale: TLocale;
     req: GetServerSidePropsContext['req'];
     params: P;
 }

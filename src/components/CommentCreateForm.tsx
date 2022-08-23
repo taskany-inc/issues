@@ -9,6 +9,8 @@ import { Session } from 'next-auth';
 
 import { gql } from '../utils/gql';
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
+import { TLocale } from '../types/locale';
+import { routes } from '../hooks/router';
 
 import { Form } from './Form';
 import { FormCard } from './FormCard';
@@ -24,6 +26,7 @@ interface CommentCreateFormProps {
     goalId: string;
     user?: Session['user'];
     setFocus?: boolean;
+    locale: TLocale;
 
     onCreate?: (CommentsId?: string) => void;
 }
@@ -68,7 +71,7 @@ const StyledTip = styled(Tip)`
     padding: 0;
 `;
 
-export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId, setFocus }) => {
+export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId, setFocus, locale }) => {
     const t = useTranslations('Comments.new');
 
     const schema = z.object({
@@ -158,7 +161,7 @@ export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCr
                         {t('Styling with markdown is supported')}
                     </StyledTip>
 
-                    <Link href="/help">
+                    <Link href={routes.help(locale, 'comments')}>
                         <Icon type="question" size="s" color={gray6} />
                     </Link>
                 </StyledFormBottom>

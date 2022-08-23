@@ -578,6 +578,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                         )}
 
                         <CommentCreateForm
+                            locale={locale}
                             goalId={goal.id}
                             user={user}
                             setFocus={commentFormFocus}
