@@ -1,5 +1,6 @@
-# Taskany Issues
+# Taskany
 
+<img width="640" alt="Taskany" src="https://user-images.githubusercontent.com/982072/186257262-6f79ee44-f949-48b9-a12e-23fd659a7f6f.png">
 
 ## Development
 
