@@ -41,6 +41,7 @@
     "date-fns": "2.28.0",
     "graphql": "15.8.0",
     "graphql-scalars": "1.15.0",
+    "gray-matter": "4.0.3",
     "md5": "2.3.0",
     "micro": "9.3.4",
     "micro-cors": "0.1.1",
