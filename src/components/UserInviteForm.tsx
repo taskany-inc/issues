@@ -5,9 +5,11 @@ import z from 'zod';
 import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
 
-import { gapM, gray7, star0 } from '../design/@generated/themes';
+import { gapM, gapS, gray6, gray7, star0 } from '../design/@generated/themes';
 import { gql } from '../utils/gql';
 import { KeyCode } from '../hooks/useKeyboard';
+import { routes } from '../hooks/router';
+import { TLocale } from '../types/locale';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -19,8 +21,11 @@ import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
 import { Tag } from './Tag';
 import { Text } from './Text';
+import { Link } from './Link';
 
 interface UserInviteFormProps {
+    locale: TLocale;
+
     onCreate?: () => void;
 }
 
@@ -28,7 +33,15 @@ const StyledEmails = styled.div`
     padding: ${gapM} 0;
 `;
 
-export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
+const StyledFormBottom = styled.div`
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    padding: ${gapS} ${gapS} 0 ${gapS};
+`;
+
+const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => {
     const t = useTranslations('users.invite');
     const inputRef = useRef<HTMLInputElement>(null);
     const [emails, setEmails] = useState<string[]>([]);
@@ -154,11 +167,19 @@ export const UserInviteForm: React.FC<UserInviteFormProps> = ({ onCreate }) => {
                 </FormActions>
             </Form>
 
-            <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
-                {t.rich('Press key to send invites', {
-                    key: () => <Keyboard command enter />,
-                })}
-            </Tip>
+            <StyledFormBottom>
+                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                    {t.rich('Press key to send invites', {
+                        key: () => <Keyboard command enter />,
+                    })}
+                </Tip>
+
+                <Link href={routes.help(locale, 'users')}>
+                    <Icon type="question" size="s" color={gray6} />
+                </Link>
+            </StyledFormBottom>
         </>
     );
 };
+
+export default UserInviteForm;
