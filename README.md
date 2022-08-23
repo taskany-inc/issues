@@ -1,48 +1,81 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Taskany Issues
 
-## Getting Started
 
-First, run the development server:
+## Development
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+__Prepare env, first!__
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> docker-compose -f ./dev-compose.yml up
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+It ups Postgres, [Maildev](http://maildev.github.io/maildev) and [localstack](https://github.com/localstack/localstack).
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Seed
-
-> ADMIN_EMAIL= ADMIN_PASSWORD= prisma db seed
+### Seed
 
 This command adds default admin user and default flows with states.
 
-## Dev mail server
+> ADMIN_EMAIL="" ADMIN_PASSWORD="" prisma db seed
 
-``` bash
-npm i -g maildev
+And you are ready!
+
+> npm run dev
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see [Taskany](taskany.org).
+
+## Environment configuration
+
+Any of variables below can be added via `.env` file, Docker env in `Dockerfile` or CLI args for container.
+
+### DB
+
+```
+DATABASE_URL=
 ```
 
-In some other terminal tab:
+### S3
 
-``` bash
-maildev
+If no env variable provided Taskany uses fs storage for uploads.
+
+```
+S3_ENDPOINT=
+S3_REGION=
+S3_ACCESS_KEY=
+S3_SECRET=
+S3_BUCKET=
+S3_PATH_STYLE=
+S3_TLS=
 ```
 
-You can check out [Maildev documentation](http://maildev.github.io/maildev/).
+### E-Mails
+
+Taskany uses [Nodemailer](https://nodemailer.com) as provider.
+
+```
+MAIL_HOST=
+MAIL_PORT=
+MAIL_USER=
+MAIL_PASS=
+```
+
+### Auth
+
+Taskany uses [NextAuth.js](https://next-auth.js.org/). Check [docs](https://next-auth.js.org/providers/) for providers.
+
+```
+NEXTAUTH_URL=
+NEXT_PUBLIC_NEXTAUTH_URL=
+NEXTAUTH_SECRET=
+
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+KEYCLOAK_ID=
+KEYCLOAK_SECRET=
+KEYCLOAK_ISSUER=
+```
+
+## License
+
+[MIT](https://github.com/taskany-inc/issues/blob/main/LICENSE)
+
+
+
