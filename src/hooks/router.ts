@@ -1,5 +1,8 @@
 import { useRouter as NextRouter } from 'next/router';
 
+import { AvailableHelpPages } from '../types/@generated/help';
+import { TLocale } from '../types/locale';
+
 export const routes = {
     index: () => '/',
     goals: () => '/goals',
@@ -8,6 +11,7 @@ export const routes = {
     project: (id: string) => `/projects/${id}`,
     userSettings: () => '/users/settings',
     signIn: () => '/api/auth/signin',
+    help: (locale: TLocale, slug: AvailableHelpPages) => `/help/${locale}/${slug}`,
 };
 
 export const useRouter = () => {
