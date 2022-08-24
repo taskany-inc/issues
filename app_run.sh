@@ -1,3 +1,3 @@
-#!/bin/sh
-npx prisma migrate dev --preview-feature
+#!/bin/bash
+npx prisma migrate deploy
 npm run start

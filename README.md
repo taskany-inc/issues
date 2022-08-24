@@ -6,7 +6,7 @@
 
 __Prepare env, first!__
 
-> docker-compose -f ./dev-compose.yml up
+> npm run db:run
 
 It ups Postgres, [Maildev](http://maildev.github.io/maildev) and [localstack](https://github.com/localstack/localstack).
 
