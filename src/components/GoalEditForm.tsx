@@ -44,7 +44,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         [tags],
     );
     const onTagDelete = useCallback(
-        (tag: TagModel) => () => {
+        (tag: TagModel) => {
             const newTags = new Map(tags);
             newTags.delete(tag.id);
             setTags(newTags);

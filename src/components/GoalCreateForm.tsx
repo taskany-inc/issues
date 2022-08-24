@@ -52,7 +52,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
         [tags],
     );
     const onTagDelete = useCallback(
-        (tag: TagModel) => () => {
+        (tag: TagModel) => {
             const newTags = new Map(tags);
             newTags.delete(tag.id);
             setTags(newTags);
