@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/display-name */
 import React, { useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import Editor /* , { useMonaco } */ from '@monaco-editor/react';
 
 import { gray2, gray3, radiusS } from '../design/@generated/themes';
+
+const Editor = dynamic(() => import('@monaco-editor/react'));
 
 interface FormEditorProps {
     id?: string;

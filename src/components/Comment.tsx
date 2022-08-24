@@ -1,14 +1,16 @@
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { Scalars, User } from '../../graphql/@generated/genql';
 import { brandColor, gray4 } from '../design/@generated/themes';
 
 import { Card, CardContent, CardInfo } from './Card';
 import { Link } from './Link';
-import { Md } from './Md';
-import { RelativeTime } from './RelativeTime';
 import { UserPic } from './UserPic';
+
+const Md = dynamic(() => import('./Md'));
+const RelativeTime = dynamic(() => import('./RelativeTime'));
 
 interface CommentProps {
     id: string;

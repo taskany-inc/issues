@@ -9,7 +9,7 @@ interface RelativeTimeProps {
     date: string;
 }
 
-export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
+const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
     const t = useTranslations('RelativeTime');
 
     return (
@@ -19,3 +19,5 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
         </>
     );
 };
+
+export default RelativeTime;

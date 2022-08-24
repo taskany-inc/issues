@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { gapS } from '../design/@generated/themes';
 import { UserAnyKind, Project, EstimateInput, State, Tag as TagModel } from '../../graphql/@generated/genql';
@@ -13,14 +14,15 @@ import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
-import { UserCompletionDropdown } from './UserCompletionDropdown';
 import { ProjectCompletion } from './ProjectCompletion';
 import { TagCompletion } from './TagCompletion';
-import { EstimateDropdown } from './EstimateDropdown';
 import { StateDropdown } from './StateDropdown';
 import { UserPic } from './UserPic';
 import { Tag } from './Tag';
 import { FormEditor } from './FormEditor';
+
+const EstimateDropdown = dynamic(() => import('./EstimateDropdown'));
+const UserCompletionDropdown = dynamic(() => import('./UserCompletionDropdown'));
 
 const tagsLimit = 5;
 

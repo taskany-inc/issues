@@ -107,7 +107,7 @@ const fetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
-export const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
+const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
     size = 'm',
     text,
     view,
@@ -234,3 +234,5 @@ export const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
         </>
     );
 };
+
+export default UserCompletionDropdown;

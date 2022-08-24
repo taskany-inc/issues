@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 
 import { gapS, gapXs, gray8 } from '../design/@generated/themes';
 import { State } from '../../graphql/@generated/genql';
@@ -8,8 +9,9 @@ import { nullable } from '../utils/nullable';
 import { Text } from './Text';
 import { Dot } from './Dot';
 import { Link } from './Link';
-import { RelativeTime } from './RelativeTime';
-import { StateSwitch } from './StateSwitch';
+
+const RelativeTime = dynamic(() => import('./RelativeTime'));
+const StateSwitch = dynamic(() => import('./StateSwitch'));
 
 interface IssueStatsProps {
     state?: State;

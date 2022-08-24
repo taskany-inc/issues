@@ -28,7 +28,7 @@ const StyledDropdownContainer = styled.div`
     top: 8px;
 `;
 
-export const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
+const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
     const t = useTranslations('IssueDependencies');
     const [kind, setKind] = useState<Dependency>();
     const [target, setTarget] = useState<Goal>();
@@ -102,3 +102,5 @@ export const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ is
         </>
     );
 };
+
+export default IssueDependenciesForm;

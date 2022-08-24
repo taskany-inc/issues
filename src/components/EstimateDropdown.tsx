@@ -92,7 +92,7 @@ const createValue = (str: string) => ({
     date: str,
 });
 
-export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
+const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     size = 'm',
     text,
     onChange,
@@ -229,3 +229,5 @@ export const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
         </>
     );
 };
+
+export default EstimateDropdown;
