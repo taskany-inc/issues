@@ -22,6 +22,8 @@ import { UserPic } from './UserPic';
 import { Tag } from './Tag';
 import { FormEditor } from './FormEditor';
 
+const tagsLimit = 5;
+
 const schemaProvider = (t: (key: string) => string) =>
     z.object({
         title: z
@@ -211,12 +213,14 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             onChange={onEstimateChange}
                         />
 
-                        <TagCompletion
-                            text="Tags"
-                            filter={Array.from(tags.keys())}
-                            placeholder={t('Enter tag title')}
-                            onAdd={onTagAdd}
-                        />
+                        {Array.from(tags.values()).length < tagsLimit ? (
+                            <TagCompletion
+                                text="Tags"
+                                filter={Array.from(tags.keys())}
+                                placeholder={t('Enter tag title')}
+                                onAdd={onTagAdd}
+                            />
+                        ) : null}
                     </FormAction>
                     <FormAction right inline>
                         <Button
