@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
@@ -45,28 +45,19 @@ export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children
 
     const { resolvedTheme } = useTheme();
 
-    const [projectModalVisible, setProjectModalVisible] = useState(false);
     const onProjectCreate = useCallback(
         (key?: string) => {
             key && router.project(key);
-            setProjectModalVisible(false);
         },
         [router],
     );
 
-    const [goalModalVisible, setGoalModalVisible] = useState(false);
     const onGoalCreate = useCallback(
         (key?: string) => {
             key && router.goal(key);
-            setGoalModalVisible(false);
         },
         [router],
     );
-
-    const [userModalVisible, setUserModalVisible] = useState(false);
-    const onUserCreate = useCallback(() => {
-        setUserModalVisible(false);
-    }, []);
 
     return (
         <pageContext.Provider value={{ theme: resolvedTheme, locale }}>
@@ -89,23 +80,20 @@ export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children
 
             <StyledContent>{children}</StyledContent>
 
-            <ModalOnEvent
-                event={ModalEvent.ProjectCreateModal}
-                hotkeys={createProjectKeys}
-                visible={projectModalVisible}
-            >
+            <ModalOnEvent event={ModalEvent.ProjectCreateModal} hotkeys={createProjectKeys}>
                 <ProjectCreateForm locale={locale} onCreate={onProjectCreate} />
             </ModalOnEvent>
 
-            <ModalOnEvent event={ModalEvent.GoalCreateModal} hotkeys={createGoalKeys} visible={goalModalVisible}>
+            <ModalOnEvent event={ModalEvent.GoalCreateModal} hotkeys={createGoalKeys}>
                 <GoalCreateForm locale={locale} onCreate={onGoalCreate} />
             </ModalOnEvent>
 
-            <ModalOnEvent event={ModalEvent.UserInviteModal} hotkeys={inviteUserKeys} visible={userModalVisible}>
-                <UserInviteForm locale={locale} onCreate={onUserCreate} />
+            <ModalOnEvent event={ModalEvent.UserInviteModal} hotkeys={inviteUserKeys}>
+                <UserInviteForm locale={locale} />
             </ModalOnEvent>
 
             <HotkeysModal />
+
             <Footer />
         </pageContext.Provider>
     );
