@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import z from 'zod';
@@ -46,13 +46,14 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
     const inputRef = useRef<HTMLInputElement>(null);
     const [emails, setEmails] = useState<string[]>([]);
     const [error, setError] = useState<FieldError>();
+    const [inputValue, setInputValue] = useState('');
 
     const emailSchema = z.string().email({
         message: t('User email is required'),
     });
 
     const inviteUser = useCallback(async () => {
-        if (inputRef.current?.value === '' || emails.length === 0) {
+        if (emails.length === 0) {
             return;
         }
 
@@ -78,10 +79,13 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
 
         await promise;
 
+        setEmails([]);
+        setInputValue('');
         onCreate && onCreate();
     }, [emails, onCreate, t]);
 
-    const onInputChange = useCallback(() => {
+    const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
         setError(undefined);
     }, []);
 
@@ -96,7 +100,7 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
         (e: React.KeyboardEvent) => {
             if ((e.keyCode === KeyCode.Enter || e.keyCode === KeyCode.Space) && inputRef.current && !e.metaKey) {
                 e.preventDefault();
-                const possibleEmail = inputRef.current.value;
+                const possibleEmail = inputValue;
 
                 if (possibleEmail === '') {
                     return;
@@ -105,7 +109,7 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
                 try {
                     emailSchema.parse(possibleEmail);
                     setEmails([...emails, possibleEmail]);
-                    inputRef.current.value = '';
+                    setInputValue('');
                 } catch (err: unknown) {
                     if (err instanceof Error) {
                         // Zod serialize errors to message field ¯\_(ツ)_/¯
@@ -115,7 +119,7 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
                 }
             }
         },
-        [emailSchema, setEmails, emails],
+        [emailSchema, setEmails, emails, inputValue],
     );
 
     const isValid = emails.length > 0;
@@ -141,9 +145,10 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
                 )}
             </StyledEmails>
 
-            <Form onSubmit={inviteUser}>
+            <Form>
                 <FormInput
                     ref={inputRef}
+                    value={inputValue}
                     error={error}
                     placeholder={t('Users emails')}
                     autoFocus
