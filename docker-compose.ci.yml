@@ -24,7 +24,7 @@ services:
       - 3000:3000
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     depends_on:
       - db
     environment:
@@ -34,7 +34,7 @@ services:
       - NEXTAUTH_SECRET=ololo
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/auth/signin"]
-      interval: 20s
+      interval: 1s
       timeout: 10s
       retries: 10
-      start_period: 40s
+      start_period: 3s
