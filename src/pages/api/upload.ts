@@ -75,19 +75,19 @@ route.post(upload.array(formFieldName, 10), async (req: any, res: NextApiRespons
                     return saveFileInPublic(fileName, buffer);
                 }
 
-                s3Client.send(
-                    new PutObjectCommand({
-                        Bucket: process.env.S3_BUCKET,
-                        BucketKeyEnabled: false,
-                        Key: `${folder}/${fileName}`,
-                        Body: buffer,
-                        ACL: 'public-read',
-                        CacheControl: 'max-age=630720000, public',
-                        ContentType: mimetype,
-                    }),
-                );
-
-                return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${folder}/${fileName}`;
+                return Promise.resolve(
+                    s3Client.send(
+                        new PutObjectCommand({
+                            Bucket: process.env.S3_BUCKET,
+                            BucketKeyEnabled: false,
+                            Key: `${folder}/${fileName}`,
+                            Body: buffer,
+                            ACL: 'public-read',
+                            CacheControl: 'max-age=630720000, public',
+                            ContentType: mimetype,
+                        }),
+                    ),
+                ).then(() => `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${folder}/${fileName}`);
             },
         ),
     );
