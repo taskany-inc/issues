@@ -21,7 +21,7 @@ const StyledImage = styled.img`
     border-radius: 100%;
 `;
 
-export const Gravatar = ({
+const Gravatar = ({
     size = 50,
     rating = 'g',
     def = 'retro',
@@ -78,3 +78,5 @@ export const Gravatar = ({
         />
     );
 };
+
+export default Gravatar;

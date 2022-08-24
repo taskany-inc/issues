@@ -18,8 +18,8 @@ import { GlobalStyle } from './GlobalStyle';
 import { TextStyle } from './Text';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import ModalOnEvent from './ModalOnEvent';
 
+const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm'));
 const GoalCreateForm = dynamic(() => import('./GoalCreateForm'));
 const UserInviteForm = dynamic(() => import('./UserInviteForm'));

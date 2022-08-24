@@ -10,9 +10,9 @@ import { nullable } from '../utils/nullable';
 
 import { Link } from './Link';
 import { Text } from './Text';
-import { IssueDependenciesForm } from './IssueDependenciesForm';
 import { IssueDependenciesList } from './IssueDependenciesList';
 
+const IssueDependenciesForm = dynamic(() => import('./IssueDependenciesForm'));
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 
 interface IssueDependenciesProps {

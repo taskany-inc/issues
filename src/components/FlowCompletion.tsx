@@ -90,7 +90,7 @@ const fetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
-export const FlowCompletion: React.FC<FlowCompletionProps> = ({
+const FlowCompletion: React.FC<FlowCompletionProps> = ({
     size,
     text,
     view,
@@ -215,3 +215,5 @@ export const FlowCompletion: React.FC<FlowCompletionProps> = ({
         </>
     );
 };
+
+export default FlowCompletion;

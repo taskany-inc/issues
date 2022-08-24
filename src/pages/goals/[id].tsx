@@ -31,23 +31,23 @@ import { Card, CardInfo, CardContent, CardActions } from '../../components/Card'
 import { IssueTitle } from '../../components/IssueTitle';
 import { IssueKey } from '../../components/IssueKey';
 import { IssueStats } from '../../components/IssueStats';
-import { RelativeTime } from '../../components/RelativeTime';
-import { Md } from '../../components/Md';
-import { UserCompletionDropdown } from '../../components/UserCompletionDropdown';
-import { EstimateDropdown } from '../../components/EstimateDropdown';
 import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
 import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
-import { CommentCreateForm } from '../../components/CommentCreateForm';
 import { Comment, commentMask } from '../../components/Comment';
 import { IssueDependencies } from '../../components/IssueDependencies';
 import { IssueParticipants } from '../../components/IssueParticipants';
 import { editGoalKeys } from '../../utils/hotkeys';
-import ModalOnEvent from '../../components/ModalOnEvent';
 
+const Md = dynamic(() => import('../../components/Md'));
+const RelativeTime = dynamic(() => import('../../components/RelativeTime'));
+const EstimateDropdown = dynamic(() => import('../../components/EstimateDropdown'));
+const UserCompletionDropdown = dynamic(() => import('../../components/UserCompletionDropdown'));
+const ModalOnEvent = dynamic(() => import('../../components/ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../../components/GoalEditForm'));
+const CommentCreateForm = dynamic(() => import('../../components/CommentCreateForm'));
 
 const refreshInterval = 3000;
 

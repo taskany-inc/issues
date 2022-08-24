@@ -1,13 +1,15 @@
 import fs from 'fs';
 import matter from 'gray-matter';
 import NextLink from 'next/link';
+import dynamic from 'next/dynamic';
 
 import { ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page } from '../../../components/Page';
-import { Md } from '../../../components/Md';
 import { TLocale } from '../../../types/locale';
 import { routes } from '../../../hooks/router';
 import { AvailableHelpPages } from '../../../types/@generated/help';
+
+const Md = dynamic(() => import('../../../components/Md'));
 
 const safeUrl = (url: string) => url.replace('/', '__');
 const sourcesDir = (locale: TLocale) => `${process.cwd()}/src/pages/help/source/${locale}`;

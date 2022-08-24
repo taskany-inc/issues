@@ -29,7 +29,7 @@ const StyledButton = styled(Button)`
     font-weight: 600;
 `;
 
-export const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
+const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
     size,
     value,
     placeholder,
@@ -120,3 +120,5 @@ export const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
         </>
     );
 };
+
+export default ProjectKeyInput;

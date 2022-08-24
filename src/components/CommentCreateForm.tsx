@@ -71,7 +71,7 @@ const StyledTip = styled(Tip)`
     padding: 0;
 `;
 
-export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId, setFocus, locale }) => {
+const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId, setFocus, locale }) => {
     const t = useTranslations('Comments.new');
 
     const schema = z.object({
@@ -169,3 +169,5 @@ export const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCr
         </StyledComment>
     );
 };
+
+export default CommentCreateForm;

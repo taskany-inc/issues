@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import z from 'zod';
 import useSWR from 'swr';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
@@ -26,13 +27,14 @@ import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { UserCompletionDropdown } from './UserCompletionDropdown';
-import { FlowCompletion } from './FlowCompletion';
 import { UserPic } from './UserPic';
-import { ProjectKeyInput } from './ProjectKeyInput';
 import { FormTitle } from './FormTitle';
 import { Text } from './Text';
 import { Link } from './Link';
+
+const UserCompletionDropdown = dynamic(() => import('./UserCompletionDropdown'));
+const FlowCompletion = dynamic(() => import('./FlowCompletion'));
+const ProjectKeyInput = dynamic(() => import('./ProjectKeyInput'));
 
 interface ProjectCreateFormProps {
     locale: TLocale;

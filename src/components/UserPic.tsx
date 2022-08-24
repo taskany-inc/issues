@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
+import dynamic from 'next/dynamic';
 
-import { Gravatar } from './Gravatar';
+const Gravatar = dynamic(() => import('./Gravatar'));
 
 interface UserPicProps {
     src?: string | null;

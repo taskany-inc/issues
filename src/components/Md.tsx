@@ -25,4 +25,6 @@ interface MdProps {
     children?: string;
 }
 
-export const Md: React.FC<MdProps> = ({ children }) => <StyledMd dangerouslySetInnerHTML={{ __html: md(children) }} />;
+const Md: React.FC<MdProps> = ({ children }) => <StyledMd dangerouslySetInnerHTML={{ __html: md(children) }} />;
+
+export default Md;

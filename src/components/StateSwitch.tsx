@@ -41,7 +41,7 @@ const fetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-export const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => {
+const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLDivElement>(null);
@@ -133,3 +133,5 @@ export const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick
         </>
     );
 };
+
+export default StateSwitch;

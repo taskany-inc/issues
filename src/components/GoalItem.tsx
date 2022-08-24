@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 
 import type { Scalars, State, Tag, UserAnyKind } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10 } from '../design/@generated/themes';
@@ -10,7 +11,8 @@ import { Tag as TagItem } from './Tag';
 import { Icon } from './Icon';
 import { UserPic } from './UserPic';
 import { StateDot } from './StateDot';
-import { RelativeTime } from './RelativeTime';
+
+const RelativeTime = dynamic(() => import('./RelativeTime'));
 
 interface GoalItemProps {
     title: string;
