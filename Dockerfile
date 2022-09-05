@@ -4,6 +4,7 @@ FROM node:16.14.2-alpine AS deps
 
 WORKDIR /app
 COPY package.json package-lock.json ./
+
 RUN npm ci
 
 # END DEPS IMAGE
@@ -24,6 +25,9 @@ RUN npx prisma generate
 
 ARG NEXTAUTH_URL
 ENV NEXT_PUBLIC_NEXTAUTH_URL=$NEXTAUTH_URL
+
+ARG GRAVATAR_HOST
+ENV NEXT_PUBLIC_GRAVATAR_HOST=$GRAVATAR_HOST
 
 RUN npm run build
 
