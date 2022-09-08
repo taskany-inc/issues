@@ -82,7 +82,7 @@ route.post(upload.array(formFieldName, 10), async (req: any, res: NextApiRespons
                             BucketKeyEnabled: false,
                             Key: `${folder}/${fileName}`,
                             Body: buffer,
-                            ACL: 'public-read',
+                            ACL: 'authenticated-read',
                             CacheControl: 'max-age=630720000, public',
                             ContentType: mimetype,
                         }),
