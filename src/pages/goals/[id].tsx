@@ -150,6 +150,7 @@ const fetcher = createFetcher((_, id: string) => ({
                     user: {
                         id: true,
                         name: true,
+                        email: true,
                         image: true,
                     },
                 },
