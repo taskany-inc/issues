@@ -57,7 +57,7 @@ export const IssueParticipantsList: React.FC<IssueParticipantsListProps> = ({
                                 {nullable(onDelete, () => (
                                     <StyledCleanButton onClick={onParticipantDelete(pa.id)} />
                                 ))}
-                                <UserPic src={pa.user?.image} size={24} />
+                                <UserPic src={pa.user?.image} email={pa.user?.email} size={24} />
                             </StyledParticipant>
                         )),
                     )}
