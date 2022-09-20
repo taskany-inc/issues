@@ -542,7 +542,9 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                         placeholder={t('Set owner')}
                                         title={t('Set owner')}
                                         query={issueOwnerName}
-                                        userPic={<UserPic src={issueOwner?.image} size={16} />}
+                                        userPic={
+                                            <UserPic src={issueOwner?.image} email={issueOwner?.email} size={16} />
+                                        }
                                         onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
                                     />
                                 </IssueAction>

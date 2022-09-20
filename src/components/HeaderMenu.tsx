@@ -147,7 +147,7 @@ export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
 
             <NextLink href={routes.userSettings()} passHref>
                 <Link inline>
-                    <UserPic src={session?.user.image} size={32} />
+                    <UserPic src={session?.user.image} email={session?.user.email} size={32} />
                 </Link>
             </NextLink>
         </StyledHeaderMenu>

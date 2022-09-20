@@ -73,7 +73,7 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
 export const Comment: FC<CommentProps> = ({ id, author, description, createdAt, isNew }) => {
     return (
         <StyledComment id={`${commentMask}${id}`}>
-            <UserPic size={32} src={author?.image} />
+            <UserPic size={32} src={author?.image} email={author?.email} />
 
             <StyledCommentCard isNew={isNew}>
                 <CardInfo>

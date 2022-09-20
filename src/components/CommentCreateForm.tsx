@@ -137,7 +137,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, g
 
     return (
         <StyledComment>
-            <UserPic size={32} src={user?.image} />
+            <UserPic size={32} src={user?.image} email={user?.email} />
 
             <StyledCommentForm>
                 <Form onSubmit={handleSubmit(createComment)}>
