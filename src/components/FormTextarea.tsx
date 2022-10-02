@@ -47,6 +47,10 @@ const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea 
         background-color: ${gray2};
     }
 
+    :hover:not([disabled]) {
+        background-color: ${gray2};
+    }
+
     ${({ flat }) =>
         flat === 'top' &&
         css`

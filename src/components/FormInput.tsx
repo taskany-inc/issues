@@ -102,6 +102,10 @@ const StyledFormInput = styled(({ flat, error, label, forwardRef, ...props }) =>
         background-color: ${gray2};
     }
 
+    :hover:not([disabled]) {
+        background-color: ${gray2};
+    }
+
     ${({ flat }) =>
         flat === 'top' &&
         css`
