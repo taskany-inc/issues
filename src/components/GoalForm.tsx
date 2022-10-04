@@ -186,7 +186,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             text={ownerButtonText}
                             placeholder={t('Enter name or email')}
                             query={owner?.name || owner?.email}
-                            userPic={<UserPic src={owner?.image} size={16} />}
+                            userPic={<UserPic src={owner?.image} email={owner?.email} size={16} />}
                             onClick={onOwnerChange}
                         />
 
