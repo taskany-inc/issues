@@ -9,6 +9,7 @@ import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps'
 import { Page } from '../../components/Page';
 import { GoalItem } from '../../components/GoalItem';
 import { Button } from '../../components/Button';
+import { nullable } from '../../utils/nullable';
 
 const PAGE_SIZE = 5;
 
@@ -29,21 +30,27 @@ const fetcher = createFetcher((_, offset: number | undefined = 0) => ({
             state: {
                 id: true,
                 title: true,
+                hue: true,
             },
             computedActivity: {
                 id: true,
                 name: true,
                 email: true,
+                image: true,
             },
             computedOwner: {
                 id: true,
                 name: true,
                 email: true,
+                image: true,
             },
             tags: {
                 id: true,
                 title: true,
                 description: true,
+            },
+            comments: {
+                id: true,
             },
             createdAt: true,
             updatedAt: true,
@@ -84,22 +91,21 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ goalUserIndex:
     return (
         <Page locale={locale} title={t('title')}>
             <StyledGoalsList>
-                <div style={{ width: '100%' }}>
-                    {goals?.map(
-                        (goal) =>
-                            goal && (
-                                <GoalItem
-                                    createdAt={goal.createdAt}
-                                    id={goal.id}
-                                    state={goal.state}
-                                    title={goal.title}
-                                    issuer={goal.computedActivity}
-                                    owner={goal.computedOwner}
-                                    key={goal.id}
-                                />
-                            ),
-                    )}
-                </div>
+                {goals?.map((goal) =>
+                    nullable(goal, (g) => (
+                        <GoalItem
+                            createdAt={g.createdAt}
+                            id={g.id}
+                            state={g.state}
+                            title={g.title}
+                            issuer={g.computedActivity}
+                            owner={g.computedOwner}
+                            tags={g.tags}
+                            comments={g.comments?.length}
+                            key={g.id}
+                        />
+                    )),
+                )}
 
                 <StyledLoadMore>
                     {shouldRenderMoreButton && <Button text={t('Load more')} onClick={() => setSize(size + 1)} />}
