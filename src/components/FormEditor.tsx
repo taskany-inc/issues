@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { gray2, gray3, radiusS } from '../design/@generated/themes';
+import { gray2, gray3, radiusS, textColor } from '../design/@generated/themes';
 
 const Editor = dynamic(() => import('@monaco-editor/react'));
 
@@ -58,6 +58,8 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
     .monaco-editor {
         background-color: ${gray3};
 
+        color: ${textColor};
+
         .monaco-editor-background,
         .margin,
         .inputarea.ime-input {
@@ -65,6 +67,11 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
 
             transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
             transition-property: background-color;
+        }
+
+        .inputarea.ime-input,
+        .mtk1 {
+            color: ${textColor};
         }
 
         .view-overlays .current-line {
