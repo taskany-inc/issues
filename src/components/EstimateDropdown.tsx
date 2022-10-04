@@ -44,6 +44,7 @@ const StyledButtonsContainer = styled.div`
 const StyledCleanButton = styled.div`
     display: none;
     position: absolute;
+    z-index: 2;
     transform: rotate(45deg);
     top: -6px;
     right: -6px;
@@ -54,7 +55,6 @@ const StyledCleanButton = styled.div`
     font-size: 12px;
     border-radius: 100%;
     cursor: pointer;
-    pointer-events: none;
 
     background-color: ${danger8};
     color: ${textColor};
