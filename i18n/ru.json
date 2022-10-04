@@ -26,6 +26,11 @@
       "Enter name or email": "Имя или почта",
       "Flow": "Флоу",
       "Flow or state title": "Модель или статус"
+    },
+    "key": {
+      "title": "Taskany — <project></project>",
+      "key": "Ключ",
+      "Load more": "Ещё"
     }
   },
   "users": {

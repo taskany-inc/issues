@@ -1,5 +1,6 @@
 import useSWRInfinite from 'swr/infinite';
 import styled, { css } from 'styled-components';
+import { useTranslations } from 'next-intl';
 
 import { createFetcher } from '../../utils/createFetcher';
 import { Goal, Project } from '../../../graphql/@generated/genql';
@@ -125,6 +126,8 @@ const ProjectPage = ({
     ssrData,
     params: { key },
 }: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) => {
+    const t = useTranslations('projects.key');
+
     const { data, setSize, size } = useSWRInfinite(
         (index: number) => ({ offset: index * PAGE_SIZE }),
         ({ offset }) => fetcher(user, key, offset),
@@ -137,11 +140,16 @@ const ProjectPage = ({
     const project = data?.[0].project ?? ssrData.project;
 
     return (
-        <Page locale={locale} title={/* t('title') */ 'test'}>
+        <Page
+            locale={locale}
+            title={t.rich('title', {
+                project: () => project.title,
+            })}
+        >
             <ProjectHeader>
                 <StyledProjectInfo align="left">
                     <Text size="m" weight="bold" color={gray6}>
-                        {project.key}
+                        {t('key')}: {project.key}
                     </Text>
 
                     <StyledProjectTitle>
@@ -172,9 +180,7 @@ const ProjectPage = ({
                 )}
 
                 <StyledLoadMore>
-                    {shouldRenderMoreButton && (
-                        <Button text={/* t('Load more') */ 'Load'} onClick={() => setSize(size + 1)} />
-                    )}
+                    {shouldRenderMoreButton && <Button text={t('Load more')} onClick={() => setSize(size + 1)} />}
                 </StyledLoadMore>
             </StyledGoalsList>
         </Page>

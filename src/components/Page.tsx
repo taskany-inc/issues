@@ -27,7 +27,7 @@ const HotkeysModal = dynamic(() => import('./HotkeysModal'));
 
 interface PageProps {
     locale: ExternalPageProps['locale'];
-    title?: string;
+    title?: React.ReactNode;
 }
 
 const StyledContent = styled.div`

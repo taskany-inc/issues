@@ -26,6 +26,11 @@
       "Enter name or email": "Enter name or email",
       "Flow": "Flow",
       "Flow or state title": "Flow or state title"
+    },
+    "key": {
+      "title": "Taskany — <project></project>",
+      "key": "Key",
+      "Load more": "Load more"
     }
   },
   "users": {
