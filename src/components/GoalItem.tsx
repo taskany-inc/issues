@@ -4,7 +4,8 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 import type { Scalars, State, Tag, UserAnyKind } from '../../graphql/@generated/genql';
-import { gray4, textColor, gray10 } from '../design/@generated/themes';
+import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
+import { nullable } from '../utils/nullable';
 
 import { Text } from './Text';
 import { Tag as TagItem } from './Tag';
@@ -18,7 +19,7 @@ interface GoalItemProps {
     title: string;
     issuer?: UserAnyKind;
     id: string;
-    tags?: Tag[];
+    tags?: Array<Tag | undefined>;
     state?: State;
     createdAt: Scalars['DateTime'];
     owner?: UserAnyKind;
@@ -29,10 +30,12 @@ interface GoalItemProps {
 
 const StyledGoal = styled.a`
     display: grid;
-    grid-template-columns: 15px 30px 600px repeat(3, 70px);
+    grid-template-columns: 15px 30px 600px repeat(3, 40px);
     align-items: center;
+
     color: ${textColor};
     text-decoration: none;
+
     &:hover {
         background-color: ${gray4};
     }
@@ -40,19 +43,19 @@ const StyledGoal = styled.a`
         color: ${textColor};
     }
 
-    padding: 10px 24px;
+    padding: ${gapM} 0;
 `;
 
 const StyledState = styled.div`
     align-self: start;
     justify-self: center;
-    padding-top: 7px;
+
+    padding-top: 5px;
 `;
 
 const StyledNotViewed = styled.div`
     align-self: start;
     justify-self: center;
-    padding-top: 11px;
 `;
 
 const StyledNotViewedDot = styled.div`
@@ -72,34 +75,37 @@ const StyledName = styled.div`
 `;
 
 const StyledTitle = styled(Text)`
-    margin-bottom: 8px;
-    margin-right: 17px;
-    min-height: 23px;
-    margin-top: 2px;
+    margin-right: ${gapS};
 `;
 
 const StyledAddon = styled.div`
     justify-self: center;
     align-self: center;
+    vertical-align: middle;
 `;
 
-const StyledCommentsCount = styled.span`
-    font-size: 14px;
-    margin-left: 9px;
+const StyledCommentsCount = styled(Text)`
+    display: inline-block;
+    margin-left: ${gapS};
     vertical-align: top;
 `;
 
 const StyledSubTitle = styled(Text)`
     color: ${gray10};
     width: 100%;
+    padding-top: ${gapS};
 `;
 
 const StyledTags = styled.div`
-    margin-bottom: 8px;
+    padding-top: 1px;
 `;
 
 const StyledTag = styled(TagItem)`
-    margin-left: 6px;
+    margin-right: ${gapS};
+`;
+
+const StyledIcon = styled(Icon)`
+    vertical-align: middle;
 `;
 
 export const GoalItem: React.FC<GoalItemProps> = ({
@@ -120,33 +126,46 @@ export const GoalItem: React.FC<GoalItemProps> = ({
         <Link href={`/goals/${id}`} passHref>
             <StyledGoal>
                 <StyledNotViewed>{isNotViewed && <StyledNotViewedDot />}</StyledNotViewed>
-                <StyledState>{state && <StateDot size="m" hue={state.hue} />}</StyledState>
+                <StyledState>
+                    {nullable(state, (s) => (
+                        <StateDot size="m" hue={s.hue} />
+                    ))}
+                </StyledState>
 
                 <StyledName>
                     <StyledTitle size="m" weight="bold">
                         {' '}
                         {title}
                     </StyledTitle>
+
                     <StyledTags>
-                        {tags?.map(
-                            (tag) => tag && <StyledTag key={tag.id} title={tag.title} description={tag.description} />,
+                        {tags?.map((tag) =>
+                            nullable(tag, (t) => <StyledTag key={t.id} title={t.title} description={t.description} />),
                         )}
                     </StyledTags>
+
                     <StyledSubTitle size="s">
                         #{id} <RelativeTime date={createdAt} kind="created" />
                         {`  ${t('by')} ${issuer?.name}`}
                     </StyledSubTitle>
                 </StyledName>
-                <StyledAddon>{hasForks && <Icon type="gitFork" size="s" />}</StyledAddon>
+
                 <StyledAddon>
-                    {comments && (
+                    <UserPic src={owner?.image} email={owner?.email} size={24} />
+                </StyledAddon>
+
+                <StyledAddon>{hasForks && <Icon type="gitFork" size="s" />}</StyledAddon>
+
+                <StyledAddon>
+                    {comments !== 0 && (
                         <>
-                            <Icon type="message" size="s" /> <StyledCommentsCount>{comments}</StyledCommentsCount>
+                            <StyledIcon type="message" size="s" />
+                            <StyledCommentsCount size="xs" weight="bold">
+                                {comments}
+                            </StyledCommentsCount>
                         </>
                     )}
                 </StyledAddon>
-
-                <StyledAddon>{owner && <UserPic size={16} src={owner?.image} />}</StyledAddon>
             </StyledGoal>
         </Link>
     );

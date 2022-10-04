@@ -75,6 +75,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             state: true,
                         },
                     },
+                    comments: true,
                 },
             });
 
