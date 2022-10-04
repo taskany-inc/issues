@@ -192,7 +192,7 @@ type Query {
   goalUserIndex(offset: Int!, pageSize: Int!): [Goal]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
-  projectGoals(key: String!): [Goal]
+  projectGoals(key: String!, offset: Int!, pageSize: Int!): [Goal]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
   users(sortBy: SortOrder): [User]
