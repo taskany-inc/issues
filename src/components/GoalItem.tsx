@@ -36,14 +36,18 @@ const StyledGoal = styled.a`
     color: ${textColor};
     text-decoration: none;
 
+    transition: background-color 150ms ease-in;
+
     &:hover {
         background-color: ${gray4};
     }
+
     &:visited {
         color: ${textColor};
     }
 
-    padding: ${gapM} 0;
+    padding: ${gapM} 20px;
+    margin: 0 -20px;
 `;
 
 const StyledState = styled.div`
