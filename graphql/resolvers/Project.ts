@@ -1,5 +1,5 @@
 import { arg, nonNull, stringArg } from 'nexus';
-import { ObjectDefinitionBlock } from 'nexus/dist/core';
+import { intArg, ObjectDefinitionBlock } from 'nexus/dist/core';
 
 import { SortOrder, Project, computeUserFields, withComputedField, Goal } from '../types';
 
@@ -33,11 +33,15 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         type: Goal,
         args: {
             key: nonNull(stringArg()),
+            pageSize: nonNull(intArg()),
+            offset: nonNull(intArg()),
         },
-        resolve: async (_, { key }, { db, activity }) => {
+        resolve: async (_, { key, pageSize, offset }, { db, activity }) => {
             if (!activity) return null;
 
             const goals = await db.goal.findMany({
+                take: pageSize,
+                skip: offset,
                 where: {
                     project: {
                         key,
@@ -50,6 +54,26 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     activity: {
                         ...computeUserFields,
                     },
+                    tags: true,
+                    state: true,
+                    project: true,
+                    estimate: true,
+                    dependsOn: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    relatedTo: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    blocks: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    comments: true,
                 },
             });
 
