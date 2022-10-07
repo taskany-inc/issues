@@ -12,7 +12,7 @@ import rehypeStringify from 'rehype-stringify';
 // import remarkHint from 'remark-hint';
 
 // const remarkHeadingId = require('remark-heading-id');
-// const rehypePrism = require('@mapbox/rehype-prism');
+const rehypePrism = require('@mapbox/rehype-prism');
 
 // TODO: my be customized
 const headingAnchorElement = {
@@ -42,7 +42,7 @@ export const md = (s?: string) =>
         .use(remarkGFM)
         // .use(remarkHint)
         .use(remarkRehype, { allowDangerousHtml: true })
-        // .use(rehypePrism)
+        .use(rehypePrism)
         // .use(rehypeSlug)
         // @ts-ignore
         // .use(rehypeAutolinkHeadings, headingAnchorElement)
