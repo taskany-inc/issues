@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg } from 'nexus';
-import { intArg, ObjectDefinitionBlock } from 'nexus/dist/core';
+import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { SortOrder, Project, computeUserFields, withComputedField, Goal } from '../types';
+import { SortOrder, Project, computeUserFields, withComputedField, Goal, ProjectGoalsInput } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('project', {
@@ -17,6 +17,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     key,
                 },
                 include: {
+                    flow: true,
                     activity: {
                         ...computeUserFields,
                     },
@@ -32,20 +33,43 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('projectGoals', {
         type: Goal,
         args: {
-            key: nonNull(stringArg()),
-            pageSize: nonNull(intArg()),
-            offset: nonNull(intArg()),
+            projectGoals: nonNull(arg({ type: ProjectGoalsInput })),
         },
-        resolve: async (_, { key, pageSize, offset }, { db, activity }) => {
+        resolve: async (_, { projectGoals }, { db, activity }) => {
             if (!activity) return null;
 
+            const stateFilter = projectGoals.states.length
+                ? {
+                      state: {
+                          id: {
+                              in: projectGoals.states,
+                          },
+                      },
+                  }
+                : {};
+
             const goals = await db.goal.findMany({
-                take: pageSize,
-                skip: offset,
+                take: projectGoals.pageSize,
+                skip: projectGoals.offset,
                 where: {
+                    OR: [
+                        {
+                            title: {
+                                contains: projectGoals.query,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            description: {
+                                contains: projectGoals.query,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
                     project: {
-                        key,
+                        key: projectGoals.key,
                     },
+                    ...stateFilter,
                 },
                 include: {
                     owner: {
