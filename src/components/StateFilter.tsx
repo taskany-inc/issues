@@ -11,19 +11,16 @@ import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
-import { Icon } from './Icon';
-import { StateDot } from './StateDot';
 import { StateDropdownItem } from './StateDropdownItem';
+import { FiltersMenuItem } from './FiltersMenuItem';
 
-interface StateDropdownProps {
-    size?: React.ComponentProps<typeof Button>['size'];
-    view?: React.ComponentProps<typeof Button>['view'];
+interface StateFilterProps {
     disabled?: React.ComponentProps<typeof Button>['disabled'];
-    text: React.ComponentProps<typeof Button>['text'];
+    text: string;
     state?: State;
     flowId?: string;
 
-    onClick?: (state: State) => void;
+    onClick?: (selected: string[]) => void;
 }
 
 const mapThemeOnId = { light: 0, dark: 1 };
@@ -46,7 +43,7 @@ const fetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state, view, flowId, disabled, onClick }) => {
+export const StateFilter: React.FC<StateFilterProps> = ({ text, state, flowId, disabled, onClick }) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -57,6 +54,7 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
     const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
     const { theme } = useContext(pageContext);
     const [themeId, setThemeId] = useState(0); // default: dark
+    const [selected, setSelected] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         theme && setThemeId(mapThemeOnId[theme]);
@@ -72,15 +70,17 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
     }, []);
 
     const onButtonClick = useCallback(() => {
-        setPopupVisibility(true);
-    }, []);
+        setPopupVisibility(!popupVisible);
+    }, [popupVisible]);
 
     const onItemClick = useCallback(
         (s: State) => () => {
-            setPopupVisibility(false);
-            onClick && onClick(s);
+            selected.has(s.id) ? selected.delete(s.id) : selected.add(s.id);
+            setSelected(new Set(selected));
+
+            onClick && onClick(Array.from(selected));
         },
-        [onClick],
+        [onClick, selected],
     );
 
     const [onESC] = useKeyboard([KeyCode.Escape], () => popupVisible && setPopupVisibility(false));
@@ -120,15 +120,14 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
     return (
         <>
             <span ref={popupRef} {...onESC} {...onENTER}>
-                <Button
+                <FiltersMenuItem
                     ref={buttonRef}
-                    disabled={disabled}
-                    size={size}
-                    view={view}
-                    text={text}
-                    iconLeft={state ? <StateDot hue={state.hue} /> : <Icon noWrap type="flow" size="xs" />}
                     onClick={onButtonClick}
-                />
+                    disabled={disabled}
+                    active={Boolean(Array.from(selected).length)}
+                >
+                    {text}
+                </FiltersMenuItem>
             </span>
 
             <Popup
@@ -149,6 +148,7 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ size, text, state,
                             hue={s.hue}
                             title={s.title}
                             hoverColor={colors[i]}
+                            checked={selected.has(s.id)}
                             focused={s.id === state?.id || cursor === i}
                             onClick={onItemClick(s)}
                         />

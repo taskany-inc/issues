@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
@@ -11,12 +12,14 @@ import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps'
 import { nullable } from '../../utils/nullable';
 import { Text } from '../../components/Text';
 import { Input } from '../../components/Input';
-import { gapM, gapS, gray4, gray5, gray6, gray7, gray9, radiusXl, textColor } from '../../design/@generated/themes';
+import { gapM, gapS, gray4, gray5, gray6, gray7, radiusXl, textColor } from '../../design/@generated/themes';
+import { FiltersMenuItem } from '../../components/FiltersMenuItem';
+import { StateFilter } from '../../components/StateFilter';
 
 const PAGE_SIZE = 5;
 
 // @ts-ignore
-const fetcher = createFetcher((_, key: string, offset = 0) => ({
+const fetcher = createFetcher((_, key: string, offset = 0, states: string[] = [], query = '') => ({
     project: [
         {
             key,
@@ -26,6 +29,9 @@ const fetcher = createFetcher((_, key: string, offset = 0) => ({
             key: true,
             title: true,
             description: true,
+            flow: {
+                id: true,
+            },
             createdAt: true,
             computedActivity: {
                 id: true,
@@ -37,9 +43,13 @@ const fetcher = createFetcher((_, key: string, offset = 0) => ({
     ],
     projectGoals: [
         {
-            key,
-            offset,
-            pageSize: PAGE_SIZE,
+            projectGoals: {
+                key,
+                offset,
+                pageSize: PAGE_SIZE,
+                states,
+                query,
+            },
         },
         {
             id: true,
@@ -163,23 +173,6 @@ const StyledFiltersMenu = styled.div`
     padding-left: ${gapM};
 `;
 
-const StyledFiltersMenuItem = styled.div<{ active?: boolean }>`
-    display: inline-block;
-    padding: ${gapS};
-
-    border-radius: ${radiusXl};
-
-    font-weight: 600;
-
-    color: ${gray9};
-
-    ${({ active }) =>
-        active &&
-        css`
-            color: ${textColor};
-        `}
-`;
-
 const ProjectPage = ({
     user,
     locale,
@@ -187,17 +180,25 @@ const ProjectPage = ({
     params: { key },
 }: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) => {
     const t = useTranslations('projects.key');
+    const [fulltextFilter, setFulltextFilter] = useState('');
+    const [stateFilter, setStateFilter] = useState<string[]>();
 
     const { data, setSize, size } = useSWRInfinite(
-        (index: number) => ({ offset: index * PAGE_SIZE }),
-        ({ offset }) => fetcher(user, key, offset),
+        (index: number) => ({ offset: index * PAGE_SIZE, stateFilter, fulltextFilter }),
+        ({ offset, stateFilter, fulltextFilter }) => fetcher(user, key, offset, stateFilter, fulltextFilter),
     );
 
     const shouldRenderMoreButton = data?.[data.length - 1]?.projectGoals?.length === PAGE_SIZE;
 
     // FIXME: https://github.com/taskany-inc/issues/issues/107
-    const goals = data?.map((chunk) => chunk.projectGoals).flat() ?? ssrData.projectGoals;
+    const goals = fulltextFilter
+        ? data?.map((chunk) => chunk.projectGoals).flat()
+        : data?.map((chunk) => chunk.projectGoals).flat() ?? ssrData.projectGoals;
     const project = data?.[0].project ?? ssrData.project;
+
+    const onSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setFulltextFilter(e.currentTarget.value);
+    }, []);
 
     return (
         <Page
@@ -230,13 +231,13 @@ const ProjectPage = ({
 
             <StyledFiltersPanel>
                 <StyledFiltersContent>
-                    <Input placeholder="Search" />
+                    <Input placeholder="Search" onChange={onSearchChange} />
 
                     <StyledFiltersMenu>
-                        <StyledFiltersMenuItem>State</StyledFiltersMenuItem>
-                        <StyledFiltersMenuItem active>Owner</StyledFiltersMenuItem>
-                        <StyledFiltersMenuItem>Tags</StyledFiltersMenuItem>
-                        <StyledFiltersMenuItem active>Sort</StyledFiltersMenuItem>
+                        <StateFilter text="State" flowId={project.flow?.id} onClick={setStateFilter} />
+                        <FiltersMenuItem>Owner</FiltersMenuItem>
+                        <FiltersMenuItem>Tags</FiltersMenuItem>
+                        <FiltersMenuItem>Sort</FiltersMenuItem>
                     </StyledFiltersMenu>
 
                     <div style={{ textAlign: 'right' }}>

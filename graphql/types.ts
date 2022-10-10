@@ -360,6 +360,17 @@ export const CommentInputType = inputObjectType({
     },
 });
 
+export const ProjectGoalsInput = inputObjectType({
+    name: 'ProjectGoalsInput',
+    definition(t) {
+        t.nonNull.string('key');
+        t.nonNull.int('pageSize');
+        t.nonNull.int('offset');
+        t.nonNull.list.nonNull.string('states');
+        t.nonNull.string('query');
+    },
+});
+
 export const computeUserFields = {
     include: {
         user: true,
