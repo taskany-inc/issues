@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { link10 } from '../design/@generated/themes';
 import { md } from '../utils/md';
-
-import { PrismCss } from './PrismStyle';
+import { pageContext } from '../utils/pageContext';
 
 const StyledMd = styled.div`
     a {
@@ -27,11 +27,21 @@ interface MdProps {
     children?: string;
 }
 
-const Md: React.FC<MdProps> = ({ children }) => (
-    <>
-        <PrismCss />
-        <StyledMd dangerouslySetInnerHTML={{ __html: md(children) }} />
-    </>
-);
+const themes = {
+    dark: dynamic(() => import('../design/prismThemes/DarkPrismCss')),
+    light: dynamic(() => import('../design/prismThemes/LightPrismCss')),
+};
+
+const Md: React.FC<MdProps> = ({ children }) => {
+    const { theme } = useContext(pageContext);
+
+    const PrismCss = theme ? themes[theme] : themes.dark;
+    return (
+        <>
+            <PrismCss />
+            <StyledMd dangerouslySetInnerHTML={{ __html: md(children) }} />
+        </>
+    );
+};
 
 export default Md;
