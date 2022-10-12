@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { Scalars, User } from '../../graphql/@generated/genql';
 import { brandColor, gray4 } from '../design/@generated/themes';
 
-import { Card, CardContent, CardInfo } from './Card';
+import { Card, CardComment, CardInfo } from './Card';
 import { Link } from './Link';
 import { UserPic } from './UserPic';
 
@@ -31,7 +31,7 @@ const StyledComment = styled.div`
 
 const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
     position: relative;
-    min-height: 90px;
+    min-height: 60px;
 
     transition: border-color 200ms ease-in-out;
 
@@ -83,9 +83,9 @@ export const Comment: FC<CommentProps> = ({ id, author, description, createdAt, 
                     </Link>
                 </CardInfo>
 
-                <CardContent>
+                <CardComment>
                     <Md>{description}</Md>
-                </CardContent>
+                </CardComment>
             </StyledCommentCard>
         </StyledComment>
     );

@@ -19,6 +19,12 @@ export const CardContent = styled.div`
     padding: 12px 14px 60px;
 `;
 
+export const CardComment = styled.div`
+    position: relative;
+    box-sizing: border-box;
+    padding: 12px 14px 12px;
+`;
+
 const StyledCardInfo = styled(Text)`
     position: relative;
     box-sizing: border-box;
