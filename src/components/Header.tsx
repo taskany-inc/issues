@@ -70,7 +70,7 @@ export const Header: React.FC = () => {
                 <NextLink href={'#'} passHref>
                     <StyledHeaderNavLink>{t('Boards')}</StyledHeaderNavLink>
                 </NextLink>
-                <NextLink href={'#'} passHref>
+                <NextLink href={routes.exploreProjects()} passHref>
                     <StyledHeaderNavLink>{t('Explore')}</StyledHeaderNavLink>
                 </NextLink>
 

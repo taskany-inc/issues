@@ -7,11 +7,11 @@ export const routes = {
     index: () => '/',
     goals: () => '/goals',
     goal: (id: string) => `/goals/${id}`,
-    projects: () => '/projects',
     project: (id: string) => `/projects/${id}`,
     userSettings: () => '/users/settings',
     signIn: () => '/api/auth/signin',
     help: (locale: TLocale, slug: AvailableHelpPages) => `/help/${locale}/${slug}`,
+    exploreProjects: () => '/explore/projects',
 };
 
 export const useRouter = () => {
@@ -19,10 +19,10 @@ export const useRouter = () => {
 
     return {
         index: () => router.push(routes.index()),
-        projects: () => router.push(routes.projects()),
         project: (id: string) => router.push(routes.project(id)),
         goals: () => router.push(routes.goals()),
         goal: (id: string) => router.push(routes.goal(id)),
         userSettings: () => router.push(routes.userSettings()),
+        exploreProjects: () => router.push(routes.exploreProjects()),
     };
 };

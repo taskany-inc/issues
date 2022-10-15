@@ -4,7 +4,9 @@
   },
   "projects": {
     "index": {
-      "title": "Taskany Goals — Projects"
+      "title": "Taskany — Explore",
+      "explore": "Explore",
+      "see what the Taskany community is most excited about today": "See what the Taskany community is most excited about today"
     },
     "new": {
       "title": "Taskany Goals — New project",

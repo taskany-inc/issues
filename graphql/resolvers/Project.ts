@@ -4,6 +4,25 @@ import { ObjectDefinitionBlock } from 'nexus/dist/core';
 import { SortOrder, Project, computeUserFields, withComputedField, Goal, ProjectGoalsInput } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
+    t.list.field('projects', {
+        type: Project,
+        resolve: async (_, __, { db, activity }) => {
+            if (!activity) return null;
+
+            const projects = await db.project.findMany({
+                include: {
+                    activity: {
+                        ...computeUserFields,
+                    },
+                },
+            });
+
+            if (!projects.length) return null;
+
+            return projects.map(withComputedField('owner', 'activity'));
+        },
+    });
+
     t.field('project', {
         type: Project,
         args: {
