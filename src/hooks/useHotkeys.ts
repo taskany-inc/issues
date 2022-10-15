@@ -13,7 +13,7 @@ export const useHotkeys = () => {
             window,
             createHotkeys(
                 [showHomeKeys, () => router.index()],
-                [showProjectsKeys, () => router.projects()],
+                [showProjectsKeys, () => router.exploreProjects()],
                 [showGoalsKeys, () => router.goals()],
             ),
         );

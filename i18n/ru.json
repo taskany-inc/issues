@@ -4,7 +4,9 @@
   },
   "projects": {
     "index": {
-      "title": "Taskany Goals — Проекты"
+      "title": "Taskany — Обзор",
+      "explore": "Обзор",
+      "see what the Taskany community is most excited about today": "Смотри чем пользователи Taskany интересуются сегодня"
     },
     "new": {
       "title": "Taskany Goals — Новый проект",
@@ -208,7 +210,7 @@
     "dependsOn": "Зависит от",
     "blocks": "Заблокировано",
     "relatedTo": "Связано",
-    "Does issue have dependencies": "Ни от чего не зависит?",
+    "Does issue have dependencies": "Ни от чего не зависит",
     "Add one": "Добавить",
     "Add dependency": "Добавить зависимость",
     "Kind": "Тип зависимости"

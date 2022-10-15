@@ -12,9 +12,10 @@ import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps'
 import { nullable } from '../../utils/nullable';
 import { Text } from '../../components/Text';
 import { Input } from '../../components/Input';
-import { gapM, gapS, gray4, gray5, gray6, gray7, radiusXl, textColor } from '../../design/@generated/themes';
+import { gapM, gapS, gray5, gray6 } from '../../design/@generated/themes';
 import { FiltersMenuItem } from '../../components/FiltersMenuItem';
 import { StateFilter } from '../../components/StateFilter';
+import { TabsMenu, TabsMenuItem } from '../../components/TabsMenu';
 
 const PAGE_SIZE = 5;
 
@@ -145,30 +146,6 @@ const StyledFiltersContent = styled(PageContent)`
     align-items: center;
 `;
 
-const StyledProjectMenu = styled.div`
-    padding: ${gapM} 0 0;
-
-    margin-left: -6px; // radius compensation
-`;
-
-const StyledProjectMenuItem = styled.div<{ active?: boolean }>`
-    display: inline-block;
-    padding: ${gapS} ${gapM};
-
-    border-radius: ${radiusXl};
-
-    color: ${gray7};
-
-    ${({ active }) =>
-        active &&
-        css`
-            font-weight: 600;
-            color: ${textColor};
-
-            background-color: ${gray4};
-        `}
-`;
-
 const StyledFiltersMenu = styled.div`
     padding-left: ${gapM};
 `;
@@ -219,13 +196,13 @@ const ProjectPage = ({
                         </Text>
                     </StyledProjectTitle>
 
-                    <StyledProjectMenu>
-                        <StyledProjectMenuItem active>Goals</StyledProjectMenuItem>
-                        <StyledProjectMenuItem>Issues</StyledProjectMenuItem>
-                        <StyledProjectMenuItem>Boards</StyledProjectMenuItem>
-                        <StyledProjectMenuItem>Wiki</StyledProjectMenuItem>
-                        <StyledProjectMenuItem>Settings</StyledProjectMenuItem>
-                    </StyledProjectMenu>
+                    <TabsMenu>
+                        <TabsMenuItem active>Goals</TabsMenuItem>
+                        <TabsMenuItem>Issues</TabsMenuItem>
+                        <TabsMenuItem>Boards</TabsMenuItem>
+                        <TabsMenuItem>Wiki</TabsMenuItem>
+                        <TabsMenuItem>Settings</TabsMenuItem>
+                    </TabsMenu>
                 </StyledProjectInfo>
             </ProjectHeader>
 
