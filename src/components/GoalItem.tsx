@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
+import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, UserAnyKind } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
@@ -127,7 +128,7 @@ export const GoalItem: React.FC<GoalItemProps> = ({
     const t = useTranslations('goals.item');
 
     return (
-        <Link href={`/goals/${id}`} passHref>
+        <Link href={routes.goal(id)} passHref>
             <StyledGoal>
                 <StyledNotViewed>{isNotViewed && <StyledNotViewedDot />}</StyledNotViewed>
                 <StyledState>
