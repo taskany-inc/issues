@@ -45,8 +45,6 @@ const StyledProjectItem = styled.a`
 const StyledName = styled.div`
     width: 800px;
     max-width: 100%;
-    display: flex;
-    flex-wrap: wrap;
 `;
 
 const StyledTitle = styled(Text)``;
