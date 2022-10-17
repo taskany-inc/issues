@@ -18,14 +18,24 @@ export const TabsMenuItem = styled.div<{ active?: boolean }>`
 
     cursor: pointer;
 
+    &:first-child {
+        padding-left: 6px;
+    }
+
     ${({ active }) =>
         active &&
         css`
+            padding: ${gapS} ${gapM};
+
             font-weight: 600;
             color: ${textColor};
 
             cursor: default;
 
             background-color: ${gray4};
+
+            &:first-child {
+                padding: ${gapS} ${gapM};
+            }
         `}
 `;
