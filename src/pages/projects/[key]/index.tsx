@@ -1,21 +1,24 @@
 import { useCallback, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
+import NextLink from 'next/link';
 
-import { createFetcher } from '../../utils/createFetcher';
-import { Goal, Project } from '../../../graphql/@generated/genql';
-import { Page, PageContent } from '../../components/Page';
-import { Button } from '../../components/Button';
-import { GoalItem } from '../../components/GoalItem';
-import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
-import { nullable } from '../../utils/nullable';
-import { Text } from '../../components/Text';
-import { Input } from '../../components/Input';
-import { gapM, gapS, gray5, gray6 } from '../../design/@generated/themes';
-import { FiltersMenuItem } from '../../components/FiltersMenuItem';
-import { StateFilter } from '../../components/StateFilter';
-import { TabsMenu, TabsMenuItem } from '../../components/TabsMenu';
+import { routes } from '../../../hooks/router';
+import { createFetcher } from '../../../utils/createFetcher';
+import { Goal, Project } from '../../../../graphql/@generated/genql';
+import { Page, PageContent } from '../../../components/Page';
+import { Button } from '../../../components/Button';
+import { GoalItem } from '../../../components/GoalItem';
+import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { nullable } from '../../../utils/nullable';
+import { Input } from '../../../components/Input';
+import { gapM, gapS, gray5 } from '../../../design/@generated/themes';
+import { FiltersMenuItem } from '../../../components/FiltersMenuItem';
+import { StateFilter } from '../../../components/StateFilter';
+import { CommonHeader } from '../../../components/CommonHeader';
+import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
+import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 
 const PAGE_SIZE = 5;
 
@@ -30,6 +33,7 @@ const fetcher = createFetcher((_, key: string, offset = 0, states: string[] = []
             key: true,
             title: true,
             description: true,
+            activityId: true,
             flow: {
                 id: true,
             },
@@ -108,29 +112,6 @@ const StyledLoadMore = styled.div`
     margin: 50px 40px;
 `;
 
-const ProjectHeader = styled(PageContent)`
-    display: grid;
-    grid-template-columns: 8fr 4fr;
-`;
-
-const StyledProjectTitle = styled.div`
-    padding-top: ${gapM};
-`;
-
-const StyledProjectInfo = styled.div<{ align: 'left' | 'right' }>`
-    ${({ align }) => css`
-        justify-self: ${align};
-    `}
-
-    ${({ align }) =>
-        align === 'right' &&
-        css`
-            display: grid;
-            justify-items: end;
-            align-content: space-between;
-        `}
-`;
-
 const StyledFiltersPanel = styled.div`
     margin: ${gapM} 0;
     padding: ${gapS} 0;
@@ -184,27 +165,24 @@ const ProjectPage = ({
                 project: () => project.title,
             })}
         >
-            <ProjectHeader>
-                <StyledProjectInfo align="left">
-                    <Text size="m" weight="bold" color={gray6}>
-                        {t('key')}: {project.key}
-                    </Text>
+            <CommonHeader
+                preTitle={`${t('key')}: ${project.key}`}
+                title={project.title}
+                description={project.description}
+            >
+                <TabsMenu>
+                    <TabsMenuItem active>Goals</TabsMenuItem>
+                    <TabsMenuItem>Issues</TabsMenuItem>
+                    <TabsMenuItem>Boards</TabsMenuItem>
+                    <TabsMenuItem>Wiki</TabsMenuItem>
 
-                    <StyledProjectTitle>
-                        <Text size="xxl" weight="bolder">
-                            {project.title}
-                        </Text>
-                    </StyledProjectTitle>
-
-                    <TabsMenu>
-                        <TabsMenuItem active>Goals</TabsMenuItem>
-                        <TabsMenuItem>Issues</TabsMenuItem>
-                        <TabsMenuItem>Boards</TabsMenuItem>
-                        <TabsMenuItem>Wiki</TabsMenuItem>
-                        <TabsMenuItem>Settings</TabsMenuItem>
-                    </TabsMenu>
-                </StyledProjectInfo>
-            </ProjectHeader>
+                    {nullable(user.activityId === project.activityId, () => (
+                        <NextLink href={routes.projectSettings(key)} passHref>
+                            <TabsMenuItem>Settings</TabsMenuItem>
+                        </NextLink>
+                    ))}
+                </TabsMenu>
+            </CommonHeader>
 
             <StyledFiltersPanel>
                 <StyledFiltersContent>
@@ -218,7 +196,12 @@ const ProjectPage = ({
                     </StyledFiltersMenu>
 
                     <div style={{ textAlign: 'right' }}>
-                        <Button view="primary" size="m" text="New goal" />
+                        <Button
+                            view="primary"
+                            size="m"
+                            text="New goal"
+                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                        />
                     </div>
                 </StyledFiltersContent>
             </StyledFiltersPanel>
