@@ -16,11 +16,15 @@ export const TabsMenuItem = styled.div<{ active?: boolean }>`
 
     color: ${gray7};
 
+    cursor: pointer;
+
     ${({ active }) =>
         active &&
         css`
             font-weight: 600;
             color: ${textColor};
+
+            cursor: default;
 
             background-color: ${gray4};
         `}

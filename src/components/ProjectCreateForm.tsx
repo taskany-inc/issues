@@ -170,10 +170,12 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
         const promise = gql.mutation({
             createProject: [
                 {
-                    key: projectKey,
-                    title,
-                    description,
-                    flowId: flow.id,
+                    data: {
+                        key: projectKey,
+                        title,
+                        description,
+                        flowId: flow.id,
+                    },
                 },
                 {
                     id: true,

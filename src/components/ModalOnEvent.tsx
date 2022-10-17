@@ -10,9 +10,10 @@ interface ModalOnEventProps {
     event: ModalEvent;
     hotkeys?: string[];
     visible?: boolean;
+    view?: React.ComponentProps<typeof Modal>['view'];
 }
 
-const ModalOnEvent: React.FC<ModalOnEventProps> = ({ event, hotkeys, visible = false, children }) => {
+const ModalOnEvent: React.FC<ModalOnEventProps> = ({ event, hotkeys, visible = false, view, children }) => {
     const [modalVisible, setModalVisibility] = useState(visible);
     const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
 
@@ -22,17 +23,17 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({ event, hotkeys, visible = f
         }
     }, [hotkeys]);
 
-    const globalListener = () => setModalVisibility(true);
+    const globalListener = useCallback(() => setModalVisibility(!modalVisible), [modalVisible]);
     useEffect(() => {
         window.addEventListener(event, globalListener);
 
         return () => {
             window.removeEventListener(event, globalListener);
         };
-    }, [event]);
+    }, [event, globalListener]);
 
     return (
-        <Modal visible={modalVisible} onClose={onModalClose}>
+        <Modal view={view} visible={modalVisible} onClose={onModalClose}>
             {children}
         </Modal>
     );

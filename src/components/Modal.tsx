@@ -1,17 +1,26 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { backgroundColor, gapM, radiusM } from '../design/@generated/themes';
+import { backgroundColor, danger0, gapM, radiusM, warn0 } from '../design/@generated/themes';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { usePortal } from '../hooks/usePortal';
 import { nullable } from '../utils/nullable';
 
 import { Icon } from './Icon';
 
+type ModalViewType = 'default' | 'warn' | 'danger';
+
+const colorsMap: Record<ModalViewType, string> = {
+    default: 'transparent',
+    warn: warn0,
+    danger: danger0,
+};
+
 interface ModalProps {
     visible: boolean;
     width?: number;
+    view?: ModalViewType;
 
     onClose?: () => void;
 }
@@ -34,7 +43,7 @@ const StyledModalSurface = styled.div`
     background-color: rgba(0, 0, 0, 0.9);
 `;
 
-const StyledModal = styled.div`
+const StyledModal = styled.div<{ view?: ModalViewType }>`
     box-sizing: border-box;
     position: absolute;
     z-index: 101;
@@ -47,6 +56,10 @@ const StyledModal = styled.div`
     border-radius: ${radiusM};
 
     background-color: ${backgroundColor};
+
+    ${({ view = 'default' }) => css`
+        border: 1px solid ${colorsMap[view]};
+    `}
 `;
 
 const StyledCross = styled.div`
@@ -72,7 +85,7 @@ const StyledCross = styled.div`
 
 const Portal: React.FC<{ id: string }> = ({ id, children }) => createPortal(children, usePortal(id));
 
-export const Modal: React.FC<ModalProps> = ({ visible, onClose, children, width = 800 }) => {
+export const Modal: React.FC<ModalProps> = ({ visible, view, onClose, children, width = 800 }) => {
     const [onESC] = useKeyboard([KeyCode.Escape], () => onClose && onClose(), {
         disableGlobalEvent: false,
     });
@@ -92,7 +105,7 @@ export const Modal: React.FC<ModalProps> = ({ visible, onClose, children, width 
             {nullable(visible, () => (
                 <Portal id="modal">
                     <StyledModalSurface>
-                        <StyledModal style={{ width: `${width}px` }} {...onESC}>
+                        <StyledModal view={view} style={{ width: `${width}px` }} {...onESC}>
                             {nullable(onClose, () => (
                                 <StyledCross onClick={onClose}>
                                     <Icon type="cross" size="s" />

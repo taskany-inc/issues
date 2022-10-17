@@ -153,13 +153,15 @@ input GoalSubscriptionInput {
 type Mutation {
   createComment(authorId: String!, description: String!, goalId: String!): Comment
   createGoal(goal: GoalCreateInput!): Goal
-  createProject(description: String, flowId: String!, key: String!, title: String!): Project
+  createProject(data: ProjectInput!): Project
   createTag(description: String, title: String!): Tag
+  deleteProject(data: ProjectDelete!): Project
   toggleGoalDependency(toggle: GoalDependencyInput!): Goal
   toggleGoalStargizer(toggle: GoalSubscriptionInput!): Activity
   toggleGoalWatcher(toggle: GoalSubscriptionInput!): Activity
   toggleReaction(reaction: ReactionInput!): Reaction
   updateGoal(goal: GoalInput!): Goal
+  updateProject(data: ProjectInput!): Project
   updateSettings(data: SettingsInput!): Settings
   updateUser(data: UserInput!): User
   usersInvites(input: UserInvitesInput!): [Ghost]
@@ -172,6 +174,7 @@ type Project {
   createdAt: DateTime!
   description: String
   flow: Flow
+  flowId: String!
   goals: [Goal]
   id: Int!
   key: String!
@@ -180,12 +183,23 @@ type Project {
   updatedAt: DateTime!
 }
 
+input ProjectDelete {
+  key: String!
+}
+
 input ProjectGoalsInput {
   key: String!
   offset: Int!
   pageSize: Int!
   query: String!
   states: [String!]!
+}
+
+input ProjectInput {
+  description: String
+  flowId: String!
+  key: String!
+  title: String!
 }
 
 type Query {

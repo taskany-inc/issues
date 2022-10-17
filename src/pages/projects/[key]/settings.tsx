@@ -255,7 +255,7 @@ const ProjectPage = ({
                             <FormActions flat="top">
                                 <FormAction left>
                                     <Text color={gray9} style={{ paddingLeft: gapS }}>
-                                        Be careful! All data will be lost.
+                                        {t('Be careful! All data will be lost')}
                                     </Text>
                                 </FormAction>
                                 <FormAction right inline>
@@ -274,13 +274,15 @@ const ProjectPage = ({
 
             <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
                 <Text color={warn0}>
-                    <h2>You are trying to delete project</h2>
+                    <h2>{t('You are trying to delete project')}</h2>
                 </Text>
 
                 <br />
 
                 <Text>
-                    To confirm deleting project <b>{project.title}</b> please type project key below.
+                    {t.rich('To confirm deleting project please type project key below', {
+                        project: () => <b>{project.title}</b>,
+                    })}
                 </Text>
 
                 <br />
@@ -296,13 +298,13 @@ const ProjectPage = ({
                     <FormActions flat="top">
                         <FormAction left />
                         <FormAction right inline>
-                            <Button size="m" text={'Cancel'} onClick={onDeleteCancel} />
+                            <Button size="m" text={t('Cancel')} onClick={onDeleteCancel} />
                             <Button
                                 size="m"
                                 view="warning"
                                 disabled={deleteConfirmation !== project.key}
                                 onClick={onProjectDelete}
-                                text={'Yes, delete it'}
+                                text={t('Yes, delete it')}
                             />
                         </FormAction>
                     </FormActions>
