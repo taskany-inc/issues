@@ -1,7 +1,16 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { SortOrder, Project, computeUserFields, withComputedField, Goal, ProjectGoalsInput } from '../types';
+import {
+    SortOrder,
+    Project,
+    computeUserFields,
+    withComputedField,
+    Goal,
+    ProjectGoalsInput,
+    ProjectInputType,
+    ProjectDeleteType,
+} from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('projects', {
@@ -17,7 +26,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
             });
 
-            if (!projects.length) return null;
+            if (!projects.length) return [];
 
             return projects.map(withComputedField('owner', 'activity'));
         },
@@ -165,12 +174,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('createProject', {
         type: Project,
         args: {
-            key: nonNull(stringArg()),
-            title: nonNull(stringArg()),
-            description: stringArg(),
-            flowId: nonNull(stringArg()),
+            data: nonNull(arg({ type: ProjectInputType })),
         },
-        resolve: async (_, { key, title, description, flowId }, { db, activity }) => {
+        resolve: async (_, { data: { key, title, description, flowId } }, { db, activity }) => {
             if (!activity) return null;
 
             try {
@@ -182,6 +188,59 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         activityId: activity.id,
                         flowId,
                     },
+                });
+
+                // await mailServer.sendMail({
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('updateProject', {
+        type: Project,
+        args: {
+            data: nonNull(arg({ type: ProjectInputType })),
+        },
+        resolve: async (_, { data: { key, ...data } }, { db, activity }) => {
+            if (!activity) return null;
+
+            try {
+                return db.project.update({
+                    where: { key },
+                    data,
+                });
+
+                // await mailServer.sendMail({
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('deleteProject', {
+        type: Project,
+        args: {
+            data: nonNull(arg({ type: ProjectDeleteType })),
+        },
+        resolve: async (_, { data: { key } }, { db, activity }) => {
+            if (!activity) return null;
+
+            try {
+                return db.project.delete({
+                    where: { key },
                 });
 
                 // await mailServer.sendMail({

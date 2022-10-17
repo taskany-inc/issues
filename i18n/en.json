@@ -33,6 +33,28 @@
       "title": "Taskany — <project></project>",
       "key": "Key",
       "Load more": "Load more"
+    },
+    "settings": {
+      "title": "Taskany — <project></project> — Settings",
+      "Settings": "Settings",
+      "key": "Key",
+      "Project's title is required": "Project's title is required",
+      "Project's title must be a string": "Project's title must be a string",
+      "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
+      "General": "General",
+      "Title": "Title",
+      "Description": "Description",
+      "Save": "Save",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are updating project settings": "We are updating project settings",
+      "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",
+      "Danger zone": "Danger zone",
+      "Delete project": "Delete project",
+      "Be careful! All data will be lost": "Be careful! All data will be lost.",
+      "You are trying to delete project": "You are trying to delete project",
+      "To confirm deleting project please type project key below": "To confirm deleting project <project></project> please type project key below.",
+      "Yes, delete it": "Yes, delete it",
+      "Cancel": "Cancel"
     }
   },
   "users": {
@@ -50,8 +72,12 @@
       "Start typing users emails": "Start typing users emails. Press <key1></key1> or <key2></key2> then."
     },
     "settings": {
+      "title": "Taskany — <user></user> — Settings",
       "Settings": "Settings",
       "General": "General",
+      "Email": "Email",
+      "Name": "Name",
+      "Nickname": "Nickname",
       "Appearance": "Appearance",
       "User name is required": "User name is required",
       "User name must be a string": "User name must be a string",
@@ -60,7 +86,7 @@
       "We are updating user settings": "We are updating user settings",
       "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",
       "Pro tip!": "Pro tip!",
-      "Press key to save setting": "Press <key></key> to save setting.",
+      "Press key to save settings": "Press <key></key> to save settings.",
       "Save": "Save"
     }
   },

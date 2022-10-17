@@ -102,6 +102,7 @@ export const Project = objectType({
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
         t.field(ProjectModel.activityId);
+        t.field(ProjectModel.flowId);
         t.field('activity', { type: Activity });
         t.field('computedActivity', { type: UserAnyKind });
         t.list.field('goals', { type: Goal });
@@ -357,6 +358,23 @@ export const CommentInputType = inputObjectType({
         t.field(CommentModel.description);
         t.field(CommentModel.goalId);
         t.field(CommentModel.activityId);
+    },
+});
+
+export const ProjectInputType = inputObjectType({
+    name: 'ProjectInput',
+    definition(t) {
+        t.field(ProjectModel.key);
+        t.field(ProjectModel.title);
+        t.field(ProjectModel.description);
+        t.field(ProjectModel.flowId);
+    },
+});
+
+export const ProjectDeleteType = inputObjectType({
+    name: 'ProjectDelete',
+    definition(t) {
+        t.field(ProjectModel.key);
     },
 });
 

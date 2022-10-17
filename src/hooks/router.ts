@@ -8,6 +8,7 @@ export const routes = {
     goals: () => '/goals',
     goal: (id: string) => `/goals/${id}`,
     project: (id: string) => `/projects/${id}`,
+    projectSettings: (id: string) => `/projects/${id}/settings`,
     userSettings: () => '/users/settings',
     signIn: () => '/api/auth/signin',
     help: (locale: TLocale, slug: AvailableHelpPages) => `/help/${locale}/${slug}`,
@@ -20,6 +21,7 @@ export const useRouter = () => {
     return {
         index: () => router.push(routes.index()),
         project: (id: string) => router.push(routes.project(id)),
+        projectSettings: (id: string) => router.push(routes.projectSettings(id)),
         goals: () => router.push(routes.goals()),
         goal: (id: string) => router.push(routes.goal(id)),
         userSettings: () => router.push(routes.userSettings()),

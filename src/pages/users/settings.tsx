@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,13 +11,11 @@ import { gql } from '../../utils/gql';
 import { shallowEqual } from '../../utils/shallowEqual';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
-import { gapM, gapS, gray9, star10 } from '../../design/@generated/themes';
+import { star10 } from '../../design/@generated/themes';
 import { Settings, User } from '../../../graphql/@generated/genql';
 import { useMounted } from '../../hooks/useMounted';
-import { Page, PageContent } from '../../components/Page';
-import { Text } from '../../components/Text';
+import { Page } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
-import { FormCard } from '../../components/FormCard';
 import { FormInput } from '../../components/FormInput';
 import { Form } from '../../components/Form';
 import { Tip } from '../../components/Tip';
@@ -28,28 +25,10 @@ import { FormAction, FormActions } from '../../components/FormActions';
 import { Button } from '../../components/Button';
 import { Fieldset } from '../../components/Fieldset';
 import { FormRadio, FormRadioInput } from '../../components/FormRadio';
+import { CommonHeader } from '../../components/CommonHeader';
+import { SettingsCard, SettingsContent } from '../../components/SettingsContent';
 
 const refreshInterval = 3000;
-
-const StyledUserName = styled(Text)`
-    padding-top: ${gapM};
-`;
-
-const StyledPageTitle = styled(Text)`
-    padding-top: ${gapS};
-`;
-
-const StyledUserContent = styled(PageContent)`
-    display: grid;
-    grid-template-columns: 7fr 5fr;
-`;
-
-const StyledSettingsCards = styled.div``;
-const StyledFormCard = styled(FormCard)`
-    & + & {
-        margin-top: ${gapM};
-    }
-`;
 
 const fetcher = createFetcher(() => ({
     settings: {
@@ -69,9 +48,17 @@ export const getServerSideProps = declareSsrProps(
 
 const UserSettingsPage = ({ user, locale, ssrData }: ExternalPageProps<{ settings: Settings }>) => {
     const t = useTranslations('users.settings');
+
+    const mounted = useMounted(refreshInterval);
+    const { data: settingsData } = useSWR(mounted ? 'settings' : null, () => fetcher(), {
+        refreshInterval,
+    });
+    // this line is compensation for first render before delayed swr will bring updates
+    const settings = settingsData?.settings ?? ssrData.settings;
+
     const [actualUserFields, setActualUserFields] = useState<Pick<User, 'name' | 'nickname'>>({
-        name: user?.name,
-        nickname: user?.nickname || '',
+        name: user.name,
+        nickname: user.nickname || '',
     });
     const [generalFormChanged, setGeneralFormChanged] = useState(false);
 
@@ -131,16 +118,9 @@ const UserSettingsPage = ({ user, locale, ssrData }: ExternalPageProps<{ setting
         }
     };
 
-    const mounted = useMounted(refreshInterval);
-    const { data: settingsData } = useSWR(mounted ? 'settings' : null, () => fetcher(), {
-        refreshInterval,
-    });
-
-    // this line is compensation for first render before delayed swr will bring updates
-    const settings = settingsData?.settings ?? ssrData.settings;
     const [appearanceTheme, setAppearanceTheme] = useState(settings.theme);
-
     const { resolvedTheme, setTheme } = useTheme();
+
     const onAppearanceThemeChange = useCallback(
         async (theme?: string) => {
             if (!theme) return;
@@ -180,99 +160,88 @@ const UserSettingsPage = ({ user, locale, ssrData }: ExternalPageProps<{ setting
     }, [setTheme, appearanceTheme, resolvedTheme]);
 
     return (
-        <Page locale={locale} title={`${t('Settings')} — ${actualUserFields?.name}`}>
-            <PageContent>
-                <StyledUserName size="l" weight="bold" color={gray9}>
-                    {actualUserFields?.name}
-                </StyledUserName>
-                <StyledPageTitle size="xxl" weight="bolder">
-                    {t('Settings')}
-                </StyledPageTitle>
-            </PageContent>
+        <Page
+            locale={locale}
+            title={t.rich('title', {
+                user: () => actualUserFields?.name,
+            })}
+        >
+            <CommonHeader preTitle={`Id: ${user.id}`} title={t('Settings')} />
 
             <PageSep />
 
-            <StyledUserContent>
-                <StyledSettingsCards>
-                    <StyledFormCard>
-                        <Form onSubmit={generalForm.handleSubmit(updateUser)}>
-                            <Fieldset title={t('General')}>
-                                <FormInput
-                                    disabled
-                                    defaultValue={user?.email}
-                                    label="Email"
-                                    autoComplete="off"
-                                    flat="bottom"
-                                    error={
-                                        generalForm.formState.isSubmitted
-                                            ? generalForm.formState.errors.name
-                                            : undefined
-                                    }
+            <SettingsContent>
+                <SettingsCard>
+                    <Form onSubmit={generalForm.handleSubmit(updateUser)}>
+                        <Fieldset title={t('General')}>
+                            <FormInput
+                                disabled
+                                defaultValue={user.email}
+                                label={t('Email')}
+                                autoComplete="off"
+                                flat="bottom"
+                            />
+
+                            <FormInput
+                                {...generalForm.register('name')}
+                                label={t('Name')}
+                                autoComplete="off"
+                                flat="bottom"
+                                error={
+                                    generalForm.formState.isSubmitted ? generalForm.formState.errors.name : undefined
+                                }
+                            />
+
+                            <FormInput
+                                {...generalForm.register('nickname')}
+                                label={t('Nickname')}
+                                flat="both"
+                                error={
+                                    generalForm.formState.isSubmitted
+                                        ? generalForm.formState.errors.nickname
+                                        : undefined
+                                }
+                            />
+                        </Fieldset>
+
+                        <FormActions flat="top">
+                            <FormAction left />
+                            <FormAction right inline>
+                                <Button
+                                    size="m"
+                                    view="primary"
+                                    type="submit"
+                                    disabled={!generalFormChanged}
+                                    text={t('Save')}
                                 />
+                            </FormAction>
+                        </FormActions>
+                    </Form>
+                </SettingsCard>
 
-                                <FormInput
-                                    {...generalForm.register('name')}
-                                    label="Name"
-                                    autoComplete="off"
-                                    flat="bottom"
-                                    error={
-                                        generalForm.formState.isSubmitted
-                                            ? generalForm.formState.errors.name
-                                            : undefined
-                                    }
-                                />
+                <SettingsCard>
+                    <Form>
+                        <Fieldset title={t('Appearance')}>
+                            <FormRadio
+                                label="Theme"
+                                name="theme"
+                                value={appearanceTheme}
+                                onChange={onAppearanceThemeChange}
+                            >
+                                <FormRadioInput value="system" label="System" />
+                                <FormRadioInput value="dark" label="Dark" />
+                                <FormRadioInput value="light" label="Light" />
+                            </FormRadio>
+                        </Fieldset>
+                    </Form>
+                </SettingsCard>
 
-                                <FormInput
-                                    {...generalForm.register('nickname')}
-                                    label="Nickname"
-                                    flat="both"
-                                    error={
-                                        generalForm.formState.isSubmitted
-                                            ? generalForm.formState.errors.nickname
-                                            : undefined
-                                    }
-                                />
-                            </Fieldset>
-
-                            <FormActions flat="top">
-                                <FormAction left />
-                                <FormAction right inline>
-                                    <Button
-                                        size="m"
-                                        view="primary"
-                                        type="submit"
-                                        disabled={!generalFormChanged}
-                                        text={t('Save')}
-                                    />
-                                </FormAction>
-                            </FormActions>
-                        </Form>
-                    </StyledFormCard>
-
-                    <StyledFormCard>
-                        <Form>
-                            <Fieldset title={t('Appearance')}>
-                                <FormRadio
-                                    label="Theme"
-                                    name="theme"
-                                    value={appearanceTheme}
-                                    onChange={onAppearanceThemeChange}
-                                >
-                                    <FormRadioInput value="system" label="System" />
-                                    <FormRadioInput value="dark" label="Dark" />
-                                    <FormRadioInput value="light" label="Light" />
-                                </FormRadio>
-                            </Fieldset>
-                        </Form>
-                    </StyledFormCard>
-
-                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star10} />}>
-                        {t.rich('Press key to save setting', {
-                            key: () => <Keyboard command enter />,
-                        })}
-                    </Tip>
-                </StyledSettingsCards>
-            </StyledUserContent>
+                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star10} />}>
+                    {t.rich('Press key to save settings', {
+                        key: () => <Keyboard command enter />,
+                    })}
+                </Tip>
+            </SettingsContent>
         </Page>
     );
 };

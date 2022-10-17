@@ -1,12 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { gapM, gray9 } from '../design/@generated/themes';
+import { danger0, gapM, gapS, gray9, warn0 } from '../design/@generated/themes';
 
 import { Text } from './Text';
 
+type FieldsetViewType = 'default' | 'warning' | 'danger';
+
 interface FieldsetProps {
     title?: string;
+    view?: FieldsetViewType;
 }
 
 const StyledFieldset = styled.fieldset`
@@ -16,12 +19,22 @@ const StyledFieldset = styled.fieldset`
     margin: 0;
 `;
 
-export const Fieldset: React.FC<FieldsetProps> = ({ title, children }) => {
+const StyledLegend = styled(Text)`
+    padding: ${gapS} ${gapM} 0;
+`;
+
+const colorsMap: Record<FieldsetViewType, string> = {
+    default: gray9,
+    warning: warn0,
+    danger: danger0,
+};
+
+export const Fieldset: React.FC<FieldsetProps> = ({ view = 'default', title, children }) => {
     return (
         <StyledFieldset>
-            <Text as="legend" size="m" weight="bold" color={gray9}>
+            <StyledLegend as="legend" size="m" weight="bold" color={colorsMap[view]}>
                 {title}
-            </Text>
+            </StyledLegend>
 
             {children}
         </StyledFieldset>
