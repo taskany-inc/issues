@@ -248,5 +248,13 @@
     "Something went wrong 😿": "Something went wrong 😿",
     "Voila! You are watcher now 🎉": "Voila! You are watcher now 🎉",
     "So sad! Project will miss you": "So sad! Project will miss you..."
+  },
+  "ProjectStarButton": {
+    "Stars": "Stars",
+    "Starred": "Starred",
+    "We are calling owner": "We are calling owner...",
+    "Something went wrong 😿": "Something went wrong 😿",
+    "Voila! You are stargizer now 🎉": "Voila! You are stargizer now 🎉",
+    "So sad! Project will miss you": "So sad! Project will miss you..."
   }
 }

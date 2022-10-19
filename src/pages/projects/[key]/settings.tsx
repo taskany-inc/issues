@@ -30,6 +30,7 @@ import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
 import { Text } from '../../../components/Text';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
+import { ProjectStarButton } from '../../../components/ProjectStarButton';
 
 const ModalOnEvent = dynamic(() => import('../../../components/ModalOnEvent'));
 
@@ -54,6 +55,9 @@ const fetcher = createFetcher((_, key: string) => ({
             watchers: {
                 id: true,
             },
+            stargizers: {
+                id: true,
+            },
             createdAt: true,
             computedActivity: {
                 id: true,
@@ -75,12 +79,14 @@ export const getServerSideProps = declareSsrProps(
 );
 
 const StyledProjectActions = styled.div`
-    display: grid;
-
     justify-self: right;
     justify-items: end;
 
     align-content: space-between;
+
+    > * + * {
+        margin-left: ${gapS};
+    }
 `;
 
 const ProjectPage = ({
@@ -206,6 +212,11 @@ const ProjectPage = ({
                         activityId={user.activityId}
                         projectId={project.id}
                         watchers={project.watchers}
+                    />
+                    <ProjectStarButton
+                        activityId={user.activityId}
+                        projectId={project.id}
+                        stargizers={project.stargizers}
                     />
                 </StyledProjectActions>
 
