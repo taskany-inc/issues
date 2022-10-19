@@ -240,5 +240,13 @@
     "Add one": "Add one",
     "Add dependency": "Add dependency",
     "Kind": "Kind"
+  },
+  "ProjectWatchButton": {
+    "Watch": "Watch",
+    "Watching": "Watching",
+    "We are calling owner": "We are calling owner...",
+    "Something went wrong 😿": "Something went wrong 😿",
+    "Voila! You are watcher now 🎉": "Voila! You are watcher now 🎉",
+    "So sad! Project will miss you": "So sad! Project will miss you..."
   }
 }

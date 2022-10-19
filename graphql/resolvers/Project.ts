@@ -10,7 +10,14 @@ import {
     ProjectGoalsInput,
     ProjectInputType,
     ProjectDeleteType,
+    SubscriptionInput,
+    Activity,
 } from '../types';
+
+const connectionMap: Record<string, string> = {
+    true: 'connect',
+    false: 'disconnect',
+};
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('projects', {
@@ -46,6 +53,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
                 include: {
                     flow: true,
+                    watchers: true,
                     activity: {
                         ...computeUserFields,
                     },
@@ -187,6 +195,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         description,
                         activityId: activity.id,
                         flowId,
+                        watchers: {
+                            connect: [activity.id].map((id) => ({ id })),
+                        },
                     },
                 });
 
@@ -241,6 +252,37 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 return db.project.delete({
                     where: { key },
+                });
+
+                // await mailServer.sendMail({
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('toggleProjectWatcher', {
+        type: Activity,
+        args: {
+            toggle: nonNull(arg({ type: SubscriptionInput })),
+        },
+        resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
+            if (!activity) return null;
+
+            const connection = { id: Number(id) };
+
+            try {
+                return db.activity.update({
+                    where: { id: activity.id },
+                    data: {
+                        projectWatchers: { [connectionMap[String(direction)]]: connection },
+                    },
                 });
 
                 // await mailServer.sendMail({

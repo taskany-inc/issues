@@ -19,6 +19,7 @@ import { StateFilter } from '../../../components/StateFilter';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
+import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 
 const PAGE_SIZE = 5;
 
@@ -35,6 +36,9 @@ const fetcher = createFetcher((_, key: string, offset = 0, states: string[] = []
             description: true,
             activityId: true,
             flow: {
+                id: true,
+            },
+            watchers: {
                 id: true,
             },
             createdAt: true,
@@ -131,6 +135,15 @@ const StyledFiltersMenu = styled.div`
     padding-left: ${gapM};
 `;
 
+const StyledProjectActions = styled.div`
+    display: grid;
+
+    justify-self: right;
+    justify-items: end;
+
+    align-content: space-between;
+`;
+
 const ProjectPage = ({
     user,
     locale,
@@ -170,6 +183,14 @@ const ProjectPage = ({
                 title={project.title}
                 description={project.description}
             >
+                <StyledProjectActions>
+                    <ProjectWatchButton
+                        activityId={user.activityId}
+                        projectId={project.id}
+                        watchers={project.watchers}
+                    />
+                </StyledProjectActions>
+
                 <TabsMenu>
                     <TabsMenuItem active>Goals</TabsMenuItem>
                     <TabsMenuItem>Issues</TabsMenuItem>

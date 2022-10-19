@@ -108,6 +108,8 @@ export const Project = objectType({
         t.list.field('goals', { type: Goal });
         t.field('flow', { type: Flow });
         t.list.field('tags', { type: Tag });
+        t.list.field('watchers', { type: Activity });
+        t.list.field('stargizers', { type: Activity });
         t.field(ProjectModel.createdAt);
         t.field(ProjectModel.updatedAt);
     },
@@ -327,10 +329,10 @@ export const TagInput = inputObjectType({
     },
 });
 
-export const GoalSubscriptionInput = inputObjectType({
-    name: 'GoalSubscriptionInput',
+export const SubscriptionInput = inputObjectType({
+    name: 'SubscriptionInput',
     definition(t) {
-        t.field(GoalModel.id);
+        t.string('id');
         t.boolean('direction');
     },
 });
