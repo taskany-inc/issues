@@ -1,7 +1,16 @@
 import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { gapXs, gray10, gray5, gray6, gray9, radiusL } from '../design/@generated/themes';
+import {
+    colorPrimary,
+    gapXs,
+    gray10,
+    gray5,
+    gray6,
+    gray9,
+    radiusL,
+    textColorPrimary,
+} from '../design/@generated/themes';
 
 import { CleanButton } from './CleanButton';
 
@@ -10,6 +19,7 @@ interface TagProps {
     description?: string;
     size?: 's' | 'm';
     className?: string;
+    checked?: boolean;
 
     onClick?: () => void;
     onHide?: () => void;
@@ -19,6 +29,7 @@ const StyledCleanButton = styled(CleanButton)``;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledTag = styled(({ onHide, ...props }) => <div {...props} />)<{
+    checked: TagProps['checked'];
     size: TagProps['size'];
     onClick: TagProps['onClick'];
     onHide: TagProps['onHide'];
@@ -45,8 +56,9 @@ const StyledTag = styled(({ onHide, ...props }) => <div {...props} />)<{
         margin-left: ${gapXs};
     }
 
-    ${({ onHide }) =>
+    ${({ onHide, checked }) =>
         !onHide &&
+        !checked &&
         css`
             &:hover {
                 color: ${gray10};
@@ -75,9 +87,17 @@ const StyledTag = styled(({ onHide, ...props }) => <div {...props} />)<{
             padding: 3px 10px;
             font-size: 11px;
         `}
+
+    ${({ checked }) =>
+        checked &&
+        css`
+            color: ${textColorPrimary};
+
+            background-color: ${colorPrimary};
+        `}
 `;
 
-export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClick, onHide, className }) => {
+export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClick, onHide, className, checked }) => {
     const onHideClick = useCallback(
         (e: React.MouseEvent) => {
             e.preventDefault();
@@ -89,7 +109,14 @@ export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClic
     );
 
     return (
-        <StyledTag size={size} onClick={onClick} onHide={onHide} title={description} className={className}>
+        <StyledTag
+            size={size}
+            onClick={onClick}
+            onHide={onHide}
+            title={description}
+            className={className}
+            checked={checked}
+        >
             {onHide && <StyledCleanButton onClick={onHideClick} />}
             {title}
         </StyledTag>

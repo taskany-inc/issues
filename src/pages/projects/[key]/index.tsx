@@ -16,6 +16,7 @@ import { Input } from '../../../components/Input';
 import { gapM, gapS, gray5 } from '../../../design/@generated/themes';
 import { FiltersMenuItem } from '../../../components/FiltersMenuItem';
 import { StateFilter } from '../../../components/StateFilter';
+import { TagsFilter } from '../../../components/TagsFilter';
 import { defaultLimit, LimitFilter } from '../../../components/LimitFilter';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
@@ -25,92 +26,100 @@ import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { Badge } from '../../../components/Badge';
 
 // @ts-ignore
-const fetcher = createFetcher((_, key: string, offset = 0, states = [], query = '', limitFilter = defaultLimit) => ({
-    project: [
-        {
-            key,
-        },
-        {
-            id: true,
-            key: true,
-            title: true,
-            description: true,
-            activityId: true,
-            flow: {
-                id: true,
-            },
-            watchers: {
-                id: true,
-            },
-            stargizers: {
-                id: true,
-            },
-            createdAt: true,
-            computedActivity: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-            },
-        },
-    ],
-    projectGoals: [
-        {
-            data: {
+const fetcher = createFetcher(
+    (_, key: string, offset = 0, states = [], query = '', limitFilter = defaultLimit, tags = []) => ({
+        project: [
+            {
                 key,
-                offset,
-                pageSize: limitFilter,
-                states,
-                query,
             },
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            project: {
+            {
                 id: true,
+                key: true,
                 title: true,
+                description: true,
+                activityId: true,
+                flow: {
+                    id: true,
+                },
+                watchers: {
+                    id: true,
+                },
+                stargizers: {
+                    id: true,
+                },
+                tags: {
+                    id: true,
+                    title: true,
+                },
+                createdAt: true,
+                computedActivity: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
             },
-            state: {
-                id: true,
-                title: true,
-                hue: true,
+        ],
+        projectGoals: [
+            {
+                data: {
+                    key,
+                    offset,
+                    pageSize: limitFilter,
+                    states,
+                    tags,
+                    query,
+                },
             },
-            computedActivity: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-            },
-            computedOwner: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-            },
-            tags: {
+            {
                 id: true,
                 title: true,
                 description: true,
+                project: {
+                    id: true,
+                    title: true,
+                },
+                state: {
+                    id: true,
+                    title: true,
+                    hue: true,
+                },
+                computedActivity: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                computedOwner: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                tags: {
+                    id: true,
+                    title: true,
+                    description: true,
+                },
+                comments: {
+                    id: true,
+                },
+                createdAt: true,
+                updatedAt: true,
             },
-            comments: {
-                id: true,
+        ],
+        projectGoalsCount: [
+            {
+                data: {
+                    key,
+                    states,
+                    tags,
+                    query,
+                },
             },
-            createdAt: true,
-            updatedAt: true,
-        },
-    ],
-    projectGoalsCount: [
-        {
-            data: {
-                key,
-                states,
-                query,
-            },
-        },
-    ],
-}));
+        ],
+    }),
+);
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key } }) => ({
@@ -175,12 +184,13 @@ const ProjectPage = ({
     const t = useTranslations('projects.key');
     const [fulltextFilter, setFulltextFilter] = useState('');
     const [stateFilter, setStateFilter] = useState<string[]>();
+    const [tagsFilter, setTagsFilter] = useState<string[]>();
     const [limitFilter, setLimitFilter] = useState(defaultLimit);
 
     const { data, setSize, size } = useSWRInfinite(
-        (index: number) => ({ offset: index * limitFilter, stateFilter, fulltextFilter, limitFilter }),
-        ({ offset, stateFilter, fulltextFilter, limitFilter }) =>
-            fetcher(user, key, offset, stateFilter, fulltextFilter, limitFilter),
+        (index: number) => ({ offset: index * limitFilter, stateFilter, fulltextFilter, limitFilter, tagsFilter }),
+        ({ offset, stateFilter, fulltextFilter, limitFilter, tagsFilter }) =>
+            fetcher(user, key, offset, stateFilter, fulltextFilter, limitFilter, tagsFilter),
     );
 
     const shouldRenderMoreButton = data?.[data.length - 1]?.projectGoals?.length === limitFilter;
@@ -245,7 +255,7 @@ const ProjectPage = ({
                         <StyledFiltersMenu>
                             <StateFilter text="State" flowId={project.flow?.id} onClick={setStateFilter} />
                             <FiltersMenuItem>Owner</FiltersMenuItem>
-                            <FiltersMenuItem>Tags</FiltersMenuItem>
+                            <TagsFilter tags={project.tags} text="Tags" onClick={setTagsFilter} />
                             <FiltersMenuItem>Sort</FiltersMenuItem>
                             <LimitFilter text="Limit" onClick={setLimitFilter} />
                         </StyledFiltersMenu>

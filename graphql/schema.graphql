@@ -190,6 +190,7 @@ input ProjectGoalsCountInput {
   key: String!
   query: String!
   states: [String!]!
+  tags: [String!]!
 }
 
 input ProjectGoalsInput {
@@ -198,6 +199,7 @@ input ProjectGoalsInput {
   pageSize: Int!
   query: String!
   states: [String!]!
+  tags: [String!]!
 }
 
 input ProjectInput {

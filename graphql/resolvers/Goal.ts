@@ -270,6 +270,19 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             if (!owner?.activityId) return null;
 
             try {
+                await db.project.update({
+                    where: {
+                        key: project?.key,
+                    },
+                    data: {
+                        tags: goal.tags
+                            ? {
+                                  connect: goal.tags.map((t) => ({ id: t!.id })),
+                              }
+                            : undefined,
+                    },
+                });
+
                 return db.goal.create({
                     data: {
                         ...goal,
@@ -318,18 +331,45 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { goal }, { db, activity }) => {
             if (!activity) return null;
-            const actualGoal = await db.goal.findUnique({ where: { id: goal.id }, include: { participants: true } });
+            const actualGoal = await db.goal.findUnique({
+                where: { id: goal.id },
+                include: { participants: true, project: true, tags: true },
+            });
+
+            if (!actualGoal) return null;
 
             let participantsToDisconnect: Array<{ id: string }> = [];
+            let tagsToDisconnect: Array<{ id: string }> = [];
 
             if (goal.participants) {
                 participantsToDisconnect =
-                    actualGoal?.participants
+                    actualGoal.participants
                         ?.filter((p) => !goal.participants?.includes(p!.id))
                         .map((a) => ({ id: a.id })) || [];
             }
 
+            if (goal.tags) {
+                tagsToDisconnect =
+                    actualGoal.tags
+                        ?.filter((t) => !goal.tags?.filter((tag) => tag!.id === t.id).length)
+                        .map((a) => ({ id: a.id })) || [];
+            }
+
             try {
+                await db.project.update({
+                    where: {
+                        key: actualGoal.project?.key,
+                    },
+                    data: {
+                        tags: goal.tags
+                            ? {
+                                  connect: goal.tags.map((t) => ({ id: t!.id })),
+                                  disconnect: tagsToDisconnect,
+                              }
+                            : undefined,
+                    },
+                });
+
                 return db.goal.update({
                     where: { id: goal.id },
                     // @ts-ignore incompatible types of Goal and GoalInput
@@ -346,6 +386,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         tags: goal.tags
                             ? {
                                   connect: goal.tags.map((t) => ({ id: t!.id })),
+                                  disconnect: tagsToDisconnect,
                               }
                             : undefined,
                         // @ts-ignore

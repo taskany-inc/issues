@@ -17,7 +17,6 @@ import { FiltersMenuItem } from './FiltersMenuItem';
 interface StateFilterProps {
     disabled?: React.ComponentProps<typeof Button>['disabled'];
     text: string;
-    state?: State;
     flowId?: string;
 
     onClick?: (selected: string[]) => void;
@@ -43,7 +42,7 @@ const fetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-export const StateFilter: React.FC<StateFilterProps> = ({ text, state, flowId, disabled, onClick }) => {
+export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, disabled, onClick }) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -106,17 +105,6 @@ export const StateFilter: React.FC<StateFilterProps> = ({ text, state, flowId, d
         }
     }, [data?.flow, upPress]);
 
-    useEffect(() => {
-        if (data?.flow?.states?.length && state) {
-            for (let currCursor = 0; currCursor < data?.flow?.states.length; currCursor++) {
-                if (data?.flow?.states[currCursor].id === state.id) {
-                    setCursor(currCursor);
-                    break;
-                }
-            }
-        }
-    }, [data?.flow, state]);
-
     return (
         <>
             <span ref={popupRef} {...onESC} {...onENTER}>
@@ -148,7 +136,6 @@ export const StateFilter: React.FC<StateFilterProps> = ({ text, state, flowId, d
                             title={s.title}
                             hoverColor={colors[i]}
                             checked={selected.has(s.id)}
-                            focused={s.id === state?.id || cursor === i}
                             onClick={onItemClick(s)}
                         />
                     ))}
