@@ -175,6 +175,7 @@ type Project {
   goals: [Goal]
   id: Int!
   key: String!
+  participants: [Activity]
   stargizers: [Activity]
   tags: [Tag]
   title: String!
@@ -188,6 +189,7 @@ input ProjectDelete {
 
 input ProjectGoalsCountInput {
   key: String!
+  owner: [String!]!
   query: String!
   states: [String!]!
   tags: [String!]!
@@ -196,6 +198,7 @@ input ProjectGoalsCountInput {
 input ProjectGoalsInput {
   key: String!
   offset: Int!
+  owner: [String!]!
   pageSize: Int!
   query: String!
   states: [String!]!

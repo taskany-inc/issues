@@ -47,7 +47,7 @@ const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: P
         refreshInterval,
     });
 
-    const projects: Project[] = data?.projects ?? ssrData.projects;
+    const projects: Project[] | null = data?.projects ?? ssrData.projects;
 
     return (
         <Page locale={locale} title={t('title')}>
@@ -55,6 +55,8 @@ const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: P
                 title={t('explore')}
                 description={t('see what the Taskany community is most excited about today')}
             >
+                <div className="exploreActions"></div>
+
                 <TabsMenu>
                     <TabsMenuItem active>Projects</TabsMenuItem>
                     <TabsMenuItem>Goals</TabsMenuItem>
@@ -66,7 +68,7 @@ const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: P
             <PageSep />
 
             <PageContent>
-                {projects.map((project) =>
+                {projects?.map((project) =>
                     nullable(project, (p) => (
                         <ProjectItem
                             key={p.key}

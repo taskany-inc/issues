@@ -14,7 +14,6 @@ import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrPro
 import { nullable } from '../../../utils/nullable';
 import { Input } from '../../../components/Input';
 import { gapM, gapS, gray5 } from '../../../design/@generated/themes';
-import { FiltersMenuItem } from '../../../components/FiltersMenuItem';
 import { StateFilter } from '../../../components/StateFilter';
 import { TagsFilter } from '../../../components/TagsFilter';
 import { defaultLimit, LimitFilter } from '../../../components/LimitFilter';
@@ -24,10 +23,11 @@ import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { Badge } from '../../../components/Badge';
+import { UserFilter } from '../../../components/UserFilter';
 
 // @ts-ignore
 const fetcher = createFetcher(
-    (_, key: string, offset = 0, states = [], query = '', limitFilter = defaultLimit, tags = []) => ({
+    (_, key: string, offset = 0, states = [], query = '', limitFilter = defaultLimit, tags = [], owner = []) => ({
         project: [
             {
                 key,
@@ -51,6 +51,15 @@ const fetcher = createFetcher(
                     id: true,
                     title: true,
                 },
+                participants: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                },
                 createdAt: true,
                 computedActivity: {
                     id: true,
@@ -68,6 +77,7 @@ const fetcher = createFetcher(
                     pageSize: limitFilter,
                     states,
                     tags,
+                    owner,
                     query,
                 },
             },
@@ -114,6 +124,7 @@ const fetcher = createFetcher(
                     key,
                     states,
                     tags,
+                    owner,
                     query,
                 },
             },
@@ -185,12 +196,20 @@ const ProjectPage = ({
     const [fulltextFilter, setFulltextFilter] = useState('');
     const [stateFilter, setStateFilter] = useState<string[]>();
     const [tagsFilter, setTagsFilter] = useState<string[]>();
+    const [ownerFilter, setOwnerFilter] = useState<string[]>();
     const [limitFilter, setLimitFilter] = useState(defaultLimit);
 
     const { data, setSize, size } = useSWRInfinite(
-        (index: number) => ({ offset: index * limitFilter, stateFilter, fulltextFilter, limitFilter, tagsFilter }),
-        ({ offset, stateFilter, fulltextFilter, limitFilter, tagsFilter }) =>
-            fetcher(user, key, offset, stateFilter, fulltextFilter, limitFilter, tagsFilter),
+        (index: number) => ({
+            offset: index * limitFilter,
+            stateFilter,
+            fulltextFilter,
+            limitFilter,
+            tagsFilter,
+            ownerFilter,
+        }),
+        ({ offset, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter }) =>
+            fetcher(user, key, offset, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter),
     );
 
     const shouldRenderMoreButton = data?.[data.length - 1]?.projectGoals?.length === limitFilter;
@@ -254,9 +273,8 @@ const ProjectPage = ({
 
                         <StyledFiltersMenu>
                             <StateFilter text="State" flowId={project.flow?.id} onClick={setStateFilter} />
-                            <FiltersMenuItem>Owner</FiltersMenuItem>
+                            <UserFilter text="Owner" activity={project.participants} onClick={setOwnerFilter} />
                             <TagsFilter tags={project.tags} text="Tags" onClick={setTagsFilter} />
-                            <FiltersMenuItem>Sort</FiltersMenuItem>
                             <LimitFilter text="Limit" onClick={setLimitFilter} />
                         </StyledFiltersMenu>
                     </StyledFiltersMenuWrapper>
