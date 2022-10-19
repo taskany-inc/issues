@@ -129,6 +129,11 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 take: data.pageSize,
                 skip: data.offset,
                 ...projectGoalsFilter(data),
+                orderBy: {
+                    state: {
+                        title: 'asc',
+                    },
+                },
                 include: {
                     owner: {
                         ...computeUserFields,
