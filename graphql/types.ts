@@ -387,6 +387,7 @@ export const ProjectGoalsInput = inputObjectType({
         t.nonNull.int('pageSize');
         t.nonNull.int('offset');
         t.nonNull.list.nonNull.string('states');
+        t.nonNull.list.nonNull.string('tags');
         t.nonNull.string('query');
     },
 });
@@ -396,6 +397,7 @@ export const ProjectGoalsCountInput = inputObjectType({
     definition(t) {
         t.nonNull.string('key');
         t.nonNull.list.nonNull.string('states');
+        t.nonNull.list.nonNull.string('tags');
         t.nonNull.string('query');
     },
 });

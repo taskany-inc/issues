@@ -20,6 +20,54 @@ const connectionMap: Record<string, string> = {
     false: 'disconnect',
 };
 
+const projectGoalsFilter = (data: { key: string; query: string; states: string[]; tags: string[] }): any => {
+    const statesFilter = data.states.length
+        ? {
+              state: {
+                  id: {
+                      in: data.states,
+                  },
+              },
+          }
+        : {};
+
+    const tagsFilter = data.tags.length
+        ? {
+              tags: {
+                  some: {
+                      id: {
+                          in: data.tags,
+                      },
+                  },
+              },
+          }
+        : {};
+
+    return {
+        where: {
+            OR: [
+                {
+                    title: {
+                        contains: data.query,
+                        mode: 'insensitive',
+                    },
+                },
+                {
+                    description: {
+                        contains: data.query,
+                        mode: 'insensitive',
+                    },
+                },
+            ],
+            project: {
+                key: data.key,
+            },
+            ...statesFilter,
+            ...tagsFilter,
+        },
+    };
+};
+
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('projects', {
         type: Project,
@@ -56,6 +104,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     flow: true,
                     watchers: true,
                     stargizers: true,
+                    tags: true,
                     activity: {
                         ...computeUserFields,
                     },
@@ -76,39 +125,10 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            const stateFilter = data.states.length
-                ? {
-                      state: {
-                          id: {
-                              in: data.states,
-                          },
-                      },
-                  }
-                : {};
-
             const goals = await db.goal.findMany({
                 take: data.pageSize,
                 skip: data.offset,
-                where: {
-                    OR: [
-                        {
-                            title: {
-                                contains: data.query,
-                                mode: 'insensitive',
-                            },
-                        },
-                        {
-                            description: {
-                                contains: data.query,
-                                mode: 'insensitive',
-                            },
-                        },
-                    ],
-                    project: {
-                        key: data.key,
-                    },
-                    ...stateFilter,
-                },
+                ...projectGoalsFilter(data),
                 include: {
                     owner: {
                         ...computeUserFields,
@@ -150,37 +170,8 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            const stateFilter = data.states.length
-                ? {
-                      state: {
-                          id: {
-                              in: data.states,
-                          },
-                      },
-                  }
-                : {};
-
             return db.goal.count({
-                where: {
-                    OR: [
-                        {
-                            title: {
-                                contains: data.query,
-                                mode: 'insensitive',
-                            },
-                        },
-                        {
-                            description: {
-                                contains: data.query,
-                                mode: 'insensitive',
-                            },
-                        },
-                    ],
-                    project: {
-                        key: data.key,
-                    },
-                    ...stateFilter,
-                },
+                ...projectGoalsFilter(data),
             });
         },
     });
