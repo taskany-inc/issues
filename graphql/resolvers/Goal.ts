@@ -7,7 +7,7 @@ import {
     computeUserFields,
     withComputedField,
     GoalCreateInput,
-    GoalSubscriptionInput,
+    SubscriptionInput,
     Activity,
     GoalDependencyInput,
     dependencyKind,
@@ -374,7 +374,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleGoalStargizer', {
         type: Activity,
         args: {
-            toggle: nonNull(arg({ type: GoalSubscriptionInput })),
+            toggle: nonNull(arg({ type: SubscriptionInput })),
         },
         resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
@@ -405,7 +405,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleGoalWatcher', {
         type: Activity,
         args: {
-            toggle: nonNull(arg({ type: GoalSubscriptionInput })),
+            toggle: nonNull(arg({ type: SubscriptionInput })),
         },
         resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
             if (!activity) return null;

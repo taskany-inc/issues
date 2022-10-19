@@ -145,11 +145,6 @@ input GoalInput {
   title: String
 }
 
-input GoalSubscriptionInput {
-  direction: Boolean
-  id: ID!
-}
-
 type Mutation {
   createComment(authorId: String!, description: String!, goalId: String!): Comment
   createGoal(goal: GoalCreateInput!): Goal
@@ -157,8 +152,9 @@ type Mutation {
   createTag(description: String, title: String!): Tag
   deleteProject(data: ProjectDelete!): Project
   toggleGoalDependency(toggle: GoalDependencyInput!): Goal
-  toggleGoalStargizer(toggle: GoalSubscriptionInput!): Activity
-  toggleGoalWatcher(toggle: GoalSubscriptionInput!): Activity
+  toggleGoalStargizer(toggle: SubscriptionInput!): Activity
+  toggleGoalWatcher(toggle: SubscriptionInput!): Activity
+  toggleProjectWatcher(toggle: SubscriptionInput!): Activity
   toggleReaction(reaction: ReactionInput!): Reaction
   updateGoal(goal: GoalInput!): Goal
   updateProject(data: ProjectInput!): Project
@@ -178,9 +174,11 @@ type Project {
   goals: [Goal]
   id: Int!
   key: String!
+  stargizers: [Activity]
   tags: [Tag]
   title: String!
   updatedAt: DateTime!
+  watchers: [Activity]
 }
 
 input ProjectDelete {
@@ -266,6 +264,11 @@ type State {
   hue: Int!
   id: ID!
   title: String!
+}
+
+input SubscriptionInput {
+  direction: Boolean
+  id: String
 }
 
 type Tag {

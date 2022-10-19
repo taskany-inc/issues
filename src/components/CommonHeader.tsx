@@ -54,9 +54,9 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({ preTitle, title, des
                         {d}
                     </Text>
                 ))}
-
-                {children}
             </StyledCommonHeaderInfo>
+
+            {children}
         </StyledCommonHeader>
     );
 };

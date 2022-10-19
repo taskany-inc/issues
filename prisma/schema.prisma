@@ -107,6 +107,8 @@ model Activity {
   goalParticipant    Goal[]     @relation("goalParticipants")
   goalWatchers       Goal[]     @relation("goalWatchers")
   goalStargizers     Goal[]     @relation("goalStargizers")
+  projectWatchers    Project[]  @relation("projectWatchers")
+  projectStargizers  Project[]  @relation("projectStargizers")
   goalOwner          Goal[]     @relation("goalOwner")
   goalIssuer         Goal[]     @relation("goalIssuer")
   settings           Settings   @relation(fields: [settingsId], references: [id])
@@ -133,6 +135,8 @@ model Project {
   flow         Flow       @relation(fields: [flowId], references: [id])
   flowId       String
   tags         Tag[]
+  watchers     Activity[] @relation("projectWatchers")
+  stargizers   Activity[] @relation("projectStargizers")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -179,10 +183,10 @@ model Goal {
   comments     Comment[]
   reactions    Reaction[]
   tags         Tag[]
-  dependsOn Goal[] @relation("dependsOn")
-  blocks    Goal[] @relation("dependsOn")
-  relatedTo Goal[] @relation("connected")
-  connected Goal[] @relation("connected")
+  dependsOn    Goal[]     @relation("dependsOn")
+  blocks       Goal[]     @relation("dependsOn")
+  relatedTo    Goal[]     @relation("connected")
+  connected    Goal[]     @relation("connected")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -251,24 +255,24 @@ model State {
 }
 
 model Settings {
-  id        String    @id @default(cuid())
-  theme     String    @default("system")
-  flow      Flow?     @relation(fields: [flowId], references: [id])
-  flowId    String?
-  activity  Activity?
+  id       String    @id @default(cuid())
+  theme    String    @default("system")
+  flow     Flow?     @relation(fields: [flowId], references: [id])
+  flowId   String?
+  activity Activity?
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Tag {
-  id          String  @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String?
-  goals      Goal[]
-  project    Project[]
-  activity   Activity  @relation(fields: [activityId], references: [id])
-  activityId String
+  goals       Goal[]
+  project     Project[]
+  activity    Activity  @relation(fields: [activityId], references: [id])
+  activityId  String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

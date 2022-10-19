@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
+import styled from 'styled-components';
 
 import { createFetcher } from '../../../utils/createFetcher';
 import { Goal, Project } from '../../../../graphql/@generated/genql';
@@ -28,6 +29,7 @@ import { FormAction, FormActions } from '../../../components/FormActions';
 import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
 import { Text } from '../../../components/Text';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
+import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 
 const ModalOnEvent = dynamic(() => import('../../../components/ModalOnEvent'));
 
@@ -49,6 +51,9 @@ const fetcher = createFetcher((_, key: string) => ({
                 id: true,
                 title: true,
             },
+            watchers: {
+                id: true,
+            },
             createdAt: true,
             computedActivity: {
                 id: true,
@@ -68,6 +73,15 @@ export const getServerSideProps = declareSsrProps(
         private: true,
     },
 );
+
+const StyledProjectActions = styled.div`
+    display: grid;
+
+    justify-self: right;
+    justify-items: end;
+
+    align-content: space-between;
+`;
 
 const ProjectPage = ({
     user,
@@ -187,6 +201,14 @@ const ProjectPage = ({
                 title={project.title}
                 description={project.description}
             >
+                <StyledProjectActions>
+                    <ProjectWatchButton
+                        activityId={user.activityId}
+                        projectId={project.id}
+                        watchers={project.watchers}
+                    />
+                </StyledProjectActions>
+
                 <TabsMenu>
                     <NextLink href={routes.project(key)} passHref>
                         <TabsMenuItem>Goals</TabsMenuItem>
