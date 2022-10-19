@@ -1,9 +1,12 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { gray7, gray9, radiusL } from '../design/@generated/themes';
 
-export const Badge = styled.div`
-    padding: 1px 4px;
+interface BadgeProps {
+    size?: 's' | 'm';
+}
+
+const StyledBadge = styled.div<{ size: BadgeProps['size'] }>`
     box-sizing: border-box;
 
     background-color: ${gray7};
@@ -12,4 +15,20 @@ export const Badge = styled.div`
 
     color: ${gray9};
     font-size: 12px;
+
+    ${({ size }) =>
+        size === 's' &&
+        css`
+            padding: 1px 4px;
+        `}
+
+    ${({ size }) =>
+        size === 'm' &&
+        css`
+            padding: 2px 8px;
+        `}
 `;
+
+export const Badge: React.FC<BadgeProps> = ({ size = 's', children }) => (
+    <StyledBadge size={size}>{children}</StyledBadge>
+);

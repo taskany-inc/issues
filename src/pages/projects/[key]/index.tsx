@@ -21,6 +21,7 @@ import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
+import { Badge } from '../../../components/Badge';
 
 const PAGE_SIZE = 5;
 
@@ -56,7 +57,7 @@ const fetcher = createFetcher((_, key: string, offset = 0, states: string[] = []
     ],
     projectGoals: [
         {
-            projectGoals: {
+            data: {
                 key,
                 offset,
                 pageSize: PAGE_SIZE,
@@ -101,6 +102,15 @@ const fetcher = createFetcher((_, key: string, offset = 0, states: string[] = []
             updatedAt: true,
         },
     ],
+    projectGoalsCount: [
+        {
+            data: {
+                key,
+                states,
+                query,
+            },
+        },
+    ],
 }));
 
 export const getServerSideProps = declareSsrProps(
@@ -135,6 +145,13 @@ const StyledFiltersContent = styled(PageContent)`
     align-items: center;
 `;
 
+const StyledFiltersMenuWrapper = styled.div`
+    display: flex;
+    align-items: center;
+
+    padding-left: ${gapS};
+`;
+
 const StyledFiltersMenu = styled.div`
     padding-left: ${gapM};
 `;
@@ -155,7 +172,7 @@ const ProjectPage = ({
     locale,
     ssrData,
     params: { key },
-}: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) => {
+}: ExternalPageProps<{ project: Project; projectGoals: Goal[]; projectGoalsCount: number }, { key: string }>) => {
     const t = useTranslations('projects.key');
     const [fulltextFilter, setFulltextFilter] = useState('');
     const [stateFilter, setStateFilter] = useState<string[]>();
@@ -172,6 +189,7 @@ const ProjectPage = ({
         ? data?.map((chunk) => chunk.projectGoals).flat()
         : data?.map((chunk) => chunk.projectGoals).flat() ?? ssrData.projectGoals;
     const project = data?.[0].project ?? ssrData.project;
+    const goalsCount = data?.[0].projectGoalsCount ?? ssrData.projectGoalsCount;
 
     const onSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setFulltextFilter(e.currentTarget.value);
@@ -220,12 +238,16 @@ const ProjectPage = ({
                 <StyledFiltersContent>
                     <Input placeholder="Search" onChange={onSearchChange} />
 
-                    <StyledFiltersMenu>
-                        <StateFilter text="State" flowId={project.flow?.id} onClick={setStateFilter} />
-                        <FiltersMenuItem>Owner</FiltersMenuItem>
-                        <FiltersMenuItem>Tags</FiltersMenuItem>
-                        <FiltersMenuItem>Sort</FiltersMenuItem>
-                    </StyledFiltersMenu>
+                    <StyledFiltersMenuWrapper>
+                        <Badge size="m">{goalsCount}</Badge>
+
+                        <StyledFiltersMenu>
+                            <StateFilter text="State" flowId={project.flow?.id} onClick={setStateFilter} />
+                            <FiltersMenuItem>Owner</FiltersMenuItem>
+                            <FiltersMenuItem>Tags</FiltersMenuItem>
+                            <FiltersMenuItem>Sort</FiltersMenuItem>
+                        </StyledFiltersMenu>
+                    </StyledFiltersMenuWrapper>
 
                     <div style={{ textAlign: 'right' }}>
                         <Button

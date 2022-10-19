@@ -186,6 +186,12 @@ input ProjectDelete {
   key: String!
 }
 
+input ProjectGoalsCountInput {
+  key: String!
+  query: String!
+  states: [String!]!
+}
+
 input ProjectGoalsInput {
   key: String!
   offset: Int!
@@ -213,7 +219,8 @@ type Query {
   goalUserIndex(offset: Int!, pageSize: Int!): [Goal]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
-  projectGoals(projectGoals: ProjectGoalsInput!): [Goal]
+  projectGoals(data: ProjectGoalsInput!): [Goal]
+  projectGoalsCount(data: ProjectGoalsCountInput!): Int
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]

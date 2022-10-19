@@ -12,6 +12,7 @@ import {
     ProjectDeleteType,
     SubscriptionInput,
     Activity,
+    ProjectGoalsCountInput,
 } from '../types';
 
 const connectionMap: Record<string, string> = {
@@ -70,41 +71,41 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('projectGoals', {
         type: Goal,
         args: {
-            projectGoals: nonNull(arg({ type: ProjectGoalsInput })),
+            data: nonNull(arg({ type: ProjectGoalsInput })),
         },
-        resolve: async (_, { projectGoals }, { db, activity }) => {
+        resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            const stateFilter = projectGoals.states.length
+            const stateFilter = data.states.length
                 ? {
                       state: {
                           id: {
-                              in: projectGoals.states,
+                              in: data.states,
                           },
                       },
                   }
                 : {};
 
             const goals = await db.goal.findMany({
-                take: projectGoals.pageSize,
-                skip: projectGoals.offset,
+                take: data.pageSize,
+                skip: data.offset,
                 where: {
                     OR: [
                         {
                             title: {
-                                contains: projectGoals.query,
+                                contains: data.query,
                                 mode: 'insensitive',
                             },
                         },
                         {
                             description: {
-                                contains: projectGoals.query,
+                                contains: data.query,
                                 mode: 'insensitive',
                             },
                         },
                     ],
                     project: {
-                        key: projectGoals.key,
+                        key: data.key,
                     },
                     ...stateFilter,
                 },
@@ -139,6 +140,48 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             });
 
             return goals.map(withComputedField('owner', 'activity'));
+        },
+    });
+
+    t.int('projectGoalsCount', {
+        args: {
+            data: nonNull(arg({ type: ProjectGoalsCountInput })),
+        },
+        resolve: async (_, { data }, { db, activity }) => {
+            if (!activity) return null;
+
+            const stateFilter = data.states.length
+                ? {
+                      state: {
+                          id: {
+                              in: data.states,
+                          },
+                      },
+                  }
+                : {};
+
+            return db.goal.count({
+                where: {
+                    OR: [
+                        {
+                            title: {
+                                contains: data.query,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            description: {
+                                contains: data.query,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                    project: {
+                        key: data.key,
+                    },
+                    ...stateFilter,
+                },
+            });
         },
     });
 
