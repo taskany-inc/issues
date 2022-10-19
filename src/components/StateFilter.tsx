@@ -132,7 +132,6 @@ export const StateFilter: React.FC<StateFilterProps> = ({ text, state, flowId, d
 
             <Popup
                 placement="top-start"
-                overflow="hidden"
                 visible={popupVisible && Boolean(data?.flow?.states?.length)}
                 onClickOutside={onClickOutside}
                 reference={popupRef}

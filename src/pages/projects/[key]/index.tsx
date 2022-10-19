@@ -16,6 +16,7 @@ import { Input } from '../../../components/Input';
 import { gapM, gapS, gray5 } from '../../../design/@generated/themes';
 import { FiltersMenuItem } from '../../../components/FiltersMenuItem';
 import { StateFilter } from '../../../components/StateFilter';
+import { defaultLimit, LimitFilter } from '../../../components/LimitFilter';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
@@ -23,10 +24,8 @@ import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { Badge } from '../../../components/Badge';
 
-const PAGE_SIZE = 5;
-
 // @ts-ignore
-const fetcher = createFetcher((_, key: string, offset = 0, states: string[] = [], query = '') => ({
+const fetcher = createFetcher((_, key: string, offset = 0, states = [], query = '', limitFilter = defaultLimit) => ({
     project: [
         {
             key,
@@ -60,7 +59,7 @@ const fetcher = createFetcher((_, key: string, offset = 0, states: string[] = []
             data: {
                 key,
                 offset,
-                pageSize: PAGE_SIZE,
+                pageSize: limitFilter,
                 states,
                 query,
             },
@@ -176,13 +175,15 @@ const ProjectPage = ({
     const t = useTranslations('projects.key');
     const [fulltextFilter, setFulltextFilter] = useState('');
     const [stateFilter, setStateFilter] = useState<string[]>();
+    const [limitFilter, setLimitFilter] = useState(defaultLimit);
 
     const { data, setSize, size } = useSWRInfinite(
-        (index: number) => ({ offset: index * PAGE_SIZE, stateFilter, fulltextFilter }),
-        ({ offset, stateFilter, fulltextFilter }) => fetcher(user, key, offset, stateFilter, fulltextFilter),
+        (index: number) => ({ offset: index * limitFilter, stateFilter, fulltextFilter, limitFilter }),
+        ({ offset, stateFilter, fulltextFilter, limitFilter }) =>
+            fetcher(user, key, offset, stateFilter, fulltextFilter, limitFilter),
     );
 
-    const shouldRenderMoreButton = data?.[data.length - 1]?.projectGoals?.length === PAGE_SIZE;
+    const shouldRenderMoreButton = data?.[data.length - 1]?.projectGoals?.length === limitFilter;
 
     // FIXME: https://github.com/taskany-inc/issues/issues/107
     const goals = fulltextFilter
@@ -246,6 +247,7 @@ const ProjectPage = ({
                             <FiltersMenuItem>Owner</FiltersMenuItem>
                             <FiltersMenuItem>Tags</FiltersMenuItem>
                             <FiltersMenuItem>Sort</FiltersMenuItem>
+                            <LimitFilter text="Limit" onClick={setLimitFilter} />
                         </StyledFiltersMenu>
                     </StyledFiltersMenuWrapper>
 
