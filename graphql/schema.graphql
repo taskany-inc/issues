@@ -154,6 +154,7 @@ type Mutation {
   toggleGoalDependency(toggle: GoalDependencyInput!): Goal
   toggleGoalStargizer(toggle: SubscriptionInput!): Activity
   toggleGoalWatcher(toggle: SubscriptionInput!): Activity
+  toggleProjectStargizer(toggle: SubscriptionInput!): Activity
   toggleProjectWatcher(toggle: SubscriptionInput!): Activity
   toggleReaction(reaction: ReactionInput!): Reaction
   updateGoal(goal: GoalInput!): Goal

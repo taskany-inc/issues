@@ -54,6 +54,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 include: {
                     flow: true,
                     watchers: true,
+                    stargizers: true,
                     activity: {
                         ...computeUserFields,
                     },
@@ -282,6 +283,37 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                     where: { id: activity.id },
                     data: {
                         projectWatchers: { [connectionMap[String(direction)]]: connection },
+                    },
+                });
+
+                // await mailServer.sendMail({
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('toggleProjectStargizer', {
+        type: Activity,
+        args: {
+            toggle: nonNull(arg({ type: SubscriptionInput })),
+        },
+        resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
+            if (!activity) return null;
+
+            const connection = { id: Number(id) };
+
+            try {
+                return db.activity.update({
+                    where: { id: activity.id },
+                    data: {
+                        projectStargizers: { [connectionMap[String(direction)]]: connection },
                     },
                 });
 

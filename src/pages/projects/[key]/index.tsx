@@ -20,6 +20,7 @@ import { CommonHeader } from '../../../components/CommonHeader';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
+import { ProjectStarButton } from '../../../components/ProjectStarButton';
 
 const PAGE_SIZE = 5;
 
@@ -39,6 +40,9 @@ const fetcher = createFetcher((_, key: string, offset = 0, states: string[] = []
                 id: true,
             },
             watchers: {
+                id: true,
+            },
+            stargizers: {
                 id: true,
             },
             createdAt: true,
@@ -136,12 +140,14 @@ const StyledFiltersMenu = styled.div`
 `;
 
 const StyledProjectActions = styled.div`
-    display: grid;
-
     justify-self: right;
     justify-items: end;
 
     align-content: space-between;
+
+    > * + * {
+        margin-left: ${gapS};
+    }
 `;
 
 const ProjectPage = ({
@@ -188,6 +194,11 @@ const ProjectPage = ({
                         activityId={user.activityId}
                         projectId={project.id}
                         watchers={project.watchers}
+                    />
+                    <ProjectStarButton
+                        activityId={user.activityId}
+                        projectId={project.id}
+                        stargizers={project.stargizers}
                     />
                 </StyledProjectActions>
 
