@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
-import { gray6, gray7, gray8, radiusM, textColor } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { UserAnyKind } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Popup } from './Popup';
-import { UserPic } from './UserPic';
 import { FormInput } from './FormInput';
+import { UserDropdownItem } from './UserDropdownItem';
 
 interface UserCompletionInputProps {
     query?: string;
@@ -21,68 +20,6 @@ interface UserCompletionInputProps {
 
     onClick?: (user: UserAnyKind) => void;
 }
-
-const StyledUserCard = styled.div<{ focused?: boolean }>`
-    box-sizing: border-box;
-    display: grid;
-    grid-template-columns: 2fr 10fr;
-    justify-content: center;
-    align-items: center;
-    min-width: 250px;
-
-    padding: 6px;
-    margin-bottom: 4px;
-
-    border: 1px solid ${gray7};
-    border-radius: ${radiusM};
-
-    cursor: pointer;
-
-    &:last-child {
-        margin-bottom: 0;
-    }
-
-    &:hover {
-        border-color: ${gray8};
-        background-color: ${gray6};
-    }
-
-    ${({ focused }) =>
-        focused &&
-        css`
-            border-color: ${gray8};
-            background-color: ${gray6};
-        `}
-`;
-const StyledUserInfo = styled.div`
-    padding-left: 4px;
-`;
-const StyledUserName = styled.div`
-    font-size: 14px;
-    font-weight: 600;
-`;
-const StyledUserEmail = styled.div`
-    font-size: 12px;
-    color: ${textColor};
-`;
-const UserCard: React.FC<{
-    name?: string;
-    email?: string;
-    image?: string;
-    focused?: boolean;
-    onClick?: () => void;
-}> = ({ name, email, image, focused, onClick }) => {
-    return (
-        <StyledUserCard onClick={onClick} focused={focused}>
-            <UserPic src={image} size={24} />
-
-            <StyledUserInfo>
-                <StyledUserName>{name}</StyledUserName>
-                <StyledUserEmail>{email}</StyledUserEmail>
-            </StyledUserInfo>
-        </StyledUserCard>
-    );
-};
 
 const StyledDropdownContainer = styled.div``;
 
@@ -191,7 +128,7 @@ export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClic
             >
                 <>
                     {data?.findUserAnyKind?.map((u, i) => (
-                        <UserCard
+                        <UserDropdownItem
                             key={u.id}
                             name={u.name}
                             email={u.email}

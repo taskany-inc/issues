@@ -108,6 +108,7 @@ export const Project = objectType({
         t.list.field('goals', { type: Goal });
         t.field('flow', { type: Flow });
         t.list.field('tags', { type: Tag });
+        t.list.field('participants', { type: Activity });
         t.list.field('watchers', { type: Activity });
         t.list.field('stargizers', { type: Activity });
         t.field(ProjectModel.createdAt);
@@ -388,6 +389,7 @@ export const ProjectGoalsInput = inputObjectType({
         t.nonNull.int('offset');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
+        t.nonNull.list.nonNull.string('owner');
         t.nonNull.string('query');
     },
 });
@@ -398,6 +400,7 @@ export const ProjectGoalsCountInput = inputObjectType({
         t.nonNull.string('key');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
+        t.nonNull.list.nonNull.string('owner');
         t.nonNull.string('query');
     },
 });

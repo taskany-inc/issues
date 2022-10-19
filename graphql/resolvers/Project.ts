@@ -20,7 +20,15 @@ const connectionMap: Record<string, string> = {
     false: 'disconnect',
 };
 
-const projectGoalsFilter = (data: { key: string; query: string; states: string[]; tags: string[] }): any => {
+const projectGoalsFilter = (data: {
+    key: string;
+    query: string;
+    states: string[];
+    tags: string[];
+    owner: string[];
+}): any => {
+    console.log(data);
+
     const statesFilter = data.states.length
         ? {
               state: {
@@ -38,6 +46,16 @@ const projectGoalsFilter = (data: { key: string; query: string; states: string[]
                       id: {
                           in: data.tags,
                       },
+                  },
+              },
+          }
+        : {};
+
+    const ownerFilter = data.owner.length
+        ? {
+              owner: {
+                  id: {
+                      in: data.owner,
                   },
               },
           }
@@ -64,6 +82,7 @@ const projectGoalsFilter = (data: { key: string; query: string; states: string[]
             },
             ...statesFilter,
             ...tagsFilter,
+            ...ownerFilter,
         },
     };
 };
@@ -105,6 +124,9 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     watchers: true,
                     stargizers: true,
                     tags: true,
+                    participants: {
+                        ...computeUserFields,
+                    },
                     activity: {
                         ...computeUserFields,
                     },
@@ -113,7 +135,12 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
 
             if (!project) return null;
 
-            return withComputedField('activity')(project);
+            // const computedParticipants = project?.participants.map((p) => withComputedField('activity')(p));
+            // if (computedParticipants) {
+            //     project.participants = computedParticipants;
+            // }
+
+            return withComputedField('activity', 'participants')(project);
         },
     });
 

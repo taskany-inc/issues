@@ -280,6 +280,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                                   connect: goal.tags.map((t) => ({ id: t!.id })),
                               }
                             : undefined,
+                        participants: {
+                            connect: [{ id: goal.ownerId }],
+                        },
                     },
                 });
 
@@ -367,6 +370,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                                   disconnect: tagsToDisconnect,
                               }
                             : undefined,
+                        participants: {
+                            connect: [{ id: goal.ownerId! || actualGoal.ownerId! }],
+                        },
                     },
                 });
 
