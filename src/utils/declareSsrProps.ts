@@ -10,6 +10,7 @@ interface SSRProps<P = Record<string, string>> {
     locale: TLocale;
     req: GetServerSidePropsContext['req'];
     params: P;
+    query: Record<string, string | string[] | undefined>;
 }
 
 export interface ExternalPageProps<D = unknown, P = unknown> extends SSRProps<P> {
@@ -19,10 +20,10 @@ export interface ExternalPageProps<D = unknown, P = unknown> extends SSRProps<P>
 }
 
 export function declareSsrProps<T = ExternalPageProps>(
-    cb?: ({ user, locale, req, params }: SSRProps) => T,
+    cb?: ({ user, locale, req, params, query }: SSRProps) => T,
     options?: { private: boolean },
 ) {
-    return async ({ locale, req, params = {} }: GetServerSidePropsContext) => {
+    return async ({ locale, req, params = {}, query }: GetServerSidePropsContext) => {
         const session = await getSession({ req });
 
         if (options?.private && !session) {
@@ -42,6 +43,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                   user: session!.user,
                   locale: locale as SSRProps['locale'],
                   params: params as Record<string, string>,
+                  query,
               })
             : {};
 

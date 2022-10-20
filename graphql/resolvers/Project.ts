@@ -27,8 +27,6 @@ const projectGoalsFilter = (data: {
     tags: string[];
     owner: string[];
 }): any => {
-    console.log(data);
-
     const statesFilter = data.states.length
         ? {
               state: {
