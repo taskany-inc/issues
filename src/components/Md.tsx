@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { link10 } from '../design/@generated/themes';
 import { md } from '../utils/md';
 import { pageContext } from '../utils/pageContext';
+import { nullable } from '../utils/nullable';
 
 const StyledMd = styled.div`
     a {
@@ -35,11 +36,14 @@ const themes = {
 const Md: React.FC<MdProps> = ({ children }) => {
     const { theme } = useContext(pageContext);
 
-    const PrismCss = theme ? themes[theme] : themes.dark;
+    const PrismCss = themes[theme || 'dark'];
     return (
         <>
-            <PrismCss />
             <StyledMd dangerouslySetInnerHTML={{ __html: md(children) }} />
+
+            {nullable(PrismCss, () => (
+                <PrismCss />
+            ))}
         </>
     );
 };
