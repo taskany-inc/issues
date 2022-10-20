@@ -7,23 +7,17 @@ import NextLink from 'next/link';
 import { routes } from '../../../hooks/router';
 import { createFetcher } from '../../../utils/createFetcher';
 import { Goal, Project } from '../../../../graphql/@generated/genql';
-import { Page, PageContent } from '../../../components/Page';
+import { Page } from '../../../components/Page';
 import { Button } from '../../../components/Button';
 import { GoalItem } from '../../../components/GoalItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
-import { Input } from '../../../components/Input';
-import { gapM, gapS, gray5 } from '../../../design/@generated/themes';
-import { StateFilter } from '../../../components/StateFilter';
-import { TagsFilter } from '../../../components/TagsFilter';
-import { defaultLimit, LimitFilter } from '../../../components/LimitFilter';
+import { gapS } from '../../../design/@generated/themes';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
-import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
-import { Badge } from '../../../components/Badge';
-import { UserFilter } from '../../../components/UserFilter';
+import { FiltersPanel, defaultLimit } from '../../../components/FiltersPanel';
 
 // @ts-ignore
 const fetcher = createFetcher(
@@ -149,32 +143,6 @@ const StyledLoadMore = styled.div`
     margin: 50px 40px;
 `;
 
-const StyledFiltersPanel = styled.div`
-    margin: ${gapM} 0;
-    padding: ${gapS} 0;
-
-    background-color: ${gray5};
-`;
-
-const StyledFiltersContent = styled(PageContent)`
-    padding-top: 0;
-
-    display: grid;
-    grid-template-columns: 2fr 9fr 1fr;
-    align-items: center;
-`;
-
-const StyledFiltersMenuWrapper = styled.div`
-    display: flex;
-    align-items: center;
-
-    padding-left: ${gapS};
-`;
-
-const StyledFiltersMenu = styled.div`
-    padding-left: ${gapM};
-`;
-
 const StyledProjectActions = styled.div`
     justify-self: right;
     justify-items: end;
@@ -264,31 +232,17 @@ const ProjectPage = ({
                 </TabsMenu>
             </CommonHeader>
 
-            <StyledFiltersPanel>
-                <StyledFiltersContent>
-                    <Input placeholder="Search" onChange={onSearchChange} />
-
-                    <StyledFiltersMenuWrapper>
-                        <Badge size="m">{goalsCount}</Badge>
-
-                        <StyledFiltersMenu>
-                            <StateFilter text="State" flowId={project.flow?.id} onClick={setStateFilter} />
-                            <UserFilter text="Owner" activity={project.participants} onClick={setOwnerFilter} />
-                            <TagsFilter tags={project.tags} text="Tags" onClick={setTagsFilter} />
-                            <LimitFilter text="Limit" onClick={setLimitFilter} />
-                        </StyledFiltersMenu>
-                    </StyledFiltersMenuWrapper>
-
-                    <div style={{ textAlign: 'right' }}>
-                        <Button
-                            view="primary"
-                            size="m"
-                            text="New goal"
-                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
-                        />
-                    </div>
-                </StyledFiltersContent>
-            </StyledFiltersPanel>
+            <FiltersPanel
+                count={goalsCount}
+                flowId={project.flow?.id}
+                users={project.participants}
+                tags={project.tags}
+                onSearchChange={onSearchChange}
+                onStateChange={setStateFilter}
+                onUserChange={setOwnerFilter}
+                onTagChange={setTagsFilter}
+                onLimitChange={setLimitFilter}
+            />
 
             <StyledGoalsList>
                 {goals?.map((goal) =>

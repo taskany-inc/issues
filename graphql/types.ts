@@ -394,6 +394,16 @@ export const ProjectGoalsInput = inputObjectType({
     },
 });
 
+export const UserGoalsInput = inputObjectType({
+    name: 'UserGoalsInput',
+    definition(t) {
+        t.nonNull.list.nonNull.string('states');
+        t.nonNull.list.nonNull.string('tags');
+        t.nonNull.list.nonNull.string('owner');
+        t.nonNull.string('query');
+    },
+});
+
 export const ProjectGoalsCountInput = inputObjectType({
     name: 'ProjectGoalsCountInput',
     definition(t) {
