@@ -221,7 +221,6 @@ type Query {
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
   goalDependencyKind: [String]
-  goalUserIndex(offset: Int!, pageSize: Int!): [Goal]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(data: ProjectGoalsInput!): [Goal]
@@ -229,6 +228,7 @@ type Query {
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
+  userGoals(data: UserGoalsInput!): [Project]
   users(sortBy: SortOrder): [User]
 }
 
@@ -320,6 +320,13 @@ type UserAnyKind {
   image: String
   kind: UserKind
   name: String
+}
+
+input UserGoalsInput {
+  owner: [String!]!
+  query: String!
+  states: [String!]!
+  tags: [String!]!
 }
 
 input UserInput {

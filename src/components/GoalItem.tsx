@@ -4,7 +4,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 import { routes } from '../hooks/router';
-import type { Scalars, State, Tag, UserAnyKind } from '../../graphql/@generated/genql';
+import type { Scalars, State, Tag, UserAnyKind, User } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
@@ -18,12 +18,12 @@ const RelativeTime = dynamic(() => import('./RelativeTime'));
 
 interface GoalItemProps {
     title: string;
-    issuer?: UserAnyKind;
+    issuer?: User | UserAnyKind;
     id: string;
     tags?: Array<Tag | undefined>;
     state?: State;
     createdAt: Scalars['DateTime'];
-    owner?: UserAnyKind;
+    owner?: User | UserAnyKind;
     comments?: number;
     hasForks?: boolean;
     isNotViewed?: boolean;

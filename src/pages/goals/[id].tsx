@@ -476,7 +476,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     }, [refresh]);
 
     return (
-        <Page locale={locale} title={goal.title}>
+        <Page
+            locale={locale}
+            title={t.rich('title', {
+                goal: () => goal.title,
+            })}
+        >
             <IssueHeader>
                 <StyledIssueInfo align="left">
                     <IssueKey id={goal.id}>

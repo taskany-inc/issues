@@ -1,4 +1,4 @@
-import { arg, nonNull, stringArg, intArg } from 'nexus';
+import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
 import {
@@ -11,6 +11,8 @@ import {
     Activity,
     GoalDependencyInput,
     dependencyKind,
+    UserGoalsInput,
+    Project,
 } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
@@ -19,26 +21,76 @@ const connectionMap: Record<string, string> = {
     false: 'disconnect',
 };
 
-export const query = (t: ObjectDefinitionBlock<'Query'>) => {
-    t.list.field('goalUserIndex', {
-        type: Goal,
-        args: {
-            pageSize: nonNull(intArg()),
-            offset: nonNull(intArg()),
+const projectGoalsFilter = (data: { query: string; states: string[]; tags: string[]; owner: string[] }): any => {
+    const statesFilter = data.states.length
+        ? {
+              state: {
+                  id: {
+                      in: data.states,
+                  },
+              },
+          }
+        : {};
+
+    const tagsFilter = data.tags.length
+        ? {
+              tags: {
+                  some: {
+                      id: {
+                          in: data.tags,
+                      },
+                  },
+              },
+          }
+        : {};
+
+    const ownerFilter = data.owner.length
+        ? {
+              owner: {
+                  id: {
+                      in: data.owner,
+                  },
+              },
+          }
+        : {};
+
+    return {
+        where: {
+            OR: [
+                {
+                    title: {
+                        contains: data.query,
+                        mode: 'insensitive',
+                    },
+                },
+                {
+                    description: {
+                        contains: data.query,
+                        mode: 'insensitive',
+                    },
+                },
+            ],
+            ...statesFilter,
+            ...tagsFilter,
+            ...ownerFilter,
         },
-        resolve: async (_, { offset, pageSize }, { db, activity }) => {
+    };
+};
+
+export const query = (t: ObjectDefinitionBlock<'Query'>) => {
+    t.list.field('userGoals', {
+        type: Project,
+        args: {
+            data: nonNull(arg({ type: UserGoalsInput })),
+        },
+        resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            const goals = await db.goal.findMany({
-                take: pageSize,
-                skip: offset,
+            return db.project.findMany({
                 where: {
                     OR: [
                         {
                             activityId: activity.id,
-                        },
-                        {
-                            ownerId: activity.id,
                         },
                         {
                             participants: {
@@ -47,39 +99,77 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                                 },
                             },
                         },
+                        {
+                            watchers: {
+                                some: {
+                                    id: activity.id,
+                                },
+                            },
+                        },
+                        {
+                            goals: {
+                                some: {
+                                    participants: {
+                                        some: {
+                                            id: activity.id,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            goals: {
+                                some: {
+                                    watchers: {
+                                        some: {
+                                            id: activity.id,
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     ],
                 },
                 include: {
-                    owner: {
-                        ...computeUserFields,
-                    },
-                    activity: {
-                        ...computeUserFields,
-                    },
-                    tags: true,
-                    state: true,
-                    project: true,
-                    estimate: true,
-                    dependsOn: {
+                    goals: {
+                        ...projectGoalsFilter(data),
                         include: {
+                            activity: {
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
+                            },
+                            owner: {
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
+                            },
+                            tags: true,
                             state: true,
+                            project: true,
+                            estimate: true,
+                            dependsOn: {
+                                include: {
+                                    state: true,
+                                },
+                            },
+                            relatedTo: {
+                                include: {
+                                    state: true,
+                                },
+                            },
+                            blocks: {
+                                include: {
+                                    state: true,
+                                },
+                            },
+                            comments: true,
                         },
                     },
-                    relatedTo: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    blocks: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    comments: true,
                 },
             });
-
-            return goals.map(withComputedField('owner', 'activity'));
         },
     });
 
@@ -275,13 +365,13 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         key: project?.key,
                     },
                     data: {
-                        tags: goal.tags
+                        tags: goal.tags?.length
                             ? {
                                   connect: goal.tags.map((t) => ({ id: t!.id })),
                               }
                             : undefined,
                         participants: {
-                            connect: [{ id: goal.ownerId }],
+                            connect: [{ id: owner.activityId }],
                         },
                     },
                 });

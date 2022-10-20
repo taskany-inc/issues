@@ -92,11 +92,12 @@
   },
   "goals": {
     "index": {
-      "title": "Taskany Goals — Personal bundle",
-      "Load more": "Load more"
+      "title": "Taskany — Goals — Dashboard",
+      "Load more": "Load more",
+      "Dashboard": "Dashboard",
+      "This is your personal goals bundle": "This is your personal goals bundle. Created, owned, watching projects and goals are here."
     },
     "new": {
-      "title": "Taskany Goals — New goal",
       "Create new goal": "Create new goal",
       "Goal's title is required": "Goal's title is required",
       "Goal's title must be a string": "Goal's title must be a string",
@@ -145,6 +146,7 @@
       "Enter tag title": "Enter tag title"
     },
     "id": {
+      "title": "Taskany — Goals — <goal></goal>",
       "Set owner": "Set owner",
       "Something went wrong 😿": "Something went wrong 😿",
       "We are updating the goal": "We are updating the goal...",
@@ -256,5 +258,13 @@
     "Something went wrong 😿": "Something went wrong 😿",
     "Voila! You are stargizer now 🎉": "Voila! You are stargizer now 🎉",
     "So sad! Project will miss you": "So sad! Project will miss you..."
+  },
+  "FiltersPanel": {
+    "Search": "Search",
+    "State": "State",
+    "Owner": "Owner",
+    "Limit": "Limit",
+    "Tags": "Tags",
+    "New goal": "New goal"
   }
 }
