@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -71,8 +71,14 @@ const StyledTip = styled(Tip)`
     padding: 0;
 `;
 
+const commentHeightMap: Record<string, string> = {
+    true: '120px',
+    false: '60px',
+};
+
 const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, goalId, setFocus, locale }) => {
     const t = useTranslations('Comments.new');
+    const [commentFocused, setCommentFocused] = useState(false);
 
     const schema = z.object({
         comment: z
@@ -92,7 +98,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, g
         handleSubmit,
         resetField,
         setFocus: setFieldFocus,
-        formState: { errors, isValid, isSubmitted },
+        formState: { errors, isValid },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
         mode: 'onChange',
@@ -135,17 +141,29 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, g
         resetField('comment');
     };
 
+    const onCommentBlur = useCallback(() => {
+        setTimeout(() => {
+            setCommentFocused(false);
+        }, 200);
+    }, []);
+
     return (
         <StyledComment>
             <UserPic size={32} src={user?.image} email={user?.email} />
 
-            <StyledCommentForm>
+            <StyledCommentForm tabIndex={0} onBlur={onCommentBlur}>
                 <Form onSubmit={handleSubmit(createComment)}>
-                    {/* https://github.com/taskany-inc/issues/issues/234 t('Leave a comment') */}
                     <Controller
                         name="comment"
                         control={control}
-                        render={({ field }) => <FormEditor height="60px" flat="both" {...field} />}
+                        render={({ field }) => (
+                            <FormEditor
+                                {...field}
+                                placeholder={t('Leave a comment')}
+                                height={commentHeightMap[String(commentFocused)]}
+                                onFocus={() => setCommentFocused(true)}
+                            />
+                        )}
                     />
 
                     <FormActions>

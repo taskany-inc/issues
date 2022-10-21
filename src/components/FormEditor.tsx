@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/display-name */
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { gray2, gray3, radiusS, textColor } from '../design/@generated/themes';
+import { gray2, gray3, gray6, radiusS, textColor } from '../design/@generated/themes';
+import { nullable } from '../utils/nullable';
 
 const Editor = dynamic(() => import('@monaco-editor/react'));
 
@@ -17,16 +18,32 @@ interface FormEditorProps {
     autoFocus?: boolean;
     flat?: 'top' | 'bottom' | 'both';
     height?: string;
+    placeholder?: string;
 
     onChange?: (value: string | undefined) => void;
-    onInput?: React.ChangeEventHandler<HTMLTextAreaElement>;
-    onBlur?: React.FocusEventHandler<HTMLTextAreaElement>;
-    onFocus?: React.FocusEventHandler<HTMLTextAreaElement>;
+    onBlur?: React.FocusEventHandler<HTMLDivElement>;
+    onFocus?: React.FocusEventHandler<HTMLDivElement>;
 
     error?: FieldError;
 }
 
+const defaultOptions: React.ComponentProps<typeof Editor>['options'] = {
+    fontSize: 16,
+    minimap: {
+        enabled: false,
+    },
+    lineNumbers: 'off',
+    unicodeHighlight: {
+        allowedLocales: {
+            en: true,
+            ru: true,
+        },
+    },
+    overviewRulerBorder: false,
+};
+
 const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
+    position: relative;
     box-sizing: border-box;
 
     outline: none;
@@ -60,13 +77,16 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
 
         color: ${textColor};
 
+        transition: 100ms cubic-bezier(0.3, 0, 0.5, 1);
+        transition-property: background-color, height;
+
         .monaco-editor-background,
         .margin,
         .inputarea.ime-input {
             background-color: ${gray3};
 
-            transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
-            transition-property: background-color;
+            transition: 150ms cubic-bezier(0.3, 0, 0.5, 1);
+            transition-property: background-color, height;
         }
 
         .inputarea.ime-input,
@@ -103,24 +123,21 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
     }
 `;
 
-const defaultOptions: React.ComponentProps<typeof Editor>['options'] = {
-    fontSize: 16,
-    minimap: {
-        enabled: false,
-    },
-    lineNumbers: 'off',
-    unicodeHighlight: {
-        allowedLocales: {
-            en: true,
-            ru: true,
-        },
-    },
-    overviewRulerBorder: false,
-};
+const StyledPlaceholder = styled.div`
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    z-index: 999;
+
+    pointer-events: none;
+
+    font-size: ${defaultOptions.fontSize}px;
+    color: ${gray6};
+`;
 
 export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
-    ({ id, defaultValue, value, flat, autoFocus, height = '200px', onChange }, ref) => {
-        // const monaco = useMonaco();
+    ({ id, defaultValue, value, flat, autoFocus, height = '200px', placeholder, onChange, onFocus, onBlur }, ref) => {
+        const [focused, setFocused] = useState(false);
         const monacoEditorRef = useRef<any>(null);
 
         const handleEditorDidMount = (editor: any /* IStandaloneEditor */) => {
@@ -137,11 +154,29 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
             if (monacoEditorRef.current && autoFocus) {
                 monacoEditorRef.current.focus();
             }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [autoFocus, monacoEditorRef.current]);
+        }, [autoFocus]);
+
+        const onEditorFocus = useCallback(
+            (e) => {
+                setFocused(true);
+                onFocus && onFocus(e);
+            },
+            [onFocus],
+        );
+
+        const onEditorBlur = useCallback(
+            (e) => {
+                setFocused(false);
+                onBlur && onBlur(e);
+            },
+            [onBlur],
+        );
 
         return (
-            <StyledEditor id={id} flat={flat} ref={ref}>
+            <StyledEditor tabIndex={0} id={id} flat={flat} ref={ref} onFocus={onEditorFocus} onBlur={onEditorBlur}>
+                {nullable(!focused && !value && placeholder, () => (
+                    <StyledPlaceholder>{placeholder}</StyledPlaceholder>
+                ))}
                 <Editor
                     loading=""
                     theme="vs-dark"
