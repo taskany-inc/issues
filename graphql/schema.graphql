@@ -18,8 +18,7 @@ input ActivityInput {
 
 type Comment {
   activity: Activity
-  author: UserAnyKind
-  computedAuthor: UserAnyKind
+  author: Activity
   createdAt: DateTime!
   description: String!
   id: ID!
@@ -82,8 +81,6 @@ type Goal {
   activityId: String
   blocks: [Goal]
   comments: [Comment]
-  computedActivity: UserAnyKind
-  computedOwner: UserAnyKind
   connected: [Goal]
   createdAt: DateTime!
   dependsOn: [Goal]
@@ -167,7 +164,6 @@ type Mutation {
 type Project {
   activity: Activity
   activityId: String!
-  computedActivity: UserAnyKind
   createdAt: DateTime!
   description: String
   flow: Flow
@@ -213,8 +209,8 @@ input ProjectInput {
 }
 
 type Query {
+  findActivity(query: String!): [Activity]
   findGoal(query: String!): [Goal]
-  findUserAnyKind(query: String!): [UserAnyKind]
   flow(id: String!): Flow
   flowCompletion(query: String!, sortBy: SortOrder): [Flow]
   flowRecommended: [Flow]
@@ -235,7 +231,6 @@ type Query {
 type Reaction {
   activity: Activity
   activityId: String!
-  computedAuthor: UserAnyKind
   createdAt: DateTime!
   emoji: String!
   goal: Goal

@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 
 import { gapL, gapM } from '../design/@generated/themes';
-import { Goal, UserAnyKind } from '../../graphql/@generated/genql';
+import { Activity, Goal } from '../../graphql/@generated/genql';
 
 import { FormTitle } from './FormTitle';
 import { UserCompletionInput } from './UserCompletionInput';
@@ -33,9 +33,9 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ is
     );
 
     const onParticipantAdd = useCallback(
-        (u: UserAnyKind) => {
-            if (u.activity) {
-                activities.add(u.activity.id);
+        (activity: Activity) => {
+            if (activity) {
+                activities.add(activity.id);
             }
 
             onChange && onChange(Array.from(activities));

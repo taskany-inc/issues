@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { gapS } from '../design/@generated/themes';
-import { UserAnyKind, Project, EstimateInput, State, Tag as TagModel } from '../../graphql/@generated/genql';
+import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 
 import { Button } from './Button';
@@ -52,7 +52,7 @@ interface GoalFormProps {
     formTitle: string;
     title?: string;
     description?: string;
-    owner: Partial<UserAnyKind>;
+    owner: Activity;
     project?: Project;
     tags?: Map<string, TagModel>;
     state?: State;
@@ -62,7 +62,7 @@ interface GoalFormProps {
     onSumbit: (fields: GoalFormType) => void;
     onTitleChange?: (title: string) => void;
     onDescriptionChange?: (description: string) => void;
-    onOwnerChange: (user: UserAnyKind) => void;
+    onOwnerChange: (activity: Activity) => void;
     onProjectChange: (project: Project) => void;
     onStateChange: (state: State) => void;
     onEstimateChange: (estimate?: EstimateInput) => void;
@@ -144,7 +144,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         [onSumbit],
     );
 
-    const ownerButtonText = owner?.name || owner?.email || t('Assign');
+    const ownerButtonText = owner?.user?.name || owner?.user?.email || owner?.ghost?.email || t('Assign');
     const projectButtonText = project?.title || t('Enter project title');
     const stateButtonText = state?.title || t('State');
 
@@ -185,8 +185,14 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             size="m"
                             text={ownerButtonText}
                             placeholder={t('Enter name or email')}
-                            query={owner?.name || owner?.email}
-                            userPic={<UserPic src={owner?.image} email={owner?.email} size={16} />}
+                            query={owner?.user?.name || owner?.user?.email || owner?.ghost?.email}
+                            userPic={
+                                <UserPic
+                                    src={owner?.user?.image}
+                                    email={owner?.user?.email || owner?.ghost?.email}
+                                    size={16}
+                                />
+                            }
                             onClick={onOwnerChange}
                         />
 

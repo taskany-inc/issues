@@ -41,22 +41,31 @@ const fetcher = createFetcher((_, states = [], query = '', tags = [], owner = []
                     hue: true,
                 },
                 activity: {
+                    id: true,
                     user: {
                         id: true,
                         name: true,
                         email: true,
                         image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
                     },
                 },
                 owner: {
+                    id: true,
                     user: {
                         id: true,
                         name: true,
                         email: true,
                         image: true,
                     },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
                 },
-
                 tags: {
                     id: true,
                     title: true,
@@ -177,8 +186,8 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
                                             id={g.id}
                                             state={g.state}
                                             title={g.title}
-                                            issuer={g.activity?.user}
-                                            owner={g.owner?.user}
+                                            issuer={g.activity}
+                                            owner={g.owner}
                                             tags={g.tags}
                                             comments={g.comments?.length}
                                             key={g.id}

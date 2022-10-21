@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
 import { gql } from '../utils/gql';
-import { UserAnyKind, Project, State, Tag as TagModel, Goal, EstimateInput } from '../../graphql/@generated/genql';
+import { Project, State, Tag as TagModel, Goal, EstimateInput } from '../../graphql/@generated/genql';
 
 import { GoalForm, GoalFormType } from './GoalForm';
 
@@ -18,7 +18,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const { data: session } = useSession();
     const [title, setTitle] = useState(goal.title);
     const [description, setDescription] = useState(goal.description);
-    const [owner, setOwner] = useState(goal.computedOwner as UserAnyKind);
+    const [owner, setOwner] = useState(goal.owner);
     const [estimate, setEstimate] = useState<EstimateInput | undefined>(
         goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
     );
@@ -60,7 +60,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     }, [project]);
 
     const updateGoal = async ({ title, description }: GoalFormType) => {
-        if (!session || !owner.id || !project?.id) return;
+        if (!session || !owner?.id || !project?.id) return;
 
         const promise = gql.mutation({
             updateGoal: [
@@ -69,7 +69,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
                         id: goal.id,
                         title,
                         description,
-                        ownerId: owner.activity?.id,
+                        ownerId: owner?.id,
                         projectId: project.id,
                         estimate,
                         stateId: state?.id,
@@ -99,7 +99,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             formTitle={t('Edit the goal')}
             title={title}
             description={description}
-            owner={owner}
+            owner={owner!}
             project={project}
             state={state}
             tags={tags}

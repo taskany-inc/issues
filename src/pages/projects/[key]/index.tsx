@@ -55,11 +55,18 @@ const fetcher = createFetcher(
                     },
                 },
                 createdAt: true,
-                computedActivity: {
+                activity: {
                     id: true,
-                    name: true,
-                    email: true,
-                    image: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
                 },
             },
         ],
@@ -88,17 +95,31 @@ const fetcher = createFetcher(
                     title: true,
                     hue: true,
                 },
-                computedActivity: {
+                activity: {
                     id: true,
-                    name: true,
-                    email: true,
-                    image: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
                 },
-                computedOwner: {
+                owner: {
                     id: true,
-                    name: true,
-                    email: true,
-                    image: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
                 },
                 tags: {
                     id: true,
@@ -182,7 +203,6 @@ const ProjectPage = ({
 
     const shouldRenderMoreButton = data?.[data.length - 1]?.projectGoals?.length === limitFilter;
 
-    // FIXME: https://github.com/taskany-inc/issues/issues/107
     const goals = fulltextFilter
         ? data?.map((chunk) => chunk.projectGoals).flat()
         : data?.map((chunk) => chunk.projectGoals).flat() ?? ssrData.projectGoals;
@@ -252,8 +272,8 @@ const ProjectPage = ({
                             id={g.id}
                             state={g.state}
                             title={g.title}
-                            issuer={g.computedActivity}
-                            owner={g.computedOwner}
+                            issuer={g.activity}
+                            owner={g.owner}
                             tags={g.tags}
                             comments={g.comments?.length}
                             key={g.id}

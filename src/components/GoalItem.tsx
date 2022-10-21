@@ -4,7 +4,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 import { routes } from '../hooks/router';
-import type { Scalars, State, Tag, UserAnyKind, User } from '../../graphql/@generated/genql';
+import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
@@ -18,12 +18,12 @@ const RelativeTime = dynamic(() => import('./RelativeTime'));
 
 interface GoalItemProps {
     title: string;
-    issuer?: User | UserAnyKind;
+    issuer?: Activity;
     id: string;
     tags?: Array<Tag | undefined>;
     state?: State;
     createdAt: Scalars['DateTime'];
-    owner?: User | UserAnyKind;
+    owner?: Activity;
     comments?: number;
     hasForks?: boolean;
     isNotViewed?: boolean;
@@ -151,12 +151,12 @@ export const GoalItem: React.FC<GoalItemProps> = ({
 
                     <StyledSubTitle size="s">
                         #{id} <RelativeTime date={createdAt} kind="created" />
-                        {`  ${t('by')} ${issuer?.name}`}
+                        {`  ${t('by')} ${issuer?.user?.name}`}
                     </StyledSubTitle>
                 </StyledName>
 
                 <StyledAddon>
-                    <UserPic src={owner?.image} email={owner?.email} size={24} />
+                    <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
                 </StyledAddon>
 
                 <StyledAddon>{hasForks && <Icon type="gitFork" size="s" />}</StyledAddon>

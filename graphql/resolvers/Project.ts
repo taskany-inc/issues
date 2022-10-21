@@ -4,8 +4,6 @@ import { ObjectDefinitionBlock } from 'nexus/dist/core';
 import {
     SortOrder,
     Project,
-    computeUserFields,
-    withComputedField,
     Goal,
     ProjectGoalsInput,
     ProjectInputType,
@@ -94,14 +92,17 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             const projects = await db.project.findMany({
                 include: {
                     activity: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                 },
             });
 
             if (!projects.length) return [];
 
-            return projects.map(withComputedField('owner', 'activity'));
+            return projects;
         },
     });
 
@@ -113,7 +114,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { key }, { db, activity }) => {
             if (!activity) return null;
 
-            const project = await db.project.findUnique({
+            return db.project.findUnique({
                 where: {
                     key,
                 },
@@ -123,22 +124,19 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     stargizers: true,
                     tags: true,
                     participants: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                     activity: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                 },
             });
-
-            if (!project) return null;
-
-            // const computedParticipants = project?.participants.map((p) => withComputedField('activity')(p));
-            // if (computedParticipants) {
-            //     project.participants = computedParticipants;
-            // }
-
-            return withComputedField('activity', 'participants')(project);
         },
     });
 
@@ -150,7 +148,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            const goals = await db.goal.findMany({
+            return db.goal.findMany({
                 take: data.pageSize,
                 skip: data.offset,
                 ...projectGoalsFilter(data),
@@ -161,10 +159,16 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 },
                 include: {
                     owner: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                     activity: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                     tags: true,
                     state: true,
@@ -188,8 +192,6 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     comments: true,
                 },
             });
-
-            return goals.map(withComputedField('owner', 'activity'));
         },
     });
 

@@ -11,9 +11,9 @@ import {
     Goal,
     EstimateInput,
     GoalInput,
-    UserAnyKind,
     State,
     GoalDependencyInput,
+    Activity,
 } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
@@ -83,16 +83,31 @@ const fetcher = createFetcher((_, id: string) => ({
                     id: true,
                 },
             },
-            computedActivity: {
+            activity: {
                 id: true,
-                name: true,
-                email: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
             },
-            computedOwner: {
+            owner: {
                 id: true,
-                name: true,
-                email: true,
-                image: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
             },
             tags: {
                 id: true,
@@ -106,6 +121,10 @@ const fetcher = createFetcher((_, id: string) => ({
                     user: {
                         id: true,
                         name: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
                     },
                 },
             },
@@ -153,16 +172,22 @@ const fetcher = createFetcher((_, id: string) => ({
                         email: true,
                         image: true,
                     },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
                 },
             },
             participants: {
                 id: true,
                 user: {
+                    id: true,
                     email: true,
                     name: true,
                     image: true,
                 },
                 ghost: {
+                    id: true,
                     email: true,
                 },
             },
@@ -304,14 +329,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         [t, goal],
     );
 
-    const [issueOwner, setIssueOwner] = useState(goal.computedOwner);
-    const issueOwnerName = issueOwner?.name || issueOwner?.email;
+    const [issueOwner, setIssueOwner] = useState(goal.owner);
+    const issueOwnerName = issueOwner?.user?.name || issueOwner?.user?.email || issueOwner?.ghost?.email;
     const onIssueOwnerChange = useCallback(
-        async (owner: UserAnyKind) => {
-            setIssueOwner(owner);
+        async (activity: Activity) => {
+            setIssueOwner(activity);
 
             await triggerUpdate({
-                ownerId: owner.activity?.id,
+                ownerId: activity?.id,
             });
         },
         [triggerUpdate],
@@ -533,7 +558,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                 <div>
                     <Card>
                         <CardInfo>
-                            <Link inline>{goal.computedActivity!.name}</Link> — <RelativeTime date={goal.createdAt} />
+                            <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
                         </CardInfo>
 
                         <CardContent>
@@ -549,7 +574,11 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                         title={t('Set owner')}
                                         query={issueOwnerName}
                                         userPic={
-                                            <UserPic src={issueOwner?.image} email={issueOwner?.email} size={16} />
+                                            <UserPic
+                                                src={issueOwner?.user?.image}
+                                                email={issueOwner?.user?.email || issueOwner?.ghost?.email}
+                                                size={16}
+                                            />
                                         }
                                         onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
                                     />

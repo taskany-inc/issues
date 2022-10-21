@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
 import { createFetcher } from '../utils/createFetcher';
-import { UserAnyKind } from '../../graphql/@generated/genql';
+import { Activity } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
@@ -22,23 +22,27 @@ interface UserCompletionDropdownProps {
     query?: string;
     placeholder?: string;
     title?: string;
-    onClick?: (user: UserAnyKind) => void;
+    onClick?: (activity: Activity) => void;
 }
 
 const StyledDropdownContainer = styled.div``;
 
 const fetcher = createFetcher((_, query: string) => ({
-    findUserAnyKind: [
+    findActivity: [
         {
             query,
         },
         {
             id: true,
-            name: true,
-            email: true,
-            image: true,
-            activity: {
+            user: {
                 id: true,
+                name: true,
+                email: true,
+                image: true,
+            },
+            ghost: {
+                id: true,
+                email: true,
             },
         },
     ],
@@ -83,11 +87,11 @@ const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
     const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
 
     const onUserCardClick = useCallback(
-        (user: UserAnyKind) => () => {
+        (activity: Activity) => () => {
             setEditMode(false);
             setPopupVisibility(false);
-            onClick && onClick(user);
-            setInputState(user.name || user.email || '');
+            onClick && onClick(activity);
+            setInputState(activity.user?.name || activity.user?.email || activity.ghost?.email || '');
         },
         [onClick],
     );
@@ -98,25 +102,25 @@ const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
     });
 
     const [onENTER] = useKeyboard([KeyCode.Enter], () => {
-        if (data?.findUserAnyKind?.length) {
-            onUserCardClick(data?.findUserAnyKind[cursor])();
+        if (data?.findActivity?.length) {
+            onUserCardClick(data?.findActivity[cursor])();
             popupRef.current?.focus();
         }
     });
 
     useEffect(() => {
-        const findUserAnyKind = data?.findUserAnyKind;
+        const findUserAnyKind = data?.findActivity;
 
         if (findUserAnyKind?.length && downPress) {
             setCursor((prevState) => (prevState < findUserAnyKind.length - 1 ? prevState + 1 : prevState));
         }
-    }, [data?.findUserAnyKind, downPress]);
+    }, [data?.findActivity, downPress]);
 
     useEffect(() => {
-        if (data?.findUserAnyKind?.length && upPress) {
+        if (data?.findActivity?.length && upPress) {
             setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
         }
-    }, [data?.findUserAnyKind, upPress]);
+    }, [data?.findActivity, upPress]);
 
     return (
         <>
@@ -147,7 +151,7 @@ const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
             <Popup
                 placement="top-start"
                 overflow="hidden"
-                visible={popupVisible && Boolean(data?.findUserAnyKind?.length)}
+                visible={popupVisible && Boolean(data?.findActivity?.length)}
                 onClickOutside={onClickOutside}
                 reference={popupRef}
                 interactive
@@ -156,14 +160,14 @@ const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
                 offset={[0, 4]}
             >
                 <>
-                    {data?.findUserAnyKind?.map((u, i) => (
+                    {data?.findActivity?.map((activity, i) => (
                         <UserDropdownItem
-                            key={u.id}
-                            name={u.name}
-                            email={u.email}
-                            image={u.image}
+                            key={activity.id}
+                            name={activity.user?.name}
+                            email={activity.user?.email || activity.ghost?.email}
+                            image={activity.user?.image}
                             focused={cursor === i}
-                            onClick={onUserCardClick(u)}
+                            onClick={onUserCardClick(activity)}
                         />
                     ))}
                 </>

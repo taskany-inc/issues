@@ -4,8 +4,6 @@ import { ObjectDefinitionBlock } from 'nexus/dist/core';
 import {
     Goal,
     GoalInput,
-    computeUserFields,
-    withComputedField,
     GoalCreateInput,
     SubscriptionInput,
     Activity,
@@ -181,16 +179,22 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { id }, { db, activity }) => {
             if (!activity) return null;
 
-            const goal = await db.goal.findUnique({
+            return db.goal.findUnique({
                 where: {
                     id,
                 },
                 include: {
                     owner: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                     activity: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                     tags: true,
                     state: true,
@@ -202,7 +206,10 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     reactions: {
                         include: {
                             activity: {
-                                ...computeUserFields,
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
                             },
                         },
                     },
@@ -227,22 +234,22 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     comments: {
                         include: {
                             activity: {
-                                ...computeUserFields,
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
                             },
                             reactions: true,
                         },
                     },
                     participants: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                 },
             });
-
-            const computedCommentAuthor = goal?.comments.map((comment) => withComputedField('author')(comment));
-            if (goal && computedCommentAuthor) {
-                goal.comments = computedCommentAuthor;
-            }
-            return withComputedField('owner', 'activity')(goal);
         },
     });
 
@@ -286,10 +293,16 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 take: 5,
                 include: {
                     owner: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                     activity: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                     tags: true,
                     state: true,
@@ -301,7 +314,10 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     reactions: {
                         include: {
                             activity: {
-                                ...computeUserFields,
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
                             },
                         },
                     },
@@ -326,13 +342,19 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     comments: {
                         include: {
                             activity: {
-                                ...computeUserFields,
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
                             },
                             reactions: true,
                         },
                     },
                     participants: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                 },
             });
@@ -352,12 +374,12 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             if (!goal.ownerId) return null;
 
             const [owner, project, goalsCount] = await Promise.all([
-                db.user.findUnique({ where: { id: goal.ownerId } }),
+                db.activity.findUnique({ where: { id: goal.ownerId } }),
                 db.project.findUnique({ where: { id: goal.projectId } }),
                 db.goal.count(),
             ]);
 
-            if (!owner?.activityId) return null;
+            if (!owner?.id) return null;
 
             try {
                 await db.project.update({
@@ -371,7 +393,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                               }
                             : undefined,
                         participants: {
-                            connect: [{ id: owner.activityId }],
+                            connect: [{ id: owner.id }],
                         },
                     },
                 });
@@ -381,7 +403,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         ...goal,
                         id: `${project?.key}-${goalsCount + 1}`,
                         activityId: activity.id,
-                        ownerId: owner?.activityId,
+                        ownerId: owner?.id,
                         tags: goal.tags?.length
                             ? {
                                   connect: goal.tags.map((t) => ({ id: t!.id })),
@@ -396,10 +418,10 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                               }
                             : undefined,
                         watchers: {
-                            connect: [activity.id, owner.activityId].map((id) => ({ id })),
+                            connect: [activity.id, owner.id].map((id) => ({ id })),
                         },
                         participants: {
-                            connect: [activity.id, owner.activityId].map((id) => ({ id })),
+                            connect: [activity.id, owner.id].map((id) => ({ id })),
                         },
                     },
                 });
