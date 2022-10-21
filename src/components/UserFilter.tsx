@@ -93,10 +93,10 @@ export const UserFilter: React.FC<UserFilterProps> = ({ text, activity, disabled
                     {activity?.map((a, i) =>
                         nullable(a, (ac) => (
                             <UserDropdownItem
-                                key={ac.user!.id}
-                                email={ac.user!.email}
-                                name={ac.user!.name}
-                                image={ac.user!.image}
+                                key={ac.id}
+                                email={ac.user?.email || ac.ghost?.email}
+                                name={ac.user?.name}
+                                image={ac.user?.image}
                                 checked={selected.has(ac.id)}
                                 onClick={onItemClick(ac)}
                             />

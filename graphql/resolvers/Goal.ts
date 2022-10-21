@@ -132,13 +132,13 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     goals: {
                         ...projectGoalsFilter(data),
                         include: {
-                            activity: {
+                            owner: {
                                 include: {
                                     user: true,
                                     ghost: true,
                                 },
                             },
-                            owner: {
+                            activity: {
                                 include: {
                                     user: true,
                                     ghost: true,
