@@ -18,6 +18,7 @@ interface StateFilterProps {
     disabled?: React.ComponentProps<typeof Button>['disabled'];
     text: string;
     flowId?: string;
+    filters?: Array<string>;
 
     onClick?: (selected: string[]) => void;
 }
@@ -42,7 +43,7 @@ const fetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, disabled, onClick }) => {
+export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, filters, disabled, onClick }) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -135,7 +136,7 @@ export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, disabled
                             hue={s.hue}
                             title={s.title}
                             hoverColor={colors[i]}
-                            checked={selected.has(s.id)}
+                            checked={filters?.includes(s.id)}
                             onClick={onItemClick(s)}
                         />
                     ))}
