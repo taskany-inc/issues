@@ -64,6 +64,10 @@ const StyledUserEmail = styled.div`
     color: ${textColor};
 `;
 
+const StyledUserPick = styled(UserPic)`
+    justify-self: center;
+`;
+
 export const UserDropdownItem: React.FC<UserDropdownItemProps> = ({
     name,
     email,
@@ -74,7 +78,7 @@ export const UserDropdownItem: React.FC<UserDropdownItemProps> = ({
 }) => {
     return (
         <StyledUserCard onClick={onClick} focused={focused} checked={checked}>
-            <UserPic src={image} size={24} />
+            <StyledUserPick src={image} size={24} />
 
             <StyledUserInfo>
                 <StyledUserName>{name}</StyledUserName>

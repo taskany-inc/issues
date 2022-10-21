@@ -59,11 +59,17 @@ const fetcher = createFetcher((_, key: string) => ({
                 id: true,
             },
             createdAt: true,
-            computedActivity: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
+            activity: {
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
             },
         },
     ],

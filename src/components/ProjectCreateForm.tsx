@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
-import { Flow, UserAnyKind } from '../../graphql/@generated/genql';
+import { Activity, Flow } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
 import { nullable } from '../utils/nullable';
@@ -84,7 +84,7 @@ const backIndexesFlow = [1, 2, 3, 4, 5, 6];
 
 const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate }) => {
     const { data: session } = useSession();
-    const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
+    const [owner, setOwner] = useState({ id: session?.user.activityId, user: session?.user } as Activity);
     const [flow, setFlow] = useState<Partial<Flow>>();
     const [projectKey, setProjectKey] = useState('');
     const [isKeyByUser, setIsKeyByUser] = useState(false);
@@ -195,7 +195,7 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
         onCreate && onCreate(res.createProject?.key);
     };
 
-    const ownerButtonText = owner?.name || owner?.email || t('Assign');
+    const ownerButtonText = owner?.user?.name || owner?.user?.email || t('Assign');
     const flowButtonText = flow?.title || t('Flow');
     const isProjectKeyAvailable = Boolean(data?.project === null);
     const richProps = {
@@ -256,8 +256,8 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
                             size="m"
                             text={ownerButtonText}
                             placeholder={t('Enter name or email')}
-                            query={owner?.name || owner?.email}
-                            userPic={<UserPic src={owner?.image} size={16} />}
+                            query={owner?.user?.name || owner?.user?.email}
+                            userPic={<UserPic src={owner?.user?.image} email={owner?.user?.email} size={16} />}
                             onClick={(u) => setOwner(u)}
                             tabIndex={indexes[3]}
                         />

@@ -104,7 +104,6 @@ export const Project = objectType({
         t.field(ProjectModel.activityId);
         t.field(ProjectModel.flowId);
         t.field('activity', { type: Activity });
-        t.field('computedActivity', { type: UserAnyKind });
         t.list.field('goals', { type: Goal });
         t.field('flow', { type: Flow });
         t.list.field('tags', { type: Tag });
@@ -145,8 +144,6 @@ export const Goal = objectType({
         t.list.field('blocks', { type: Goal });
         t.list.field('relatedTo', { type: Goal });
         t.list.field('connected', { type: Goal });
-        t.field('computedOwner', { type: UserAnyKind });
-        t.field('computedActivity', { type: UserAnyKind });
         t.list.field('comments', { type: Comment });
     },
 });
@@ -209,7 +206,6 @@ export const Reaction = objectType({
         t.field('goal', { type: Goal });
         t.field(ReactionModel.createdAt);
         t.field(ReactionModel.updatedAt);
-        t.field('computedAuthor', { type: UserAnyKind });
     },
 });
 
@@ -227,8 +223,7 @@ export const Comment = objectType({
     definition(t) {
         t.field(CommentModel.id);
         t.field(CommentModel.description);
-        t.field('author', { type: UserAnyKind });
-        t.field('computedAuthor', { type: UserAnyKind });
+        t.field('author', { type: Activity });
         t.field('activity', { type: Activity });
         // t.field(CommentModel.reactions);
         t.field(CommentModel.createdAt);
@@ -414,22 +409,3 @@ export const ProjectGoalsCountInput = inputObjectType({
         t.nonNull.string('query');
     },
 });
-
-export const computeUserFields = {
-    include: {
-        user: true,
-        ghost: true,
-    },
-};
-
-export const withComputedField =
-    (...args: string[]) =>
-    <T>(o: T): T => ({
-        ...o,
-        ...args.reduce((acc, field) => {
-            // @ts-ignore
-            acc[`computed${field[0].toUpperCase() + field.substring(1)}`] = o[`${field}`]?.user ?? o[`${field}`]?.ghost;
-
-            return acc;
-        }, {}),
-    });

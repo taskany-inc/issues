@@ -14,18 +14,23 @@ import { CommonHeader } from '../../components/CommonHeader';
 
 const refreshInterval = 3000;
 
-// @ts-ignore FIXME: https://github.com/taskany-inc/issues/issues/25
 const fetcher = createFetcher(() => ({
     projects: {
         key: true,
         title: true,
         description: true,
         createdAt: true,
-        computedActivity: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
+        activity: {
+            user: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+            },
+            ghost: {
+                id: true,
+                email: true,
+            },
         },
     },
 }));
@@ -76,7 +81,7 @@ const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: P
                             title={p.title}
                             description={p.description}
                             createdAt={p.createdAt}
-                            owner={p.computedActivity}
+                            owner={p.activity}
                         />
                     )),
                 )}

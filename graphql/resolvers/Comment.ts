@@ -1,7 +1,7 @@
 import { nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Comment, computeUserFields, withComputedField } from '../types';
+import { Comment } from '../types';
 import { mailServer } from '../../src/utils/mailServer';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -11,19 +11,20 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             goalId: nonNull(stringArg()),
         },
         resolve: async (_, { goalId }, { db }) => {
-            const comments = await db.comment.findMany({
+            return db.comment.findMany({
                 where: {
                     goalId,
                 },
                 include: {
                     activity: {
-                        ...computeUserFields,
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
                     reactions: true,
                 },
             });
-
-            return comments.map(withComputedField('author'));
         },
     });
 };
@@ -39,7 +40,10 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         resolve: async (_, { goalId, description, authorId }, { db }) => {
             const [commentAuthor, goal] = await Promise.all([
                 db.user.findUnique({ where: { id: authorId }, include: { activity: true } }),
-                db.goal.findUnique({ where: { id: goalId }, include: { participants: { ...computeUserFields } } }),
+                db.goal.findUnique({
+                    where: { id: goalId },
+                    include: { participants: { include: { user: true, ghost: true } } },
+                }),
             ]);
 
             if (!commentAuthor || !commentAuthor.activity) return null;

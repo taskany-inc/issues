@@ -17,8 +17,9 @@ export default {
             __typename: 'State',
         },
         issuer: {
-            name: 'Petr Nikitin',
-            __typename: 'UserAnyKind',
+            user: {
+                name: 'Petr Nikitin',
+            },
         },
     },
 } as ComponentMeta<typeof GoalItem>;
@@ -62,8 +63,20 @@ WithOwnerPhoto.args = {
     tags: createTags(4),
     createdAt: '2022-01-24T10:07:12.887Z',
     owner: {
-        image: 'https://www.beeztees.nl/wp-content/uploads/2017/01/shutterstock_235089946.jpg',
-        __typename: 'UserAnyKind',
+        id: '1',
+        createdAt: '2022-01-24T10:07:12.887Z',
+        updatedAt: '2022-01-24T10:07:12.887Z',
+        __typename: 'Activity',
+        user: {
+            id: '1',
+            email: 'user@taskany.org',
+            name: 'Test User',
+            role: 'USER',
+            image: 'https://www.beeztees.nl/wp-content/uploads/2017/01/shutterstock_235089946.jpg',
+            createdAt: '2022-01-24T10:07:12.887Z',
+            updatedAt: '2022-01-24T10:07:12.887Z',
+            __typename: 'User',
+        },
     },
 };
 
@@ -72,8 +85,20 @@ WithOwnerIcon.args = {
     tags: createTags(2),
     createdAt: '2022-01-24T10:07:12.887Z',
     owner: {
-        name: 'Test User',
-        __typename: 'UserAnyKind',
+        id: '1',
+        createdAt: '2022-01-24T10:07:12.887Z',
+        updatedAt: '2022-01-24T10:07:12.887Z',
+        __typename: 'Activity',
+        user: {
+            id: '1',
+            email: 'user@taskany.org',
+            name: 'Test User',
+            role: 'USER',
+            image: 'https://www.beeztees.nl/wp-content/uploads/2017/01/shutterstock_235089946.jpg',
+            createdAt: '2022-01-24T10:07:12.887Z',
+            updatedAt: '2022-01-24T10:07:12.887Z',
+            __typename: 'User',
+        },
     },
 };
 
@@ -84,8 +109,19 @@ WithCommentsForkAndOwner.args = {
     hasForks: true,
     comments: 42,
     owner: {
-        image: 'https://www.beeztees.nl/wp-content/uploads/2017/01/shutterstock_235089946.jpg',
-        name: 'Test User',
-        __typename: 'UserAnyKind',
+        id: '1',
+        createdAt: '2022-01-24T10:07:12.887Z',
+        updatedAt: '2022-01-24T10:07:12.887Z',
+        __typename: 'Activity',
+        user: {
+            id: '1',
+            email: 'user@taskany.org',
+            name: 'Test User',
+            role: 'USER',
+            image: 'https://www.beeztees.nl/wp-content/uploads/2017/01/shutterstock_235089946.jpg',
+            createdAt: '2022-01-24T10:07:12.887Z',
+            updatedAt: '2022-01-24T10:07:12.887Z',
+            __typename: 'User',
+        },
     },
 };

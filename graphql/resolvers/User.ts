@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { User, SortOrder, UserAnyKind, Ghost, UserInput, UserInvitesInput } from '../types';
+import { User, SortOrder, Ghost, UserInput, UserInvitesInput, Activity } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('users', {
@@ -15,8 +15,8 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             }),
     });
 
-    t.list.field('findUserAnyKind', {
-        type: UserAnyKind,
+    t.list.field('findActivity', {
+        type: Activity,
         args: {
             query: nonNull(stringArg()),
         },
@@ -26,55 +26,43 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 return [];
             }
 
-            const [ghosts, users] = await Promise.all([
-                db.ghost.findMany({
-                    where: {
-                        email: {
-                            contains: query,
-                            mode: 'insensitive',
-                        },
-                    },
-                    include: {
-                        activity: true,
-                    },
-                    take: 5,
-                }),
-                db.user.findMany({
-                    where: {
-                        OR: [
-                            {
+            return db.activity.findMany({
+                take: 5,
+                where: {
+                    OR: [
+                        {
+                            ghost: {
                                 email: {
                                     contains: query,
                                     mode: 'insensitive',
                                 },
                             },
-                            {
-                                name: {
-                                    contains: query,
-                                    mode: 'insensitive',
-                                },
+                        },
+                        {
+                            user: {
+                                OR: [
+                                    {
+                                        email: {
+                                            contains: query,
+                                            mode: 'insensitive',
+                                        },
+                                    },
+                                    {
+                                        name: {
+                                            contains: query,
+                                            mode: 'insensitive',
+                                        },
+                                    },
+                                ],
                             },
-                        ],
-                    },
-                    include: {
-                        activity: true,
-                    },
-                    take: 5,
-                }),
-            ]);
-
-            return [
-                ...users.map((u) => {
-                    // @ts-ignore
-                    u.kind = 'USER';
-                    return u;
-                }),
-                ...ghosts.map((g) => {
-                    // @ts-ignore
-                    g.kind = 'GHOST';
-                    return g;
-                }),
-            ];
+                        },
+                    ],
+                },
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            });
         },
     });
 };

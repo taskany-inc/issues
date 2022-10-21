@@ -3,7 +3,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 import { routes } from '../hooks/router';
-import type { Scalars, UserAnyKind } from '../../graphql/@generated/genql';
+import type { Scalars, Activity } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
@@ -17,7 +17,7 @@ interface ProjectItemProps {
     title: string;
     description?: string;
     createdAt: Scalars['DateTime'];
-    owner?: UserAnyKind;
+    owner?: Activity;
 }
 
 const StyledProjectItem = styled.a`
@@ -86,7 +86,7 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({ projectKey, title, des
                 </StyledName>
 
                 <StyledAddon>
-                    <UserPic src={owner?.image} email={owner?.email} size={24} />
+                    <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
                 </StyledAddon>
             </StyledProjectItem>
         </Link>

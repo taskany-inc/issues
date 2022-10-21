@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import { gql } from '../utils/gql';
 import { gapS, gray6, star0 } from '../design/@generated/themes';
-import { UserAnyKind, Project, EstimateInput, State, Tag as TagModel } from '../../graphql/@generated/genql';
+import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
 import { TLocale } from '../types/locale';
 
@@ -33,7 +33,7 @@ const StyledFormBottom = styled.div`
 const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => {
     const t = useTranslations('goals.new');
     const { data: session } = useSession();
-    const [owner, setOwner] = useState(session?.user as Partial<UserAnyKind>);
+    const [owner, setOwner] = useState({ id: session?.user.activityId, user: session?.user } as Activity);
     const [estimate, setEstimate] = useState<EstimateInput>();
     const [project, setProject] = useState<Project>();
     const [state, setState] = useState<State>();
@@ -104,7 +104,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
         <GoalForm
             i18nKeyset="goals.new"
             formTitle={t('Create new goal')}
-            owner={owner}
+            owner={owner!}
             project={project}
             state={state}
             tags={tags}
