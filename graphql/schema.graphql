@@ -308,15 +308,6 @@ type User {
   updatedAt: DateTime!
 }
 
-type UserAnyKind {
-  activity: Activity
-  email: String
-  id: String
-  image: String
-  kind: UserKind
-  name: String
-}
-
 input UserGoalsInput {
   owner: [String!]!
   query: String!
@@ -332,9 +323,4 @@ input UserInput {
 
 input UserInvitesInput {
   emails: [String]
-}
-
-enum UserKind {
-  GHOST
-  USER
 }
