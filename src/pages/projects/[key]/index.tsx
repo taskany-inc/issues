@@ -1,8 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 
 import { routes } from '../../../hooks/router';
 import { createFetcher } from '../../../utils/createFetcher';
@@ -18,7 +19,11 @@ import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { FiltersPanel, defaultLimit } from '../../../components/FiltersPanel';
+import { useMounted } from '../../../hooks/useMounted';
 
+const refreshInterval = 3000;
+
+const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 // @ts-ignore
 const fetcher = createFetcher(
     (_, key: string, offset = 0, states = [], query = '', limitFilter = defaultLimit, tags = [], owner = []) => ({
@@ -148,9 +153,11 @@ const fetcher = createFetcher(
 );
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { key } }) => ({
-        ssrData: await fetcher(user, key),
-    }),
+    async ({ user, params: { key }, query }) => {
+        return {
+            ssrData: await fetcher(user, key, 0, parseQueryParam(query.stateFilter as string)),
+        };
+    },
     {
         private: true,
     },
@@ -182,8 +189,9 @@ const ProjectPage = ({
     params: { key },
 }: ExternalPageProps<{ project: Project; projectGoals: Goal[]; projectGoalsCount: number }, { key: string }>) => {
     const t = useTranslations('projects.key');
+    const router = useRouter();
     const [fulltextFilter, setFulltextFilter] = useState('');
-    const [stateFilter, setStateFilter] = useState<string[]>();
+    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.stateFilter as string));
     const [tagsFilter, setTagsFilter] = useState<string[]>();
     const [ownerFilter, setOwnerFilter] = useState<string[]>();
     const [limitFilter, setLimitFilter] = useState(defaultLimit);
@@ -212,6 +220,21 @@ const ProjectPage = ({
     const onSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setFulltextFilter(e.currentTarget.value);
     }, []);
+
+    const mounted = useMounted(refreshInterval);
+
+    useEffect(() => {
+        const stateParams = new URLSearchParams(window.location.search);
+        const newurl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+        if (mounted) {
+            if (stateFilter.length > 0) {
+                stateParams.set('stateFilter', Array.from(stateFilter).toString());
+                window.history.pushState({ path: `${newurl}?${stateParams}` }, '', `${newurl}?${stateParams}`);
+            } else {
+                window.history.pushState({ path: newurl }, '', newurl);
+            }
+        }
+    }, [stateFilter, mounted]);
 
     return (
         <Page
@@ -257,6 +280,7 @@ const ProjectPage = ({
                 flowId={project.flow?.id}
                 users={project.participants}
                 tags={project.tags}
+                filters={stateFilter}
                 onSearchChange={onSearchChange}
                 onStateChange={setStateFilter}
                 onUserChange={setOwnerFilter}

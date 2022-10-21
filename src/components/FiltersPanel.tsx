@@ -22,6 +22,7 @@ interface FiltersPanelProps {
     flowId?: React.ComponentProps<typeof StateFilter>['flowId'];
     users?: React.ComponentProps<typeof UserFilter>['activity'];
     tags?: React.ComponentProps<typeof TagsFilter>['tags'];
+    filters?: Array<string>;
 
     onSearchChange: React.ComponentProps<typeof Input>['onChange'];
     onStateChange?: React.ComponentProps<typeof StateFilter>['onClick'];
@@ -61,6 +62,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     flowId,
     users,
     tags,
+    filters,
     onSearchChange,
     onStateChange,
     onUserChange,
@@ -81,7 +83,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
                     <StyledFiltersMenu>
                         {nullable(flowId, (id) => (
-                            <StateFilter text={t('State')} flowId={id} onClick={onStateChange} />
+                            <StateFilter text={t('State')} flowId={id} filters={filters} onClick={onStateChange} />
                         ))}
                         {nullable(users, (u) => (
                             <UserFilter text={t('Owner')} activity={u} onClick={onUserChange} />
