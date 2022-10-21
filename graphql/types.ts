@@ -28,11 +28,6 @@ export const Role = enumType({
     members: ['USER', 'ADMIN'],
 });
 
-const UserKind = enumType({
-    name: 'UserKind',
-    members: ['USER', 'GHOST'],
-});
-
 export const dependencyKind = ['dependsOn', 'blocks', 'relatedTo'];
 export const Dependency = enumType({
     name: 'Dependency',
@@ -79,18 +74,6 @@ export const Ghost = objectType({
         t.field(GhostModel.createdAt);
         t.field(GhostModel.updatedAt);
         t.field('activity', { type: Activity });
-    },
-});
-
-export const UserAnyKind = objectType({
-    name: 'UserAnyKind',
-    definition(t) {
-        t.string('id');
-        t.string('email');
-        t.string('name');
-        t.string('image');
-        t.field('activity', { type: Activity });
-        t.field('kind', { type: UserKind });
     },
 });
 
