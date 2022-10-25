@@ -208,8 +208,9 @@ const ProjectPage = ({
         ({ offset, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter }) =>
             fetcher(user, key, offset, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter),
     );
-
-    const shouldRenderMoreButton = data?.[data.length - 1]?.projectGoals?.length === limitFilter;
+    const shouldRenderMoreButton =
+        (data?.[data.length - 1]?.projectGoals?.length || 0) === limitFilter &&
+        (data?.[data.length - 1]?.projectGoals?.length || 0) * size < (data?.[0].projectGoalsCount || 0);
 
     const goals = fulltextFilter
         ? data?.map((chunk) => chunk.projectGoals).flat()
