@@ -7,6 +7,8 @@ import styled, { css } from 'styled-components';
 
 import { gray2, gray3, gray6, radiusS, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
+import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
+import { useMounted } from '../hooks/useMounted';
 
 const Editor = dynamic(() => import('@monaco-editor/react'));
 
@@ -14,15 +16,14 @@ interface FormEditorProps {
     id?: string;
     name?: string;
     value?: string;
-    defaultValue?: string;
     autoFocus?: boolean;
     flat?: 'top' | 'bottom' | 'both';
     height?: string;
     placeholder?: string;
 
     onChange?: (value: string | undefined) => void;
-    onBlur?: React.FocusEventHandler<HTMLDivElement>;
-    onFocus?: React.FocusEventHandler<HTMLDivElement>;
+    onBlur?: () => void;
+    onFocus?: () => void;
 
     error?: FieldError;
 }
@@ -136,59 +137,79 @@ const StyledPlaceholder = styled.div`
 `;
 
 export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
-    ({ id, defaultValue, value, flat, autoFocus, height = '200px', placeholder, onChange, onFocus, onBlur }, ref) => {
+    ({ id, value, flat, autoFocus, height = '200px', placeholder, onChange, onFocus, onBlur }, ref) => {
         const [focused, setFocused] = useState(false);
         const monacoEditorRef = useRef<any>(null);
+        const extraRef = useRef<HTMLDivElement>(null);
+        const [viewValue, setViewValue] = useState<string | undefined>('');
+        const mounted = useMounted();
 
         const handleEditorDidMount = (editor: any /* IStandaloneEditor */) => {
             monacoEditorRef.current = editor;
+
+            if (autoFocus) {
+                editor.focus();
+                setFocused(true);
+                onFocus && onFocus();
+
+                if (viewValue !== value) {
+                    editor.trigger('keyboard', 'type', { text: value });
+                }
+            } else {
+                setViewValue(value);
+            }
         };
 
-        // useEffect(() => {
-        //     if (monaco) {
-        //         console.log('here is the monaco instance:', monaco);
-        //     }
-        // }, [monaco]);
+        useEffect(() => {
+            if (mounted && viewValue !== value) setViewValue(value);
+        }, [value, viewValue, mounted]);
 
         useEffect(() => {
-            if (monacoEditorRef.current && autoFocus) {
-                monacoEditorRef.current.focus();
-            }
-        }, [autoFocus]);
-
-        const onEditorFocus = useCallback(
-            (e) => {
+            if (autoFocus) {
+                monacoEditorRef.current?.focus();
                 setFocused(true);
-                onFocus && onFocus(e);
-            },
-            [onFocus],
-        );
+                onFocus && onFocus();
+                monacoEditorRef.current?.setPosition(monacoEditorRef.current?.getPosition());
+            }
+        }, [autoFocus, onFocus, viewValue, value]);
 
-        const onEditorBlur = useCallback(
-            (e) => {
-                setFocused(false);
-                onBlur && onBlur(e);
-            },
-            [onBlur],
-        );
+        const onEditorFocus = useCallback(() => {
+            setFocused(true);
+            onFocus && onFocus();
+        }, [onFocus]);
+
+        const onEditorBlur = useCallback(() => {
+            setFocused(false);
+            onBlur && onBlur();
+        }, [onBlur]);
+
+        const [onESC] = useKeyboard([KeyCode.Escape], () => {
+            onEditorBlur();
+
+            extraRef.current?.focus();
+            extraRef.current?.blur();
+        });
 
         return (
-            <StyledEditor tabIndex={0} id={id} flat={flat} ref={ref} onFocus={onEditorFocus} onBlur={onEditorBlur}>
-                {nullable(!focused && !value && placeholder, () => (
-                    <StyledPlaceholder>{placeholder}</StyledPlaceholder>
-                ))}
-                <Editor
-                    loading=""
-                    theme="vs-dark"
-                    height={height}
-                    defaultLanguage="markdown"
-                    value={value}
-                    defaultValue={defaultValue}
-                    options={defaultOptions}
-                    onChange={onChange}
-                    onMount={handleEditorDidMount}
-                />
-            </StyledEditor>
+            <div tabIndex={0} ref={extraRef} style={{ outline: 'none' }}>
+                <StyledEditor tabIndex={0} id={id} flat={flat} ref={ref} {...onESC}>
+                    {nullable(!focused && !value && placeholder, () => (
+                        <StyledPlaceholder>{placeholder}</StyledPlaceholder>
+                    ))}
+                    <div onFocus={onEditorFocus} onBlur={onEditorBlur}>
+                        <Editor
+                            loading=""
+                            theme="vs-dark"
+                            height={height}
+                            defaultLanguage="markdown"
+                            value={viewValue}
+                            options={defaultOptions}
+                            onChange={onChange}
+                            onMount={handleEditorDidMount}
+                        />
+                    </div>
+                </StyledEditor>
+            </div>
         );
     },
 );

@@ -1,12 +1,12 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { Comment } from '../components/Comment';
+import { CommentView } from '../components/CommentView';
 
 // @ts-ignore
 export default {
     title: 'Taskany/Comment',
-    component: Comment,
+    component: CommentView,
     args: {
         author: {
             __typename: 'User',
@@ -17,7 +17,7 @@ export default {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type",
         createdAt: Date.now(),
     },
-} as ComponentMeta<typeof Comment>;
-const Template: ComponentStory<typeof Comment> = (args) => <Comment {...args} />;
+} as ComponentMeta<typeof CommentView>;
+const Template: ComponentStory<typeof CommentView> = (args) => <CommentView {...args} />;
 
 export const Default = Template.bind({});

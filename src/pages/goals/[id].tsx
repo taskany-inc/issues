@@ -36,7 +36,7 @@ import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
 import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
-import { Comment, commentMask } from '../../components/Comment';
+import { commentMask, CommentView } from '../../components/CommentView';
 import { IssueDependencies } from '../../components/IssueDependencies';
 import { IssueParticipants } from '../../components/IssueParticipants';
 import { editGoalKeys } from '../../utils/hotkeys';
@@ -166,6 +166,7 @@ const fetcher = createFetcher((_, id: string) => ({
                 description: true,
                 createdAt: true,
                 activity: {
+                    id: true,
                     user: {
                         id: true,
                         name: true,
@@ -611,12 +612,15 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
                         {goal.comments?.map((comment) =>
                             nullable(comment, (c) => (
-                                <Comment
+                                <CommentView
                                     key={c.id}
                                     id={c.id}
                                     author={c.activity?.user}
                                     description={c.description}
                                     createdAt={c.createdAt}
+                                    locale={locale}
+                                    goalId={goal.id}
+                                    isEditable={c.activity?.id === user.activityId}
                                     isNew={c.id === highlightCommentId}
                                 />
                             )),
@@ -628,6 +632,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                             user={user}
                             setFocus={commentFormFocus}
                             onCreate={onCommentPublish}
+                            onBlur={() => setCommentFormFocus(false)}
                         />
                     </StyledActivityFeed>
                 </div>

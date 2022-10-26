@@ -1,6 +1,7 @@
 /* eslint-disable react/display-name */
 import React from 'react';
 import dynamic from 'next/dynamic';
+import styled, { css } from 'styled-components';
 
 const componentsMap = {
     plus: dynamic(() => import('teenyicons/outline/plus-circle.svg')),
@@ -53,19 +54,38 @@ interface IconProps {
     onClick?: (e: React.MouseEvent) => void;
 }
 
+const StyledIcon = styled.span<{ onClick?: IconProps['onClick'] }>`
+    ${({ onClick }) =>
+        onClick &&
+        css`
+            cursor: pointer;
+        `}
+`;
+
 export const Icon = React.forwardRef<HTMLSpanElement, IconProps>(
     ({ type, size, color = 'inherit', stroke = 1, className, onClick, noWrap }, ref) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const Component: React.ComponentType<any> = componentsMap[type];
         const sizePx = `${typeof size === 'string' ? sizesMap[size] : size}px`;
-        const content = <Component width={sizePx} height={sizePx} color={color} strokeWidth={stroke} />;
+        const content = (
+            <Component
+                width={sizePx}
+                height={sizePx}
+                color={color}
+                strokeWidth={stroke}
+                onClick={onClick}
+                style={{
+                    cursor: onClick ? 'pointer' : 'default',
+                }}
+            />
+        );
 
         return noWrap ? (
             content
         ) : (
-            <span ref={ref} className={className} style={{ lineHeight: 'initial' }} onClick={onClick}>
+            <StyledIcon ref={ref} className={className} style={{ lineHeight: 'initial' }} onClick={onClick}>
                 {content}
-            </span>
+            </StyledIcon>
         );
     },
 );

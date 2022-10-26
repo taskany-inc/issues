@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,11 +11,9 @@ import { gql } from '../utils/gql';
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
 import { TLocale } from '../types/locale';
 import { routes } from '../hooks/router';
-import { nullable } from '../utils/nullable';
 
 import { Form } from './Form';
 import { FormCard } from './FormCard';
-import { UserPic } from './UserPic';
 import { Icon } from './Icon';
 import { FormAction, FormActions } from './FormActions';
 import { Button } from './Button';
@@ -23,21 +21,17 @@ import { Tip } from './Tip';
 import { Link } from './Link';
 import { FormEditor } from './FormEditor';
 
-interface CommentCreateFormProps {
+interface CommentEditFormProps {
     goalId: string;
+    locale: TLocale;
+    value: string;
     user?: Session['user'];
     setFocus?: boolean;
-    locale: TLocale;
 
-    onCreate?: (CommentsId?: string) => void;
     onBlur?: () => void;
+    onCreate?: (CommentsId?: string) => void;
+    onCancel?: () => void;
 }
-
-const StyledComment = styled.div`
-    display: grid;
-    grid-template-columns: 35px 1fr;
-    column-gap: 15px;
-`;
 
 const StyledFormBottom = styled.div`
     display: flex;
@@ -78,10 +72,17 @@ const commentHeightMap: Record<string, string> = {
     false: '60px',
 };
 
-const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, onBlur, goalId, setFocus, locale }) => {
-    const t = useTranslations('Comments.new');
-    const [commentFocused, setCommentFocused] = useState(false);
-    const [autoFocus, setAutoFocus] = useState(false);
+const CommentEditForm: React.FC<CommentEditFormProps> = ({
+    user,
+    goalId,
+    locale,
+    value,
+    onCreate,
+    onBlur,
+    onCancel,
+}) => {
+    const t = useTranslations('Comments.edit');
+    const [commentFocused, setCommentFocused] = useState(true);
 
     const schema = z.object({
         comment: z
@@ -99,23 +100,16 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
     const {
         control,
         handleSubmit,
-        resetField,
-        watch,
         formState: { errors, isValid },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
+        defaultValues: {
+            comment: value,
+        },
     });
-
-    const commentValue = watch('comment');
-
-    useEffect(() => {
-        if (setFocus) {
-            setAutoFocus(true);
-        }
-    }, [setFocus]);
 
     const createComment = async ({ comment }: FormType) => {
         if (!user) return;
@@ -142,63 +136,49 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
         const data = await promise;
 
         onCreate && onCreate(data.createComment?.id);
-
-        resetField('comment');
     };
 
     const onCommentBlur = useCallback(() => {
-        setTimeout(() => {
-            setCommentFocused(false);
-            setAutoFocus(false);
-            onBlur && onBlur();
-            resetField('comment');
-        }, 100);
-    }, [onBlur, resetField]);
+        setCommentFocused(false);
+    }, []);
 
     return (
-        <StyledComment>
-            <UserPic size={32} src={user?.image} email={user?.email} />
+        <StyledCommentForm tabIndex={0} onBlur={onCommentBlur}>
+            <Form onSubmit={handleSubmit(createComment)}>
+                <Controller
+                    name="comment"
+                    control={control}
+                    render={({ field }) => (
+                        <FormEditor
+                            {...field}
+                            placeholder={t('Leave a comment')}
+                            height={commentHeightMap[String(commentFocused)]}
+                            autoFocus={commentFocused}
+                            onBlur={onBlur}
+                        />
+                    )}
+                />
 
-            <StyledCommentForm tabIndex={0}>
-                <Form onSubmit={handleSubmit(createComment)}>
-                    <Controller
-                        name="comment"
-                        control={control}
-                        render={({ field }) => (
-                            <FormEditor
-                                {...field}
-                                placeholder={t('Leave a comment')}
-                                height={commentHeightMap[String(commentFocused)]}
-                                onFocus={() => setCommentFocused(true)}
-                                onBlur={onCommentBlur}
-                                autoFocus={autoFocus}
-                            />
-                        )}
-                    />
+                <FormActions>
+                    <FormAction left inline />
+                    <FormAction right inline>
+                        <Button size="m" text={t('Cancel')} onClick={onCancel} />
+                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Save')} />
+                    </FormAction>
+                </FormActions>
+            </Form>
 
-                    <FormActions>
-                        <FormAction left inline />
-                        <FormAction right inline>
-                            {nullable(commentValue?.length, () => (
-                                <Button size="m" text={t('Cancel')} onClick={onCommentBlur} />
-                            ))}
-                            <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Comment')} />
-                        </FormAction>
-                    </FormActions>
-                </Form>
+            <StyledFormBottom>
+                <StyledTip icon={<Icon type="markdown" size="s" color={gray6} />}>
+                    {t('Styling with markdown is supported')}
+                </StyledTip>
 
-                <StyledFormBottom>
-                    <StyledTip icon={<Icon type="markdown" size="s" color={gray6} />}>
-                        {t('Styling with markdown is supported')}
-                    </StyledTip>
-
-                    <Link href={routes.help(locale, 'comments')}>
-                        <Icon type="question" size="s" color={gray6} />
-                    </Link>
-                </StyledFormBottom>
-            </StyledCommentForm>
-        </StyledComment>
+                <Link href={routes.help(locale, 'comments')}>
+                    <Icon type="question" size="s" color={gray6} />
+                </Link>
+            </StyledFormBottom>
+        </StyledCommentForm>
     );
 };
 
-export default CommentCreateForm;
+export default CommentEditForm;
