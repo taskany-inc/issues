@@ -20,7 +20,6 @@ interface CommentViewProps {
     id: string;
     description: string;
     createdAt: Scalars['DateTime'];
-    goalId: string;
     locale: TLocale;
     updatedAt?: Scalars['DateTime'];
     author?: User;
@@ -111,10 +110,10 @@ export const CommentView: FC<CommentViewProps> = ({
     createdAt,
     isNew,
     isEditable,
-    goalId,
     locale,
 }) => {
     const [editMode, setEditMode] = useState(false);
+    const [commentDescription, setCommentDescription] = useState(description);
 
     const onDoubleCommentClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if (e.detail === 2) {
@@ -124,8 +123,16 @@ export const CommentView: FC<CommentViewProps> = ({
         }
     }, []);
 
-    const onCommentBlur = useCallback(() => {
-        setEditMode(false);
+    const onEdited = useCallback(
+        (id?: string, description?: string) => {
+            setEditMode(false);
+            setCommentDescription(description || commentDescription);
+        },
+        [commentDescription],
+    );
+
+    const onChanged = useCallback((description: string) => {
+        setCommentDescription(description);
     }, []);
 
     return (
@@ -134,11 +141,12 @@ export const CommentView: FC<CommentViewProps> = ({
 
             {editMode ? (
                 <CommentEditForm
-                    goalId={goalId}
+                    id={id}
                     locale={locale}
-                    value={description}
-                    onBlur={onCommentBlur}
-                    onCancel={() => setEditMode(false)}
+                    description={commentDescription}
+                    onCancel={onEdited}
+                    onChanged={onChanged}
+                    onUpdate={onEdited}
                 />
             ) : (
                 <StyledCommentCard isNew={isNew} onClick={onDoubleCommentClick}>
@@ -157,7 +165,7 @@ export const CommentView: FC<CommentViewProps> = ({
                     </StyledCardInfo>
 
                     <CardComment>
-                        <Md>{description}</Md>
+                        <Md>{commentDescription}</Md>
                     </CardComment>
                 </StyledCommentCard>
             )}

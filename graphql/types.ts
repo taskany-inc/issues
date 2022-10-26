@@ -333,12 +333,20 @@ export const UserInvitesInput = inputObjectType({
     },
 });
 
-export const CommentInputType = inputObjectType({
-    name: 'CommentInput',
+export const CommentCreateInputType = inputObjectType({
+    name: 'CommentCreateInputType',
     definition(t) {
         t.field(CommentModel.description);
         t.field(CommentModel.goalId);
         t.field(CommentModel.activityId);
+    },
+});
+
+export const CommentUpdateInputType = inputObjectType({
+    name: 'CommentUpdateInputType',
+    definition(t) {
+        t.field(CommentModel.id);
+        t.field(CommentModel.description);
     },
 });
 
