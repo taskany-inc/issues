@@ -73,7 +73,7 @@ export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children
                 toastOptions={{
                     style: { borderRadius: radiusM, background: gray4, color: textColor },
                 }}
-                position="bottom-center"
+                position="bottom-right"
             />
 
             <Header />
