@@ -150,12 +150,19 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
 
     const onCommentBlur = useCallback(() => {
         setTimeout(() => {
+            onBlur && onBlur();
             setCommentFocused(false);
             setAutoFocus(false);
-            onBlur && onBlur();
+        }, 100);
+    }, [onBlur]);
+
+    const onCancelCreate = useCallback(() => {
+        setTimeout(() => {
+            setCommentFocused(false);
+            setAutoFocus(false);
             resetField('comment');
         }, 100);
-    }, [onBlur, resetField]);
+    }, [resetField]);
 
     return (
         <StyledComment>
@@ -171,6 +178,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
                                 {...field}
                                 placeholder={t('Leave a comment')}
                                 height={commentHeightMap[String(commentFocused)]}
+                                onCancel={onCancelCreate}
                                 onFocus={() => setCommentFocused(true)}
                                 onBlur={onCommentBlur}
                                 autoFocus={autoFocus}
@@ -182,7 +190,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
                         <FormAction left inline />
                         <FormAction right inline>
                             {nullable(commentValue?.length, () => (
-                                <Button size="m" text={t('Cancel')} onClick={onCommentBlur} />
+                                <Button size="m" text={t('Cancel')} onClick={onCancelCreate} />
                             ))}
                             <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Comment')} />
                         </FormAction>
