@@ -24,6 +24,7 @@ interface FormEditorProps {
     onChange?: (value: string | undefined) => void;
     onBlur?: () => void;
     onFocus?: () => void;
+    onCancel?: () => void;
 
     error?: FieldError;
 }
@@ -137,7 +138,7 @@ const StyledPlaceholder = styled.div`
 `;
 
 export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
-    ({ id, value, flat, autoFocus, height = '200px', placeholder, onChange, onFocus, onBlur }, ref) => {
+    ({ id, value, flat, autoFocus, height = '200px', placeholder, onChange, onFocus, onBlur, onCancel }, ref) => {
         const [focused, setFocused] = useState(false);
         const monacoEditorRef = useRef<any>(null);
         const extraRef = useRef<HTMLDivElement>(null);
@@ -188,6 +189,8 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
 
             extraRef.current?.focus();
             extraRef.current?.blur();
+
+            onCancel && onCancel();
         });
 
         return (

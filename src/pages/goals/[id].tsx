@@ -615,11 +615,10 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                 <CommentView
                                     key={c.id}
                                     id={c.id}
+                                    locale={locale}
                                     author={c.activity?.user}
                                     description={c.description}
                                     createdAt={c.createdAt}
-                                    locale={locale}
-                                    goalId={goal.id}
                                     isEditable={c.activity?.id === user.activityId}
                                     isNew={c.id === highlightCommentId}
                                 />

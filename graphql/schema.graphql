@@ -25,10 +25,15 @@ type Comment {
   updatedAt: DateTime!
 }
 
-input CommentInput {
+input CommentCreateInputType {
   activityId: String!
   description: String!
   goalId: String!
+}
+
+input CommentUpdateInputType {
+  description: String!
+  id: ID!
 }
 
 """
@@ -143,7 +148,7 @@ input GoalInput {
 }
 
 type Mutation {
-  createComment(authorId: String!, description: String!, goalId: String!): Comment
+  createComment(data: CommentCreateInputType!): Comment
   createGoal(goal: GoalCreateInput!): Goal
   createProject(data: ProjectInput!): Project
   createTag(description: String, title: String!): Tag
@@ -154,6 +159,7 @@ type Mutation {
   toggleProjectStargizer(toggle: SubscriptionInput!): Activity
   toggleProjectWatcher(toggle: SubscriptionInput!): Activity
   toggleReaction(reaction: ReactionInput!): Reaction
+  updateComment(data: CommentUpdateInputType!): Comment
   updateGoal(goal: GoalInput!): Goal
   updateProject(data: ProjectInput!): Project
   updateSettings(data: SettingsInput!): Settings

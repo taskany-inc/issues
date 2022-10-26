@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
-import { Session } from 'next-auth';
 
 import { gql } from '../utils/gql';
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
@@ -22,14 +21,13 @@ import { Link } from './Link';
 import { FormEditor } from './FormEditor';
 
 interface CommentEditFormProps {
-    goalId: string;
+    id: string;
     locale: TLocale;
-    value: string;
-    user?: Session['user'];
+    description: string;
     setFocus?: boolean;
 
-    onBlur?: () => void;
-    onCreate?: (CommentsId?: string) => void;
+    onChanged?: (description: string) => void;
+    onUpdate?: (id?: string, description?: string) => void;
     onCancel?: () => void;
 }
 
@@ -67,25 +65,18 @@ const StyledTip = styled(Tip)`
     padding: 0;
 `;
 
-const commentHeightMap: Record<string, string> = {
-    true: '120px',
-    false: '60px',
-};
-
 const CommentEditForm: React.FC<CommentEditFormProps> = ({
-    user,
-    goalId,
+    id,
     locale,
-    value,
-    onCreate,
-    onBlur,
+    description,
+    onChanged,
+    onUpdate,
     onCancel,
 }) => {
     const t = useTranslations('Comments.edit');
-    const [commentFocused, setCommentFocused] = useState(true);
 
     const schema = z.object({
-        comment: z
+        description: z
             .string({
                 required_error: t("Comments's description is required"),
                 invalid_type_error: t("Comments's description must be a string"),
@@ -100,6 +91,7 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({
     const {
         control,
         handleSubmit,
+        watch,
         formState: { errors, isValid },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
@@ -107,22 +99,27 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({
         reValidateMode: 'onChange',
         shouldFocusError: true,
         defaultValues: {
-            comment: value,
+            description,
         },
     });
 
-    const createComment = async ({ comment }: FormType) => {
-        if (!user) return;
+    const newDescription = watch('description');
+    const isUpdateAllowed = isValid && newDescription !== description;
+
+    const updateComment = async ({ description }: FormType) => {
+        onChanged && onChanged(description);
 
         const promise = gql.mutation({
-            createComment: [
+            updateComment: [
                 {
-                    goalId,
-                    description: comment,
-                    authorId: user.id,
+                    data: {
+                        id,
+                        description,
+                    },
                 },
                 {
                     id: true,
+                    description: true,
                 },
             ],
         });
@@ -135,26 +132,26 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({
 
         const data = await promise;
 
-        onCreate && onCreate(data.createComment?.id);
+        onUpdate && onUpdate(data.updateComment?.id, data.updateComment?.description);
     };
 
-    const onCommentBlur = useCallback(() => {
-        setCommentFocused(false);
-    }, []);
+    const onCancelEdit = useCallback(() => {
+        onCancel && onCancel();
+    }, [onCancel]);
 
     return (
-        <StyledCommentForm tabIndex={0} onBlur={onCommentBlur}>
-            <Form onSubmit={handleSubmit(createComment)}>
+        <StyledCommentForm>
+            <Form onSubmit={handleSubmit(updateComment)}>
                 <Controller
-                    name="comment"
+                    name="description"
                     control={control}
                     render={({ field }) => (
                         <FormEditor
                             {...field}
                             placeholder={t('Leave a comment')}
-                            height={commentHeightMap[String(commentFocused)]}
-                            autoFocus={commentFocused}
-                            onBlur={onBlur}
+                            height="120px"
+                            autoFocus
+                            onCancel={onCancelEdit}
                         />
                     )}
                 />
@@ -162,8 +159,8 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({
                 <FormActions>
                     <FormAction left inline />
                     <FormAction right inline>
-                        <Button size="m" text={t('Cancel')} onClick={onCancel} />
-                        <Button size="m" view="primary" type="submit" disabled={!isValid} text={t('Save')} />
+                        <Button size="m" text={t('Cancel')} onClick={onCancelEdit} />
+                        <Button size="m" view="primary" type="submit" disabled={!isUpdateAllowed} text={t('Save')} />
                     </FormAction>
                 </FormActions>
             </Form>

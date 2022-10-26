@@ -29,7 +29,7 @@ interface CommentCreateFormProps {
     setFocus?: boolean;
     locale: TLocale;
 
-    onCreate?: (CommentsId?: string) => void;
+    onCreate?: (id?: string) => void;
     onBlur?: () => void;
 }
 
@@ -123,9 +123,11 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
         const promise = gql.mutation({
             createComment: [
                 {
-                    goalId,
-                    description: comment,
-                    authorId: user.id,
+                    data: {
+                        goalId,
+                        description: comment,
+                        activityId: user.id,
+                    },
                 },
                 {
                     id: true,
