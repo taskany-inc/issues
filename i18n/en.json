@@ -223,7 +223,20 @@
       "Voila! Comment is here 🎉": "Voila! Comment is here 🎉",
       "Leave a comment": "Leave a comment...",
       "Styling with markdown is supported": "Styling with markdown is supported",
-      "Comment": "Comment"
+      "Comment": "Comment",
+      "Cancel": "Cancel"
+    },
+    "edit": {
+      "Comments's description is required": "Comments's description is required",
+      "Comments's description must be a string": "Comments's description must be a string",
+      "Comments's description must be longer than 1 symbol": "Comments's description must be longer than 1 symbol",
+      "Something went wrong 😿": "Something went wrong 😿",
+      "We are creating new Comment": "We are creating new Comment",
+      "Voila! Comment is here 🎉": "Voila! Comment is here 🎉",
+      "Leave a comment": "Leave a comment...",
+      "Styling with markdown is supported": "Styling with markdown is supported",
+      "Save": "Save",
+      "Cancel": "Cancel"
     }
   },
   "IssueParticipants": {
