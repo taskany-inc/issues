@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut, signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 
@@ -84,6 +84,10 @@ const StyledMenuItem = styled.div`
     padding: ${gapXs} ${gapM};
 `;
 
+const StyledUnauthorizedLink = styled.span`
+    cursor: pointer;
+`;
+
 export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
     const t = useTranslations('HeaderMenu');
     const popupRef = useRef<HTMLDivElement>(null);
@@ -145,11 +149,15 @@ export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
                 <StyledNotifier />
             ))}
 
-            <NextLink href={routes.userSettings()} passHref>
-                <Link inline>
-                    <UserPic src={session?.user.image} email={session?.user.email} size={32} />
-                </Link>
-            </NextLink>
+            {session ? (
+                <NextLink href={routes.userSettings()} passHref>
+                    <Link inline></Link>
+                </NextLink>
+            ) : (
+                <StyledUnauthorizedLink onClick={() => signIn()}>
+                    <UserPic size={32} />
+                </StyledUnauthorizedLink>
+            )}
         </StyledHeaderMenu>
     );
 };
