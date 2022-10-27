@@ -54,7 +54,7 @@ export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, filters,
     const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
     const { theme } = useContext(pageContext);
     const [themeId, setThemeId] = useState(0); // default: dark
-    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [selected, setSelected] = useState<Set<string>>(new Set(filters));
 
     useEffect(() => {
         theme && setThemeId(mapThemeOnId[theme]);
@@ -136,7 +136,7 @@ export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, filters,
                             hue={s.hue}
                             title={s.title}
                             hoverColor={colors[i]}
-                            checked={filters?.includes(s.id)}
+                            checked={selected?.has(s.id)}
                             onClick={onItemClick(s)}
                         />
                     ))}
