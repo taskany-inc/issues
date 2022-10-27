@@ -4,6 +4,7 @@ import { gray7, gray9, radiusL } from '../design/@generated/themes';
 
 interface BadgeProps {
     size?: 's' | 'm';
+    children: React.ReactNode;
 }
 
 const StyledBadge = styled.div<{ size: BadgeProps['size'] }>`

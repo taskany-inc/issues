@@ -220,6 +220,7 @@ const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
                     <StyledButtonsContainer>{['Q1', 'Q2', 'Q3', 'Q4'].map(renderQButton)}</StyledButtonsContainer>
 
                     <InputMask mask={mask} maskPlaceholder={null} onChange={onInputChange} value={inputState}>
+                        {/* @ts-ignore */}
                         {(props: { value: string; onChange: () => void }) => (
                             <Input autoFocus placeholder={placeholder} value={props.value} onChange={props.onChange} />
                         )}

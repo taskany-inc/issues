@@ -9,6 +9,7 @@ interface TipProps {
     title?: string;
     icon?: React.ReactNode;
     className?: string;
+    children: React.ReactNode;
 }
 
 const StyledTip = styled(Text)`

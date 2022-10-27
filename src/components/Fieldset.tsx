@@ -10,6 +10,7 @@ type FieldsetViewType = 'default' | 'warning' | 'danger';
 interface FieldsetProps {
     title?: string;
     view?: FieldsetViewType;
+    children: React.ReactNode;
 }
 
 const StyledFieldset = styled.fieldset`

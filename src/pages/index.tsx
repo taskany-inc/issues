@@ -8,7 +8,7 @@ export const getServerSideProps = declareSsrProps();
 const HomePage = ({ locale }: ExternalPageProps) => {
     const t = useTranslations('index');
 
-    return <Page locale={locale} title={t('title')}></Page>;
+    return <Page locale={locale} title={t('title')} />;
 };
 
 export default HomePage;

@@ -11,6 +11,7 @@ interface ModalOnEventProps {
     hotkeys?: string[];
     visible?: boolean;
     view?: React.ComponentProps<typeof Modal>['view'];
+    children: React.ComponentProps<typeof Modal>['children'];
 }
 
 const ModalOnEvent: React.FC<ModalOnEventProps> = ({ event, hotkeys, visible = false, view, children }) => {

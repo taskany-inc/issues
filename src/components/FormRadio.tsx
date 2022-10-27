@@ -9,6 +9,7 @@ import { Text } from './Text';
 interface FormRadioContext {
     name: FormRadioProps['name'];
     value: FormRadioProps['value'];
+
     onChange?: (v: FormRadioProps['value']) => void;
 }
 
@@ -73,6 +74,7 @@ interface FormRadioProps {
     label?: string;
     value?: string;
     flat?: 'top' | 'bottom' | 'both';
+    children?: React.ReactNode;
 
     onChange?: (v: FormRadioProps['value']) => void;
 }

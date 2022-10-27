@@ -21,6 +21,7 @@ interface ModalProps {
     visible: boolean;
     width?: number;
     view?: ModalViewType;
+    children: React.ReactNode;
 
     onClose?: () => void;
 }
@@ -83,7 +84,12 @@ const StyledCross = styled.div`
     }
 `;
 
-const Portal: React.FC<{ id: string }> = ({ id, children }) => createPortal(children, usePortal(id));
+interface PortalProps {
+    id: string;
+    children: React.ReactNode;
+}
+
+const Portal: React.FC<PortalProps> = ({ id, children }) => createPortal(children, usePortal(id));
 
 export const Modal: React.FC<ModalProps> = ({ visible, view, onClose, children, width = 800 }) => {
     const [onESC] = useKeyboard([KeyCode.Escape], () => onClose && onClose(), {

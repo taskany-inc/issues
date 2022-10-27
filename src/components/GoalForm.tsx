@@ -58,6 +58,7 @@ interface GoalFormProps {
     state?: State;
     estimate?: EstimateInput;
     i18nKeyset: string;
+    children?: React.ReactNode;
 
     onSumbit: (fields: GoalFormType) => void;
     onTitleChange?: (title: string) => void;

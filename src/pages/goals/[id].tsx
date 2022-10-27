@@ -284,12 +284,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
     );
     const [commentFormFocus, setCommentFormFocus] = useState(false);
-    const [highlightCommentId, setHighlightCommentId] = useState<string | null>(null);
+    const [highlightCommentId, setHighlightCommentId] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         let tId: NodeJS.Timeout;
         if (highlightCommentId) {
-            tId = setTimeout(() => setHighlightCommentId(null), 1000);
+            tId = setTimeout(() => setHighlightCommentId(undefined), 1000);
         }
 
         return () => clearInterval(tId);
@@ -483,7 +483,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     );
 
     const onCommentPublish = useCallback(
-        (id) => {
+        (id?: string) => {
             refresh();
             setHighlightCommentId(id);
             setCommentFormFocus(false);

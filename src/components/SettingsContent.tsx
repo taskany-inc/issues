@@ -28,7 +28,7 @@ export const SettingsCard = styled(FormCard)<{ view?: SettingsCardViewType }>`
     `}
 `;
 
-export const SettingsContent: React.FC = ({ children }) => {
+export const SettingsContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <StyledSettingsContent>
             <div>{children}</div>
