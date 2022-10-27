@@ -73,7 +73,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
         const promise = gql.mutation({
             createGoal: [
                 {
-                    goal: {
+                    data: {
                         title,
                         description,
                         ownerId: owner.id,
