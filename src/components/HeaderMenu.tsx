@@ -151,7 +151,9 @@ export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
 
             {session ? (
                 <NextLink href={routes.userSettings()} passHref>
-                    <Link inline></Link>
+                    <Link inline>
+                        <UserPic src={session.user.image} email={session.user.email} size={32} />
+                    </Link>
                 </NextLink>
             ) : (
                 <StyledUnauthorizedLink onClick={() => signIn()}>
