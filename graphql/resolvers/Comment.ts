@@ -1,7 +1,7 @@
 import { nonNull, stringArg, arg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Comment, CommentCreateInputType, CommentUpdateInputType } from '../types';
+import { Comment, CommentCreateInput, CommentUpdateInput } from '../types';
 import { mailServer } from '../../src/utils/mailServer';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -33,7 +33,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('createComment', {
         type: Comment,
         args: {
-            data: nonNull(arg({ type: CommentCreateInputType })),
+            data: nonNull(arg({ type: CommentCreateInput })),
         },
         resolve: async (_, { data: { goalId, description, activityId } }, { db }) => {
             const [commentAuthor, goal] = await Promise.all([
@@ -74,7 +74,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('updateComment', {
         type: Comment,
         args: {
-            data: nonNull(arg({ type: CommentUpdateInputType })),
+            data: nonNull(arg({ type: CommentUpdateInput })),
         },
         resolve: async (_, { data: { id, description } }, { db }) => {
             try {

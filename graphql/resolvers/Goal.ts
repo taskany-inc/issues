@@ -3,11 +3,11 @@ import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
 import {
     Goal,
-    GoalInput,
+    GoalUpdateInput,
     GoalCreateInput,
-    SubscriptionInput,
+    SubscriptionToggleInput,
     Activity,
-    GoalDependencyInput,
+    GoalDependencyToggleInput,
     dependencyKind,
     UserGoalsInput,
     Project,
@@ -443,12 +443,12 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('updateGoal', {
         type: Goal,
         args: {
-            goal: nonNull(arg({ type: GoalInput })),
+            data: nonNull(arg({ type: GoalUpdateInput })),
         },
-        resolve: async (_, { goal }, { db, activity }) => {
+        resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
             const actualGoal = await db.goal.findUnique({
-                where: { id: goal.id },
+                where: { id: data.id },
                 include: { participants: true, project: true, tags: true },
             });
 
@@ -457,17 +457,17 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             let participantsToDisconnect: Array<{ id: string }> = [];
             let tagsToDisconnect: Array<{ id: string }> = [];
 
-            if (goal.participants) {
+            if (data.participants) {
                 participantsToDisconnect =
                     actualGoal.participants
-                        ?.filter((p) => !goal.participants?.includes(p!.id))
+                        ?.filter((p) => !data.participants?.includes(p!.id))
                         .map((a) => ({ id: a.id })) || [];
             }
 
-            if (goal.tags) {
+            if (data.tags) {
                 tagsToDisconnect =
                     actualGoal.tags
-                        ?.filter((t) => !goal.tags?.filter((tag) => tag!.id === t.id).length)
+                        ?.filter((t) => !data.tags?.filter((tag) => tag!.id === t.id).length)
                         .map((a) => ({ id: a.id })) || [];
             }
 
@@ -477,41 +477,41 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         key: actualGoal.project?.key,
                     },
                     data: {
-                        tags: goal.tags
+                        tags: data.tags
                             ? {
-                                  connect: goal.tags.map((t) => ({ id: t!.id })),
+                                  connect: data.tags.map((t) => ({ id: t!.id })),
                                   disconnect: tagsToDisconnect,
                               }
                             : undefined,
                         participants: {
-                            connect: [{ id: goal.ownerId! || actualGoal.ownerId! }],
+                            connect: [{ id: data.ownerId! || actualGoal.ownerId! }],
                         },
                     },
                 });
 
                 return db.goal.update({
-                    where: { id: goal.id },
-                    // @ts-ignore incompatible types of Goal and GoalInput
+                    where: { id: data.id },
+                    // @ts-ignore incompatible types of Goal and GoalUpdateInput
                     data: {
-                        ...goal,
-                        estimate: goal.estimate
+                        ...data,
+                        estimate: data.estimate
                             ? {
                                   create: {
-                                      ...goal.estimate,
+                                      ...data.estimate,
                                       activityId: activity.id,
                                   },
                               }
                             : undefined,
-                        tags: goal.tags
+                        tags: data.tags
                             ? {
-                                  connect: goal.tags.map((t) => ({ id: t!.id })),
+                                  connect: data.tags.map((t) => ({ id: t!.id })),
                                   disconnect: tagsToDisconnect,
                               }
                             : undefined,
                         // @ts-ignore
                         participants: goal.participants
                             ? {
-                                  connect: goal.participants.map((id) => ({ id })),
+                                  connect: data.participants?.map((id) => ({ id })),
                                   disconnect: participantsToDisconnect,
                               }
                             : undefined,
@@ -534,7 +534,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleGoalStargizer', {
         type: Activity,
         args: {
-            toggle: nonNull(arg({ type: SubscriptionInput })),
+            toggle: nonNull(arg({ type: SubscriptionToggleInput })),
         },
         resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
@@ -565,7 +565,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleGoalWatcher', {
         type: Activity,
         args: {
-            toggle: nonNull(arg({ type: SubscriptionInput })),
+            toggle: nonNull(arg({ type: SubscriptionToggleInput })),
         },
         resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
@@ -596,7 +596,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleGoalDependency', {
         type: Goal,
         args: {
-            toggle: nonNull(arg({ type: GoalDependencyInput })),
+            toggle: nonNull(arg({ type: GoalDependencyToggleInput })),
         },
         resolve: async (_, { toggle: { id, target, dependency, direction } }, { db, activity }) => {
             if (!activity) return null;

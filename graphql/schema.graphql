@@ -25,13 +25,13 @@ type Comment {
   updatedAt: DateTime!
 }
 
-input CommentCreateInputType {
+input CommentCreateInput {
   activityId: String!
   description: String!
   goalId: String!
 }
 
-input CommentUpdateInputType {
+input CommentUpdateInput {
   description: String!
   id: ID!
 }
@@ -125,14 +125,14 @@ input GoalCreateInput {
   title: String!
 }
 
-input GoalDependencyInput {
+input GoalDependencyToggleInput {
   dependency: Dependency
   direction: Boolean
   id: ID!
   target: String
 }
 
-input GoalInput {
+input GoalUpdateInput {
   description: String
   estimate: EstimateInput
   id: ID!
@@ -148,22 +148,22 @@ input GoalInput {
 }
 
 type Mutation {
-  createComment(data: CommentCreateInputType!): Comment
+  createComment(data: CommentCreateInput!): Comment
   createGoal(goal: GoalCreateInput!): Goal
   createProject(data: ProjectInput!): Project
   createTag(description: String, title: String!): Tag
   deleteProject(data: ProjectDelete!): Project
-  toggleGoalDependency(toggle: GoalDependencyInput!): Goal
-  toggleGoalStargizer(toggle: SubscriptionInput!): Activity
-  toggleGoalWatcher(toggle: SubscriptionInput!): Activity
-  toggleProjectStargizer(toggle: SubscriptionInput!): Activity
-  toggleProjectWatcher(toggle: SubscriptionInput!): Activity
-  toggleReaction(reaction: ReactionInput!): Reaction
-  updateComment(data: CommentUpdateInputType!): Comment
-  updateGoal(goal: GoalInput!): Goal
+  toggleGoalDependency(toggle: GoalDependencyToggleInput!): Goal
+  toggleGoalStargizer(toggle: SubscriptionToggleInput!): Activity
+  toggleGoalWatcher(toggle: SubscriptionToggleInput!): Activity
+  toggleProjectStargizer(data: SubscriptionToggleInput!): Activity
+  toggleProjectWatcher(data: SubscriptionToggleInput!): Activity
+  toggleReaction(data: ReactionToggleInput!): Reaction
+  updateComment(data: CommentUpdateInput!): Comment
+  updateGoal(data: GoalUpdateInput!): Goal
   updateProject(data: ProjectInput!): Project
-  updateSettings(data: SettingsInput!): Settings
-  updateUser(data: UserInput!): User
+  updateSettings(data: SettingsUpdateInput!): Settings
+  updateUser(data: UserUpdateInput!): User
   usersInvites(input: UserInvitesInput!): [Ghost]
 }
 
@@ -245,7 +245,7 @@ type Reaction {
   updatedAt: DateTime!
 }
 
-input ReactionInput {
+input ReactionToggleInput {
   commentId: String
   emoji: String!
   goalId: String
@@ -262,7 +262,7 @@ type Settings {
   theme: String!
 }
 
-input SettingsInput {
+input SettingsUpdateInput {
   id: ID!
   theme: String!
 }
@@ -280,7 +280,7 @@ type State {
   title: String!
 }
 
-input SubscriptionInput {
+input SubscriptionToggleInput {
   direction: Boolean
   id: String
 }
@@ -321,12 +321,12 @@ input UserGoalsInput {
   tags: [String!]!
 }
 
-input UserInput {
+input UserInvitesInput {
+  emails: [String]
+}
+
+input UserUpdateInput {
   id: ID!
   name: String
   nickname: String
-}
-
-input UserInvitesInput {
-  emails: [String]
 }

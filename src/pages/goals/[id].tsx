@@ -9,11 +9,11 @@ import { useRouter } from 'next/router';
 
 import {
     Goal,
-    EstimateInput,
-    GoalInput,
     State,
-    GoalDependencyInput,
     Activity,
+    EstimateInput,
+    GoalUpdateInput,
+    GoalDependencyToggleInput,
 } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
@@ -304,11 +304,11 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     }, [asPath]);
 
     const triggerUpdate = useCallback(
-        (data: Partial<GoalInput>) => {
+        (data: Partial<GoalUpdateInput>) => {
             const promise = gql.mutation({
                 updateGoal: [
                     {
-                        goal: {
+                        data: {
                             ...data,
                             id: goal.id,
                         },
@@ -429,7 +429,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             await gql.mutation({
                 toggleReaction: [
                     {
-                        reaction: {
+                        data: {
                             emoji,
                             goalId: goal.id,
                         },
@@ -457,7 +457,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     );
 
     const onDependenciesChange = useCallback(
-        async (toggle: GoalDependencyInput) => {
+        async (toggle: GoalDependencyToggleInput) => {
             const promise = gql.mutation({
                 toggleGoalDependency: [
                     {

@@ -1,7 +1,7 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { User, SortOrder, Ghost, UserInput, UserInvitesInput, Activity } from '../types';
+import { User, SortOrder, Ghost, UserUpdateInput, UserInvitesInput, Activity } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('users', {
@@ -116,7 +116,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('updateUser', {
         type: User,
         args: {
-            data: nonNull(arg({ type: UserInput })),
+            data: nonNull(arg({ type: UserUpdateInput })),
         },
         resolve: async (_, { data: { id, ...data } }, { db }) => {
             try {

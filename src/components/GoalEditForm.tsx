@@ -65,14 +65,14 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         const promise = gql.mutation({
             updateGoal: [
                 {
-                    goal: {
+                    data: {
                         id: goal.id,
                         title,
                         description,
-                        ownerId: owner?.id,
+                        ownerId: owner.id,
                         projectId: project.id,
                         estimate,
-                        stateId: state?.id,
+                        stateId: state.id,
                         tags: Array.from(tags.values()),
                     },
                 },

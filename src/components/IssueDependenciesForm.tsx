@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 
 import { gapL, gapM } from '../design/@generated/themes';
-import { Dependency, enumDependency, Goal, GoalDependencyInput } from '../../graphql/@generated/genql';
+import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
 
 import { FormTitle } from './FormTitle';
 import { IssueDependenciesList } from './IssueDependenciesList';
@@ -13,7 +13,7 @@ import { IssueSearchInput } from './IssueSearchInput';
 interface IssueDependenciesFormProps {
     issue: Goal;
 
-    onChange?: (input: GoalDependencyInput) => void;
+    onChange?: (input: GoalDependencyToggleInput) => void;
 }
 
 const StyledCompletion = styled.div`

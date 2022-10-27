@@ -27,7 +27,7 @@ export const ProjectStarButton: React.FC<ProjectStarButtonProps> = ({ activityId
         const promise = gql.mutation({
             toggleProjectStargizer: [
                 {
-                    toggle: {
+                    data: {
                         id: String(projectId),
                         direction: !stargizer,
                     },
