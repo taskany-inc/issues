@@ -149,7 +149,7 @@ input GoalUpdateInput {
 
 type Mutation {
   createComment(data: CommentCreateInput!): Comment
-  createGoal(goal: GoalCreateInput!): Goal
+  createGoal(data: GoalCreateInput!): Goal
   createProject(data: ProjectInput!): Project
   createTag(description: String, title: String!): Tag
   deleteProject(data: ProjectDelete!): Project

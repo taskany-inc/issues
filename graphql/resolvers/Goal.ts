@@ -366,16 +366,16 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('createGoal', {
         type: Goal,
         args: {
-            goal: nonNull(arg({ type: GoalCreateInput })),
+            data: nonNull(arg({ type: GoalCreateInput })),
         },
-        resolve: async (_, { goal }, { db, activity }) => {
+        resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
-            if (!goal.projectId) return null;
-            if (!goal.ownerId) return null;
+            if (!data.projectId) return null;
+            if (!data.ownerId) return null;
 
             const [owner, project] = await Promise.all([
-                db.activity.findUnique({ where: { id: goal.ownerId } }),
-                db.project.findUnique({ where: { id: goal.projectId } }),
+                db.activity.findUnique({ where: { id: data.ownerId } }),
+                db.project.findUnique({ where: { id: data.projectId } }),
             ]);
 
             const goalsCount = await db.goal.count({ where: { id: { contains: project?.key } } });
@@ -388,9 +388,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         key: project?.key,
                     },
                     data: {
-                        tags: goal.tags?.length
+                        tags: data.tags?.length
                             ? {
-                                  connect: goal.tags.map((t) => ({ id: t!.id })),
+                                  connect: data.tags.map((t) => ({ id: t!.id })),
                               }
                             : undefined,
                         participants: {
@@ -401,19 +401,19 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
 
                 return db.goal.create({
                     data: {
-                        ...goal,
+                        ...data,
                         id: `${project?.key}-${goalsCount + 1}`,
                         activityId: activity.id,
                         ownerId: owner?.id,
-                        tags: goal.tags?.length
+                        tags: data.tags?.length
                             ? {
-                                  connect: goal.tags.map((t) => ({ id: t!.id })),
+                                  connect: data.tags.map((t) => ({ id: t!.id })),
                               }
                             : undefined,
-                        estimate: goal.estimate
+                        estimate: data.estimate
                             ? {
                                   create: {
-                                      ...goal.estimate,
+                                      ...data.estimate,
                                       activityId: activity.id,
                                   },
                               }
@@ -509,7 +509,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                               }
                             : undefined,
                         // @ts-ignore
-                        participants: goal.participants
+                        participants: data.participants
                             ? {
                                   connect: data.participants?.map((id) => ({ id })),
                                   disconnect: participantsToDisconnect,
