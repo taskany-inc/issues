@@ -1,3 +1,7 @@
+import slugify from 'slugify';
+
 export const keyPredictor = (str: string) =>
-    // eslint-disable-next-line no-useless-escape
-    str.replace(/[aeiou `~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '').toUpperCase();
+    slugify(str.replace(/[^A-Za-z0-9]/g, ''), {
+        // eslint-disable-next-line no-useless-escape
+        remove: /[aeiou `~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]|/gi,
+    }).toUpperCase();
