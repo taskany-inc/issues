@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-export const useKeyPress = function (targetKey: string) {
+export const useKeyPress = (targetKey: string) => {
     const [keyPressed, setKeyPressed] = useState(false);
 
     const downHandler = ({ key }: KeyboardEvent) => {

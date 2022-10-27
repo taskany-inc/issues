@@ -28,6 +28,7 @@ const HotkeysModal = dynamic(() => import('./HotkeysModal'));
 interface PageProps {
     locale: ExternalPageProps['locale'];
     title?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 const StyledContent = styled.div`
@@ -44,6 +45,7 @@ export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children
     const router = useRouter();
 
     const { resolvedTheme } = useTheme();
+    const theme = resolvedTheme as 'dark' | 'light' | 'dark';
 
     const onProjectCreate = useCallback(
         (key?: string) => {
@@ -60,14 +62,14 @@ export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children
     );
 
     return (
-        <pageContext.Provider value={{ theme: resolvedTheme, locale }}>
+        <pageContext.Provider value={{ theme, locale }}>
             <Head>
                 <title>{title}</title>
             </Head>
 
             <GlobalStyle />
             <TextStyle />
-            <Theme theme={resolvedTheme} />
+            <Theme theme={theme} />
 
             <Toaster
                 toastOptions={{

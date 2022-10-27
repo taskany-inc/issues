@@ -10,6 +10,7 @@ interface KeyboardProps {
     ctrl?: boolean;
     enter?: boolean;
     space?: boolean;
+    children?: React.ReactNode;
 }
 
 const StyledKeyboard = styled.kbd`

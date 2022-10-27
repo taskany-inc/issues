@@ -32,6 +32,7 @@ interface PopupProps {
     tooltip?: boolean;
     view?: 'warning' | 'danger' | 'primary';
     offset?: number[];
+    children: React.ReactNode;
 
     onTrigger?: ComponentProps<typeof Tippy>['onTrigger'];
     onShow?: ComponentProps<typeof Tippy>['onShow'];

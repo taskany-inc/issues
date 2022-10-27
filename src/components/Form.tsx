@@ -5,6 +5,7 @@ import { KeyCode, KeyMod, useKeyboard } from '../hooks/useKeyboard';
 
 interface FormProps {
     onSubmit?: () => void;
+    children: React.ReactNode;
 }
 
 const StyledFormContainer = styled.div`

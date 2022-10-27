@@ -10,6 +10,7 @@ interface CommonHeaderProps {
     preTitle?: React.ReactNode;
     title: React.ReactNode;
     description?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 const StyledCommonHeader = styled(PageContent)`

@@ -34,6 +34,7 @@ const providers: NextAuthOptions['providers'] = [
                 email: user.email,
                 image: user.image,
                 role: user.role,
+                nickname: user.nickname,
                 activityId: user.activityId,
             };
         },
@@ -142,5 +143,7 @@ declare module 'next-auth' {
 
     interface User {
         role: Role;
+        nickname: string | null;
+        activityId: string | null;
     }
 }

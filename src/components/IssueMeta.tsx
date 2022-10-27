@@ -8,6 +8,7 @@ import { Icon } from './Icon';
 
 interface IssueMetaProps {
     title: string;
+    children?: React.ReactNode;
 
     onEdit?: () => void | null;
 }

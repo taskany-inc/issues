@@ -37,7 +37,12 @@ const StyledCardInfo = styled(Text)`
     border-top-right-radius: ${radiusM};
 `;
 
-export const CardInfo: React.FC<{ className?: string }> = ({ children, className }) => (
+interface CardInfoProps {
+    className?: string;
+    children?: React.ReactNode;
+}
+
+export const CardInfo: React.FC<CardInfoProps> = ({ className, children }) => (
     <StyledCardInfo className={className} size="xs" weight="bold" color={gray8}>
         {children}
     </StyledCardInfo>

@@ -17,6 +17,7 @@ export const useOnlineState = (): boolean => {
     const whenOffline = useGlobalEvent('offline', undefined, { capture: true });
 
     if (!isSupported) {
+        // eslint-disable-next-line no-console
         console.warn(
             "The current device does not support the 'online/offline' events, you should avoid using useOnlineState",
         );
