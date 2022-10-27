@@ -23,7 +23,7 @@ export const ProjectWatchButton: React.FC<ProjectWatchButtonProps> = ({ activity
         const promise = gql.mutation({
             toggleProjectWatcher: [
                 {
-                    toggle: {
+                    data: {
                         id: String(projectId),
                         direction: !watcher,
                     },

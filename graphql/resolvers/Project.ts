@@ -6,9 +6,9 @@ import {
     Project,
     Goal,
     ProjectGoalsInput,
-    ProjectInputType,
-    ProjectDeleteType,
-    SubscriptionInput,
+    ProjectInput,
+    ProjectDeleteInput,
+    SubscriptionToggleInput,
     Activity,
     ProjectGoalsCountInput,
 } from '../types';
@@ -249,7 +249,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('createProject', {
         type: Project,
         args: {
-            data: nonNull(arg({ type: ProjectInputType })),
+            data: nonNull(arg({ type: ProjectInput })),
         },
         resolve: async (_, { data: { key, title, description, flowId } }, { db, activity }) => {
             if (!activity) return null;
@@ -284,7 +284,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('updateProject', {
         type: Project,
         args: {
-            data: nonNull(arg({ type: ProjectInputType })),
+            data: nonNull(arg({ type: ProjectInput })),
         },
         resolve: async (_, { data: { key, ...data } }, { db, activity }) => {
             if (!activity) return null;
@@ -311,7 +311,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('deleteProject', {
         type: Project,
         args: {
-            data: nonNull(arg({ type: ProjectDeleteType })),
+            data: nonNull(arg({ type: ProjectDeleteInput })),
         },
         resolve: async (_, { data: { key } }, { db, activity }) => {
             if (!activity) return null;
@@ -337,9 +337,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleProjectWatcher', {
         type: Activity,
         args: {
-            toggle: nonNull(arg({ type: SubscriptionInput })),
+            data: nonNull(arg({ type: SubscriptionToggleInput })),
         },
-        resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
+        resolve: async (_, { data: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
 
             const connection = { id: Number(id) };
@@ -368,9 +368,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleProjectStargizer', {
         type: Activity,
         args: {
-            toggle: nonNull(arg({ type: SubscriptionInput })),
+            data: nonNull(arg({ type: SubscriptionToggleInput })),
         },
-        resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
+        resolve: async (_, { data: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
 
             const connection = { id: Number(id) };

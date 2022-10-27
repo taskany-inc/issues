@@ -208,14 +208,13 @@ export const Comment = objectType({
         t.field(CommentModel.description);
         t.field('author', { type: Activity });
         t.field('activity', { type: Activity });
-        // t.field(CommentModel.reactions);
         t.field(CommentModel.createdAt);
         t.field(CommentModel.updatedAt);
     },
 });
 
-export const SettingsInput = inputObjectType({
-    name: 'SettingsInput',
+export const SettingsUpdateInput = inputObjectType({
+    name: 'SettingsUpdateInput',
     definition(t) {
         t.field(SettingsModel.id);
         t.field(SettingsModel.theme);
@@ -234,17 +233,13 @@ export const GoalCreateInput = inputObjectType({
         t.field(GoalModel.ownerId);
         t.field(GoalModel.projectId);
         t.field(GoalModel.stateId);
-        t.list.field('tags', { type: TagInput });
+        t.list.field('tags', { type: TagCreateInput });
         t.list.field('participants', { type: ActivityInput });
-        // t.list.field('dependsOn', { type: Goal });
-        // t.list.field('blocks', { type: Goal });
-        // t.list.field('relatedTo', { type: Goal });
-        // t.list.field('connected', { type: Goal });
     },
 });
 
-export const GoalInput = inputObjectType({
-    name: 'GoalInput',
+export const GoalUpdateInput = inputObjectType({
+    name: 'GoalUpdateInput',
     definition(t) {
         t.field(GoalModel.id);
         t.string('title');
@@ -256,12 +251,8 @@ export const GoalInput = inputObjectType({
         t.field(GoalModel.ownerId);
         t.field(GoalModel.projectId);
         t.field(GoalModel.stateId);
-        t.list.field('tags', { type: TagInput });
+        t.list.field('tags', { type: TagCreateInput });
         t.list.string('participants');
-        // t.list.field('dependsOn', { type: Goal });
-        // t.list.field('blocks', { type: Goal });
-        // t.list.field('relatedTo', { type: Goal });
-        // t.list.field('connected', { type: Goal });
     },
 });
 
@@ -281,8 +272,8 @@ export const ActivityInput = inputObjectType({
     },
 });
 
-export const UserInput = inputObjectType({
-    name: 'UserInput',
+export const UserUpdateInput = inputObjectType({
+    name: 'UserUpdateInput',
     definition(t) {
         t.field(UserModel.id);
         t.field(UserModel.nickname);
@@ -290,8 +281,8 @@ export const UserInput = inputObjectType({
     },
 });
 
-export const ReactionInput = inputObjectType({
-    name: 'ReactionInput',
+export const ReactionToggleInput = inputObjectType({
+    name: 'ReactionToggleInput',
     definition(t) {
         t.field(ReactionModel.emoji);
         t.field(ReactionModel.goalId);
@@ -299,7 +290,7 @@ export const ReactionInput = inputObjectType({
     },
 });
 
-export const TagInput = inputObjectType({
+export const TagCreateInput = inputObjectType({
     name: 'TagInput',
     definition(t) {
         t.field(TagModel.id);
@@ -308,16 +299,16 @@ export const TagInput = inputObjectType({
     },
 });
 
-export const SubscriptionInput = inputObjectType({
-    name: 'SubscriptionInput',
+export const SubscriptionToggleInput = inputObjectType({
+    name: 'SubscriptionToggleInput',
     definition(t) {
         t.string('id');
         t.boolean('direction');
     },
 });
 
-export const GoalDependencyInput = inputObjectType({
-    name: 'GoalDependencyInput',
+export const GoalDependencyToggleInput = inputObjectType({
+    name: 'GoalDependencyToggleInput',
     definition(t) {
         t.field(GoalModel.id);
         t.string('target');
@@ -333,8 +324,8 @@ export const UserInvitesInput = inputObjectType({
     },
 });
 
-export const CommentCreateInputType = inputObjectType({
-    name: 'CommentCreateInputType',
+export const CommentCreateInput = inputObjectType({
+    name: 'CommentCreateInput',
     definition(t) {
         t.field(CommentModel.description);
         t.field(CommentModel.goalId);
@@ -342,15 +333,15 @@ export const CommentCreateInputType = inputObjectType({
     },
 });
 
-export const CommentUpdateInputType = inputObjectType({
-    name: 'CommentUpdateInputType',
+export const CommentUpdateInput = inputObjectType({
+    name: 'CommentUpdateInput',
     definition(t) {
         t.field(CommentModel.id);
         t.field(CommentModel.description);
     },
 });
 
-export const ProjectInputType = inputObjectType({
+export const ProjectInput = inputObjectType({
     name: 'ProjectInput',
     definition(t) {
         t.field(ProjectModel.key);
@@ -360,7 +351,7 @@ export const ProjectInputType = inputObjectType({
     },
 });
 
-export const ProjectDeleteType = inputObjectType({
+export const ProjectDeleteInput = inputObjectType({
     name: 'ProjectDelete',
     definition(t) {
         t.field(ProjectModel.key);

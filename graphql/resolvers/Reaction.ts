@@ -1,7 +1,7 @@
 import { arg, nonNull } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Reaction, ReactionInput } from '../types';
+import { Reaction, ReactionToggleInput } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {};
@@ -10,9 +10,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleReaction', {
         type: Reaction,
         args: {
-            reaction: nonNull(arg({ type: ReactionInput })),
+            data: nonNull(arg({ type: ReactionToggleInput })),
         },
-        resolve: async (_, { reaction: { emoji, goalId, commentId } }, { db, activity }) => {
+        resolve: async (_, { data: { emoji, goalId, commentId } }, { db, activity }) => {
             if (!activity) return null;
 
             const existingReaction = await db.reaction.findFirst({

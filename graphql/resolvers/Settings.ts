@@ -1,7 +1,7 @@
 import { arg, nonNull } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Settings, SettingsInput } from '../types';
+import { Settings, SettingsUpdateInput } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('settings', {
@@ -29,7 +29,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('updateSettings', {
         type: Settings,
         args: {
-            data: nonNull(arg({ type: SettingsInput })),
+            data: nonNull(arg({ type: SettingsUpdateInput })),
         },
         resolve: async (_, { data: { id, ...data } }, { db }) => {
             try {
