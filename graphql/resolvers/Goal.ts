@@ -373,11 +373,12 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             if (!goal.projectId) return null;
             if (!goal.ownerId) return null;
 
-            const [owner, project, goalsCount] = await Promise.all([
+            const [owner, project] = await Promise.all([
                 db.activity.findUnique({ where: { id: goal.ownerId } }),
                 db.project.findUnique({ where: { id: goal.projectId } }),
-                db.goal.count(),
             ]);
+
+            const goalsCount = await db.goal.count({ where: { id: { contains: project?.key } } });
 
             if (!owner?.id) return null;
 
