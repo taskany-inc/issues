@@ -32,7 +32,8 @@
     "key": {
       "title": "Taskany — <project></project>",
       "key": "Key",
-      "Load more": "Load more"
+      "Load more": "Load more",
+      "New goal": "New goal"
     },
     "settings": {
       "title": "Taskany — <project></project> — Settings",
@@ -95,7 +96,8 @@
       "title": "Taskany — Goals — Dashboard",
       "Load more": "Load more",
       "Dashboard": "Dashboard",
-      "This is your personal goals bundle": "This is your personal goals bundle. Created, owned, watching projects and goals are here."
+      "This is your personal goals bundle": "This is your personal goals bundle. Created, owned, watching projects and goals are here.",
+      "New goal": "New goal"
     },
     "new": {
       "Create new goal": "Create new goal",
@@ -277,7 +279,6 @@
     "State": "State",
     "Owner": "Owner",
     "Limit": "Limit",
-    "Tags": "Tags",
-    "New goal": "New goal"
+    "Tags": "Tags"
   }
 }

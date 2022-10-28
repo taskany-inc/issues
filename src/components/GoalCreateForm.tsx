@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
@@ -15,6 +15,7 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { GoalForm, GoalFormType } from './GoalForm';
 import { Link } from './Link';
+import { modalOnEventContext } from './ModalOnEvent';
 
 interface GoalCreateFormProps {
     locale: TLocale;
@@ -38,6 +39,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
     const [project, setProject] = useState<Project>();
     const [state, setState] = useState<State>();
     const [tags, setTags] = useState(new Map<string, TagModel>());
+    const modalOnEventProps: Project | undefined = useContext(modalOnEventContext);
 
     const onOwnerChange = useCallback(setOwner, [setOwner]);
     const onProjectChange = useCallback(setProject, [setProject]);
@@ -66,6 +68,12 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
             setState(defaultState);
         }
     }, [project]);
+
+    useEffect(() => {
+        if (modalOnEventProps) {
+            setProject(modalOnEventProps);
+        }
+    }, [modalOnEventProps]);
 
     const createGoal = async ({ title, description }: GoalFormType) => {
         if (!owner.id || !project?.id) return;

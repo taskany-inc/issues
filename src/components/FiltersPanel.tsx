@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
-import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { gapM, gapS, gray5 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
@@ -13,7 +12,6 @@ import { StateFilter } from './StateFilter';
 import { UserFilter } from './UserFilter';
 import { TagsFilter } from './TagsFilter';
 import { LimitFilter } from './LimitFilter';
-import { Button } from './Button';
 
 export { defaultLimit } from './LimitFilter';
 
@@ -23,6 +21,7 @@ interface FiltersPanelProps {
     users?: React.ComponentProps<typeof UserFilter>['activity'];
     tags?: React.ComponentProps<typeof TagsFilter>['tags'];
     filters?: Array<string>;
+    children?: React.ReactNode;
 
     onSearchChange: React.ComponentProps<typeof Input>['onChange'];
     onStateChange?: React.ComponentProps<typeof StateFilter>['onClick'];
@@ -63,6 +62,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     users,
     tags,
     filters,
+    children,
     onSearchChange,
     onStateChange,
     onUserChange,
@@ -97,14 +97,9 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                     </StyledFiltersMenu>
                 </StyledFiltersMenuWrapper>
 
-                <div style={{ textAlign: 'right' }}>
-                    <Button
-                        view="primary"
-                        size="m"
-                        text={t('New goal')}
-                        onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
-                    />
-                </div>
+                {nullable(children, (ch) => (
+                    <div style={{ textAlign: 'right' }}>{ch}</div>
+                ))}
             </StyledFiltersContent>
         </StyledFiltersPanel>
     );

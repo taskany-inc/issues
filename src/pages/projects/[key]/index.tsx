@@ -5,21 +5,22 @@ import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
-import { routes } from '../../../hooks/router';
-import { createFetcher } from '../../../utils/createFetcher';
+import { gapS } from '../../../design/@generated/themes';
 import { Goal, Project } from '../../../../graphql/@generated/genql';
+import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
+import { createFetcher } from '../../../utils/createFetcher';
+import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { nullable } from '../../../utils/nullable';
+import { routes } from '../../../hooks/router';
+import { useMounted } from '../../../hooks/useMounted';
 import { Page } from '../../../components/Page';
 import { Button } from '../../../components/Button';
 import { GoalItem } from '../../../components/GoalItem';
-import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { nullable } from '../../../utils/nullable';
-import { gapS } from '../../../design/@generated/themes';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { FiltersPanel, defaultLimit } from '../../../components/FiltersPanel';
-import { useMounted } from '../../../hooks/useMounted';
 
 const refreshInterval = 3000;
 
@@ -287,7 +288,14 @@ const ProjectPage = ({
                 onUserChange={setOwnerFilter}
                 onTagChange={setTagsFilter}
                 onLimitChange={setLimitFilter}
-            />
+            >
+                <Button
+                    view="primary"
+                    size="m"
+                    text={t('New goal')}
+                    onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, project)}
+                />
+            </FiltersPanel>
 
             <StyledGoalsList>
                 {goals?.map((goal) =>
