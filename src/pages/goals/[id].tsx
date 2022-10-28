@@ -541,13 +541,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                         />
                     </StyledIssueInfoRow>
 
-                    {/* TODO: set curr project in form */}
                     {/* TODO: open create form with `C` hotkey */}
                     <StyledIssueInfoRow>
                         <Button
                             view="primary"
                             text={t('New goal')}
-                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, goal.project)}
                         />
                     </StyledIssueInfoRow>
                 </StyledIssueInfo>

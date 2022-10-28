@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 
+import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Project } from '../../../graphql/@generated/genql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
@@ -14,6 +15,7 @@ import { FiltersPanel } from '../../components/FiltersPanel';
 import { useMounted } from '../../hooks/useMounted';
 import { Text } from '../../components/Text';
 import { PageSep } from '../../components/PageSep';
+import { Button } from '../../components/Button';
 
 const refreshInterval = 3000;
 
@@ -166,7 +168,14 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
                 onStateChange={setStateFilter}
                 onUserChange={setOwnerFilter}
                 onTagChange={setTagsFilter}
-            />
+            >
+                <Button
+                    view="primary"
+                    size="m"
+                    text={t('New goal')}
+                    onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                />
+            </FiltersPanel>
 
             <PageContent>
                 {projects?.map((project) => {

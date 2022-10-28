@@ -32,7 +32,8 @@
     "key": {
       "title": "Taskany — <project></project>",
       "key": "Ключ",
-      "Load more": "Ещё"
+      "Load more": "Ещё",
+      "New goal": "Создать цель"
     },
     "settings": {
       "title": "Taskany — <project></project> — Settings",
@@ -95,7 +96,8 @@
       "title": "Taskany — Цели — Рабочий стол",
       "Load more": "Загрузить еще",
       "Dashboard": "Рабочий стол",
-      "This is your personal goals bundle": "Здесь будут все созданные вами, назначенные на вас, а также цели и проекты, за которыми вы следите."
+      "This is your personal goals bundle": "Здесь будут все созданные вами, назначенные на вас, а также цели и проекты, за которыми вы следите.",
+      "New goal": "Создать цель"
     },
     "new": {
       "Create new goal": "Создание новой цели",
@@ -277,7 +279,6 @@
     "State": "Статус",
     "Owner": "Ответственный",
     "Limit": "Лимит",
-    "Tags": "Теги",
-    "New goal": "Новая цель"
+    "Tags": "Теги"
   }
 }
