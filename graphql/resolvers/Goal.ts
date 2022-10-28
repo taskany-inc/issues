@@ -200,7 +200,11 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     state: true,
                     project: {
                         include: {
-                            flow: true,
+                            flow: {
+                                include: {
+                                    states: true,
+                                },
+                            },
                         },
                     },
                     reactions: {

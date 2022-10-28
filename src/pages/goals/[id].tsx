@@ -81,6 +81,12 @@ const fetcher = createFetcher((_, id: string) => ({
                 description: true,
                 flow: {
                     id: true,
+                    states: {
+                        id: true,
+                        title: true,
+                        default: true,
+                        hue: true,
+                    },
                 },
             },
             activity: {
