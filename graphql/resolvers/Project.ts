@@ -119,7 +119,11 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     key,
                 },
                 include: {
-                    flow: true,
+                    flow: {
+                        include: {
+                            states: true,
+                        },
+                    },
                     watchers: true,
                     stargizers: true,
                     tags: true,

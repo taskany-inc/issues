@@ -40,6 +40,12 @@ const fetcher = createFetcher(
                 activityId: true,
                 flow: {
                     id: true,
+                    states: {
+                        id: true,
+                        title: true,
+                        hue: true,
+                        default: true,
+                    },
                 },
                 watchers: {
                     id: true,
