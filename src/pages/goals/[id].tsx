@@ -14,6 +14,7 @@ import {
     EstimateInput,
     GoalUpdateInput,
     GoalDependencyToggleInput,
+    Priority,
 } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
@@ -40,6 +41,7 @@ import { commentMask, CommentView } from '../../components/CommentView';
 import { IssueDependencies } from '../../components/IssueDependencies';
 import { IssueParticipants } from '../../components/IssueParticipants';
 import { editGoalKeys } from '../../utils/hotkeys';
+import { PriorityDropdown } from '../../components/PriorityDropdown';
 
 const Md = dynamic(() => import('../../components/Md'));
 const RelativeTime = dynamic(() => import('../../components/RelativeTime'));
@@ -67,6 +69,7 @@ const fetcher = createFetcher((_, id: string) => ({
                 title: true,
                 hue: true,
             },
+            priority: true,
             estimate: {
                 date: true,
                 q: true,
@@ -349,6 +352,18 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         [triggerUpdate],
     );
 
+    const [issuePriority, setIssuePriority] = useState(goal.priority);
+    const onIssuePriorityChange = useCallback(
+        async (priority: Priority) => {
+            setIssuePriority(priority);
+
+            await triggerUpdate({
+                priority,
+            });
+        },
+        [triggerUpdate],
+    );
+
     const onIssueStateChange = useCallback(
         async (state: State) => {
             await triggerUpdate({
@@ -591,6 +606,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                             />
                                         }
                                         onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
+                                    />
+                                </IssueAction>
+
+                                <IssueAction>
+                                    <PriorityDropdown
+                                        priority={issuePriority}
+                                        text={issuePriority || t('Priority.Priority')}
+                                        onClick={isUserAllowedToEdit ? onIssuePriorityChange : undefined}
                                     />
                                 </IssueAction>
 

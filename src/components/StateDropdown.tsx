@@ -16,10 +16,10 @@ import { StateDot } from './StateDot';
 import { StateDropdownItem } from './StateDropdownItem';
 
 interface StateDropdownProps {
+    text: React.ComponentProps<typeof Button>['text'];
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
     disabled?: React.ComponentProps<typeof Button>['disabled'];
-    text: React.ComponentProps<typeof Button>['text'];
     state?: State;
     flowId?: string;
 

@@ -34,6 +34,12 @@ export const Dependency = enumType({
     members: dependencyKind,
 });
 
+export const priorityKind = ['Highest', 'High', 'Medium', 'Low', 'Lowest'];
+export const Priority = enumType({
+    name: 'Priority',
+    members: priorityKind,
+});
+
 export const User = objectType({
     name: UserModel.$name,
     definition(t) {
@@ -107,6 +113,7 @@ export const Goal = objectType({
         t.field(GoalModel.key);
         t.field(GoalModel.personal);
         t.field(GoalModel.private);
+        t.field(GoalModel.priority);
         t.list.field('estimate', { type: Estimate });
         t.field(GoalModel.createdAt);
         t.field(GoalModel.updatedAt);
@@ -233,6 +240,7 @@ export const GoalCreateInput = inputObjectType({
         t.field(GoalModel.ownerId);
         t.field(GoalModel.projectId);
         t.field(GoalModel.stateId);
+        t.field(GoalModel.priority);
         t.list.field('tags', { type: TagCreateInput });
         t.list.field('participants', { type: ActivityInput });
     },
@@ -251,6 +259,7 @@ export const GoalUpdateInput = inputObjectType({
         t.field(GoalModel.ownerId);
         t.field(GoalModel.projectId);
         t.field(GoalModel.stateId);
+        t.field(GoalModel.priority);
         t.list.field('tags', { type: TagCreateInput });
         t.list.string('participants');
     },

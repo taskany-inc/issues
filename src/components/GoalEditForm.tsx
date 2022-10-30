@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
 import { gql } from '../utils/gql';
-import { Project, State, Tag as TagModel, Goal, EstimateInput } from '../../graphql/@generated/genql';
+import { Project, State, Tag as TagModel, Goal, EstimateInput, Priority } from '../../graphql/@generated/genql';
 
 import { GoalForm, GoalFormType } from './GoalForm';
 
@@ -24,6 +24,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     );
     const [project, setProject] = useState(goal.project as Project);
     const [state, setState] = useState(goal.state as State);
+    const [priority, setPriority] = useState(goal.priority as Priority);
     const [tags, setTags] = useState(
         // @ts-ignore
         new Map<string, TagModel>(goal.tags?.map((t) => (t ? [t.id, t] : null)).filter(Boolean)),
@@ -34,6 +35,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const onOwnerChange = useCallback(setOwner, [setOwner]);
     const onProjectChange = useCallback(setProject, [setProject]);
     const onStateChange = useCallback(setState, [setState]);
+    const onPriorityChange = useCallback(setPriority, [setPriority]);
     const onEstimateChange = useCallback(setEstimate, [setEstimate]);
     const onTagAdd = useCallback(
         (tag: TagModel) => {
@@ -73,6 +75,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
                         projectId: project.id,
                         estimate,
                         stateId: state.id,
+                        priority,
                         tags: Array.from(tags.values()),
                     },
                 },
@@ -102,6 +105,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             owner={owner!}
             project={project}
             state={state}
+            priority={priority}
             tags={tags}
             estimate={estimate}
             onSumbit={updateGoal}
@@ -111,6 +115,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             onProjectChange={onProjectChange}
             onEstimateChange={onEstimateChange}
             onStateChange={onStateChange}
+            onPriorityChange={onPriorityChange}
             onTagAdd={onTagAdd}
             onTagDelete={onTagDelete}
         />

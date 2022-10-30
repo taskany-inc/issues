@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { gapS } from '../design/@generated/themes';
-import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../graphql/@generated/genql';
+import { Project, EstimateInput, State, Tag as TagModel, Activity, Priority } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 
 import { Button } from './Button';
@@ -17,6 +17,7 @@ import { Form } from './Form';
 import { ProjectCompletion } from './ProjectCompletion';
 import { TagCompletion } from './TagCompletion';
 import { StateDropdown } from './StateDropdown';
+import { PriorityDropdown } from './PriorityDropdown';
 import { UserPic } from './UserPic';
 import { Tag } from './Tag';
 import { FormEditor } from './FormEditor';
@@ -56,6 +57,7 @@ interface GoalFormProps {
     project?: Project;
     tags?: Map<string, TagModel>;
     state?: State;
+    priority?: Priority;
     estimate?: EstimateInput;
     i18nKeyset: string;
     children?: React.ReactNode;
@@ -66,6 +68,7 @@ interface GoalFormProps {
     onOwnerChange: (activity: Activity) => void;
     onProjectChange: (project: Project) => void;
     onStateChange: (state: State) => void;
+    onPriorityChange: (priority: Priority) => void;
     onEstimateChange: (estimate?: EstimateInput) => void;
     onTagAdd: (tag: TagModel) => void;
     onTagDelete: (tag: TagModel) => void;
@@ -83,6 +86,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     project,
     tags = new Map<string, TagModel>(),
     state,
+    priority,
     estimate,
     i18nKeyset,
     children,
@@ -92,6 +96,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     onOwnerChange,
     onProjectChange,
     onStateChange,
+    onPriorityChange,
     onEstimateChange,
     onTagAdd,
     onTagDelete,
@@ -148,6 +153,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     const ownerButtonText = owner?.user?.name || owner?.user?.email || owner?.ghost?.email || t('Assign');
     const projectButtonText = project?.title || t('Enter project title');
     const stateButtonText = state?.title || t('State');
+    const priorityButtonText = priority || t('Priority.Priority');
 
     return (
         <>
@@ -210,6 +216,13 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             flowId={project?.flow?.id}
                             state={state}
                             onClick={onStateChange}
+                        />
+
+                        <PriorityDropdown
+                            size="m"
+                            text={priorityButtonText}
+                            priority={priority}
+                            onClick={onPriorityChange}
                         />
 
                         <EstimateDropdown

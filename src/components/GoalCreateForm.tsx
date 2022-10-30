@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import { gql } from '../utils/gql';
 import { gapS, gray6, star0 } from '../design/@generated/themes';
-import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../graphql/@generated/genql';
+import { Project, EstimateInput, State, Tag as TagModel, Activity, Priority } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
 import { TLocale } from '../types/locale';
 
@@ -38,12 +38,14 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
     const [estimate, setEstimate] = useState<EstimateInput>();
     const [project, setProject] = useState<Project>();
     const [state, setState] = useState<State>();
+    const [priority, setPriority] = useState<Priority>();
     const [tags, setTags] = useState(new Map<string, TagModel>());
     const modalOnEventProps: Project | undefined = useContext(modalOnEventContext);
 
     const onOwnerChange = useCallback(setOwner, [setOwner]);
     const onProjectChange = useCallback(setProject, [setProject]);
     const onStateChange = useCallback(setState, [setState]);
+    const onPriorityChange = useCallback(setPriority, [setPriority]);
     const onEstimateChange = useCallback(setEstimate, [setEstimate]);
     const onTagAdd = useCallback(
         (tag: TagModel) => {
@@ -88,6 +90,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
                         projectId: project.id,
                         estimate,
                         stateId: state?.id,
+                        priority,
                         tags: Array.from(tags.values()),
                     },
                 },
@@ -115,6 +118,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
             owner={owner!}
             project={project}
             state={state}
+            priority="Medium"
             tags={tags}
             estimate={estimate}
             onSumbit={createGoal}
@@ -122,6 +126,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
             onProjectChange={onProjectChange}
             onEstimateChange={onEstimateChange}
             onStateChange={onStateChange}
+            onPriorityChange={onPriorityChange}
             onTagAdd={onTagAdd}
             onTagDelete={onTagDelete}
         >
