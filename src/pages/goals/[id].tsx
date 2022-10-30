@@ -503,9 +503,13 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(() => {
-        refresh();
         setGoalEditModalVisible(false);
+        refresh();
     }, [refresh]);
+
+    const onGoalEditModalShow = useCallback(() => {
+        setGoalEditModalVisible(true);
+    }, []);
 
     return (
         <Page
@@ -648,7 +652,12 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             </IssueContent>
 
             {nullable(isUserAllowedToEdit, () => (
-                <ModalOnEvent event={ModalEvent.GoalEditModal} hotkeys={editGoalKeys} visible={goalEditModalVisible}>
+                <ModalOnEvent
+                    event={ModalEvent.GoalEditModal}
+                    hotkeys={editGoalKeys}
+                    visible={goalEditModalVisible}
+                    onShow={onGoalEditModalShow}
+                >
                     <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
                 </ModalOnEvent>
             ))}

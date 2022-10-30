@@ -8,19 +8,33 @@ import { Modal } from './Modal';
 
 interface ModalOnEventProps {
     event: ModalEvent;
+    children: React.ComponentProps<typeof Modal>['children'];
     hotkeys?: string[];
     visible?: boolean;
     view?: React.ComponentProps<typeof Modal>['view'];
-    children: React.ComponentProps<typeof Modal>['children'];
+
+    onShow?: React.ComponentProps<typeof Modal>['onShow'];
+    onClose?: React.ComponentProps<typeof Modal>['onClose'];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const modalOnEventContext = createContext<any>(undefined);
 
-const ModalOnEvent: React.FC<ModalOnEventProps> = ({ event, hotkeys, visible = false, view, children }) => {
+const ModalOnEvent: React.FC<ModalOnEventProps> = ({
+    event,
+    hotkeys,
+    visible = false,
+    view,
+    children,
+    onShow,
+    onClose,
+}) => {
     const [modalVisible, setModalVisibility] = useState(visible);
     const [modalContextProps, setModalContextProps] = useState(null);
-    const onModalClose = useCallback(() => setModalVisibility(false), [setModalVisibility]);
+    const onModalClose = useCallback(() => {
+        setModalVisibility(false);
+        onClose && onClose();
+    }, [setModalVisibility, onClose]);
 
     useEffect(() => {
         if (hotkeys) {
@@ -28,14 +42,16 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({ event, hotkeys, visible = f
         }
     }, [hotkeys]);
 
-    const globalListener = useCallback(
-        (e: CustomEvent) => {
+    useEffect(() => {
+        setModalVisibility(visible);
+    }, [visible]);
+
+    useEffect(() => {
+        const globalListener = (e: CustomEvent) => {
             setModalVisibility(!modalVisible);
             setModalContextProps(e.detail);
-        },
-        [modalVisible],
-    );
-    useEffect(() => {
+        };
+
         // @ts-ignore EventListener doesn't work with CustomEvent type ¯\_(ツ)_/¯
         window.addEventListener(event, globalListener);
 
@@ -43,10 +59,10 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({ event, hotkeys, visible = f
             // @ts-ignore EventListener doesn't work with CustomEvent type ¯\_(ツ)_/¯
             window.removeEventListener(event, globalListener);
         };
-    }, [event, globalListener]);
+    }, [event, modalVisible]);
 
     return (
-        <Modal view={view} visible={modalVisible} onClose={onModalClose}>
+        <Modal view={view} visible={modalVisible} onShow={onShow} onClose={onModalClose}>
             <modalOnEventContext.Provider value={modalContextProps}>{children}</modalOnEventContext.Provider>
         </Modal>
     );
