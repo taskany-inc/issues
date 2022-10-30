@@ -129,7 +129,7 @@ const StyledPlaceholder = styled.div`
     position: absolute;
     top: 5px;
     left: 8px;
-    z-index: 999;
+    z-index: 100;
 
     pointer-events: none;
 
