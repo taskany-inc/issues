@@ -122,7 +122,15 @@
       "Date input mask placeholder": "mm/dd/yyyy",
       "Date input mask": "99/99/9999",
       "State": "State",
-      "Enter tag title": "Enter tag title"
+      "Enter tag title": "Enter tag title",
+      "Priority": {
+        "Priority": "Priority",
+        "Highest": "Highest",
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low",
+        "Lowest": "Lowest"
+      }
     },
     "edit": {
       "Edit the goal": "Edit the goal",
@@ -145,7 +153,15 @@
       "Date input mask placeholder": "mm/dd/yyyy",
       "Date input mask": "99/99/9999",
       "State": "State",
-      "Enter tag title": "Enter tag title"
+      "Enter tag title": "Enter tag title",
+      "Priority": {
+        "Priority": "Priority",
+        "Highest": "Highest",
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low",
+        "Lowest": "Lowest"
+      }
     },
     "id": {
       "title": "Taskany — Goals — <goal></goal>",
@@ -165,7 +181,15 @@
       "Stars": "Stars",
       "Starred": "Starred",
       "Edit goal": "Edit goal",
-      "New goal": "New goal"
+      "New goal": "New goal",
+      "Priority": {
+        "Priority": "Priority",
+        "Highest": "Highest",
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low",
+        "Lowest": "Lowest"
+      }
     },
     "item": {
       "by": "by"

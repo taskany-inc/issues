@@ -20,6 +20,14 @@ enum Role {
   ADMIN
 }
 
+enum Priority {
+  Highest
+  High
+  Medium
+  Low
+  Lowest
+}
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -168,6 +176,7 @@ model Goal {
   key          Boolean?
   personal     Boolean?
   private      Boolean?
+  priority     String?
   estimate     Estimate[]
   project      Project?   @relation("projectGoals", fields: [projectId], references: [id])
   projectId    Int?

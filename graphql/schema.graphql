@@ -97,6 +97,7 @@ type Goal {
   ownerId: String
   participants: [Activity]
   personal: Boolean
+  priority: String
   private: Boolean
   project: Project
   projectId: Int
@@ -118,6 +119,7 @@ input GoalCreateInput {
   ownerId: String
   participants: [ActivityInput]
   personal: Boolean
+  priority: String
   private: Boolean
   projectId: Int
   stateId: String
@@ -140,6 +142,7 @@ input GoalUpdateInput {
   ownerId: String
   participants: [String]
   personal: Boolean
+  priority: String
   private: Boolean
   projectId: Int
   stateId: String
@@ -165,6 +168,14 @@ type Mutation {
   updateSettings(data: SettingsUpdateInput!): Settings
   updateUser(data: UserUpdateInput!): User
   usersInvites(input: UserInvitesInput!): [Ghost]
+}
+
+enum Priority {
+  High
+  Highest
+  Low
+  Lowest
+  Medium
 }
 
 type Project {
@@ -223,6 +234,7 @@ type Query {
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
   goalDependencyKind: [String]
+  goalPriorityKind: [String]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(data: ProjectGoalsInput!): [Goal]

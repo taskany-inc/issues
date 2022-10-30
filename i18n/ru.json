@@ -122,7 +122,15 @@
       "Date input mask placeholder": "dd.mm.yyyy",
       "Date input mask": "99.99.9999",
       "State": "Статус",
-      "Enter tag title": "Название тэга"
+      "Enter tag title": "Название тэга",
+      "Priority": {
+        "Priority": "Приоритет",
+        "Highest": "Самый высокий",
+        "High": "Высокий",
+        "Medium": "Средний",
+        "Low": "Низкий",
+        "Lowest": "Самый низкий"
+      }
     },
     "edit": {
       "Edit the goal": "Редактирование цели",
@@ -145,7 +153,15 @@
       "Date input mask placeholder": "dd.mm.yyyy",
       "Date input mask": "99.99.9999",
       "State": "Статус",
-      "Enter tag title": "Название тэга"
+      "Enter tag title": "Название тэга",
+      "Priority": {
+        "Priority": "Приоритет",
+        "Highest": "Самый высокий",
+        "High": "Высокий",
+        "Medium": "Средний",
+        "Low": "Низкий",
+        "Lowest": "Самый низкий"
+      }
     },
     "id": {
       "title": "Taskany — Цели — <goal></goal>",
@@ -165,7 +181,15 @@
       "Stars": "В избранное",
       "Starred": "Избранное",
       "Edit goal": "Редактировать",
-      "New goal": "Создать цель"
+      "New goal": "Создать цель",
+      "Priority": {
+        "Priority": "Приоритет",
+        "Highest": "Самый высокий",
+        "High": "Высокий",
+        "Medium": "Средний",
+        "Low": "Низкий",
+        "Lowest": "Самый низкий"
+      }
     },
     "item": {
       "by": ""

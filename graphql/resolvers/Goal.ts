@@ -11,6 +11,7 @@ import {
     dependencyKind,
     UserGoalsInput,
     Project,
+    priorityKind,
 } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
@@ -262,6 +263,14 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             if (!activity) return null;
 
             return dependencyKind;
+        },
+    });
+
+    t.list.string('goalPriorityKind', {
+        resolve: async (_, _args, { activity }) => {
+            if (!activity) return null;
+
+            return priorityKind;
         },
     });
 
