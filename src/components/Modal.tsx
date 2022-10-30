@@ -24,6 +24,7 @@ interface ModalProps {
     children: React.ReactNode;
 
     onClose?: () => void;
+    onShow?: () => void;
 }
 
 const StyledModalSurface = styled.div`
@@ -91,7 +92,7 @@ interface PortalProps {
 
 const Portal: React.FC<PortalProps> = ({ id, children }) => createPortal(children, usePortal(id));
 
-export const Modal: React.FC<ModalProps> = ({ visible, view, onClose, children, width = 800 }) => {
+export const Modal: React.FC<ModalProps> = ({ visible, view, children, width = 800, onClose, onShow }) => {
     const [onESC] = useKeyboard([KeyCode.Escape], () => onClose && onClose(), {
         disableGlobalEvent: false,
     });
@@ -105,6 +106,12 @@ export const Modal: React.FC<ModalProps> = ({ visible, view, onClose, children, 
             document.body.style.overflow = 'unset';
         };
     }, [visible]);
+
+    useEffect(() => {
+        if (visible) {
+            onShow && onShow();
+        }
+    }, [visible, onShow]);
 
     return (
         <>
