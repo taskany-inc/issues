@@ -40,7 +40,6 @@
     "color-layer": "1.0.2",
     "cors": "2.8.5",
     "cyrillic-to-translit-js": "3.2.1",
-    "date-fns": "2.29.3",
     "graphql": "15.8.0",
     "graphql-scalars": "1.20.0",
     "gray-matter": "4.0.3",
