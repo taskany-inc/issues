@@ -2,9 +2,9 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: process.env.ANALYZE === 'true',
 });
+const { withSentryConfig } = require('@sentry/nextjs');
 
-/** @type {import('next').NextConfig} */
-const nextConfig = withBundleAnalyzer({
+const baseConfig = {
     reactStrictMode: process.env.STRICT_MODE,
     swcMinify: true,
     i18n: {
@@ -22,6 +22,19 @@ const nextConfig = withBundleAnalyzer({
 
         return config;
     },
-});
+    /** @see https://github.com/getsentry/sentry-webpack-plugin#options */
+    sentry: {
+        hideSourceMaps: true,
+    },
+};
 
-module.exports = nextConfig;
+const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
+
+/** @type {import('next').NextConfig} */
+const nextConfig = SENTRY_DSN
+    ? withSentryConfig(baseConfig, {
+          silent: true,
+      })
+    : baseConfig;
+
+module.exports = withBundleAnalyzer(nextConfig);
