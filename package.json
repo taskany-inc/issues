@@ -21,7 +21,8 @@
     "test": "jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "type-check": "npx tsc"
   },
   "prisma": {
     "seed": "ts-node -r dotenv/config --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
