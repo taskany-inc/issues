@@ -22,6 +22,7 @@ type Comment {
   createdAt: DateTime!
   description: String!
   id: ID!
+  reactions: [Reaction]
   updatedAt: DateTime!
 }
 

@@ -1,20 +1,19 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import dynamic from 'next/dynamic';
 
-import { Reaction } from '../../graphql/@generated/genql';
 import { nullable } from '../utils/nullable';
 
 import { ReactionsButton } from './ReactionsButton';
 
-const ReactionsDropdown = dynamic(() => import('./ReactionsDropdown'));
+export const reactionsGroupsLimit = 10;
+export type ReactionsMap = Record<string, { count: number; authors: Set<string> }>;
 
 interface ReactionsProps {
-    reactions?: Array<Reaction | undefined>;
+    reactions?: ReactionsMap;
+    children?: React.ReactNode;
+
     onClick?: React.ComponentProps<typeof ReactionsButton>['onClick'];
 }
-
-const reactionsGroupsLimit = 10;
 
 const StyledReactions = styled.div`
     display: flex;
@@ -22,34 +21,10 @@ const StyledReactions = styled.div`
     justify-items: center;
 `;
 
-type ReactionsMap = Record<string, { count: number; authors: Set<string> }>;
-
 // eslint-disable-next-line react/display-name
-export const Reactions = React.memo(({ reactions, onClick }: ReactionsProps) => {
-    const grouppedReactions = useMemo(
-        () =>
-            reactions?.reduce((acc, curr) => {
-                if (!curr) return acc;
-
-                acc[curr.emoji] = acc[curr.emoji]
-                    ? {
-                          count: acc[curr.emoji].count + 1,
-                          authors: acc[curr.emoji].authors.add(curr.activityId),
-                      }
-                    : {
-                          count: 1,
-                          authors: new Set(),
-                      };
-
-                return acc;
-            }, {} as ReactionsMap),
-        [reactions],
-    );
-
-    const reactionsGroupsNames = Object.keys(grouppedReactions || {});
-
-    const existingReactions = nullable(grouppedReactions, (gr) =>
-        reactionsGroupsNames.map((r) =>
+export const Reactions = React.memo(({ reactions, children, onClick }: ReactionsProps) => {
+    const existingReactions = nullable(reactions, (gr) =>
+        Object.keys(reactions || {}).map((r) =>
             nullable(r, (reaction) => (
                 <ReactionsButton key={reaction} emoji={reaction} count={gr[reaction].count} onClick={onClick} />
             )),
@@ -60,7 +35,7 @@ export const Reactions = React.memo(({ reactions, onClick }: ReactionsProps) => 
         <StyledReactions>
             {existingReactions}
 
-            {reactionsGroupsNames.length < reactionsGroupsLimit ? <ReactionsDropdown onClick={onClick} /> : null}
+            {children}
         </StyledReactions>
     );
 });

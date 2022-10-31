@@ -244,7 +244,16 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                                     ghost: true,
                                 },
                             },
-                            reactions: true,
+                            reactions: {
+                                include: {
+                                    activity: {
+                                        include: {
+                                            user: true,
+                                            ghost: true,
+                                        },
+                                    },
+                                },
+                            },
                         },
                     },
                     participants: {

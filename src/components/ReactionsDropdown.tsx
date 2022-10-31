@@ -6,10 +6,13 @@ import { pageContext, PageContext } from '../utils/pageContext';
 import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '../design/@generated/themes';
 
 import { Popup } from './Popup';
+import { Icon } from './Icon';
 import { ReactionsButton } from './ReactionsButton';
 
 interface ReactionsDropdownProps {
-    onClick?: (emoji: string) => void;
+    view?: 'button' | 'icon';
+
+    onClick?: (emoji?: string) => void;
 }
 
 const StyledPicker = styled.div`
@@ -30,7 +33,7 @@ const StyledPicker = styled.div`
     }
 `;
 
-const ReactionsDropdown = ({ onClick }: ReactionsDropdownProps) => {
+const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps) => {
     const { theme } = useContext(pageContext);
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -94,11 +97,14 @@ const ReactionsDropdown = ({ onClick }: ReactionsDropdownProps) => {
         setPopupVisibility(!popupVisible);
     }, [popupVisible]);
 
+    const viewModeMap: Record<'button' | 'icon', React.ReactNode> = {
+        button: <ReactionsButton ref={buttonRef} onClick={onButtonClick} />,
+        icon: <Icon ref={buttonRef} noWrap type="emoji" size="xs" onClick={onButtonClick} />,
+    };
+
     return (
         <>
-            <span ref={popupRef}>
-                <ReactionsButton ref={buttonRef} onClick={onButtonClick} />
-            </span>
+            <span ref={popupRef}>{viewModeMap[view]}</span>
 
             <Popup
                 placement="right"
