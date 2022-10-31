@@ -1,20 +1,5 @@
-import parseDate from 'date-fns/parse';
-import getQuarter from 'date-fns/getQuarter';
-import getYear from 'date-fns/getYear';
-import format from 'date-fns/format';
-import setMonth from 'date-fns/setMonth';
-import lastDayOfQuarter from 'date-fns/lastDayOfQuarter';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import ruLocale from 'date-fns/locale/ru';
-import isPast from 'date-fns/isPast';
-
-export const localeFormatMap = {
-    ru: 'dd.MM.yyyy',
-    en: 'MM/dd/yyyy',
-};
-
 type LocaleArg = {
-    locale: keyof typeof localeFormatMap;
+    locale: 'ru' | 'en';
 };
 
 const localeArgDefault: LocaleArg = { locale: 'en' };
@@ -27,15 +12,15 @@ export enum quarters {
 }
 
 export const createLocaleDate = (date: string, { locale }: LocaleArg = localeArgDefault) =>
-    parseDate(date, localeFormatMap[locale], new Date());
+    new Intl.DateTimeFormat(locale).format(new Date(date));
 
 export const yearFromDate = (date: string, { locale }: LocaleArg = localeArgDefault) =>
-    getYear(createLocaleDate(date, { locale }));
+    new Date(createLocaleDate(date, { locale })).getFullYear();
 
 export const currentDate = (date = new Date(), { locale }: LocaleArg = localeArgDefault) =>
-    format(date, localeFormatMap[locale]);
+    new Intl.DateTimeFormat(locale).format(date);
 
-export const endOfQuarter = (q: string, date = new Date(), { locale }: LocaleArg = localeArgDefault) => {
+export const endOfQuarter = (q: string, date: string, { locale }: LocaleArg = localeArgDefault) => {
     const qToM = {
         [quarters.Q1]: 2,
         [quarters.Q2]: 5,
@@ -43,18 +28,28 @@ export const endOfQuarter = (q: string, date = new Date(), { locale }: LocaleArg
         [quarters.Q4]: 11,
     };
 
-    const abstractDate = setMonth(date, qToM[q as quarters]);
-    return currentDate(lastDayOfQuarter(abstractDate), { locale });
+    const abstractDate = new Date(date).setMonth(qToM[q as quarters]);
+
+    const getQ = (date: number) => {
+        const d = new Date(date);
+        const quarter = Math.floor(d.getMonth() / 3);
+        const startDate = new Date(d.getFullYear(), quarter * 3, 1);
+        return [startDate, new Date(startDate.getFullYear(), startDate.getMonth() + 3, 0)];
+    };
+
+    return currentDate(getQ(abstractDate)[1], { locale });
 };
 
-export const quarterFromDate = (date = new Date()) => `Q${getQuarter(date)}` as quarters;
+const getQuarter = (date = new Date()) => Math.floor(date.getMonth() / 3 + 1);
+
+export const quarterFromDate = (date = '') => `Q${getQuarter(new Date(date))}` as quarters;
 
 export const availableYears = (n = 5, currY = new Date().getFullYear()) =>
     Array(n)
         .fill(0)
         .map((_, i) => currY + i);
 
-export const estimatedMeta = (date = new Date(), { locale }: LocaleArg = localeArgDefault) => {
+export const estimatedMeta = (date = '', { locale }: LocaleArg = localeArgDefault) => {
     const q = quarterFromDate(date);
 
     return {
@@ -64,9 +59,27 @@ export const estimatedMeta = (date = new Date(), { locale }: LocaleArg = localeA
 };
 
 export const dateAgo = (date: string, { locale }: LocaleArg = localeArgDefault) => {
-    return formatDistanceToNow(new Date(date), { locale: locale === 'ru' ? ruLocale : undefined, addSuffix: true });
+    const formatter = new Intl.RelativeTimeFormat(locale, { style: 'long', numeric: 'auto' });
+
+    const divisions: Array<{ amount: number; name: Intl.RelativeTimeFormatUnit }> = [
+        { amount: 60, name: 'seconds' },
+        { amount: 60, name: 'minutes' },
+        { amount: 24, name: 'hours' },
+        { amount: 7, name: 'days' },
+        { amount: 4.34524, name: 'weeks' },
+        { amount: 12, name: 'months' },
+        { amount: Number.POSITIVE_INFINITY, name: 'years' },
+    ];
+
+    let duration = (Number(new Date(date)) - Number(new Date())) / 1000;
+
+    for (let i = 0; i <= divisions.length; i++) {
+        const division = divisions[i];
+        if (Math.abs(duration) < division.amount) {
+            return formatter.format(Math.round(duration), division.name);
+        }
+        duration /= division.amount;
+    }
 };
 
-export const isPastDate = (date: string): boolean => {
-    return isPast(new Date(date));
-};
+export const isPastDate = (date: string): boolean => new Date(date) < new Date();
