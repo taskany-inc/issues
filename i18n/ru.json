@@ -308,5 +308,15 @@
         "Owner": "Ответственный",
         "Limit": "Лимит",
         "Tags": "Теги"
+    },
+    "PriorityDropdown": {
+        "Priority": {
+            "Priority": "Приоритет",
+            "Highest": "Самый высокий",
+            "High": "Высокий",
+            "Medium": "Средний",
+            "Low": "Низкий",
+            "Lowest": "Самый низкий"
+        }
     }
 }
