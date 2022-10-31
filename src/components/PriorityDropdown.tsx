@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import styled, { css } from 'styled-components';
+import { useTranslations } from 'next-intl';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Priority } from '../../graphql/@generated/genql';
@@ -74,6 +75,7 @@ export const PriorityDropdown: React.FC<PriorityDropdownProps> = ({
     disabled,
     onClick,
 }) => {
+    const t = useTranslations('PriorityDropdown');
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -164,7 +166,7 @@ export const PriorityDropdown: React.FC<PriorityDropdownProps> = ({
                     {data?.goalPriorityKind?.map((p, i) => (
                         <PriorityCard
                             key={p}
-                            title={p}
+                            title={t(`Priority.${p}`)}
                             focused={p === priority || cursor === i}
                             onClick={onItemClick(p as Priority)}
                         />
