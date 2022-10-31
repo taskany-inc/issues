@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { gapS, gapXs, gray8 } from '../design/@generated/themes';
 import { State } from '../../graphql/@generated/genql';
 import { nullable } from '../utils/nullable';
+import { pluralize } from '../utils/pluralize';
 
 import { Text } from './Text';
 import { Dot } from './Dot';
@@ -54,7 +55,14 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
                     {state ? <Dot /> : null} <RelativeTime kind="updated" locale={locale} date={updatedAt} /> <Dot />{' '}
                     {comments ? (
                         <Link inline href="#comments">
-                            <b>{comments}</b> {t('comments')}
+                            <b>{comments}</b>{' '}
+                            {pluralize({
+                                locale,
+                                count: comments,
+                                one: t('comments.one'),
+                                few: t('comments.few'),
+                                many: t('comments.many'),
+                            })}
                         </Link>
                     ) : (
                         <Link inline onClick={onCommentsClick}>
