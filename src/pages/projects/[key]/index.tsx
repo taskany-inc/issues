@@ -307,6 +307,7 @@ const ProjectPage = ({
                 {goals?.map((goal) =>
                     nullable(goal, (g) => (
                         <GoalItem
+                            locale={locale}
                             createdAt={g.createdAt}
                             id={g.id}
                             state={g.state}

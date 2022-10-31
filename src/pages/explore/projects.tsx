@@ -76,6 +76,7 @@ const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: P
                 {projects?.map((project) =>
                     nullable(project, (p) => (
                         <ProjectItem
+                            locale={locale}
                             key={p.key}
                             projectKey={p.key}
                             title={p.title}

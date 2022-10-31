@@ -542,6 +542,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     <IssueTitle title={goal.title} project={goal.project} />
 
                     <IssueStats
+                        locale={locale}
                         flow={goal.project?.flow?.id}
                         state={goal.state}
                         comments={goal.comments?.length || 0}
@@ -583,7 +584,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                 <div>
                     <Card>
                         <CardInfo>
-                            <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
+                            <Link inline>{goal.activity?.user?.name}</Link> —{' '}
+                            <RelativeTime locale={locale} date={goal.createdAt} />
                         </CardInfo>
 
                         <CardContent>

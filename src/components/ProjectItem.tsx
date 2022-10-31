@@ -15,8 +15,9 @@ const RelativeTime = dynamic(() => import('./RelativeTime'));
 interface ProjectItemProps {
     projectKey: string;
     title: string;
-    description?: string;
     createdAt: Scalars['DateTime'];
+    locale: 'en' | 'ru';
+    description?: string;
     owner?: Activity;
 }
 
@@ -65,7 +66,14 @@ const StyledSubTitle = styled(Text)`
     padding-top: ${gapS};
 `;
 
-export const ProjectItem: React.FC<ProjectItemProps> = ({ projectKey, title, description, owner, createdAt }) => {
+export const ProjectItem: React.FC<ProjectItemProps> = ({
+    projectKey,
+    title,
+    description,
+    owner,
+    createdAt,
+    locale,
+}) => {
     return (
         <Link href={routes.project(projectKey)} passHref>
             <StyledProjectItem>
@@ -81,7 +89,7 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({ projectKey, title, des
                     ))}
 
                     <StyledSubTitle size="s">
-                        <RelativeTime date={createdAt} kind="created" />
+                        <RelativeTime locale={locale} date={createdAt} kind="created" />
                     </StyledSubTitle>
                 </StyledName>
 

@@ -5,17 +5,18 @@ import { dateAgo, currentDate } from '../utils/dateTime';
 import { Light } from './Light';
 
 interface RelativeTimeProps {
-    kind?: 'created' | 'updated' | 'Created' | 'Updated';
     date: string;
+    locale: 'en' | 'ru';
+    kind?: 'created' | 'updated' | 'Created' | 'Updated';
 }
 
-const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
+const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, locale }) => {
     const t = useTranslations('RelativeTime');
 
     return (
         <>
             {kind ? `${t(kind)} ` : ''}
-            <Light title={currentDate(new Date(date))}>{dateAgo(date)}</Light>
+            <Light title={currentDate(new Date(date))}>{dateAgo(date, { locale })}</Light>
         </>
     );
 };
