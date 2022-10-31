@@ -14,10 +14,11 @@ const RelativeTime = dynamic(() => import('./RelativeTime'));
 const StateSwitch = dynamic(() => import('./StateSwitch'));
 
 interface IssueStatsProps {
-    state?: State;
-    flow?: string;
     updatedAt: string;
     comments: number;
+    locale: 'en' | 'ru';
+    state?: State;
+    flow?: string;
 
     onStateChange?: (state: State) => void;
     onCommentsClick?: () => void;
@@ -36,6 +37,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
     flow,
     comments,
     updatedAt,
+    locale,
     onStateChange,
     onCommentsClick,
 }) => {
@@ -49,7 +51,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
 
             <Text as="span" size="m" color={gray8}>
                 <StyledIssueInfo>
-                    {state ? <Dot /> : null} <RelativeTime kind="updated" date={updatedAt} /> <Dot />{' '}
+                    {state ? <Dot /> : null} <RelativeTime kind="updated" locale={locale} date={updatedAt} /> <Dot />{' '}
                     {comments ? (
                         <Link inline href="#comments">
                             <b>{comments}</b> {t('comments')}

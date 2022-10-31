@@ -17,9 +17,10 @@ import { StateDot } from './StateDot';
 const RelativeTime = dynamic(() => import('./RelativeTime'));
 
 interface GoalItemProps {
-    title: string;
-    issuer?: Activity;
     id: string;
+    title: string;
+    locale: 'en' | 'ru';
+    issuer?: Activity;
     tags?: Array<Tag | undefined>;
     state?: State;
     createdAt: Scalars['DateTime'];
@@ -124,6 +125,7 @@ export const GoalItem: React.FC<GoalItemProps> = ({
     hasForks,
     isNotViewed,
     state,
+    locale,
 }) => {
     const t = useTranslations('goals.item');
 
@@ -150,7 +152,7 @@ export const GoalItem: React.FC<GoalItemProps> = ({
                     </StyledTags>
 
                     <StyledSubTitle size="s">
-                        #{id} <RelativeTime date={createdAt} kind="created" />
+                        #{id} <RelativeTime locale={locale} date={createdAt} kind="created" />
                         {`  ${t('by')} ${issuer?.user?.name}`}
                     </StyledSubTitle>
                 </StyledName>

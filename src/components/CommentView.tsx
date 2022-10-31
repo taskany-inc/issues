@@ -154,7 +154,7 @@ export const CommentView: FC<CommentViewProps> = ({
                         <div>
                             <Link inline>{author?.name}</Link> —{' '}
                             <Link inline href={`#${commentMask}${id}`}>
-                                <RelativeTime date={createdAt} />
+                                <RelativeTime locale={locale} date={createdAt} />
                             </Link>
                         </div>
                         {nullable(isEditable, () => (
