@@ -41,7 +41,7 @@
     "color-layer": "1.0.3",
     "cors": "2.8.5",
     "cyrillic-to-translit-js": "3.2.1",
-    "graphql": "15.8.0",
+    "graphql": "16.6.0",
     "graphql-scalars": "1.20.0",
     "gray-matter": "4.0.3",
     "md5": "2.3.0",
