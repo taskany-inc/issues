@@ -614,7 +614,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                 <IssueAction>
                                     <PriorityDropdown
                                         priority={issuePriority}
-                                        text={t(`Priority.${issuePriority}`) || t('Priority.Priority')}
+                                        text={issuePriority ? t(`Priority.${issuePriority}`) : t('Priority.Priority')}
                                         onClick={isUserAllowedToEdit ? onIssuePriorityChange : undefined}
                                     />
                                 </IssueAction>
