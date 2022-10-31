@@ -38,7 +38,7 @@
     "@tippyjs/react": "4.2.6",
     "apollo-server-micro": "3.10.3",
     "apollo-tracing": "0.15.0",
-    "color-layer": "1.0.2",
+    "color-layer": "1.0.3",
     "cors": "2.8.5",
     "cyrillic-to-translit-js": "3.2.1",
     "graphql": "15.8.0",
