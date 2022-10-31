@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled, { css } from 'styled-components';
@@ -35,7 +35,7 @@ import { IssueStats } from '../../components/IssueStats';
 import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
-import { Reactions } from '../../components/Reactions';
+import { Reactions, ReactionsMap, reactionsGroupsLimit } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
 import { commentMask, CommentView } from '../../components/CommentView';
 import { IssueDependencies } from '../../components/IssueDependencies';
@@ -50,6 +50,7 @@ const UserCompletionDropdown = dynamic(() => import('../../components/UserComple
 const ModalOnEvent = dynamic(() => import('../../components/ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../../components/GoalEditForm'));
 const CommentCreateForm = dynamic(() => import('../../components/CommentCreateForm'));
+const ReactionsDropdown = dynamic(() => import('../../components/ReactionsDropdown'));
 
 const refreshInterval = 3000;
 
@@ -187,6 +188,20 @@ const fetcher = createFetcher((_, id: string) => ({
                         email: true,
                     },
                 },
+                reactions: {
+                    id: true,
+                    emoji: true,
+                    activity: {
+                        user: {
+                            id: true,
+                            name: true,
+                        },
+                        ghost: {
+                            id: true,
+                            email: true,
+                        },
+                    },
+                },
             },
             participants: {
                 id: true,
@@ -311,6 +326,27 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             setHighlightCommentId(targetComment);
         }
     }, [asPath]);
+
+    const grouppedReactions = useMemo(
+        () =>
+            goal.reactions?.reduce((acc, curr) => {
+                if (!curr) return acc;
+
+                acc[curr.emoji] = acc[curr.emoji]
+                    ? {
+                          count: acc[curr.emoji].count + 1,
+                          authors: acc[curr.emoji].authors.add(curr.activityId),
+                      }
+                    : {
+                          count: 1,
+                          authors: new Set(),
+                      };
+
+                return acc;
+            }, {} as ReactionsMap),
+        [goal.reactions],
+    );
+    const reactionsGroupsNames = Object.keys(grouppedReactions || {});
 
     const triggerUpdate = useCallback(
         (data: Partial<GoalUpdateInput>) => {
@@ -444,26 +480,28 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     }, [stargizer, goal, refresh, t]);
 
     const onReactionsToggle = useCallback(
-        async (emoji?: string) => {
-            if (!emoji) return;
+        ({ goalId, commentId }: { goalId?: string; commentId?: string }) =>
+            async (emoji?: string) => {
+                if (!emoji) return;
 
-            await gql.mutation({
-                toggleReaction: [
-                    {
-                        data: {
-                            emoji,
-                            goalId: goal.id,
+                await gql.mutation({
+                    toggleReaction: [
+                        {
+                            data: {
+                                emoji,
+                                goalId,
+                                commentId,
+                            },
                         },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
-            });
+                        {
+                            id: true,
+                        },
+                    ],
+                });
 
-            refresh();
-        },
-        [goal, refresh],
+                refresh();
+            },
+        [refresh],
     );
 
     const onParticipantsChange = useCallback(
@@ -567,7 +605,6 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                         />
                     </StyledIssueInfoRow>
 
-                    {/* TODO: open create form with `C` hotkey */}
                     <StyledIssueInfoRow>
                         <Button
                             view="primary"
@@ -631,7 +668,14 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                     />
                                 </IssueAction>
                                 <IssueAction>
-                                    <Reactions reactions={goal.reactions} onClick={onReactionsToggle} />
+                                    <Reactions
+                                        reactions={grouppedReactions}
+                                        onClick={onReactionsToggle({ goalId: goal.id })}
+                                    >
+                                        {nullable(reactionsGroupsNames.length < reactionsGroupsLimit, () => (
+                                            <ReactionsDropdown onClick={onReactionsToggle({ goalId: goal.id })} />
+                                        ))}
+                                    </Reactions>
                                 </IssueAction>
                             </IssueBaseActions>
 
@@ -655,6 +699,8 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                     createdAt={c.createdAt}
                                     isEditable={c.activity?.id === user.activityId}
                                     isNew={c.id === highlightCommentId}
+                                    reactions={c.reactions}
+                                    onReactionToggle={onReactionsToggle({ commentId: c.id })}
                                 />
                             )),
                         )}

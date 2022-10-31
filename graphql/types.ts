@@ -215,6 +215,7 @@ export const Comment = objectType({
         t.field(CommentModel.description);
         t.field('author', { type: Activity });
         t.field('activity', { type: Activity });
+        t.list.field('reactions', { type: Reaction });
         t.field(CommentModel.createdAt);
         t.field(CommentModel.updatedAt);
     },
