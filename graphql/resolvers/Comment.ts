@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { nonNull, stringArg, arg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
@@ -46,6 +47,19 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
 
             if (!commentAuthor || !commentAuthor.activity) return null;
             if (!goal) return null;
+
+            if (!goal.participants.length) {
+                Sentry.captureException(new Error('Goal without participants'), {
+                    tags: {
+                        scope: 'graphql',
+                        resolvers: 'Comment',
+                    },
+                    extra: {
+                        goalId: goal.id,
+                        activityId: commentAuthor.id,
+                    },
+                });
+            }
 
             try {
                 const newComment = await db.comment.create({
