@@ -1,5 +1,7 @@
+import { TLocale } from '../types/locale';
+
 interface PluralizeProps {
-    locale: 'en' | 'ru';
+    locale: TLocale;
     count: number;
     one: string;
     few: string;

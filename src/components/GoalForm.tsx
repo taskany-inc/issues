@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import { gapS } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Priority } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
+import { TLocale } from '../types/locale';
 
 import { Button } from './Button';
 import { FormInput } from './FormInput';
@@ -53,7 +54,7 @@ interface GoalFormProps {
     formTitle: string;
     owner: Activity;
     i18nKeyset: string;
-    locale: 'en' | 'ru';
+    locale: TLocale;
     title?: string;
     description?: string;
     project?: Project;

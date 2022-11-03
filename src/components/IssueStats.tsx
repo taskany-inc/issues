@@ -6,6 +6,7 @@ import { gapS, gapXs, gray8 } from '../design/@generated/themes';
 import { State } from '../../graphql/@generated/genql';
 import { nullable } from '../utils/nullable';
 import { pluralize } from '../utils/pluralize';
+import { TLocale } from '../types/locale';
 
 import { Text } from './Text';
 import { Dot } from './Dot';
@@ -17,7 +18,7 @@ const StateSwitch = dynamic(() => import('./StateSwitch'));
 interface IssueStatsProps {
     updatedAt: string;
     comments: number;
-    locale: 'en' | 'ru';
+    locale: TLocale;
     state?: State;
     flow?: string;
 

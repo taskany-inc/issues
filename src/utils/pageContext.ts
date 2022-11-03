@@ -1,7 +1,9 @@
 import React from 'react';
 
+import { TLocale } from '../types/locale';
+
 export interface PageContext {
-    locale?: 'en' | 'ru';
+    locale?: TLocale;
     theme?: 'light' | 'dark';
 }
 

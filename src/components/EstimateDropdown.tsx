@@ -24,7 +24,7 @@ import { Input } from './Input';
 interface EstimateDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
     mask: string;
-    locale: 'en' | 'ru';
+    locale: TLocale;
     size?: React.ComponentProps<typeof Button>['size'];
     value?: {
         date: string;
