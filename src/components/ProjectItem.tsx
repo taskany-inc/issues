@@ -6,6 +6,7 @@ import { routes } from '../hooks/router';
 import type { Scalars, Activity } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
+import { TLocale } from '../types/locale';
 
 import { Text } from './Text';
 import { UserPic } from './UserPic';
@@ -16,7 +17,7 @@ interface ProjectItemProps {
     projectKey: string;
     title: string;
     createdAt: Scalars['DateTime'];
-    locale: 'en' | 'ru';
+    locale: TLocale;
     description?: string;
     owner?: Activity;
 }

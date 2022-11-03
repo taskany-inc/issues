@@ -7,6 +7,7 @@ import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
+import { TLocale } from '../types/locale';
 
 import { Text } from './Text';
 import { Tag as TagItem } from './Tag';
@@ -19,7 +20,7 @@ const RelativeTime = dynamic(() => import('./RelativeTime'));
 interface GoalItemProps {
     id: string;
     title: string;
-    locale: 'en' | 'ru';
+    locale: TLocale;
     issuer?: Activity;
     tags?: Array<Tag | undefined>;
     state?: State;

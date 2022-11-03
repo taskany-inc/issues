@@ -4,13 +4,14 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
 import { gql } from '../utils/gql';
+import { TLocale } from '../types/locale';
 import { Project, State, Tag as TagModel, Goal, EstimateInput, Priority } from '../../graphql/@generated/genql';
 
 import { GoalForm, GoalFormType } from './GoalForm';
 
 interface GoalEditFormProps {
     goal: Goal;
-    locale: 'en' | 'ru';
+    locale: TLocale;
 
     onSubmit: (id?: string) => void;
 }
