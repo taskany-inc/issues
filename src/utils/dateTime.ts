@@ -11,16 +11,16 @@ export enum quarters {
     'Q4' = 'Q4',
 }
 
-export const createLocaleDate = (date: string, { locale }: LocaleArg = localeArgDefault) =>
-    new Intl.DateTimeFormat(locale).format(new Date(date));
+export const createLocaleDate = (date?: string, { locale }: LocaleArg = localeArgDefault) =>
+    new Intl.DateTimeFormat(locale).format(date ? new Date(date) : new Date());
 
 export const yearFromDate = (date: string, { locale }: LocaleArg = localeArgDefault) =>
     new Date(createLocaleDate(date, { locale })).getFullYear();
 
-export const currentDate = (date = new Date(), { locale }: LocaleArg = localeArgDefault) =>
-    new Intl.DateTimeFormat(locale).format(date);
+export const currentDate = (date: string | Date, { locale }: LocaleArg = localeArgDefault) =>
+    new Intl.DateTimeFormat(locale).format(new Date(date));
 
-export const endOfQuarter = (q: string, date: string, { locale }: LocaleArg = localeArgDefault) => {
+export const endOfQuarter = (q: string, { locale }: LocaleArg = localeArgDefault) => {
     const qToM = {
         [quarters.Q1]: 2,
         [quarters.Q2]: 5,
@@ -28,32 +28,30 @@ export const endOfQuarter = (q: string, date: string, { locale }: LocaleArg = lo
         [quarters.Q4]: 11,
     };
 
-    const abstractDate = new Date(date).setMonth(qToM[q as quarters]);
+    const abstractDate = new Date().setMonth(qToM[q as quarters]);
 
-    const getQ = (date: number) => {
+    const qEndDate = (date: number) => {
         const d = new Date(date);
         const quarter = Math.floor(d.getMonth() / 3);
         const startDate = new Date(d.getFullYear(), quarter * 3, 1);
-        return [startDate, new Date(startDate.getFullYear(), startDate.getMonth() + 3, 0)];
+        return new Date(startDate.getFullYear(), startDate.getMonth() + 3, 0);
     };
 
-    return currentDate(getQ(abstractDate)[1], { locale });
+    return currentDate(qEndDate(abstractDate), { locale });
 };
 
-const getQuarter = (date = new Date()) => Math.floor(date.getMonth() / 3 + 1);
-
-export const quarterFromDate = (date = '') => `Q${getQuarter(new Date(date))}` as quarters;
+export const quarterFromDate = (date = new Date()) => `Q${Math.floor(date.getMonth() / 3 + 1)}` as quarters;
 
 export const availableYears = (n = 5, currY = new Date().getFullYear()) =>
     Array(n)
         .fill(0)
         .map((_, i) => currY + i);
 
-export const estimatedMeta = (date = '', { locale }: LocaleArg = localeArgDefault) => {
-    const q = quarterFromDate(date);
+export const estimatedMeta = ({ locale }: LocaleArg = localeArgDefault) => {
+    const q = quarterFromDate();
 
     return {
-        date: endOfQuarter(q, date, { locale }),
+        date: endOfQuarter(q, { locale }),
         q,
     };
 };

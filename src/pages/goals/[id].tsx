@@ -658,6 +658,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
                                 <IssueAction>
                                     <EstimateDropdown
+                                        locale={locale}
                                         size="m"
                                         text={t('Schedule')}
                                         placeholder={t('Date input mask placeholder')}
@@ -729,7 +730,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                     visible={goalEditModalVisible}
                     onShow={onGoalEditModalShow}
                 >
-                    <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
+                    <GoalEditForm goal={goal} locale={locale} onSubmit={onGoalEdit} />
                 </ModalOnEvent>
             ))}
         </Page>

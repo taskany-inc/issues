@@ -115,6 +115,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
         <GoalForm
             i18nKeyset="goals.new"
             formTitle={t('Create new goal')}
+            locale={locale}
             owner={owner!}
             project={project}
             state={state}
