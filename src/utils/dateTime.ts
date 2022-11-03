@@ -83,7 +83,7 @@ export const parseLocaleDate = (date: string, { locale }: LocaleArg) => {
     const parsers: Record<TLocale, (date: string) => Date> = {
         en: (date) => new Date(date),
         ru: (date) => {
-            if (date.includes('T')) {
+            if (date.includes('T') || date.includes('/')) {
                 return new Date(date);
             }
 
