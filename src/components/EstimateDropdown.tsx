@@ -14,8 +14,10 @@ import { Icon } from './Icon';
 import { Input } from './Input';
 
 interface EstimateDropdownProps {
-    size?: React.ComponentProps<typeof Button>['size'];
     text: React.ComponentProps<typeof Button>['text'];
+    mask: string;
+    locale: 'en' | 'ru';
+    size?: React.ComponentProps<typeof Button>['size'];
     value?: {
         date: string;
         q: string;
@@ -27,7 +29,7 @@ interface EstimateDropdownProps {
         y?: string;
     };
     placeholder?: string;
-    mask: string;
+
     onChange?: (estimate?: EstimateInput) => void;
     onClose?: (estimate?: EstimateInput) => void;
 }
@@ -87,7 +89,7 @@ const CheckableButton = styled(Button)`
 const isValidDate = (d: string) => !d.includes('_');
 
 const createValue = (str: string) => ({
-    q: quarterFromDate(createLocaleDate(str)),
+    q: quarterFromDate(new Date(createLocaleDate(str))),
     y: String(yearFromDate(str)),
     date: str,
 });
@@ -95,12 +97,13 @@ const createValue = (str: string) => ({
 const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     size = 'm',
     text,
-    onChange,
-    onClose,
+    locale,
     value,
     defaultValuePlaceholder,
     placeholder,
     mask,
+    onChange,
+    onClose,
 }) => {
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -126,10 +129,16 @@ const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     const onQButtonClick = useCallback(
         (nextQ: string) => () => {
             setSelectedQ(nextQ);
-            setInputState(endOfQuarter(nextQ, createLocaleDate(inputState)));
+
+            let newDate = endOfQuarter(nextQ, { locale });
+            if (newDate.length === 9) {
+                newDate = `0${newDate}`;
+            }
+
+            setInputState(newDate);
             setChanged(true);
         },
-        [inputState],
+        [locale],
     );
 
     const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,16 +151,16 @@ const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     });
 
     useEffect(() => {
-        setSelectedQ(quarterFromDate(createLocaleDate(inputState)));
+        if (isValidDate(inputState)) {
+            setSelectedQ(quarterFromDate(new Date(createLocaleDate(inputState))));
+        }
     }, [inputState]);
 
     useEffect(() => {
         if (changed && isValidDate(inputState)) {
             const v = createValue(inputState);
 
-            v.date === endOfQuarter(v.q, createLocaleDate(v.date))
-                ? setButtonText(`${v.q}/${v.y}`)
-                : setButtonText(v.date);
+            v.date === endOfQuarter(v.q) ? setButtonText(`${v.q}/${v.y}`) : setButtonText(v.date);
 
             setNextValue(v);
             onChange && onChange(v);
@@ -163,7 +172,7 @@ const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
 
         const newValue = createValue(value.date);
 
-        newValue.date === endOfQuarter(newValue.q, createLocaleDate(newValue.date))
+        newValue.date === endOfQuarter(newValue.q)
             ? setButtonText(`${newValue.q}/${String(yearFromDate(newValue.date))}`)
             : setButtonText(newValue.date);
 

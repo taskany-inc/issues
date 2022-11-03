@@ -10,10 +10,12 @@ import { GoalForm, GoalFormType } from './GoalForm';
 
 interface GoalEditFormProps {
     goal: Goal;
+    locale: 'en' | 'ru';
+
     onSubmit: (id?: string) => void;
 }
 
-const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
+const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, locale, onSubmit }) => {
     const t = useTranslations('goals.edit');
     const { data: session } = useSession();
     const [title, setTitle] = useState(goal.title);
@@ -99,6 +101,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     return (
         <GoalForm
             i18nKeyset="goals.edit"
+            locale={locale}
             formTitle={t('Edit the goal')}
             title={title}
             description={description}

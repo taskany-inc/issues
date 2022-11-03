@@ -51,15 +51,16 @@ export type GoalFormType = z.infer<ReturnType<typeof schemaProvider>>;
 
 interface GoalFormProps {
     formTitle: string;
+    owner: Activity;
+    i18nKeyset: string;
+    locale: 'en' | 'ru';
     title?: string;
     description?: string;
-    owner: Activity;
     project?: Project;
     tags?: Map<string, TagModel>;
     state?: State;
     priority?: Priority;
     estimate?: EstimateInput;
-    i18nKeyset: string;
     children?: React.ReactNode;
 
     onSumbit: (fields: GoalFormType) => void;
@@ -89,6 +90,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     priority,
     estimate,
     i18nKeyset,
+    locale,
     children,
     onSumbit,
     onTitleChange,
@@ -226,12 +228,13 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         />
 
                         <EstimateDropdown
+                            locale={locale}
                             size="m"
                             text={t('Schedule')}
                             placeholder={t('Date input mask placeholder')}
                             mask={t('Date input mask')}
                             value={estimate}
-                            defaultValuePlaceholder={estimate ?? estimatedMeta()}
+                            defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
                             onChange={onEstimateChange}
                         />
 
