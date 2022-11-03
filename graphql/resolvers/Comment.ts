@@ -38,10 +38,16 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { data: { goalId, description, activityId } }, { db }) => {
             const [commentAuthor, goal] = await Promise.all([
-                db.user.findUnique({ where: { id: activityId }, include: { activity: true } }),
+                db.user.findUnique({
+                    where: { id: activityId },
+                    include: { activity: { include: { user: true, ghost: true } } },
+                }),
                 db.goal.findUnique({
                     where: { id: goalId },
-                    include: { participants: { include: { user: true, ghost: true } } },
+                    include: {
+                        participants: { include: { user: true, ghost: true } },
+                        activity: { include: { user: true, ghost: true } },
+                    },
                 }),
             ]);
 
@@ -70,9 +76,15 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                     },
                 });
 
+                let toEmails = goal.participants;
+
+                if (commentAuthor.activity.user?.email === goal.activity?.user?.email) {
+                    toEmails = toEmails.filter((p) => p.user?.email !== commentAuthor.activity?.user?.email);
+                }
+
                 await mailServer.sendMail({
                     from: `"Taskany Issues" <${process.env.MAIL_USER}>`,
-                    to: goal.participants.map((p) => p.user?.email).join(' ,'),
+                    to: toEmails.map((p) => p.user?.email).join(' ,'),
                     subject: 'Hello ✔',
                     text: `new comment for ${process.env.NEXTAUTH_URL}/goals/${goalId}#comment-${newComment.id}`,
                     html: `<a href="${process.env.NEXTAUTH_URL}/goals/${goalId}#comment-${newComment.id}">new comment</a> for <a href="${process.env.NEXTAUTH_URL}/goals/${goalId}">${goalId}</a>`,
