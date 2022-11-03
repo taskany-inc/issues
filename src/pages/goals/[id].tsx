@@ -664,7 +664,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                         placeholder={t('Date input mask placeholder')}
                                         mask={t('Date input mask')}
                                         value={issueEstimate}
-                                        defaultValuePlaceholder={issueEstimate ?? estimatedMeta()}
+                                        defaultValuePlaceholder={issueEstimate ?? estimatedMeta({ locale })}
                                         onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
                                     />
                                 </IssueAction>

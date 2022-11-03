@@ -1,8 +1,8 @@
-type LocaleArg = {
-    locale: 'ru' | 'en';
-};
+import { TLocale } from '../types/locale';
 
-const localeArgDefault: LocaleArg = { locale: 'en' };
+type LocaleArg = {
+    locale: TLocale;
+};
 
 export enum quarters {
     'Q1' = 'Q1',
@@ -11,16 +11,13 @@ export enum quarters {
     'Q4' = 'Q4',
 }
 
-export const createLocaleDate = (date?: string, { locale }: LocaleArg = localeArgDefault) =>
-    new Intl.DateTimeFormat(locale).format(date ? new Date(date) : new Date());
+export const createLocaleDate = (date: Date, { locale }: LocaleArg) => new Intl.DateTimeFormat(locale).format(date);
 
-export const yearFromDate = (date: string, { locale }: LocaleArg = localeArgDefault) =>
-    new Date(createLocaleDate(date, { locale })).getFullYear();
+export const yearFromDate = (date: Date) => date.getFullYear();
 
-export const currentDate = (date: string | Date, { locale }: LocaleArg = localeArgDefault) =>
-    new Intl.DateTimeFormat(locale).format(new Date(date));
+export const currentLocaleDate = ({ locale }: LocaleArg) => new Intl.DateTimeFormat(locale).format(new Date());
 
-export const endOfQuarter = (q: string, { locale }: LocaleArg = localeArgDefault) => {
+export const endOfQuarter = (q: string) => {
     const qToM = {
         [quarters.Q1]: 2,
         [quarters.Q2]: 5,
@@ -37,26 +34,26 @@ export const endOfQuarter = (q: string, { locale }: LocaleArg = localeArgDefault
         return new Date(startDate.getFullYear(), startDate.getMonth() + 3, 0);
     };
 
-    return currentDate(qEndDate(abstractDate), { locale });
+    return qEndDate(abstractDate);
 };
 
-export const quarterFromDate = (date = new Date()) => `Q${Math.floor(date.getMonth() / 3 + 1)}` as quarters;
+export const quarterFromDate = (date: Date) => `Q${Math.floor(date.getMonth() / 3 + 1)}` as quarters;
 
 export const availableYears = (n = 5, currY = new Date().getFullYear()) =>
     Array(n)
         .fill(0)
         .map((_, i) => currY + i);
 
-export const estimatedMeta = ({ locale }: LocaleArg = localeArgDefault) => {
-    const q = quarterFromDate();
+export const estimatedMeta = ({ locale }: LocaleArg) => {
+    const q = quarterFromDate(new Date());
 
     return {
-        date: endOfQuarter(q, { locale }),
+        date: createLocaleDate(endOfQuarter(q), { locale }),
         q,
     };
 };
 
-export const dateAgo = (date: string, { locale }: LocaleArg = localeArgDefault) => {
+export const dateAgo = (date: Date, { locale }: LocaleArg) => {
     const formatter = new Intl.RelativeTimeFormat(locale, { style: 'long', numeric: 'auto' });
 
     const divisions: Array<{ amount: number; name: Intl.RelativeTimeFormatUnit }> = [
@@ -69,7 +66,7 @@ export const dateAgo = (date: string, { locale }: LocaleArg = localeArgDefault) 
         { amount: Number.POSITIVE_INFINITY, name: 'years' },
     ];
 
-    let duration = (Number(new Date(date)) - Number(new Date())) / 1000;
+    let duration = (Number(date) - Number(new Date())) / 1000;
 
     for (let i = 0; i <= divisions.length; i++) {
         const division = divisions[i];
@@ -80,4 +77,21 @@ export const dateAgo = (date: string, { locale }: LocaleArg = localeArgDefault) 
     }
 };
 
-export const isPastDate = (date: string): boolean => new Date(date) < new Date();
+export const isPastDate = (date: Date): boolean => date < new Date();
+
+export const parseLocaleDate = (date: string, { locale }: LocaleArg) => {
+    const parsers: Record<TLocale, (date: string) => Date> = {
+        en: (date) => new Date(date),
+        ru: (date) => {
+            if (date.includes('T')) {
+                return new Date(date);
+            }
+
+            // eslint-disable-next-line radix
+            const dateParts = date.split('.').map((p) => parseInt(p));
+            return new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+        },
+    };
+
+    return parsers[locale](date);
+};

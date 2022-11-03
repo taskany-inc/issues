@@ -4,9 +4,17 @@ import InputMask from 'react-input-mask';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
 import { colorPrimary, danger8, danger9, gray6, textColor } from '../design/@generated/themes';
-import { createLocaleDate, quarterFromDate, yearFromDate, endOfQuarter, isPastDate } from '../utils/dateTime';
+import {
+    createLocaleDate,
+    quarterFromDate,
+    yearFromDate,
+    endOfQuarter,
+    isPastDate,
+    parseLocaleDate,
+} from '../utils/dateTime';
 import { is } from '../utils/styles';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
+import { TLocale } from '../types/locale';
 
 import { Button } from './Button';
 import { Popup } from './Popup';
@@ -23,7 +31,7 @@ interface EstimateDropdownProps {
         q: string;
         y: string;
     };
-    defaultValuePlaceholder?: {
+    defaultValuePlaceholder: {
         date: string;
         q: string;
         y?: string;
@@ -88,11 +96,15 @@ const CheckableButton = styled(Button)`
 
 const isValidDate = (d: string) => !d.includes('_');
 
-const createValue = (str: string) => ({
-    q: quarterFromDate(new Date(createLocaleDate(str))),
-    y: String(yearFromDate(str)),
-    date: str,
-});
+const createValue = (date: string | Date, locale: TLocale) => {
+    const localDate = typeof date === 'object' ? date : parseLocaleDate(date, { locale });
+
+    return {
+        q: quarterFromDate(localDate),
+        y: String(yearFromDate(localDate)),
+        date: createLocaleDate(localDate, { locale }),
+    };
+};
 
 const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     size = 'm',
@@ -108,13 +120,14 @@ const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
-    const [inputState, setInputState] = useState(value?.date || defaultValuePlaceholder?.date || '');
+    const inputVal = parseLocaleDate(value?.date || defaultValuePlaceholder?.date, { locale });
+    const [inputState, setInputState] = useState(inputVal ? createLocaleDate(inputVal, { locale }) : '');
     const [selectedQ, setSelectedQ] = useState(value?.q || defaultValuePlaceholder?.q);
     const [changed, setChanged] = useState(false);
     const [buttonText, setButtonText] = useState(text);
     const [nextValue, setNextValue] = useState(value);
 
-    const isPast = isPastDate(nextValue?.date || '');
+    const isPast = nextValue?.date ? isPastDate(parseLocaleDate(nextValue?.date, { locale })) : false;
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
@@ -130,7 +143,8 @@ const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
         (nextQ: string) => () => {
             setSelectedQ(nextQ);
 
-            let newDate = endOfQuarter(nextQ, { locale });
+            let newDate = createLocaleDate(endOfQuarter(nextQ), { locale });
+            // this is trick to avoid no zero before month in the EN locale, ex: 2/10/1990
             if (newDate.length === 9) {
                 newDate = `0${newDate}`;
             }
@@ -152,40 +166,43 @@ const EstimateDropdown: React.FC<EstimateDropdownProps> = ({
 
     useEffect(() => {
         if (isValidDate(inputState)) {
-            setSelectedQ(quarterFromDate(new Date(createLocaleDate(inputState))));
+            setSelectedQ(quarterFromDate(parseLocaleDate(inputState, { locale })));
         }
-    }, [inputState]);
+    }, [inputState, locale]);
 
     useEffect(() => {
         if (changed && isValidDate(inputState)) {
-            const v = createValue(inputState);
+            const v = createValue(inputState, locale);
 
-            v.date === endOfQuarter(v.q) ? setButtonText(`${v.q}/${v.y}`) : setButtonText(v.date);
+            v.date === createLocaleDate(endOfQuarter(v.q), { locale })
+                ? setButtonText(`${v.q}/${v.y}`)
+                : setButtonText(v.date);
 
             setNextValue(v);
             onChange && onChange(v);
         }
-    }, [changed, selectedQ, inputState, onChange]);
+    }, [changed, selectedQ, inputState, locale, onChange]);
 
     useEffect(() => {
         if (!value) return;
 
-        const newValue = createValue(value.date);
+        const newValue = createValue(value.date, locale);
 
-        newValue.date === endOfQuarter(newValue.q)
-            ? setButtonText(`${newValue.q}/${String(yearFromDate(newValue.date))}`)
+        newValue.date === createLocaleDate(endOfQuarter(newValue.q), { locale })
+            ? setButtonText(`${newValue.q}/${yearFromDate(parseLocaleDate(newValue.date, { locale }))}`)
             : setButtonText(newValue.date);
 
         setNextValue(newValue);
-    }, [value]);
+    }, [value, locale]);
 
     const onCleanClick = useCallback(() => {
         setButtonText(text);
         setChanged(false);
-        setInputState(defaultValuePlaceholder?.date || '');
+        const inputVal = value?.date || defaultValuePlaceholder?.date;
+        setInputState(inputVal ? createLocaleDate(parseLocaleDate(inputVal, { locale }), { locale }) : '');
         setSelectedQ(defaultValuePlaceholder?.q);
         onChange && onChange(undefined);
-    }, [defaultValuePlaceholder, text, onChange, setInputState]);
+    }, [defaultValuePlaceholder, text, onChange, setInputState, value?.date, locale]);
 
     const renderQButton = (qValue: string) => (
         <CheckableButton
