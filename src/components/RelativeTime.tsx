@@ -1,22 +1,24 @@
 import { useTranslations } from 'next-intl';
 
-import { dateAgo, currentDate } from '../utils/dateTime';
+import { TLocale } from '../types/locale';
+import { dateAgo, createLocaleDate, parseLocaleDate } from '../utils/dateTime';
 
 import { Light } from './Light';
 
 interface RelativeTimeProps {
     date: string;
-    locale: 'en' | 'ru';
+    locale: TLocale;
     kind?: 'created' | 'updated' | 'Created' | 'Updated';
 }
 
 const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, locale }) => {
     const t = useTranslations('RelativeTime');
+    const localeDate = parseLocaleDate(date, { locale });
 
     return (
         <>
             {kind ? `${t(kind)} ` : ''}
-            <Light title={currentDate(new Date(date))}>{dateAgo(date, { locale })}</Light>
+            <Light title={createLocaleDate(localeDate, { locale })}>{dateAgo(localeDate, { locale })}</Light>
         </>
     );
 };
