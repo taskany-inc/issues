@@ -161,9 +161,17 @@ const fetcher = createFetcher(
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key }, query }) => {
-        return {
+        const ssrProps = {
             ssrData: await fetcher(user, key, 0, parseQueryParam(query.stateFilter as string)),
         };
+
+        if (!ssrProps.ssrData.project) {
+            return {
+                notFound: true,
+            };
+        }
+
+        return ssrProps;
     },
     {
         private: true,
