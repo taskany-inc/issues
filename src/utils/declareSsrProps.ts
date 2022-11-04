@@ -47,6 +47,11 @@ export function declareSsrProps<T = ExternalPageProps>(
               })
             : {};
 
+        // @ts-ignore
+        if (resProps.notFound) {
+            return resProps;
+        }
+
         return {
             props: {
                 ...resProps,
