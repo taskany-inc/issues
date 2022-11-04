@@ -237,6 +237,9 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                         },
                     },
                     comments: {
+                        orderBy: {
+                            createdAt: 'asc',
+                        },
                         include: {
                             activity: {
                                 include: {
