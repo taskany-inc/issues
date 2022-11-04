@@ -23,10 +23,13 @@ interface UserCompletionInputProps {
 
 const StyledDropdownContainer = styled.div``;
 
-const fetcher = createFetcher((_, query: string) => ({
+const fetcher = createFetcher((_, query: string, filter?: string[]) => ({
     findActivity: [
         {
-            query,
+            data: {
+                query,
+                filter,
+            },
         },
         {
             id: true,
@@ -44,7 +47,12 @@ const fetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
-export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClick, query = '', placeholder }) => {
+export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({
+    onClick,
+    query = '',
+    filter,
+    placeholder,
+}) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -59,7 +67,7 @@ export const UserCompletionInput: React.FC<UserCompletionInputProps> = ({ onClic
         setInputState(query);
     }, [query]);
 
-    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
+    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q, filter));
 
     const onInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {

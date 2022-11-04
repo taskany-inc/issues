@@ -14,23 +14,28 @@ import { Input } from './Input';
 import { UserDropdownItem } from './UserDropdownItem';
 
 interface UserCompletionDropdownProps {
+    text: React.ComponentProps<typeof Button>['text'];
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
     tabIndex?: React.ComponentProps<typeof Button>['tabIndex'];
-    text: React.ComponentProps<typeof Button>['text'];
     userPic?: React.ComponentProps<typeof Button>['iconLeft'];
     query?: string;
     placeholder?: string;
     title?: string;
+    filter?: string[];
+
     onClick?: (activity: Activity) => void;
 }
 
 const StyledDropdownContainer = styled.div``;
 
-const fetcher = createFetcher((_, query: string) => ({
+const fetcher = createFetcher((_, query: string, filter?: string[]) => ({
     findActivity: [
         {
-            query,
+            data: {
+                query,
+                filter,
+            },
         },
         {
             id: true,
@@ -56,6 +61,7 @@ const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
     userPic,
     onClick,
     query = '',
+    filter,
     title,
     placeholder,
 }) => {
@@ -84,7 +90,7 @@ const UserCompletionDropdown: React.FC<UserCompletionDropdownProps> = ({
         setInputState(e.target.value);
     }, []);
 
-    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
+    const { data } = useSWR(inputState, (q) => fetcher(session?.user, q, filter));
 
     const onUserCardClick = useCallback(
         (activity: Activity) => () => {

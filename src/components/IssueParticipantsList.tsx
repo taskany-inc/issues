@@ -49,20 +49,18 @@ export const IssueParticipantsList: React.FC<IssueParticipantsListProps> = ({
 
     return (
         <>
-            {nullable(participants?.length, () => (
-                <IssueMeta title={title} onEdit={onEdit}>
-                    {participants?.map((p) =>
-                        nullable(p, (pa) => (
-                            <StyledParticipant key={pa.id}>
-                                {nullable(onDelete, () => (
-                                    <StyledCleanButton onClick={onParticipantDelete(pa.id)} />
-                                ))}
-                                <UserPic src={pa.user?.image} email={pa.user?.email} size={24} />
-                            </StyledParticipant>
-                        )),
-                    )}
-                </IssueMeta>
-            ))}
+            <IssueMeta title={title} onEdit={onEdit}>
+                {participants?.map((p) =>
+                    nullable(p, (pa) => (
+                        <StyledParticipant key={pa.id}>
+                            {nullable(onDelete, () => (
+                                <StyledCleanButton onClick={onParticipantDelete(pa.id)} />
+                            ))}
+                            <UserPic src={pa.user?.image} email={pa.user?.email} size={24} />
+                        </StyledParticipant>
+                    )),
+                )}
+            </IssueMeta>
         </>
     );
 };

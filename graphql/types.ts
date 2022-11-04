@@ -401,3 +401,11 @@ export const ProjectGoalsCountInput = inputObjectType({
         t.nonNull.string('query');
     },
 });
+
+export const FindActivityInput = inputObjectType({
+    name: 'FindActivityInput',
+    definition(t) {
+        t.nonNull.string('query');
+        t.list.nonNull.string('filter');
+    },
+});
