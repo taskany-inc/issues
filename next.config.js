@@ -3,9 +3,9 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: process.env.ANALYZE === 'true',
 });
-const { withSentryConfig } = require('@sentry/nextjs');
 
-const baseConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
     reactStrictMode: process.env.STRICT_MODE,
     swcMinify: true,
     i18n: {
@@ -24,25 +24,5 @@ const baseConfig = {
         return config;
     },
 };
-
-if (!process.env.SENTRY_DSN) {
-    console.log('NextConfig: Sentry DSN is not provided via SENTRY_DSN env variable. Sentry SDK will not be included.');
-}
-
-/** @type {import('next').NextConfig} */
-const nextConfig = process.env.SENTRY_DSN
-    ? withSentryConfig(
-          {
-              ...baseConfig,
-              /** @see https://github.com/getsentry/sentry-webpack-plugin#options */
-              sentry: {
-                  hideSourceMaps: true,
-              },
-          },
-          {
-              silent: true,
-          },
-      )
-    : baseConfig;
 
 module.exports = withBundleAnalyzer(nextConfig);
