@@ -76,9 +76,19 @@ const fetcher = createFetcher((_, key: string) => ({
 }));
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { key } }) => ({
-        ssrData: await fetcher(user, key),
-    }),
+    async ({ user, params: { key } }) => {
+        const ssrProps = {
+            ssrData: await fetcher(user, key),
+        };
+
+        if (!ssrProps.ssrData.project) {
+            return {
+                notFound: true,
+            };
+        }
+
+        return ssrProps;
+    },
     {
         private: true,
     },
