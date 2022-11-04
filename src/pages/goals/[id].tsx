@@ -279,9 +279,19 @@ const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
 const StyledIssueDeps = styled.div``;
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { id } }) => ({
-        ssrData: await fetcher(user, id),
-    }),
+    async ({ user, params: { id } }) => {
+        const ssrProps = {
+            ssrData: await fetcher(user, id),
+        };
+
+        if (!ssrProps.ssrData.goal) {
+            return {
+                notFound: true,
+            };
+        }
+
+        return ssrProps;
+    },
     {
         private: true,
     },
