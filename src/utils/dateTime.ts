@@ -80,6 +80,16 @@ export const dateAgo = (date: Date, { locale }: LocaleArg) => {
 export const isPastDate = (date: Date): boolean => date < new Date();
 
 export const parseLocaleDate = (date: string, { locale }: LocaleArg) => {
+    let resolvedLocale: TLocale = locale;
+
+    if (date.includes('/')) {
+        resolvedLocale = 'en';
+    }
+
+    if (date.includes('.')) {
+        resolvedLocale = 'ru';
+    }
+
     const parsers: Record<TLocale, (date: string) => Date> = {
         en: (date) => new Date(date),
         ru: (date) => {
@@ -93,5 +103,5 @@ export const parseLocaleDate = (date: string, { locale }: LocaleArg) => {
         },
     };
 
-    return parsers[locale](date);
+    return parsers[resolvedLocale](date);
 };
