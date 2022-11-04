@@ -1,7 +1,7 @@
-import { arg, nonNull, stringArg } from 'nexus';
+import { arg, nonNull } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { User, SortOrder, Ghost, UserUpdateInput, UserInvitesInput, Activity } from '../types';
+import { User, SortOrder, Ghost, UserUpdateInput, UserInvitesInput, Activity, FindActivityInput } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('users', {
@@ -18,10 +18,10 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('findActivity', {
         type: Activity,
         args: {
-            query: nonNull(stringArg()),
+            data: nonNull(arg({ type: FindActivityInput })),
         },
         // eslint-disable-next-line no-shadow
-        resolve: async (_, { query }, { db }) => {
+        resolve: async (_, { data: { query, filter } }, { db }) => {
             if (query === '') {
                 return [];
             }
@@ -57,6 +57,13 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             },
                         },
                     ],
+                    ...(filter
+                        ? {
+                              id: {
+                                  notIn: filter,
+                              },
+                          }
+                        : {}),
                 },
                 include: {
                     user: true,

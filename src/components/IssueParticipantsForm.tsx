@@ -54,7 +54,11 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ is
             />
 
             <StyledCompletion>
-                <UserCompletionInput placeholder={t('Add participants')} onClick={onParticipantAdd} />
+                <UserCompletionInput
+                    placeholder={t('Add participants')}
+                    onClick={onParticipantAdd}
+                    filter={issue.participants?.map((p) => p!.id)}
+                />
             </StyledCompletion>
         </>
     );

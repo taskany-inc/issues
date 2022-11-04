@@ -63,6 +63,11 @@ input EstimateInput {
   y: String!
 }
 
+input FindActivityInput {
+  filter: [String!]
+  query: String!
+}
+
 type Flow {
   graph: String
   id: ID!
@@ -227,7 +232,7 @@ input ProjectInput {
 }
 
 type Query {
-  findActivity(query: String!): [Activity]
+  findActivity(data: FindActivityInput!): [Activity]
   findGoal(query: String!): [Goal]
   flow(id: String!): Flow
   flowCompletion(query: String!, sortBy: SortOrder): [Flow]
