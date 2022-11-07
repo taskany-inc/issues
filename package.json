@@ -37,7 +37,7 @@
     "@prisma/client": "3.10.0",
     "@sentry/nextjs": "7.17.3",
     "@tippyjs/react": "4.2.6",
-    "apollo-server-micro": "3.10.3",
+    "apollo-server-micro": "3.11.1",
     "apollo-tracing": "0.15.0",
     "color-layer": "1.0.3",
     "cors": "2.8.5",
