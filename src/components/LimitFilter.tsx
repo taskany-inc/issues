@@ -12,9 +12,10 @@ import { FiltersMenuItem } from './FiltersMenuItem';
 export const defaultLimit = 10;
 const limitVariants = [defaultLimit, 20, 30, 50, 100];
 
-interface StateFilterProps {
+interface LimitFilterProps {
     text: string;
     disabled?: React.ComponentProps<typeof Button>['disabled'];
+    limitFilter?: number;
 
     onClick?: (l: number) => void;
 }
@@ -44,14 +45,14 @@ const StyledDropdownItem = styled.div<{ focused?: boolean }>`
         `}
 `;
 
-export const LimitFilter: React.FC<StateFilterProps> = ({ text, disabled, onClick }) => {
+export const LimitFilter: React.FC<LimitFilterProps> = ({ text, limitFilter = defaultLimit, disabled, onClick }) => {
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState<number>();
-    const [selected, setSelected] = useState(defaultLimit);
+    const [selected, setSelected] = useState(limitFilter);
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);

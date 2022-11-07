@@ -18,7 +18,7 @@ interface StateFilterProps {
     disabled?: React.ComponentProps<typeof Button>['disabled'];
     text: string;
     flowId?: string;
-    filters?: Array<string>;
+    stateFilter?: Array<string>;
 
     onClick?: (selected: string[]) => void;
 }
@@ -43,7 +43,7 @@ const fetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, filters, disabled, onClick }) => {
+export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, stateFilter, disabled, onClick }) => {
     const { data: session } = useSession();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -54,7 +54,7 @@ export const StateFilter: React.FC<StateFilterProps> = ({ text, flowId, filters,
     const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
     const { theme } = useContext(pageContext);
     const [themeId, setThemeId] = useState(0); // default: dark
-    const [selected, setSelected] = useState<Set<string>>(new Set(filters));
+    const [selected, setSelected] = useState<Set<string>>(new Set(stateFilter));
 
     useEffect(() => {
         theme && setThemeId(mapThemeOnId[theme]);

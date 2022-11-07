@@ -1,28 +1,26 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
-import { gapS } from '../../../design/@generated/themes';
-import { Goal, Project } from '../../../../graphql/@generated/genql';
-import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
-import { createFetcher } from '../../../utils/createFetcher';
-import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { nullable } from '../../../utils/nullable';
 import { routes } from '../../../hooks/router';
-import { useMounted } from '../../../hooks/useMounted';
+import { createFetcher } from '../../../utils/createFetcher';
+import { Goal, Project } from '../../../../graphql/@generated/genql';
 import { Page } from '../../../components/Page';
 import { Button } from '../../../components/Button';
 import { GoalItem } from '../../../components/GoalItem';
+import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { nullable } from '../../../utils/nullable';
+import { gapS } from '../../../design/@generated/themes';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
-import { FiltersPanel, defaultLimit } from '../../../components/FiltersPanel';
-
-const refreshInterval = 3000;
+import { FiltersPanel } from '../../../components/FiltersPanel';
+import { defaultLimit } from '../../../components/LimitFilter';
+import { useUrlParams } from '../../../hooks/useUrlParams';
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 // @ts-ignore
@@ -40,12 +38,6 @@ const fetcher = createFetcher(
                 activityId: true,
                 flow: {
                     id: true,
-                    states: {
-                        id: true,
-                        title: true,
-                        hue: true,
-                        default: true,
-                    },
                 },
                 watchers: {
                     id: true,
@@ -162,7 +154,16 @@ const fetcher = createFetcher(
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key }, query }) => {
         const ssrProps = {
-            ssrData: await fetcher(user, key, 0, parseQueryParam(query.stateFilter as string)),
+            ssrData: await fetcher(
+                user,
+                key,
+                0,
+                parseQueryParam(query.state as string),
+                parseQueryParam(query.search as string).toString(),
+                Number(parseQueryParam(query.limit as string)),
+                parseQueryParam(query.user as string),
+                parseQueryParam(query.tags as string),
+            ),
         };
 
         if (!ssrProps.ssrData.project) {
@@ -205,11 +206,12 @@ const ProjectPage = ({
 }: ExternalPageProps<{ project: Project; projectGoals: Goal[]; projectGoalsCount: number }, { key: string }>) => {
     const t = useTranslations('projects.key');
     const router = useRouter();
-    const [fulltextFilter, setFulltextFilter] = useState('');
-    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.stateFilter as string));
-    const [tagsFilter, setTagsFilter] = useState<string[]>();
-    const [ownerFilter, setOwnerFilter] = useState<string[]>();
-    const [limitFilter, setLimitFilter] = useState(defaultLimit);
+
+    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
+    const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));
+    const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user as string));
+    const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(router.query.search as string).toString());
+    const [limitFilter, setLimitFilter] = useState(Number(router.query.limit) || defaultLimit);
 
     const { data, setSize, size } = useSWRInfinite(
         (index: number) => ({
@@ -223,8 +225,9 @@ const ProjectPage = ({
         ({ offset, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter }) =>
             fetcher(user, key, offset, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter),
     );
+
     const shouldRenderMoreButton =
-        (data?.[data.length - 1]?.projectGoals?.length || 0) === limitFilter &&
+        data?.[data.length - 1]?.projectGoals?.length === limitFilter &&
         (data?.[data.length - 1]?.projectGoals?.length || 0) * size < (data?.[0].projectGoalsCount || 0);
 
     const goals = fulltextFilter
@@ -237,20 +240,7 @@ const ProjectPage = ({
         setFulltextFilter(e.currentTarget.value);
     }, []);
 
-    const mounted = useMounted(refreshInterval);
-
-    useEffect(() => {
-        const stateParams = new URLSearchParams(window.location.search);
-        const newurl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
-        if (mounted) {
-            if (stateFilter.length > 0) {
-                stateParams.set('stateFilter', Array.from(stateFilter).toString());
-                window.history.pushState({ path: `${newurl}?${stateParams}` }, '', `${newurl}?${stateParams}`);
-            } else {
-                window.history.pushState({ path: newurl }, '', newurl);
-            }
-        }
-    }, [stateFilter, mounted]);
+    useUrlParams(stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
 
     return (
         <Page
@@ -296,20 +286,17 @@ const ProjectPage = ({
                 flowId={project.flow?.id}
                 users={project.participants}
                 tags={project.tags}
-                filters={stateFilter}
+                stateFilter={stateFilter}
+                tagsFilter={tagsFilter}
+                ownerFilter={ownerFilter}
+                searchFilter={fulltextFilter}
+                limitFilter={limitFilter}
                 onSearchChange={onSearchChange}
                 onStateChange={setStateFilter}
                 onUserChange={setOwnerFilter}
                 onTagChange={setTagsFilter}
                 onLimitChange={setLimitFilter}
-            >
-                <Button
-                    view="primary"
-                    size="m"
-                    text={t('New goal')}
-                    onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, project)}
-                />
-            </FiltersPanel>
+            />
 
             <StyledGoalsList>
                 {goals?.map((goal) =>
