@@ -14,18 +14,19 @@ interface UserFilterProps {
     disabled?: React.ComponentProps<typeof Button>['disabled'];
     text: string;
     activity?: Array<Activity | undefined>;
+    ownerFilter?: Array<string>;
 
     onClick?: (selected: string[]) => void;
 }
 
-export const UserFilter: React.FC<UserFilterProps> = ({ text, activity, disabled, onClick }) => {
+export const UserFilter: React.FC<UserFilterProps> = ({ text, activity, ownerFilter, disabled, onClick }) => {
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState<number>();
-    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [selected, setSelected] = useState<Set<string>>(new Set(ownerFilter));
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);

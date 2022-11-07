@@ -13,14 +13,16 @@ import { UserFilter } from './UserFilter';
 import { TagsFilter } from './TagsFilter';
 import { LimitFilter } from './LimitFilter';
 
-export { defaultLimit } from './LimitFilter';
-
 interface FiltersPanelProps {
     count?: number;
     flowId?: React.ComponentProps<typeof StateFilter>['flowId'];
     users?: React.ComponentProps<typeof UserFilter>['activity'];
     tags?: React.ComponentProps<typeof TagsFilter>['tags'];
-    filters?: Array<string>;
+    stateFilter?: Array<string>;
+    ownerFilter?: Array<string>;
+    tagsFilter?: Array<string>;
+    searchFilter?: string;
+    limitFilter?: number;
     children?: React.ReactNode;
 
     onSearchChange: React.ComponentProps<typeof Input>['onChange'];
@@ -61,20 +63,24 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     flowId,
     users,
     tags,
-    filters,
-    children,
+    stateFilter,
+    ownerFilter,
+    tagsFilter,
+    searchFilter,
+    limitFilter,
     onSearchChange,
     onStateChange,
     onUserChange,
     onTagChange,
     onLimitChange,
+    children,
 }) => {
     const t = useTranslations('FiltersPanel');
 
     return (
         <StyledFiltersPanel>
             <StyledFiltersContent>
-                <Input placeholder={t('Search')} onChange={onSearchChange} />
+                <Input placeholder={t('Search')} value={searchFilter} onChange={onSearchChange} />
 
                 <StyledFiltersMenuWrapper>
                     {nullable(count, () => (
@@ -83,16 +89,26 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
                     <StyledFiltersMenu>
                         {nullable(flowId, (id) => (
-                            <StateFilter text={t('State')} flowId={id} filters={filters} onClick={onStateChange} />
+                            <StateFilter
+                                text={t('State')}
+                                flowId={id}
+                                stateFilter={stateFilter}
+                                onClick={onStateChange}
+                            />
                         ))}
                         {nullable(users, (u) => (
-                            <UserFilter text={t('Owner')} activity={u} onClick={onUserChange} />
+                            <UserFilter
+                                text={t('Owner')}
+                                activity={u}
+                                ownerFilter={ownerFilter}
+                                onClick={onUserChange}
+                            />
                         ))}
                         {nullable(tags, (ta) => (
-                            <TagsFilter text={t('Tags')} tags={ta} onClick={onTagChange} />
+                            <TagsFilter text={t('Tags')} tags={ta} tagsFilter={tagsFilter} onClick={onTagChange} />
                         ))}
                         {nullable(onLimitChange, (olc) => (
-                            <LimitFilter text={t('Limit')} onClick={olc} />
+                            <LimitFilter text={t('Limit')} limitFilter={limitFilter} onClick={olc} />
                         ))}
                     </StyledFiltersMenu>
                 </StyledFiltersMenuWrapper>

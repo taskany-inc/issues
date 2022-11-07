@@ -14,18 +14,19 @@ interface TagsFilterProps {
     disabled?: React.ComponentProps<typeof Button>['disabled'];
     text: string;
     tags?: Array<TagModel | undefined>;
+    tagsFilter?: Array<string>;
 
     onClick?: (selected: string[]) => void;
 }
 
-export const TagsFilter: React.FC<TagsFilterProps> = ({ text, tags, disabled, onClick }) => {
+export const TagsFilter: React.FC<TagsFilterProps> = ({ text, tags, tagsFilter, disabled, onClick }) => {
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState<number>();
-    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [selected, setSelected] = useState<Set<string>>(new Set(tagsFilter));
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
