@@ -17,6 +17,7 @@ import { nullable } from '../utils/nullable';
 import { gql } from '../utils/gql';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { TLocale } from '../types/locale';
+import { submitKeys } from '../utils/hotkeys';
 import { routes } from '../hooks/router';
 
 import { Icon } from './Icon';
@@ -212,7 +213,7 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
         <>
             <FormTitle>{t('Create new project')}</FormTitle>
 
-            <Form onSubmit={handleSubmit(createProject)}>
+            <Form onSubmit={handleSubmit(createProject)} submitHotkey={submitKeys}>
                 <StyledProjectTitleContainer>
                     <FormInput
                         {...register('title')}

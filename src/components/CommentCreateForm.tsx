@@ -10,6 +10,7 @@ import { Session } from 'next-auth';
 import { gql } from '../utils/gql';
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
 import { TLocale } from '../types/locale';
+import { submitKeys } from '../utils/hotkeys';
 import { routes } from '../hooks/router';
 import { nullable } from '../utils/nullable';
 
@@ -169,7 +170,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
             <UserPic size={32} src={user?.image} email={user?.email} />
 
             <StyledCommentForm tabIndex={0}>
-                <Form onSubmit={handleSubmit(createComment)}>
+                <Form onSubmit={handleSubmit(createComment)} submitHotkey={submitKeys}>
                     <Controller
                         name="comment"
                         control={control}
