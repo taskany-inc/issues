@@ -10,6 +10,7 @@ import { gapS } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Priority } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 import { TLocale } from '../types/locale';
+import { submitKeys } from '../utils/hotkeys';
 
 import { Button } from './Button';
 import { FormInput } from './FormInput';
@@ -162,7 +163,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         <>
             <h2>{formTitle}</h2>
 
-            <Form onSubmit={handleSubmit(onFormSubmit)}>
+            <Form onSubmit={handleSubmit(onFormSubmit)} submitHotkey={submitKeys}>
                 <FormInput
                     {...register('title')}
                     error={isSubmitted ? errors.title : undefined}
