@@ -82,13 +82,15 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                     toEmails = toEmails.filter((p) => p.user?.email !== commentAuthor.activity?.user?.email);
                 }
 
-                await mailServer.sendMail({
-                    from: `"Taskany Issues" <${process.env.MAIL_USER}>`,
-                    to: toEmails.map((p) => p.user?.email).join(' ,'),
-                    subject: 'Hello ✔',
-                    text: `new comment for ${process.env.NEXTAUTH_URL}/goals/${goalId}#comment-${newComment.id}`,
-                    html: `<a href="${process.env.NEXTAUTH_URL}/goals/${goalId}#comment-${newComment.id}">new comment</a> for <a href="${process.env.NEXTAUTH_URL}/goals/${goalId}">${goalId}</a>`,
-                });
+                if (toEmails.length) {
+                    await mailServer.sendMail({
+                        from: `"Taskany Issues" <${process.env.MAIL_USER}>`,
+                        to: toEmails.map((p) => p.user?.email).join(' ,'),
+                        subject: 'Hello ✔',
+                        text: `new comment for ${process.env.NEXTAUTH_URL}/goals/${goalId}#comment-${newComment.id}`,
+                        html: `<a href="${process.env.NEXTAUTH_URL}/goals/${goalId}#comment-${newComment.id}">new comment</a> for <a href="${process.env.NEXTAUTH_URL}/goals/${goalId}">${goalId}</a>`,
+                    });
+                }
 
                 return newComment;
             } catch (error) {
