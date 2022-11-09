@@ -172,11 +172,17 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                     flat="bottom"
                 />
 
-                {/* https://github.com/taskany-inc/issues/issues/234 t('And its description') */}
                 <Controller
                     name="description"
                     control={control}
-                    render={({ field }) => <FormEditor flat="both" {...field} />}
+                    render={({ field }) => (
+                        <FormEditor
+                            flat="both"
+                            placeholder={t('And its description')}
+                            error={isSubmitted ? errors.description : undefined}
+                            {...field}
+                        />
+                    )}
                 />
 
                 <StyledTagsContainer>
