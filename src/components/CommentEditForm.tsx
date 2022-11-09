@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import styled from 'styled-components';
 
 import { gql } from '../utils/gql';
+import { submitKeys } from '../utils/hotkeys';
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
 import { TLocale } from '../types/locale';
 import { routes } from '../hooks/router';
@@ -141,7 +142,7 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({
 
     return (
         <StyledCommentForm>
-            <Form onSubmit={handleSubmit(updateComment)}>
+            <Form onSubmit={handleSubmit(updateComment)} submitHotkey={submitKeys}>
                 <Controller
                     name="description"
                     control={control}
