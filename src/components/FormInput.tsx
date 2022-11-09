@@ -21,14 +21,13 @@ interface FormInputProps {
     placeholder?: string;
     disabled?: boolean;
     flat?: 'top' | 'bottom' | 'both';
+    error?: FieldError;
 
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
     onInput?: React.ChangeEventHandler<HTMLInputElement>;
     onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
     onBlur?: React.FocusEventHandler<HTMLInputElement>;
     onFocus?: React.FocusEventHandler<HTMLInputElement>;
-
-    error?: FieldError;
 }
 
 const StyledFormInputContainer = styled.div<{ flat: FormInputProps['flat'] }>`

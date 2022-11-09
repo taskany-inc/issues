@@ -5,10 +5,12 @@ import dynamic from 'next/dynamic';
 import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { gray2, gray3, gray6, radiusS, textColor } from '../design/@generated/themes';
+import { danger10, gray2, gray3, gray6, radiusS, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { useMounted } from '../hooks/useMounted';
+
+import { Popup } from './Popup';
 
 const Editor = dynamic(() => import('@monaco-editor/react'));
 
@@ -20,13 +22,12 @@ interface FormEditorProps {
     flat?: 'top' | 'bottom' | 'both';
     height?: string;
     placeholder?: string;
+    error?: FieldError;
 
     onChange?: (value: string | undefined) => void;
     onBlur?: () => void;
     onFocus?: () => void;
     onCancel?: () => void;
-
-    error?: FieldError;
 }
 
 const defaultOptions: React.ComponentProps<typeof Editor>['options'] = {
@@ -137,12 +138,28 @@ const StyledPlaceholder = styled.div`
     color: ${gray6};
 `;
 
+const StyledErrorTrigger = styled.div`
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 100%;
+    background-color: ${danger10};
+    top: 45%;
+    left: -2px;
+    z-index: 2;
+`;
+
 export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
-    ({ id, value, flat, autoFocus, height = '200px', placeholder, onChange, onFocus, onBlur, onCancel }, ref) => {
+    (
+        { id, value, flat, autoFocus, height = '200px', placeholder, error, onChange, onFocus, onBlur, onCancel },
+        ref,
+    ) => {
         const [focused, setFocused] = useState(false);
         const monacoEditorRef = useRef<any>(null);
         const extraRef = useRef<HTMLDivElement>(null);
         const [viewValue, setViewValue] = useState<string | undefined>('');
+        const [popupVisible, setPopupVisibility] = useState(false);
+        const popupRef = useRef<HTMLDivElement>(null);
         const mounted = useMounted();
 
         const handleEditorDidMount = (editor: any /* IStandaloneEditor */) => {
@@ -176,13 +193,15 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
 
         const onEditorFocus = useCallback(() => {
             setFocused(true);
+            error && setPopupVisibility(true);
             onFocus && onFocus();
-        }, [onFocus]);
+        }, [onFocus, error]);
 
         const onEditorBlur = useCallback(() => {
             setFocused(false);
+            error && setPopupVisibility(false);
             onBlur && onBlur();
-        }, [onBlur]);
+        }, [onBlur, error]);
 
         const [onESC] = useKeyboard([KeyCode.Escape], () => {
             onEditorBlur();
@@ -193,12 +212,35 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
             onCancel && onCancel();
         });
 
+        const onClickOutside = useCallback(() => setPopupVisibility(false), [setPopupVisibility]);
+
         return (
             <div tabIndex={0} ref={extraRef} style={{ outline: 'none' }}>
                 <StyledEditor tabIndex={0} id={id} flat={flat} ref={ref} {...onESC}>
+                    {nullable(error, (err) => (
+                        <>
+                            <StyledErrorTrigger
+                                ref={popupRef}
+                                onMouseEnter={() => setPopupVisibility(true)}
+                                onMouseLeave={() => setPopupVisibility(false)}
+                            />
+                            <Popup
+                                tooltip
+                                view="danger"
+                                placement="top-start"
+                                visible={popupVisible}
+                                onClickOutside={onClickOutside}
+                                reference={popupRef}
+                            >
+                                {err.message}
+                            </Popup>
+                        </>
+                    ))}
+
                     {nullable(!focused && !value && placeholder, () => (
                         <StyledPlaceholder>{placeholder}</StyledPlaceholder>
                     ))}
+
                     <div onFocus={onEditorFocus} onBlur={onEditorBlur}>
                         <Editor
                             loading=""
