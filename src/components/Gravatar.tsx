@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import md5Hash from 'md5';
 import styled from 'styled-components';
 
@@ -31,6 +31,12 @@ const Gravatar = ({
     className,
     onClick,
 }: GravatarProps) => {
+    const [modernBrowser, setModernBrowser] = useState(true);
+
+    useLayoutEffect(() => {
+        setModernBrowser('srcset' in document.createElement('img'));
+    }, []);
+
     const base = `//${domain}/avatar/`;
 
     const query = new URLSearchParams({
@@ -47,6 +53,11 @@ const Gravatar = ({
 
     const formattedEmail = email.trim().toLowerCase();
 
+    const onLoadError: React.ReactEventHandler<HTMLImageElement> = useCallback(({ currentTarget }) => {
+        currentTarget.onerror = null;
+        currentTarget.src = '/anonymous.png';
+    }, []);
+
     let hash;
     if (md5) {
         hash = md5;
@@ -61,20 +72,15 @@ const Gravatar = ({
     const src = `${base}${hash}?${query}`;
     const retinaSrc = `${base}${hash}?${retinaQuery}`;
 
-    let modernBrowser = true; // server-side, we render for modern browsers
-
-    if (typeof window !== 'undefined') {
-        modernBrowser = 'srcset' in document.createElement('img');
-    }
-
     return (
         <StyledImage
             alt={`Gravatar for ${formattedEmail}`}
-            src={!modernBrowser && isRetina() ? retinaSrc : src}
+            src={modernBrowser && isRetina() ? retinaSrc : src}
             height={size}
             width={size}
             className={className}
             onClick={onClick}
+            onError={onLoadError}
         />
     );
 };
