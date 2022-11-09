@@ -4,9 +4,10 @@ import { gray3 } from '../design/@generated/themes';
 import { useKeyboard } from '../hooks/useKeyboard';
 
 interface FormProps {
-    onSubmit?: () => void;
-    submitHotkey?: Array<number>;
     children: React.ReactNode;
+    submitHotkey?: Array<number>;
+
+    onSubmit?: () => void;
 }
 
 const StyledFormContainer = styled.div`
@@ -22,6 +23,7 @@ export const Form: React.FC<FormProps> = ({ onSubmit, submitHotkey, children }) 
 
     const [keyboard] = useKeyboard(submitHotkey || [], () => handleSubmit(), {
         disableGlobalEvent: false,
+        capture: true,
     });
 
     return (
