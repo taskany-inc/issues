@@ -126,13 +126,16 @@ export const CommentView: FC<CommentViewProps> = ({
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);
 
-    const onDoubleCommentClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.detail === 2) {
-            setTimeout(() => {
-                setEditMode(true);
-            }, 100);
-        }
-    }, []);
+    const onDoubleCommentClick = useCallback(
+        (e: React.MouseEvent<HTMLDivElement>) => {
+            if (isEditable && e.detail === 2) {
+                setTimeout(() => {
+                    setEditMode(true);
+                }, 100);
+            }
+        },
+        [isEditable],
+    );
 
     const onEdited = useCallback(
         (id?: string, description?: string) => {
