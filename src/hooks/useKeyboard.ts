@@ -123,7 +123,7 @@ export type KeyboardOptions = {
     event?: 'keydown' | 'keypress' | 'keyup';
 };
 
-type KeyboardEvents =
+export type KeyboardEvents =
     | 'onKeyDown'
     | 'onKeyDownCapture'
     | 'onKeyPress'
