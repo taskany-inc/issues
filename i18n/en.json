@@ -284,7 +284,8 @@
         "Does issue have dependencies": "Does issue have dependencies",
         "Add one": "Add one",
         "Add dependency": "Add dependency",
-        "Kind": "Kind"
+        "Kind": "Kind",
+        "Add": "Add"
     },
     "ProjectWatchButton": {
         "Watch": "Watch",
