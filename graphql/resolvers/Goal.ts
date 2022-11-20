@@ -403,9 +403,16 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 db.project.findUnique({ where: { id: data.projectId } }),
             ]);
 
-            const goalsCount = await db.goal.count({ where: { id: { contains: project?.key } } });
-
             if (!owner?.id) return null;
+
+            const lastGoal = await db.goal.findFirst({
+                where: { id: { contains: project?.key } },
+                orderBy: { createdAt: 'desc' },
+            });
+
+            const pre = `${project?.key}-`;
+            const numId = Number(lastGoal?.id?.replace(pre, '')) + 1;
+            const id = `${pre}${numId}`;
 
             try {
                 await db.project.update({
@@ -427,7 +434,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 return db.goal.create({
                     data: {
                         ...data,
-                        id: `${project?.key}-${goalsCount + 1}`,
+                        id,
                         activityId: activity.id,
                         ownerId: owner?.id,
                         tags: data.tags?.length
