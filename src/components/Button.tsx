@@ -188,6 +188,7 @@ const StyledButton = styled(
     ${is(
         { size: 'm' },
         css`
+            min-height: 28px;
             padding: 5px 16px;
 
             font-size: 13px;
