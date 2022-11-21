@@ -38,7 +38,7 @@
     "@sentry/nextjs": "7.20.0",
     "@tippyjs/react": "4.2.6",
     "apollo-server-micro": "3.11.1",
-    "apollo-tracing": "0.15.0",
+    "apollo-tracing": "0.16.0",
     "color-layer": "1.0.3",
     "cors": "2.8.5",
     "cyrillic-to-translit-js": "3.2.1",
