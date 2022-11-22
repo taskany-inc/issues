@@ -1,6 +1,5 @@
 /* eslint-disable react/display-name */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import { danger10, gray2, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
@@ -21,7 +20,9 @@ interface FormInputProps {
     placeholder?: string;
     disabled?: boolean;
     flat?: 'top' | 'bottom' | 'both';
-    error?: FieldError;
+    error?: {
+        message?: string;
+    };
 
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
     onInput?: React.ChangeEventHandler<HTMLInputElement>;
@@ -72,7 +73,7 @@ const StyledErrorTrigger = styled.div`
     height: 6px;
     border-radius: 100%;
     background-color: ${danger10};
-    top: 45%;
+    top: 17px;
     left: -2px;
 `;
 
