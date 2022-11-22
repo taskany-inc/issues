@@ -2,7 +2,6 @@
 /* eslint-disable react/display-name */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import { danger10, gray2, gray3, gray6, radiusS, textColor } from '../design/@generated/themes';
@@ -22,7 +21,9 @@ interface FormEditorProps {
     flat?: 'top' | 'bottom' | 'both';
     height?: string;
     placeholder?: string;
-    error?: FieldError;
+    error?: {
+        message?: string;
+    };
 
     onChange?: (value: string | undefined) => void;
     onBlur?: () => void;
@@ -129,7 +130,7 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
 const StyledPlaceholder = styled.div`
     position: absolute;
     top: 5px;
-    left: 8px;
+    left: 16px;
     z-index: 100;
 
     pointer-events: none;
@@ -144,7 +145,7 @@ const StyledErrorTrigger = styled.div`
     height: 6px;
     border-radius: 100%;
     background-color: ${danger10};
-    top: 45%;
+    top: 12px;
     left: -2px;
     z-index: 2;
 `;
