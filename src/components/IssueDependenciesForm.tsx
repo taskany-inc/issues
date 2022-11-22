@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
+import dynamic from 'next/dynamic';
 
 import { gapL, gapM } from '../design/@generated/themes';
 import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
@@ -11,12 +12,13 @@ import { createFetcher } from '../utils/createFetcher';
 import { FormTitle } from './FormTitle';
 import { IssueDependenciesList } from './IssueDependenciesList';
 import { FormInput } from './FormInput';
-import { ComboBox } from './ComboBox';
-import { Dropdown } from './Dropdown';
 import { MenuItem } from './MenuItem';
 import { GoalMenuItem } from './GoalMenuItem';
 import { Button } from './Button';
 import { Icon } from './Icon';
+
+const ComboBox = dynamic(() => import('./ComboBox'));
+const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface IssueDependenciesFormProps {
     issue: Goal;

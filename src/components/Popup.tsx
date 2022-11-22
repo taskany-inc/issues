@@ -232,3 +232,5 @@ export const Popup: React.FC<PopupProps> = ({
         {target}
     </Tippy>
 );
+
+export default Popup;
