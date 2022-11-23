@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
+import dynamic from 'next/dynamic';
 
 import { gapM } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -9,8 +10,9 @@ import { State as StateModel } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
-import { Popup } from './Popup';
 import { State } from './State';
+
+const Popup = dynamic(() => import('./Popup'));
 
 interface StateSwitchProps {
     state: StateModel;

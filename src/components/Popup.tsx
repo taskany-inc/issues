@@ -186,7 +186,7 @@ const StyledPopupContainer = styled.div<{
  * @see https://github.com/atomiks/tippyjs-react
  * Styling https://popper.js.org/docs/v2/tutorial/#styling
  */
-export const Popup: React.FC<PopupProps> = ({
+const Popup: React.FC<PopupProps> = ({
     placement = 'auto',
     children,
     target,
