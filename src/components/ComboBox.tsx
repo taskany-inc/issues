@@ -38,6 +38,7 @@ interface ComboBoxProps {
     renderInput: (props: ComboBoxInputProps) => React.ReactNode;
     renderItem: (props: ComboBoxItemProps) => React.ReactNode;
     renderTrigger?: (props: ComboBoxTriggerProps) => React.ReactNode;
+    renderItems?: (children: React.ReactNode) => React.ReactNode;
     text?: string;
     value?: any;
     items?: any[];
@@ -46,6 +47,8 @@ interface ComboBoxProps {
     error?: {
         message?: string;
     };
+    maxWidth?: React.ComponentProps<typeof Popup>['maxWidth'];
+    minWidth?: React.ComponentProps<typeof Popup>['minWidth'];
 
     onChange?: (value: any) => void;
 }
@@ -67,7 +70,21 @@ const StyledErrorTrigger = styled.div`
 
 const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
     (
-        { text, value, visible = false, items = [], disabled, error, renderItem, renderTrigger, renderInput, onChange },
+        {
+            text,
+            value,
+            visible = false,
+            items = [],
+            disabled,
+            error,
+            maxWidth = 250,
+            minWidth = 150,
+            renderItem,
+            renderTrigger,
+            renderInput,
+            onChange,
+            renderItems,
+        },
         ref,
     ) => {
         const popupRef = useRef<HTMLDivElement>(null);
@@ -125,6 +142,8 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
             }
         }, [items, upPress]);
 
+        const children = items.map((item, index) => renderItem({ item, index, cursor, onClick: onItemClick(item) }));
+
         return (
             <StyledComboBox ref={ref}>
                 {nullable(error, (err) => (
@@ -166,13 +185,11 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
                     reference={popupRef}
                     interactive
                     arrow={false}
-                    minWidth={150}
-                    maxWidth={250}
+                    minWidth={minWidth}
+                    maxWidth={maxWidth}
                     offset={[-4, 8]}
                 >
-                    <div {...onESC}>
-                        {items.map((item, index) => renderItem({ item, index, cursor, onClick: onItemClick(item) }))}
-                    </div>
+                    <div {...onESC}>{renderItems ? renderItems(children) : children}</div>
                 </Popup>
             </StyledComboBox>
         );
