@@ -9,15 +9,15 @@ import { Badge } from './Badge';
 import { Input } from './Input';
 import { PageContent } from './Page';
 import { StateFilterDropdown } from './StateFilterDropdown';
-import { UserFilter } from './UserFilter';
-import { TagsFilter } from './TagsFilter';
+import { UserFilterDropdown } from './UserFilterDropdown';
+import { TagsFilterDropdown } from './TagsFilterDropdown';
 import { LimitFilterDropdown } from './LimitFilterDropdown';
 
 interface FiltersPanelProps {
     count?: number;
     flowId?: React.ComponentProps<typeof StateFilterDropdown>['flowId'];
-    users?: React.ComponentProps<typeof UserFilter>['activity'];
-    tags?: React.ComponentProps<typeof TagsFilter>['tags'];
+    users?: React.ComponentProps<typeof UserFilterDropdown>['activity'];
+    tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
     stateFilter?: Array<string>;
     ownerFilter?: Array<string>;
     tagsFilter?: Array<string>;
@@ -27,8 +27,8 @@ interface FiltersPanelProps {
 
     onSearchChange: React.ComponentProps<typeof Input>['onChange'];
     onStateChange?: React.ComponentProps<typeof StateFilterDropdown>['onChange'];
-    onUserChange?: React.ComponentProps<typeof UserFilter>['onClick'];
-    onTagChange?: React.ComponentProps<typeof TagsFilter>['onClick'];
+    onUserChange?: React.ComponentProps<typeof UserFilterDropdown>['onChange'];
+    onTagChange?: React.ComponentProps<typeof TagsFilterDropdown>['onChange'];
     onLimitChange?: React.ComponentProps<typeof LimitFilterDropdown>['onChange'];
 }
 
@@ -97,15 +97,15 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             />
                         ))}
                         {nullable(users, (u) => (
-                            <UserFilter
+                            <UserFilterDropdown
                                 text={t('Owner')}
                                 activity={u}
-                                ownerFilter={ownerFilter}
-                                onClick={onUserChange}
+                                value={ownerFilter}
+                                onChange={onUserChange}
                             />
                         ))}
                         {nullable(tags, (ta) => (
-                            <TagsFilter text={t('Tags')} tags={ta} tagsFilter={tagsFilter} onClick={onTagChange} />
+                            <TagsFilterDropdown text={t('Tags')} tags={ta} value={tagsFilter} onChange={onTagChange} />
                         ))}
                         {nullable(onLimitChange, (olc) => (
                             <LimitFilterDropdown text={t('Limit')} value={limitFilter} onChange={olc} />
