@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { gapM, gapS, gray7, gray8 } from '../design/@generated/themes';
+import { gapM, gapS, gapXs, gray7, gray8 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { Text } from './Text';
@@ -13,7 +13,7 @@ interface TipProps {
 }
 
 const StyledTip = styled(Text)`
-    padding: ${gapM} ${gapS} 0;
+    padding: ${gapM} ${gapXs} 0;
 `;
 
 const StyledTipIcon = styled.span`
