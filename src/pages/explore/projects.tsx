@@ -8,7 +8,7 @@ import { Page, PageContent } from '../../components/Page';
 import { useMounted } from '../../hooks/useMounted';
 import { TabsMenu, TabsMenuItem } from '../../components/TabsMenu';
 import { PageSep } from '../../components/PageSep';
-import { ProjectItem } from '../../components/ProjectItem';
+import { ProjectListItem } from '../../components/ProjectListItem';
 import { nullable } from '../../utils/nullable';
 import { CommonHeader } from '../../components/CommonHeader';
 
@@ -75,7 +75,7 @@ const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: P
             <PageContent>
                 {projects?.map((project) =>
                     nullable(project, (p) => (
-                        <ProjectItem
+                        <ProjectListItem
                             locale={locale}
                             key={p.key}
                             projectKey={p.key}

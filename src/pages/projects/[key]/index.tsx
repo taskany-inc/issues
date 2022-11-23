@@ -10,7 +10,7 @@ import { createFetcher } from '../../../utils/createFetcher';
 import { Goal, Project } from '../../../../graphql/@generated/genql';
 import { Page } from '../../../components/Page';
 import { Button } from '../../../components/Button';
-import { GoalItem } from '../../../components/GoalItem';
+import { GoalListItem } from '../../../components/GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
 import { gapS } from '../../../design/@generated/themes';
@@ -19,11 +19,11 @@ import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { FiltersPanel } from '../../../components/FiltersPanel';
-import { defaultLimit } from '../../../components/LimitFilter';
+import { defaultLimit } from '../../../components/LimitFilterDropdown';
 import { useUrlParams } from '../../../hooks/useUrlParams';
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
-// @ts-ignore
+
 const fetcher = createFetcher(
     (_, key: string, offset = 0, states = [], query = '', limitFilter = defaultLimit, tags = [], owner = []) => ({
         project: [
@@ -301,7 +301,7 @@ const ProjectPage = ({
             <StyledGoalsList>
                 {goals?.map((goal) =>
                     nullable(goal, (g) => (
-                        <GoalItem
+                        <GoalListItem
                             locale={locale}
                             createdAt={g.createdAt}
                             id={g.id}

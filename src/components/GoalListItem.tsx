@@ -17,7 +17,7 @@ import { StateDot } from './StateDot';
 
 const RelativeTime = dynamic(() => import('./RelativeTime'));
 
-interface GoalItemProps {
+interface GoalListItemProps {
     id: string;
     title: string;
     locale: TLocale;
@@ -115,7 +115,7 @@ const StyledIcon = styled(Icon)`
     vertical-align: middle;
 `;
 
-export const GoalItem: React.FC<GoalItemProps> = ({
+export const GoalListItem: React.FC<GoalListItemProps> = ({
     id,
     owner,
     issuer,
