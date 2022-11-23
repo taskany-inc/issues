@@ -13,7 +13,7 @@ import { UserPic } from './UserPic';
 
 const RelativeTime = dynamic(() => import('./RelativeTime'));
 
-interface ProjectItemProps {
+interface ProjectListItemProps {
     projectKey: string;
     title: string;
     createdAt: Scalars['DateTime'];
@@ -22,7 +22,7 @@ interface ProjectItemProps {
     owner?: Activity;
 }
 
-const StyledProjectItem = styled.a`
+const StyledProjectListItem = styled.a`
     display: grid;
     grid-template-columns: 500px 40px;
     align-items: center;
@@ -67,7 +67,7 @@ const StyledSubTitle = styled(Text)`
     padding-top: ${gapS};
 `;
 
-export const ProjectItem: React.FC<ProjectItemProps> = ({
+export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     projectKey,
     title,
     description,
@@ -77,7 +77,7 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
 }) => {
     return (
         <Link href={routes.project(projectKey)} passHref>
-            <StyledProjectItem>
+            <StyledProjectListItem>
                 <StyledName>
                     <StyledTitle size="m" weight="bold">
                         {title}
@@ -97,7 +97,7 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
                 <StyledAddon>
                     <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
                 </StyledAddon>
-            </StyledProjectItem>
+            </StyledProjectListItem>
         </Link>
     );
 };
