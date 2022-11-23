@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-import { defaultLimit } from '../components/LimitFilter';
+import { defaultLimit } from '../components/LimitFilterDropdown';
 
 import { useMounted } from './useMounted';
 
