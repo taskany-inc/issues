@@ -46,6 +46,7 @@ interface DropdownProps {
 
 const StyledDropdown = styled.span`
     position: relative;
+    display: inline-block;
 `;
 
 const StyledErrorTrigger = styled.div`
@@ -64,7 +65,6 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
         const popupRef = useRef<HTMLDivElement>(null);
         const buttonRef = useRef<HTMLButtonElement>(null);
         const [popupVisible, setPopupVisibility] = useState(visible);
-        const [editMode, setEditMode] = useState(false);
         const downPress = useKeyPress('ArrowDown');
         const upPress = useKeyPress('ArrowUp');
         const [cursor, setCursor] = useState(0);
@@ -73,28 +73,24 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
             setPopupVisibility(visible);
         }, [visible]);
 
-        useEffect(() => {
-            setPopupVisibility(editMode);
-        }, [renderTrigger, editMode]);
-
         const onClickOutside = useCallback(() => {
-            setEditMode(false);
+            setPopupVisibility(false);
         }, []);
 
         const onTriggerClick = useCallback(() => {
-            setEditMode(true);
+            setPopupVisibility(true);
         }, []);
 
         const onItemClick = useCallback(
             (value: any) => () => {
-                setEditMode(false);
+                setPopupVisibility(false);
                 onChange && onChange(value);
             },
             [onChange],
         );
 
         const [onESC] = useKeyboard([KeyCode.Escape], () => {
-            setEditMode(false);
+            setPopupVisibility(false);
         });
 
         const [onENTER] = useKeyboard([KeyCode.Enter], () => {
