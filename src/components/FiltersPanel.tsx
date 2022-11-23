@@ -11,7 +11,7 @@ import { PageContent } from './Page';
 import { StateFilter } from './StateFilter';
 import { UserFilter } from './UserFilter';
 import { TagsFilter } from './TagsFilter';
-import { LimitFilter } from './LimitFilter';
+import { LimitFilterDropdown } from './LimitFilterDropdown';
 
 interface FiltersPanelProps {
     count?: number;
@@ -29,7 +29,7 @@ interface FiltersPanelProps {
     onStateChange?: React.ComponentProps<typeof StateFilter>['onClick'];
     onUserChange?: React.ComponentProps<typeof UserFilter>['onClick'];
     onTagChange?: React.ComponentProps<typeof TagsFilter>['onClick'];
-    onLimitChange?: React.ComponentProps<typeof LimitFilter>['onClick'];
+    onLimitChange?: React.ComponentProps<typeof LimitFilterDropdown>['onChange'];
 }
 
 const StyledFiltersPanel = styled.div`
@@ -108,7 +108,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             <TagsFilter text={t('Tags')} tags={ta} tagsFilter={tagsFilter} onClick={onTagChange} />
                         ))}
                         {nullable(onLimitChange, (olc) => (
-                            <LimitFilter text={t('Limit')} limitFilter={limitFilter} onClick={olc} />
+                            <LimitFilterDropdown text={t('Limit')} value={limitFilter} onChange={olc} />
                         ))}
                     </StyledFiltersMenu>
                 </StyledFiltersMenuWrapper>
