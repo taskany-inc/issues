@@ -8,14 +8,14 @@ import { nullable } from '../utils/nullable';
 import { Badge } from './Badge';
 import { Input } from './Input';
 import { PageContent } from './Page';
-import { StateFilter } from './StateFilter';
+import { StateFilterDropdown } from './StateFilterDropdown';
 import { UserFilter } from './UserFilter';
 import { TagsFilter } from './TagsFilter';
 import { LimitFilterDropdown } from './LimitFilterDropdown';
 
 interface FiltersPanelProps {
     count?: number;
-    flowId?: React.ComponentProps<typeof StateFilter>['flowId'];
+    flowId?: React.ComponentProps<typeof StateFilterDropdown>['flowId'];
     users?: React.ComponentProps<typeof UserFilter>['activity'];
     tags?: React.ComponentProps<typeof TagsFilter>['tags'];
     stateFilter?: Array<string>;
@@ -26,7 +26,7 @@ interface FiltersPanelProps {
     children?: React.ReactNode;
 
     onSearchChange: React.ComponentProps<typeof Input>['onChange'];
-    onStateChange?: React.ComponentProps<typeof StateFilter>['onClick'];
+    onStateChange?: React.ComponentProps<typeof StateFilterDropdown>['onChange'];
     onUserChange?: React.ComponentProps<typeof UserFilter>['onClick'];
     onTagChange?: React.ComponentProps<typeof TagsFilter>['onClick'];
     onLimitChange?: React.ComponentProps<typeof LimitFilterDropdown>['onChange'];
@@ -89,11 +89,11 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
                     <StyledFiltersMenu>
                         {nullable(flowId, (id) => (
-                            <StateFilter
+                            <StateFilterDropdown
                                 text={t('State')}
                                 flowId={id}
-                                stateFilter={stateFilter}
-                                onClick={onStateChange}
+                                value={stateFilter}
+                                onChange={onStateChange}
                             />
                         ))}
                         {nullable(users, (u) => (
