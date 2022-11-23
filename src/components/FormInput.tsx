@@ -1,12 +1,14 @@
 /* eslint-disable react/display-name */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { danger10, gray2, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
-import { Popup } from './Popup';
 import { Text } from './Text';
+
+const Popup = dynamic(() => import('./Popup'));
 
 interface FormInputProps {
     id?: string;

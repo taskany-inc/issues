@@ -1,12 +1,14 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 
 import { Button } from './Button';
 import { Input } from './Input';
-import { Popup } from './Popup';
 import { Text } from './Text';
+
+const Popup = dynamic(() => import('./Popup'));
 
 interface ProjectKeyInputProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -34,7 +36,7 @@ const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
     value,
     placeholder,
     tabIndex,
-    available,
+    available = true,
     tooltip,
     onChange,
     onBlur,

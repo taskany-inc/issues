@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useSession, signOut, signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
+import dynamic from 'next/dynamic';
 
 import { nullable } from '../utils/nullable';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
@@ -10,9 +11,10 @@ import { routes } from '../hooks/router';
 import { backgroundColor, brandColor, gapM, gray3, textColor, gray8, gapXs, link10 } from '../design/@generated/themes';
 
 import { UserPic } from './UserPic';
-import { Popup } from './Popup';
 import { Link } from './Link';
 import { Text } from './Text';
+
+const Popup = dynamic(() => import('./Popup'));
 
 interface HeaderMenuProps {
     notifications?: boolean;

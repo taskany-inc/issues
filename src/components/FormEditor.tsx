@@ -9,9 +9,8 @@ import { nullable } from '../utils/nullable';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { useMounted } from '../hooks/useMounted';
 
-import { Popup } from './Popup';
-
 const Editor = dynamic(() => import('@monaco-editor/react'));
+const Popup = dynamic(() => import('./Popup'));
 
 interface FormEditorProps {
     id?: string;
