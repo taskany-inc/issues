@@ -1,12 +1,12 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { GoalItem } from '../components/GoalItem';
+import { GoalListItem } from '../components/GoalListItem';
 import { Tag } from '../../graphql/@generated/genql';
 
 export default {
     title: 'Taskany/GoalItem',
-    component: GoalItem,
+    component: GoalListItem,
     args: {
         title: 'Test goal',
         id: 'TST-1',
@@ -22,8 +22,8 @@ export default {
             },
         },
     },
-} as ComponentMeta<typeof GoalItem>;
-const Template: ComponentStory<typeof GoalItem> = (args) => <GoalItem {...args} />;
+} as ComponentMeta<typeof GoalListItem>;
+const Template: ComponentStory<typeof GoalListItem> = (args) => <GoalListItem {...args} />;
 
 const createTags = (tagsNumber: number): Tag[] => {
     return new Array(tagsNumber).fill('').map((tag, index) => ({
