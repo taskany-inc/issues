@@ -1,13 +1,14 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import FlowCompletion from '../components/FlowCompletion';
+import { FlowComboBox } from '../components/FlowComboBox';
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
-    title: 'Taskany/FlowCompletion',
-    component: FlowCompletion,
+    title: 'Taskany/FlowComboBox',
+    component: FlowComboBox,
     args: {
         text: 'Flow',
     },
-} as ComponentMeta<typeof FlowCompletion>;
-export const flowCompletion: ComponentStory<typeof FlowCompletion> = (args) => <FlowCompletion {...args} />;
+} as ComponentMeta<typeof FlowComboBox>;
+
+export const Default: ComponentStory<typeof FlowComboBox> = (args) => <FlowComboBox {...args} />;
