@@ -63,8 +63,6 @@ const StyledButton = styled(
 
     white-space: nowrap;
 
-    cursor: pointer;
-    user-select: none;
     outline: none;
     appearance: none;
 
@@ -73,10 +71,6 @@ const StyledButton = styled(
 
     transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
     transition-property: color, background-color, border-color;
-
-    :active:not([disabled]) {
-        transform: scale(0.985);
-    }
 
     :disabled {
         cursor: not-allowed;
@@ -87,23 +81,38 @@ const StyledButton = styled(
         background-color: ${gray5};
     }
 
-    ${is(
-        { view: 'default' },
+    ${({ onClick }) =>
+        onClick &&
+        css`
+            cursor: pointer;
+            user-select: none;
+
+            :active:not([disabled]) {
+                transform: scale(0.985);
+            }
+        `}
+
+    ${({ view }) =>
+        view === 'default' &&
         css`
             color: ${gray10};
             border-color: ${gray7};
             background-color: ${gray4};
 
             --color: ${gray9};
+        `}
 
+    ${({ view, onClick }) =>
+        view === 'default' &&
+        onClick &&
+        css`
             :hover:not([disabled]),
             :focus:not([disabled]) {
                 color: ${textColor};
                 border-color: ${gray8};
                 background-color: ${gray6};
             }
-        `,
-    )}
+        `}
 
     ${is(
         { view: 'primary' },
