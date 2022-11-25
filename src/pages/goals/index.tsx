@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
@@ -9,7 +9,7 @@ import { Project } from '../../../graphql/@generated/genql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Page, PageContent } from '../../components/Page';
-import { GoalItem } from '../../components/GoalItem';
+import { GoalListItem } from '../../components/GoalListItem';
 import { nullable } from '../../utils/nullable';
 import { CommonHeader } from '../../components/CommonHeader';
 import { FiltersPanel } from '../../components/FiltersPanel';
@@ -18,7 +18,7 @@ import { useUrlParams } from '../../hooks/useUrlParams';
 import { Text } from '../../components/Text';
 import { PageSep } from '../../components/PageSep';
 import { Button } from '../../components/Button';
-import { defaultLimit } from '../../components/LimitFilter';
+import { defaultLimit } from '../../components/LimitFilterDropdown';
 
 const refreshInterval = 3000;
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
@@ -211,7 +211,7 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
                             <StyledGoalsList>
                                 {project.goals?.map((goal) =>
                                     nullable(goal, (g) => (
-                                        <GoalItem
+                                        <GoalListItem
                                             locale={locale}
                                             createdAt={g.createdAt}
                                             id={g.id}
