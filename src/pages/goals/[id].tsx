@@ -7,19 +7,11 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 
-import {
-    Goal,
-    State,
-    Activity,
-    EstimateInput,
-    GoalUpdateInput,
-    GoalDependencyToggleInput,
-    Priority,
-} from '../../../graphql/@generated/genql';
+import { Goal, State, GoalUpdateInput, GoalDependencyToggleInput } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
-import { estimatedMeta } from '../../utils/dateTime';
+import { formatEstimate } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
@@ -38,19 +30,16 @@ import { Icon } from '../../components/Icon';
 import { Reactions, ReactionsMap, reactionsGroupsLimit } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
 import { commentMask, CommentView } from '../../components/CommentView';
-import { IssueDependencies } from '../../components/IssueDependencies';
-import { IssueParticipants } from '../../components/IssueParticipants';
 import { editGoalKeys } from '../../utils/hotkeys';
-import { PriorityDropdown } from '../../components/PriorityDropdown';
 
 const Md = dynamic(() => import('../../components/Md'));
 const RelativeTime = dynamic(() => import('../../components/RelativeTime'));
-const EstimateDropdown = dynamic(() => import('../../components/EstimateDropdown'));
-const UserCompletionDropdown = dynamic(() => import('../../components/UserCompletionDropdown'));
 const ModalOnEvent = dynamic(() => import('../../components/ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../../components/GoalEditForm'));
 const CommentCreateForm = dynamic(() => import('../../components/CommentCreateForm'));
 const ReactionsDropdown = dynamic(() => import('../../components/ReactionsDropdown'));
+const IssueDependencies = dynamic(() => import('../../components/IssueDependencies'));
+const IssueParticipants = dynamic(() => import('../../components/IssueParticipants'));
 
 const refreshInterval = 3000;
 
@@ -83,6 +72,7 @@ const fetcher = createFetcher((_, id: string) => ({
                 key: true,
                 title: true,
                 description: true,
+                flowId: true,
                 flow: {
                     id: true,
                     states: {
@@ -310,6 +300,7 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
     // NB: this line is compensation for first render before delayed swr will bring updates
     const goal: Goal = data?.goal ?? ssrData.goal;
 
+    const issueEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
     const isUserAllowedToEdit = user?.activityId === goal?.activityId || user?.activityId === goal?.ownerId;
     // @ts-ignore unexpectable trouble with filter
     const [watcher, setWatcher] = useState(goal.watchers?.filter(({ id }) => id === user.activityId).length > 0);
@@ -385,31 +376,6 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
         [t, goal],
     );
 
-    const [issueOwner, setIssueOwner] = useState(goal.owner);
-    const issueOwnerName = issueOwner?.user?.name || issueOwner?.user?.email || issueOwner?.ghost?.email;
-    const onIssueOwnerChange = useCallback(
-        async (activity: Activity) => {
-            setIssueOwner(activity);
-
-            await triggerUpdate({
-                ownerId: activity?.id,
-            });
-        },
-        [triggerUpdate],
-    );
-
-    const [issuePriority, setIssuePriority] = useState(goal.priority);
-    const onIssuePriorityChange = useCallback(
-        async (priority: Priority) => {
-            setIssuePriority(priority);
-
-            await triggerUpdate({
-                priority,
-            });
-        },
-        [triggerUpdate],
-    );
-
     const onIssueStateChange = useCallback(
         async (state: State) => {
             await triggerUpdate({
@@ -419,20 +385,6 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
             refresh();
         },
         [triggerUpdate, refresh],
-    );
-
-    const [issueEstimate, setIssueEstimate] = useState<EstimateInput | undefined>(
-        goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
-    );
-    const onIssueEstimateChange = useCallback(
-        async (estimate?: EstimateInput) => {
-            setIssueEstimate(estimate);
-
-            await triggerUpdate({
-                estimate,
-            });
-        },
-        [triggerUpdate],
     );
 
     const onWatchToggle = useCallback(async () => {
@@ -642,42 +594,35 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                         <CardActions>
                             <IssueBaseActions>
                                 <IssueAction>
-                                    <UserCompletionDropdown
-                                        text={issueOwnerName}
-                                        placeholder={t('Set owner')}
-                                        title={t('Set owner')}
-                                        query={issueOwnerName}
-                                        userPic={
+                                    <Button
+                                        ghost
+                                        text={
+                                            goal.owner?.user?.name ||
+                                            goal.owner?.user?.email ||
+                                            goal.owner?.ghost?.email
+                                        }
+                                        iconLeft={
                                             <UserPic
-                                                src={issueOwner?.user?.image}
-                                                email={issueOwner?.user?.email || issueOwner?.ghost?.email}
+                                                src={goal.owner?.user?.image}
+                                                email={goal.owner?.user?.email || goal.owner?.ghost?.email}
                                                 size={16}
                                             />
                                         }
-                                        onClick={isUserAllowedToEdit ? onIssueOwnerChange : undefined}
                                     />
                                 </IssueAction>
 
-                                <IssueAction>
-                                    <PriorityDropdown
-                                        priority={issuePriority}
-                                        text={issuePriority ? t(`Priority.${issuePriority}`) : t('Priority.Priority')}
-                                        onClick={isUserAllowedToEdit ? onIssuePriorityChange : undefined}
-                                    />
-                                </IssueAction>
+                                {nullable(goal.priority, (ip) => (
+                                    <IssueAction>
+                                        <Button ghost text={t(`Priority.${ip}`)} />
+                                    </IssueAction>
+                                ))}
 
-                                <IssueAction>
-                                    <EstimateDropdown
-                                        locale={locale}
-                                        size="m"
-                                        text={t('Schedule')}
-                                        placeholder={t('Date input mask placeholder')}
-                                        mask={t('Date input mask')}
-                                        value={issueEstimate}
-                                        defaultValuePlaceholder={issueEstimate ?? estimatedMeta({ locale })}
-                                        onClose={isUserAllowedToEdit ? onIssueEstimateChange : undefined}
-                                    />
-                                </IssueAction>
+                                {nullable(issueEstimate, (ie) => (
+                                    <IssueAction>
+                                        <Button ghost text={formatEstimate(ie, locale)} />
+                                    </IssueAction>
+                                ))}
+
                                 <IssueAction>
                                     <Reactions
                                         reactions={grouppedReactions}

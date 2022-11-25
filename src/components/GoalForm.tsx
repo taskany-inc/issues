@@ -77,7 +77,6 @@ const schemaProvider = (t: (key: string) => string) =>
                 z.object({
                     id: z.string(),
                     title: z.string(),
-                    description: z.string().optional(),
                 }),
             )
             .optional(),
@@ -193,12 +192,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
                 <StyledTagsContainer>
                     {tagsWatcher?.map((tag) => (
-                        <Tag
-                            key={tag.id}
-                            title={tag.title}
-                            description={tag.description}
-                            onHide={onTagDeleteProvider(tag)}
-                        />
+                        <Tag key={tag.id} title={tag.title} onHide={onTagDeleteProvider(tag)} />
                     ))}
                 </StyledTagsContainer>
 
