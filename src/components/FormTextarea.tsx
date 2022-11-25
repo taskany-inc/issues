@@ -1,6 +1,5 @@
 /* eslint-disable react/display-name */
 import React from 'react';
-import { FieldError } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import { gray2, gray3, gray7, radiusS, textColor } from '../design/@generated/themes';
@@ -16,13 +15,14 @@ interface FormTextareaProps {
     placeholder?: string;
     disabled?: boolean;
     flat?: 'top' | 'bottom' | 'both';
+    error?: {
+        message?: string;
+    };
 
     onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
     onInput?: React.ChangeEventHandler<HTMLTextAreaElement>;
     onBlur?: React.FocusEventHandler<HTMLTextAreaElement>;
     onFocus?: React.FocusEventHandler<HTMLTextAreaElement>;
-
-    error?: FieldError;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
