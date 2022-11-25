@@ -4,28 +4,26 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
-import dynamic from 'next/dynamic';
 
+import { TLocale } from '../types/locale';
 import { gapS } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Priority } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
-import { TLocale } from '../types/locale';
 import { submitKeys } from '../utils/hotkeys';
+import { errorsProvider } from '../utils/forms';
 
 import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
-import { ProjectCompletion } from './ProjectCompletion';
-import { TagCompletion } from './TagCompletion';
+import { UserComboBox } from './UserComboBox';
+import { ProjectComboBox } from './ProjectComboBox';
+import { EstimateComboBox } from './EstimateComboBox';
+import { TagComboBox } from './TagComboBox';
 import { StateDropdown } from './StateDropdown';
 import { PriorityDropdown } from './PriorityDropdown';
-import { UserPic } from './UserPic';
 import { Tag } from './Tag';
 import { FormEditor } from './FormEditor';
-
-const EstimateDropdown = dynamic(() => import('./EstimateDropdown'));
-const UserCompletionDropdown = dynamic(() => import('./UserCompletionDropdown'));
 
 const tagsLimit = 5;
 
@@ -47,34 +45,61 @@ const schemaProvider = (t: (key: string) => string) =>
             .min(10, {
                 message: t("Goal's description must be longer than 10 symbols"),
             }),
+        owner: z.object({
+            id: z.string(),
+        }),
+        project: z.object(
+            {
+                id: z.number(),
+                title: z.string(),
+                flowId: z.string(),
+            },
+            {
+                invalid_type_error: "Goal's project is required",
+                required_error: "Goal's project is required",
+            },
+        ),
+        state: z.object({
+            id: z.string(),
+            hue: z.number(),
+            title: z.string(),
+        }),
+        priority: z.string(),
+        estimate: z
+            .object({
+                date: z.string(),
+                q: z.string(),
+                y: z.string(),
+            })
+            .optional(),
+        tags: z
+            .array(
+                z.object({
+                    id: z.string(),
+                    title: z.string(),
+                    description: z.string().optional(),
+                }),
+            )
+            .optional(),
     });
 
 export type GoalFormType = z.infer<ReturnType<typeof schemaProvider>>;
 
 interface GoalFormProps {
     formTitle: string;
-    owner: Activity;
+    owner?: Partial<Activity>;
     i18nKeyset: string;
     locale: TLocale;
     title?: string;
     description?: string;
-    project?: Project;
-    tags?: Map<string, TagModel>;
-    state?: State;
-    priority?: Priority;
+    project?: Partial<Project>;
+    tags?: Array<TagModel | undefined>;
+    state?: Partial<State>;
+    priority?: Priority | string;
     estimate?: EstimateInput;
     children?: React.ReactNode;
 
     onSumbit: (fields: GoalFormType) => void;
-    onTitleChange?: (title: string) => void;
-    onDescriptionChange?: (description: string) => void;
-    onOwnerChange: (activity: Activity) => void;
-    onProjectChange: (project: Project) => void;
-    onStateChange: (state: State) => void;
-    onPriorityChange: (priority: Priority) => void;
-    onEstimateChange: (estimate?: EstimateInput) => void;
-    onTagAdd: (tag: TagModel) => void;
-    onTagDelete: (tag: TagModel) => void;
 }
 
 const StyledTagsContainer = styled.div`
@@ -87,7 +112,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     description,
     owner,
     project,
-    tags = new Map<string, TagModel>(),
+    tags = [],
     state,
     priority,
     estimate,
@@ -95,15 +120,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     locale,
     children,
     onSumbit,
-    onTitleChange,
-    onDescriptionChange,
-    onOwnerChange,
-    onProjectChange,
-    onStateChange,
-    onPriorityChange,
-    onEstimateChange,
-    onTagAdd,
-    onTagDelete,
 }) => {
     const t = useTranslations(i18nKeyset);
     const schema = schemaProvider(t);
@@ -114,6 +130,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         handleSubmit,
         watch,
         setFocus,
+        setValue,
         formState: { errors, isValid, isSubmitted },
     } = useForm<GoalFormType>({
         resolver: zodResolver(schema),
@@ -123,50 +140,39 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         defaultValues: {
             title,
             description,
+            owner,
+            project,
+            state,
+            priority,
+            estimate,
+            tags,
         },
     });
+
+    const projectWatcher = watch('project');
+    const tagsWatcher = watch('tags');
+    const errorsResolver = errorsProvider(errors, isSubmitted);
 
     useEffect(() => {
         setTimeout(() => setFocus('title'), 0);
     }, [setFocus]);
 
-    const titleWatcher = watch('title');
-    useEffect(() => {
-        onTitleChange && onTitleChange(titleWatcher);
-    }, [titleWatcher, onTitleChange]);
-
-    const descriptionWatcher = watch('description');
-    useEffect(() => {
-        onDescriptionChange && onDescriptionChange(descriptionWatcher);
-    }, [descriptionWatcher, onDescriptionChange]);
-
     const onTagDeleteProvider = useCallback(
-        (tag: TagModel) => () => {
-            onTagDelete(tag);
+        (tag: Partial<TagModel>) => () => {
+            const tags = tagsWatcher?.filter((t) => t.id !== tag.id);
+            setValue('tags', tags);
         },
-        [onTagDelete],
+        [setValue, tagsWatcher],
     );
-
-    const onFormSubmit = useCallback(
-        (fields: GoalFormType) => {
-            onSumbit(fields);
-        },
-        [onSumbit],
-    );
-
-    const ownerButtonText = owner?.user?.name || owner?.user?.email || owner?.ghost?.email || t('Assign');
-    const projectButtonText = project?.title || t('Enter project title');
-    const stateButtonText = state?.title || t('State');
-    const priorityButtonText = priority || t('Priority.Priority');
 
     return (
         <>
             <h2>{formTitle}</h2>
 
-            <Form onSubmit={handleSubmit(onFormSubmit)} submitHotkey={submitKeys}>
+            <Form onSubmit={handleSubmit(onSumbit)} submitHotkey={submitKeys}>
                 <FormInput
                     {...register('title')}
-                    error={isSubmitted ? errors.title : undefined}
+                    error={errorsResolver('title')}
                     placeholder={t("Goal's title")}
                     autoFocus
                     flat="bottom"
@@ -179,14 +185,14 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         <FormEditor
                             flat="both"
                             placeholder={t('And its description')}
-                            error={isSubmitted ? errors.description : undefined}
+                            error={errorsResolver(field.name)}
                             {...field}
                         />
                     )}
                 />
 
                 <StyledTagsContainer>
-                    {Array.from(tags.values()).map((tag) => (
+                    {tagsWatcher?.map((tag) => (
                         <Tag
                             key={tag.id}
                             title={tag.title}
@@ -198,71 +204,89 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
                 <FormActions flat="top">
                     <FormAction left inline>
-                        <UserCompletionDropdown
-                            size="m"
-                            text={ownerButtonText}
-                            placeholder={t('Enter name or email')}
-                            query={owner?.user?.name || owner?.user?.email || owner?.ghost?.email}
-                            userPic={
-                                <UserPic
-                                    src={owner?.user?.image}
-                                    email={owner?.user?.email || owner?.ghost?.email}
-                                    size={16}
+                        <Controller
+                            name="owner"
+                            control={control}
+                            render={({ field }) => (
+                                <UserComboBox
+                                    text={t('Assign')}
+                                    placeholder={t('Enter project title')}
+                                    error={errorsResolver(field.name)}
+                                    {...field}
                                 />
-                            }
-                            onClick={onOwnerChange}
+                            )}
                         />
 
-                        <ProjectCompletion
-                            text={projectButtonText}
-                            placeholder={t('Enter project title')}
-                            query={project?.title}
-                            onClick={onProjectChange}
+                        <Controller
+                            name="project"
+                            control={control}
+                            render={({ field }) => (
+                                <ProjectComboBox
+                                    text={t('Enter project title')}
+                                    placeholder={t('Enter project title')}
+                                    error={errorsResolver(field.name)}
+                                    {...field}
+                                />
+                            )}
                         />
 
-                        <StateDropdown
-                            size="m"
-                            text={stateButtonText}
-                            flowId={project?.flow?.id}
-                            state={state}
-                            onClick={onStateChange}
+                        <Controller
+                            name="state"
+                            control={control}
+                            render={({ field }) => (
+                                <StateDropdown
+                                    text={t('State')}
+                                    flowId={projectWatcher?.flowId}
+                                    error={errorsResolver(field.name)}
+                                    {...field}
+                                />
+                            )}
                         />
 
-                        <PriorityDropdown
-                            size="m"
-                            text={priorityButtonText}
-                            priority={priority}
-                            onClick={onPriorityChange}
+                        <Controller
+                            name="priority"
+                            control={control}
+                            render={({ field }) => (
+                                <PriorityDropdown
+                                    text={t('Priority.Priority')}
+                                    error={errorsResolver(field.name)}
+                                    {...field}
+                                />
+                            )}
                         />
 
-                        <EstimateDropdown
-                            locale={locale}
-                            size="m"
-                            text={t('Schedule')}
-                            placeholder={t('Date input mask placeholder')}
-                            mask={t('Date input mask')}
-                            value={estimate}
-                            defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
-                            onChange={onEstimateChange}
+                        <Controller
+                            name="estimate"
+                            control={control}
+                            render={({ field }) => (
+                                <EstimateComboBox
+                                    locale={locale}
+                                    text={t('Schedule')}
+                                    placeholder={t('Date input mask placeholder')}
+                                    mask={t('Date input mask')}
+                                    defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
+                                    error={errorsResolver(field.name)}
+                                    {...field}
+                                />
+                            )}
                         />
 
-                        {Array.from(tags.values()).length < tagsLimit ? (
-                            <TagCompletion
-                                text="Tags"
-                                filter={Array.from(tags.keys())}
-                                placeholder={t('Enter tag title')}
-                                onAdd={onTagAdd}
-                            />
-                        ) : null}
+                        <Controller
+                            name="tags"
+                            control={control}
+                            render={({ field }) => (
+                                <TagComboBox
+                                    text="Tags"
+                                    disabled={(tagsWatcher || []).length >= tagsLimit}
+                                    placeholder={t('Enter tag title')}
+                                    error={errorsResolver(field.name)}
+                                    {...field}
+                                />
+                            )}
+                        />
                     </FormAction>
                     <FormAction right inline>
-                        <Button
-                            size="m"
-                            view="primary"
-                            type="submit"
-                            disabled={!(isValid && project)}
-                            text={t('Submit')}
-                        />
+                        <Button view="primary" outline={!isValid} type="submit" text={t('Submit')} />
                     </FormAction>
                 </FormActions>
             </Form>

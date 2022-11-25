@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
 import { gql } from '../utils/gql';
 import { TLocale } from '../types/locale';
-import { Project, State, Tag as TagModel, Goal, EstimateInput, Priority } from '../../graphql/@generated/genql';
+import { Goal } from '../../graphql/@generated/genql';
 
 import { GoalForm, GoalFormType } from './GoalForm';
 
@@ -18,68 +16,21 @@ interface GoalEditFormProps {
 
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, locale, onSubmit }) => {
     const t = useTranslations('goals.edit');
-    const { data: session } = useSession();
-    const [title, setTitle] = useState(goal.title);
-    const [description, setDescription] = useState(goal.description);
-    const [owner, setOwner] = useState(goal.owner);
-    const [estimate, setEstimate] = useState<EstimateInput | undefined>(
-        goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
-    );
-    const [project, setProject] = useState(goal.project as Project);
-    const [state, setState] = useState(goal.state as State);
-    const [priority, setPriority] = useState(goal.priority as Priority);
-    const [tags, setTags] = useState(
-        // @ts-ignore
-        new Map<string, TagModel>(goal.tags?.map((t) => (t ? [t.id, t] : null)).filter(Boolean)),
-    );
 
-    const onTitleChange = useCallback(setTitle, [setTitle]);
-    const onDescriptionChange = useCallback(setDescription, [setDescription]);
-    const onOwnerChange = useCallback(setOwner, [setOwner]);
-    const onProjectChange = useCallback(setProject, [setProject]);
-    const onStateChange = useCallback(setState, [setState]);
-    const onPriorityChange = useCallback(setPriority, [setPriority]);
-    const onEstimateChange = useCallback(setEstimate, [setEstimate]);
-    const onTagAdd = useCallback(
-        (tag: TagModel) => {
-            const newTags = new Map(tags);
-            newTags.set(tag.id, tag);
-            setTags(newTags);
-        },
-        [tags],
-    );
-    const onTagDelete = useCallback(
-        (tag: TagModel) => {
-            const newTags = new Map(tags);
-            newTags.delete(tag.id);
-            setTags(newTags);
-        },
-        [tags],
-    );
-
-    useEffect(() => {
-        const defaultState = project?.flow?.states?.filter((s) => s?.default)[0];
-        if (defaultState) {
-            setState(defaultState);
-        }
-    }, [project]);
-
-    const updateGoal = async ({ title, description }: GoalFormType) => {
-        if (!session || !owner?.id || !project?.id) return;
-
+    const updateGoal = async (form: GoalFormType) => {
         const promise = gql.mutation({
             updateGoal: [
                 {
                     data: {
                         id: goal.id,
-                        title,
-                        description,
-                        ownerId: owner.id,
-                        projectId: project.id,
-                        estimate,
-                        stateId: state.id,
-                        priority,
-                        tags: Array.from(tags.values()),
+                        title: form.title,
+                        description: form.description,
+                        ownerId: form.owner.id,
+                        projectId: form.project.id,
+                        stateId: form.state.id,
+                        priority: form.priority,
+                        tags: form.tags,
+                        estimate: form.estimate,
                     },
                 },
                 {
@@ -104,24 +55,15 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, locale, onSubmit }) =
             i18nKeyset="goals.edit"
             locale={locale}
             formTitle={t('Edit the goal')}
-            title={title}
-            description={description}
-            owner={owner!}
-            project={project}
-            state={state}
-            priority={priority}
-            tags={tags}
-            estimate={estimate}
+            title={goal.title}
+            description={goal.description}
+            owner={goal.owner}
+            project={goal.project}
+            state={goal.state}
+            priority={goal.priority}
+            tags={goal.tags}
+            estimate={goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined}
             onSumbit={updateGoal}
-            onTitleChange={onTitleChange}
-            onDescriptionChange={onDescriptionChange}
-            onOwnerChange={onOwnerChange}
-            onProjectChange={onProjectChange}
-            onEstimateChange={onEstimateChange}
-            onStateChange={onStateChange}
-            onPriorityChange={onPriorityChange}
-            onTagAdd={onTagAdd}
-            onTagDelete={onTagDelete}
         />
     );
 };
