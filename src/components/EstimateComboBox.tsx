@@ -5,7 +5,14 @@ import dynamic from 'next/dynamic';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
 import { danger8, danger9, gray6, textColor } from '../design/@generated/themes';
-import { createLocaleDate, quarterFromDate, yearFromDate, endOfQuarter, parseLocaleDate } from '../utils/dateTime';
+import {
+    createLocaleDate,
+    quarterFromDate,
+    yearFromDate,
+    endOfQuarter,
+    parseLocaleDate,
+    formatEstimate,
+} from '../utils/dateTime';
 import { is } from '../utils/styles';
 import { TLocale } from '../types/locale';
 
@@ -142,14 +149,17 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
         useEffect(() => {
             if (changed && isValidDate(inputState)) {
                 const v = createValue(inputState, locale);
+                setButtonText(formatEstimate(v, locale));
 
-                v.date === createLocaleDate(endOfQuarter(v.q), { locale })
-                    ? setButtonText(`${v.q}/${v.y}`)
-                    : setButtonText(v.date);
-
-                onChange && onChange(v);
+                onChange?.(v);
             }
         }, [changed, selectedQ, inputState, locale, onChange]);
+
+        useEffect(() => {
+            if (value) {
+                setButtonText(formatEstimate(createValue(value.date, locale), locale));
+            }
+        }, [value, locale]);
 
         const onCleanClick = useCallback(() => {
             setButtonText(text);
@@ -157,7 +167,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
             const inputVal = value?.date || defaultValuePlaceholder?.date;
             setInputState(inputVal ? createLocaleDate(parseLocaleDate(inputVal, { locale }), { locale }) : '');
             setSelectedQ(defaultValuePlaceholder?.q);
-            onChange && onChange(undefined);
+            onChange?.(undefined);
         }, [defaultValuePlaceholder, text, onChange, setInputState, value?.date, locale]);
 
         return (

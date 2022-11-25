@@ -105,3 +105,19 @@ export const parseLocaleDate = (date: string, { locale }: LocaleArg) => {
 
     return parsers[resolvedLocale](date);
 };
+
+const createValue = (date: string | Date, locale: TLocale) => {
+    const localDate = typeof date === 'object' ? date : parseLocaleDate(date, { locale });
+
+    return {
+        q: quarterFromDate(localDate) as string,
+        y: String(yearFromDate(localDate)),
+        date: createLocaleDate(localDate, { locale }),
+    };
+};
+
+export const formatEstimate = (estimate: ReturnType<typeof createValue>, locale: TLocale) => {
+    const { date, q, y } = createValue(estimate.date, locale);
+
+    return date === createLocaleDate(endOfQuarter(q), { locale }) ? `${q}/${y}` : date;
+};
