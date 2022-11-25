@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import z from 'zod';
@@ -10,14 +10,14 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
-import { Activity, Flow } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
 import { nullable } from '../utils/nullable';
 import { gql } from '../utils/gql';
+import { submitKeys } from '../utils/hotkeys';
+import { errorsProvider } from '../utils/forms';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { TLocale } from '../types/locale';
-import { submitKeys } from '../utils/hotkeys';
 import { routes } from '../hooks/router';
 
 import { Icon } from './Icon';
@@ -28,13 +28,12 @@ import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { UserPic } from './UserPic';
 import { FormTitle } from './FormTitle';
 import { Text } from './Text';
 import { Link } from './Link';
+import { FlowComboBox } from './FlowComboBox';
 
-const UserCompletionDropdown = dynamic(() => import('./UserCompletionDropdown'));
-const FlowCompletion = dynamic(() => import('./FlowCompletion'));
+// const UserCompletionDropdown = dynamic(() => import('./UserComboBox'));
 const ProjectKeyInput = dynamic(() => import('./ProjectKeyInput'));
 
 interface ProjectCreateFormProps {
@@ -43,7 +42,7 @@ interface ProjectCreateFormProps {
     onCreate?: (slug?: string) => void;
 }
 
-const fetcher = createFetcher((_, key: string) => ({
+const flowFetcher = createFetcher(() => ({
     flowRecommended: {
         id: true,
         title: true,
@@ -52,6 +51,8 @@ const fetcher = createFetcher((_, key: string) => ({
             title: true,
         },
     },
+}));
+const projectFetcher = createFetcher((_, key: string) => ({
     project: [
         {
             key,
@@ -80,26 +81,8 @@ const StyledFormBottom = styled.div`
     padding: ${gapS} ${gapS} 0 ${gapS};
 `;
 
-const defaultIndexesFlow = [0, -1, 0, 1, 2, 3];
-const backIndexesFlow = [1, 2, 3, 4, 5, 6];
-
-const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate }) => {
-    const { data: session } = useSession();
-    const [owner, setOwner] = useState({ id: session?.user.activityId, user: session?.user } as Activity);
-    const [flow, setFlow] = useState<Partial<Flow>>();
-    const [projectKey, setProjectKey] = useState('');
-    const [isKeyByUser, setIsKeyByUser] = useState(false);
-    const [indexes, setIndexes] = useState(defaultIndexesFlow);
-    const t = useTranslations('projects.new');
-    const { data } = useSWR([session?.user, projectKey], (...args) => fetcher(...args));
-
-    useEffect(() => {
-        if (data?.flowRecommended) {
-            setFlow(data?.flowRecommended[0]);
-        }
-    }, [data?.flowRecommended]);
-
-    const schema = z.object({
+const schemaProvider = (t: (key: string) => string) =>
+    z.object({
         title: z
             .string({
                 required_error: t("Project's title is required"),
@@ -109,73 +92,72 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
                 message: t("Project's title must be longer than 2 symbols"),
             }),
         description: z.string().optional(),
+        flow: z.object({
+            id: z.string(),
+        }),
+        key: z.string().min(3),
     });
 
-    type FormType = z.infer<typeof schema>;
+export type ProjectFormType = z.infer<ReturnType<typeof schemaProvider>>;
+
+const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate }) => {
+    const { data: session } = useSession();
+    const t = useTranslations('projects.new');
+
+    const schema = schemaProvider(t);
 
     const {
         register,
         handleSubmit,
         watch,
         setFocus,
+        setValue,
+        control,
         formState: { errors, isValid, isSubmitted },
-    } = useForm<FormType>({
+    } = useForm<ProjectFormType>({
         resolver: zodResolver(schema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
     });
 
-    const projectTitleValue = watch('title');
-    useDebouncedEffect(
-        () => {
-            if (!isKeyByUser && projectTitleValue) {
-                setProjectKey(keyPredictor(projectTitleValue));
-            }
-
-            if (projectTitleValue === '') {
-                setProjectKey('');
-            }
-        },
-        500,
-        [projectTitleValue, isKeyByUser],
-    );
-
     useEffect(() => {
         setTimeout(() => setFocus('title'), 0);
     }, [setFocus]);
 
-    const onInputFocus = useCallback(() => {
-        setIndexes(defaultIndexesFlow);
-    }, []);
+    const errorsResolver = errorsProvider(errors, isSubmitted);
+    const titleWatcher = watch('title');
+    const keyWatcher = watch('key');
 
-    const onTextareaFocus = useCallback(() => {
-        setIndexes(backIndexesFlow);
-    }, []);
+    useDebouncedEffect(
+        () => {
+            setValue('key', titleWatcher && titleWatcher !== '' ? keyPredictor(titleWatcher) : '');
+        },
+        300,
+        [setValue, titleWatcher],
+    );
 
-    const onProjectKeyChange = (k: string) => {
-        setIsKeyByUser(true);
-        setProjectKey(k);
-    };
+    const { data: flowData } = useSWR([session?.user], (...args) => flowFetcher(...args));
+    const { data: projectData } = useSWR(
+        keyWatcher && keyWatcher !== '' ? [session?.user, keyWatcher] : null,
+        (...args) => projectFetcher(...args),
+    );
 
-    const onProjectKeyEdited = (k: string) => {
-        if (k === '') {
-            setIsKeyByUser(false);
-            setProjectKey(keyPredictor(projectTitleValue));
+    useEffect(() => {
+        if (flowData?.flowRecommended) {
+            setValue('flow', flowData?.flowRecommended[0]);
         }
-    };
+    }, [setValue, flowData?.flowRecommended]);
 
-    const createProject = async ({ title, description }: FormType) => {
-        if (!session || !owner.id || !flow?.id) return;
-
+    const createProject = async (form: ProjectFormType) => {
         const promise = gql.mutation({
             createProject: [
                 {
                     data: {
-                        key: projectKey,
-                        title,
-                        description,
-                        flowId: flow.id,
+                        key: form.key,
+                        title: form.title,
+                        description: form.description,
+                        flowId: form.flow.id,
                     },
                 },
                 {
@@ -196,17 +178,14 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
         onCreate && onCreate(res.createProject?.key);
     };
 
-    const ownerButtonText = owner?.user?.name || owner?.user?.email || t('Assign');
-    const flowButtonText = flow?.title || t('Flow');
-    const isProjectKeyAvailable = Boolean(data?.project === null);
+    const isProjectKeyAvailable = Boolean(projectData?.project === null);
     const richProps = {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        b: (c: any) => (
+        b: (c: React.ReactNode) => (
             <Text as="span" size="s" weight="bolder">
                 {c}
             </Text>
         ),
-        key: () => projectKey,
+        key: () => keyWatcher,
     };
 
     return (
@@ -219,24 +198,25 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
                         {...register('title')}
                         placeholder={t("Project's title")}
                         flat="bottom"
-                        tabIndex={indexes[0]}
-                        error={isSubmitted ? errors.title : undefined}
-                        onFocus={onInputFocus}
+                        error={errorsResolver('title')}
                     />
 
-                    {nullable(isValid && projectKey, () => (
+                    {nullable(titleWatcher, () => (
                         <StyledProjectKeyContainer>
-                            <ProjectKeyInput
-                                value={projectKey}
-                                onChange={onProjectKeyChange}
-                                onBlur={onProjectKeyEdited}
-                                available={isProjectKeyAvailable}
-                                tooltip={
-                                    isProjectKeyAvailable
-                                        ? t.rich('Perfect! Issues in your project will looks like', richProps)
-                                        : t.rich('Project with key already exists', richProps)
-                                }
-                                tabIndex={indexes[1]}
+                            <Controller
+                                name="key"
+                                control={control}
+                                render={({ field }) => (
+                                    <ProjectKeyInput
+                                        available={isProjectKeyAvailable}
+                                        tooltip={
+                                            isProjectKeyAvailable
+                                                ? t.rich('Perfect! Issues in your project will looks like', richProps)
+                                                : t.rich('Project with key already exists', richProps)
+                                        }
+                                        {...field}
+                                    />
+                                )}
                             />
                         </StyledProjectKeyContainer>
                     ))}
@@ -246,42 +226,27 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
                     {...register('description')}
                     placeholder={t('And its description')}
                     flat="both"
-                    tabIndex={indexes[2]}
-                    error={isSubmitted ? errors.description : undefined}
-                    onFocus={onTextareaFocus}
+                    error={errorsResolver('description')}
                 />
 
                 <FormActions flat="top">
                     <FormAction left inline>
-                        <UserCompletionDropdown
-                            size="m"
-                            text={ownerButtonText}
-                            placeholder={t('Enter name or email')}
-                            query={owner?.user?.name || owner?.user?.email}
-                            userPic={<UserPic src={owner?.user?.image} email={owner?.user?.email} size={16} />}
-                            onClick={(u) => setOwner(u)}
-                            tabIndex={indexes[3]}
-                        />
-
-                        <FlowCompletion
-                            disabled
-                            size="m"
-                            text={flowButtonText}
-                            placeholder={t('Flow or state title')}
-                            query={flow?.title}
-                            onClick={(f) => setFlow(f)}
-                            tabIndex={indexes[4]}
+                        <Controller
+                            name="flow"
+                            control={control}
+                            render={({ field }) => (
+                                <FlowComboBox
+                                    disabled
+                                    text={t('Flow')}
+                                    placeholder={t('Flow or state title')}
+                                    error={errorsResolver(field.name)}
+                                    {...field}
+                                />
+                            )}
                         />
                     </FormAction>
                     <FormAction right inline>
-                        <Button
-                            size="m"
-                            view="primary"
-                            type="submit"
-                            disabled={!(isValid && isProjectKeyAvailable)}
-                            text={t('Create project')}
-                            tabIndex={indexes[5]}
-                        />
+                        <Button view="primary" outline={!isValid} type="submit" text={t('Create project')} />
                     </FormAction>
                 </FormActions>
             </Form>
