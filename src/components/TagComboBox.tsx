@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable react/display-name */
 import React, { useCallback, useState, ChangeEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';

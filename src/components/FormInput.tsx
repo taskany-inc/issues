@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
