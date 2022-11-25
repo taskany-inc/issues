@@ -4,7 +4,7 @@ import { gray4, gray6, radiusM, textColor } from '../design/@generated/themes';
 
 import { UserPic } from './UserPic';
 
-interface UserDropdownItemProps {
+interface UserMenuItemProps {
     name?: string;
     email?: string;
     image?: string;
@@ -14,7 +14,7 @@ interface UserDropdownItemProps {
     onClick?: () => void;
 }
 
-const StyledUserCard = styled.div<Pick<UserDropdownItemProps, 'focused' | 'checked'>>`
+const StyledUserCard = styled.div<Pick<UserMenuItemProps, 'focused' | 'checked'>>`
     box-sizing: border-box;
     display: grid;
     grid-template-columns: 2fr 10fr;
@@ -68,22 +68,13 @@ const StyledUserPick = styled(UserPic)`
     justify-self: center;
 `;
 
-export const UserDropdownItem: React.FC<UserDropdownItemProps> = ({
-    name,
-    email,
-    image,
-    focused,
-    checked,
-    onClick,
-}) => {
-    return (
-        <StyledUserCard onClick={onClick} focused={focused} checked={checked}>
-            <StyledUserPick src={image} size={24} />
+export const UserMenuItem: React.FC<UserMenuItemProps> = ({ name, email, image, focused, checked, onClick }) => (
+    <StyledUserCard onClick={onClick} focused={focused} checked={checked}>
+        <StyledUserPick src={image} size={24} />
 
-            <StyledUserInfo>
-                <StyledUserName>{name}</StyledUserName>
-                <StyledUserEmail>{email}</StyledUserEmail>
-            </StyledUserInfo>
-        </StyledUserCard>
-    );
-};
+        <StyledUserInfo>
+            <StyledUserName>{name}</StyledUserName>
+            <StyledUserEmail>{email}</StyledUserEmail>
+        </StyledUserInfo>
+    </StyledUserCard>
+);
