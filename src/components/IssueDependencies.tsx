@@ -25,7 +25,7 @@ const StyledActionNotice = styled.div`
     padding: ${gapS} 0;
 `;
 
-export const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onChange }) => {
+const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onChange }) => {
     const t = useTranslations('IssueDependencies');
     const issueHasDeps = issue.dependsOn?.length || issue.blocks?.length || issue.relatedTo?.length;
 
@@ -68,3 +68,5 @@ export const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onC
         </>
     );
 };
+
+export default IssueDependencies;
