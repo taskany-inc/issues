@@ -17,7 +17,7 @@ interface IssueParticipantsProps {
     onChange?: React.ComponentProps<typeof IssueParticipantsForm>['onChange'];
 }
 
-export const IssueParticipants: React.FC<IssueParticipantsProps> = ({ issue, onChange }) => {
+const IssueParticipants: React.FC<IssueParticipantsProps> = ({ issue, onChange }) => {
     const t = useTranslations('IssueParticipants');
 
     const onParticipantsEdit = useCallback(() => {
@@ -42,3 +42,5 @@ export const IssueParticipants: React.FC<IssueParticipantsProps> = ({ issue, onC
         </>
     );
 };
+
+export default IssueParticipants;
