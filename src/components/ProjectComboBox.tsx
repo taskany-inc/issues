@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import React, { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';

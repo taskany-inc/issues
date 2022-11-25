@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import React, { useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 

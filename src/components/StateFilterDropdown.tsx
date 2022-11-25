@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';

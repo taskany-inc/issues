@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import InputMask from 'react-input-mask';
