@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled, { css } from 'styled-components';
 
-import { backgroundColor, danger0, gapM, radiusM, warn0 } from '../design/@generated/themes';
+import { backgroundColor, danger0, gapM, gapS, gray3, gray4, radiusM, warn0 } from '../design/@generated/themes';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { usePortal } from '../hooks/usePortal';
 import { nullable } from '../utils/nullable';
@@ -50,7 +50,7 @@ const StyledModal = styled.div<{ view?: ModalViewType }>`
     position: absolute;
     z-index: 101;
 
-    padding: ${gapM};
+    overflow: hidden;
 
     min-width: 300px;
     min-height: 200px;
@@ -83,6 +83,15 @@ const StyledCross = styled.div`
         opacity: 1;
         transition: opacity 200ms ease-in-out;
     }
+`;
+
+export const ModalHeader = styled.div`
+    background-color: ${gray4};
+    padding: ${gapM} ${gapM} ${gapS} ${gapM};
+`;
+
+export const ModalContent = styled.div`
+    padding: ${gapM};
 `;
 
 interface PortalProps {

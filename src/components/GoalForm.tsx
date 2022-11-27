@@ -24,6 +24,8 @@ import { StateDropdown } from './StateDropdown';
 import { PriorityDropdown } from './PriorityDropdown';
 import { Tag } from './Tag';
 import { FormEditor } from './FormEditor';
+import { ModalHeader, ModalContent } from './Modal';
+import { FormTitle } from './FormTitle';
 
 const tagsLimit = 5;
 
@@ -166,126 +168,130 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
     return (
         <>
-            <h2>{formTitle}</h2>
+            <ModalHeader>
+                <FormTitle>{formTitle}</FormTitle>
+            </ModalHeader>
 
-            <Form onSubmit={handleSubmit(onSumbit)} submitHotkey={submitKeys}>
-                <FormInput
-                    {...register('title')}
-                    error={errorsResolver('title')}
-                    placeholder={t("Goal's title")}
-                    autoFocus
-                    flat="bottom"
-                />
+            <ModalContent>
+                <Form onSubmit={handleSubmit(onSumbit)} submitHotkey={submitKeys}>
+                    <FormInput
+                        {...register('title')}
+                        error={errorsResolver('title')}
+                        placeholder={t("Goal's title")}
+                        autoFocus
+                        flat="bottom"
+                    />
 
-                <Controller
-                    name="description"
-                    control={control}
-                    render={({ field }) => (
-                        <FormEditor
-                            flat="both"
-                            placeholder={t('And its description')}
-                            error={errorsResolver(field.name)}
-                            {...field}
-                        />
-                    )}
-                />
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field }) => (
+                            <FormEditor
+                                flat="both"
+                                placeholder={t('And its description')}
+                                error={errorsResolver(field.name)}
+                                {...field}
+                            />
+                        )}
+                    />
 
-                <StyledTagsContainer>
-                    {tagsWatcher?.map((tag) => (
-                        <Tag key={tag.id} title={tag.title} onHide={onTagDeleteProvider(tag)} />
-                    ))}
-                </StyledTagsContainer>
+                    <StyledTagsContainer>
+                        {tagsWatcher?.map((tag) => (
+                            <Tag key={tag.id} title={tag.title} onHide={onTagDeleteProvider(tag)} />
+                        ))}
+                    </StyledTagsContainer>
 
-                <FormActions flat="top">
-                    <FormAction left inline>
-                        <Controller
-                            name="owner"
-                            control={control}
-                            render={({ field }) => (
-                                <UserComboBox
-                                    text={t('Assign')}
-                                    placeholder={t('Enter project title')}
-                                    error={errorsResolver(field.name)}
-                                    {...field}
-                                />
-                            )}
-                        />
+                    <FormActions flat="top">
+                        <FormAction left inline>
+                            <Controller
+                                name="owner"
+                                control={control}
+                                render={({ field }) => (
+                                    <UserComboBox
+                                        text={t('Assign')}
+                                        placeholder={t('Enter project title')}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
 
-                        <Controller
-                            name="project"
-                            control={control}
-                            render={({ field }) => (
-                                <ProjectComboBox
-                                    text={t('Enter project title')}
-                                    placeholder={t('Enter project title')}
-                                    error={errorsResolver(field.name)}
-                                    {...field}
-                                />
-                            )}
-                        />
+                            <Controller
+                                name="project"
+                                control={control}
+                                render={({ field }) => (
+                                    <ProjectComboBox
+                                        text={t('Enter project title')}
+                                        placeholder={t('Enter project title')}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
 
-                        <Controller
-                            name="state"
-                            control={control}
-                            render={({ field }) => (
-                                <StateDropdown
-                                    text={t('State')}
-                                    flowId={projectWatcher?.flowId}
-                                    error={errorsResolver(field.name)}
-                                    {...field}
-                                />
-                            )}
-                        />
+                            <Controller
+                                name="state"
+                                control={control}
+                                render={({ field }) => (
+                                    <StateDropdown
+                                        text={t('State')}
+                                        flowId={projectWatcher?.flowId}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
 
-                        <Controller
-                            name="priority"
-                            control={control}
-                            render={({ field }) => (
-                                <PriorityDropdown
-                                    text={t('Priority.Priority')}
-                                    error={errorsResolver(field.name)}
-                                    {...field}
-                                />
-                            )}
-                        />
+                            <Controller
+                                name="priority"
+                                control={control}
+                                render={({ field }) => (
+                                    <PriorityDropdown
+                                        text={t('Priority.Priority')}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
 
-                        <Controller
-                            name="estimate"
-                            control={control}
-                            render={({ field }) => (
-                                <EstimateComboBox
-                                    locale={locale}
-                                    text={t('Schedule')}
-                                    placeholder={t('Date input mask placeholder')}
-                                    mask={t('Date input mask')}
-                                    defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
-                                    error={errorsResolver(field.name)}
-                                    {...field}
-                                />
-                            )}
-                        />
+                            <Controller
+                                name="estimate"
+                                control={control}
+                                render={({ field }) => (
+                                    <EstimateComboBox
+                                        locale={locale}
+                                        text={t('Schedule')}
+                                        placeholder={t('Date input mask placeholder')}
+                                        mask={t('Date input mask')}
+                                        defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
 
-                        <Controller
-                            name="tags"
-                            control={control}
-                            render={({ field }) => (
-                                <TagComboBox
-                                    text="Tags"
-                                    disabled={(tagsWatcher || []).length >= tagsLimit}
-                                    placeholder={t('Enter tag title')}
-                                    error={errorsResolver(field.name)}
-                                    {...field}
-                                />
-                            )}
-                        />
-                    </FormAction>
-                    <FormAction right inline>
-                        <Button view="primary" outline={!isValid} type="submit" text={t('Submit')} />
-                    </FormAction>
-                </FormActions>
-            </Form>
+                            <Controller
+                                name="tags"
+                                control={control}
+                                render={({ field }) => (
+                                    <TagComboBox
+                                        text="Tags"
+                                        disabled={(tagsWatcher || []).length >= tagsLimit}
+                                        placeholder={t('Enter tag title')}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormAction>
+                        <FormAction right inline>
+                            <Button view="primary" outline={!isValid} type="submit" text={t('Submit')} />
+                        </FormAction>
+                    </FormActions>
+                </Form>
 
-            {children}
+                {children}
+            </ModalContent>
         </>
     );
 };

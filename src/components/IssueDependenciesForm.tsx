@@ -16,6 +16,7 @@ import { MenuItem } from './MenuItem';
 import { GoalMenuItem } from './GoalMenuItem';
 import { Button } from './Button';
 import { Icon } from './Icon';
+import { ModalContent, ModalHeader } from './Modal';
 
 const ComboBox = dynamic(() => import('./ComboBox'));
 const Dropdown = dynamic(() => import('./Dropdown'));
@@ -169,85 +170,93 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
 
     return (
         <>
-            <FormTitle>{t('Edit dependencies')}</FormTitle>
+            <ModalHeader>
+                <FormTitle>{t('Edit dependencies')}</FormTitle>
+            </ModalHeader>
 
-            {Object.values(enumDependency).map((dependency) => (
-                <IssueDependenciesList
-                    key={dependency}
-                    title={t(dependency)}
-                    dependencies={issue[dependency]}
-                    onDelete={onDependencyDelete(dependency)}
-                />
-            ))}
+            <ModalContent>
+                {Object.values(enumDependency).map((dependency) => (
+                    <IssueDependenciesList
+                        key={dependency}
+                        title={t(dependency)}
+                        dependencies={issue[dependency]}
+                        onDelete={onDependencyDelete(dependency)}
+                    />
+                ))}
 
-            <StyledCompletion>
-                <ComboBox
-                    text={query}
-                    value={query}
-                    visible={completionVisible}
-                    items={goalsData?.findGoal}
-                    onChange={onDependencyAdd}
-                    renderInput={(props) => (
-                        <FormInput
-                            autoFocus
-                            placeholder={t('Add dependency')}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                setQuery(e.currentTarget.value);
-                                setCompletionVisible(true);
-                            }}
-                            {...props}
-                        />
-                    )}
-                    renderItem={(props) => (
-                        <GoalMenuItem
-                            key={props.item.id}
-                            id={props.item.id}
-                            title={props.item.title}
-                            focused={props.cursor === props.index}
-                            onClick={props.onClick}
-                        />
-                    )}
-                />
-
-                <StyledDropdownContainer>
-                    <Dropdown
-                        items={depsKindData?.goalDependencyKind}
-                        onChange={onKindChange}
-                        renderTrigger={(props) => (
-                            <Button
-                                disabled={disabled}
-                                view="primary"
-                                outline
-                                brick="right"
-                                iconRight={
-                                    <Icon size="s" noWrap type={props.visible ? 'arrowUpSmall' : 'arrowDownSmall'} />
-                                }
-                                text={kind ? t(kind) : undefined}
-                                ref={props.ref}
-                                onClick={props.onClick}
+                <StyledCompletion>
+                    <ComboBox
+                        text={query}
+                        value={query}
+                        visible={completionVisible}
+                        items={goalsData?.findGoal}
+                        onChange={onDependencyAdd}
+                        renderInput={(props) => (
+                            <FormInput
+                                autoFocus
+                                placeholder={t('Add dependency')}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                    setQuery(e.currentTarget.value);
+                                    setCompletionVisible(true);
+                                }}
+                                {...props}
                             />
                         )}
                         renderItem={(props) => (
-                            <MenuItem
-                                key={props.item}
+                            <GoalMenuItem
+                                key={props.item.id}
+                                id={props.item.id}
+                                title={props.item.title}
                                 focused={props.cursor === props.index}
-                                selected={props.item === kind}
                                 onClick={props.onClick}
-                                view="primary"
-                            >
-                                {t(props.item)}
-                            </MenuItem>
+                            />
                         )}
                     />
-                    <Button
-                        disabled={disabled || !kind}
-                        text={t('Add')}
-                        view="primary"
-                        brick="left"
-                        onClick={onSubmit}
-                    />
-                </StyledDropdownContainer>
-            </StyledCompletion>
+
+                    <StyledDropdownContainer>
+                        <Dropdown
+                            items={depsKindData?.goalDependencyKind}
+                            onChange={onKindChange}
+                            renderTrigger={(props) => (
+                                <Button
+                                    disabled={disabled}
+                                    view="primary"
+                                    outline
+                                    brick="right"
+                                    iconRight={
+                                        <Icon
+                                            size="s"
+                                            noWrap
+                                            type={props.visible ? 'arrowUpSmall' : 'arrowDownSmall'}
+                                        />
+                                    }
+                                    text={kind ? t(kind) : undefined}
+                                    ref={props.ref}
+                                    onClick={props.onClick}
+                                />
+                            )}
+                            renderItem={(props) => (
+                                <MenuItem
+                                    key={props.item}
+                                    focused={props.cursor === props.index}
+                                    selected={props.item === kind}
+                                    onClick={props.onClick}
+                                    view="primary"
+                                >
+                                    {t(props.item)}
+                                </MenuItem>
+                            )}
+                        />
+                        <Button
+                            disabled={disabled || !kind}
+                            text={t('Add')}
+                            view="primary"
+                            brick="left"
+                            onClick={onSubmit}
+                        />
+                    </StyledDropdownContainer>
+                </StyledCompletion>
+            </ModalContent>
         </>
     );
 };
