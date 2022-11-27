@@ -11,7 +11,7 @@ import { State } from '../../graphql/@generated/genql';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import { StateDot } from './StateDot';
-import { StateDropdownItem } from './StateDropdownItem';
+import { ColorizedMenuItem } from './ColorizedMenuItem';
 
 const Dropdown = dynamic(() => import('./Dropdown'));
 
@@ -98,7 +98,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                     />
                 )}
                 renderItem={(props) => (
-                    <StateDropdownItem
+                    <ColorizedMenuItem
                         key={props.item.id}
                         hue={props.item.hue}
                         title={props.item.title}

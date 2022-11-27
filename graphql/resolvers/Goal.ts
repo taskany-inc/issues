@@ -12,6 +12,7 @@ import {
     UserGoalsInput,
     Project,
     priorityKind,
+    priorityColors,
 } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
@@ -283,6 +284,14 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             if (!activity) return null;
 
             return priorityKind;
+        },
+    });
+
+    t.list.int('goalPriorityColors', {
+        resolve: async (_, _args, { activity }) => {
+            if (!activity) return null;
+
+            return priorityColors;
         },
     });
 

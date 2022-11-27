@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import colorLayer from 'color-layer';
 
 import { createFetcher } from '../utils/createFetcher';
+import { pageContext } from '../utils/pageContext';
 import { Priority } from '../../graphql/@generated/genql';
 
 import { Button } from './Button';
-import { MenuItem } from './MenuItem';
+import { StateDot } from './StateDot';
+import { ColorizedMenuItem } from './ColorizedMenuItem';
 
 const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
-    value?: string;
+    value?: string | null;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
     error?: React.ComponentProps<typeof Dropdown>['error'];
 
@@ -23,13 +26,30 @@ interface PriorityDropdownProps {
 
 const fetcher = createFetcher(() => ({
     goalPriorityKind: true,
+    goalPriorityColors: true,
 }));
+
+const mapThemeOnId = { light: 0, dark: 1 };
 
 export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
     ({ text, value, disabled, error, onChange }, ref) => {
         const t = useTranslations('PriorityDropdown');
         const { data: session } = useSession();
+        const { theme } = useContext(pageContext);
+        const [themeId, setThemeId] = useState(0);
+
+        useEffect(() => {
+            theme && setThemeId(mapThemeOnId[theme]);
+        }, [theme]);
+
         const { data } = useSWR('priority', () => fetcher(session?.user));
+
+        const colors = useMemo(
+            () => data?.goalPriorityColors?.map((hue) => colorLayer(hue!, 5, hue === 1 ? 0 : undefined)[themeId]) || [],
+            [themeId, data?.goalPriorityColors],
+        );
+
+        const colorIndex = data?.goalPriorityKind?.indexOf(value || '') ?? -1;
 
         return (
             <Dropdown
@@ -41,17 +61,25 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                 items={data?.goalPriorityKind}
                 disabled={disabled}
                 renderTrigger={(props) => (
-                    <Button ref={props.ref} text={props.text} onClick={props.onClick} disabled={props.disabled} />
+                    <Button
+                        ref={props.ref}
+                        text={props.text}
+                        onClick={props.onClick}
+                        disabled={props.disabled}
+                        iconLeft={
+                            colorIndex !== -1 ? <StateDot hue={data?.goalPriorityColors?.[colorIndex]} /> : undefined
+                        }
+                    />
                 )}
                 renderItem={(props) => (
-                    <MenuItem
+                    <ColorizedMenuItem
                         key={props.item}
+                        hue={data?.goalPriorityColors?.[props.index]}
+                        title={t(`Priority.${props.item}`)}
+                        hoverColor={colors[props.index]}
                         focused={props.cursor === props.index}
-                        selected={props.item === value}
                         onClick={props.onClick}
-                    >
-                        {t(`Priority.${props.item}`)}
-                    </MenuItem>
+                    />
                 )}
             />
         );

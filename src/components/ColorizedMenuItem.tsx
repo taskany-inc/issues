@@ -59,7 +59,7 @@ const StyledItemInfo = styled(Text)`
     padding-left: ${gapS};
 `;
 
-export const StateDropdownItem: React.FC<{
+export const ColorizedMenuItem: React.FC<{
     hue?: number;
     title?: string;
     hoverColor?: string;
