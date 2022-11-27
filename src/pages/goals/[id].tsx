@@ -31,6 +31,7 @@ import { Reactions, ReactionsMap, reactionsGroupsLimit } from '../../components/
 import { Badge } from '../../components/Badge';
 import { commentMask, CommentView } from '../../components/CommentView';
 import { editGoalKeys } from '../../utils/hotkeys';
+import { StateDot } from '../../components/StateDot';
 
 const Md = dynamic(() => import('../../components/Md'));
 const RelativeTime = dynamic(() => import('../../components/RelativeTime'));
@@ -44,6 +45,8 @@ const IssueParticipants = dynamic(() => import('../../components/IssueParticipan
 const refreshInterval = 3000;
 
 const fetcher = createFetcher((_, id: string) => ({
+    goalPriorityColors: true,
+    goalPriorityKind: true,
     goal: [
         {
             id,
@@ -287,7 +290,12 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{ goal: Goal }, { id: string }>) => {
+const GoalPage = ({
+    user,
+    locale,
+    ssrData,
+    params: { id },
+}: ExternalPageProps<{ goal: Goal; goalPriorityKind: string[]; goalPriorityColors: number[] }, { id: string }>) => {
     const t = useTranslations('goals.id');
     const mounted = useMounted(refreshInterval);
     const { asPath } = useRouter();
@@ -302,6 +310,9 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
     const issueEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
     const isUserAllowedToEdit = user?.activityId === goal?.activityId || user?.activityId === goal?.ownerId;
+    const priorityColorIndex = (data || ssrData)?.goalPriorityKind?.indexOf(goal.priority || '') ?? -1;
+    const priorityColor =
+        priorityColorIndex >= 0 ? (data || ssrData)?.goalPriorityColors?.[priorityColorIndex] : undefined;
     // @ts-ignore unexpectable trouble with filter
     const [watcher, setWatcher] = useState(goal.watchers?.filter(({ id }) => id === user.activityId).length > 0);
     const [stargizer, setStargizer] = useState(
@@ -593,6 +604,16 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
 
                         <CardActions>
                             <IssueBaseActions>
+                                {nullable(goal.priority, (ip) => (
+                                    <IssueAction>
+                                        <Button
+                                            ghost
+                                            text={t(`Priority.${ip}`)}
+                                            iconLeft={<StateDot hue={priorityColor} />}
+                                        />
+                                    </IssueAction>
+                                ))}
+
                                 <IssueAction>
                                     <Button
                                         ghost
@@ -610,12 +631,6 @@ const GoalPage = ({ user, locale, ssrData, params: { id } }: ExternalPageProps<{
                                         }
                                     />
                                 </IssueAction>
-
-                                {nullable(goal.priority, (ip) => (
-                                    <IssueAction>
-                                        <Button ghost text={t(`Priority.${ip}`)} />
-                                    </IssueAction>
-                                ))}
 
                                 {nullable(issueEstimate, (ie) => (
                                     <IssueAction>

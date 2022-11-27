@@ -34,7 +34,8 @@ export const Dependency = enumType({
     members: dependencyKind,
 });
 
-export const priorityKind = ['Highest', 'High', 'Medium', 'Low', 'Lowest'];
+export const priorityKind = ['Highest', 'High', 'Medium', 'Low'];
+export const priorityColors = [360, 30, 158, 1];
 export const Priority = enumType({
     name: 'Priority',
     members: priorityKind,

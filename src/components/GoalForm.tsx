@@ -64,7 +64,7 @@ const schemaProvider = (t: (key: string) => string) =>
             hue: z.number(),
             title: z.string(),
         }),
-        priority: z.string(),
+        priority: z.string().nullable().optional(),
         estimate: z
             .object({
                 date: z.string(),

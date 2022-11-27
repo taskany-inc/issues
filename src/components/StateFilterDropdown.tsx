@@ -8,7 +8,7 @@ import { createFetcher } from '../utils/createFetcher';
 import { pageContext } from '../utils/pageContext';
 import { State } from '../../graphql/@generated/genql';
 
-import { StateDropdownItem } from './StateDropdownItem';
+import { ColorizedMenuItem } from './ColorizedMenuItem';
 import { FiltersMenuItem } from './FiltersMenuItem';
 
 const Dropdown = dynamic(() => import('./Dropdown'));
@@ -90,7 +90,7 @@ export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterD
                     </FiltersMenuItem>
                 )}
                 renderItem={(props) => (
-                    <StateDropdownItem
+                    <ColorizedMenuItem
                         key={props.item.id}
                         hue={props.item.hue}
                         title={props.item.title}

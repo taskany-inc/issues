@@ -180,7 +180,6 @@ enum Priority {
   High
   Highest
   Low
-  Lowest
   Medium
 }
 
@@ -240,6 +239,7 @@ type Query {
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
   goalDependencyKind: [String]
+  goalPriorityColors: [Int]
   goalPriorityKind: [String]
   project(key: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]

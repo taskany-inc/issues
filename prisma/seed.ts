@@ -9,7 +9,7 @@ import { keyPredictor } from '../src/utils/keyPredictor';
 const adminEmail = process.env.ADMIN_EMAIL || 'tony@taskany.org';
 const adminPassword = process.env.ADMIN_PASSWORD || 'taskany';
 const tags = ['frontend', 'backend'];
-const priorities = ['Highest', 'High', 'Medium', 'Low', 'Lowest'];
+const priorities = ['Highest', 'High', 'Medium', 'Low'];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
 
