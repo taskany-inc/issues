@@ -31,6 +31,8 @@ import { Text } from '../../../components/Text';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
 import { ProjectStarButton } from '../../../components/ProjectStarButton';
+import { ModalContent, ModalHeader } from '../../../components/Modal';
+import { FormTitle } from '../../../components/FormTitle';
 
 const ModalOnEvent = dynamic(() => import('../../../components/ModalOnEvent'));
 
@@ -322,42 +324,42 @@ const ProjectPage = ({
             </SettingsContent>
 
             <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
-                <Text color={warn0}>
-                    <h2>{t('You are trying to delete project')}</h2>
-                </Text>
+                <ModalHeader>
+                    <FormTitle color={warn0}>{t('You are trying to delete project')}</FormTitle>
+                </ModalHeader>
 
-                <br />
+                <ModalContent>
+                    <Text>
+                        {t.rich('To confirm deleting project please type project key below', {
+                            project: () => <b>{project.title}</b>,
+                        })}
+                    </Text>
 
-                <Text>
-                    {t.rich('To confirm deleting project please type project key below', {
-                        project: () => <b>{project.title}</b>,
-                    })}
-                </Text>
+                    <br />
 
-                <br />
+                    <Form>
+                        <FormInput
+                            flat="bottom"
+                            placeholder={project.key}
+                            autoComplete="off"
+                            onChange={onConfirmationInputChange}
+                        />
 
-                <Form>
-                    <FormInput
-                        flat="bottom"
-                        placeholder={project.key}
-                        autoComplete="off"
-                        onChange={onConfirmationInputChange}
-                    />
-
-                    <FormActions flat="top">
-                        <FormAction left />
-                        <FormAction right inline>
-                            <Button size="m" text={t('Cancel')} onClick={onDeleteCancel} />
-                            <Button
-                                size="m"
-                                view="warning"
-                                disabled={deleteConfirmation !== project.key}
-                                onClick={onProjectDelete}
-                                text={t('Yes, delete it')}
-                            />
-                        </FormAction>
-                    </FormActions>
-                </Form>
+                        <FormActions flat="top">
+                            <FormAction left />
+                            <FormAction right inline>
+                                <Button size="m" text={t('Cancel')} onClick={onDeleteCancel} />
+                                <Button
+                                    size="m"
+                                    view="warning"
+                                    disabled={deleteConfirmation !== project.key}
+                                    onClick={onProjectDelete}
+                                    text={t('Yes, delete it')}
+                                />
+                            </FormAction>
+                        </FormActions>
+                    </Form>
+                </ModalContent>
             </ModalOnEvent>
         </Page>
     );

@@ -32,6 +32,7 @@ import { FormTitle } from './FormTitle';
 import { Text } from './Text';
 import { Link } from './Link';
 import { FlowComboBox } from './FlowComboBox';
+import { ModalContent, ModalHeader } from './Modal';
 
 // const UserCompletionDropdown = dynamic(() => import('./UserComboBox'));
 const ProjectKeyInput = dynamic(() => import('./ProjectKeyInput'));
@@ -190,78 +191,85 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
 
     return (
         <>
-            <FormTitle>{t('Create new project')}</FormTitle>
+            <ModalHeader>
+                <FormTitle>{t('Create new project')}</FormTitle>
+            </ModalHeader>
 
-            <Form onSubmit={handleSubmit(createProject)} submitHotkey={submitKeys}>
-                <StyledProjectTitleContainer>
-                    <FormInput
-                        {...register('title')}
-                        placeholder={t("Project's title")}
-                        flat="bottom"
-                        error={errorsResolver('title')}
+            <ModalContent>
+                <Form onSubmit={handleSubmit(createProject)} submitHotkey={submitKeys}>
+                    <StyledProjectTitleContainer>
+                        <FormInput
+                            {...register('title')}
+                            placeholder={t("Project's title")}
+                            flat="bottom"
+                            error={errorsResolver('title')}
+                        />
+
+                        {nullable(titleWatcher, () => (
+                            <StyledProjectKeyContainer>
+                                <Controller
+                                    name="key"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <ProjectKeyInput
+                                            available={isProjectKeyAvailable}
+                                            tooltip={
+                                                isProjectKeyAvailable
+                                                    ? t.rich(
+                                                          'Perfect! Issues in your project will looks like',
+                                                          richProps,
+                                                      )
+                                                    : t.rich('Project with key already exists', richProps)
+                                            }
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </StyledProjectKeyContainer>
+                        ))}
+                    </StyledProjectTitleContainer>
+
+                    <FormTextarea
+                        {...register('description')}
+                        placeholder={t('And its description')}
+                        flat="both"
+                        error={errorsResolver('description')}
                     />
 
-                    {nullable(titleWatcher, () => (
-                        <StyledProjectKeyContainer>
+                    <FormActions flat="top">
+                        <FormAction left inline>
                             <Controller
-                                name="key"
+                                name="flow"
                                 control={control}
                                 render={({ field }) => (
-                                    <ProjectKeyInput
-                                        available={isProjectKeyAvailable}
-                                        tooltip={
-                                            isProjectKeyAvailable
-                                                ? t.rich('Perfect! Issues in your project will look like', richProps)
-                                                : t.rich('Project with key already exists', richProps)
-                                        }
+                                    <FlowComboBox
+                                        disabled
+                                        text={t('Flow')}
+                                        placeholder={t('Flow or state title')}
+                                        error={errorsResolver(field.name)}
                                         {...field}
                                     />
                                 )}
                             />
-                        </StyledProjectKeyContainer>
-                    ))}
-                </StyledProjectTitleContainer>
+                        </FormAction>
+                        <FormAction right inline>
+                            <Button view="primary" outline={!isValid} type="submit" text={t('Create project')} />
+                        </FormAction>
+                    </FormActions>
+                </Form>
 
-                <FormTextarea
-                    {...register('description')}
-                    placeholder={t('And its description')}
-                    flat="both"
-                    error={errorsResolver('description')}
-                />
+                <StyledFormBottom>
+                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                        {t.rich('Press key to create the project', {
+                            key: () => <Keyboard command enter />,
+                        })}
+                    </Tip>
 
-                <FormActions flat="top">
-                    <FormAction left inline>
-                        <Controller
-                            name="flow"
-                            control={control}
-                            render={({ field }) => (
-                                <FlowComboBox
-                                    disabled
-                                    text={t('Flow')}
-                                    placeholder={t('Flow or state title')}
-                                    error={errorsResolver(field.name)}
-                                    {...field}
-                                />
-                            )}
-                        />
-                    </FormAction>
-                    <FormAction right inline>
-                        <Button view="primary" outline={!isValid} type="submit" text={t('Create project')} />
-                    </FormAction>
-                </FormActions>
-            </Form>
-
-            <StyledFormBottom>
-                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
-                    {t.rich('Press key to create the project', {
-                        key: () => <Keyboard command enter />,
-                    })}
-                </Tip>
-
-                <Link href={routes.help(locale, 'projects')}>
-                    <Icon type="question" size="s" color={gray6} />
-                </Link>
-            </StyledFormBottom>
+                    <Link href={routes.help(locale, 'projects')}>
+                        <Icon type="question" size="s" color={gray6} />
+                    </Link>
+                </StyledFormBottom>
+            </ModalContent>
         </>
     );
 };

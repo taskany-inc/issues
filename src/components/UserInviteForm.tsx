@@ -22,6 +22,7 @@ import { FormTitle } from './FormTitle';
 import { Tag } from './Tag';
 import { Text } from './Text';
 import { Link } from './Link';
+import { ModalContent, ModalHeader } from './Modal';
 
 interface UserInviteFormProps {
     locale: TLocale;
@@ -126,63 +127,67 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
 
     return (
         <>
-            <FormTitle>{t('Invite new users')}</FormTitle>
+            <ModalHeader>
+                <FormTitle>{t('Invite new users')}</FormTitle>
+            </ModalHeader>
 
-            <StyledEmails>
-                {isValid ? (
-                    <>
-                        {emails.map((email) => (
-                            <Tag key={email} title={email} onHide={onEmailRemove(email)} />
-                        ))}
-                    </>
-                ) : (
-                    <Text size="s" color={gray7}>
-                        {t.rich('Start typing users emails', {
-                            key1: () => <Keyboard enter />,
-                            key2: () => <Keyboard space />,
+            <ModalContent>
+                <StyledEmails>
+                    {isValid ? (
+                        <>
+                            {emails.map((email) => (
+                                <Tag key={email} title={email} onHide={onEmailRemove(email)} />
+                            ))}
+                        </>
+                    ) : (
+                        <Text size="s" color={gray7}>
+                            {t.rich('Start typing users emails', {
+                                key1: () => <Keyboard enter />,
+                                key2: () => <Keyboard space />,
+                            })}
+                        </Text>
+                    )}
+                </StyledEmails>
+
+                <Form>
+                    <FormInput
+                        ref={inputRef}
+                        value={inputValue}
+                        error={error}
+                        placeholder={t('Users emails')}
+                        autoFocus
+                        flat="bottom"
+                        onChange={onInputChange}
+                        onKeyDown={onInputKeyDown}
+                    />
+
+                    <FormActions flat="top">
+                        <FormAction left />
+                        <FormAction right inline>
+                            <Button
+                                size="m"
+                                view="primary"
+                                type="submit"
+                                disabled={!isValid}
+                                text={t('Send invites')}
+                                onClick={inviteUser}
+                            />
+                        </FormAction>
+                    </FormActions>
+                </Form>
+
+                <StyledFormBottom>
+                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                        {t.rich('Press key to send invites', {
+                            key: () => <Keyboard command enter />,
                         })}
-                    </Text>
-                )}
-            </StyledEmails>
+                    </Tip>
 
-            <Form>
-                <FormInput
-                    ref={inputRef}
-                    value={inputValue}
-                    error={error}
-                    placeholder={t('Users emails')}
-                    autoFocus
-                    flat="bottom"
-                    onChange={onInputChange}
-                    onKeyDown={onInputKeyDown}
-                />
-
-                <FormActions flat="top">
-                    <FormAction left />
-                    <FormAction right inline>
-                        <Button
-                            size="m"
-                            view="primary"
-                            type="submit"
-                            disabled={!isValid}
-                            text={t('Send invites')}
-                            onClick={inviteUser}
-                        />
-                    </FormAction>
-                </FormActions>
-            </Form>
-
-            <StyledFormBottom>
-                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
-                    {t.rich('Press key to send invites', {
-                        key: () => <Keyboard command enter />,
-                    })}
-                </Tip>
-
-                <Link href={routes.help(locale, 'users')}>
-                    <Icon type="question" size="s" color={gray6} />
-                </Link>
-            </StyledFormBottom>
+                    <Link href={routes.help(locale, 'users')}>
+                        <Icon type="question" size="s" color={gray6} />
+                    </Link>
+                </StyledFormBottom>
+            </ModalContent>
         </>
     );
 };
