@@ -178,7 +178,7 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
         onCreate && onCreate(res.createProject?.key);
     };
 
-    const isProjectKeyAvailable = Boolean(projectData?.project === null);
+    const isProjectKeyAvailable = Boolean(projectData?.project === null || !projectData);
     const richProps = {
         b: (c: React.ReactNode) => (
             <Text as="span" size="s" weight="bolder">
@@ -211,7 +211,7 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
                                         available={isProjectKeyAvailable}
                                         tooltip={
                                             isProjectKeyAvailable
-                                                ? t.rich('Perfect! Issues in your project will looks like', richProps)
+                                                ? t.rich('Perfect! Issues in your project will look like', richProps)
                                                 : t.rich('Project with key already exists', richProps)
                                         }
                                         {...field}

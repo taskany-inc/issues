@@ -23,7 +23,7 @@
             "Pro tip!": "Держи совет!",
             "Press key to create the project": "Нажми <key></key> чтобы создать проект.",
             "Project with key already exists": "Проект с ключом <b><key></key></b> уже существует. Попробуйте любой другой.",
-            "Perfect! Issues in your project will looks like": "<b>Супер!</b> Задачи в вашем проекте будут выглядеть примерно так: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>.",
+            "Perfect! Issues in your project will look like": "<b>Супер!</b> Задачи в вашем проекте будут выглядеть примерно так: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>.",
             "Assign": "Ответственный",
             "Enter name or email": "Имя или почта",
             "Flow": "Флоу",
