@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
 import { backgroundColor, gapM, radiusM } from '../design/@generated/themes';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
-import { usePortal } from '../hooks/usePortal';
 import { nullable } from '../utils/nullable';
 
-import { Icon } from './Icon';
+import { ModalCross } from './Modal';
+import { Portal } from './Portal';
 
 interface ModalPreviewProps {
     children: React.ReactNode;
@@ -39,34 +38,6 @@ const StyledModal = styled.div`
 
     box-shadow: -10px 0px 20px 15px rgb(0 0 0 / 30%);
 `;
-
-const StyledCross = styled.div`
-    position: absolute;
-    z-index: 102;
-    right: ${gapM};
-    top: ${gapM};
-
-    width: 20px;
-    height: 20px;
-
-    opacity: 0.6;
-
-    cursor: pointer;
-
-    text-align: center;
-
-    &:hover {
-        opacity: 1;
-        transition: opacity 200ms ease-in-out;
-    }
-`;
-
-interface PortalProps {
-    id: string;
-    children: React.ReactNode;
-}
-
-const Portal: React.FC<PortalProps> = ({ id, children }) => createPortal(children, usePortal(id));
 
 export const ModalPreview: React.FC<ModalPreviewProps> = ({ visible, children, onClose, onShow }) => {
     const [focused, setFocused] = useState(false);
@@ -103,9 +74,7 @@ export const ModalPreview: React.FC<ModalPreviewProps> = ({ visible, children, o
                 <Portal id="modalPreview">
                     <StyledModal onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...onESC}>
                         {nullable(onClose, () => (
-                            <StyledCross onClick={onClose}>
-                                <Icon type="cross" size="s" />
-                            </StyledCross>
+                            <ModalCross onClick={onClose} />
                         ))}
                         {children}
                     </StyledModal>

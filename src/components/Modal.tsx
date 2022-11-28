@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import styled, { css } from 'styled-components';
 
 import { backgroundColor, danger0, gapM, gapS, gray4, radiusM, warn0 } from '../design/@generated/themes';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
-import { usePortal } from '../hooks/usePortal';
 import { nullable } from '../utils/nullable';
 
 import { Icon } from './Icon';
+import { Portal } from './Portal';
 
 type ModalViewType = 'default' | 'warn' | 'danger';
 
@@ -86,6 +85,12 @@ const StyledCross = styled.div`
     }
 `;
 
+export const ModalCross: React.FC<{ onClick?: () => void }> = ({ onClick }) => (
+    <StyledCross onClick={onClick}>
+        <Icon type="cross" size="s" />
+    </StyledCross>
+);
+
 export const ModalHeader = styled.div`
     z-index: 2;
 
@@ -103,13 +108,6 @@ export const ModalContent = styled.div`
 
     padding: ${gapM};
 `;
-
-interface PortalProps {
-    id: string;
-    children: React.ReactNode;
-}
-
-const Portal: React.FC<PortalProps> = ({ id, children }) => createPortal(children, usePortal(id));
 
 export const Modal: React.FC<ModalProps> = ({ visible, view, children, width = 800, onClose, onShow }) => {
     const [onESC] = useKeyboard([KeyCode.Escape], () => onClose?.(), {
@@ -137,9 +135,7 @@ export const Modal: React.FC<ModalProps> = ({ visible, view, children, width = 8
                     <StyledModalSurface>
                         <StyledModal view={view} style={{ width: `${width}px` }} {...onESC}>
                             {nullable(onClose, () => (
-                                <StyledCross onClick={onClose}>
-                                    <Icon type="cross" size="s" />
-                                </StyledCross>
+                                <ModalCross onClick={onClose} />
                             ))}
                             {children}
                         </StyledModal>
