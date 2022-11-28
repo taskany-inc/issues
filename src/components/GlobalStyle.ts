@@ -16,6 +16,7 @@ export const GlobalStyle = createGlobalStyle`
         height: 100%;
 
         background-color: ${backgroundColor};
+        --background-color-context: ${backgroundColor};
     }
 
     // https://cdn.jsdelivr.net/npm/katex@0.15.0/dist/katex.min.css

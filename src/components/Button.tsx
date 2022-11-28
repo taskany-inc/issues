@@ -256,6 +256,7 @@ const StyledButton = styled(
         { ghost: true },
         css`
             border-color: transparent;
+            background-color: ${gray5};
         `,
     )}
 `;
