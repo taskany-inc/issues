@@ -1,23 +1,22 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
 
-import { Goal, State, GoalUpdateInput, GoalDependencyToggleInput } from '../../../graphql/@generated/genql';
+import { Goal, State, GoalDependencyToggleInput } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
-import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { formatEstimate } from '../../utils/dateTime';
 import { nullable } from '../../utils/nullable';
+import { editGoalKeys } from '../../utils/hotkeys';
+import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
 import { gapL, gapM, gapS } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
-import { Tag } from '../../components/Tag';
 import { PageSep } from '../../components/PageSep';
 import { Link } from '../../components/Link';
 import { Card, CardInfo, CardContent, CardActions } from '../../components/Card';
@@ -29,10 +28,14 @@ import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
 import { Reactions, ReactionsMap, reactionsGroupsLimit } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
-import { commentMask, CommentView } from '../../components/CommentView';
-import { editGoalKeys } from '../../utils/hotkeys';
+import { CommentView } from '../../components/CommentView';
 import { StateDot } from '../../components/StateDot';
+import { IssueProject } from '../../components/IssueProject';
+import { IssueTags } from '../../components/IssueTags';
+import { useHighlightedComment } from '../../hooks/useHighlightedComment';
+import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 
+const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
 const RelativeTime = dynamic(() => import('../../components/RelativeTime'));
 const ModalOnEvent = dynamic(() => import('../../components/ModalOnEvent'));
@@ -41,177 +44,6 @@ const CommentCreateForm = dynamic(() => import('../../components/CommentCreateFo
 const ReactionsDropdown = dynamic(() => import('../../components/ReactionsDropdown'));
 const IssueDependencies = dynamic(() => import('../../components/IssueDependencies'));
 const IssueParticipants = dynamic(() => import('../../components/IssueParticipants'));
-
-const refreshInterval = 3000;
-
-const fetcher = createFetcher((_, id: string) => ({
-    goalPriorityColors: true,
-    goalPriorityKind: true,
-    goal: [
-        {
-            id,
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            activityId: true,
-            ownerId: true,
-            state: {
-                id: true,
-                title: true,
-                hue: true,
-            },
-            priority: true,
-            estimate: {
-                date: true,
-                q: true,
-                y: true,
-            },
-            createdAt: true,
-            updatedAt: true,
-            project: {
-                id: true,
-                key: true,
-                title: true,
-                description: true,
-                flowId: true,
-                flow: {
-                    id: true,
-                    states: {
-                        id: true,
-                        title: true,
-                        default: true,
-                        hue: true,
-                    },
-                },
-            },
-            activity: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            owner: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            tags: {
-                id: true,
-                title: true,
-                description: true,
-            },
-            reactions: {
-                id: true,
-                emoji: true,
-                activity: {
-                    user: {
-                        id: true,
-                        name: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-            },
-            watchers: {
-                id: true,
-            },
-            stargizers: {
-                id: true,
-            },
-            dependsOn: {
-                id: true,
-                title: true,
-                state: {
-                    id: true,
-                    title: true,
-                    hue: true,
-                },
-            },
-            relatedTo: {
-                id: true,
-                title: true,
-                state: {
-                    id: true,
-                    title: true,
-                    hue: true,
-                },
-            },
-            blocks: {
-                id: true,
-                title: true,
-                state: {
-                    id: true,
-                    title: true,
-                    hue: true,
-                },
-            },
-            comments: {
-                id: true,
-                description: true,
-                createdAt: true,
-                activity: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                reactions: {
-                    id: true,
-                    emoji: true,
-                    activity: {
-                        user: {
-                            id: true,
-                            name: true,
-                        },
-                        ghost: {
-                            id: true,
-                            email: true,
-                        },
-                    },
-                },
-            },
-            participants: {
-                id: true,
-                user: {
-                    id: true,
-                    email: true,
-                    name: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-        },
-    ],
-}));
 
 const IssueHeader = styled(PageContent)`
     display: grid;
@@ -244,17 +76,13 @@ const ActionButton = styled(Button)`
     margin-left: ${gapS};
 `;
 
-const IssueAction = styled.div`
-    margin-right: ${gapS};
-`;
-
 const IssueBaseActions = styled.div`
     display: flex;
     align-items: center;
-`;
 
-const StyledIssueTags = styled.span`
-    padding-left: ${gapS};
+    & > * {
+        margin-right: ${gapS};
+    }
 `;
 
 const StyledActivityFeed = styled.div`
@@ -263,18 +91,12 @@ const StyledActivityFeed = styled.div`
     row-gap: ${gapM};
 `;
 
-const IssueTags: React.FC<{ tags: Goal['tags'] }> = ({ tags }) => (
-    <StyledIssueTags>
-        {tags?.map((tag) => nullable(tag, (t) => <Tag key={t.id} title={t.title} description={t.description} />))}
-    </StyledIssueTags>
-);
-
 const StyledIssueDeps = styled.div``;
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { id } }) => {
         const ssrProps = {
-            ssrData: await fetcher(user, id),
+            ssrData: await goalFetcher(user, id),
         };
 
         if (!ssrProps.ssrData.goal) {
@@ -298,13 +120,11 @@ const GoalPage = ({
 }: ExternalPageProps<{ goal: Goal; goalPriorityKind: string[]; goalPriorityColors: number[] }, { id: string }>) => {
     const t = useTranslations('goals.id');
     const mounted = useMounted(refreshInterval);
-    const { asPath } = useRouter();
 
-    const { data, mutate } = useSWR(mounted ? [user, id] : null, (...args) => fetcher(...args), {
+    const { data, mutate } = useSWR(mounted ? [user, id] : null, (...args) => goalFetcher(...args), {
         refreshInterval,
     });
     const refresh = useCallback(() => mutate(), [mutate]);
-
     // NB: this line is compensation for first render before delayed swr will bring updates
     const goal: Goal = data?.goal ?? ssrData.goal;
 
@@ -320,24 +140,8 @@ const GoalPage = ({
         goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
     );
     const [commentFormFocus, setCommentFormFocus] = useState(false);
-    const [highlightCommentId, setHighlightCommentId] = useState<string | undefined>(undefined);
-
-    useEffect(() => {
-        let tId: NodeJS.Timeout;
-        if (highlightCommentId) {
-            tId = setTimeout(() => setHighlightCommentId(undefined), 1000);
-        }
-
-        return () => clearInterval(tId);
-    }, [highlightCommentId]);
-
-    useEffect(() => {
-        const targetComment = asPath.split(`#${commentMask}`)[1];
-
-        if (targetComment) {
-            setHighlightCommentId(targetComment);
-        }
-    }, [asPath]);
+    const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
+    const updateGoal = useGoalUpdate(t, goal);
 
     const grouppedReactions = useMemo(
         () =>
@@ -360,42 +164,15 @@ const GoalPage = ({
     );
     const reactionsGroupsNames = Object.keys(grouppedReactions || {});
 
-    const triggerUpdate = useCallback(
-        (data: Partial<GoalUpdateInput>) => {
-            const promise = gql.mutation({
-                updateGoal: [
-                    {
-                        data: {
-                            ...data,
-                            id: goal.id,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
-            });
-
-            toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are updating the goal'),
-                success: t('Voila! Goal is up to date 🎉'),
-            });
-
-            return promise;
-        },
-        [t, goal],
-    );
-
-    const onIssueStateChange = useCallback(
+    const onGoalStateChange = useCallback(
         async (state: State) => {
-            await triggerUpdate({
+            await updateGoal({
                 stateId: state.id,
             });
 
             refresh();
         },
-        [triggerUpdate, refresh],
+        [updateGoal, refresh],
     );
 
     const onWatchToggle = useCallback(async () => {
@@ -479,13 +256,13 @@ const GoalPage = ({
 
     const onParticipantsChange = useCallback(
         async (participants: string[]) => {
-            await triggerUpdate({
+            await updateGoal({
                 participants,
             });
 
             refresh();
         },
-        [refresh, triggerUpdate],
+        [refresh, updateGoal],
     );
 
     const onDependenciesChange = useCallback(
@@ -547,18 +324,25 @@ const GoalPage = ({
             <IssueHeader>
                 <StyledIssueInfo align="left">
                     <IssueKey id={goal.id}>
-                        <IssueTags tags={goal.tags} />
+                        {nullable(goal.tags, (tags) => (
+                            <IssueTags tags={tags} />
+                        ))}
                     </IssueKey>
 
-                    <IssueTitle title={goal.title} project={goal.project} />
+                    {nullable(goal.project, (project) => (
+                        <IssueProject project={project} />
+                    ))}
+
+                    <IssueTitle title={goal.title} />
+
+                    {nullable(goal.state, (s) => (
+                        <StateSwitch state={s} flowId={goal.project?.flowId} onClick={onGoalStateChange} />
+                    ))}
 
                     <IssueStats
                         locale={locale}
-                        flow={goal.project?.flow?.id}
-                        state={goal.state}
                         comments={goal.comments?.length || 0}
                         updatedAt={goal.updatedAt}
-                        onStateChange={onIssueStateChange}
                         onCommentsClick={onCommentLinkClick}
                     />
                 </StyledIssueInfo>
@@ -605,49 +389,37 @@ const GoalPage = ({
                         <CardActions>
                             <IssueBaseActions>
                                 {nullable(goal.priority, (ip) => (
-                                    <IssueAction>
-                                        <Button
-                                            ghost
-                                            text={t(`Priority.${ip}`)}
-                                            iconLeft={<StateDot hue={priorityColor} />}
-                                        />
-                                    </IssueAction>
-                                ))}
-
-                                <IssueAction>
                                     <Button
                                         ghost
-                                        text={
-                                            goal.owner?.user?.name ||
-                                            goal.owner?.user?.email ||
-                                            goal.owner?.ghost?.email
-                                        }
-                                        iconLeft={
-                                            <UserPic
-                                                src={goal.owner?.user?.image}
-                                                email={goal.owner?.user?.email || goal.owner?.ghost?.email}
-                                                size={16}
-                                            />
-                                        }
+                                        text={t(`Priority.${ip}`)}
+                                        iconLeft={<StateDot hue={priorityColor} />}
                                     />
-                                </IssueAction>
-
-                                {nullable(issueEstimate, (ie) => (
-                                    <IssueAction>
-                                        <Button ghost text={formatEstimate(ie, locale)} />
-                                    </IssueAction>
                                 ))}
 
-                                <IssueAction>
-                                    <Reactions
-                                        reactions={grouppedReactions}
-                                        onClick={onReactionsToggle({ goalId: goal.id })}
-                                    >
-                                        {nullable(reactionsGroupsNames.length < reactionsGroupsLimit, () => (
-                                            <ReactionsDropdown onClick={onReactionsToggle({ goalId: goal.id })} />
-                                        ))}
-                                    </Reactions>
-                                </IssueAction>
+                                <Button
+                                    ghost
+                                    text={goal.owner?.user?.name || goal.owner?.user?.email || goal.owner?.ghost?.email}
+                                    iconLeft={
+                                        <UserPic
+                                            src={goal.owner?.user?.image}
+                                            email={goal.owner?.user?.email || goal.owner?.ghost?.email}
+                                            size={16}
+                                        />
+                                    }
+                                />
+
+                                {nullable(issueEstimate, (ie) => (
+                                    <Button ghost text={formatEstimate(ie, locale)} />
+                                ))}
+
+                                <Reactions
+                                    reactions={grouppedReactions}
+                                    onClick={onReactionsToggle({ goalId: goal.id })}
+                                >
+                                    {nullable(reactionsGroupsNames.length < reactionsGroupsLimit, () => (
+                                        <ReactionsDropdown onClick={onReactionsToggle({ goalId: goal.id })} />
+                                    ))}
+                                </Reactions>
                             </IssueBaseActions>
 
                             {nullable(isUserAllowedToEdit, () => (

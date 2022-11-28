@@ -83,7 +83,7 @@ const StyledPopupContainer = styled.div<{
 }>`
     position: relative;
 
-    background: ${backgroundColor};
+    background: var(--background-color-context);
 
     border-radius: ${radiusS};
 

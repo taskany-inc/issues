@@ -33,7 +33,7 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     const [modalContextProps, setModalContextProps] = useState(null);
     const onModalClose = useCallback(() => {
         setModalVisibility(false);
-        onClose && onClose();
+        onClose?.();
     }, [setModalVisibility, onClose]);
 
     useEffect(() => {

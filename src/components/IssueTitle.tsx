@@ -1,45 +1,24 @@
+import React from 'react';
 import styled from 'styled-components';
-import { useTranslations } from 'next-intl';
-import NextLink from 'next/link';
 
-import { gapM, gapS, gray9 } from '../design/@generated/themes';
-import { routes } from '../hooks/router';
+import { gapS } from '../design/@generated/themes';
 
 import { Text } from './Text';
-import { Link } from './Link';
 
 interface IssueTitleProps {
     title: string;
-    project?: {
-        key: string;
-        title: string;
-    };
+    size?: React.ComponentProps<typeof Text>['size'];
 }
 
-const StyledIssueTitle = styled.div``;
-const StyledIssueProjectTitle = styled(Text)`
-    padding-top: ${gapM};
-`;
-const StyledIssueTitleText = styled(Text)`
+const StyledIssueTitleText = styled(({ forwardRef, ...props }) => <Text forwardRef={forwardRef} {...props} />)`
     padding-top: ${gapS};
+    padding-bottom: ${gapS};
 `;
 
-export const IssueTitle: React.FC<IssueTitleProps> = ({ title, project }) => {
-    const t = useTranslations('IssueTitle');
-
+export const IssueTitle = React.forwardRef<HTMLDivElement, IssueTitleProps>(({ title, size = 'xxl' }, ref) => {
     return (
-        <StyledIssueTitle>
-            {project ? (
-                <StyledIssueProjectTitle size="l" weight="bold" color={gray9}>
-                    {t('Project')} —{' '}
-                    <NextLink passHref href={routes.project(project.key)}>
-                        <Link inline>{project.title}</Link>
-                    </NextLink>
-                </StyledIssueProjectTitle>
-            ) : null}
-            <StyledIssueTitleText size="xxl" weight="bolder">
-                {title}
-            </StyledIssueTitleText>
-        </StyledIssueTitle>
+        <StyledIssueTitleText forwardRef={ref} size={size} weight="bolder">
+            {title}
+        </StyledIssueTitleText>
     );
-};
+});

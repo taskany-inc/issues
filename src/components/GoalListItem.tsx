@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import { MouseEventHandler } from 'react';
+import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -29,9 +30,12 @@ interface GoalListItemProps {
     comments?: number;
     hasForks?: boolean;
     isNotViewed?: boolean;
+    focused?: boolean;
+
+    onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
 
-const StyledGoal = styled.a`
+const StyledGoal = styled.a<{ focused?: boolean }>`
     display: grid;
     grid-template-columns: 15px 30px 600px repeat(3, 40px);
     align-items: center;
@@ -48,6 +52,12 @@ const StyledGoal = styled.a`
     &:visited {
         color: ${textColor};
     }
+
+    ${({ focused }) =>
+        focused &&
+        css`
+            background-color: ${gray4};
+        `}
 
     padding: ${gapM} 20px;
     margin: 0 -20px;
@@ -127,12 +137,14 @@ export const GoalListItem: React.FC<GoalListItemProps> = ({
     isNotViewed,
     state,
     locale,
+    focused,
+    onClick,
 }) => {
     const t = useTranslations('goals.item');
 
     return (
         <Link href={routes.goal(id)} passHref>
-            <StyledGoal>
+            <StyledGoal focused={focused} onClick={onClick}>
                 <StyledNotViewed>{isNotViewed && <StyledNotViewedDot />}</StyledNotViewed>
                 <StyledState>
                     {nullable(state, (s) => (

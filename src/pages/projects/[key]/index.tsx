@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { MouseEventHandler, useCallback, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
@@ -21,6 +21,7 @@ import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { FiltersPanel } from '../../../components/FiltersPanel';
 import { defaultLimit } from '../../../components/LimitFilterDropdown';
 import { useUrlParams } from '../../../hooks/useUrlParams';
+import GoalPreview from '../../../components/GoalPreview';
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
@@ -213,6 +214,8 @@ const ProjectPage = ({
     const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(router.query.search as string).toString());
     const [limitFilter, setLimitFilter] = useState(Number(router.query.limit) || defaultLimit);
 
+    const [preview, setPreview] = useState<Goal | null>(null);
+
     const { data, setSize, size } = useSWRInfinite(
         (index: number) => ({
             offset: index * limitFilter,
@@ -241,6 +244,21 @@ const ProjectPage = ({
     }, []);
 
     useUrlParams(stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
+
+    const onGoalPrewiewShow = useCallback(
+        (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
+            (e) => {
+                if (e.metaKey || e.ctrlKey) return;
+
+                e.preventDefault();
+                setPreview(goal);
+            },
+        [],
+    );
+
+    const onGoalPreviewClose = useCallback(() => {
+        setPreview(null);
+    }, []);
 
     return (
         <Page
@@ -312,6 +330,7 @@ const ProjectPage = ({
                             tags={g.tags}
                             comments={g.comments?.length}
                             key={g.id}
+                            onClick={onGoalPrewiewShow(g)}
                         />
                     )),
                 )}
@@ -320,6 +339,10 @@ const ProjectPage = ({
                     {shouldRenderMoreButton && <Button text={t('Load more')} onClick={() => setSize(size + 1)} />}
                 </StyledLoadMore>
             </StyledGoalsList>
+
+            {nullable(preview, (p) => (
+                <GoalPreview locale={locale} goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
+            ))}
         </Page>
     );
 };

@@ -42,11 +42,15 @@ interface TextProps extends HTMLAttributes<HTMLOrSVGElement> {
     size?: keyof typeof textSizes;
     weight?: keyof typeof textWeight;
     color?: string;
+    as?: string;
+    forwardRef?: React.RefObject<any>;
     children?: React.ReactNode;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const Text = styled(({ color, weight, size, ...props }: TextProps) => <div {...props} />)<TextProps>`
+export const Text = styled(({ forwardRef, color, weight, size, ...props }: TextProps) => (
+    <div ref={forwardRef} {...props} />
+))<TextProps>`
     font-size: 16px;
     font-family: ${fontDisplay};
     color: ${textColor};

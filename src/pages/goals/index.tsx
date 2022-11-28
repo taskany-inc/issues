@@ -1,11 +1,12 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { MouseEventHandler, useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
-import { Project } from '../../../graphql/@generated/genql';
+import { Goal, Project } from '../../../graphql/@generated/genql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Page, PageContent } from '../../components/Page';
@@ -19,6 +20,8 @@ import { Text } from '../../components/Text';
 import { PageSep } from '../../components/PageSep';
 import { Button } from '../../components/Button';
 import { defaultLimit } from '../../components/LimitFilterDropdown';
+
+const GoalPreview = dynamic(() => import('../../components/GoalPreview'));
 
 const refreshInterval = 3000;
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
@@ -126,6 +129,8 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
     const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(router.query.search as string).toString());
     const [limitFilter, setLimitFilter] = useState(Number(router.query.limit) || defaultLimit);
 
+    const [preview, setPreview] = useState<Goal | null>(null);
+
     const { data } = useSWR(
         mounted ? [user, stateFilter, fulltextFilter, tagsFilter, ownerFilter, limitFilter] : null,
         (...args) => fetcher(...args),
@@ -146,7 +151,7 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
         const tagsData = new Map();
         const usersData = new Map();
         let goalsCount = 0;
-        // useMemo
+
         projects.forEach((p) => {
             projectsData.set(p.id, {
                 id: p.id,
@@ -169,6 +174,21 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
     }, [projects]);
 
     useUrlParams(stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
+
+    const onGoalPrewiewShow = useCallback(
+        (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
+            (e) => {
+                if (e.metaKey || e.ctrlKey) return;
+
+                e.preventDefault();
+                setPreview(goal);
+            },
+        [],
+    );
+
+    const onGoalPreviewClose = useCallback(() => {
+        setPreview(null);
+    }, []);
 
     return (
         <Page locale={locale} title={t('title')}>
@@ -222,6 +242,8 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
                                             tags={g.tags}
                                             comments={g.comments?.length}
                                             key={g.id}
+                                            focused={g.id === preview?.id}
+                                            onClick={onGoalPrewiewShow(g)}
                                         />
                                     )),
                                 )}
@@ -230,6 +252,10 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
                     ));
                 })}
             </PageContent>
+
+            {nullable(preview, (p) => (
+                <GoalPreview locale={locale} goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
+            ))}
         </Page>
     );
 };

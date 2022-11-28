@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled, { css } from 'styled-components';
 
-import { backgroundColor, danger0, gapM, gapS, gray3, gray4, radiusM, warn0 } from '../design/@generated/themes';
+import { backgroundColor, danger0, gapM, gapS, gray4, radiusM, warn0 } from '../design/@generated/themes';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { usePortal } from '../hooks/usePortal';
 import { nullable } from '../utils/nullable';
@@ -18,10 +18,11 @@ const colorsMap: Record<ModalViewType, string> = {
 };
 
 interface ModalProps {
-    visible: boolean;
+    children: React.ReactNode;
+
+    visible?: boolean;
     width?: number;
     view?: ModalViewType;
-    children: React.ReactNode;
 
     onClose?: () => void;
     onShow?: () => void;
@@ -86,11 +87,20 @@ const StyledCross = styled.div`
 `;
 
 export const ModalHeader = styled.div`
+    z-index: 2;
+
     background-color: ${gray4};
+    --background-color-context: ${gray4};
+
     padding: ${gapM} ${gapM} ${gapS} ${gapM};
+
+    border-top-left-radius: ${radiusM};
+    border-top-right-radius: ${radiusM};
 `;
 
 export const ModalContent = styled.div`
+    z-index: 1;
+
     padding: ${gapM};
 `;
 
@@ -102,7 +112,7 @@ interface PortalProps {
 const Portal: React.FC<PortalProps> = ({ id, children }) => createPortal(children, usePortal(id));
 
 export const Modal: React.FC<ModalProps> = ({ visible, view, children, width = 800, onClose, onShow }) => {
-    const [onESC] = useKeyboard([KeyCode.Escape], () => onClose && onClose(), {
+    const [onESC] = useKeyboard([KeyCode.Escape], () => onClose?.(), {
         disableGlobalEvent: false,
     });
 
@@ -117,9 +127,7 @@ export const Modal: React.FC<ModalProps> = ({ visible, view, children, width = 8
     }, [visible]);
 
     useEffect(() => {
-        if (visible) {
-            onShow && onShow();
-        }
+        visible && onShow?.();
     }, [visible, onShow]);
 
     return (
