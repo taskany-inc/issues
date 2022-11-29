@@ -1,11 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useLayoutEffect } from 'react';
 import styled from 'styled-components';
-import dynamic from 'next/dynamic';
+import { useRemark, useRemarkSync } from 'react-remark';
+import remarkGFM from 'remark-gfm';
+import remarkEmoji from 'remark-emoji';
 
 import { link10, radiusS } from '../design/@generated/themes';
-import { md } from '../utils/md';
-import { pageContext } from '../utils/pageContext';
-import { nullable } from '../utils/nullable';
 
 const StyledMd = styled.div`
     a {
@@ -33,24 +32,24 @@ interface MdProps {
     children?: string;
 }
 
-const themes = {
-    dark: dynamic(() => import('../design/prismThemes/DarkPrismCss')),
-    light: dynamic(() => import('../design/prismThemes/LightPrismCss')),
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ssrRenderOptions: any = {
+    remarkPlugins: [remarkEmoji],
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const clientRenderOptions: any = {
+    remarkPlugins: [remarkGFM, remarkEmoji],
 };
 
-const Md: React.FC<MdProps> = ({ children }) => {
-    const { theme } = useContext(pageContext);
+const Md: React.FC<MdProps> = ({ children = '' }) => {
+    const ssrContent = useRemarkSync(children, ssrRenderOptions);
+    const [clientContent, setMarkdownSource] = useRemark(clientRenderOptions);
 
-    const PrismCss = themes[theme || 'dark'];
-    return (
-        <>
-            <StyledMd dangerouslySetInnerHTML={{ __html: md(children) }} />
+    useLayoutEffect(() => {
+        setMarkdownSource(children);
+    }, [children, setMarkdownSource]);
 
-            {nullable(PrismCss, () => (
-                <PrismCss />
-            ))}
-        </>
-    );
+    return <StyledMd>{clientContent || ssrContent}</StyledMd>;
 };
 
 export default Md;
