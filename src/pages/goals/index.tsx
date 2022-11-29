@@ -44,6 +44,11 @@ const fetcher = createFetcher((_, states = [], query = '', tags = [], owner = []
                 id: true,
                 title: true,
                 description: true,
+                project: {
+                    id: true,
+                    key: true,
+                    title: true,
+                },
                 state: {
                     id: true,
                     title: true,
