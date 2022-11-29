@@ -61,8 +61,7 @@ const StyledActivityFeed = styled.div`
 `;
 
 const StyledModalHeader = styled(ModalHeader)`
-    position: absolute;
-    width: 100%;
+    position: sticky;
 
     box-shadow: 0 5px 10px 5px rgb(0 0 0 / 30%);
 `;
@@ -71,7 +70,7 @@ const StyledModalContent = styled(ModalContent)`
     overflow: auto;
     height: 100%;
 
-    padding-top: 180px;
+    padding-top: ${gapM};
 `;
 
 const StyledCard = styled(Card)`
