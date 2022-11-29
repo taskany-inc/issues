@@ -4,7 +4,6 @@ import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import NextLink from 'next/link';
 
 import { Goal, State } from '../../graphql/@generated/genql';
 import { gapM, gapS } from '../design/@generated/themes';
@@ -142,11 +141,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, l
                 ))}
 
                 {nullable(goal.title, (title) => (
-                    <NextLink href={routes.goal(goal.id)} passHref>
-                        <Link inline>
-                            <IssueTitle title={title} size="xl" />
-                        </Link>
-                    </NextLink>
+                    <IssueTitle title={title} href={routes.goal(goal.id)} size="xl" />
                 ))}
 
                 <StyledImportantActions>
