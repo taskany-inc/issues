@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { link10 } from '../design/@generated/themes';
+import { link10, radiusS } from '../design/@generated/themes';
 import { md } from '../utils/md';
 import { pageContext } from '../utils/pageContext';
 import { nullable } from '../utils/nullable';
@@ -21,6 +21,11 @@ const StyledMd = styled.div`
         &:hover {
             color: ${link10};
         }
+    }
+
+    img {
+        max-width: 100%;
+        border-radius: ${radiusS};
     }
 `;
 
