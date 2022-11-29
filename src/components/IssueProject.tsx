@@ -14,6 +14,8 @@ interface IssueProjectProps {
         key: string;
         title: string;
     };
+    mode?: 'compact' | 'default';
+    as?: React.ComponentProps<typeof Text>['as'];
     size?: React.ComponentProps<typeof Text>['size'];
 }
 
@@ -28,15 +30,18 @@ const sizeGapMap = {
 };
 
 const StyledIssueProjectTitle = styled(Text)`
+    display: inline-block;
     padding-top: ${({ size = 'l' }) => sizeGapMap[size]};
 `;
 
-export const IssueProject: React.FC<IssueProjectProps> = ({ project, size = 'l' }) => {
+export const IssueProject: React.FC<IssueProjectProps> = ({ project, as, mode, size = 'l' }) => {
     const t = useTranslations('IssueTitle');
 
+    const pre = mode === 'compact' ? '' : `${t('Project')} — `;
+
     return (
-        <StyledIssueProjectTitle size={size} weight="bold" color={gray9}>
-            {t('Project')} —{' '}
+        <StyledIssueProjectTitle as={as} size={size} weight="bold" color={gray9}>
+            {pre}
             <NextLink passHref href={routes.project(project.key)}>
                 <Link inline>{project.title}</Link>
             </NextLink>

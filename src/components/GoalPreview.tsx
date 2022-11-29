@@ -137,8 +137,16 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, l
                 ))}
 
                 {nullable(goal.project, (project) => (
-                    <IssueProject project={project} size="m" />
+                    <IssueProject as="span" mode="compact" project={project} size="m" />
                 ))}
+
+                <IssueStats
+                    mode="compact"
+                    locale={locale}
+                    comments={goal.comments?.length || 0}
+                    updatedAt={goal.updatedAt}
+                    onCommentsClick={onCommentLinkClick}
+                />
 
                 {nullable(goal.title, (title) => (
                     <IssueTitle title={title} href={routes.goal(goal.id)} size="xl" />
@@ -167,14 +175,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, l
                                 size={16}
                             />
                         }
-                    />
-
-                    <IssueStats
-                        mode="compact"
-                        locale={locale}
-                        comments={goal.comments?.length || 0}
-                        updatedAt={goal.updatedAt}
-                        onCommentsClick={onCommentLinkClick}
                     />
                 </StyledImportantActions>
             </StyledModalHeader>
