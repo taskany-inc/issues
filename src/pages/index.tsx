@@ -5,10 +5,10 @@ import { Page } from '../components/Page';
 
 export const getServerSideProps = declareSsrProps();
 
-const HomePage = ({ locale }: ExternalPageProps) => {
+const HomePage = ({ user, locale }: ExternalPageProps) => {
     const t = useTranslations('index');
 
-    return <Page locale={locale} title={t('title')} />;
+    return <Page user={user} locale={locale} title={t('title')} />;
 };
 
 export default HomePage;

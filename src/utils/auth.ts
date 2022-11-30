@@ -21,6 +21,11 @@ const providers: NextAuthOptions['providers'] = [
                 },
                 include: {
                     accounts: true,
+                    activity: {
+                        include: {
+                            settings: true,
+                        },
+                    },
                 },
             });
 
@@ -36,6 +41,7 @@ const providers: NextAuthOptions['providers'] = [
                 role: user.role,
                 nickname: user.nickname,
                 activityId: user.activityId,
+                settings: user.activity?.settings,
             };
         },
     }),
@@ -82,6 +88,13 @@ export const authOptions: NextAuthOptions = {
                 where: {
                     id,
                 },
+                include: {
+                    activity: {
+                        include: {
+                            settings: true,
+                        },
+                    },
+                },
             });
 
             return {
@@ -93,6 +106,7 @@ export const authOptions: NextAuthOptions = {
                     name: dbUser?.name,
                     nickname: dbUser?.nickname,
                     activityId: dbUser?.activityId,
+                    settings: dbUser?.activity?.settings,
                 },
             };
         },
@@ -138,6 +152,9 @@ declare module 'next-auth' {
             image?: string | null;
             role: Role;
             activityId: string;
+            settings?: {
+                theme: 'light' | 'dark' | 'system';
+            };
         };
     }
 

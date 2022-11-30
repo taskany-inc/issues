@@ -55,7 +55,7 @@ const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: P
     const projects: Project[] | null = data?.projects ?? ssrData.projects;
 
     return (
-        <Page locale={locale} title={t('title')}>
+        <Page user={user} locale={locale} title={t('title')}>
             <CommonHeader
                 title={t('explore')}
                 description={t('see what the Taskany community is most excited about today')}
