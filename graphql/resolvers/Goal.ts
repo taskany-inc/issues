@@ -420,7 +420,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             });
 
             const pre = `${project?.key}-`;
-            const numId = Number(lastGoal?.id?.replace(pre, '')) + 1;
+            const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
             const id = `${pre}${numId}`;
 
             try {
