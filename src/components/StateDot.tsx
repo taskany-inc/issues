@@ -1,23 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import colorLayer from 'color-layer';
 
 import { usePageContext } from '../hooks/usePageContext';
+import { gray6 } from '../design/@generated/themes';
 
 interface StateDotProps {
     title?: string;
     hue?: number;
     size?: 's' | 'm';
+
     onClick?: () => void;
 }
 
 const StyledStateDot = styled.div<{
     size: StateDotProps['size'];
     onClick: StateDotProps['onClick'];
-    colors: {
-        bkg: string;
-        bkgHover: string;
-    };
 }>`
     width: 14px;
     height: 14px;
@@ -29,13 +27,11 @@ const StyledStateDot = styled.div<{
         margin-left: 6px;
     }
 
-    ${({ colors }) => css`
-        background-color: ${colors.bkg};
+    background-color: var(--bkg);
 
-        &:hover {
-            background-color: ${colors.bkgHover};
-        }
-    `}
+    &:hover {
+        background-color: var(--bkg-hover);
+    }
 
     ${({ onClick }) =>
         onClick &&
@@ -54,15 +50,20 @@ const StyledStateDot = styled.div<{
 // eslint-disable-next-line react/display-name
 export const StateDot: React.FC<StateDotProps> = React.memo(({ title, hue = 1, size = 'm', onClick }) => {
     const { themeId } = usePageContext();
+    const [colors, setColors] = useState({
+        '--bkg': gray6,
+        '--bkgHover': gray6,
+    } as React.CSSProperties);
 
-    const colors = useMemo(() => {
-        const sat = hue === 1 ? 0 : undefined;
-
-        return {
-            bkg: colorLayer(hue, 9, sat)[themeId],
-            bkgHover: colorLayer(hue, 10, sat)[themeId],
-        };
+    useEffect(() => {
+        setColors(() => {
+            const sat = hue === 1 ? 0 : undefined;
+            return {
+                '--bkg': colorLayer(hue, 9, sat)[themeId],
+                '--bkgHover': colorLayer(hue, 10, sat)[themeId],
+            } as React.CSSProperties;
+        });
     }, [hue, themeId]);
 
-    return <StyledStateDot title={title} size={size} onClick={onClick} colors={colors} />;
+    return <StyledStateDot title={title} size={size} onClick={onClick} style={colors} />;
 });
