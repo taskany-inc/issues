@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import colorLayer from 'color-layer';
 
-import { pageContext } from '../utils/pageContext';
+import { usePageContext } from '../hooks/usePageContext';
 
 interface StateDotProps {
     title?: string;
@@ -10,8 +10,6 @@ interface StateDotProps {
     size?: 's' | 'm';
     onClick?: () => void;
 }
-
-const mapThemeOnId = { light: 0, dark: 1 };
 
 const StyledStateDot = styled.div<{
     size: StateDotProps['size'];
@@ -55,12 +53,7 @@ const StyledStateDot = styled.div<{
 
 // eslint-disable-next-line react/display-name
 export const StateDot: React.FC<StateDotProps> = React.memo(({ title, hue = 1, size = 'm', onClick }) => {
-    const { theme } = useContext(pageContext);
-    const [themeId, setThemeId] = useState(0); // default: dark
-
-    useEffect(() => {
-        theme && setThemeId(mapThemeOnId[theme]);
-    }, [theme]);
+    const { themeId } = usePageContext();
 
     const colors = useMemo(() => {
         const sat = hue === 1 ? 0 : undefined;

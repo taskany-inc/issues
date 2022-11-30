@@ -1,13 +1,12 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import React, { useMemo } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import colorLayer from 'color-layer';
 
 import { createFetcher } from '../utils/createFetcher';
-import { pageContext } from '../utils/pageContext';
 import { Priority } from '../../graphql/@generated/genql';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Button } from './Button';
 import { StateDot } from './StateDot';
@@ -29,20 +28,12 @@ const fetcher = createFetcher(() => ({
     goalPriorityColors: true,
 }));
 
-const mapThemeOnId = { light: 0, dark: 1 };
-
 export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
     ({ text, value, disabled, error, onChange }, ref) => {
         const t = useTranslations('PriorityDropdown');
-        const { data: session } = useSession();
-        const { theme } = useContext(pageContext);
-        const [themeId, setThemeId] = useState(0);
+        const { user, themeId } = usePageContext();
 
-        useEffect(() => {
-            theme && setThemeId(mapThemeOnId[theme]);
-        }, [theme]);
-
-        const { data } = useSWR('priority', () => fetcher(session?.user));
+        const { data } = useSWR('priority', () => fetcher(user));
 
         const colors = useMemo(
             () => data?.goalPriorityColors?.map((hue) => colorLayer(hue!, 5, hue === 1 ? 0 : undefined)[themeId]) || [],

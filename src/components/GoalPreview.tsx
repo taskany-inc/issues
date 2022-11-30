@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
@@ -10,10 +9,10 @@ import { gapM, gapS } from '../design/@generated/themes';
 import { goalFetcher, refreshInterval } from '../utils/entityFetcher';
 import { nullable } from '../utils/nullable';
 import { formatEstimate } from '../utils/dateTime';
-import { TLocale } from '../types/locale';
 import { useHighlightedComment } from '../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../hooks/useGoalUpdate';
 import { routes } from '../hooks/router';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { ModalHeader, ModalContent } from './Modal';
 import { ModalPreview } from './ModalPreview';
@@ -36,7 +35,6 @@ const CommentCreateForm = dynamic(() => import('./CommentCreateForm'));
 
 interface GoalPreviewProps {
     goal: Goal;
-    locale: TLocale;
 
     visible?: boolean;
 
@@ -77,13 +75,13 @@ const StyledCard = styled(Card)`
     min-height: 60px;
 `;
 
-const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, locale, onClose }) => {
+const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, onClose }) => {
     const t = useTranslations('goals.id');
-    const { data: session } = useSession();
+    const { user, locale } = usePageContext();
     const [commentFormFocus, setCommentFormFocus] = useState(false);
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
 
-    const { data, mutate } = useSWR([session?.user, partialGoal.id], (...args) => goalFetcher(...args), {
+    const { data, mutate } = useSWR([user, partialGoal.id], (...args) => goalFetcher(...args), {
         refreshInterval,
     });
     const refresh = useCallback(() => mutate(), [mutate]);
@@ -141,7 +139,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, l
 
                 <IssueStats
                     mode="compact"
-                    locale={locale}
                     comments={goal.comments?.length || 0}
                     updatedAt={goal.updatedAt}
                     onCommentsClick={onCommentLinkClick}
@@ -180,8 +177,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, l
             <StyledModalContent>
                 <StyledCard>
                     <CardInfo>
-                        <Link inline>{goal.activity?.user?.name}</Link> —{' '}
-                        <RelativeTime locale={locale} date={goal.createdAt} />
+                        <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
                     </CardInfo>
 
                     <CardComment>
@@ -198,11 +194,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, l
                                 <CommentView
                                     key={c.id}
                                     id={c.id}
-                                    locale={locale}
                                     author={c.activity?.user}
                                     description={c.description}
                                     createdAt={c.createdAt}
-                                    isEditable={c.activity?.id === session?.user?.activityId}
+                                    isEditable={c.activity?.id === user?.activityId}
                                     isNew={c.id === highlightCommentId}
                                     reactions={c.reactions}
                                     // onReactionToggle={onReactionsToggle({ commentId: c.id })}
@@ -211,9 +206,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, l
                         )}
 
                         <CommentCreateForm
-                            locale={locale}
                             goalId={goal.id}
-                            user={session?.user}
                             setFocus={commentFormFocus}
                             onCreate={onCommentPublish}
                             onBlur={() => setCommentFormFocus(false)}

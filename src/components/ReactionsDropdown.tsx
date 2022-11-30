@@ -1,10 +1,11 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import type { EmojiSelection, EmojiPicker } from 'picmo';
 import dynamic from 'next/dynamic';
 
-import { pageContext, PageContext } from '../utils/pageContext';
+import { PageContext } from '../utils/pageContext';
 import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '../design/@generated/themes';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Icon } from './Icon';
 import { ReactionsButton } from './ReactionsButton';
@@ -36,7 +37,7 @@ const StyledPicker = styled.div`
 `;
 
 const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps) => {
-    const { theme } = useContext(pageContext);
+    const { theme } = usePageContext();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);

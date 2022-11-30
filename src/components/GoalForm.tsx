@@ -5,12 +5,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
 
-import { TLocale } from '../types/locale';
 import { gapS } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Priority } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Button } from './Button';
 import { FormInput } from './FormInput';
@@ -88,9 +88,8 @@ export type GoalFormType = z.infer<ReturnType<typeof schemaProvider>>;
 
 interface GoalFormProps {
     formTitle: string;
-    owner?: Partial<Activity>;
     i18nKeyset: string;
-    locale: TLocale;
+    owner?: Partial<Activity>;
     title?: string;
     description?: string;
     project?: Partial<Project>;
@@ -118,12 +117,12 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     priority,
     estimate,
     i18nKeyset,
-    locale,
     children,
     onSumbit,
 }) => {
     const t = useTranslations(i18nKeyset);
     const schema = schemaProvider(t);
+    const { locale } = usePageContext();
 
     const {
         control,
@@ -259,7 +258,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <EstimateComboBox
-                                        locale={locale}
                                         text={t('Schedule')}
                                         placeholder={t('Date input mask placeholder')}
                                         mask={t('Date input mask')}

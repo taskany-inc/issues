@@ -2,12 +2,12 @@ import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
-import { useSession } from 'next-auth/react';
 import dynamic from 'next/dynamic';
 
 import { gapL, gapM } from '../design/@generated/themes';
 import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { FormTitle } from './FormTitle';
 import { IssueDependenciesList } from './IssueDependenciesList';
@@ -107,7 +107,7 @@ const goalsFetcher = createFetcher((_, query: string) => ({
 }));
 
 const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
-    const { data: session } = useSession();
+    const { user } = usePageContext();
     const t = useTranslations('IssueDependencies');
 
     const [kind, setKind] = useState<Dependency>();
@@ -115,8 +115,8 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
     const [query, setQuery] = useState('');
     const [completionVisible, setCompletionVisible] = useState(false);
 
-    const { data: goalsData } = useSWR(query, (q) => goalsFetcher(session?.user, q));
-    const { data: depsKindData } = useSWR('depsKind', () => depsKindfetcher(session?.user));
+    const { data: goalsData } = useSWR(query, (q) => goalsFetcher(user, q));
+    const { data: depsKindData } = useSWR('depsKind', () => depsKindfetcher(user));
 
     const onDependencyDelete = useCallback(
         (dependency: keyof typeof enumDependency) => (id: string) => {

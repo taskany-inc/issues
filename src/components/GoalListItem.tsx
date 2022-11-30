@@ -8,7 +8,6 @@ import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
-import { TLocale } from '../types/locale';
 
 import { Text } from './Text';
 import { Tag as TagItem } from './Tag';
@@ -21,7 +20,6 @@ const RelativeTime = dynamic(() => import('./RelativeTime'));
 interface GoalListItemProps {
     id: string;
     title: string;
-    locale: TLocale;
     issuer?: Activity;
     tags?: Array<Tag | undefined>;
     state?: State;
@@ -136,7 +134,6 @@ export const GoalListItem: React.FC<GoalListItemProps> = ({
     hasForks,
     isNotViewed,
     state,
-    locale,
     focused,
     onClick,
 }) => {
@@ -165,7 +162,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = ({
                     </StyledTags>
 
                     <StyledSubTitle size="s">
-                        #{id} <RelativeTime locale={locale} date={createdAt} kind="created" />
+                        #{id} <RelativeTime date={createdAt} kind="created" />
                         {`  ${t('by')} ${issuer?.user?.name}`}
                     </StyledSubTitle>
                 </StyledName>

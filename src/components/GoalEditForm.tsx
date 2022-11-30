@@ -2,19 +2,17 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
 import { gql } from '../utils/gql';
-import { TLocale } from '../types/locale';
 import { Goal } from '../../graphql/@generated/genql';
 
 import { GoalForm, GoalFormType } from './GoalForm';
 
 interface GoalEditFormProps {
     goal: Goal;
-    locale: TLocale;
 
     onSubmit: (id?: string) => void;
 }
 
-const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, locale, onSubmit }) => {
+const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const t = useTranslations('goals.edit');
 
     const updateGoal = async (form: GoalFormType) => {
@@ -53,7 +51,6 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, locale, onSubmit }) =
     return (
         <GoalForm
             i18nKeyset="goals.edit"
-            locale={locale}
             formTitle={t('Edit the goal')}
             title={goal.title}
             description={goal.description}

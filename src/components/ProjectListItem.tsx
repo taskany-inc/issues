@@ -3,10 +3,9 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 import { routes } from '../hooks/router';
-import type { Scalars, Activity } from '../../graphql/@generated/genql';
+import type { Activity } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
-import { TLocale } from '../types/locale';
 
 import { Text } from './Text';
 import { UserPic } from './UserPic';
@@ -16,8 +15,7 @@ const RelativeTime = dynamic(() => import('./RelativeTime'));
 interface ProjectListItemProps {
     projectKey: string;
     title: string;
-    createdAt: Scalars['DateTime'];
-    locale: TLocale;
+    createdAt: string;
     description?: string;
     owner?: Activity;
 }
@@ -73,7 +71,6 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     description,
     owner,
     createdAt,
-    locale,
 }) => {
     return (
         <Link href={routes.project(projectKey)} passHref>
@@ -90,7 +87,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
                     ))}
 
                     <StyledSubTitle size="s">
-                        <RelativeTime locale={locale} date={createdAt} kind="created" />
+                        <RelativeTime date={createdAt} kind="created" />
                     </StyledSubTitle>
                 </StyledName>
 

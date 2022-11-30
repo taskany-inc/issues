@@ -5,14 +5,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
-import { Session } from 'next-auth';
 
 import { gql } from '../utils/gql';
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
-import { TLocale } from '../types/locale';
 import { submitKeys } from '../utils/hotkeys';
 import { routes } from '../hooks/router';
 import { nullable } from '../utils/nullable';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Form } from './Form';
 import { FormCard } from './FormCard';
@@ -26,9 +25,7 @@ import { FormEditor } from './FormEditor';
 
 interface CommentCreateFormProps {
     goalId: string;
-    user?: Session['user'];
     setFocus?: boolean;
-    locale: TLocale;
 
     onCreate?: (id?: string) => void;
     onBlur?: () => void;
@@ -79,12 +76,8 @@ const commentHeightMap: Record<string, string> = {
     false: '60px',
 };
 
-const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, onBlur, goalId, setFocus, locale }) => {
-    const t = useTranslations('Comments.new');
-    const [commentFocused, setCommentFocused] = useState(false);
-    const [autoFocus, setAutoFocus] = useState(false);
-
-    const schema = z.object({
+const schemaProvider = (t: (key: string) => string) =>
+    z.object({
         comment: z
             .string({
                 required_error: t("Comments's description is required"),
@@ -95,14 +88,21 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
             }),
     });
 
-    type FormType = z.infer<typeof schema>;
+type FormType = z.infer<ReturnType<typeof schemaProvider>>;
+
+const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onCreate, onBlur, goalId, setFocus }) => {
+    const t = useTranslations('Comments.new');
+    const schema = schemaProvider(t);
+    const { user, locale } = usePageContext();
+    const [commentFocused, setCommentFocused] = useState(false);
+    const [autoFocus, setAutoFocus] = useState(false);
 
     const {
         control,
         handleSubmit,
         resetField,
         watch,
-        formState: { errors, isValid },
+        formState: { isValid },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
         mode: 'onChange',
@@ -144,14 +144,14 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ user, onCreate, o
 
         const data = await promise;
 
-        onCreate && onCreate(data.createComment?.id);
+        onCreate?.(data.createComment?.id);
 
         resetField('comment');
     };
 
     const onCommentBlur = useCallback(() => {
         setTimeout(() => {
-            onBlur && onBlur();
+            onBlur?.();
             setCommentFocused(false);
             setAutoFocus(false);
         }, 100);

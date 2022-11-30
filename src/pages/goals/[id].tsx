@@ -343,7 +343,6 @@ const GoalPage = ({
                     ))}
 
                     <IssueStats
-                        locale={locale}
                         comments={goal.comments?.length || 0}
                         updatedAt={goal.updatedAt}
                         onCommentsClick={onCommentLinkClick}
@@ -381,8 +380,7 @@ const GoalPage = ({
                 <div>
                     <Card>
                         <CardInfo>
-                            <Link inline>{goal.activity?.user?.name}</Link> —{' '}
-                            <RelativeTime locale={locale} date={goal.createdAt} />
+                            <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
                         </CardInfo>
 
                         <CardContent>
@@ -439,7 +437,6 @@ const GoalPage = ({
                                 <CommentView
                                     key={c.id}
                                     id={c.id}
-                                    locale={locale}
                                     author={c.activity?.user}
                                     description={c.description}
                                     createdAt={c.createdAt}
@@ -452,9 +449,7 @@ const GoalPage = ({
                         )}
 
                         <CommentCreateForm
-                            locale={locale}
                             goalId={goal.id}
-                            user={user}
                             setFocus={commentFormFocus}
                             onCreate={onCommentPublish}
                             onBlur={() => setCommentFormFocus(false)}
@@ -475,7 +470,7 @@ const GoalPage = ({
                     visible={goalEditModalVisible}
                     onShow={onGoalEditModalShow}
                 >
-                    <GoalEditForm goal={goal} locale={locale} onSubmit={onGoalEdit} />
+                    <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
                 </ModalOnEvent>
             ))}
         </Page>

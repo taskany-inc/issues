@@ -1,11 +1,11 @@
 import React, { useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
-import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Activity } from '../../graphql/@generated/genql';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Button } from './Button';
 import { Input } from './Input';
@@ -56,13 +56,13 @@ const fetcher = createFetcher((_, query: string, filter?: string[]) => ({
 
 export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
     ({ text, query = '', value, filter, disabled, placeholder, error, onChange }, ref) => {
-        const { data: session } = useSession();
+        const { user } = usePageContext();
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(
             value?.user?.name || value?.user?.email || value?.ghost?.email || query,
         );
 
-        const { data } = useSWR(inputState, (q) => fetcher(session?.user, q, filter));
+        const { data } = useSWR(inputState, (q) => fetcher(user, q, filter));
 
         return (
             <ComboBox

@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 
 import { Comment, Scalars, User } from '../../graphql/@generated/genql';
 import { brandColor, gapM, gapS, gray4, textColorPrimary } from '../design/@generated/themes';
-import { TLocale } from '../types/locale';
 import { nullable } from '../utils/nullable';
 
 import { Card, CardComment, CardInfo } from './Card';
@@ -22,7 +21,6 @@ interface CommentViewProps {
     id: string;
     description: string;
     createdAt: Scalars['DateTime'];
-    locale: TLocale;
     reactions?: Comment['reactions'];
     updatedAt?: Scalars['DateTime'];
     author?: User;
@@ -119,7 +117,6 @@ export const CommentView: FC<CommentViewProps> = ({
     createdAt,
     isNew,
     isEditable,
-    locale,
     reactions,
     onReactionToggle,
 }) => {
@@ -177,7 +174,6 @@ export const CommentView: FC<CommentViewProps> = ({
             {editMode ? (
                 <CommentEditForm
                     id={id}
-                    locale={locale}
                     description={commentDescription}
                     onCancel={onEdited}
                     onChanged={onChanged}
@@ -189,7 +185,7 @@ export const CommentView: FC<CommentViewProps> = ({
                         <div>
                             <Link inline>{author?.name}</Link> —{' '}
                             <Link inline href={`#${commentMask}${id}`}>
-                                <RelativeTime locale={locale} date={createdAt} />
+                                <RelativeTime date={createdAt} />
                             </Link>
                         </div>
                         <StyledCommentActions>

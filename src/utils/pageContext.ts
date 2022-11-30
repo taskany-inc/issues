@@ -4,10 +4,11 @@ import React from 'react';
 import { TLocale } from '../types/locale';
 
 export interface PageContext {
+    locale: TLocale;
+    theme: 'light' | 'dark';
+    themeId: number;
+    ssrTime: number;
     user?: Session['user'];
-    locale?: TLocale;
-    theme?: 'light' | 'dark';
-    ssrTime?: number;
 }
 
-export const pageContext = React.createContext<PageContext>({ locale: 'en', theme: 'dark' });
+export const pageContext = React.createContext<PageContext>({ locale: 'en', theme: 'dark', themeId: 0, ssrTime: 0 });

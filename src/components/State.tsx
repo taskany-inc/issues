@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import colorLayer from 'color-layer';
 
-import { pageContext } from '../utils/pageContext';
 import { gray6, radiusXl } from '../design/@generated/themes';
+import { usePageContext } from '../hooks/usePageContext';
 
 interface StateProps {
     title: string;
@@ -62,7 +62,7 @@ const StyledState = styled.div<{
 
 // eslint-disable-next-line react/display-name
 export const State = React.forwardRef<HTMLDivElement, StateProps>(({ title, hue = 1, size = 'm', onClick }, ref) => {
-    const { theme } = useContext(pageContext);
+    const { theme } = usePageContext();
     const themeId = mapThemeOnId[theme || 'dark'];
     const [colors, setColors] = useState({
         '--bkg': 'transparent',

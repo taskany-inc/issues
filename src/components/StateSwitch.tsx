@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
@@ -9,6 +8,7 @@ import { createFetcher } from '../utils/createFetcher';
 import { State as StateModel } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { State } from './State';
 
@@ -44,14 +44,14 @@ const fetcher = createFetcher((_, id: string) => ({
 }));
 
 const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => {
-    const { data: session } = useSession();
+    const { user } = usePageContext();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLDivElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState<number>();
-    const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
+    const { data } = useSWR(flowId, (id) => fetcher(user, id));
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);

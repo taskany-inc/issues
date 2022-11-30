@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useSession, signOut, signIn } from 'next-auth/react';
+import { signOut, signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
@@ -9,6 +9,7 @@ import { nullable } from '../utils/nullable';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { routes } from '../hooks/router';
 import { backgroundColor, brandColor, gapM, gray3, textColor, gray8, gapXs, link10 } from '../design/@generated/themes';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { UserPic } from './UserPic';
 import { Link } from './Link';
@@ -95,7 +96,7 @@ export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLDivElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
-    const { data: session } = useSession();
+    const { user } = usePageContext();
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
@@ -151,10 +152,10 @@ export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
                 <StyledNotifier />
             ))}
 
-            {session ? (
+            {user ? (
                 <NextLink href={routes.userSettings()} passHref>
                     <Link inline>
-                        <UserPic src={session.user.image} email={session.user.email} size={32} />
+                        <UserPic src={user.image} email={user.email} size={32} />
                     </Link>
                 </NextLink>
             ) : (

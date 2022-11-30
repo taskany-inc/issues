@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, ChangeEvent, useEffect } from 'react';
 import styled from 'styled-components';
-import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
@@ -10,6 +9,7 @@ import dynamic from 'next/dynamic';
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { gql } from '../utils/gql';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Button } from './Button';
 import { Icon } from './Icon';
@@ -48,7 +48,7 @@ const StyledInput = styled(Input)`
 
 export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
     ({ text, value = [], query = '', error, disabled, placeholder, onChange }, ref) => {
-        const { data: session } = useSession();
+        const { user } = usePageContext();
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(query);
         const [tags, setTags] = useState(value);
@@ -58,7 +58,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
         }, [value]);
 
         const t = useTranslations('TagCompletion');
-        const { data } = useSWR(inputState, (q) => fetcher(session?.user, q));
+        const { data } = useSWR(inputState, (q) => fetcher(user, q));
 
         const createTag = useCallback(async () => {
             const promise = gql.mutation({
