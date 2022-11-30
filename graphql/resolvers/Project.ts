@@ -90,6 +90,9 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             if (!activity) return null;
 
             const projects = await db.project.findMany({
+                orderBy: {
+                    createdAt: 'asc',
+                },
                 include: {
                     activity: {
                         include: {
@@ -157,6 +160,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 skip: data.offset,
                 ...projectGoalsFilter(data),
                 orderBy: {
+                    createdAt: 'asc',
                     state: {
                         title: 'asc',
                     },

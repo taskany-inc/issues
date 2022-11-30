@@ -130,9 +130,18 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                         },
                     ],
                 },
+                orderBy: {
+                    createdAt: 'asc',
+                },
                 include: {
                     goals: {
                         ...projectGoalsFilter(data),
+                        orderBy: {
+                            createdAt: 'asc',
+                            state: {
+                                title: 'asc',
+                            },
+                        },
                         include: {
                             owner: {
                                 include: {
