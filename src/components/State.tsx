@@ -1,9 +1,9 @@
-import React, { useContext, useMemo, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import colorLayer from 'color-layer';
 
 import { pageContext } from '../utils/pageContext';
-import { radiusXl } from '../design/@generated/themes';
+import { gray6, radiusXl } from '../design/@generated/themes';
 
 interface StateProps {
     title: string;
@@ -17,12 +17,6 @@ const mapThemeOnId = { light: 0, dark: 1 };
 const StyledState = styled.div<{
     size: StateProps['size'];
     onClick: StateProps['onClick'];
-    colors: {
-        bkg: string;
-        stroke: string;
-        bkgHover: string;
-        strokeHover: string;
-    };
 }>`
     display: inline-block;
     padding: 6px 14px;
@@ -42,18 +36,15 @@ const StyledState = styled.div<{
         margin-left: 6px;
     }
 
-    ${({ colors }) =>
-        css`
-            color: ${colors.stroke};
-            border: 3px solid ${colors.stroke};
-            background-color: ${colors.bkg};
+    color: var(--stroke);
+    border: 3px solid var(--stroke);
+    background-color: var(--bkg);
 
-            &:hover {
-                color: ${colors.strokeHover};
-                border-color: ${colors.strokeHover};
-                background-color: ${colors.bkgHover};
-            }
-        `}
+    &:hover {
+        color: var(--strokeHover);
+        border-color: var(--strokeHover);
+        background-color: var(--bkgHover);
+    }
 
     ${({ onClick }) =>
         onClick &&
@@ -70,29 +61,31 @@ const StyledState = styled.div<{
 `;
 
 // eslint-disable-next-line react/display-name
-export const State = React.memo(
-    React.forwardRef<HTMLDivElement, StateProps>(({ title, hue = 1, size = 'm', onClick }, ref) => {
-        const { theme } = useContext(pageContext);
-        const [themeId, setThemeId] = useState(0); // default: dark
+export const State = React.forwardRef<HTMLDivElement, StateProps>(({ title, hue = 1, size = 'm', onClick }, ref) => {
+    const { theme } = useContext(pageContext);
+    const themeId = mapThemeOnId[theme || 'dark'];
+    const [colors, setColors] = useState({
+        '--bkg': 'transparent',
+        '--stroke': gray6,
+        '--bkgHover': 'transparent',
+        '--strokeHover': gray6,
+    } as React.CSSProperties);
 
-        useEffect(() => {
-            theme && setThemeId(mapThemeOnId[theme]);
-        }, [theme]);
-
-        const colors = useMemo(() => {
+    useEffect(() => {
+        setColors(() => {
             const sat = hue === 1 ? 0 : undefined;
             return {
-                bkg: colorLayer(hue, 3, sat)[themeId],
-                stroke: colorLayer(hue, 9, sat)[themeId],
-                bkgHover: colorLayer(hue, 4, sat)[themeId],
-                strokeHover: colorLayer(hue, 10, sat)[themeId],
-            };
-        }, [hue, themeId]);
+                '--bkg': colorLayer(hue, 3, sat)[themeId],
+                '--stroke': colorLayer(hue, 9, sat)[themeId],
+                '--bkgHover': colorLayer(hue, 4, sat)[themeId],
+                '--strokeHover': colorLayer(hue, 10, sat)[themeId],
+            } as React.CSSProperties;
+        });
+    }, [hue, themeId]);
 
-        return (
-            <StyledState ref={ref} size={size} onClick={onClick} colors={colors}>
-                {title}
-            </StyledState>
-        );
-    }),
-);
+    return (
+        <StyledState ref={ref} size={size} onClick={onClick} style={colors}>
+            {title}
+        </StyledState>
+    );
+});
