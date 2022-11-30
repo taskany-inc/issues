@@ -64,13 +64,14 @@ export async function getStaticProps({ params: { locale, slug } }: { params: { l
 const HomePage = ({
     user,
     locale,
+    ssrTime,
     source,
     stat,
     yml,
     menu,
 }: ExternalPageProps<{ source: string; stat: fs.Stats; yml: YmlProps }>) => {
     return (
-        <Page user={user} locale={locale} title={yml.title}>
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={yml.title}>
             Created: {stat.ctime}
             <br />
             Modified: {stat.mtime}

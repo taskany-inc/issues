@@ -53,7 +53,7 @@ export const estimatedMeta = ({ locale }: LocaleArg) => {
     };
 };
 
-export const dateAgo = (date: Date, { locale }: LocaleArg) => {
+export const dateAgo = (date: Date, pastDate: number, { locale }: LocaleArg) => {
     const formatter = new Intl.RelativeTimeFormat(locale, { style: 'long', numeric: 'auto' });
 
     const divisions: Array<{ amount: number; name: Intl.RelativeTimeFormatUnit }> = [
@@ -66,7 +66,7 @@ export const dateAgo = (date: Date, { locale }: LocaleArg) => {
         { amount: Number.POSITIVE_INFINITY, name: 'years' },
     ];
 
-    let duration = (Number(date) - Number(new Date())) / 1000;
+    let duration = (Number(date) - pastDate) / 1000;
 
     for (let i = 0; i <= divisions.length; i++) {
         const division = divisions[i];

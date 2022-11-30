@@ -115,6 +115,7 @@ export const getServerSideProps = declareSsrProps(
 const GoalPage = ({
     user,
     locale,
+    ssrTime,
     ssrData,
     params: { id },
 }: ExternalPageProps<{ goal: Goal; goalPriorityKind: string[]; goalPriorityColors: number[] }, { id: string }>) => {
@@ -318,6 +319,7 @@ const GoalPage = ({
         <Page
             user={user}
             locale={locale}
+            ssrTime={ssrTime}
             title={t.rich('title', {
                 goal: () => goal.title,
             })}

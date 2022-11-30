@@ -46,7 +46,7 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const UserSettingsPage = ({ user, locale, ssrData }: ExternalPageProps<{ settings: Settings }>) => {
+const UserSettingsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ settings: Settings }>) => {
     const t = useTranslations('users.settings');
 
     const mounted = useMounted(refreshInterval);
@@ -163,6 +163,7 @@ const UserSettingsPage = ({ user, locale, ssrData }: ExternalPageProps<{ setting
         <Page
             user={user}
             locale={locale}
+            ssrTime={ssrTime}
             title={t.rich('title', {
                 user: () => actualUserFields?.name,
             })}

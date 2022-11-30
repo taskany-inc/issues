@@ -123,7 +123,7 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Project[] }>) => {
+const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userGoals: Project[] }>) => {
     const t = useTranslations('goals.index');
     const mounted = useMounted(refreshInterval);
     const router = useRouter();
@@ -195,10 +195,8 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
         setPreview(null);
     }, []);
 
-    console.log(user);
-
     return (
-        <Page user={user} locale={locale} title={t('title')}>
+        <Page user={user} ssrTime={ssrTime} locale={locale} title={t('title')}>
             <CommonHeader title={t('Dashboard')} description={t('This is your personal goals bundle')}></CommonHeader>
 
             <FiltersPanel
