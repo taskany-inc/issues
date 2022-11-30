@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
-import { Goal, State, GoalDependencyToggleInput } from '../../../graphql/@generated/genql';
+import { Goal, State, GoalDependencyToggleInput, Project } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { formatEstimate } from '../../utils/dateTime';
@@ -34,6 +34,8 @@ import { IssueProject } from '../../components/IssueProject';
 import { IssueTags } from '../../components/IssueTags';
 import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useWillUnmount } from '../../hooks/useWillUnmount';
 
 const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
@@ -121,6 +123,7 @@ const GoalPage = ({
 }: ExternalPageProps<{ goal: Goal; goalPriorityKind: string[]; goalPriorityColors: number[] }, { id: string }>) => {
     const t = useTranslations('goals.id');
     const mounted = useMounted(refreshInterval);
+    const [, setCurrentProjectCache] = useLocalStorage<Partial<Project> | null>('currentProjectCache', null);
 
     const { data, mutate } = useSWR(mounted ? [user, id] : null, (...args) => goalFetcher(...args), {
         refreshInterval,
@@ -164,6 +167,15 @@ const GoalPage = ({
         [goal.reactions],
     );
     const reactionsGroupsNames = Object.keys(grouppedReactions || {});
+
+    useEffect(() => {
+        goal.project && setCurrentProjectCache(goal.project);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useWillUnmount(() => {
+        setCurrentProjectCache(null);
+    });
 
     const onGoalStateChange = useCallback(
         async (state: State) => {
@@ -368,7 +380,7 @@ const GoalPage = ({
                         <Button
                             view="primary"
                             text={t('New goal')}
-                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, goal.project)}
+                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
                         />
                     </StyledIssueInfoRow>
                 </StyledIssueInfo>

@@ -1,4 +1,4 @@
-import { MouseEventHandler, useCallback, useState } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
@@ -22,6 +22,8 @@ import { FiltersPanel } from '../../../components/FiltersPanel';
 import { defaultLimit } from '../../../components/LimitFilterDropdown';
 import { useUrlParams } from '../../../hooks/useUrlParams';
 import GoalPreview from '../../../components/GoalPreview';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { useWillUnmount } from '../../../hooks/useWillUnmount';
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
@@ -37,6 +39,7 @@ const fetcher = createFetcher(
                 title: true,
                 description: true,
                 activityId: true,
+                flowId: true,
                 flow: {
                     id: true,
                 },
@@ -209,6 +212,8 @@ const ProjectPage = ({
     const t = useTranslations('projects.key');
     const router = useRouter();
 
+    const [, setCurrentProjectCache] = useLocalStorage<Partial<Project> | null>('currentProjectCache', null);
+
     const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
     const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));
     const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user as string));
@@ -239,6 +244,20 @@ const ProjectPage = ({
         : data?.map((chunk) => chunk.projectGoals).flat() ?? ssrData.projectGoals;
     const project = data?.[0].project ?? ssrData.project;
     const goalsCount = data?.[0].projectGoalsCount ?? ssrData.projectGoalsCount;
+
+    useEffect(() => {
+        setCurrentProjectCache({
+            id: project.id,
+            title: project.title,
+            description: project.description,
+            flowId: project.flowId,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useWillUnmount(() => {
+        setCurrentProjectCache(null);
+    });
 
     const onSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setFulltextFilter(e.currentTarget.value);

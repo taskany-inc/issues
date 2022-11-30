@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
@@ -8,13 +7,14 @@ import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { Activity } from '../../graphql/@generated/genql';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { LastOrCurrentProject, RecentProjectsCache } from '../types/localStorage';
 
 import { Icon } from './Icon';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { GoalForm, GoalFormType } from './GoalForm';
 import { Link } from './Link';
-import { modalOnEventContext } from './ModalOnEvent';
 
 const StyledFormBottom = styled.div`
     display: flex;
@@ -27,8 +27,13 @@ const StyledFormBottom = styled.div`
 const GoalCreateForm: React.FC = () => {
     const t = useTranslations('goals.new');
     const router = useRouter();
-    const modalOnEventProps = useContext(modalOnEventContext);
     const { locale, user } = usePageContext();
+    const [lastProjectCache, setLastProjectCache] = useLocalStorage<LastOrCurrentProject>('lastProjectCache');
+    const [currentProjectCache] = useLocalStorage<LastOrCurrentProject>('currentProjectCache');
+    const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage<RecentProjectsCache>(
+        'recentProjectsCache',
+        {},
+    );
 
     const createGoal = async (form: GoalFormType) => {
         const promise = gql.mutation({
@@ -59,7 +64,22 @@ const GoalCreateForm: React.FC = () => {
 
         const res = await promise;
 
-        res.createGoal?.id && router.goal(res.createGoal.id);
+        if (res?.createGoal?.id) {
+            const newRecentProjectsCache = { ...recentProjectsCache };
+            if (newRecentProjectsCache[form.project.id]) {
+                newRecentProjectsCache[form.project.id].rate += 1;
+            } else {
+                newRecentProjectsCache[form.project.id] = {
+                    rate: 1,
+                    cache: form.project,
+                };
+            }
+
+            setRecentProjectsCache(newRecentProjectsCache);
+            setLastProjectCache(form.project);
+
+            router.goal(res.createGoal.id);
+        }
     };
 
     return (
@@ -67,7 +87,7 @@ const GoalCreateForm: React.FC = () => {
             i18nKeyset="goals.new"
             formTitle={t('Create new goal')}
             owner={{ id: user?.activityId, user } as Partial<Activity>}
-            project={modalOnEventProps}
+            project={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}
         >
