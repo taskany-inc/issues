@@ -29,6 +29,7 @@ const HotkeysModal = dynamic(() => import('./HotkeysModal'));
 
 interface PageProps {
     user: Session['user'];
+    ssrTime?: number;
     locale: ExternalPageProps['locale'];
     title?: React.ReactNode;
     children?: React.ReactNode;
@@ -43,7 +44,7 @@ export const PageContent = styled.div`
     padding: 10px 40px 0 40px;
 `;
 
-export const Page: React.FC<PageProps> = ({ user, title = 'Untitled', locale, children }) => {
+export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', locale, children }) => {
     useHotkeys();
     const router = useRouter();
 
@@ -67,7 +68,7 @@ export const Page: React.FC<PageProps> = ({ user, title = 'Untitled', locale, ch
     );
 
     return (
-        <pageContext.Provider value={{ user, theme, locale }}>
+        <pageContext.Provider value={{ user, theme, locale, ssrTime }}>
             <Head>
                 <title>{title}</title>
             </Head>

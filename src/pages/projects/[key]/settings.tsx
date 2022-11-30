@@ -110,6 +110,7 @@ const StyledProjectActions = styled.div`
 const ProjectPage = ({
     user,
     locale,
+    ssrTime,
     ssrData,
     params: { key },
 }: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) => {
@@ -217,6 +218,7 @@ const ProjectPage = ({
         <Page
             user={user}
             locale={locale}
+            ssrTime={ssrTime}
             title={t.rich('title', {
                 project: () => project.title,
             })}

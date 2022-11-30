@@ -44,7 +44,7 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: Project[] }>) => {
+const ProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ projects: Project[] }>) => {
     const mounted = useMounted(refreshInterval);
     const t = useTranslations('projects.index');
 
@@ -55,7 +55,7 @@ const ProjectsPage = ({ user, locale, ssrData }: ExternalPageProps<{ projects: P
     const projects: Project[] | null = data?.projects ?? ssrData.projects;
 
     return (
-        <Page user={user} locale={locale} title={t('title')}>
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={t('title')}>
             <CommonHeader
                 title={t('explore')}
                 description={t('see what the Taskany community is most excited about today')}
