@@ -1,12 +1,11 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import React, { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import colorLayer from 'color-layer';
 import dynamic from 'next/dynamic';
 
 import { createFetcher } from '../utils/createFetcher';
-import { pageContext } from '../utils/pageContext';
 import { State } from '../../graphql/@generated/genql';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 import { FiltersMenuItem } from './FiltersMenuItem';
@@ -21,8 +20,6 @@ interface StateFilterDropdownProps {
 
     onChange?: (selected: string[]) => void;
 }
-
-const mapThemeOnId = { light: 0, dark: 1 };
 
 const fetcher = createFetcher((_, id: string) => ({
     flow: [
@@ -44,16 +41,10 @@ const fetcher = createFetcher((_, id: string) => ({
 
 export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterDropdownProps>(
     ({ text, flowId, value, disabled, onChange }, ref) => {
-        const { data: session } = useSession();
-        const { theme } = useContext(pageContext);
-        const [themeId, setThemeId] = useState(0); // default: dark
+        const { user, themeId } = usePageContext();
         const [selected, setSelected] = useState<Set<string>>(new Set(value));
 
-        const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
-
-        useEffect(() => {
-            theme && setThemeId(mapThemeOnId[theme]);
-        }, [theme]);
+        const { data } = useSWR(flowId, (id) => fetcher(user, id));
 
         const colors = useMemo(
             () => data?.flow?.states?.map((f) => colorLayer(f.hue, 5, f.hue === 1 ? 0 : undefined)[themeId]) || [],

@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useState, ChangeEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
-import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
 import { gapL, gapM } from '../design/@generated/themes';
 import { Activity, Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { FormTitle } from './FormTitle';
 import { IssueParticipantsList } from './IssueParticipantsList';
@@ -51,14 +51,14 @@ const fetcher = createFetcher((_, query: string, filter?: string[]) => ({
 }));
 
 export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ issue, onChange }) => {
-    const { data: session } = useSession();
+    const { user } = usePageContext();
     const t = useTranslations('IssueParticipants');
 
     const [query, setQuery] = useState('');
     const [completionVisible, setCompletionVisible] = useState(false);
     const activities = useMemo(() => new Set<string>(issue.participants?.map((p) => p!.id)), [issue]);
 
-    const { data } = useSWR(query, (q) => fetcher(session?.user, q));
+    const { data } = useSWR(query, (q) => fetcher(user, q));
 
     const onParticipantDelete = useCallback(
         (id: string) => {

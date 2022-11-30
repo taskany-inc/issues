@@ -237,7 +237,6 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
                                 {project.goals?.map((goal) =>
                                     nullable(goal, (g) => (
                                         <GoalListItem
-                                            locale={locale}
                                             createdAt={g.createdAt}
                                             id={g.id}
                                             state={g.state}
@@ -259,7 +258,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
             </PageContent>
 
             {nullable(preview, (p) => (
-                <GoalPreview locale={locale} goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
+                <GoalPreview goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
             ))}
         </Page>
     );

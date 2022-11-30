@@ -9,8 +9,8 @@ import styled from 'styled-components';
 import { gql } from '../utils/gql';
 import { submitKeys } from '../utils/hotkeys';
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
-import { TLocale } from '../types/locale';
 import { routes } from '../hooks/router';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Form } from './Form';
 import { FormCard } from './FormCard';
@@ -23,7 +23,6 @@ import { FormEditor } from './FormEditor';
 
 interface CommentEditFormProps {
     id: string;
-    locale: TLocale;
     description: string;
     setFocus?: boolean;
 
@@ -66,17 +65,8 @@ const StyledTip = styled(Tip)`
     padding: 0;
 `;
 
-const CommentEditForm: React.FC<CommentEditFormProps> = ({
-    id,
-    locale,
-    description,
-    onChanged,
-    onUpdate,
-    onCancel,
-}) => {
-    const t = useTranslations('Comments.edit');
-
-    const schema = z.object({
+const schemaProvider = (t: (key: string) => string) =>
+    z.object({
         description: z
             .string({
                 required_error: t("Comments's description is required"),
@@ -87,13 +77,18 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({
             }),
     });
 
-    type FormType = z.infer<typeof schema>;
+type FormType = z.infer<ReturnType<typeof schemaProvider>>;
+
+const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onChanged, onUpdate, onCancel }) => {
+    const t = useTranslations('Comments.edit');
+    const schema = schemaProvider(t);
+    const { locale } = usePageContext();
 
     const {
         control,
         handleSubmit,
         watch,
-        formState: { errors, isValid },
+        formState: { isValid },
     } = useForm<FormType>({
         resolver: zodResolver(schema),
         mode: 'onChange',
@@ -108,7 +103,7 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({
     const isUpdateAllowed = isValid && newDescription !== description;
 
     const updateComment = async ({ description }: FormType) => {
-        onChanged && onChanged(description);
+        onChanged?.(description);
 
         const promise = gql.mutation({
             updateComment: [
@@ -133,11 +128,11 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({
 
         const data = await promise;
 
-        onUpdate && onUpdate(data.updateComment?.id, data.updateComment?.description);
+        onUpdate?.(data.updateComment?.id, data.updateComment?.description);
     };
 
     const onCancelEdit = useCallback(() => {
-        onCancel && onCancel();
+        onCancel?.();
     }, [onCancel]);
 
     return (

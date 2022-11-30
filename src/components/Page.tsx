@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
@@ -12,7 +12,6 @@ import { ExternalPageProps } from '../utils/declareSsrProps';
 import { useHotkeys } from '../hooks/useHotkeys';
 import { ModalEvent } from '../utils/dispatchModal';
 import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../utils/hotkeys';
-import { useRouter } from '../hooks/router';
 import { nullable } from '../utils/nullable';
 
 import { Theme } from './Theme';
@@ -29,7 +28,7 @@ const HotkeysModal = dynamic(() => import('./HotkeysModal'));
 
 interface PageProps {
     user: Session['user'];
-    ssrTime?: number;
+    ssrTime: number;
     locale: ExternalPageProps['locale'];
     title?: React.ReactNode;
     children?: React.ReactNode;
@@ -44,31 +43,18 @@ export const PageContent = styled.div`
     padding: 10px 40px 0 40px;
 `;
 
+const mapThemeOnId = { light: 0, dark: 1 };
+
 export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', locale, children }) => {
     useHotkeys();
-    const router = useRouter();
 
     const { resolvedTheme } = useTheme();
     const theme = (
         user?.settings?.theme === 'system' ? resolvedTheme || 'dark' : user?.settings?.theme || 'light'
     ) as PageContext['theme'];
 
-    const onProjectCreate = useCallback(
-        (key?: string) => {
-            key && router.project(key);
-        },
-        [router],
-    );
-
-    const onGoalCreate = useCallback(
-        (key?: string) => {
-            key && router.goal(key);
-        },
-        [router],
-    );
-
     return (
-        <pageContext.Provider value={{ user, theme, locale, ssrTime }}>
+        <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], locale, ssrTime }}>
             <Head>
                 <title>{title}</title>
             </Head>
@@ -92,15 +78,15 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', l
             <StyledContent>{children}</StyledContent>
 
             <ModalOnEvent event={ModalEvent.ProjectCreateModal} hotkeys={createProjectKeys}>
-                <ProjectCreateForm locale={locale} onCreate={onProjectCreate} />
+                <ProjectCreateForm />
             </ModalOnEvent>
 
             <ModalOnEvent event={ModalEvent.GoalCreateModal} hotkeys={createGoalKeys}>
-                <GoalCreateForm locale={locale} onCreate={onGoalCreate} />
+                <GoalCreateForm />
             </ModalOnEvent>
 
             <ModalOnEvent event={ModalEvent.UserInviteModal} hotkeys={inviteUserKeys}>
-                <UserInviteForm locale={locale} />
+                <UserInviteForm />
             </ModalOnEvent>
 
             <HotkeysModal />

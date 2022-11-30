@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,8 +16,8 @@ import { gql } from '../utils/gql';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
-import { TLocale } from '../types/locale';
-import { routes } from '../hooks/router';
+import { routes, useRouter } from '../hooks/router';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -34,14 +33,7 @@ import { Link } from './Link';
 import { FlowComboBox } from './FlowComboBox';
 import { ModalContent, ModalHeader } from './Modal';
 
-// const UserCompletionDropdown = dynamic(() => import('./UserComboBox'));
 const ProjectKeyInput = dynamic(() => import('./ProjectKeyInput'));
-
-interface ProjectCreateFormProps {
-    locale: TLocale;
-
-    onCreate?: (slug?: string) => void;
-}
 
 const flowFetcher = createFetcher(() => ({
     flowRecommended: {
@@ -101,9 +93,10 @@ const schemaProvider = (t: (key: string) => string) =>
 
 export type ProjectFormType = z.infer<ReturnType<typeof schemaProvider>>;
 
-const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate }) => {
-    const { data: session } = useSession();
+const ProjectCreateForm: React.FC = () => {
     const t = useTranslations('projects.new');
+    const router = useRouter();
+    const { locale, user } = usePageContext();
 
     const schema = schemaProvider(t);
 
@@ -138,10 +131,9 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
         [setValue, titleWatcher],
     );
 
-    const { data: flowData } = useSWR([session?.user], (...args) => flowFetcher(...args));
-    const { data: projectData } = useSWR(
-        keyWatcher && keyWatcher !== '' ? [session?.user, keyWatcher] : null,
-        (...args) => projectFetcher(...args),
+    const { data: flowData } = useSWR([user], (...args) => flowFetcher(...args));
+    const { data: projectData } = useSWR(keyWatcher && keyWatcher !== '' ? [user, keyWatcher] : null, (...args) =>
+        projectFetcher(...args),
     );
 
     useEffect(() => {
@@ -176,7 +168,7 @@ const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({ locale, onCreate 
 
         const res = await promise;
 
-        onCreate && onCreate(res.createProject?.key);
+        res.createProject?.key && router.project(res.createProject.key);
     };
 
     const isProjectKeyAvailable = Boolean(projectData?.project === null || !projectData);

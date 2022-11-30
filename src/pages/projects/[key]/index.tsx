@@ -323,7 +323,6 @@ const ProjectPage = ({
                 {goals?.map((goal) =>
                     nullable(goal, (g) => (
                         <GoalListItem
-                            locale={locale}
                             createdAt={g.createdAt}
                             id={g.id}
                             state={g.state}
@@ -344,7 +343,7 @@ const ProjectPage = ({
             </StyledGoalsList>
 
             {nullable(preview, (p) => (
-                <GoalPreview locale={locale} goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
+                <GoalPreview goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
             ))}
         </Page>
     );

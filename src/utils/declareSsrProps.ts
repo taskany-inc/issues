@@ -11,7 +11,7 @@ interface SSRProps<P = Record<string, string>> {
     req: GetServerSidePropsContext['req'];
     params: P;
     query: Record<string, string | string[] | undefined>;
-    ssrTime?: number;
+    ssrTime: number;
 }
 
 export interface ExternalPageProps<D = unknown, P = unknown> extends SSRProps<P> {
@@ -36,6 +36,8 @@ export function declareSsrProps<T = ExternalPageProps>(
             };
         }
 
+        const ssrTime = Date.now();
+
         const resProps = cb
             ? await cb({
                   req,
@@ -45,6 +47,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                   locale: locale as SSRProps['locale'],
                   params: params as Record<string, string>,
                   query,
+                  ssrTime,
               })
             : {};
 
@@ -60,7 +63,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                 params: params as Record<string, string>,
                 user: session ? session.user : null,
                 i18n: (await import(`../../i18n/${locale}.json`)).default,
-                ssrTime: Date.now(),
+                ssrTime,
             },
         };
     };

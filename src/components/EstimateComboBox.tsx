@@ -15,6 +15,7 @@ import {
 } from '../utils/dateTime';
 import { is } from '../utils/styles';
 import { TLocale } from '../types/locale';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Button } from './Button';
 import { Icon } from './Icon';
@@ -25,7 +26,6 @@ const ComboBox = dynamic(() => import('./ComboBox'));
 interface EstimateComboBoxProps {
     text: React.ComponentProps<typeof Button>['text'];
     mask: string;
-    locale: TLocale;
     value?: {
         date: string;
         q: string;
@@ -112,7 +112,8 @@ const createValue = (date: string | Date, locale: TLocale) => {
 };
 
 export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBoxProps>(
-    ({ text, locale, value, defaultValuePlaceholder, placeholder, mask, disabled, error, onChange }, ref) => {
+    ({ text, value, defaultValuePlaceholder, placeholder, mask, disabled, error, onChange }, ref) => {
+        const { locale } = usePageContext();
         const inputVal = parseLocaleDate(value?.date || defaultValuePlaceholder?.date, { locale });
         const [inputState, setInputState] = useState(inputVal ? createLocaleDate(inputVal, { locale }) : '');
         const [selectedQ, setSelectedQ] = useState(value?.q || defaultValuePlaceholder?.q);

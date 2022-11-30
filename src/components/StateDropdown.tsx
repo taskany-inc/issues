@@ -1,12 +1,11 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import colorLayer from 'color-layer';
 import dynamic from 'next/dynamic';
 
 import { createFetcher } from '../utils/createFetcher';
-import { pageContext } from '../utils/pageContext';
 import { State } from '../../graphql/@generated/genql';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Button } from './Button';
 import { Icon } from './Icon';
@@ -24,8 +23,6 @@ interface StateDropdownProps {
 
     onChange?: (state: State) => void;
 }
-
-const mapThemeOnId = { light: 0, dark: 1 };
 
 const fetcher = createFetcher((_, id: string) => ({
     flow: [
@@ -47,29 +44,23 @@ const fetcher = createFetcher((_, id: string) => ({
 
 export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps>(
     ({ text, value, flowId, error, disabled, onChange }, ref) => {
-        const { data: session } = useSession();
-        const { theme } = useContext(pageContext);
-        const [themeId, setThemeId] = useState(0);
+        const { user, themeId } = usePageContext();
         const [state, setState] = useState(value);
 
-        const { data } = useSWR(flowId, (id) => fetcher(session?.user, id));
-
-        useEffect(() => {
-            theme && setThemeId(mapThemeOnId[theme]);
-        }, [theme]);
+        const { data } = useSWR(flowId, (id) => fetcher(user, id));
 
         useEffect(() => {
             const defaultState = data?.flow?.states?.filter((s) => s?.default)[0];
             if (!value && defaultState) {
                 setState(defaultState);
-                onChange && onChange(defaultState);
+                onChange?.(defaultState);
             }
         }, [value, onChange, data?.flow?.states]);
 
         const onStateChange = useCallback(
             (s: Partial<State>) => {
                 setState(s);
-                onChange && onChange(s as State);
+                onChange?.(s as State);
             },
             [onChange],
         );

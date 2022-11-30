@@ -9,7 +9,7 @@ import { gapM, gapS, gray6, gray7, star0 } from '../design/@generated/themes';
 import { gql } from '../utils/gql';
 import { KeyCode } from '../hooks/useKeyboard';
 import { routes } from '../hooks/router';
-import { TLocale } from '../types/locale';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -24,12 +24,6 @@ import { Text } from './Text';
 import { Link } from './Link';
 import { ModalContent, ModalHeader } from './Modal';
 
-interface UserInviteFormProps {
-    locale: TLocale;
-
-    onCreate?: () => void;
-}
-
 const StyledEmails = styled.div`
     padding: ${gapM} 0;
 `;
@@ -42,16 +36,19 @@ const StyledFormBottom = styled.div`
     padding: ${gapS} ${gapS} 0 ${gapS};
 `;
 
-const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => {
+const schemaProvider = (t: (key: string) => string) =>
+    z.string().email({
+        message: t('User email is required'),
+    });
+
+const UserInviteForm: React.FC = () => {
     const t = useTranslations('users.invite');
+    const { locale } = usePageContext();
     const inputRef = useRef<HTMLInputElement>(null);
     const [emails, setEmails] = useState<string[]>([]);
     const [error, setError] = useState<FieldError>();
     const [inputValue, setInputValue] = useState('');
-
-    const emailSchema = z.string().email({
-        message: t('User email is required'),
-    });
+    const schema = schemaProvider(t);
 
     const inviteUser = useCallback(async () => {
         if (emails.length === 0) {
@@ -82,8 +79,7 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
 
         setEmails([]);
         setInputValue('');
-        onCreate && onCreate();
-    }, [emails, onCreate, t]);
+    }, [emails, t]);
 
     const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
@@ -108,7 +104,7 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
                 }
 
                 try {
-                    emailSchema.parse(possibleEmail);
+                    schema.parse(possibleEmail);
                     setEmails([...emails, possibleEmail]);
                     setInputValue('');
                 } catch (err: unknown) {
@@ -120,7 +116,7 @@ const UserInviteForm: React.FC<UserInviteFormProps> = ({ locale, onCreate }) => 
                 }
             }
         },
-        [emailSchema, setEmails, emails, inputValue],
+        [schema, setEmails, emails, inputValue],
     );
 
     const isValid = emails.length > 0;

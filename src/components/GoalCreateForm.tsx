@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
@@ -7,8 +6,8 @@ import styled from 'styled-components';
 import { gql } from '../utils/gql';
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { Activity } from '../../graphql/@generated/genql';
-import { routes } from '../hooks/router';
-import { TLocale } from '../types/locale';
+import { routes, useRouter } from '../hooks/router';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Icon } from './Icon';
 import { Tip } from './Tip';
@@ -16,12 +15,6 @@ import { Keyboard } from './Keyboard';
 import { GoalForm, GoalFormType } from './GoalForm';
 import { Link } from './Link';
 import { modalOnEventContext } from './ModalOnEvent';
-
-interface GoalCreateFormProps {
-    locale: TLocale;
-
-    onCreate: (id?: string) => void;
-}
 
 const StyledFormBottom = styled.div`
     display: flex;
@@ -31,10 +24,11 @@ const StyledFormBottom = styled.div`
     padding: ${gapS} ${gapS} 0 ${gapS};
 `;
 
-const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => {
+const GoalCreateForm: React.FC = () => {
     const t = useTranslations('goals.new');
-    const { data: session } = useSession();
+    const router = useRouter();
     const modalOnEventProps = useContext(modalOnEventContext);
+    const { locale, user } = usePageContext();
 
     const createGoal = async (form: GoalFormType) => {
         const promise = gql.mutation({
@@ -65,15 +59,14 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ locale, onCreate }) => 
 
         const res = await promise;
 
-        onCreate(res.createGoal?.id);
+        res.createGoal?.id && router.goal(res.createGoal.id);
     };
 
     return (
         <GoalForm
             i18nKeyset="goals.new"
             formTitle={t('Create new goal')}
-            locale={locale}
-            owner={{ id: session?.user.activityId, user: session?.user } as Partial<Activity>}
+            owner={{ id: user?.activityId, user } as Partial<Activity>}
             project={modalOnEventProps}
             priority="Medium"
             onSumbit={createGoal}
