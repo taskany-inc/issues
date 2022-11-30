@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, createContext } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import tinykeys from 'tinykeys';
 
 import { ModalEvent } from '../utils/dispatchModal';
@@ -17,9 +17,6 @@ interface ModalOnEventProps {
     onClose?: React.ComponentProps<typeof Modal>['onClose'];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const modalOnEventContext = createContext<any>(undefined);
-
 const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     event,
     hotkeys,
@@ -30,7 +27,6 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     onClose,
 }) => {
     const [modalVisible, setModalVisibility] = useState(visible);
-    const [modalContextProps, setModalContextProps] = useState(null);
     const onModalClose = useCallback(() => {
         setModalVisibility(false);
         onClose?.();
@@ -47,23 +43,20 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     }, [visible]);
 
     useEffect(() => {
-        const globalListener = (e: CustomEvent) => {
+        const globalListener = () => {
             setModalVisibility(!modalVisible);
-            setModalContextProps(e.detail);
         };
 
-        // @ts-ignore EventListener doesn't work with CustomEvent type ¯\_(ツ)_/¯
         window.addEventListener(event, globalListener);
 
         return () => {
-            // @ts-ignore EventListener doesn't work with CustomEvent type ¯\_(ツ)_/¯
             window.removeEventListener(event, globalListener);
         };
     }, [event, modalVisible]);
 
     return (
         <Modal view={view} visible={modalVisible} onShow={onShow} onClose={onModalClose}>
-            <modalOnEventContext.Provider value={modalContextProps}>{children}</modalOnEventContext.Provider>
+            {children}
         </Modal>
     );
 };
