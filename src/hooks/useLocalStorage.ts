@@ -3,9 +3,10 @@ import { useCallback, useState } from 'react';
 import { safelyParseJson } from '../utils/safelyParseJson';
 
 type SetValue<TValue> = (value: TValue | ((previousValue: TValue) => TValue)) => void;
+type StorageKey = 'lastProjectCache' | 'currentProjectCache' | 'recentProjectsCache';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useLocalStorage<T>(storageKey: string, defaultValue?: any): [T, SetValue<T>] {
+export function useLocalStorage<T>(storageKey: StorageKey, defaultValue?: any): [T, SetValue<T>] {
     const safelySetStorage = useCallback(
         (valueToStore: string) => {
             try {
