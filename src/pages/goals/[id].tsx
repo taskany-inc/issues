@@ -316,6 +316,7 @@ const GoalPage = ({
 
     return (
         <Page
+            user={user}
             locale={locale}
             title={t.rich('title', {
                 goal: () => goal.title,

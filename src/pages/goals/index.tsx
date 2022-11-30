@@ -195,8 +195,10 @@ const GoalsPage = ({ user, locale, ssrData }: ExternalPageProps<{ userGoals: Pro
         setPreview(null);
     }, []);
 
+    console.log(user);
+
     return (
-        <Page locale={locale} title={t('title')}>
+        <Page user={user} locale={locale} title={t('title')}>
             <CommonHeader title={t('Dashboard')} description={t('This is your personal goals bundle')}></CommonHeader>
 
             <FiltersPanel

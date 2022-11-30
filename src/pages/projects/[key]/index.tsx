@@ -262,6 +262,7 @@ const ProjectPage = ({
 
     return (
         <Page
+            user={user}
             locale={locale}
             title={t.rich('title', {
                 project: () => project.title,

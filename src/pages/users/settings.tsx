@@ -161,6 +161,7 @@ const UserSettingsPage = ({ user, locale, ssrData }: ExternalPageProps<{ setting
 
     return (
         <Page
+            user={user}
             locale={locale}
             title={t.rich('title', {
                 user: () => actualUserFields?.name,

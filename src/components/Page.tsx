@@ -4,14 +4,16 @@ import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
+import { Session } from 'next-auth';
 
 import { gray4, radiusM, textColor } from '../design/@generated/themes';
-import { pageContext } from '../utils/pageContext';
+import { pageContext, PageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/declareSsrProps';
 import { useHotkeys } from '../hooks/useHotkeys';
 import { ModalEvent } from '../utils/dispatchModal';
 import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../utils/hotkeys';
 import { useRouter } from '../hooks/router';
+import { nullable } from '../utils/nullable';
 
 import { Theme } from './Theme';
 import { GlobalStyle } from './GlobalStyle';
@@ -26,6 +28,7 @@ const UserInviteForm = dynamic(() => import('./UserInviteForm'));
 const HotkeysModal = dynamic(() => import('./HotkeysModal'));
 
 interface PageProps {
+    user: Session['user'];
     locale: ExternalPageProps['locale'];
     title?: React.ReactNode;
     children?: React.ReactNode;
@@ -40,12 +43,14 @@ export const PageContent = styled.div`
     padding: 10px 40px 0 40px;
 `;
 
-export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children }) => {
+export const Page: React.FC<PageProps> = ({ user, title = 'Untitled', locale, children }) => {
     useHotkeys();
     const router = useRouter();
 
     const { resolvedTheme } = useTheme();
-    const theme = resolvedTheme as 'dark' | 'light' | 'dark';
+    const theme = (
+        user?.settings?.theme === 'system' ? resolvedTheme || 'dark' : user?.settings?.theme || 'light'
+    ) as PageContext['theme'];
 
     const onProjectCreate = useCallback(
         (key?: string) => {
@@ -62,14 +67,17 @@ export const Page: React.FC<PageProps> = ({ title = 'Untitled', locale, children
     );
 
     return (
-        <pageContext.Provider value={{ theme, locale }}>
+        <pageContext.Provider value={{ user, theme, locale }}>
             <Head>
                 <title>{title}</title>
             </Head>
 
             <GlobalStyle />
             <TextStyle />
-            <Theme theme={theme} />
+
+            {nullable(theme, (t) => (
+                <Theme theme={t} />
+            ))}
 
             <Toaster
                 toastOptions={{

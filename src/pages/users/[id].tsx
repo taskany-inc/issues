@@ -11,7 +11,7 @@ const UserSettingsPage = ({ user, locale, params: { id } }: ExternalPageProps<nu
     const t = useTranslations('users.settings');
 
     return (
-        <Page locale={locale} title={user?.name || 'No name'}>
+        <Page user={user} locale={locale} title={user?.name || 'No name'}>
             Settings
         </Page>
     );
