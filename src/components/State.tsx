@@ -12,8 +12,6 @@ interface StateProps {
     onClick?: () => void;
 }
 
-const mapThemeOnId = { light: 0, dark: 1 };
-
 const StyledState = styled.div<{
     size: StateProps['size'];
     onClick: StateProps['onClick'];
@@ -62,8 +60,7 @@ const StyledState = styled.div<{
 
 // eslint-disable-next-line react/display-name
 export const State = React.forwardRef<HTMLDivElement, StateProps>(({ title, hue = 1, size = 'm', onClick }, ref) => {
-    const { theme } = usePageContext();
-    const themeId = mapThemeOnId[theme || 'dark'];
+    const { themeId } = usePageContext();
     const [colors, setColors] = useState({
         '--bkg': 'transparent',
         '--stroke': gray6,
