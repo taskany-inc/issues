@@ -1,5 +1,5 @@
 import NextLink from 'next/link';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { routes } from '../hooks/router';
@@ -29,7 +29,7 @@ const StyledSearch = styled.div`
     top: 3px;
 `;
 
-const StyledHeaderNavLink = styled.a`
+const StyledHeaderNavLink = styled.a<{ disabled?: boolean }>`
     display: inline-block;
     padding-bottom: 2px;
     margin-top: 3px;
@@ -48,6 +48,12 @@ const StyledHeaderNavLink = styled.a`
         border-color: ${colorPrimary};
     }
 
+    ${({ disabled }) =>
+        disabled &&
+        css`
+            color: ${gray7};
+        `}
+
     & + & {
         margin-left: 24px;
     }
@@ -64,12 +70,8 @@ export const Header: React.FC = () => {
                 <NextLink href={routes.goals()} passHref>
                     <StyledHeaderNavLink>{t('Goals')}</StyledHeaderNavLink>
                 </NextLink>
-                <NextLink href={'#'} passHref>
-                    <StyledHeaderNavLink>{t('Issues')}</StyledHeaderNavLink>
-                </NextLink>
-                <NextLink href={'#'} passHref>
-                    <StyledHeaderNavLink>{t('Boards')}</StyledHeaderNavLink>
-                </NextLink>
+                <StyledHeaderNavLink disabled>{t('Issues')}</StyledHeaderNavLink>
+                <StyledHeaderNavLink disabled>{t('Boards')}</StyledHeaderNavLink>
                 <NextLink href={routes.exploreProjects()} passHref>
                     <StyledHeaderNavLink>{t('Explore')}</StyledHeaderNavLink>
                 </NextLink>
