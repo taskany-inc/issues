@@ -8,7 +8,7 @@ import { Text } from './Text';
 
 interface CommonHeaderProps {
     preTitle?: React.ReactNode;
-    title: React.ReactNode;
+    title: string;
     description?: React.ReactNode;
     children?: React.ReactNode;
 }
@@ -33,6 +33,10 @@ const StyledCommonHeaderInfo = styled.div<{ align: 'left' | 'right' }>`
 `;
 
 const StyledCommonHeaderTitle = styled(Text)`
+    width: 850px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     padding-top: ${gapM};
 `;
 
@@ -46,7 +50,7 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({ preTitle, title, des
                     </Text>
                 ))}
 
-                <StyledCommonHeaderTitle size="xxl" weight="bolder">
+                <StyledCommonHeaderTitle size="xxl" weight="bolder" title={title}>
                     {title}
                 </StyledCommonHeaderTitle>
 
