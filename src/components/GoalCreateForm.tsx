@@ -8,7 +8,6 @@ import { Activity } from '../../graphql/@generated/genql';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { LastOrCurrentProject, RecentProjectsCache } from '../types/localStorage';
 
 import { Icon } from './Icon';
 import { Tip } from './Tip';
@@ -28,12 +27,9 @@ const GoalCreateForm: React.FC = () => {
     const t = useTranslations('goals.new');
     const router = useRouter();
     const { locale, user } = usePageContext();
-    const [lastProjectCache, setLastProjectCache] = useLocalStorage<LastOrCurrentProject>('lastProjectCache');
-    const [currentProjectCache] = useLocalStorage<LastOrCurrentProject>('currentProjectCache');
-    const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage<RecentProjectsCache>(
-        'recentProjectsCache',
-        {},
-    );
+    const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
+    const [currentProjectCache] = useLocalStorage('currentProjectCache');
+    const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
     const createGoal = async (form: GoalFormType) => {
         const promise = gql.mutation({

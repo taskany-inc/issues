@@ -1,12 +1,22 @@
 import { useCallback, useState } from 'react';
 
 import { safelyParseJson } from '../utils/safelyParseJson';
+import { Project } from '../../graphql/@generated/genql';
 
+export type LastOrCurrentProject = Partial<Project> | null;
+export type RecentProjectsCache = Record<string, { rate: number; cache: Partial<Project> }>;
 type SetValue<TValue> = (value: TValue | ((previousValue: TValue) => TValue)) => void;
-type StorageKey = 'lastProjectCache' | 'currentProjectCache' | 'recentProjectsCache';
+interface StorageKey {
+    lastProjectCache: LastOrCurrentProject;
+    currentProjectCache: LastOrCurrentProject;
+    recentProjectsCache: RecentProjectsCache;
+}
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useLocalStorage<T>(storageKey: StorageKey, defaultValue?: any): [T, SetValue<T>] {
+export function useLocalStorage<T extends keyof StorageKey>(
+    storageKey: T,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    defaultValue?: any,
+): [StorageKey[T], SetValue<StorageKey[T]>] {
     const safelySetStorage = useCallback(
         (valueToStore: string) => {
             try {
@@ -17,7 +27,7 @@ export function useLocalStorage<T>(storageKey: StorageKey, defaultValue?: any): 
         [storageKey],
     );
 
-    const [storedValue, setStoredValue] = useState<T>(() => {
+    const [storedValue, setStoredValue] = useState<StorageKey[T]>(() => {
         let valueToStore: string;
         try {
             valueToStore = window.localStorage.getItem(storageKey) || JSON.stringify(defaultValue);
@@ -29,7 +39,7 @@ export function useLocalStorage<T>(storageKey: StorageKey, defaultValue?: any): 
         return safelyParseJson(valueToStore);
     });
 
-    const setValue: SetValue<T> = useCallback(
+    const setValue: SetValue<StorageKey[T]> = useCallback(
         (value) => {
             const valueToStore = value instanceof Function ? value(storedValue) : value;
             safelySetStorage(JSON.stringify(valueToStore));
