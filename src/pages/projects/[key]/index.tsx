@@ -212,7 +212,7 @@ const ProjectPage = ({
     const t = useTranslations('projects.key');
     const router = useRouter();
 
-    const [, setCurrentProjectCache] = useLocalStorage<Partial<Project> | null>('currentProjectCache', null);
+    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
     const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
     const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));

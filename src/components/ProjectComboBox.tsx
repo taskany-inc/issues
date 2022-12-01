@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
-import { RecentProjectsCache } from '../types/localStorage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
 import { Button } from './Button';
@@ -58,7 +57,7 @@ export const ProjectComboBox = React.forwardRef<HTMLDivElement, ProjectComboBoxP
         const { user } = usePageContext();
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(value?.title || query);
-        const [recentProjectsCache] = useLocalStorage<RecentProjectsCache>('recentProjectsCache', {});
+        const [recentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
         useEffect(() => {
             setInputState(value?.title || query);

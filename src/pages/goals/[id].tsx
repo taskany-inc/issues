@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
-import { Goal, State, GoalDependencyToggleInput, Project } from '../../../graphql/@generated/genql';
+import { Goal, State, GoalDependencyToggleInput } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { formatEstimate } from '../../utils/dateTime';
@@ -123,7 +123,7 @@ const GoalPage = ({
 }: ExternalPageProps<{ goal: Goal; goalPriorityKind: string[]; goalPriorityColors: number[] }, { id: string }>) => {
     const t = useTranslations('goals.id');
     const mounted = useMounted(refreshInterval);
-    const [, setCurrentProjectCache] = useLocalStorage<Partial<Project> | null>('currentProjectCache', null);
+    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
     const { data, mutate } = useSWR(mounted ? [user, id] : null, (...args) => goalFetcher(...args), {
         refreshInterval,
