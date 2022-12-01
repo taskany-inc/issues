@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled, { css } from 'styled-components';
@@ -26,7 +26,7 @@ import { IssueStats } from '../../components/IssueStats';
 import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
-import { Reactions, ReactionsMap, reactionsGroupsLimit } from '../../components/Reactions';
+import { Reactions } from '../../components/Reactions';
 import { Badge } from '../../components/Badge';
 import { CommentView } from '../../components/CommentView';
 import { StateDot } from '../../components/StateDot';
@@ -36,6 +36,7 @@ import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
+import { useReactionsProps } from '../../hooks/useReactionsProps';
 
 const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
@@ -146,27 +147,7 @@ const GoalPage = ({
     const [commentFormFocus, setCommentFormFocus] = useState(false);
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const updateGoal = useGoalUpdate(t, goal);
-
-    const grouppedReactions = useMemo(
-        () =>
-            goal.reactions?.reduce((acc, curr) => {
-                if (!curr) return acc;
-
-                acc[curr.emoji] = acc[curr.emoji]
-                    ? {
-                          count: acc[curr.emoji].count + 1,
-                          authors: acc[curr.emoji].authors.add(curr.activityId),
-                      }
-                    : {
-                          count: 1,
-                          authors: new Set(),
-                      };
-
-                return acc;
-            }, {} as ReactionsMap),
-        [goal.reactions],
-    );
-    const reactionsGroupsNames = Object.keys(grouppedReactions || {});
+    const reactionsProps = useReactionsProps(goal.reactions);
 
     useEffect(() => {
         goal.project && setCurrentProjectCache(goal.project);
@@ -426,10 +407,10 @@ const GoalPage = ({
                                 ))}
 
                                 <Reactions
-                                    reactions={grouppedReactions}
+                                    reactions={reactionsProps.reactions}
                                     onClick={onReactionsToggle({ goalId: goal.id })}
                                 >
-                                    {nullable(reactionsGroupsNames.length < reactionsGroupsLimit, () => (
+                                    {nullable(!reactionsProps.limited, () => (
                                         <ReactionsDropdown onClick={onReactionsToggle({ goalId: goal.id })} />
                                     ))}
                                 </Reactions>
