@@ -24,7 +24,10 @@ interface FormInputProps {
     error?: {
         message?: string;
     };
+    brick?: 'left' | 'right' | 'center';
 
+    onMouseLeave?: React.ChangeEventHandler<HTMLInputElement>;
+    onMouseEnter?: React.ChangeEventHandler<HTMLInputElement>;
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
     onInput?: React.ChangeEventHandler<HTMLInputElement>;
     onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
@@ -79,7 +82,7 @@ const StyledErrorTrigger = styled.div`
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledFormInput = styled(({ flat, error, label, forwardRef, ...props }) => (
+const StyledFormInput = styled(({ flat, brick, error, label, forwardRef, ...props }) => (
     <input ref={forwardRef} {...props} />
 ))<{ flat: FormInputProps['flat'] }>`
     box-sizing: border-box;
@@ -131,6 +134,27 @@ const StyledFormInput = styled(({ flat, error, label, forwardRef, ...props }) =>
         disabled &&
         css`
             color: ${gray8};
+        `}
+
+    
+    ${({ brick }) =>
+        brick === 'left' &&
+        css`
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        `}
+
+    ${({ brick }) =>
+        brick === 'right' &&
+        css`
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        `}
+
+    ${({ brick }) =>
+        brick === 'center' &&
+        css`
+            border-radius: 0;
         `}
 `;
 

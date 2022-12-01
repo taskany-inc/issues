@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +32,7 @@ import { Text } from './Text';
 import { Link } from './Link';
 import { FlowComboBox } from './FlowComboBox';
 import { ModalContent, ModalHeader } from './Modal';
+import { InputContainer } from './InputContaier';
 
 const ProjectKeyInput = dynamic(() => import('./ProjectKeyInput'));
 
@@ -57,13 +58,12 @@ const projectFetcher = createFetcher((_, key: string) => ({
 }));
 
 const StyledProjectTitleContainer = styled.div`
+    display: flex;
     position: relative;
 `;
 
 const StyledProjectKeyContainer = styled.div`
-    position: absolute;
-    top: 6px;
-    right: ${gapS};
+    position: relative;
 `;
 
 const StyledFormBottom = styled.div`
@@ -72,6 +72,12 @@ const StyledFormBottom = styled.div`
     justify-content: space-between;
 
     padding: ${gapS} ${gapS} 0 ${gapS};
+`;
+
+const StyledProjectKeyInputContainer = styled(InputContainer)`
+    box-sizing: border-box;
+    width: fit-content;
+    padding-right: ${gapS};
 `;
 
 const schemaProvider = (t: (key: string) => string) =>
@@ -95,8 +101,12 @@ export type ProjectFormType = z.infer<ReturnType<typeof schemaProvider>>;
 
 const ProjectCreateForm: React.FC = () => {
     const t = useTranslations('projects.new');
+
     const router = useRouter();
     const { locale, user } = usePageContext();
+
+    const [focusedInput, setFocusedInput] = useState(false);
+    const [hoveredInput, setHoveredInput] = useState(false);
 
     const schema = schemaProvider(t);
 
@@ -194,7 +204,12 @@ const ProjectCreateForm: React.FC = () => {
                             {...register('title')}
                             placeholder={t("Project's title")}
                             flat="bottom"
+                            brick="right"
                             error={errorsResolver('title')}
+                            onMouseEnter={() => setHoveredInput(true)}
+                            onMouseLeave={() => setHoveredInput(false)}
+                            onFocus={() => setFocusedInput(true)}
+                            onBlur={() => setFocusedInput(false)}
                         />
 
                         {nullable(titleWatcher, () => (
@@ -203,18 +218,24 @@ const ProjectCreateForm: React.FC = () => {
                                     name="key"
                                     control={control}
                                     render={({ field }) => (
-                                        <ProjectKeyInput
-                                            available={isProjectKeyAvailable}
-                                            tooltip={
-                                                isProjectKeyAvailable
-                                                    ? t.rich(
-                                                          'Perfect! Issues in your project will looks like',
-                                                          richProps,
-                                                      )
-                                                    : t.rich('Project with key already exists', richProps)
-                                            }
-                                            {...field}
-                                        />
+                                        <StyledProjectKeyInputContainer
+                                            brick="left"
+                                            hovered={hoveredInput}
+                                            focused={focusedInput}
+                                        >
+                                            <ProjectKeyInput
+                                                available={isProjectKeyAvailable}
+                                                tooltip={
+                                                    isProjectKeyAvailable
+                                                        ? t.rich(
+                                                              'Perfect! Issues in your project will look like',
+                                                              richProps,
+                                                          )
+                                                        : t.rich('Project with key already exists', richProps)
+                                                }
+                                                {...field}
+                                            />
+                                        </StyledProjectKeyInputContainer>
                                     )}
                                 />
                             </StyledProjectKeyContainer>
