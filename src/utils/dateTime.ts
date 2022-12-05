@@ -31,7 +31,11 @@ export const endOfQuarter = (q: string) => {
         const d = new Date(date);
         const quarter = Math.floor(d.getMonth() / 3);
         const startDate = new Date(d.getFullYear(), quarter * 3, 1);
-        return new Date(startDate.getFullYear(), startDate.getMonth() + 3, 0);
+        return new Date(
+            startDate.getFullYear() + Number(d.getMonth() < new Date().getMonth()),
+            startDate.getMonth() + 3,
+            0,
+        );
     };
 
     return qEndDate(abstractDate);
