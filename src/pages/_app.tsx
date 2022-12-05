@@ -3,16 +3,6 @@ import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
 import { NextIntlProvider } from 'next-intl';
-import * as Sentry from '@sentry/nextjs';
-
-const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
-
-if (SENTRY_DSN) {
-    Sentry.init({
-        dsn: SENTRY_DSN,
-        tracesSampleRate: 1.0,
-    });
-}
 
 const App = ({ Component, pageProps }: AppProps) => {
     return (

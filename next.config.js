@@ -3,6 +3,8 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: process.env.ANALYZE === 'true',
 });
+const { withSentryConfig } = require('@sentry/nextjs');
+const { DeleteSourceMapsPlugin } = require('webpack-delete-sourcemaps-plugin');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,14 +17,20 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true,
     },
-    webpack(config) {
+    webpack(config, { isServer }) {
         config.module.rules.push({
             test: /\.svg$/,
             use: ['@svgr/webpack'],
         });
 
+        config.plugins.push(new DeleteSourceMapsPlugin({ isServer, keepServerSourcemaps: true }));
+
         return config;
     },
 };
 
-module.exports = withBundleAnalyzer(nextConfig);
+const sentryWebpackPluginOptions = {
+    silent: true,
+};
+
+module.exports = withBundleAnalyzer(withSentryConfig(nextConfig, sentryWebpackPluginOptions));
