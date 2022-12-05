@@ -13,7 +13,7 @@ RUN npm ci
 
 FROM node:16.14.2-alpine AS build
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache ca-certificates
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
