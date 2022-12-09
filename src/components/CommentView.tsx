@@ -1,16 +1,18 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { Comment, Scalars, User } from '../../graphql/@generated/genql';
+import { Comment, User } from '../../graphql/@generated/genql';
 import { brandColor, gapM, gapS, gray4, textColorPrimary } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
+import { useReactionsProps } from '../hooks/useReactionsProps';
 
 import { Card, CardComment, CardInfo } from './Card';
 import { Link } from './Link';
 import { UserPic } from './UserPic';
 import { Icon } from './Icon';
-import { Reactions, ReactionsMap, reactionsGroupsLimit } from './Reactions';
+import { Reactions } from './Reactions';
+import { ActivityFeedItem } from './ActivityFeed';
 
 const Md = dynamic(() => import('./Md'));
 const RelativeTime = dynamic(() => import('./RelativeTime'));
@@ -20,17 +22,15 @@ const ReactionsDropdown = dynamic(() => import('./ReactionsDropdown'));
 interface CommentViewProps {
     id: string;
     description: string;
-    createdAt: Scalars['DateTime'];
+    createdAt: string;
+    updatedAt?: string;
     reactions?: Comment['reactions'];
-    updatedAt?: Scalars['DateTime'];
     author?: User;
     isNew?: boolean;
     isEditable?: boolean;
 
     onReactionToggle?: React.ComponentProps<typeof ReactionsDropdown>['onClick'];
 }
-
-export const commentMask = 'comment-';
 
 const StyledCommentActions = styled.div`
     display: flex;
@@ -50,12 +50,6 @@ const StyledCommentActions = styled.div`
     & > span + span {
         margin-left: ${gapS};
     }
-`;
-
-const StyledComment = styled.div`
-    display: grid;
-    grid-template-columns: 35px 1fr;
-    column-gap: 15px;
 `;
 
 const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
@@ -122,9 +116,10 @@ export const CommentView: FC<CommentViewProps> = ({
 }) => {
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);
+    const reactionsProps = useReactionsProps(reactions);
 
-    const onDoubleCommentClick = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
+    const onDoubleCommentClick = useCallback<React.MouseEventHandler>(
+        (e) => {
             if (isEditable && e.detail === 2) {
                 setTimeout(() => {
                     setEditMode(true);
@@ -134,57 +129,36 @@ export const CommentView: FC<CommentViewProps> = ({
         [isEditable],
     );
 
-    const onEdited = useCallback(
-        (id?: string, description?: string) => {
+    const onUpdate = useCallback<React.ComponentProps<typeof CommentEditForm>['onUpdate']>(
+        (comment) => {
             setEditMode(false);
-            setCommentDescription(description || commentDescription);
+            setCommentDescription(comment?.description || commentDescription);
         },
         [commentDescription],
     );
 
-    const onChanged = useCallback((description: string) => {
+    const onChanged = useCallback<React.ComponentProps<typeof CommentEditForm>['onChanged']>(({ description }) => {
         setCommentDescription(description);
     }, []);
 
-    const grouppedReactions = useMemo(
-        () =>
-            reactions?.reduce((acc, curr) => {
-                if (!curr) return acc;
-
-                acc[curr.emoji] = acc[curr.emoji]
-                    ? {
-                          count: acc[curr.emoji].count + 1,
-                          authors: acc[curr.emoji].authors.add(curr.activityId),
-                      }
-                    : {
-                          count: 1,
-                          authors: new Set(),
-                      };
-
-                return acc;
-            }, {} as ReactionsMap),
-        [reactions],
-    );
-    const reactionsGroupsNames = Object.keys(grouppedReactions || {});
-
     return (
-        <StyledComment id={`${commentMask}${id}`}>
+        <ActivityFeedItem id={`comment-${id}`}>
             <UserPic size={32} src={author?.image} email={author?.email} />
 
             {editMode ? (
                 <CommentEditForm
                     id={id}
                     description={commentDescription}
-                    onCancel={onEdited}
+                    onCancel={onUpdate}
                     onChanged={onChanged}
-                    onUpdate={onEdited}
+                    onUpdate={onUpdate}
                 />
             ) : (
                 <StyledCommentCard isNew={isNew} onClick={onDoubleCommentClick}>
                     <StyledCardInfo>
                         <div>
                             <Link inline>{author?.name}</Link> —{' '}
-                            <Link inline href={`#${commentMask}${id}`}>
+                            <Link inline href={`#comment-${id}`}>
                                 <RelativeTime date={createdAt} />
                             </Link>
                         </div>
@@ -194,7 +168,7 @@ export const CommentView: FC<CommentViewProps> = ({
                                     <Icon type="editCircle" size="xs" noWrap onClick={() => setEditMode(true)} />
                                 </span>
                             ))}
-                            {nullable(reactionsGroupsNames.length < reactionsGroupsLimit, () => (
+                            {nullable(!reactionsProps.limited, () => (
                                 <ReactionsDropdown view="icon" onClick={onReactionToggle} />
                             ))}
                         </StyledCommentActions>
@@ -205,12 +179,12 @@ export const CommentView: FC<CommentViewProps> = ({
 
                         {nullable(reactions?.length, () => (
                             <StyledReactions>
-                                <Reactions reactions={grouppedReactions} onClick={onReactionToggle} />
+                                <Reactions reactions={reactionsProps.reactions} onClick={onReactionToggle} />
                             </StyledReactions>
                         ))}
                     </CardComment>
                 </StyledCommentCard>
             )}
-        </StyledComment>
+        </ActivityFeedItem>
     );
 };

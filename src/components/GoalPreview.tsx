@@ -29,6 +29,7 @@ import Md from './Md';
 import { Link } from './Link';
 import { IssueStats } from './IssueStats';
 import { CommentView } from './CommentView';
+import { ActivityFeed } from './ActivityFeed';
 
 const StateSwitch = dynamic(() => import('./StateSwitch'));
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm'));
@@ -48,14 +49,6 @@ const StyledImportantActions = styled.div`
     & > * {
         margin-right: ${gapS};
     }
-`;
-
-const StyledActivityFeed = styled.div`
-    display: grid;
-    row-gap: ${gapM};
-
-    padding-top: ${gapM};
-    padding-bottom: 200px;
 `;
 
 const StyledModalHeader = styled(ModalHeader)`
@@ -186,9 +179,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                 </StyledCard>
 
                 {nullable(data, () => (
-                    <StyledActivityFeed>
-                        <div id="comments" />
-
+                    <ActivityFeed id="comments">
                         {goal.comments?.map((comment) =>
                             nullable(comment, (c) => (
                                 <CommentView
@@ -207,11 +198,11 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
 
                         <CommentCreateForm
                             goalId={goal.id}
-                            setFocus={commentFormFocus}
-                            onCreate={onCommentPublish}
+                            autoFocus={commentFormFocus}
+                            onSubmit={onCommentPublish}
                             onBlur={() => setCommentFormFocus(false)}
                         />
-                    </StyledActivityFeed>
+                    </ActivityFeed>
                 ))}
             </StyledModalContent>
         </ModalPreview>

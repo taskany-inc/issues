@@ -15,7 +15,7 @@ import { editGoalKeys } from '../../utils/hotkeys';
 import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
-import { gapL, gapM, gapS } from '../../design/@generated/themes';
+import { gapM, gapS } from '../../design/@generated/themes';
 import { Page, PageContent } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { Link } from '../../components/Link';
@@ -37,6 +37,7 @@ import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { useReactionsProps } from '../../hooks/useReactionsProps';
+import { ActivityFeed } from '../../components/ActivityFeed';
 
 const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
@@ -86,12 +87,6 @@ const IssueBaseActions = styled.div`
     & > * {
         margin-right: ${gapS};
     }
-`;
-
-const StyledActivityFeed = styled.div`
-    display: grid;
-    padding-top: ${gapL};
-    row-gap: ${gapM};
 `;
 
 const StyledIssueDeps = styled.div``;
@@ -422,9 +417,7 @@ const GoalPage = ({
                         </CardActions>
                     </Card>
 
-                    <StyledActivityFeed>
-                        <div id="comments" />
-
+                    <ActivityFeed id="comments">
                         {goal.comments?.map((comment) =>
                             nullable(comment, (c) => (
                                 <CommentView
@@ -443,11 +436,11 @@ const GoalPage = ({
 
                         <CommentCreateForm
                             goalId={goal.id}
-                            setFocus={commentFormFocus}
-                            onCreate={onCommentPublish}
+                            autoFocus={commentFormFocus}
+                            onSubmit={onCommentPublish}
                             onBlur={() => setCommentFormFocus(false)}
                         />
-                    </StyledActivityFeed>
+                    </ActivityFeed>
                 </div>
 
                 <StyledIssueDeps>
