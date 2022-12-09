@@ -185,7 +185,7 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
             if (autoFocus) {
                 monacoEditorRef.current?.focus();
                 setFocused(true);
-                onFocus && onFocus();
+                onFocus?.();
                 monacoEditorRef.current?.setPosition(monacoEditorRef.current?.getPosition());
             }
         }, [autoFocus, onFocus, viewValue, value]);
@@ -193,13 +193,13 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
         const onEditorFocus = useCallback(() => {
             setFocused(true);
             error && setPopupVisibility(true);
-            onFocus && onFocus();
+            onFocus?.();
         }, [onFocus, error]);
 
         const onEditorBlur = useCallback(() => {
             setFocused(false);
             error && setPopupVisibility(false);
-            onBlur && onBlur();
+            onBlur?.();
         }, [onBlur, error]);
 
         const [onESC] = useKeyboard([KeyCode.Escape], () => {
@@ -208,7 +208,7 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
             extraRef.current?.focus();
             extraRef.current?.blur();
 
-            onCancel && onCancel();
+            onCancel?.();
         });
 
         const onClickOutside = useCallback(() => setPopupVisibility(false), [setPopupVisibility]);

@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { commentMask } from '../components/CommentView';
-
 export const useHighlightedComment = () => {
     const { asPath } = useRouter();
     const [highlightCommentId, setHighlightCommentId] = useState<string | undefined>(undefined);
@@ -17,7 +15,7 @@ export const useHighlightedComment = () => {
     }, [highlightCommentId]);
 
     useEffect(() => {
-        const targetComment = asPath.split(`#${commentMask}`)[1];
+        const targetComment = asPath.split('#comment-')[1];
 
         if (targetComment) {
             setHighlightCommentId(targetComment);

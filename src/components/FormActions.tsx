@@ -1,9 +1,12 @@
 import styled, { css } from 'styled-components';
 
-import { gapS, gray3, radiusS, textColor } from '../design/@generated/themes';
+import { gapS, gray2, gray3, radiusS, textColor } from '../design/@generated/themes';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ flat?: 'top' | 'bottom' }>`
+export const FormActions = styled(({ flat, focused, ...props }) => <div {...props} />)<{
+    flat?: 'top' | 'bottom';
+    focused?: boolean;
+}>`
     box-sizing: border-box;
     padding: ${gapS};
     display: grid;
@@ -15,6 +18,12 @@ export const FormActions = styled(({ flat, ...props }) => <div {...props} />)<{ 
     background-color: ${gray3};
 
     color: ${textColor};
+
+    ${({ focused }) =>
+        focused &&
+        css`
+            background-color: ${gray2};
+        `}
 
     ${({ flat }) =>
         flat === 'top' &&
