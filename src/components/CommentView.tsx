@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Comment, User } from '../../graphql/@generated/genql';
 import { brandColor, danger0, gapM, gapS, gray4 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
-import { useReactionsProps } from '../hooks/useReactionsProps';
+import { useReactionsResource } from '../hooks/useReactionsResource';
 import { useCommentResource } from '../hooks/useCommentResource';
 
 import { Card, CardComment, CardInfo } from './Card';
@@ -116,7 +116,7 @@ export const CommentView: FC<CommentViewProps> = ({
     const { remove } = useCommentResource({ t });
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);
-    const reactionsProps = useReactionsProps(reactions);
+    const { reactionsProps } = useReactionsResource(reactions);
 
     const onEditClick = useCallback(() => {
         setEditMode(true);
