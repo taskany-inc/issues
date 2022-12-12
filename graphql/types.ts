@@ -352,6 +352,13 @@ export const CommentUpdateInput = inputObjectType({
     },
 });
 
+export const CommentDeleteInput = inputObjectType({
+    name: 'CommentDeleteInput',
+    definition(t) {
+        t.field(CommentModel.id);
+    },
+});
+
 export const ProjectInput = inputObjectType({
     name: 'ProjectInput',
     definition(t) {

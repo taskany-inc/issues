@@ -19,7 +19,7 @@ interface CommentEditFormProps {
 }
 
 const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onChanged, onUpdate, onCancel }) => {
-    const t = useTranslations('Comments.edit');
+    const t = useTranslations('Comment.edit');
     const { updateSchema, update } = useCommentResource({ t });
 
     const {
@@ -50,7 +50,7 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onCh
 
     return (
         <CommentForm
-            i18nKeyset="Comments.edit"
+            i18nKeyset="Comment.edit"
             control={control}
             autoFocus
             height="120px"

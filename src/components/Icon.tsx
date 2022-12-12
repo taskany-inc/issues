@@ -34,9 +34,13 @@ const componentsMap = {
     markdown: dynamic(() => import('teenyicons/outline/markdown.svg')),
     question: dynamic(() => import('teenyicons/outline/question-circle.svg')),
     editCircle: dynamic(() => import('teenyicons/outline/edit-circle.svg')),
+    edit: dynamic(() => import('teenyicons/outline/edit.svg')),
+    bin: dynamic(() => import('teenyicons/outline/bin.svg')),
+    moreVertical: dynamic(() => import('teenyicons/outline/more-vertical.svg')),
 };
 
 export const sizesMap = {
+    xxs: 12,
     xs: 14,
     s: 15,
     m: 32,
