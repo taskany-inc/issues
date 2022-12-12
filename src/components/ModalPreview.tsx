@@ -36,7 +36,7 @@ const StyledModal = styled.div`
 
     background-color: ${backgroundColor};
 
-    box-shadow: -10px 0px 20px 15px rgb(0 0 0 / 30%);
+    box-shadow: -10px 0px 25px 10px rgb(0 0 0 / 15%);
 `;
 
 export const ModalPreview: React.FC<ModalPreviewProps> = ({ visible, children, onClose, onShow }) => {

@@ -4,8 +4,9 @@ import { gapL, gapM } from '../design/@generated/themes';
 
 export const ActivityFeed = styled.div`
     display: grid;
-    padding-top: ${gapL};
     row-gap: ${gapM};
+    padding-top: ${gapL};
+    padding-bottom: 250px;
 `;
 
 export const ActivityFeedItem = styled.div`
