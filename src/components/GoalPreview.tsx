@@ -57,7 +57,7 @@ const StyledImportantActions = styled.div`
 const StyledModalHeader = styled(ModalHeader)`
     position: sticky;
 
-    box-shadow: 0 5px 10px 5px rgb(0 0 0 / 30%);
+    box-shadow: 0 2px 5px 2px rgb(0 0 0 / 10%);
 `;
 
 const StyledModalContent = styled(ModalContent)`
