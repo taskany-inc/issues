@@ -28,7 +28,7 @@
     "seed": "ts-node -r dotenv/config --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.154.0",
+    "@aws-sdk/client-s3": "3.226.0",
     "@genql/runtime": "2.10.0",
     "@hookform/resolvers": "2.9.10",
     "@monaco-editor/react": "4.4.6",
