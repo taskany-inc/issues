@@ -13,8 +13,7 @@ import { useHighlightedComment } from '../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../hooks/useGoalUpdate';
 import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
-import { gql } from '../utils/gql';
-import { useReactionsProps } from '../hooks/useReactionsProps';
+import { useReactionsResource } from '../hooks/useReactionsResource';
 
 import { ModalHeader, ModalContent } from './Modal';
 import { ModalPreview } from './ModalPreview';
@@ -86,7 +85,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
     const goal: Goal = data?.goal ?? partialGoal;
 
     const updateGoal = useGoalUpdate(t, goal);
-    const reactionsProps = useReactionsProps(goal.reactions);
+    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
 
     const priorityColorIndex = data?.goalPriorityKind?.indexOf(goal.priority || '') ?? -1;
     const priorityColor = priorityColorIndex >= 0 ? data?.goalPriorityColors?.[priorityColorIndex] : undefined;
@@ -120,29 +119,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
         [refresh, setHighlightCommentId],
     );
 
-    const onReactionsToggle = useCallback(
-        ({ goalId, commentId }: { goalId?: string; commentId?: string }) =>
-            async (emoji?: string) => {
-                if (!emoji) return;
-
-                await gql.mutation({
-                    toggleReaction: [
-                        {
-                            data: {
-                                emoji,
-                                goalId,
-                                commentId,
-                            },
-                        },
-                        {
-                            id: true,
-                        },
-                    ],
-                });
-
-                refresh();
-            },
-        [refresh],
+    const onGoalReactionToggle = useCallback((id: string) => goalReaction(id, refresh), [refresh, goalReaction]);
+    const onCommentReactionToggle = useCallback(
+        (id: string) => commentReaction(id, refresh),
+        [refresh, commentReaction],
     );
 
     return (
@@ -196,9 +176,9 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                         }
                     />
 
-                    <Reactions reactions={reactionsProps.reactions} onClick={onReactionsToggle({ goalId: goal.id })}>
+                    <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(goal.id)}>
                         {nullable(!reactionsProps.limited, () => (
-                            <ReactionsDropdown onClick={onReactionsToggle({ goalId: goal.id })} />
+                            <ReactionsDropdown onClick={onGoalReactionToggle(goal.id)} />
                         ))}
                     </Reactions>
                 </StyledImportantActions>
@@ -227,7 +207,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                                     isEditable={c.activity?.id === user?.activityId}
                                     isNew={c.id === highlightCommentId}
                                     reactions={c.reactions}
-                                    onReactionToggle={onReactionsToggle({ commentId: c.id })}
+                                    onReactionToggle={onCommentReactionToggle(c.id)}
                                 />
                             )),
                         )}

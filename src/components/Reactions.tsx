@@ -5,8 +5,7 @@ import { nullable } from '../utils/nullable';
 
 import { ReactionsButton } from './ReactionsButton';
 
-export const reactionsGroupsLimit = 10;
-export type ReactionsMap = Record<string, { count: number; authors: Set<string> }>;
+type ReactionsMap = Record<string, { count: number; authors: Set<string> }>;
 
 interface ReactionsProps {
     reactions?: ReactionsMap;

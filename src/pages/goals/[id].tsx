@@ -36,8 +36,8 @@ import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
-import { useReactionsProps } from '../../hooks/useReactionsProps';
 import { ActivityFeed } from '../../components/ActivityFeed';
+import { useReactionsResource } from '../../hooks/useReactionsResource';
 
 const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
@@ -142,7 +142,7 @@ const GoalPage = ({
     const [commentFormFocus, setCommentFormFocus] = useState(false);
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const updateGoal = useGoalUpdate(t, goal);
-    const reactionsProps = useReactionsProps(goal.reactions);
+    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
 
     useEffect(() => {
         goal.project && setCurrentProjectCache(goal.project);
@@ -218,29 +218,10 @@ const GoalPage = ({
         refresh();
     }, [stargizer, goal, refresh, t]);
 
-    const onReactionsToggle = useCallback(
-        ({ goalId, commentId }: { goalId?: string; commentId?: string }) =>
-            async (emoji?: string) => {
-                if (!emoji) return;
-
-                await gql.mutation({
-                    toggleReaction: [
-                        {
-                            data: {
-                                emoji,
-                                goalId,
-                                commentId,
-                            },
-                        },
-                        {
-                            id: true,
-                        },
-                    ],
-                });
-
-                refresh();
-            },
-        [refresh],
+    const onGoalReactionToggle = useCallback((id: string) => goalReaction(id, refresh), [refresh, goalReaction]);
+    const onCommentReactionToggle = useCallback(
+        (id: string) => commentReaction(id, refresh),
+        [refresh, commentReaction],
     );
 
     const onCommentDelete = useCallback(() => {
@@ -405,12 +386,9 @@ const GoalPage = ({
                                     <Button ghost text={formatEstimate(ie, locale)} />
                                 ))}
 
-                                <Reactions
-                                    reactions={reactionsProps.reactions}
-                                    onClick={onReactionsToggle({ goalId: goal.id })}
-                                >
+                                <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(goal.id)}>
                                     {nullable(!reactionsProps.limited, () => (
-                                        <ReactionsDropdown onClick={onReactionsToggle({ goalId: goal.id })} />
+                                        <ReactionsDropdown onClick={onGoalReactionToggle(goal.id)} />
                                     ))}
                                 </Reactions>
                             </IssueBaseActions>
@@ -433,7 +411,7 @@ const GoalPage = ({
                                     isEditable={c.activity?.id === user.activityId}
                                     isNew={c.id === highlightCommentId}
                                     reactions={c.reactions}
-                                    onReactionToggle={onReactionsToggle({ commentId: c.id })}
+                                    onReactionToggle={onCommentReactionToggle(c.id)}
                                     onDelete={onCommentDelete}
                                 />
                             )),
