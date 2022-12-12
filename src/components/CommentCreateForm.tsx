@@ -28,7 +28,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     goalId,
     autoFocus,
 }) => {
-    const t = useTranslations('Comments.new');
+    const t = useTranslations('Comment.new');
     const { user } = usePageContext();
     const { createSchema, create } = useCommentResource({ t });
     const [commentFocused] = useState(false);
@@ -81,7 +81,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
             <UserPic size={32} src={user?.image} email={user?.email} />
 
             <CommentForm
-                i18nKeyset="Comments.new"
+                i18nKeyset="Comment.new"
                 control={control}
                 isValid={isValid}
                 error={errors.description}

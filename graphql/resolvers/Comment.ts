@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import { nonNull, stringArg, arg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { Comment, CommentCreateInput, CommentUpdateInput } from '../types';
+import { Comment, CommentCreateInput, CommentDeleteInput, CommentUpdateInput } from '../types';
 import { mailServer } from '../../src/utils/mailServer';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -116,6 +116,24 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 });
 
                 return newComment;
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('deleteComment', {
+        type: Comment,
+        args: {
+            data: nonNull(arg({ type: CommentDeleteInput })),
+        },
+        resolve: async (_, { data: { id } }, { db }) => {
+            try {
+                return db.comment.delete({
+                    where: {
+                        id,
+                    },
+                });
             } catch (error) {
                 throw Error(`${error}`);
             }

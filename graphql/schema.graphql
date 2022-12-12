@@ -32,6 +32,10 @@ input CommentCreateInput {
   goalId: String!
 }
 
+input CommentDeleteInput {
+  id: ID!
+}
+
 input CommentUpdateInput {
   description: String!
   id: ID!
@@ -161,6 +165,7 @@ type Mutation {
   createGoal(data: GoalCreateInput!): Goal
   createProject(data: ProjectInput!): Project
   createTag(description: String, title: String!): Tag
+  deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
   toggleGoalDependency(toggle: GoalDependencyToggleInput!): Goal
   toggleGoalStargizer(toggle: SubscriptionToggleInput!): Activity

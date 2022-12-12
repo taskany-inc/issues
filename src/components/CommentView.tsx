@@ -1,11 +1,13 @@
 import React, { FC, useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 import { Comment, User } from '../../graphql/@generated/genql';
-import { brandColor, gapM, gapS, gray4, textColorPrimary } from '../design/@generated/themes';
+import { brandColor, danger0, gapM, gapS, gray4 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { useReactionsProps } from '../hooks/useReactionsProps';
+import { useCommentResource } from '../hooks/useCommentResource';
 
 import { Card, CardComment, CardInfo } from './Card';
 import { Link } from './Link';
@@ -13,8 +15,10 @@ import { UserPic } from './UserPic';
 import { Icon } from './Icon';
 import { Reactions } from './Reactions';
 import { ActivityFeedItem } from './ActivityFeed';
+import { MenuItem } from './MenuItem';
 
 const Md = dynamic(() => import('./Md'));
+const Dropdown = dynamic(() => import('./Dropdown'));
 const RelativeTime = dynamic(() => import('./RelativeTime'));
 const CommentEditForm = dynamic(() => import('./CommentEditForm'));
 const ReactionsDropdown = dynamic(() => import('./ReactionsDropdown'));
@@ -30,6 +34,7 @@ interface CommentViewProps {
     isEditable?: boolean;
 
     onReactionToggle?: React.ComponentProps<typeof ReactionsDropdown>['onClick'];
+    onDelete?: (id: string) => void;
 }
 
 const StyledCommentActions = styled.div`
@@ -37,15 +42,7 @@ const StyledCommentActions = styled.div`
     align-items: center;
     justify-self: end;
 
-    & > span {
-        display: flex;
-        align-self: center;
-        transition: color 150ms ease-in-out;
-
-        &:hover {
-            color: ${textColorPrimary};
-        }
-    }
+    margin-right: -10px;
 
     & > span + span {
         margin-left: ${gapS};
@@ -112,21 +109,28 @@ export const CommentView: FC<CommentViewProps> = ({
     isNew,
     isEditable,
     reactions,
+    onDelete,
     onReactionToggle,
 }) => {
+    const t = useTranslations('Comment.delete');
+    const { remove } = useCommentResource({ t });
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);
     const reactionsProps = useReactionsProps(reactions);
+
+    const onEditClick = useCallback(() => {
+        setEditMode(true);
+    }, []);
 
     const onDoubleCommentClick = useCallback<React.MouseEventHandler>(
         (e) => {
             if (isEditable && e.detail === 2) {
                 setTimeout(() => {
-                    setEditMode(true);
+                    onEditClick();
                 }, 100);
             }
         },
-        [isEditable],
+        [isEditable, onEditClick],
     );
 
     const onUpdate = useCallback<React.ComponentProps<typeof CommentEditForm>['onUpdate']>(
@@ -140,6 +144,13 @@ export const CommentView: FC<CommentViewProps> = ({
     const onChanged = useCallback<React.ComponentProps<typeof CommentEditForm>['onChanged']>(({ description }) => {
         setCommentDescription(description);
     }, []);
+
+    // TODO: think twice about this
+    const onDeleteClick = useCallback(() => {
+        remove(({ id }) => {
+            id && onDelete?.(id);
+        })({ id });
+    }, [id, onDelete, remove]);
 
     return (
         <ActivityFeedItem id={`comment-${id}`}>
@@ -163,13 +174,42 @@ export const CommentView: FC<CommentViewProps> = ({
                             </Link>
                         </div>
                         <StyledCommentActions>
-                            {nullable(isEditable, () => (
-                                <span>
-                                    <Icon type="editCircle" size="xs" noWrap onClick={() => setEditMode(true)} />
-                                </span>
-                            ))}
                             {nullable(!reactionsProps.limited, () => (
                                 <ReactionsDropdown view="icon" onClick={onReactionToggle} />
+                            ))}
+                            {nullable(isEditable, () => (
+                                <span>
+                                    <Dropdown
+                                        items={[
+                                            {
+                                                label: 'Edit',
+                                                icon: <Icon type="edit" size="xxs" />,
+                                                onClick: onEditClick,
+                                            },
+                                            {
+                                                label: 'Delete',
+                                                color: danger0,
+                                                icon: <Icon type="bin" size="xxs" />,
+                                                onClick: onDeleteClick,
+                                            },
+                                        ]}
+                                        renderTrigger={({ ref, onClick }) => (
+                                            <Icon type="moreVertical" size="xs" ref={ref} onClick={onClick} />
+                                        )}
+                                        renderItem={({ item, cursor, index }) => (
+                                            <MenuItem
+                                                key={item.label}
+                                                ghost
+                                                color={item.color}
+                                                focused={cursor === index}
+                                                icon={item.icon}
+                                                onClick={item.onClick}
+                                            >
+                                                {item.label}
+                                            </MenuItem>
+                                        )}
+                                    />
+                                </span>
                             ))}
                         </StyledCommentActions>
                     </StyledCardInfo>

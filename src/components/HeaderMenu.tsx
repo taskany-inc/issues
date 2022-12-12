@@ -87,10 +87,6 @@ const StyledMenuItem = styled.div`
     padding: ${gapXs} ${gapM};
 `;
 
-const StyledUnauthorizedLink = styled.span`
-    cursor: pointer;
-`;
-
 export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
     const t = useTranslations('HeaderMenu');
     const popupRef = useRef<HTMLDivElement>(null);
@@ -159,9 +155,7 @@ export const HeaderMenu = ({ notifications }: HeaderMenuProps) => {
                     </Link>
                 </NextLink>
             ) : (
-                <StyledUnauthorizedLink onClick={() => signIn()}>
-                    <UserPic size={32} />
-                </StyledUnauthorizedLink>
+                <UserPic size={32} onClick={() => signIn()} />
             )}
         </StyledHeaderMenu>
     );

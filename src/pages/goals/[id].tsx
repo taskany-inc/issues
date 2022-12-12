@@ -243,6 +243,10 @@ const GoalPage = ({
         [refresh],
     );
 
+    const onCommentDelete = useCallback(() => {
+        refresh();
+    }, [refresh]);
+
     const onParticipantsChange = useCallback(
         async (participants: string[]) => {
             await updateGoal({
@@ -430,6 +434,7 @@ const GoalPage = ({
                                     isNew={c.id === highlightCommentId}
                                     reactions={c.reactions}
                                     onReactionToggle={onReactionsToggle({ commentId: c.id })}
+                                    onDelete={onCommentDelete}
                                 />
                             )),
                         )}
