@@ -29,7 +29,6 @@ interface CommentFormProps {
 
     onSubmit?: () => void;
     onFocus?: () => void;
-    onBlur?: () => void;
     onCancel?: () => void;
 }
 
@@ -76,7 +75,6 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     isValid,
     onSubmit,
     onFocus,
-    onBlur,
     onCancel,
 }) => {
     const t = useTranslations(i18nKeyset);
@@ -87,13 +85,6 @@ export const CommentForm: React.FC<CommentFormProps> = ({
         setCommentFocused(true);
         onFocus?.();
     }, [onFocus]);
-
-    const onCommentBlur = useCallback(() => {
-        setTimeout(() => {
-            setCommentFocused(false);
-            onBlur?.();
-        }, 100);
-    }, [onBlur]);
 
     const onCommentCancel = useCallback(() => {
         setCommentFocused(false);
@@ -113,7 +104,6 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                             height={height}
                             onCancel={onCommentCancel}
                             onFocus={onCommentFocus}
-                            onBlur={onCommentBlur}
                             autoFocus={autoFocus}
                             error={commentFocused ? error : undefined}
                         />
