@@ -15,23 +15,14 @@ interface CommentCreateFormProps {
     autoFocus?: boolean;
 
     onSubmit?: (id?: string) => void;
-    onBlur?: () => void;
     onFocus?: () => void;
     onCancel?: () => void;
 }
 
-const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
-    onSubmit,
-    onBlur,
-    onFocus,
-    onCancel,
-    goalId,
-    autoFocus,
-}) => {
+const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus, onCancel, goalId, autoFocus }) => {
     const t = useTranslations('Comment.new');
     const { user } = usePageContext();
     const { createSchema, create } = useCommentResource({ t });
-    const [commentFocused] = useState(false);
     const [focus, setFocus] = useState<boolean | undefined>();
 
     const {
@@ -62,13 +53,8 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     const onCommentFocus = useCallback(() => {
         onFocus?.();
         clearErrors();
+        setFocus(true);
     }, [onFocus, clearErrors]);
-
-    const onCommentBlur = useCallback(() => {
-        onBlur?.();
-        reset();
-        setFocus(false);
-    }, [onBlur, reset]);
 
     const onCancelCreate = useCallback(() => {
         onCancel?.();
@@ -86,10 +72,9 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                 isValid={isValid}
                 error={errors.description}
                 autoFocus={focus}
-                height={commentFocused ? '120px' : '60px'}
+                height={focus ? '120px' : '60px'}
                 onSubmit={handleSubmit(createComment)}
                 onCancel={onCancelCreate}
-                onBlur={onCommentBlur}
                 onFocus={onCommentFocus}
             />
         </ActivityFeedItem>

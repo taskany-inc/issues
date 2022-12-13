@@ -2,11 +2,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
+import { useDropzone } from 'react-dropzone';
 
-import { danger10, gray2, gray3, gray6, radiusS, textColor } from '../design/@generated/themes';
+import { danger10, gapS, gapXs, gray2, gray3, gray4, gray6, radiusS, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { useMounted } from '../hooks/useMounted';
+import { useUpload } from '../hooks/useUpload';
 
 const Editor = dynamic(() => import('@monaco-editor/react'));
 const Popup = dynamic(() => import('./Popup'));
@@ -42,9 +44,10 @@ const defaultOptions: React.ComponentProps<typeof Editor>['options'] = {
         },
     },
     overviewRulerBorder: false,
+    scrollBeyondLastLine: false,
 };
 
-const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
+const StyledEditor = styled.div<{ flat: FormEditorProps['flat']; value: boolean }>`
     position: relative;
     box-sizing: border-box;
 
@@ -112,6 +115,10 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
         .lines-content {
             margin-top: 8px;
         }
+
+        .decorationsOverviewRuler {
+            visibility: hidden;
+        }
     }
 
     .monaco-editor.focused {
@@ -123,6 +130,20 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat'] }>`
             background-color: ${gray2};
         }
     }
+
+    ${({ value }) =>
+        value &&
+        css`
+            .monaco-editor {
+                background-color: ${gray2};
+
+                .monaco-editor-background,
+                .margin,
+                .inputarea.ime-input {
+                    background-color: ${gray2};
+                }
+            }
+        `}
 `;
 
 const StyledPlaceholder = styled.div`
@@ -148,6 +169,43 @@ const StyledErrorTrigger = styled.div`
     z-index: 2;
 `;
 
+const StyledUploadButton = styled.div`
+    position: absolute;
+    padding: ${gapXs} ${gapS};
+    bottom: -38px;
+
+    border-top: 1px dashed ${gray4};
+
+    color: ${gray6};
+    font-size: 13px;
+
+    cursor: pointer;
+`;
+
+const StyledUploadInput = styled.input`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+
+    cursor: pointer;
+`;
+
+const StyledDropZone = styled.div`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+
+    opacity: 0;
+    visibility: hidden;
+`;
+
+const mdImageLink = (url: string) => `![](${url})`;
+
 export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
     (
         { id, value, flat, autoFocus, height = '200px', placeholder, error, onChange, onFocus, onBlur, onCancel },
@@ -156,25 +214,24 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
         const [focused, setFocused] = useState(false);
         const monacoEditorRef = useRef<any>(null);
         const extraRef = useRef<HTMLDivElement>(null);
+        const popupRef = useRef<HTMLDivElement>(null);
         const [viewValue, setViewValue] = useState<string | undefined>('');
         const [popupVisible, setPopupVisibility] = useState(false);
-        const popupRef = useRef<HTMLDivElement>(null);
         const mounted = useMounted();
+        const { loading, files, uploadFiles } = useUpload();
+        // @ts-ignore
+        const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: uploadFiles });
 
         const handleEditorDidMount = (editor: any /* IStandaloneEditor */) => {
             monacoEditorRef.current = editor;
 
             if (autoFocus) {
-                editor.focus();
-                setFocused(true);
-                onFocus && onFocus();
-
                 if (viewValue !== value) {
                     editor.trigger('keyboard', 'type', { text: value });
                 }
-            } else {
-                setViewValue(value);
             }
+
+            setViewValue(value);
         };
 
         useEffect(() => {
@@ -211,11 +268,80 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
             onCancel?.();
         });
 
-        const onClickOutside = useCallback(() => setPopupVisibility(false), [setPopupVisibility]);
+        const onPopupClickOutside = useCallback(() => setPopupVisibility(false), [setPopupVisibility]);
+
+        const onEditorClickOutside = useCallback(
+            (e: MouseEvent) => {
+                // @ts-ignore
+                if (extraRef.current && !extraRef.current.contains(e.target)) {
+                    onEditorBlur();
+
+                    if (!value) {
+                        onCancel?.();
+                    }
+                }
+            },
+            [onEditorBlur, onCancel, value],
+        );
+
+        useEffect(() => {
+            document.addEventListener('click', onEditorClickOutside, true);
+
+            return () => {
+                document.removeEventListener('click', onEditorClickOutside, true);
+            };
+        }, [onEditorClickOutside]);
+
+        useEffect(() => {
+            if (!files) return;
+
+            const p = monacoEditorRef.current.getPosition();
+            monacoEditorRef.current.executeEdits('', [
+                {
+                    range: {
+                        startLineNumber: p.lineNumber,
+                        startColumn: p.column,
+                        endLineNumber: p.lineNumber,
+                        endColumn: p.column,
+                    },
+                    text: files.map((url) => mdImageLink(url)).join(', '),
+                },
+            ]);
+        }, [files]);
+
+        const onEditorPaste = useCallback(
+            (e: React.ClipboardEvent<HTMLDivElement>) => {
+                if (!e.clipboardData.files.length) return;
+
+                uploadFiles(e.clipboardData.files);
+            },
+            [uploadFiles],
+        );
+
+        const onFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (!e.target.files) return;
+
+            await uploadFiles(e.target.files);
+        };
 
         return (
-            <div tabIndex={0} ref={extraRef} style={{ outline: 'none' }}>
-                <StyledEditor tabIndex={0} id={id} flat={flat} ref={ref} {...onESC}>
+            <div tabIndex={0} ref={extraRef} style={{ outline: 'none' }} onPaste={onEditorPaste}>
+                <StyledEditor
+                    {...getRootProps()}
+                    value={Boolean(viewValue)}
+                    tabIndex={-1}
+                    id={id}
+                    flat={flat}
+                    ref={ref}
+                    {...onESC}
+                    onClick={() => {}}
+                >
+                    {nullable(isDragActive, () => (
+                        <StyledDropZone>
+                            <input {...getInputProps()} />
+                        </StyledDropZone>
+                    ))}
+
                     {nullable(error, (err) => (
                         <>
                             <StyledErrorTrigger
@@ -228,7 +354,7 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
                                 view="danger"
                                 placement="top-start"
                                 visible={popupVisible}
-                                onClickOutside={onClickOutside}
+                                onClickOutside={onPopupClickOutside}
                                 reference={popupRef}
                             >
                                 {err.message}
@@ -240,7 +366,7 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
                         <StyledPlaceholder>{placeholder}</StyledPlaceholder>
                     ))}
 
-                    <div onFocus={onEditorFocus} onBlur={onEditorBlur}>
+                    <div onFocus={onEditorFocus}>
                         <Editor
                             loading=""
                             theme="vs-dark"
@@ -251,6 +377,15 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
                             onChange={onChange}
                             onMount={handleEditorDidMount}
                         />
+
+                        {nullable(focused, () => (
+                            <StyledUploadButton>
+                                <StyledUploadInput onChange={onFileInputChange} type="file" multiple />
+                                {loading
+                                    ? 'Uploading...'
+                                    : 'Attach files by dragging & dropping, selecting or pasting them.'}
+                            </StyledUploadButton>
+                        ))}
                     </div>
                 </StyledEditor>
             </div>
