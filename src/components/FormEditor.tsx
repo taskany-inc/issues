@@ -208,7 +208,7 @@ const mdImageLink = (url: string) => `![](${url})`;
 
 export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
     (
-        { id, value, flat, autoFocus, height = '200px', placeholder, error, onChange, onFocus, onBlur, onCancel },
+        { id, value, flat, height = '200px', placeholder, error, autoFocus, onChange, onFocus, onBlur, onCancel },
         ref,
     ) => {
         const [focused, setFocused] = useState(false);

@@ -139,7 +139,6 @@ const GoalPage = ({
         // @ts-ignore unexpectable trouble with filter
         goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
     );
-    const [commentFormFocus, setCommentFormFocus] = useState(false);
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const updateGoal = useGoalUpdate(t, goal);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
@@ -269,14 +268,9 @@ const GoalPage = ({
         (id?: string) => {
             refresh();
             setHighlightCommentId(id);
-            setCommentFormFocus(false);
         },
         [refresh, setHighlightCommentId],
     );
-
-    const onCommentLinkClick = useCallback(() => {
-        setCommentFormFocus(true);
-    }, []);
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(() => {
@@ -315,11 +309,7 @@ const GoalPage = ({
                         <StateSwitch state={s} flowId={goal.project?.flowId} onClick={onGoalStateChange} />
                     ))}
 
-                    <IssueStats
-                        comments={goal.comments?.length || 0}
-                        updatedAt={goal.updatedAt}
-                        onCommentsClick={onCommentLinkClick}
-                    />
+                    <IssueStats comments={goal.comments?.length || 0} updatedAt={goal.updatedAt} />
                 </StyledIssueInfo>
 
                 <StyledIssueInfo align="right">
@@ -417,12 +407,7 @@ const GoalPage = ({
                             )),
                         )}
 
-                        <CommentCreateForm
-                            goalId={goal.id}
-                            autoFocus={commentFormFocus}
-                            onSubmit={onCommentPublish}
-                            onBlur={() => setCommentFormFocus(false)}
-                        />
+                        <CommentCreateForm goalId={goal.id} onSubmit={onCommentPublish} />
                     </ActivityFeed>
                 </div>
 

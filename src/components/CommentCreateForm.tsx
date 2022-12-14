@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
@@ -12,14 +12,13 @@ import { ActivityFeedItem } from './ActivityFeed';
 
 interface CommentCreateFormProps {
     goalId: string;
-    autoFocus?: boolean;
 
     onSubmit?: (id?: string) => void;
     onFocus?: () => void;
     onCancel?: () => void;
 }
 
-const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus, onCancel, goalId, autoFocus }) => {
+const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus, onCancel, goalId }) => {
     const t = useTranslations('Comment.new');
     const { user } = usePageContext();
     const { createSchema, create } = useCommentResource({ t });
@@ -40,10 +39,6 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
             goalId,
         },
     });
-
-    useEffect(() => {
-        setFocus(autoFocus);
-    }, [autoFocus]);
 
     const createComment = create(({ id }) => {
         onSubmit?.(id);
@@ -71,7 +66,6 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
                 control={control}
                 isValid={isValid}
                 error={errors.description}
-                autoFocus={focus}
                 height={focus ? '120px' : '60px'}
                 onSubmit={handleSubmit(createComment)}
                 onCancel={onCancelCreate}
