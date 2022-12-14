@@ -87,7 +87,7 @@ route.post(upload.array(formFieldName, 10), async (req: any, res: NextApiRespons
                             ContentType: mimetype,
                         }),
                     ),
-                ).then(() => `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${folder}/${fileName}`);
+                ).then(() => `${process.env.PUBLIC_URL}/static/${folder}/${fileName}`);
             },
         ),
     );
