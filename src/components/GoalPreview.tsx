@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
@@ -74,7 +74,6 @@ const StyledCard = styled(Card)`
 const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, onClose }) => {
     const t = useTranslations('goals.id');
     const { user, locale } = usePageContext();
-    const [commentFormFocus, setCommentFormFocus] = useState(false);
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
 
     const { data, mutate } = useSWR([user, partialGoal.id], (...args) => goalFetcher(...args), {
@@ -106,15 +105,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
         [updateGoal, refresh],
     );
 
-    const onCommentLinkClick = useCallback(() => {
-        setCommentFormFocus(true);
-    }, []);
-
     const onCommentPublish = useCallback(
         (id?: string) => {
             refresh();
             setHighlightCommentId(id);
-            setCommentFormFocus(false);
         },
         [refresh, setHighlightCommentId],
     );
@@ -140,12 +134,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                     <IssueProject as="span" mode="compact" project={project} size="m" />
                 ))}
 
-                <IssueStats
-                    mode="compact"
-                    comments={goal.comments?.length || 0}
-                    updatedAt={goal.updatedAt}
-                    onCommentsClick={onCommentLinkClick}
-                />
+                <IssueStats mode="compact" comments={goal.comments?.length || 0} updatedAt={goal.updatedAt} />
 
                 {nullable(goal.title, (title) => (
                     <IssueTitle title={title} href={routes.goal(goal.id)} size="xl" />
@@ -212,12 +201,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                             )),
                         )}
 
-                        <CommentCreateForm
-                            goalId={goal.id}
-                            autoFocus={commentFormFocus}
-                            onSubmit={onCommentPublish}
-                            onBlur={() => setCommentFormFocus(false)}
-                        />
+                        <CommentCreateForm goalId={goal.id} onSubmit={onCommentPublish} />
                     </ActivityFeed>
                 ))}
             </StyledModalContent>
