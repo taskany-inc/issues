@@ -110,13 +110,17 @@ model Activity {
   comments           Comment[]
   reactions          Reaction[]
   projects           Project[]
+  teams              Team[]
   estimates          Estimate[]
+  teamParticipant    Team[]     @relation("teamParticipants")
   projectParticipant Project[]  @relation("projectParticipants")
   goalParticipant    Goal[]     @relation("goalParticipants")
   goalWatchers       Goal[]     @relation("goalWatchers")
   goalStargizers     Goal[]     @relation("goalStargizers")
   projectWatchers    Project[]  @relation("projectWatchers")
   projectStargizers  Project[]  @relation("projectStargizers")
+  teamWatchers       Team[]     @relation("teamWatchers")
+  teamStargizers     Team[]     @relation("teamStargizers")
   goalOwner          Goal[]     @relation("goalOwner")
   goalIssuer         Goal[]     @relation("goalIssuer")
   settings           Settings   @relation(fields: [settingsId], references: [id])
@@ -138,6 +142,7 @@ model Project {
   children     Project[]  @relation("parentChildren")
   activity     Activity   @relation(fields: [activityId], references: [id])
   activityId   String
+  teams        Team[]     @relation("teamProjects")
   participants Activity[] @relation("projectParticipants")
   goals        Goal[]     @relation("projectGoals")
   flow         Flow       @relation(fields: [flowId], references: [id])
@@ -150,6 +155,26 @@ model Project {
   updatedAt DateTime @default(now()) @updatedAt
 
   @@index([key])
+  @@index([activityId])
+}
+
+model Team {
+  id           Int        @id @default(autoincrement())
+  title        String     @unique
+  description  String?
+  parent       Team?      @relation("teamChildren", fields: [id], references: [id])
+  children     Team[]     @relation("teamChildren")
+  projects     Project[]  @relation("teamProjects")
+  activity     Activity   @relation(fields: [activityId], references: [id])
+  activityId   String
+  participants Activity[] @relation("teamParticipants")
+  goals        Goal[]     @relation("teamGoals")
+  watchers     Activity[] @relation("teamWatchers")
+  stargizers   Activity[] @relation("teamStargizers")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   @@index([activityId])
 }
 
@@ -180,6 +205,8 @@ model Goal {
   estimate     Estimate[]
   project      Project?   @relation("projectGoals", fields: [projectId], references: [id])
   projectId    Int?
+  team         Team?      @relation("teamGoals", fields: [teamId], references: [id])
+  teamId       Int?
   state        State?     @relation("goalState", fields: [stateId], references: [id])
   stateId      String?
   activity     Activity?  @relation("goalIssuer", fields: [activityId], references: [id])
