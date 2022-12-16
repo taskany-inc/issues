@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useState, ChangeEvent, useEffect } from 'react';
+import React, { useCallback, useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
@@ -53,10 +53,6 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
         const [inputState, setInputState] = useState(query);
         const [tags, setTags] = useState(value);
 
-        useEffect(() => {
-            setTags(value);
-        }, [value]);
-
         const t = useTranslations('TagCompletion');
         const { data } = useSWR(inputState, (q) => fetcher(user, q));
 
@@ -94,13 +90,14 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
             async (tag: TagModel) => {
                 if (!data?.tagCompletion?.length) {
                     await createTag();
+                    return;
                 }
                 const newTags = [...tags, tag];
                 setTags(newTags);
                 onChange?.(newTags);
                 setInputState('');
             },
-            [onChange, tags, data?.tagCompletion?.length, createTag],
+            [onChange, tags, data?.tagCompletion, createTag],
         );
 
         const filterIds = value.map((t) => t.id);
