@@ -9,6 +9,7 @@ interface InputContainerProps {
     hovered?: boolean;
     children?: React.ReactNode;
 }
+
 export const InputContainer = styled.div<InputContainerProps>`
     display: flex;
     flex-direction: row;

@@ -13,7 +13,6 @@ import {
     parseLocaleDate,
     formatEstimate,
 } from '../utils/dateTime';
-import { is } from '../utils/styles';
 import { TLocale } from '../types/locale';
 import { usePageContext } from '../hooks/usePageContext';
 
@@ -90,13 +89,12 @@ const StyledTriggerContainer = styled.div`
     }
 `;
 
-const CheckableButton = styled(Button)`
-    ${is(
-        { checked: true },
+const CheckableButton = styled(Button)<{ checked?: boolean }>`
+    ${({ checked }) =>
+        checked &&
         css`
             background-color: ${gray6};
-        `,
-    )}
+        `}
 `;
 
 const isValidDate = (d: string) => !d.includes('_');

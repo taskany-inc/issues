@@ -3,13 +3,20 @@ import styled, { css } from 'styled-components';
 
 import { link10 } from '../design/@generated/themes';
 
-interface LinkProps extends React.HTMLProps<HTMLLinkElement> {
+interface LinkProps {
     inline?: boolean;
     className?: string;
+    children?: React.ReactNode;
+    href?: string;
+    onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledLink = styled(({ forwardRef, inline, ...props }) => <a ref={forwardRef} {...props} />)`
+const StyledLink = styled(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ({ forwardRef, inline, ...props }: LinkProps & { forwardRef?: React.Ref<HTMLAnchorElement> }) => (
+        <a ref={forwardRef} {...props} />
+    ),
+)`
     color: ${link10};
 
     transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
@@ -35,6 +42,6 @@ const StyledLink = styled(({ forwardRef, inline, ...props }) => <a ref={forwardR
 `;
 
 // eslint-disable-next-line react/display-name
-export const Link = React.forwardRef<HTMLLinkElement, LinkProps>(({ as, ...props }, ref) => {
+export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(({ ...props }, ref) => {
     return <StyledLink {...props} forwardRef={ref} />;
 });

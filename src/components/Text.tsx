@@ -1,4 +1,3 @@
-import { HTMLAttributes } from 'react';
 import styled, { css, createGlobalStyle } from 'styled-components';
 
 import { fontDisplay, gapL, gapM, gapS, gapSm, gapXl, gapXs, textColor } from '../design/@generated/themes';
@@ -38,19 +37,14 @@ const calcTextSize = (size: keyof typeof textSizes, weight: keyof typeof textWei
         font-weight: ${textWeight[weight]};
     `;
 
-interface TextProps extends HTMLAttributes<HTMLOrSVGElement> {
+interface TextProps {
     size?: keyof typeof textSizes;
     weight?: keyof typeof textWeight;
     color?: string;
-    as?: string;
-    forwardRef?: React.RefObject<any>;
-    children?: React.ReactNode;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const Text = styled(({ forwardRef, color, weight, size, ...props }: TextProps) => (
-    <div ref={forwardRef} {...props} />
-))<TextProps>`
+export const Text = styled.div<TextProps>`
     font-size: 16px;
     font-family: ${fontDisplay};
     color: ${textColor};

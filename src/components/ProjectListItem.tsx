@@ -47,8 +47,6 @@ const StyledName = styled.div`
     max-width: 100%;
 `;
 
-const StyledTitle = styled(Text)``;
-
 const StyledDescription = styled(Text)`
     margin-top: ${gapS};
 `;
@@ -76,9 +74,9 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
         <Link href={routes.project(projectKey)} passHref>
             <StyledProjectListItem>
                 <StyledName>
-                    <StyledTitle size="m" weight="bold">
+                    <Text size="m" weight="bold">
                         {title}
-                    </StyledTitle>
+                    </Text>
 
                     {nullable(description, (d) => (
                         <StyledDescription size="s" color={gray7}>

@@ -23,7 +23,6 @@ import {
     danger2,
     radiusM,
 } from '../design/@generated/themes';
-import { is } from '../utils/styles';
 
 interface ButtonProps {
     text?: string;
@@ -35,11 +34,13 @@ interface ButtonProps {
     view?: 'default' | 'primary' | 'warning' | 'danger';
     outline?: boolean;
     size?: 's' | 'm' | 'l';
-    type?: 'submit';
+    type?: 'submit' | 'button';
     iconLeft?: React.ReactNode;
     iconRight?: React.ReactNode;
     brick?: 'left' | 'right' | 'center';
     className?: string;
+    forwardRef?: React.Ref<HTMLButtonElement>;
+    children?: React.ReactNode;
 
     onClick?: React.MouseEventHandler;
     onMouseEnter?: React.MouseEventHandler;
@@ -54,10 +55,10 @@ const StyledText = styled.span``;
 
 const StyledButton = styled(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, checked, outline, ...props }) => (
+    ({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, checked, outline, ...props }: ButtonProps) => (
         <button ref={forwardRef} {...props} />
     ),
-)`
+)<ButtonProps>`
     position: relative;
     box-sizing: border-box;
 
@@ -116,8 +117,8 @@ const StyledButton = styled(
             }
         `}
 
-    ${is(
-        { view: 'primary' },
+    ${({ view }) =>
+        view === 'primary' &&
         css`
             font-weight: 500;
             color: ${textColorPrimary};
@@ -132,11 +133,10 @@ const StyledButton = styled(
                 border-color: ${colorPrimaryAccent};
                 background-color: ${colorPrimaryAccent};
             }
-        `,
-    )}
+        `}
 
-    ${is(
-        { view: 'warning' },
+    ${({ view }) =>
+        view === 'warning' &&
         css`
             color: ${warn1};
             border-color: ${warn0};
@@ -150,11 +150,10 @@ const StyledButton = styled(
                 border-color: ${warn10};
                 background-color: ${warn10};
             }
-        `,
-    )}
+        `}
 
-    ${is(
-        { view: 'danger' },
+    ${({ view }) =>
+        view === 'danger' &&
         css`
             color: ${danger1};
             border-color: ${danger9};
@@ -168,11 +167,10 @@ const StyledButton = styled(
                 border-color: ${danger10};
                 background-color: ${danger10};
             }
-        `,
-    )}
+        `}
 
-    ${is(
-        { outline: true },
+    ${({ outline }) =>
+        outline &&
         css`
             background-color: transparent;
 
@@ -183,37 +181,38 @@ const StyledButton = styled(
             :active:not([disabled]) {
                 color: ${textColor};
             }
-        `,
-    )}
+        `}
 
-    ${is(
-        { size: 's' },
-        css`
-            padding: 3px 12px;
+    ${({ size }) =>
+        size &&
+        {
+            s: css`
+                padding: 3px 12px;
 
-            font-size: 12px;
-        `,
-    )}
+                font-size: 12px;
+            `,
+            m: css`
+                min-height: 28px;
+                padding: 5px 16px;
 
-    ${is(
-        { size: 'm' },
-        css`
-            min-height: 28px;
-            padding: 5px 16px;
+                font-size: 13px;
 
-            font-size: 13px;
+                ${StyledIcon} {
+                    width: 15px;
+                    height: 15px;
+                }
 
-            ${StyledIcon} {
-                width: 15px;
-                height: 15px;
-            }
+                ${StyledIcon} + ${StyledText},
+                ${StyledText} + ${StyledIcon} {
+                    padding-left: 8px;
+                }
+            `,
+            l: css`
+                padding: 0.6em 1.5em;
 
-            ${StyledIcon} + ${StyledText},
-            ${StyledText} + ${StyledIcon} {
-                padding-left: 8px;
-            }
-        `,
-    )}
+                font-size: 16px;
+            `,
+        }[size]}
 
     ${({ iconRight, iconLeft, size }) =>
         size === 'm' &&
@@ -222,45 +221,28 @@ const StyledButton = styled(
             padding: 5px 10px;
         `}
 
-    ${is(
-        { size: 'l' },
-        css`
-            padding: 0.6em 1.5em;
+    ${({ brick }) =>
+        brick &&
+        {
+            left: css`
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            `,
+            right: css`
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            `,
+            center: css`
+                border-radius: 0;
+            `,
+        }[brick]}
 
-            font-size: 16px;
-        `,
-    )}
-
-    ${is(
-        { brick: 'left' },
-        css`
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-        `,
-    )}
-
-    ${is(
-        { brick: 'right' },
-        css`
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        `,
-    )}
-
-    ${is(
-        { brick: 'center' },
-        css`
-            border-radius: 0;
-        `,
-    )}
-
-    ${is(
-        { ghost: true },
+    ${({ ghost }) =>
+        ghost &&
         css`
             border-color: transparent;
             background-color: ${gray5};
-        `,
-    )}
+        `}
 `;
 
 const Aligner = styled.span`

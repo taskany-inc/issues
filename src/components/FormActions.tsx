@@ -2,11 +2,14 @@ import styled, { css } from 'styled-components';
 
 import { gapS, gray2, gray3, radiusS, textColor } from '../design/@generated/themes';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const FormActions = styled(({ flat, focused, ...props }) => <div {...props} />)<{
+interface FormActionsProps {
     flat?: 'top' | 'bottom';
     focused?: boolean;
-}>`
+    children?: React.ReactNode;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const FormActions = styled(({ flat, focused, ...props }: FormActionsProps) => <div {...props} />)`
     box-sizing: border-box;
     padding: ${gapS};
     display: grid;

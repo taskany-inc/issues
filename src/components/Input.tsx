@@ -16,6 +16,7 @@ interface InputProps {
     view?: 'default' | 'primary' | 'warning' | 'danger';
     size?: 's' | 'm' | 'l';
     className?: string;
+    forwardRef?: React.Ref<HTMLInputElement>;
 
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
     onInput?: React.ChangeEventHandler<HTMLInputElement>;
@@ -24,7 +25,7 @@ interface InputProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledInput = styled(({ forwardRef, size, view, ...props }) => <input ref={forwardRef} {...props} />)<InputProps>`
+const StyledInput = styled(({ forwardRef, size, view, ...props }: InputProps) => <input ref={forwardRef} {...props} />)`
     box-sizing: border-box;
     width: 100%;
 
