@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { backgroundColor, danger0, gapM, gapS, gray4, radiusM, warn0 } from '../design/@generated/themes';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
@@ -59,9 +59,7 @@ const StyledModal = styled.div<{ view?: ModalViewType }>`
 
     background-color: ${backgroundColor};
 
-    ${({ view = 'default' }) => css`
-        border: 1px solid ${colorsMap[view]};
-    `}
+    border: 1px solid ${({ view = 'default' }) => colorsMap[view]};
 `;
 
 const StyledCross = styled.div`

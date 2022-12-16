@@ -1,5 +1,5 @@
 import React, { ComponentProps } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { colorPrimary, danger0, gapXs, gray3, gray4, radiusS, warn0 } from '../design/@generated/themes';
@@ -33,6 +33,12 @@ interface PopupProps {
     onHidden?: ComponentProps<typeof Tippy>['onHidden'];
     onClickOutside?: ComponentProps<typeof Tippy>['onClickOutside'];
 }
+
+const colorsMap = {
+    primary: colorPrimary,
+    danger: danger0,
+    warning: warn0,
+};
 
 const StyledPopupArrow = styled.div`
     visibility: hidden;
@@ -80,47 +86,35 @@ const StyledPopupContainer = styled.div<{
 
     ${({ tooltip }) =>
         tooltip &&
-        css`
+        `
             font-size: 14px;
             font-weight: 500;
         `}
 
     ${({ view }) =>
-        view === 'primary' &&
-        css`
-            background-color: ${colorPrimary};
-        `}
-
-    ${({ view }) =>
-        view === 'danger' &&
-        css`
-            background-color: ${danger0};
-        `}
-
-    ${({ view }) =>
-        view === 'warning' &&
-        css`
-            background-color: ${warn0};
+        view &&
+        `
+            background-color: ${colorsMap[view]};
         `}
 
     ${({ overflow }) =>
         overflow
-            ? css`
+            ? `
                   overflow: hidden;
               `
-            : css`
+            : `
                   padding: ${gapXs};
               `}
 
     ${({ maxWidth }) =>
         maxWidth &&
-        css`
+        `
             max-width: ${maxWidth}px;
         `}
 
     ${({ minWidth }) =>
         minWidth &&
-        css`
+        `
             min-width: ${minWidth}px;
         `}
 

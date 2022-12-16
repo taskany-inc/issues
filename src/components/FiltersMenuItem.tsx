@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapS, gray9, radiusXl, textColor } from '../design/@generated/themes';
 
@@ -26,7 +26,7 @@ export const FiltersMenuItem = styled.span<FiltersMenuItemProps>`
 
     ${({ active }) =>
         active &&
-        css`
+        `
             color: ${textColor};
         `}
 

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapXs, gray4, gray7, gray8, radiusM } from '../design/@generated/themes';
 
@@ -39,7 +39,7 @@ const StyledGoalMenuItem = styled.div<{ focused?: boolean }>`
 
     ${({ focused }) =>
         focused &&
-        css`
+        `
             border-color: ${gray8};
             background-color: ${gray4};
         `}

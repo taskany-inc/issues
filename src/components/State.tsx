@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import colorLayer from 'color-layer';
 
 import { gray6, radiusXl } from '../design/@generated/themes';
@@ -46,13 +46,13 @@ const StyledState = styled.div<{
 
     ${({ onClick }) =>
         onClick &&
-        css`
+        `
             cursor: pointer;
         `}
 
     ${({ size }) =>
         size === 's' &&
-        css`
+        `
             padding: 4px 10px;
             font-size: 12px;
         `}

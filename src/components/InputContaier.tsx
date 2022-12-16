@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapS, gray2 } from '../design/@generated/themes';
 
@@ -22,27 +22,27 @@ export const InputContainer = styled.div<InputContainerProps>`
 
     ${({ brick }) =>
         brick === 'left' &&
-        css`
+        `
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         `}
 
     ${({ brick }) =>
         brick === 'right' &&
-        css`
+        `
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         `}
 
     ${({ brick }) =>
         brick === 'center' &&
-        css`
+        `
             border-radius: 0;
         `}
 
      ${({ focused, hovered }) =>
         (focused || hovered) &&
-        css`
+        `
             background-color: ${gray2};
         `}
 `;

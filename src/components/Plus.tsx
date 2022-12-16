@@ -1,10 +1,11 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { textColor, backgroundColor, colorPrimary, brandColor, gray9 } from '../design/@generated/themes';
 
 interface PlusProps {
     action?: boolean;
+
     onClick?: () => void;
 }
 
@@ -25,7 +26,7 @@ const StyledPlus = styled(({ action, forwardRef, ...props }) => <span ref={forwa
 
     ${({ action }) =>
         action &&
-        css`
+        `
             border: 1px solid ${colorPrimary};
             color: ${brandColor};
         `}
@@ -45,11 +46,11 @@ const StyledPlus = styled(({ action, forwardRef, ...props }) => <span ref={forwa
 
         ${({ action }) =>
             action &&
-            css`
-            border-color: ${colorPrimary}
-            background-color: ${colorPrimary};
-            color: ${backgroundColor};
-        `}
+            `
+                border-color: ${colorPrimary}
+                background-color: ${colorPrimary};
+                color: ${backgroundColor};
+            `}
     }
 `;
 

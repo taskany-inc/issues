@@ -2,7 +2,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
@@ -61,13 +61,13 @@ const IssueContent = styled(PageContent)`
 `;
 
 const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
-    ${({ align }) => css`
+    ${({ align }) => `
         justify-self: ${align};
     `}
 
     ${({ align }) =>
         align === 'right' &&
-        css`
+        `
             display: grid;
             justify-items: end;
             align-content: space-between;

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useDropzone } from 'react-dropzone';
 
 import { danger10, gapS, gapXs, gray2, gray3, gray4, gray6, radiusS, textColor } from '../design/@generated/themes';
@@ -59,21 +59,21 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat']; value: boolean 
 
     ${({ flat }) =>
         flat === 'top' &&
-        css`
+        `
             border-top-left-radius: 0;
             border-top-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'bottom' &&
-        css`
+        `
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'both' &&
-        css`
+        `
             border-radius: 0;
         `}
 
@@ -133,7 +133,7 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat']; value: boolean 
 
     ${({ value }) =>
         value &&
-        css`
+        `
             .monaco-editor {
                 background-color: ${gray2};
 

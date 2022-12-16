@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import colorLayer from 'color-layer';
 
 import { usePageContext } from '../hooks/usePageContext';
@@ -35,13 +35,13 @@ const StyledStateDot = styled.div<{
 
     ${({ onClick }) =>
         onClick &&
-        css`
+        `
             cursor: pointer;
         `}
 
     ${({ size }) =>
         size === 's' &&
-        css`
+        `
             width: 10px;
             height: 10px;
         `}

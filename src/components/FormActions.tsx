@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapS, gray2, gray3, radiusS, textColor } from '../design/@generated/themes';
 
@@ -24,20 +24,20 @@ export const FormActions = styled(({ flat, focused, ...props }: FormActionsProps
 
     ${({ focused }) =>
         focused &&
-        css`
+        `
             background-color: ${gray2};
         `}
 
     ${({ flat }) =>
         flat === 'top' &&
-        css`
+        `
             border-top-left-radius: 0;
             border-top-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'bottom' &&
-        css`
+        `
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         `}
@@ -50,21 +50,21 @@ export const FormAction = styled.div<{ left?: boolean; right?: boolean; columns?
 
     ${({ left }) =>
         left &&
-        css`
+        `
             justify-self: start;
             text-align: left;
         `}
 
     ${({ right }) =>
         right &&
-        css`
+        `
             justify-self: end;
             text-align: right;
         `}
 
     ${({ columns }) =>
         columns &&
-        css`
+        `
             display: grid;
             align-items: center;
             grid-template-columns: repeat(${columns}, 1fr);
@@ -72,7 +72,7 @@ export const FormAction = styled.div<{ left?: boolean; right?: boolean; columns?
 
     ${({ inline }) =>
         inline &&
-        css`
+        `
             & > * {
                 display: inline-block;
             }

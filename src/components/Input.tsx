@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gray10, gray3, gray4, gray6, gray7, radiusM, textColor } from '../design/@generated/themes';
 
@@ -40,7 +40,7 @@ const StyledInput = styled(({ forwardRef, size, view, ...props }: InputProps) =>
 
     ${({ view }) =>
         view === 'default' &&
-        css`
+        `
             color: ${gray10};
             border-color: ${gray6};
             background-color: ${gray4};
@@ -55,7 +55,7 @@ const StyledInput = styled(({ forwardRef, size, view, ...props }: InputProps) =>
 
     ${({ size }) =>
         size === 'm' &&
-        css`
+        `
             padding: 5px 8px;
 
             font-size: 13px;
