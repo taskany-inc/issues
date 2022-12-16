@@ -116,7 +116,7 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
         const onItemClick = useCallback(
             (value: any) => () => {
                 setEditMode(false);
-                onChange && onChange(value);
+                onChange?.(value);
             },
             [onChange],
         );
