@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 
@@ -59,7 +59,7 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
 
     ${({ isNew }) =>
         isNew &&
-        css`
+        `
             border-color: ${brandColor};
         `}
 
@@ -86,7 +86,7 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
 
         ${({ isNew }) =>
             isNew &&
-            css`
+            `
                 border-color: ${brandColor};
             `}
     }

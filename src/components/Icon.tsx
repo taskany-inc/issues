@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 const componentsMap = {
     plus: dynamic(() => import('teenyicons/outline/plus-circle.svg')),
@@ -61,7 +61,7 @@ interface IconProps {
 const StyledIcon = styled.span<{ onClick?: IconProps['onClick'] }>`
     ${({ onClick }) =>
         onClick &&
-        css`
+        `
             cursor: pointer;
         `}
 `;

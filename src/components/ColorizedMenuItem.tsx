@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapS, gapXs, gray3, radiusM } from '../design/@generated/themes';
 
@@ -28,20 +28,20 @@ const StyledItemCard = styled.div<{ focused?: boolean; checked?: boolean; hoverC
 
     ${({ focused }) =>
         focused &&
-        css`
+        `
             background-color: ${gray3};
         `}
 
     ${({ checked, hoverColor }) =>
         checked &&
         hoverColor &&
-        css`
+        `
             background-color: ${hoverColor};
         `}
 
     ${({ hoverColor }) =>
         hoverColor &&
-        css`
+        `
             &:hover {
                 background-color: ${hoverColor};
             }
@@ -50,7 +50,7 @@ const StyledItemCard = styled.div<{ focused?: boolean; checked?: boolean; hoverC
     ${({ hoverColor, focused }) =>
         hoverColor &&
         focused &&
-        css`
+        `
             background-color: ${hoverColor};
         `}
 `;

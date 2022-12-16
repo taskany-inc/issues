@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import {
     colorPrimary,
@@ -56,7 +56,7 @@ const StyledTag = styled(({ onHide, ...props }: Partial<TagProps> & { children?:
     ${({ onHide, checked }) =>
         !onHide &&
         !checked &&
-        css`
+        `
             &:hover {
                 color: ${gray10};
 
@@ -74,20 +74,20 @@ const StyledTag = styled(({ onHide, ...props }: Partial<TagProps> & { children?:
 
     ${({ onClick }) =>
         onClick &&
-        css`
+        `
             cursor: pointer;
         `}
 
     ${({ size }) =>
         size === 's' &&
-        css`
+        `
             padding: 3px 10px;
             font-size: 11px;
         `}
 
     ${({ checked }) =>
         checked &&
-        css`
+        `
             color: ${textColorPrimary};
 
             background-color: ${colorPrimary};

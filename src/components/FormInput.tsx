@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { danger10, gray2, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
@@ -53,21 +53,21 @@ const StyledFormInputContainer = styled.div<{ flat: FormInputProps['flat'] }>`
 
     ${({ flat }) =>
         flat === 'top' &&
-        css`
+        `
             border-top-left-radius: 0;
             border-top-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'bottom' &&
-        css`
+        `
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'both' &&
-        css`
+        `
             border-radius: 0;
         `}
 `;
@@ -119,48 +119,48 @@ const StyledFormInput = styled(
 
     ${({ flat }) =>
         flat === 'top' &&
-        css`
+        `
             border-top-left-radius: 0;
             border-top-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'bottom' &&
-        css`
+        `
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'both' &&
-        css`
+        `
             border-radius: 0;
         `}
 
     ${({ disabled }) =>
         disabled &&
-        css`
+        `
             color: ${gray8};
         `}
 
 
     ${({ brick }) =>
         brick === 'left' &&
-        css`
+        `
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         `}
 
     ${({ brick }) =>
         brick === 'right' &&
-        css`
+        `
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         `}
 
     ${({ brick }) =>
         brick === 'center' &&
-        css`
+        `
             border-radius: 0;
         `}
 `;

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import InputMask from 'react-input-mask';
 import dynamic from 'next/dynamic';
 
@@ -92,7 +92,7 @@ const StyledTriggerContainer = styled.div`
 const CheckableButton = styled(Button)<{ checked?: boolean }>`
     ${({ checked }) =>
         checked &&
-        css`
+        `
             background-color: ${gray6};
         `}
 `;

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { colorPrimary, danger9, gray5, warn0 } from '../design/@generated/themes';
 
@@ -18,26 +18,23 @@ const colorViewMap: Record<ViewType, string> = {
 
 export const Dot = styled.span<DotProps>`
     display: inline-block;
-    width: 8px;
-    height: 8px;
+
     border-radius: 100%;
 
     margin-left: 6px;
     margin-right: 6px;
 
-    ${({ size }) =>
-        size === 's' &&
-        css`
-            width: 6px;
-            height: 6px;
-        `}
+    background-color: ${({ view = 'default' }) => colorViewMap[view]};
 
-    ${({ view = 'default' }) => css`
-        background-color: ${colorViewMap[view]};
-    `}
+    ${({ size = 'm' }) =>
+        ({
+            s: `
+                width: 6px;
+                height: 6px;
+            `,
+            m: `
+                width: 8px;
+                height: 8px;
+            `,
+        }[size])}
 `;
-
-Dot.defaultProps = {
-    size: 'm',
-    view: 'default',
-};

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { danger0, gapM, gray4, warn0 } from '../design/@generated/themes';
 
@@ -23,9 +23,7 @@ export const SettingsCard = styled(FormCard)<{ view?: SettingsCardViewType }>`
         margin-top: ${gapM};
     }
 
-    ${({ view = 'default' }) => css`
-        border-color: ${colorsMap[view]};
-    `}
+    border-color: ${({ view = 'default' }) => colorsMap[view]};
 `;
 
 export const SettingsContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapM, gapS, gray6 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
@@ -7,8 +7,8 @@ import { PageContent } from './Page';
 import { Text } from './Text';
 
 interface CommonHeaderProps {
-    preTitle?: React.ReactNode;
     title: string;
+    preTitle?: React.ReactNode;
     description?: React.ReactNode;
     children?: React.ReactNode;
 }
@@ -19,13 +19,13 @@ const StyledCommonHeader = styled(PageContent)`
 `;
 
 const StyledCommonHeaderInfo = styled.div<{ align: 'left' | 'right' }>`
-    ${({ align }) => css`
+    ${({ align }) => `
         justify-self: ${align};
     `}
 
     ${({ align }) =>
         align === 'right' &&
-        css`
+        `
             display: grid;
             justify-items: end;
             align-content: space-between;

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapS, gapXs, gray4, radiusM } from '../design/@generated/themes';
 
@@ -31,7 +31,7 @@ const StyledProjectCard = styled.div<{ focused?: boolean }>`
 
     ${({ focused }) =>
         focused &&
-        css`
+        `
             background-color: ${gray4};
         `}
 `;

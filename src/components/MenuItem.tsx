@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapS, gray4, gray7, gray8, radiusM } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
@@ -46,14 +46,14 @@ const StyledMenuItem = styled.div<{ focused?: boolean; color?: string; ghost?: b
 
     ${({ focused }) =>
         focused &&
-        css`
+        `
             border-color: ${gray8};
             background-color: ${gray4};
         `}
 
     ${({ ghost }) =>
         ghost &&
-        css`
+        `
             border: 0;
         `}
 `;

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import {
     textColor,
@@ -39,7 +40,6 @@ interface ButtonProps {
     iconRight?: React.ReactNode;
     brick?: 'left' | 'right' | 'center';
     className?: string;
-    forwardRef?: React.Ref<HTMLButtonElement>;
     children?: React.ReactNode;
 
     onClick?: React.MouseEventHandler;
@@ -54,10 +54,18 @@ const StyledIcon = styled.span`
 const StyledText = styled.span``;
 
 const StyledButton = styled(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ({ forwardRef, size, view, brick, iconRight, iconLeft, ghost, checked, outline, ...props }: ButtonProps) => (
-        <button ref={forwardRef} {...props} />
-    ),
+    ({
+        forwardRef,
+        size,
+        view,
+        brick,
+        iconRight,
+        iconLeft,
+        ghost,
+        checked,
+        outline,
+        ...props
+    }: ButtonProps & { forwardRef?: React.Ref<HTMLButtonElement> }) => <button ref={forwardRef} {...props} />,
 )<ButtonProps>`
     position: relative;
     box-sizing: border-box;
@@ -86,7 +94,7 @@ const StyledButton = styled(
 
     ${({ onClick }) =>
         onClick &&
-        css`
+        `
             cursor: pointer;
             user-select: none;
 
@@ -97,7 +105,7 @@ const StyledButton = styled(
 
     ${({ view }) =>
         view === 'default' &&
-        css`
+        `
             color: ${gray10};
             border-color: ${gray7};
             background-color: ${gray4};
@@ -108,7 +116,7 @@ const StyledButton = styled(
     ${({ view, onClick }) =>
         view === 'default' &&
         onClick &&
-        css`
+        `
             :hover:not([disabled]),
             :focus:not([disabled]) {
                 color: ${textColor};
@@ -119,7 +127,7 @@ const StyledButton = styled(
 
     ${({ view }) =>
         view === 'primary' &&
-        css`
+        `
             font-weight: 500;
             color: ${textColorPrimary};
             border-color: ${colorPrimary};
@@ -137,7 +145,7 @@ const StyledButton = styled(
 
     ${({ view }) =>
         view === 'warning' &&
-        css`
+        `
             color: ${warn1};
             border-color: ${warn0};
             background-color: ${warn0};
@@ -154,7 +162,7 @@ const StyledButton = styled(
 
     ${({ view }) =>
         view === 'danger' &&
-        css`
+        `
             color: ${danger1};
             border-color: ${danger9};
             background-color: ${danger9};
@@ -171,7 +179,7 @@ const StyledButton = styled(
 
     ${({ outline }) =>
         outline &&
-        css`
+        `
             background-color: transparent;
 
             color: var(--color);
@@ -186,12 +194,12 @@ const StyledButton = styled(
     ${({ size }) =>
         size &&
         {
-            s: css`
+            s: `
                 padding: 3px 12px;
 
                 font-size: 12px;
             `,
-            m: css`
+            m: `
                 min-height: 28px;
                 padding: 5px 16px;
 
@@ -207,7 +215,7 @@ const StyledButton = styled(
                     padding-left: 8px;
                 }
             `,
-            l: css`
+            l: `
                 padding: 0.6em 1.5em;
 
                 font-size: 16px;
@@ -217,29 +225,29 @@ const StyledButton = styled(
     ${({ iconRight, iconLeft, size }) =>
         size === 'm' &&
         (iconRight || iconLeft) &&
-        css`
+        `
             padding: 5px 10px;
         `}
 
     ${({ brick }) =>
         brick &&
         {
-            left: css`
+            left: `
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
             `,
-            right: css`
+            right: `
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             `,
-            center: css`
+            center: `
                 border-radius: 0;
             `,
         }[brick]}
 
     ${({ ghost }) =>
         ghost &&
-        css`
+        `
             border-color: transparent;
             background-color: ${gray5};
         `}

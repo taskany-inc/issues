@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gray7, gray9, radiusL } from '../design/@generated/themes';
 
@@ -18,16 +18,15 @@ const StyledBadge = styled.div<{ size: BadgeProps['size'] }>`
     font-size: 12px;
 
     ${({ size }) =>
-        size === 's' &&
-        css`
+        size &&
+        {
+            s: `
             padding: 1px 4px;
-        `}
-
-    ${({ size }) =>
-        size === 'm' &&
-        css`
+        `,
+            m: `
             padding: 2px 8px;
-        `}
+        `,
+        }[size]}
 `;
 
 export const Badge: React.FC<BadgeProps> = ({ size = 's', children }) => (

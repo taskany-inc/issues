@@ -1,5 +1,5 @@
 import { MouseEventHandler } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -53,7 +53,7 @@ const StyledGoal = styled.a<{ focused?: boolean }>`
 
     ${({ focused }) =>
         focused &&
-        css`
+        `
             background-color: ${gray4};
         `}
 

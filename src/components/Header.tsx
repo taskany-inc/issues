@@ -1,5 +1,5 @@
 import NextLink from 'next/link';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { routes } from '../hooks/router';
@@ -50,7 +50,7 @@ const StyledHeaderNavLink = styled.a<{ disabled?: boolean }>`
 
     ${({ disabled }) =>
         disabled &&
-        css`
+        `
             color: ${gray7};
         `}
 

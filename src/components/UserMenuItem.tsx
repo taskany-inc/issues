@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gray4, gray6, radiusM, textColor } from '../design/@generated/themes';
 
@@ -39,13 +39,13 @@ const StyledUserCard = styled.div<Pick<UserMenuItemProps, 'focused' | 'checked'>
 
     ${({ focused }) =>
         focused &&
-        css`
+        `
             background-color: ${gray6};
         `}
 
     ${({ checked }) =>
         checked &&
-        css`
+        `
             background-color: ${gray4};
         `}
 `;

@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { link10 } from '../design/@generated/themes';
 
@@ -8,6 +8,7 @@ interface LinkProps {
     className?: string;
     children?: React.ReactNode;
     href?: string;
+
     onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
@@ -31,7 +32,7 @@ const StyledLink = styled(
 
     ${({ inline }) =>
         inline &&
-        css`
+        `
             color: inherit;
             text-decoration: none;
 

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gapM, gapS, gray4, gray7, radiusXl, textColor } from '../design/@generated/themes';
 
@@ -24,7 +24,7 @@ export const TabsMenuItem = styled.div<{ active?: boolean }>`
 
     ${({ active }) =>
         active &&
-        css`
+        `
             padding: ${gapS} ${gapM};
 
             font-weight: 600;

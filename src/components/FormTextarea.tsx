@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { gray2, gray3, gray7, radiusS, textColor } from '../design/@generated/themes';
 
@@ -56,21 +56,21 @@ const StyledFormTextarea = styled(
 
     ${({ flat }) =>
         flat === 'top' &&
-        css`
+        `
             border-top-left-radius: 0;
             border-top-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'bottom' &&
-        css`
+        `
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         `}
 
     ${({ flat }) =>
         flat === 'both' &&
-        css`
+        `
             border-radius: 0;
         `}
 
