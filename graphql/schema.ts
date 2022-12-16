@@ -10,6 +10,7 @@ import * as Tag from './resolvers/Tag';
 import * as Settings from './resolvers/Settings';
 import * as Reaction from './resolvers/Reaction';
 import * as Comment from './resolvers/Comment';
+import * as Team from './resolvers/Team';
 
 const Query = queryType({
     definition(t) {
@@ -21,6 +22,7 @@ const Query = queryType({
         Settings.query(t);
         Reaction.query(t);
         Comment.query(t);
+        Team.query(t);
     },
 });
 
@@ -34,6 +36,7 @@ const Mutation = mutationType({
         Settings.mutation(t);
         Reaction.mutation(t);
         Comment.mutation(t);
+        Team.mutation(t);
     },
 });
 

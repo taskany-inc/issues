@@ -165,18 +165,23 @@ type Mutation {
   createGoal(data: GoalCreateInput!): Goal
   createProject(data: ProjectInput!): Project
   createTag(description: String, title: String!): Tag
+  createTeam(data: TeamCreateInput!): Team
   deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
+  deleteTeam(data: ProjectDelete!): Team
   toggleGoalDependency(toggle: GoalDependencyToggleInput!): Goal
   toggleGoalStargizer(toggle: SubscriptionToggleInput!): Activity
   toggleGoalWatcher(toggle: SubscriptionToggleInput!): Activity
   toggleProjectStargizer(data: SubscriptionToggleInput!): Activity
   toggleProjectWatcher(data: SubscriptionToggleInput!): Activity
   toggleReaction(data: ReactionToggleInput!): Reaction
+  toggleTeamStargizer(data: SubscriptionToggleInput!): Activity
+  toggleTeamWatcher(data: SubscriptionToggleInput!): Activity
   updateComment(data: CommentUpdateInput!): Comment
   updateGoal(data: GoalUpdateInput!): Goal
   updateProject(data: ProjectInput!): Project
   updateSettings(data: SettingsUpdateInput!): Settings
+  updateTeam(data: TeamUpdateInput!): Team
   updateUser(data: UserUpdateInput!): User
   usersInvites(input: UserInvitesInput!): [Ghost]
 }
@@ -191,6 +196,7 @@ enum Priority {
 type Project {
   activity: Activity
   activityId: String!
+  children: [Project]
   createdAt: DateTime!
   description: String
   flow: Flow
@@ -198,6 +204,7 @@ type Project {
   goals: [Goal]
   id: Int!
   key: String!
+  parent: Project
   participants: [Activity]
   stargizers: [Activity]
   tags: [Tag]
@@ -253,6 +260,10 @@ type Query {
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
+  team(id: Int!): Team
+  teamCompletion(query: String!, sortBy: SortOrder): [Team]
+  teamGoals(data: TeamGoalsInput!): [Goal]
+  teams: [Team]
   userGoals(data: UserGoalsInput!): [Project]
   users(sortBy: SortOrder): [User]
 }
@@ -321,6 +332,54 @@ type Tag {
 input TagInput {
   description: String
   id: ID!
+  title: String!
+}
+
+type Team {
+  activity: Activity
+  activityId: String!
+  children: [Team]
+  createdAt: DateTime!
+  description: String
+  goals: [Goal]
+  id: Int!
+  parent: Team
+  participants: [Activity]
+  projects: [Project]
+  stargizers: [Activity]
+  title: String!
+  updatedAt: DateTime!
+  watchers: [Activity]
+}
+
+input TeamCreateInput {
+  children: [Int!]!
+  description: String
+  parent: Int!
+  projects: [String!]!
+  title: String!
+}
+
+input TeamDelete {
+  id: Int!
+}
+
+input TeamGoalsInput {
+  id: Int!
+  offset: Int!
+  owner: [String!]!
+  pageSize: Int!
+  query: String!
+  states: [String!]!
+  tags: [String!]!
+}
+
+input TeamUpdateInput {
+  children: [Int!]!
+  description: String
+  id: Int!
+  parent: Int!
+  projects: [String!]!
   title: String!
 }
 
