@@ -29,17 +29,21 @@ const StyledIssueListItemTitle = styled(Text)`
     padding-left: ${gapS};
 `;
 
+const StyledLink = styled(Link)`
+    display: 'inline-block';
+`;
+
 export const IssueListItem: React.FC<IssueListItemProps> = ({ issue }) => {
     return (
         <NextLink passHref href={routes.goal(issue.id)}>
-            <Link inline style={{ display: 'inline-block' }}>
+            <StyledLink inline>
                 <StyledIssueListItem>
                     <StateDot {...issue.state} />
                     <StyledIssueListItemTitle size="s" weight="bold" color="inherit">
                         {issue.title}
                     </StyledIssueListItemTitle>
                 </StyledIssueListItem>
-            </Link>
+            </StyledLink>
         </NextLink>
     );
 };

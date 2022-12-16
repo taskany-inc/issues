@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import dynamic from 'next/dynamic';
@@ -26,8 +27,8 @@ interface FormInputProps {
     };
     brick?: 'left' | 'right' | 'center';
 
-    onMouseLeave?: React.ChangeEventHandler<HTMLInputElement>;
-    onMouseEnter?: React.ChangeEventHandler<HTMLInputElement>;
+    onMouseLeave?: React.MouseEventHandler<HTMLInputElement>;
+    onMouseEnter?: React.MouseEventHandler<HTMLInputElement>;
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
     onInput?: React.ChangeEventHandler<HTMLInputElement>;
     onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
@@ -81,10 +82,16 @@ const StyledErrorTrigger = styled.div`
     left: -2px;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledFormInput = styled(({ flat, brick, error, label, forwardRef, ...props }) => (
-    <input ref={forwardRef} {...props} />
-))<{ flat: FormInputProps['flat'] }>`
+const StyledFormInput = styled(
+    ({
+        flat,
+        brick,
+        error,
+        label,
+        forwardRef,
+        ...props
+    }: FormInputProps & { forwardRef?: React.Ref<HTMLInputElement> }) => <input ref={forwardRef} {...props} />,
+)`
     box-sizing: border-box;
     outline: none;
     width: 100%;
@@ -136,7 +143,7 @@ const StyledFormInput = styled(({ flat, brick, error, label, forwardRef, ...prop
             color: ${gray8};
         `}
 
-    
+
     ${({ brick }) =>
         brick === 'left' &&
         css`

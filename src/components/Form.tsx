@@ -10,7 +10,7 @@ interface FormProps {
     onSubmit?: () => void;
 }
 
-const StyledFormContainer = styled.div`
+const StyledForm = styled.form`
     background-color: ${gray3};
 `;
 
@@ -18,7 +18,7 @@ export const Form: React.FC<FormProps> = ({ onSubmit, submitHotkey, children }) 
     const handleSubmit = (e?: React.SyntheticEvent) => {
         e?.preventDefault();
 
-        if (onSubmit) onSubmit();
+        onSubmit?.();
     };
 
     const [keyboard] = useKeyboard(submitHotkey || [], () => handleSubmit(), {
@@ -27,8 +27,8 @@ export const Form: React.FC<FormProps> = ({ onSubmit, submitHotkey, children }) 
     });
 
     return (
-        <StyledFormContainer {...keyboard}>
-            <form onSubmit={handleSubmit}>{children}</form>
-        </StyledFormContainer>
+        <StyledForm {...keyboard} onSubmit={handleSubmit}>
+            {children}
+        </StyledForm>
     );
 };

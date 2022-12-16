@@ -24,8 +24,12 @@ interface FormTextareaProps {
     onFocus?: React.FocusEventHandler<HTMLTextAreaElement>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea ref={forwardRef} {...props} />)`
+const StyledFormTextarea = styled(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ({ flat, forwardRef, ...props }: FormTextareaProps & { forwardRef?: React.Ref<HTMLTextAreaElement> }) => (
+        <textarea ref={forwardRef} {...props} />
+    ),
+)`
     box-sizing: border-box;
     outline: none;
     border: 0;
@@ -42,11 +46,11 @@ const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea 
     transition: 200ms cubic-bezier(0.3, 0, 0.5, 1);
     transition-property: color, background-color, border-color;
 
-    :focus:not([disabled]) {
+    &:focus:not([disabled]) {
         background-color: ${gray2};
     }
 
-    :hover:not([disabled]) {
+    &:hover:not([disabled]) {
         background-color: ${gray2};
     }
 
@@ -76,6 +80,6 @@ const StyledFormTextarea = styled(({ flat, forwardRef, ...props }) => <textarea 
     }
 `;
 
-export const FormTextarea = React.forwardRef<FormTextareaProps, FormTextareaProps>((props, ref) => {
+export const FormTextarea = React.forwardRef<HTMLTextAreaElement, FormTextareaProps>((props, ref) => {
     return <StyledFormTextarea forwardRef={ref} {...props} />;
 });

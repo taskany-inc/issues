@@ -28,12 +28,9 @@ interface TagProps {
 const StyledCleanButton = styled(CleanButton)``;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledTag = styled(({ onHide, ...props }) => <div {...props} />)<{
-    checked: TagProps['checked'];
-    size: TagProps['size'];
-    onClick: TagProps['onClick'];
-    onHide: TagProps['onHide'];
-}>`
+const StyledTag = styled(({ onHide, ...props }: Partial<TagProps> & { children?: React.ReactNode }) => (
+    <div {...props} />
+))`
     display: inline-block;
     position: relative;
     padding: 4px 12px 5px;
