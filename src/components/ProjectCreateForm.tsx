@@ -141,7 +141,7 @@ const ProjectCreateForm: React.FC = () => {
         [setValue, titleWatcher],
     );
 
-    const { data: flowData } = useSWR([user], (...args) => flowFetcher(...args));
+    const { data: flowData } = useSWR('flow', () => flowFetcher(user));
     const { data: projectData } = useSWR(keyWatcher && keyWatcher !== '' ? [user, keyWatcher] : null, (...args) =>
         projectFetcher(...args),
     );
