@@ -2,6 +2,24 @@
     "index": {
         "title": "Taskany"
     },
+    "teams": {
+        "new": {
+            "title": "Taskany — New team",
+            "Create new team": "Create new team",
+            "Team's title is required": "Team's title is required",
+            "Team's title must be a string": "Team's title must be a string",
+            "Team's title must be longer than 2 symbols": "Team's title must be longer than 2 symbols",
+            "Something went wrong 😿": "Something went wrong 😿",
+            "We are creating new team": "We are creating new team...",
+            "Voila! Team is here 🎉": "Voila! Team is here 🎉",
+            "Create team": "Create team",
+            "Team's title": "Team's title",
+            "And its description": "And its description",
+            "Pro tip!": "Pro tip!",
+            "Press key to create the team": "Press <key></key> to create the team.",
+            "Team with title already exists": "Team with title <b><title></title></b> already exists. Please, try to use another title."
+        }
+    },
     "projects": {
         "index": {
             "title": "Taskany — Explore",
