@@ -1,5 +1,6 @@
 import { KeyCode, KeyMod } from '../hooks/useKeyboard';
 
+export const createTeamKeys = ['c t', 'с е'];
 export const createProjectKeys = ['c p', 'с з'];
 export const createGoalKeys = ['c g', 'с п'];
 export const editGoalKeys = ['e', 'у'];

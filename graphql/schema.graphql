@@ -263,7 +263,7 @@ type Query {
   team(id: Int!): Team
   teamCompletion(query: String!, sortBy: SortOrder): [Team]
   teamGoals(data: TeamGoalsInput!): [Goal]
-  teams: [Team]
+  teams(data: TeamsInput!): [Team]
   userGoals(data: UserGoalsInput!): [Project]
   users(sortBy: SortOrder): [User]
 }
@@ -353,10 +353,10 @@ type Team {
 }
 
 input TeamCreateInput {
-  children: [Int!]!
+  children: [Int!]
   description: String
-  parent: Int!
-  projects: [String!]!
+  parent: Int
+  projects: [String!]
   title: String!
 }
 
@@ -380,6 +380,10 @@ input TeamUpdateInput {
   id: Int!
   parent: Int!
   projects: [String!]!
+  title: String!
+}
+
+input TeamsInput {
   title: String!
 }
 

@@ -446,9 +446,9 @@ export const TeamCreateInput = inputObjectType({
     definition(t) {
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
-        t.nonNull.int('parent');
-        t.nonNull.list.nonNull.int('children');
-        t.nonNull.list.nonNull.string('projects');
+        t.int('parent');
+        t.list.nonNull.int('children');
+        t.list.nonNull.string('projects');
     },
 });
 
@@ -474,6 +474,13 @@ export const TeamGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('owner');
         t.nonNull.string('query');
+    },
+});
+
+export const TeamsInput = inputObjectType({
+    name: 'TeamsInput',
+    definition(t) {
+        t.nonNull.string('title');
     },
 });
 

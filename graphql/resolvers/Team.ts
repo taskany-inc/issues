@@ -11,6 +11,7 @@ import {
     TeamGoalsInput,
     TeamCreateInput,
     TeamUpdateInput,
+    TeamsInput,
 } from '../types';
 
 const connectionMap: Record<string, string> = {
@@ -86,10 +87,16 @@ const teamGoalsFilter = (data: {
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('teams', {
         type: Team,
-        resolve: async (_, __, { db, activity }) => {
+        args: {
+            data: nonNull(arg({ type: TeamsInput })),
+        },
+        resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
             const teams = await db.team.findMany({
+                where: {
+                    title: data.title,
+                },
                 orderBy: {
                     createdAt: 'asc',
                 },
