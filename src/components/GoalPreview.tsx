@@ -76,7 +76,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
     const { user, locale } = usePageContext();
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
 
-    const { data, mutate } = useSWR([user, partialGoal.id], (...args) => goalFetcher(...args), {
+    const { data, mutate } = useSWR(`goal-${partialGoal.id}`, () => goalFetcher(user, partialGoal.id), {
         refreshInterval,
     });
     const refresh = useCallback(() => mutate(), [mutate]);
@@ -89,10 +89,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
     const priorityColorIndex = data?.goalPriorityKind?.indexOf(goal.priority || '') ?? -1;
     const priorityColor = priorityColorIndex >= 0 ? data?.goalPriorityColors?.[priorityColorIndex] : undefined;
     const issueEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
-
-    const onModalClose = useCallback(() => {
-        onClose?.();
-    }, [onClose]);
 
     const onGoalStateChange = useCallback(
         async (state: State) => {
@@ -120,7 +116,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
     );
 
     return (
-        <ModalPreview visible={visible} onClose={onModalClose}>
+        <ModalPreview visible={visible} onClose={onClose}>
             <StyledModalHeader>
                 {nullable(goal.id, (id) => (
                     <IssueKey size="s" id={id}>
