@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useRemark, useRemarkSync } from 'react-remark';
 import remarkGFM from 'remark-gfm';
@@ -43,13 +43,9 @@ const clientRenderOptions: any = {
 
 const Md: React.FC<MdProps> = ({ children = '' }) => {
     const ssrContent = useRemarkSync(children, ssrRenderOptions);
-    const [clientContent, setMarkdownSource] = useRemark(clientRenderOptions);
+    const [clientContent] = useRemark(clientRenderOptions);
 
-    useLayoutEffect(() => {
-        setMarkdownSource(children);
-    }, [children, setMarkdownSource]);
-
-    return <StyledMd>{clientContent || ssrContent}</StyledMd>;
+    return <StyledMd>{clientContent ?? ssrContent}</StyledMd>;
 };
 
 export default Md;
