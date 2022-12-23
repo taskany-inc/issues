@@ -16,7 +16,7 @@ import { defaultLimit } from '../../../components/LimitFilterDropdown';
 import { useUrlParams } from '../../../hooks/useUrlParams';
 import { TeamPageLayout } from '../../../components/TeamPageLayout';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
-import { PageContent } from '../../../components/Page';
+import { Page, PageContent } from '../../../components/Page';
 import { Text } from '../../../components/Text';
 import { PageSep } from '../../../components/PageSep';
 
@@ -261,78 +261,78 @@ const TeamGoalsPage = ({
     }, []);
 
     return (
-        <TeamPageLayout
-            actions
+        <Page
             user={user}
             locale={locale}
             ssrTime={ssrTime}
             title={t.rich('goals.title', {
                 team: () => team.title,
             })}
-            team={team}
         >
-            <FiltersPanel
-                count={goalsCount}
-                flowId={projects[0]?.flowId}
-                users={usersFilterData}
-                tags={tagsFilterData}
-                stateFilter={stateFilter}
-                tagsFilter={tagsFilter}
-                ownerFilter={ownerFilter}
-                searchFilter={fulltextFilter}
-                limitFilter={limitFilter}
-                onSearchChange={onSearchChange}
-                onStateChange={setStateFilter}
-                onUserChange={setOwnerFilter}
-                onTagChange={setTagsFilter}
-                onLimitChange={setLimitFilter}
-            >
-                <Button
-                    view="primary"
-                    size="m"
-                    text={t('New goal')}
-                    onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
-                />
-            </FiltersPanel>
+            <TeamPageLayout actions team={team}>
+                <FiltersPanel
+                    count={goalsCount}
+                    flowId={projects[0]?.flowId}
+                    users={usersFilterData}
+                    tags={tagsFilterData}
+                    stateFilter={stateFilter}
+                    tagsFilter={tagsFilter}
+                    ownerFilter={ownerFilter}
+                    searchFilter={fulltextFilter}
+                    limitFilter={limitFilter}
+                    onSearchChange={onSearchChange}
+                    onStateChange={setStateFilter}
+                    onUserChange={setOwnerFilter}
+                    onTagChange={setTagsFilter}
+                    onLimitChange={setLimitFilter}
+                >
+                    <Button
+                        view="primary"
+                        size="m"
+                        text={t('New goal')}
+                        onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                    />
+                </FiltersPanel>
 
-            <PageContent>
-                {projects?.map((project) => {
-                    return nullable(project.goals?.length, () => (
-                        <StyledProjectGroup key={project.key}>
-                            <Text size="l" weight="bolder">
-                                {project.title}
-                            </Text>
+                <PageContent>
+                    {projects?.map((project) => {
+                        return nullable(project.goals?.length, () => (
+                            <StyledProjectGroup key={project.key}>
+                                <Text size="l" weight="bolder">
+                                    {project.title}
+                                </Text>
 
-                            <PageSep />
+                                <PageSep />
 
-                            <StyledGoalsList>
-                                {project.goals?.map((goal) =>
-                                    nullable(goal, (g) => (
-                                        <GoalListItem
-                                            createdAt={g.createdAt}
-                                            id={g.id}
-                                            state={g.state}
-                                            title={g.title}
-                                            issuer={g.activity}
-                                            owner={g.owner}
-                                            tags={g.tags}
-                                            comments={g.comments?.length}
-                                            key={g.id}
-                                            focused={g.id === preview?.id}
-                                            onClick={onGoalPrewiewShow(g)}
-                                        />
-                                    )),
-                                )}
-                            </StyledGoalsList>
-                        </StyledProjectGroup>
-                    ));
-                })}
-            </PageContent>
+                                <StyledGoalsList>
+                                    {project.goals?.map((goal) =>
+                                        nullable(goal, (g) => (
+                                            <GoalListItem
+                                                createdAt={g.createdAt}
+                                                id={g.id}
+                                                state={g.state}
+                                                title={g.title}
+                                                issuer={g.activity}
+                                                owner={g.owner}
+                                                tags={g.tags}
+                                                comments={g.comments?.length}
+                                                key={g.id}
+                                                focused={g.id === preview?.id}
+                                                onClick={onGoalPrewiewShow(g)}
+                                            />
+                                        )),
+                                    )}
+                                </StyledGoalsList>
+                            </StyledProjectGroup>
+                        ));
+                    })}
+                </PageContent>
 
-            {nullable(preview, (p) => (
-                <GoalPreview goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
-            ))}
-        </TeamPageLayout>
+                {nullable(preview, (p) => (
+                    <GoalPreview goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
+                ))}
+            </TeamPageLayout>
+        </Page>
     );
 };
 

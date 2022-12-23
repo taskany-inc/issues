@@ -6,26 +6,20 @@ import { useRouter } from 'next/router';
 import { Team } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
 import { nullable } from '../utils/nullable';
+import { usePageContext } from '../hooks/usePageContext';
 
-import { Page, PageActions } from './Page';
+import { PageActions } from './Page';
 import { CommonHeader } from './CommonHeader';
 import { TabsMenu, TabsMenuItem } from './TabsMenu';
 
-interface TeamPageLayoutProps extends React.ComponentProps<typeof Page> {
+interface TeamPageLayoutProps {
     team: Team;
     children: React.ReactNode;
     actions?: boolean;
 }
 
-export const TeamPageLayout: React.FC<TeamPageLayoutProps> = ({
-    user,
-    title,
-    locale,
-    ssrTime,
-    team,
-    children,
-    actions,
-}) => {
+export const TeamPageLayout: React.FC<TeamPageLayoutProps> = ({ team, children, actions }) => {
+    const { user } = usePageContext();
     const t = useTranslations('teams');
     const router = useRouter();
 
@@ -36,7 +30,7 @@ export const TeamPageLayout: React.FC<TeamPageLayoutProps> = ({
     ];
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={title}>
+        <>
             <CommonHeader title={team.title} description={team.description}>
                 <div>
                     {nullable(actions, () => (
@@ -57,7 +51,7 @@ export const TeamPageLayout: React.FC<TeamPageLayoutProps> = ({
 
                 <TabsMenu>
                     {tabsMenuOptions.map(([title, href, ownerOnly]) =>
-                        nullable(ownerOnly ? user.activityId === team.activityId : true, () => (
+                        nullable(ownerOnly ? user?.activityId === team.activityId : true, () => (
                             <NextLink key={href} href={href} passHref>
                                 <TabsMenuItem active={router.asPath === href}>{title}</TabsMenuItem>
                             </NextLink>
@@ -67,6 +61,6 @@ export const TeamPageLayout: React.FC<TeamPageLayoutProps> = ({
             </CommonHeader>
 
             {children}
-        </Page>
+        </>
     );
 };

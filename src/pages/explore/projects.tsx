@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Project } from '../../../graphql/@generated/genql';
-import { PageContent } from '../../components/Page';
+import { Page, PageContent } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { ProjectListItem } from '../../components/ProjectListItem';
 import { nullable } from '../../utils/nullable';
@@ -51,24 +51,26 @@ const ExploreProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPagePro
     const projects: Project[] | null = data?.projects ?? ssrData.projects;
 
     return (
-        <ExplorePageLayout user={user} locale={locale} ssrTime={ssrTime} title={t('projects.title')}>
-            <PageSep />
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={t('projects.title')}>
+            <ExplorePageLayout>
+                <PageSep />
 
-            <PageContent>
-                {projects?.map((project) =>
-                    nullable(project, (p) => (
-                        <ProjectListItem
-                            key={p.key}
-                            projectKey={p.key}
-                            title={p.title}
-                            description={p.description}
-                            createdAt={p.createdAt}
-                            owner={p.activity}
-                        />
-                    )),
-                )}
-            </PageContent>
-        </ExplorePageLayout>
+                <PageContent>
+                    {projects?.map((project) =>
+                        nullable(project, (p) => (
+                            <ProjectListItem
+                                key={p.key}
+                                projectKey={p.key}
+                                title={p.title}
+                                description={p.description}
+                                createdAt={p.createdAt}
+                                owner={p.activity}
+                            />
+                        )),
+                    )}
+                </PageContent>
+            </ExplorePageLayout>
+        </Page>
     );
 };
 

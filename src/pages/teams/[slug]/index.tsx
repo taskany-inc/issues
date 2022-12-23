@@ -9,7 +9,7 @@ import { nullable } from '../../../utils/nullable';
 import { ProjectListItem } from '../../../components/ProjectListItem';
 import { TeamPageLayout } from '../../../components/TeamPageLayout';
 import { PageSep } from '../../../components/PageSep';
-import { PageContent } from '../../../components/Page';
+import { Page, PageContent } from '../../../components/Page';
 
 const fetcher = createFetcher((_, slug: string) => ({
     team: [
@@ -105,33 +105,33 @@ const TeamPage = ({
     const team: Team = data?.team ?? ssrData.team;
 
     return (
-        <TeamPageLayout
-            actions
+        <Page
             user={user}
             locale={locale}
             ssrTime={ssrTime}
             title={t.rich('index.title', {
                 team: () => team.title,
             })}
-            team={team}
         >
-            <PageSep />
+            <TeamPageLayout actions team={team}>
+                <PageSep />
 
-            <PageContent>
-                {team?.projects?.map((project) =>
-                    nullable(project, (p) => (
-                        <ProjectListItem
-                            key={p.key}
-                            projectKey={p.key}
-                            title={p.title}
-                            description={p.description}
-                            createdAt={p.createdAt}
-                            owner={p.activity}
-                        />
-                    )),
-                )}
-            </PageContent>
-        </TeamPageLayout>
+                <PageContent>
+                    {team?.projects?.map((project) =>
+                        nullable(project, (p) => (
+                            <ProjectListItem
+                                key={p.key}
+                                projectKey={p.key}
+                                title={p.title}
+                                description={p.description}
+                                createdAt={p.createdAt}
+                                owner={p.activity}
+                            />
+                        )),
+                    )}
+                </PageContent>
+            </TeamPageLayout>
+        </Page>
     );
 };
 

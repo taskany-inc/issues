@@ -5,15 +5,14 @@ import { useRouter } from 'next/router';
 
 import { routes } from '../hooks/router';
 
-import { Page } from './Page';
 import { CommonHeader } from './CommonHeader';
 import { TabsMenu, TabsMenuItem } from './TabsMenu';
 
-interface ExplorePageLayoutProps extends React.ComponentProps<typeof Page> {
+interface ExplorePageLayoutProps {
     children: React.ReactNode;
 }
 
-export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ user, title, locale, ssrTime, children }) => {
+export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ children }) => {
     const t = useTranslations('explore');
     const router = useRouter();
 
@@ -24,7 +23,7 @@ export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ user, titl
     ];
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={title}>
+        <>
             <CommonHeader
                 title={t('Explore')}
                 description={t('see what the Taskany community is most excited about today')}
@@ -41,6 +40,6 @@ export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ user, titl
             </CommonHeader>
 
             {children}
-        </Page>
+        </>
     );
 };

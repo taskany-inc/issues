@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Team } from '../../../graphql/@generated/genql';
-import { PageContent } from '../../components/Page';
+import { Page, PageContent } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { TeamListItem } from '../../components/TeamListItem';
 import { nullable } from '../../utils/nullable';
@@ -59,23 +59,25 @@ const ExploreTeamsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<
     const teams: Team[] | null = data?.teams ?? ssrData.teams;
 
     return (
-        <ExplorePageLayout user={user} locale={locale} ssrTime={ssrTime} title={t('teams.title')}>
-            <PageSep />
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={t('teams.title')}>
+            <ExplorePageLayout>
+                <PageSep />
 
-            <PageContent>
-                {teams?.map((team) =>
-                    nullable(team, (te) => (
-                        <TeamListItem
-                            key={te.id}
-                            slug={te.slug}
-                            title={te.title}
-                            description={te.description}
-                            owner={te.activity}
-                        />
-                    )),
-                )}
-            </PageContent>
-        </ExplorePageLayout>
+                <PageContent>
+                    {teams?.map((team) =>
+                        nullable(team, (te) => (
+                            <TeamListItem
+                                key={te.id}
+                                slug={te.slug}
+                                title={te.title}
+                                description={te.description}
+                                owner={te.activity}
+                            />
+                        )),
+                    )}
+                </PageContent>
+            </ExplorePageLayout>
+        </Page>
     );
 };
 
