@@ -233,12 +233,20 @@
         }
     },
     "explore": {
-        "title": "Taskany — Обзор",
         "Explore": "Обзор",
         "see what the Taskany community is most excited about today": "Смотри чем пользователи Taskany интересуются сегодня",
         "Teams": "Команды",
         "Projects": "Проекты",
-        "Goals": "Цели"
+        "Goals": "Цели",
+        "teams": {
+            "title": "Taskany — Обзор — Команды"
+        },
+        "projects": {
+            "title": "Taskany — Обзор — Проекты"
+        },
+        "goals": {
+            "title": "Taskany — Обзор — Цели"
+        }
     },
     "Header": {
         "Projects": "Проекты",

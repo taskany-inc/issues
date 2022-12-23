@@ -383,7 +383,7 @@ input TeamUpdateInput {
 }
 
 input TeamsInput {
-  title: String!
+  title: String
 }
 
 type User {
