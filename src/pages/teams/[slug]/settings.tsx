@@ -19,6 +19,7 @@ import { gql } from '../../../utils/gql';
 import { FormInput } from '../../../components/FormInput';
 import { FormAction, FormActions } from '../../../components/FormActions';
 import { TeamPageLayout } from '../../../components/TeamPageLayout';
+import { Page } from '../../../components/Page';
 
 const refreshInterval = 3000;
 
@@ -181,53 +182,54 @@ const TeamSettingsPage = ({
     };
 
     return (
-        <TeamPageLayout
+        <Page
             user={user}
             locale={locale}
             ssrTime={ssrTime}
             title={t.rich('settings.title', {
                 team: () => team.title,
             })}
-            team={team}
         >
-            <PageSep />
+            <TeamPageLayout team={team}>
+                <PageSep />
 
-            <SettingsContent>
-                <SettingsCard>
-                    <Form onSubmit={handleSubmit(update)}>
-                        <Fieldset title={t('settings.General')}>
-                            <FormInput
-                                {...register('title')}
-                                label={t('settings.Title')}
-                                autoComplete="off"
-                                flat="bottom"
-                                error={formState.isSubmitted ? formState.errors.title : undefined}
-                            />
-
-                            <FormInput
-                                {...register('description')}
-                                label={t('settings.Description')}
-                                flat="both"
-                                error={formState.isSubmitted ? formState.errors.description : undefined}
-                            />
-                        </Fieldset>
-
-                        <FormActions flat="top">
-                            <FormAction left />
-                            <FormAction right inline>
-                                <Button
-                                    size="m"
-                                    view="primary"
-                                    type="submit"
-                                    disabled={!formChanged}
-                                    text={t('settings.Save')}
+                <SettingsContent>
+                    <SettingsCard>
+                        <Form onSubmit={handleSubmit(update)}>
+                            <Fieldset title={t('settings.General')}>
+                                <FormInput
+                                    {...register('title')}
+                                    label={t('settings.Title')}
+                                    autoComplete="off"
+                                    flat="bottom"
+                                    error={formState.isSubmitted ? formState.errors.title : undefined}
                                 />
-                            </FormAction>
-                        </FormActions>
-                    </Form>
-                </SettingsCard>
-            </SettingsContent>
-        </TeamPageLayout>
+
+                                <FormInput
+                                    {...register('description')}
+                                    label={t('settings.Description')}
+                                    flat="both"
+                                    error={formState.isSubmitted ? formState.errors.description : undefined}
+                                />
+                            </Fieldset>
+
+                            <FormActions flat="top">
+                                <FormAction left />
+                                <FormAction right inline>
+                                    <Button
+                                        size="m"
+                                        view="primary"
+                                        type="submit"
+                                        disabled={!formChanged}
+                                        text={t('settings.Save')}
+                                    />
+                                </FormAction>
+                            </FormActions>
+                        </Form>
+                    </SettingsCard>
+                </SettingsContent>
+            </TeamPageLayout>
+        </Page>
     );
 };
 
