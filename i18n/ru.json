@@ -296,7 +296,7 @@
         "goals page": "цели",
         "shows this instruction": "показывает эту инструкцию"
     },
-    "Comments": {
+    "Comment": {
         "new": {
             "Comments's description is required": "Текст комментария обязателен",
             "Comments's description must be a string": "Комментарий должен быть сторок",
