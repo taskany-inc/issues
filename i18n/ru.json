@@ -20,7 +20,7 @@
             "Team's title": "Название команды",
             "And its description": "Можно и описание, пригодится ведь",
             "Pro tip!": "Держи совет!",
-            "Press key to create the project": "Нажми <key></key> чтобы создать команду.",
+            "Press key to create the team": "Нажми <key></key> чтобы создать команду.",
             "Project with title already exists": "Команда с названием <b><title></title></b> уже существует. Попробуй другое."
         },
         "index": {
