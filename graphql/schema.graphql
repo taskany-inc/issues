@@ -163,7 +163,7 @@ input GoalUpdateInput {
 type Mutation {
   createComment(data: CommentCreateInput!): Comment
   createGoal(data: GoalCreateInput!): Goal
-  createProject(data: ProjectInput!): Project
+  createProject(data: ProjectCreateInput!): Project
   createTag(description: String, title: String!): Tag
   createTeam(data: TeamCreateInput!): Team
   deleteComment(data: CommentDeleteInput!): Comment
@@ -179,7 +179,7 @@ type Mutation {
   toggleTeamWatcher(data: SubscriptionToggleInput!): Activity
   updateComment(data: CommentUpdateInput!): Comment
   updateGoal(data: GoalUpdateInput!): Goal
-  updateProject(data: ProjectInput!): Project
+  updateProject(data: ProjectUpdateInput!): Project
   updateSettings(data: SettingsUpdateInput!): Settings
   updateTeam(data: TeamUpdateInput!): Team
   updateUser(data: UserUpdateInput!): User
@@ -194,6 +194,9 @@ enum Priority {
 }
 
 type Project {
+  _count: ProjectAggregation
+  _isStarred: Boolean
+  _isWatching: Boolean
   activity: Activity
   activityId: String!
   children: [Project]
@@ -214,8 +217,20 @@ type Project {
   watchers: [Activity]
 }
 
-input ProjectDelete {
+type ProjectAggregation {
+  stargizers: Int
+  watchers: Int
+}
+
+input ProjectCreateInput {
+  description: String
+  flowId: String!
   key: String!
+  title: String!
+}
+
+input ProjectDelete {
+  id: Int!
 }
 
 input ProjectGoalsCountInput {
@@ -236,10 +251,9 @@ input ProjectGoalsInput {
   tags: [String!]!
 }
 
-input ProjectInput {
+input ProjectUpdateInput {
   description: String
-  flowId: String!
-  key: String!
+  id: Int!
   title: String!
 }
 

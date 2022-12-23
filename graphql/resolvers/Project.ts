@@ -6,11 +6,12 @@ import {
     Project,
     Goal,
     ProjectGoalsInput,
-    ProjectInput,
     ProjectDeleteInput,
     SubscriptionToggleInput,
     Activity,
     ProjectGoalsCountInput,
+    ProjectUpdateInput,
+    ProjectCreateInput,
 } from '../types';
 
 const connectionMap: Record<string, string> = {
@@ -117,7 +118,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { key }, { db, activity }) => {
             if (!activity) return null;
 
-            return db.project.findUnique({
+            const project = await db.project.findUnique({
                 where: {
                     key,
                 },
@@ -127,15 +128,13 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             states: true,
                         },
                     },
+                    stargizers: true,
+                    watchers: true,
                     teams: {
                         include: {
-                            _count: {
-                                select: { projects: true },
-                            },
+                            _count: true,
                         },
                     },
-                    watchers: true,
-                    stargizers: true,
                     tags: true,
                     participants: {
                         include: {
@@ -149,8 +148,22 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             ghost: true,
                         },
                     },
+                    _count: {
+                        select: {
+                            watchers: true,
+                            stargizers: true,
+                        },
+                    },
                 },
             });
+
+            if (!project) return null;
+
+            return {
+                ...project,
+                _isStarred: project.stargizers.filter((stargizer) => stargizer?.id === activity.id).length > 0,
+                _isWatching: project.watchers.filter((watcher) => watcher?.id === activity.id).length > 0,
+            };
         },
     });
 
@@ -261,7 +274,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('createProject', {
         type: Project,
         args: {
-            data: nonNull(arg({ type: ProjectInput })),
+            data: nonNull(arg({ type: ProjectCreateInput })),
         },
         resolve: async (_, { data: { key, title, description, flowId } }, { db, activity }) => {
             if (!activity) return null;
@@ -296,14 +309,14 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('updateProject', {
         type: Project,
         args: {
-            data: nonNull(arg({ type: ProjectInput })),
+            data: nonNull(arg({ type: ProjectUpdateInput })),
         },
-        resolve: async (_, { data: { key, ...data } }, { db, activity }) => {
+        resolve: async (_, { data: { id, ...data } }, { db, activity }) => {
             if (!activity) return null;
 
             try {
                 return db.project.update({
-                    where: { key },
+                    where: { id },
                     data,
                 });
 
@@ -325,12 +338,12 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: ProjectDeleteInput })),
         },
-        resolve: async (_, { data: { key } }, { db, activity }) => {
+        resolve: async (_, { data: { id } }, { db, activity }) => {
             if (!activity) return null;
 
             try {
                 return db.project.delete({
-                    where: { key },
+                    where: { id },
                 });
 
                 // await mailServer.sendMail({
