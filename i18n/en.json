@@ -47,15 +47,20 @@
         "Goals": "Goals",
         "Settings": "Settings",
         "Teams": "Teams",
-        "new": {
-            "title": "Taskany Goals — New project",
+        "We are calling owner": "We are calling owner...",
+        "Something went wrong 😿": "Something went wrong 😿",
+        "Voila! You are watcher now 🎉": "Voila! You are watcher now 🎉",
+        "Voila! You are stargizer now 🎉": "Voila! You are stargizer now 🎉",
+        "So sad! Project will miss you": "So sad! Project will miss you...",
+        "Project's title is required": "Project's title is required",
+        "Project's title must be a string": "Project's title must be a string",
+        "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
+        "We are creating new project": "We are creating new project...",
+        "Voila! Project is here 🎉": "Voila! Project is here 🎉",
+        "We are updating project settings": "We are updating project settings",
+        "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",
+        "create": {
             "Create new project": "Create new project",
-            "Project's title is required": "Project's title is required",
-            "Project's title must be a string": "Project's title must be a string",
-            "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
-            "Something went wrong 😿": "Something went wrong 😿",
-            "We are creating new project": "We are creating new project...",
-            "Voila! Project is here 🎉": "Voila! Project is here 🎉",
             "Create project": "Create project",
             "Project's title": "Project's title",
             "And its description": "And its description",
@@ -76,16 +81,10 @@
         "settings": {
             "title": "Taskany — <project></project> — Settings",
             "key": "Key",
-            "Project's title is required": "Project's title is required",
-            "Project's title must be a string": "Project's title must be a string",
-            "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
             "General": "General",
             "Title": "Title",
             "Description": "Description",
             "Save": "Save",
-            "Something went wrong 😿": "Something went wrong 😿",
-            "We are updating project settings": "We are updating project settings",
-            "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",
             "Danger zone": "Danger zone",
             "Delete project": "Delete project",
             "Be careful! All data will be lost": "Be careful! All data will be lost.",
@@ -348,21 +347,13 @@
         "Kind": "Kind",
         "Add": "Add"
     },
-    "ProjectWatchButton": {
+    "WatchButton": {
         "Watch": "Watch",
-        "Watching": "Watching",
-        "We are calling owner": "We are calling owner...",
-        "Something went wrong 😿": "Something went wrong 😿",
-        "Voila! You are watcher now 🎉": "Voila! You are watcher now 🎉",
-        "So sad! Project will miss you": "So sad! Project will miss you..."
+        "Watching": "Watching"
     },
-    "ProjectStarButton": {
+    "StarButton": {
         "Stars": "Stars",
-        "Starred": "Starred",
-        "We are calling owner": "We are calling owner...",
-        "Something went wrong 😿": "Something went wrong 😿",
-        "Voila! You are stargizer now 🎉": "Voila! You are stargizer now 🎉",
-        "So sad! Project will miss you": "So sad! Project will miss you..."
+        "Starred": "Starred"
     },
     "FiltersPanel": {
         "Search": "Search",
