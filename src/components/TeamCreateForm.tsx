@@ -132,8 +132,8 @@ const TeamCreateForm: React.FC = () => {
 
         toast.promise(promise, {
             error: t('Something went wrong 😿'),
-            loading: t('We are creating new project'),
-            success: t('Voila! Project is here 🎉'),
+            loading: t('We are creating new team'),
+            success: t('Voila! Team is here 🎉'),
         });
 
         const res = await promise;
