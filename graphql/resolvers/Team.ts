@@ -146,6 +146,11 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             ghost: true,
                         },
                     },
+                    _count: {
+                        select: {
+                            projects: true,
+                        },
+                    },
                 },
             });
         },

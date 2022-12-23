@@ -106,6 +106,19 @@ export const Project = objectType({
         t.list.field('stargizers', { type: Activity });
         t.field(ProjectModel.createdAt);
         t.field(ProjectModel.updatedAt);
+
+        // calculated fields
+        t.field('_count', { type: ProjectAggregation });
+        t.boolean('_isStarred');
+        t.boolean('_isWatching');
+    },
+});
+
+export const ProjectAggregation = objectType({
+    name: 'ProjectAggregation',
+    definition(t) {
+        t.int('stargizers');
+        t.int('watchers');
     },
 });
 
@@ -128,6 +141,7 @@ export const Team = objectType({
         t.field(TeamModel.createdAt);
         t.field(TeamModel.updatedAt);
 
+        // calculated fields
         t.field('_count', { type: TeamAggregation });
     },
 });
@@ -394,8 +408,8 @@ export const CommentDeleteInput = inputObjectType({
     },
 });
 
-export const ProjectInput = inputObjectType({
-    name: 'ProjectInput',
+export const ProjectCreateInput = inputObjectType({
+    name: 'ProjectCreateInput',
     definition(t) {
         t.field(ProjectModel.key);
         t.field(ProjectModel.title);
@@ -404,10 +418,19 @@ export const ProjectInput = inputObjectType({
     },
 });
 
+export const ProjectUpdateInput = inputObjectType({
+    name: 'ProjectUpdateInput',
+    definition(t) {
+        t.field(ProjectModel.id);
+        t.field(ProjectModel.title);
+        t.field(ProjectModel.description);
+    },
+});
+
 export const ProjectDeleteInput = inputObjectType({
     name: 'ProjectDelete',
     definition(t) {
-        t.field(ProjectModel.key);
+        t.field(ProjectModel.id);
     },
 });
 
