@@ -479,7 +479,7 @@ export const TeamGoalsInput = inputObjectType({
 export const TeamsInput = inputObjectType({
     name: 'TeamsInput',
     definition(t) {
-        t.nonNull.string('title');
+        t.string('title');
     },
 });
 

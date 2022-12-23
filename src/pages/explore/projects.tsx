@@ -4,13 +4,11 @@ import { useTranslations } from 'next-intl';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Project } from '../../../graphql/@generated/genql';
-import { Page, PageContent } from '../../components/Page';
-import { useMounted } from '../../hooks/useMounted';
-import { TabsMenu, TabsMenuItem } from '../../components/TabsMenu';
+import { PageContent } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { ProjectListItem } from '../../components/ProjectListItem';
 import { nullable } from '../../utils/nullable';
-import { CommonHeader } from '../../components/CommonHeader';
+import { ExplorePageLayout } from '../../components/ExplorePageLayout';
 
 const refreshInterval = 3000;
 
@@ -44,31 +42,16 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const ProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ projects: Project[] }>) => {
-    const mounted = useMounted(refreshInterval);
+const ExploreProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ projects: Project[] }>) => {
     const t = useTranslations('explore');
 
-    const { data } = useSWR(mounted ? [user] : null, (...args) => fetcher(...args), {
+    const { data } = useSWR([user], (...args) => fetcher(...args), {
         refreshInterval,
     });
-
     const projects: Project[] | null = data?.projects ?? ssrData.projects;
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={t('title')}>
-            <CommonHeader
-                title={t('Explore')}
-                description={t('see what the Taskany community is most excited about today')}
-            >
-                <div className="exploreActions"></div>
-
-                <TabsMenu>
-                    <TabsMenuItem>{t('Teams')}</TabsMenuItem>
-                    <TabsMenuItem active>{t('Projects')}</TabsMenuItem>
-                    <TabsMenuItem>{t('Goals')}</TabsMenuItem>
-                </TabsMenu>
-            </CommonHeader>
-
+        <ExplorePageLayout user={user} locale={locale} ssrTime={ssrTime} title={t('projects.title')}>
             <PageSep />
 
             <PageContent>
@@ -85,8 +68,8 @@ const ProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ pr
                     )),
                 )}
             </PageContent>
-        </Page>
+        </ExplorePageLayout>
     );
 };
 
-export default ProjectsPage;
+export default ExploreProjectsPage;

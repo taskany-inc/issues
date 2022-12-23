@@ -233,12 +233,20 @@
         }
     },
     "explore": {
-        "title": "Taskany — Explore",
         "Explore": "Explore",
         "see what the Taskany community is most excited about today": "See what the Taskany community is most excited about today",
         "Teams": "Teams",
         "Projects": "Projects",
-        "Goals": "Goals"
+        "Goals": "Goals",
+        "teams": {
+            "title": "Taskany — Explore — Teams"
+        },
+        "projects": {
+            "title": "Taskany — Explore — Projects"
+        },
+        "goals": {
+            "title": "Taskany — Explore — Goals"
+        }
     },
     "Header": {
         "Projects": "Projects",

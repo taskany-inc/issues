@@ -87,12 +87,13 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
 
             const teams = await db.team.findMany({
                 where: {
-                    title: data.title,
+                    title: data.title ?? undefined,
                 },
                 orderBy: {
                     createdAt: 'asc',
                 },
                 include: {
+                    projects: true,
                     activity: {
                         include: {
                             user: true,
