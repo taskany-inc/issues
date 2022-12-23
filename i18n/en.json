@@ -46,6 +46,7 @@
     "projects": {
         "Goals": "Goals",
         "Settings": "Settings",
+        "Teams": "Teams",
         "new": {
             "title": "Taskany Goals — New project",
             "Create new project": "Create new project",
@@ -67,9 +68,8 @@
             "Flow": "Flow",
             "Flow or state title": "Flow or state title"
         },
-        "key": {
-            "title": "Taskany — <project></project>",
-            "key": "Key",
+        "index": {
+            "title": "Taskany — <project></project> — Goals",
             "Load more": "Load more",
             "New goal": "New goal"
         },

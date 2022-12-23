@@ -2,27 +2,22 @@ import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import { routes } from '../../../hooks/router';
 import { createFetcher } from '../../../utils/createFetcher';
 import { Goal, Project } from '../../../../graphql/@generated/genql';
-import { Page, PageActions } from '../../../components/Page';
 import { Button } from '../../../components/Button';
 import { GoalListItem } from '../../../components/GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
-import { CommonHeader } from '../../../components/CommonHeader';
-import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
-import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
-import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { FiltersPanel } from '../../../components/FiltersPanel';
 import { defaultLimit } from '../../../components/LimitFilterDropdown';
 import { useUrlParams } from '../../../hooks/useUrlParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
+import { ProjectPageLayout } from '../../../components/ProjectPageLayout';
+import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 
 const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
 
@@ -43,6 +38,14 @@ const fetcher = createFetcher(
                 flowId: true,
                 flow: {
                     id: true,
+                },
+                teams: {
+                    slug: true,
+                    title: true,
+                    description: true,
+                    _count: {
+                        projects: true,
+                    },
                 },
                 watchers: {
                     id: true,
@@ -199,8 +202,7 @@ const ProjectPage = ({
     ssrData,
     params: { key },
 }: ExternalPageProps<{ project: Project; projectGoals: Goal[]; projectGoalsCount: number }, { key: string }>) => {
-    const tCommon = useTranslations('projects');
-    const t = useTranslations('projects.key');
+    const t = useTranslations('projects');
     const router = useRouter();
 
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
@@ -272,43 +274,16 @@ const ProjectPage = ({
     }, []);
 
     return (
-        <Page
+        <ProjectPageLayout
+            actions
             user={user}
             locale={locale}
             ssrTime={ssrTime}
-            title={t.rich('title', {
+            title={t.rich('index.title', {
                 project: () => project.title,
             })}
+            project={project}
         >
-            <CommonHeader
-                preTitle={`${t('key')}: ${project.key}`}
-                title={project.title}
-                description={project.description}
-            >
-                <PageActions>
-                    <ProjectWatchButton
-                        activityId={user.activityId}
-                        projectId={project.id}
-                        watchers={project.watchers}
-                    />
-                    <ProjectStarButton
-                        activityId={user.activityId}
-                        projectId={project.id}
-                        stargizers={project.stargizers}
-                    />
-                </PageActions>
-
-                {nullable(user.activityId === project.activityId, () => (
-                    <TabsMenu>
-                        <TabsMenuItem active>{tCommon('Goals')}</TabsMenuItem>
-
-                        <NextLink href={routes.projectSettings(key)} passHref>
-                            <TabsMenuItem>{tCommon('Settings')}</TabsMenuItem>
-                        </NextLink>
-                    </TabsMenu>
-                ))}
-            </CommonHeader>
-
             <FiltersPanel
                 count={goalsCount}
                 flowId={project.flow?.id}
@@ -324,7 +299,14 @@ const ProjectPage = ({
                 onUserChange={setOwnerFilter}
                 onTagChange={setTagsFilter}
                 onLimitChange={setLimitFilter}
-            />
+            >
+                <Button
+                    view="primary"
+                    size="m"
+                    text={t('index.New goal')}
+                    onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                />
+            </FiltersPanel>
 
             <StyledGoalsList>
                 {goals?.map((goal) =>
@@ -345,14 +327,14 @@ const ProjectPage = ({
                 )}
 
                 <StyledLoadMore>
-                    {shouldRenderMoreButton && <Button text={t('Load more')} onClick={() => setSize(size + 1)} />}
+                    {shouldRenderMoreButton && <Button text={t('index.Load more')} onClick={() => setSize(size + 1)} />}
                 </StyledLoadMore>
             </StyledGoalsList>
 
             {nullable(preview, (p) => (
                 <GoalPreview goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
             ))}
-        </Page>
+        </ProjectPageLayout>
     );
 };
 

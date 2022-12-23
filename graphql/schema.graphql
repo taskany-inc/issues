@@ -208,6 +208,7 @@ type Project {
   participants: [Activity]
   stargizers: [Activity]
   tags: [Tag]
+  teams: [Team]
   title: String!
   updatedAt: DateTime!
   watchers: [Activity]
@@ -336,6 +337,7 @@ input TagInput {
 }
 
 type Team {
+  _count: TeamAggregation
   activity: Activity
   activityId: String!
   children: [Team]
@@ -351,6 +353,11 @@ type Team {
   title: String!
   updatedAt: DateTime!
   watchers: [Activity]
+}
+
+type TeamAggregation {
+  participants: Int
+  projects: Int
 }
 
 input TeamCreateInput {

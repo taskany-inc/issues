@@ -98,6 +98,7 @@ export const Project = objectType({
         t.field('flow', { type: Flow });
         t.field('parent', { type: Project });
         t.list.field('children', { type: Project });
+        t.list.field('teams', { type: Team });
         t.list.field('goals', { type: Goal });
         t.list.field('tags', { type: Tag });
         t.list.field('participants', { type: Activity });
@@ -126,6 +127,16 @@ export const Team = objectType({
         t.list.field('stargizers', { type: Activity });
         t.field(TeamModel.createdAt);
         t.field(TeamModel.updatedAt);
+
+        t.field('_count', { type: TeamAggregation });
+    },
+});
+
+export const TeamAggregation = objectType({
+    name: 'TeamAggregation',
+    definition(t) {
+        t.int('projects');
+        t.int('participants');
     },
 });
 

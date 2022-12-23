@@ -151,7 +151,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
     // NB: this line is compensation for first render before delayed swr will bring updates
     const projects: Project[] = data?.userGoals ?? ssrData.userGoals;
 
-    const [projectsFilterData, usersFilterData, tagsFilterData, goalsCount] = useMemo(() => {
+    const [usersFilterData, tagsFilterData, goalsCount] = useMemo(() => {
         const projectsData = new Map();
         const tagsData = new Map();
         const usersData = new Map();
@@ -171,10 +171,10 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
         });
 
         return [
-            Array.from(projectsData.values()),
             Array.from(usersData.values()),
             Array.from(tagsData.values()),
             goalsCount,
+            Array.from(projectsData.values()), // https://github.com/taskany-inc/issues/issues/438
         ];
     }, [projects]);
 
