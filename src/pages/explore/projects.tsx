@@ -46,7 +46,7 @@ export const getServerSideProps = declareSsrProps(
 
 const ProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ projects: Project[] }>) => {
     const mounted = useMounted(refreshInterval);
-    const t = useTranslations('projects.index');
+    const t = useTranslations('explore');
 
     const { data } = useSWR(mounted ? [user] : null, (...args) => fetcher(...args), {
         refreshInterval,
@@ -57,16 +57,15 @@ const ProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ pr
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={t('title')}>
             <CommonHeader
-                title={t('explore')}
+                title={t('Explore')}
                 description={t('see what the Taskany community is most excited about today')}
             >
                 <div className="exploreActions"></div>
 
                 <TabsMenu>
-                    <TabsMenuItem active>Projects</TabsMenuItem>
-                    <TabsMenuItem>Goals</TabsMenuItem>
-                    <TabsMenuItem>Issues</TabsMenuItem>
-                    <TabsMenuItem>Boards</TabsMenuItem>
+                    <TabsMenuItem>{t('Teams')}</TabsMenuItem>
+                    <TabsMenuItem active>{t('Projects')}</TabsMenuItem>
+                    <TabsMenuItem>{t('Goals')}</TabsMenuItem>
                 </TabsMenu>
             </CommonHeader>
 

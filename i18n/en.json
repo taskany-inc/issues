@@ -3,6 +3,10 @@
         "title": "Taskany"
     },
     "teams": {
+        "Projects": "Projects",
+        "Goals": "Goals",
+        "Settings": "Settings",
+        "New goal": "New goal",
         "new": {
             "title": "Taskany — New team",
             "Create new team": "Create new team",
@@ -18,14 +22,30 @@
             "Pro tip!": "Pro tip!",
             "Press key to create the team": "Press <key></key> to create the team.",
             "Team with title already exists": "Team with title <b><title></title></b> already exists. Please, try to use another title."
+        },
+        "index": {
+            "title": "Taskany — <team></team> — Projects"
+        },
+        "goals": {
+            "title": "Taskany — <team></team> — Goals"
+        },
+        "settings": {
+            "title": "Taskany — <team></team> — Settings",
+            "Team's title is required": "Team's title is required",
+            "Team's title must be a string": "Team's title must be a string",
+            "Team's title must be longer than 2 symbols": "Team's title must be longer than 2 symbols",
+            "General": "General",
+            "Title": "Title",
+            "Description": "Description",
+            "Save": "Save",
+            "Something went wrong 😿": "Something went wrong 😿",
+            "We are updating team settings": "We are updating team settings",
+            "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉"
         }
     },
     "projects": {
-        "index": {
-            "title": "Taskany — Explore",
-            "explore": "Explore",
-            "see what the Taskany community is most excited about today": "See what the Taskany community is most excited about today"
-        },
+        "Goals": "Goals",
+        "Settings": "Settings",
         "new": {
             "title": "Taskany Goals — New project",
             "Create new project": "Create new project",
@@ -55,7 +75,6 @@
         },
         "settings": {
             "title": "Taskany — <project></project> — Settings",
-            "Settings": "Settings",
             "key": "Key",
             "Project's title is required": "Project's title is required",
             "Project's title must be a string": "Project's title must be a string",
@@ -212,6 +231,14 @@
         "item": {
             "by": "by"
         }
+    },
+    "explore": {
+        "title": "Taskany — Explore",
+        "Explore": "Explore",
+        "see what the Taskany community is most excited about today": "See what the Taskany community is most excited about today",
+        "Teams": "Teams",
+        "Projects": "Projects",
+        "Goals": "Goals"
     },
     "Header": {
         "Projects": "Projects",

@@ -7,15 +7,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import styled from 'styled-components';
 
 import { createFetcher } from '../../../utils/createFetcher';
 import { Goal, Project } from '../../../../graphql/@generated/genql';
-import { Page } from '../../../components/Page';
+import { Page, PageActions } from '../../../components/Page';
 import { Button } from '../../../components/Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
-import { useMounted } from '../../../hooks/useMounted';
 import { PageSep } from '../../../components/PageSep';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { routes, useRouter } from '../../../hooks/router';
@@ -38,7 +36,6 @@ const ModalOnEvent = dynamic(() => import('../../../components/ModalOnEvent'));
 
 const refreshInterval = 3000;
 
-// @ts-ignore
 const fetcher = createFetcher((_, key: string) => ({
     project: [
         {
@@ -96,40 +93,8 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const StyledProjectActions = styled.div`
-    justify-self: right;
-    justify-items: end;
-
-    align-content: space-between;
-
-    > * + * {
-        margin-left: ${gapS};
-    }
-`;
-
-const ProjectPage = ({
-    user,
-    locale,
-    ssrTime,
-    ssrData,
-    params: { key },
-}: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) => {
-    const t = useTranslations('projects.settings');
-
-    const mounted = useMounted(refreshInterval);
-    const { data } = useSWR(mounted ? [user, key] : null, (...args) => fetcher(...args), {
-        refreshInterval,
-    });
-
-    const project: Project = data?.project ?? ssrData.project;
-
-    const [actualProjectFields, setActualProjectFields] = useState<Pick<Project, 'title' | 'description'>>({
-        title: project.title,
-        description: project.description || '',
-    });
-    const [generalFormChanged, setGeneralFormChanged] = useState(false);
-
-    const generalSchema = z.object({
+const schemaProvider = (t: (key: string) => string) =>
+    z.object({
         title: z
             .string({
                 required_error: t("Project's title is required"),
@@ -141,10 +106,32 @@ const ProjectPage = ({
         description: z.string().optional(),
     });
 
-    type GeneralFormType = z.infer<typeof generalSchema>;
+type FormType = z.infer<ReturnType<typeof schemaProvider>>;
 
-    const generalForm = useForm<GeneralFormType>({
-        resolver: zodResolver(generalSchema),
+const ProjectSettingsPage = ({
+    user,
+    locale,
+    ssrTime,
+    ssrData,
+    params: { key },
+}: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) => {
+    const t = useTranslations('projects.settings');
+    const router = useRouter();
+    const schema = schemaProvider(t);
+
+    const { data } = useSWR([user, key], (...args) => fetcher(...args), {
+        refreshInterval,
+    });
+    const project: Project = data?.project ?? ssrData.project;
+
+    const [actualProjectFields, setActualProjectFields] = useState<Pick<Project, 'title' | 'description'>>({
+        title: project.title,
+        description: project.description || '',
+    });
+    const [generalFormChanged, setGeneralFormChanged] = useState(false);
+
+    const generalForm = useForm<FormType>({
+        resolver: zodResolver(schema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
@@ -156,7 +143,7 @@ const ProjectPage = ({
         setGeneralFormChanged(!shallowEqual(generalFormValues, actualProjectFields));
     }, [generalFormValues, actualProjectFields]);
 
-    const updateProject = async (data: GeneralFormType) => {
+    const updateProject = async (data: FormType) => {
         const promise = gql.mutation({
             updateProject: [
                 {
@@ -186,7 +173,6 @@ const ProjectPage = ({
         }
     };
 
-    const router = useRouter();
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
     const onConfirmationInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setDeleteConfirmation(e.currentTarget.value);
@@ -228,7 +214,7 @@ const ProjectPage = ({
                 title={project.title}
                 description={project.description}
             >
-                <StyledProjectActions>
+                <PageActions>
                     <ProjectWatchButton
                         activityId={user.activityId}
                         projectId={project.id}
@@ -239,7 +225,7 @@ const ProjectPage = ({
                         projectId={project.id}
                         stargizers={project.stargizers}
                     />
-                </StyledProjectActions>
+                </PageActions>
 
                 <TabsMenu>
                     <NextLink href={routes.project(key)} passHref>
@@ -368,4 +354,4 @@ const ProjectPage = ({
     );
 };
 
-export default ProjectPage;
+export default ProjectSettingsPage;

@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 import z from 'zod';
 import useSWR from 'swr';
 import styled from 'styled-components';
-import dynamic from 'next/dynamic';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -126,7 +125,7 @@ const TeamCreateForm: React.FC = () => {
                     },
                 },
                 {
-                    id: true,
+                    slug: true,
                 },
             ],
         });
@@ -139,7 +138,7 @@ const TeamCreateForm: React.FC = () => {
 
         const res = await promise;
 
-        res.createTeam?.id && router.team(res.createTeam.id);
+        res.createTeam?.slug && router.team(res.createTeam.slug);
     };
 
     const isTeamTitleAvailable = Boolean(teamsData?.teams?.length === 0);

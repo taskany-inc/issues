@@ -168,7 +168,7 @@ type Mutation {
   createTeam(data: TeamCreateInput!): Team
   deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
-  deleteTeam(data: ProjectDelete!): Team
+  deleteTeam(data: TeamDelete!): Team
   toggleGoalDependency(toggle: GoalDependencyToggleInput!): Goal
   toggleGoalStargizer(toggle: SubscriptionToggleInput!): Activity
   toggleGoalWatcher(toggle: SubscriptionToggleInput!): Activity
@@ -260,9 +260,9 @@ type Query {
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
-  team(id: Int!): Team
+  team(slug: String!): Team
   teamCompletion(query: String!, sortBy: SortOrder): [Team]
-  teamGoals(data: TeamGoalsInput!): [Goal]
+  teamGoals(data: TeamGoalsInput!): [Project]
   teams(data: TeamsInput!): [Team]
   userGoals(data: UserGoalsInput!): [Project]
   users(sortBy: SortOrder): [User]
@@ -346,6 +346,7 @@ type Team {
   parent: Team
   participants: [Activity]
   projects: [Project]
+  slug: String!
   stargizers: [Activity]
   title: String!
   updatedAt: DateTime!
@@ -365,21 +366,19 @@ input TeamDelete {
 }
 
 input TeamGoalsInput {
-  id: Int!
-  offset: Int!
   owner: [String!]!
-  pageSize: Int!
   query: String!
+  slug: String!
   states: [String!]!
   tags: [String!]!
 }
 
 input TeamUpdateInput {
-  children: [Int!]!
+  children: [Int!]
   description: String
   id: Int!
-  parent: Int!
-  projects: [String!]!
+  parent: Int
+  projects: [String!]
   title: String!
 }
 
