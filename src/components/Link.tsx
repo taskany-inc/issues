@@ -8,6 +8,7 @@ interface LinkProps {
     className?: string;
     children?: React.ReactNode;
     href?: string;
+    title?: string;
 
     onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
