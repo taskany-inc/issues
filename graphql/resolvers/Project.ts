@@ -127,6 +127,13 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             states: true,
                         },
                     },
+                    teams: {
+                        include: {
+                            _count: {
+                                select: { projects: true },
+                            },
+                        },
+                    },
                     watchers: true,
                     stargizers: true,
                     tags: true,

@@ -46,6 +46,7 @@
     "projects": {
         "Goals": "Цели",
         "Settings": "Настройки",
+        "Teams": "Команды",
         "new": {
             "title": "Taskany — Новый проект",
             "Create new project": "Новый проект",
@@ -67,9 +68,8 @@
             "Flow": "Флоу",
             "Flow or state title": "Модель или статус"
         },
-        "key": {
+        "index": {
             "title": "Taskany — <project></project>",
-            "key": "Ключ",
             "Load more": "Ещё",
             "New goal": "Создать цель"
         },
