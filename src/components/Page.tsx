@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
 
-import { gray4, radiusM, textColor } from '../design/@generated/themes';
+import { gapS, gray4, radiusM, textColor } from '../design/@generated/themes';
 import { pageContext, PageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/declareSsrProps';
 import { useHotkeys } from '../hooks/useHotkeys';
@@ -42,6 +42,17 @@ const StyledContent = styled.div`
 
 export const PageContent = styled.div`
     padding: 10px 40px 0 40px;
+`;
+
+export const PageActions = styled.div`
+    justify-self: right;
+    justify-items: end;
+
+    align-content: space-between;
+
+    > * + * {
+        margin-left: ${gapS};
+    }
 `;
 
 const mapThemeOnId = { light: 0, dark: 1 };

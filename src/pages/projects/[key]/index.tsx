@@ -4,16 +4,16 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
 import { routes } from '../../../hooks/router';
 import { createFetcher } from '../../../utils/createFetcher';
 import { Goal, Project } from '../../../../graphql/@generated/genql';
-import { Page } from '../../../components/Page';
+import { Page, PageActions } from '../../../components/Page';
 import { Button } from '../../../components/Button';
 import { GoalListItem } from '../../../components/GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
-import { gapS } from '../../../design/@generated/themes';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { TabsMenu, TabsMenuItem } from '../../../components/TabsMenu';
 import { ProjectWatchButton } from '../../../components/ProjectWatchButton';
@@ -21,9 +21,10 @@ import { ProjectStarButton } from '../../../components/ProjectStarButton';
 import { FiltersPanel } from '../../../components/FiltersPanel';
 import { defaultLimit } from '../../../components/LimitFilterDropdown';
 import { useUrlParams } from '../../../hooks/useUrlParams';
-import GoalPreview from '../../../components/GoalPreview';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
+
+const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
@@ -191,17 +192,6 @@ const StyledLoadMore = styled.div`
     margin: 50px 40px;
 `;
 
-const StyledProjectActions = styled.div`
-    justify-self: right;
-    justify-items: end;
-
-    align-content: space-between;
-
-    > * + * {
-        margin-left: ${gapS};
-    }
-`;
-
 const ProjectPage = ({
     user,
     locale,
@@ -209,6 +199,7 @@ const ProjectPage = ({
     ssrData,
     params: { key },
 }: ExternalPageProps<{ project: Project; projectGoals: Goal[]; projectGoalsCount: number }, { key: string }>) => {
+    const tCommon = useTranslations('projects');
     const t = useTranslations('projects.key');
     const router = useRouter();
 
@@ -294,7 +285,7 @@ const ProjectPage = ({
                 title={project.title}
                 description={project.description}
             >
-                <StyledProjectActions>
+                <PageActions>
                     <ProjectWatchButton
                         activityId={user.activityId}
                         projectId={project.id}
@@ -305,20 +296,17 @@ const ProjectPage = ({
                         projectId={project.id}
                         stargizers={project.stargizers}
                     />
-                </StyledProjectActions>
+                </PageActions>
 
-                <TabsMenu>
-                    <TabsMenuItem active>Goals</TabsMenuItem>
-                    <TabsMenuItem>Issues</TabsMenuItem>
-                    <TabsMenuItem>Boards</TabsMenuItem>
-                    <TabsMenuItem>Wiki</TabsMenuItem>
+                {nullable(user.activityId === project.activityId, () => (
+                    <TabsMenu>
+                        <TabsMenuItem active>{tCommon('Goals')}</TabsMenuItem>
 
-                    {nullable(user.activityId === project.activityId, () => (
                         <NextLink href={routes.projectSettings(key)} passHref>
-                            <TabsMenuItem>Settings</TabsMenuItem>
+                            <TabsMenuItem>{tCommon('Settings')}</TabsMenuItem>
                         </NextLink>
-                    ))}
-                </TabsMenu>
+                    </TabsMenu>
+                ))}
             </CommonHeader>
 
             <FiltersPanel

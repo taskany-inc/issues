@@ -1,10 +1,9 @@
 import { arg, nonNull, stringArg } from 'nexus';
-import { intArg, ObjectDefinitionBlock } from 'nexus/dist/core';
+import { ObjectDefinitionBlock } from 'nexus/dist/core';
+import slugify from 'slugify';
 
 import {
     SortOrder,
-    Goal,
-    ProjectDeleteInput,
     SubscriptionToggleInput,
     Activity,
     Team,
@@ -12,6 +11,8 @@ import {
     TeamCreateInput,
     TeamUpdateInput,
     TeamsInput,
+    TeamDeleteInput,
+    Project,
 } from '../types';
 
 const connectionMap: Record<string, string> = {
@@ -19,13 +20,7 @@ const connectionMap: Record<string, string> = {
     false: 'disconnect',
 };
 
-const teamGoalsFilter = (data: {
-    id: number;
-    query: string;
-    states: string[];
-    tags: string[];
-    owner: string[];
-}): any => {
+const projectGoalsFilter = (data: { query: string; states: string[]; tags: string[]; owner: string[] }): any => {
     const statesFilter = data.states.length
         ? {
               state: {
@@ -74,9 +69,6 @@ const teamGoalsFilter = (data: {
                     },
                 },
             ],
-            team: {
-                id: data.id,
-            },
             ...statesFilter,
             ...tagsFilter,
             ...ownerFilter,
@@ -119,16 +111,26 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('team', {
         type: Team,
         args: {
-            id: nonNull(intArg()),
+            slug: nonNull(stringArg()),
         },
-        resolve: async (_, { id }, { db, activity }) => {
+        resolve: async (_, { slug }, { db, activity }) => {
             if (!activity) return null;
 
             return db.team.findUnique({
                 where: {
-                    id,
+                    slug,
                 },
                 include: {
+                    projects: {
+                        include: {
+                            activity: {
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
+                            },
+                        },
+                    },
                     watchers: true,
                     stargizers: true,
                     participants: {
@@ -149,53 +151,65 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     });
 
     t.list.field('teamGoals', {
-        type: Goal,
+        type: Project,
         args: {
             data: nonNull(arg({ type: TeamGoalsInput })),
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            return db.goal.findMany({
-                take: data.pageSize,
-                skip: data.offset,
-                ...teamGoalsFilter(data),
+            return db.project.findMany({
+                where: {
+                    teams: {
+                        some: {
+                            slug: data.slug,
+                        },
+                    },
+                },
                 orderBy: {
                     createdAt: 'asc',
                 },
                 include: {
-                    owner: {
-                        include: {
-                            user: true,
-                            ghost: true,
+                    goals: {
+                        ...projectGoalsFilter(data),
+                        orderBy: {
+                            createdAt: 'asc',
                         },
-                    },
-                    activity: {
                         include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    tags: true,
-                    state: true,
-                    project: true,
-                    estimate: true,
-                    dependsOn: {
-                        include: {
+                            owner: {
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
+                            },
+                            activity: {
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
+                            },
+                            tags: true,
                             state: true,
+                            project: true,
+                            estimate: true,
+                            dependsOn: {
+                                include: {
+                                    state: true,
+                                },
+                            },
+                            relatedTo: {
+                                include: {
+                                    state: true,
+                                },
+                            },
+                            blocks: {
+                                include: {
+                                    state: true,
+                                },
+                            },
+                            comments: true,
                         },
                     },
-                    relatedTo: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    blocks: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    comments: true,
                 },
             });
         },
@@ -255,6 +269,11 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 const newTeam = await db.team.create({
                     data: {
+                        slug: slugify(title, {
+                            replacement: '_',
+                            lower: true,
+                            strict: true,
+                        }),
                         title,
                         description,
                         activityId: activity.id,
@@ -349,14 +368,14 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('deleteTeam', {
         type: Team,
         args: {
-            data: nonNull(arg({ type: ProjectDeleteInput })),
+            data: nonNull(arg({ type: TeamDeleteInput })),
         },
-        resolve: async (_, { data: { key } }, { db, activity }) => {
+        resolve: async (_, { data: { id } }, { db, activity }) => {
             if (!activity) return null;
 
             try {
-                return db.project.delete({
-                    where: { key },
+                return db.team.delete({
+                    where: { id },
                 });
 
                 // await mailServer.sendMail({

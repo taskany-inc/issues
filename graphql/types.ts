@@ -112,6 +112,7 @@ export const Team = objectType({
     name: TeamModel.$name,
     definition(t) {
         t.field(TeamModel.id);
+        t.field(TeamModel.slug);
         t.field(TeamModel.title);
         t.field(TeamModel.description);
         t.field(TeamModel.activityId);
@@ -444,8 +445,8 @@ export const FindActivityInput = inputObjectType({
 export const TeamCreateInput = inputObjectType({
     name: 'TeamCreateInput',
     definition(t) {
-        t.field(ProjectModel.title);
-        t.field(ProjectModel.description);
+        t.field(TeamModel.title);
+        t.field(TeamModel.description);
         t.int('parent');
         t.list.nonNull.int('children');
         t.list.nonNull.string('projects');
@@ -455,21 +456,19 @@ export const TeamCreateInput = inputObjectType({
 export const TeamUpdateInput = inputObjectType({
     name: 'TeamUpdateInput',
     definition(t) {
-        t.nonNull.field(ProjectModel.id);
-        t.field(ProjectModel.title);
-        t.field(ProjectModel.description);
-        t.nonNull.int('parent');
-        t.nonNull.list.nonNull.int('children');
-        t.nonNull.list.nonNull.string('projects');
+        t.nonNull.field(TeamModel.id);
+        t.field(TeamModel.title);
+        t.field(TeamModel.description);
+        t.int('parent');
+        t.list.nonNull.int('children');
+        t.list.nonNull.string('projects');
     },
 });
 
 export const TeamGoalsInput = inputObjectType({
     name: 'TeamGoalsInput',
     definition(t) {
-        t.field(ProjectModel.id);
-        t.nonNull.int('pageSize');
-        t.nonNull.int('offset');
+        t.field(TeamModel.slug);
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('owner');
