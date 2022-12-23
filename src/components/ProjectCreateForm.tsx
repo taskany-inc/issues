@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import toast from 'react-hot-toast';
-import z from 'zod';
 import useSWR from 'swr';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
@@ -12,12 +10,12 @@ import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
 import { nullable } from '../utils/nullable';
-import { gql } from '../utils/gql';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
+import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../hooks/useProjectResource';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -80,35 +78,15 @@ const StyledProjectKeyInputContainer = styled(InputContainer)`
     padding-right: ${gapS};
 `;
 
-const schemaProvider = (t: (key: string) => string) =>
-    z.object({
-        title: z
-            .string({
-                required_error: t("Project's title is required"),
-                invalid_type_error: t("Project's title must be a string"),
-            })
-            .min(2, {
-                message: t("Project's title must be longer than 2 symbols"),
-            }),
-        description: z.string().optional(),
-        flow: z.object({
-            id: z.string(),
-        }),
-        key: z.string().min(3),
-    });
-
-export type ProjectFormType = z.infer<ReturnType<typeof schemaProvider>>;
-
 const ProjectCreateForm: React.FC = () => {
-    const t = useTranslations('projects.new');
-
+    const t = useTranslations('projects');
     const router = useRouter();
     const { locale, user } = usePageContext();
-
+    const { createProject } = useProjectResource(0);
     const [focusedInput, setFocusedInput] = useState(false);
     const [hoveredInput, setHoveredInput] = useState(false);
 
-    const schema = schemaProvider(t);
+    const schema = createProjectSchemaProvider(t);
 
     const {
         register,
@@ -118,7 +96,7 @@ const ProjectCreateForm: React.FC = () => {
         setValue,
         control,
         formState: { errors, isValid, isSubmitted },
-    } = useForm<ProjectFormType>({
+    } = useForm<CreateProjectFormType>({
         resolver: zodResolver(schema),
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -142,9 +120,7 @@ const ProjectCreateForm: React.FC = () => {
     );
 
     const { data: flowData } = useSWR('flow', () => flowFetcher(user));
-    const { data: projectData } = useSWR(keyWatcher && keyWatcher !== '' ? [user, keyWatcher] : null, (...args) =>
-        projectFetcher(...args),
-    );
+    const { data: projectData } = useSWR(keyWatcher && keyWatcher !== '' ? [user, keyWatcher] : null, projectFetcher);
 
     useEffect(() => {
         if (flowData?.flowRecommended) {
@@ -152,34 +128,12 @@ const ProjectCreateForm: React.FC = () => {
         }
     }, [setValue, flowData?.flowRecommended]);
 
-    const createProject = async (form: ProjectFormType) => {
-        const promise = gql.mutation({
-            createProject: [
-                {
-                    data: {
-                        key: form.key,
-                        title: form.title,
-                        description: form.description,
-                        flowId: form.flow.id,
-                    },
-                },
-                {
-                    id: true,
-                    key: true,
-                },
-            ],
-        });
-
-        toast.promise(promise, {
-            error: t('Something went wrong 😿'),
-            loading: t('We are creating new project'),
-            success: t('Voila! Project is here 🎉'),
-        });
-
-        const res = await promise;
-
-        res.createProject?.key && router.project(res.createProject.key);
-    };
+    const onCreateProject = useCallback(
+        (key: string) => {
+            router.project(key);
+        },
+        [router],
+    );
 
     const isProjectKeyAvailable = Boolean(projectData?.project === null || !projectData);
     const richProps = {
@@ -194,15 +148,15 @@ const ProjectCreateForm: React.FC = () => {
     return (
         <>
             <ModalHeader>
-                <FormTitle>{t('Create new project')}</FormTitle>
+                <FormTitle>{t('create.Create new project')}</FormTitle>
             </ModalHeader>
 
             <ModalContent>
-                <Form onSubmit={handleSubmit(createProject)} submitHotkey={submitKeys}>
+                <Form onSubmit={handleSubmit(createProject(onCreateProject, t))} submitHotkey={submitKeys}>
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
-                            placeholder={t("Project's title")}
+                            placeholder={t("create.Project's title")}
                             flat="bottom"
                             brick="right"
                             error={errorsResolver('title')}
@@ -228,10 +182,10 @@ const ProjectCreateForm: React.FC = () => {
                                                 tooltip={
                                                     isProjectKeyAvailable
                                                         ? t.rich(
-                                                              'Perfect! Issues in your project will look like',
+                                                              'create.Perfect! Issues in your project will look like',
                                                               richProps,
                                                           )
-                                                        : t.rich('Project with key already exists', richProps)
+                                                        : t.rich('create.Project with key already exists', richProps)
                                                 }
                                                 {...field}
                                             />
@@ -244,7 +198,7 @@ const ProjectCreateForm: React.FC = () => {
 
                     <FormTextarea
                         {...register('description')}
-                        placeholder={t('And its description')}
+                        placeholder={t('create.And its description')}
                         flat="both"
                         error={errorsResolver('description')}
                     />
@@ -257,8 +211,8 @@ const ProjectCreateForm: React.FC = () => {
                                 render={({ field }) => (
                                     <FlowComboBox
                                         disabled
-                                        text={t('Flow')}
-                                        placeholder={t('Flow or state title')}
+                                        text={t('create.Flow')}
+                                        placeholder={t('create.Flow or state title')}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />
@@ -266,14 +220,14 @@ const ProjectCreateForm: React.FC = () => {
                             />
                         </FormAction>
                         <FormAction right inline>
-                            <Button view="primary" outline={!isValid} type="submit" text={t('Create project')} />
+                            <Button view="primary" outline={!isValid} type="submit" text={t('create.Create project')} />
                         </FormAction>
                     </FormActions>
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
-                        {t.rich('Press key to create the project', {
+                    <Tip title={t('create.Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                        {t.rich('create.Press key to create the project', {
                             key: () => <Keyboard command enter />,
                         })}
                     </Tip>

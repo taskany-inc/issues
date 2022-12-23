@@ -1,21 +1,24 @@
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
 import { routes } from '../hooks/router';
+import { useProjectResource } from '../hooks/useProjectResource';
+import { usePageContext } from '../hooks/usePageContext';
 import { Project } from '../../graphql/@generated/genql';
 import { gapM, gapS, gray6, gray9 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
-import { PageContent, Page, PageActions } from './Page';
-import { ProjectStarButton } from './ProjectStarButton';
-import { ProjectWatchButton } from './ProjectWatchButton';
+import { PageContent, PageActions } from './Page';
 import { Text } from './Text';
 import { TabsMenu, TabsMenuItem } from './TabsMenu';
 import { Link } from './Link';
+import { WatchButton } from './WatchButton';
+import { StarButton } from './StarButton';
 
-interface ProjectPageLayoutProps extends React.ComponentProps<typeof Page> {
+interface ProjectPageLayoutProps {
     project: Project;
     children: React.ReactNode;
     actions?: boolean;
@@ -39,31 +42,35 @@ const StyledProjectTeamsTitle = styled(Text)`
     padding-top: ${gapM};
 `;
 
-export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
-    user,
-    title,
-    locale,
-    ssrTime,
-    project,
-    children,
-    actions,
-}) => {
+export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, children, actions }) => {
+    const { user } = usePageContext();
     const t = useTranslations('projects');
     const router = useRouter();
+    const { toggleProjectWatching, toggleProjectStar } = useProjectResource(project.id);
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
         [t('Goals'), routes.project(project.key), false],
         [t('Settings'), routes.projectSettings(project.key), true],
     ];
 
+    const [watcher, setWatcher] = useState(project._isWatching);
+    const onWatchToggle = useCallback(() => {
+        setWatcher(!watcher);
+    }, [watcher]);
+
+    const [stargizer, setStargizer] = useState(project._isStarred);
+    const onStarToggle = useCallback(() => {
+        setStargizer(!stargizer);
+    }, [stargizer]);
+
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={title}>
+        <>
             <ProjectHeader>
                 <div>
-                    {nullable(project.teams, (teams) => (
+                    {nullable(project.teams?.length, () => (
                         <StyledProjectTeamsTitle weight="bold" color={gray9}>
                             {t('Teams')}:{' '}
-                            {teams.map((team) =>
+                            {project.teams?.map((team) =>
                                 nullable(team, (te) => (
                                     <NextLink key={te.slug} passHref href={routes.team(te.slug)}>
                                         <Link inline title={te.description}>
@@ -88,22 +95,18 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
 
                 {nullable(actions, () => (
                     <PageActions>
-                        <ProjectWatchButton
-                            activityId={user.activityId}
-                            projectId={project.id}
-                            watchers={project.watchers}
-                        />
-                        <ProjectStarButton
-                            activityId={user.activityId}
-                            projectId={project.id}
-                            stargizers={project.stargizers}
+                        <WatchButton watcher={watcher} onToggle={toggleProjectWatching(onWatchToggle, t, watcher)} />
+                        <StarButton
+                            stargizer={stargizer}
+                            count={project._count?.stargizers}
+                            onToggle={toggleProjectStar(onStarToggle, t, stargizer)}
                         />
                     </PageActions>
                 ))}
 
                 <TabsMenu>
                     {tabsMenuOptions.map(([title, href, ownerOnly]) =>
-                        nullable(ownerOnly ? user.activityId === project.activityId : true, () => (
+                        nullable(ownerOnly ? user?.activityId === project.activityId : true, () => (
                             <NextLink key={href} href={href} passHref>
                                 <TabsMenuItem active={router.asPath === href}>{title}</TabsMenuItem>
                             </NextLink>
@@ -113,6 +116,6 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
             </ProjectHeader>
 
             {children}
-        </Page>
+        </>
     );
 };
