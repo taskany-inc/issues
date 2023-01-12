@@ -170,6 +170,8 @@ model Team {
   activityId   String
   participants Activity[] @relation("teamParticipants")
   goals        Goal[]     @relation("teamGoals")
+  flow         Flow?       @relation(fields: [flowId], references: [id])
+  flowId       String?
   watchers     Activity[] @relation("teamWatchers")
   stargizers   Activity[] @relation("teamStargizers")
 
@@ -272,6 +274,7 @@ model Flow {
   graph       String? // [[stateId, stateId], [stateId, stateId]] — any transition allowed if undefined
   settings    Settings[]
   projects    Project[]
+  teams       Team[]
   states      State[]
   recommended Boolean?
 

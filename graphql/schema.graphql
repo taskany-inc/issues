@@ -364,6 +364,8 @@ type Team {
   children: [Team]
   createdAt: DateTime!
   description: String
+  flow: Flow
+  flowId: String
   goals: [Goal]
   id: Int!
   parent: Team

@@ -129,6 +129,8 @@ export const Team = objectType({
         t.field(TeamModel.title);
         t.field(TeamModel.description);
         t.field(TeamModel.activityId);
+        t.field(TeamModel.flowId);
+        t.field('flow', { type: Flow });
         t.field('activity', { type: Activity });
         t.field('parent', { type: Team });
         t.list.field('children', { type: Team });
