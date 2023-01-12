@@ -116,6 +116,8 @@
             "Name": "Имя",
             "Nickname": "Логин",
             "Appearance": "Интерфейс",
+            "Danger zone": "Опасная зона",
+            "Sign out": "Выйти",
             "User name is required": "Указание имени обязательно",
             "User name must be a string": "Имя должно быть строкой",
             "User name must be longer than 3 symbols": "Имя не может быть короче 3х символов",
@@ -252,12 +254,13 @@
         "Goals": "Цели",
         "Issues": "Задачи",
         "Explore": "Обзор",
-        "Boards": "Доски"
+        "Boards": "Доски",
+        "Create": "Создать",
+        "Create goal": "Цель",
+        "Create project": "Проект",
+        "Create team": "Команду"
     },
     "HeaderMenu": {
-        "New goal": "Новая цель",
-        "New project": "Новый проект",
-        "Invite users": "Пригласить",
         "Sign out": "Выйти"
     },
     "TagCompletion": {

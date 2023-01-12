@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 
 import { createFetcher } from '../../../utils/createFetcher';
 import { Goal, Project, Team } from '../../../../graphql/@generated/genql';
-import { Button } from '../../../components/Button';
 import { GoalListItem } from '../../../components/GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
@@ -15,7 +14,6 @@ import { FiltersPanel } from '../../../components/FiltersPanel';
 import { defaultLimit } from '../../../components/LimitFilterDropdown';
 import { useUrlParams } from '../../../hooks/useUrlParams';
 import { TeamPageLayout } from '../../../components/TeamPageLayout';
-import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { Page, PageContent } from '../../../components/Page';
 import { Text } from '../../../components/Text';
 import { PageSep } from '../../../components/PageSep';
@@ -285,14 +283,7 @@ const TeamGoalsPage = ({
                     onUserChange={setOwnerFilter}
                     onTagChange={setTagsFilter}
                     onLimitChange={setLimitFilter}
-                >
-                    <Button
-                        view="primary"
-                        size="m"
-                        text={t('New goal')}
-                        onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
-                    />
-                </FiltersPanel>
+                />
 
                 <PageContent>
                     {projects?.map((project) => {

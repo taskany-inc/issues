@@ -17,7 +17,6 @@ import { useUrlParams } from '../../../hooks/useUrlParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
 import { ProjectPageLayout } from '../../../components/ProjectPageLayout';
-import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { Page } from '../../../components/Page';
 
 const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
@@ -298,14 +297,7 @@ const ProjectPage = ({
                     onUserChange={setOwnerFilter}
                     onTagChange={setTagsFilter}
                     onLimitChange={setLimitFilter}
-                >
-                    <Button
-                        view="primary"
-                        size="m"
-                        text={t('index.New goal')}
-                        onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
-                    />
-                </FiltersPanel>
+                />
 
                 <StyledGoalsList>
                     {goals?.map((goal) =>
