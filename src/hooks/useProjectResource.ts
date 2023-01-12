@@ -5,8 +5,6 @@ import z from 'zod';
 import { Project } from '../../graphql/@generated/genql';
 import { gql } from '../utils/gql';
 
-// import { usePageContext } from './usePageContext';
-
 type KeySet = (key: string) => string;
 type Callback<A = []> = (...args: A[]) => void;
 
@@ -43,8 +41,6 @@ export type CreateProjectFormType = z.infer<ReturnType<typeof createProjectSchem
 export type UpdateProjectFormType = z.infer<ReturnType<typeof updateProjectSchemaProvider>>;
 
 export const useProjectResource = (id: number) => {
-    // const { user } = usePageContext();
-
     const createProject = useCallback(
         (cb: Callback<Project['key']>, t: KeySet) => async (form: CreateProjectFormType) => {
             const promise = gql.mutation({
@@ -175,7 +171,7 @@ export const useProjectResource = (id: number) => {
             toast.promise(promise, {
                 error: t('Something went wrong 😿'),
                 loading: t('We are calling owner'),
-                success: t(!stargizer ? 'Voila! You are stargizer now 🎉' : 'So sad! Goal will miss you'),
+                success: t(!stargizer ? 'Voila! You are stargizer now 🎉' : 'So sad! Project will miss you'),
             });
 
             cb();

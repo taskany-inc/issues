@@ -77,7 +77,6 @@ const fetcher = createFetcher(
                 },
                 _count: {
                     stargizers: true,
-                    watchers: true,
                 },
                 _isStarred: true,
                 _isWatching: true,

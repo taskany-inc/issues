@@ -118,7 +118,6 @@ export const ProjectAggregation = objectType({
     name: 'ProjectAggregation',
     definition(t) {
         t.int('stargizers');
-        t.int('watchers');
     },
 });
 
@@ -185,6 +184,19 @@ export const Goal = objectType({
         t.list.field('relatedTo', { type: Goal });
         t.list.field('connected', { type: Goal });
         t.list.field('comments', { type: Comment });
+
+        // calculated fields
+        t.field('_count', { type: GoalAggregation });
+        t.boolean('_isStarred');
+        t.boolean('_isWatching');
+    },
+});
+
+export const GoalAggregation = objectType({
+    name: 'GoalAggregation',
+    definition(t) {
+        t.int('stargizers');
+        t.int('comments');
     },
 });
 

@@ -92,6 +92,9 @@ type Ghost {
 }
 
 type Goal {
+  _count: GoalAggregation
+  _isStarred: Boolean
+  _isWatching: Boolean
   activity: Activity
   activityId: String
   blocks: [Goal]
@@ -120,6 +123,11 @@ type Goal {
   title: String!
   updatedAt: DateTime!
   watchers: [Activity]
+}
+
+type GoalAggregation {
+  comments: Int
+  stargizers: Int
 }
 
 input GoalCreateInput {
@@ -170,8 +178,8 @@ type Mutation {
   deleteProject(data: ProjectDelete!): Project
   deleteTeam(data: TeamDelete!): Team
   toggleGoalDependency(toggle: GoalDependencyToggleInput!): Goal
-  toggleGoalStargizer(toggle: SubscriptionToggleInput!): Activity
-  toggleGoalWatcher(toggle: SubscriptionToggleInput!): Activity
+  toggleGoalStargizer(data: SubscriptionToggleInput!): Activity
+  toggleGoalWatcher(data: SubscriptionToggleInput!): Activity
   toggleProjectStargizer(data: SubscriptionToggleInput!): Activity
   toggleProjectWatcher(data: SubscriptionToggleInput!): Activity
   toggleReaction(data: ReactionToggleInput!): Reaction
@@ -219,7 +227,6 @@ type Project {
 
 type ProjectAggregation {
   stargizers: Int
-  watchers: Int
 }
 
 input ProjectCreateInput {
