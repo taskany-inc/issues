@@ -26,5 +26,5 @@ test('returns lastDayOfQuarter for en locale', () => {
 });
 
 test('returns available years for passed number', () => {
-    expect(availableYears(6)).toStrictEqual([2022, 2023, 2024, 2025, 2026, 2027]);
+    expect(availableYears(6)).toStrictEqual([2023, 2024, 2025, 2026, 2027, 2028]);
 });
