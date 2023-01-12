@@ -13,6 +13,7 @@ import { FormTitle } from './FormTitle';
 import { IssueParticipantsList } from './IssueParticipantsList';
 import { FormInput } from './FormInput';
 import { UserMenuItem } from './UserMenuItem';
+import { ModalContent, ModalHeader } from './Modal';
 
 const ComboBox = dynamic(() => import('./ComboBox'));
 
@@ -84,44 +85,48 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ is
 
     return (
         <>
-            <FormTitle>{t('Edit participants')}</FormTitle>
+            <ModalHeader>
+                <FormTitle>{t('Edit participants')}</FormTitle>
+            </ModalHeader>
 
-            <IssueParticipantsList
-                title={t('Participants')}
-                participants={issue.participants}
-                onDelete={onParticipantDelete}
-            />
-
-            <StyledCompletion>
-                <ComboBox
-                    text={query}
-                    value={query}
-                    visible={completionVisible}
-                    items={data?.findActivity?.filter((a) => !alreadyParticipants?.includes(a.id))}
-                    onChange={onParticipantAdd}
-                    renderInput={(props) => (
-                        <FormInput
-                            autoFocus
-                            placeholder={t('Add participants')}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                setQuery(e.currentTarget.value);
-                                setCompletionVisible(true);
-                            }}
-                            {...props}
-                        />
-                    )}
-                    renderItem={(props) => (
-                        <UserMenuItem
-                            key={props.item.id}
-                            name={props.item.user?.name}
-                            email={props.item.user?.email || props.item.ghost?.email}
-                            image={props.item.user?.image}
-                            focused={props.cursor === props.index}
-                            onClick={props.onClick}
-                        />
-                    )}
+            <ModalContent>
+                <IssueParticipantsList
+                    title={t('Participants')}
+                    participants={issue.participants}
+                    onDelete={onParticipantDelete}
                 />
-            </StyledCompletion>
+
+                <StyledCompletion>
+                    <ComboBox
+                        text={query}
+                        value={query}
+                        visible={completionVisible}
+                        items={data?.findActivity?.filter((a) => !alreadyParticipants?.includes(a.id))}
+                        onChange={onParticipantAdd}
+                        renderInput={(props) => (
+                            <FormInput
+                                autoFocus
+                                placeholder={t('Add participants')}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                    setQuery(e.currentTarget.value);
+                                    setCompletionVisible(true);
+                                }}
+                                {...props}
+                            />
+                        )}
+                        renderItem={(props) => (
+                            <UserMenuItem
+                                key={props.item.id}
+                                name={props.item.user?.name}
+                                email={props.item.user?.email || props.item.ghost?.email}
+                                image={props.item.user?.image}
+                                focused={props.cursor === props.index}
+                                onClick={props.onClick}
+                            />
+                        )}
+                    />
+                </StyledCompletion>
+            </ModalContent>
         </>
     );
 };
