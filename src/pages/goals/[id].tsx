@@ -16,7 +16,7 @@ import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
 import { gapM, gapS } from '../../design/@generated/themes';
-import { Page, PageContent } from '../../components/Page';
+import { Page, PageContent, PageActions } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { Link } from '../../components/Link';
 import { Card, CardInfo, CardContent, CardActions } from '../../components/Card';
@@ -25,9 +25,7 @@ import { IssueKey } from '../../components/IssueKey';
 import { IssueStats } from '../../components/IssueStats';
 import { UserPic } from '../../components/UserPic';
 import { Button } from '../../components/Button';
-import { Icon } from '../../components/Icon';
 import { Reactions } from '../../components/Reactions';
-import { Badge } from '../../components/Badge';
 import { CommentView } from '../../components/CommentView';
 import { StateDot } from '../../components/StateDot';
 import { IssueProject } from '../../components/IssueProject';
@@ -38,6 +36,9 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { ActivityFeed } from '../../components/ActivityFeed';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
+import { WatchButton } from '../../components/WatchButton';
+import { useGoalResource } from '../../hooks/useGoalResource';
+import { StarButton } from '../../components/StarButton';
 
 const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
@@ -75,10 +76,6 @@ const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
 `;
 
 const StyledIssueInfoRow = styled.div``;
-
-const ActionButton = styled(Button)`
-    margin-left: ${gapS};
-`;
 
 const IssueBaseActions = styled.div`
     display: flex;
@@ -128,20 +125,25 @@ const GoalPage = ({
     // NB: this line is compensation for first render before delayed swr will bring updates
     const goal: Goal = data?.goal ?? ssrData.goal;
 
+    const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal.id);
     const issueEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
     const isUserAllowedToEdit = user?.activityId === goal?.activityId || user?.activityId === goal?.ownerId;
     const priorityColorIndex = (data || ssrData)?.goalPriorityKind?.indexOf(goal.priority || '') ?? -1;
     const priorityColor =
         priorityColorIndex >= 0 ? (data || ssrData)?.goalPriorityColors?.[priorityColorIndex] : undefined;
-    // @ts-ignore unexpectable trouble with filter
-    const [watcher, setWatcher] = useState(goal.watchers?.filter(({ id }) => id === user.activityId).length > 0);
-    const [stargizer, setStargizer] = useState(
-        // @ts-ignore unexpectable trouble with filter
-        goal.stargizers?.filter(({ id }) => id === user.activityId).length > 0,
-    );
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const updateGoal = useGoalUpdate(t, goal);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
+
+    const [watcher, setWatcher] = useState(goal._isWatching);
+    const onWatchToggle = useCallback(() => {
+        setWatcher(!watcher);
+    }, [watcher]);
+
+    const [stargizer, setStargizer] = useState(goal._isStarred);
+    const onStarToggle = useCallback(() => {
+        setStargizer(!stargizer);
+    }, [stargizer]);
 
     useEffect(() => {
         goal.project && setCurrentProjectCache(goal.project);
@@ -163,69 +165,7 @@ const GoalPage = ({
         [updateGoal, refresh],
     );
 
-    const onWatchToggle = useCallback(async () => {
-        const promise = gql.mutation({
-            toggleGoalWatcher: [
-                {
-                    toggle: {
-                        id: goal.id,
-                        direction: !watcher,
-                    },
-                },
-                {
-                    id: true,
-                },
-            ],
-        });
-
-        toast.promise(promise, {
-            error: t('Something went wrong 😿'),
-            loading: t('We are calling owner'),
-            success: t(!watcher ? 'Voila! You are watcher now 🎉' : 'So sad! Goal will miss you'),
-        });
-
-        setWatcher((w) => !w);
-
-        await promise;
-        refresh();
-    }, [watcher, goal, refresh, t]);
-
-    const onStarToggle = useCallback(async () => {
-        const promise = gql.mutation({
-            toggleGoalStargizer: [
-                {
-                    toggle: {
-                        id: goal.id,
-                        direction: !stargizer,
-                    },
-                },
-                {
-                    id: true,
-                },
-            ],
-        });
-
-        toast.promise(promise, {
-            error: t('Something went wrong 😿'),
-            loading: t('We are calling owner'),
-            success: t(!stargizer ? 'Voila! You are stargizer now 🎉' : 'So sad! Goal will miss you'),
-        });
-
-        setStargizer((s) => !s);
-
-        await promise;
-        refresh();
-    }, [stargizer, goal, refresh, t]);
-
     const onGoalReactionToggle = useCallback((id: string) => goalReaction(id, refresh), [refresh, goalReaction]);
-    const onCommentReactionToggle = useCallback(
-        (id: string) => commentReaction(id, refresh),
-        [refresh, commentReaction],
-    );
-
-    const onCommentDelete = useCallback(() => {
-        refresh();
-    }, [refresh]);
 
     const onParticipantsChange = useCallback(
         async (participants: string[]) => {
@@ -271,13 +211,19 @@ const GoalPage = ({
         },
         [refresh, setHighlightCommentId],
     );
+    const onCommentReactionToggle = useCallback(
+        (id: string) => commentReaction(id, refresh),
+        [refresh, commentReaction],
+    );
+    const onCommentDelete = useCallback(() => {
+        refresh();
+    }, [refresh]);
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(() => {
         setGoalEditModalVisible(false);
         refresh();
     }, [refresh]);
-
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
     }, []);
@@ -313,19 +259,14 @@ const GoalPage = ({
                 </StyledIssueInfo>
 
                 <StyledIssueInfo align="right">
-                    <StyledIssueInfoRow>
-                        <ActionButton
-                            text={t(watcher ? 'Watching' : 'Watch')}
-                            iconLeft={<Icon noWrap type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
-                            onClick={onWatchToggle}
+                    <PageActions>
+                        <WatchButton watcher={watcher} onToggle={toggleGoalWatching(onWatchToggle, t, watcher)} />
+                        <StarButton
+                            stargizer={stargizer}
+                            count={goal._count?.stargizers}
+                            onToggle={toggleGoalStar(onStarToggle, t, stargizer)}
                         />
-                        <ActionButton
-                            text={t(stargizer ? 'Starred' : 'Stars')}
-                            iconLeft={<Icon noWrap type={stargizer ? 'starFilled' : 'star'} size="s" />}
-                            iconRight={<Badge>{goal.stargizers?.length}</Badge>}
-                            onClick={onStarToggle}
-                        />
-                    </StyledIssueInfoRow>
+                    </PageActions>
 
                     <StyledIssueInfoRow>
                         <Button

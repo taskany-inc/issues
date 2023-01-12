@@ -19,7 +19,7 @@ export const StarButton: React.FC<StarButtonProps> = ({ stargizer, count, onTogg
         <Button
             text={t(stargizer ? 'Starred' : 'Stars')}
             iconLeft={<Icon noWrap type={stargizer ? 'starFilled' : 'star'} size="s" />}
-            iconRight={count ? <Badge>{count}</Badge> : undefined}
+            iconRight={count !== undefined ? <Badge>{count}</Badge> : undefined}
             onClick={onToggle}
         />
     );

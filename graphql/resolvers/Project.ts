@@ -150,7 +150,6 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     },
                     _count: {
                         select: {
-                            watchers: true,
                             stargizers: true,
                         },
                     },

@@ -187,7 +187,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { id }, { db, activity }) => {
             if (!activity) return null;
 
-            return db.goal.findUnique({
+            const goal = await db.goal.findUnique({
                 where: {
                     id,
                 },
@@ -272,8 +272,22 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             ghost: true,
                         },
                     },
+                    _count: {
+                        select: {
+                            stargizers: true,
+                            comments: true,
+                        },
+                    },
                 },
             });
+
+            if (!goal) return null;
+
+            return {
+                ...goal,
+                _isStarred: goal.stargizers.filter((stargizer) => stargizer?.id === activity.id).length > 0,
+                _isWatching: goal.watchers.filter((watcher) => watcher?.id === activity.id).length > 0,
+            };
         },
     });
 
@@ -581,9 +595,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleGoalStargizer', {
         type: Activity,
         args: {
-            toggle: nonNull(arg({ type: SubscriptionToggleInput })),
+            data: nonNull(arg({ type: SubscriptionToggleInput })),
         },
-        resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
+        resolve: async (_, { data: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
 
             const connection = { id };
@@ -612,9 +626,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleGoalWatcher', {
         type: Activity,
         args: {
-            toggle: nonNull(arg({ type: SubscriptionToggleInput })),
+            data: nonNull(arg({ type: SubscriptionToggleInput })),
         },
-        resolve: async (_, { toggle: { id, direction } }, { db, activity }) => {
+        resolve: async (_, { data: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
 
             const connection = { id };

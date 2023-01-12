@@ -89,12 +89,6 @@ export const goalFetcher = createFetcher((_, id: string) => ({
                     },
                 },
             },
-            watchers: {
-                id: true,
-            },
-            stargizers: {
-                id: true,
-            },
             dependsOn: {
                 id: true,
                 title: true,
@@ -167,6 +161,12 @@ export const goalFetcher = createFetcher((_, id: string) => ({
                     email: true,
                 },
             },
+            _count: {
+                stargizers: true,
+                comments: true,
+            },
+            _isStarred: true,
+            _isWatching: true,
         },
     ],
 }));
