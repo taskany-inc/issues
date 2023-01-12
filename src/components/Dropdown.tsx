@@ -151,7 +151,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
                     reference={popupRef}
                     interactive
                     arrow={false}
-                    minWidth={150}
+                    minWidth={100}
                     maxWidth={250}
                     offset={[-4, 8]}
                 >

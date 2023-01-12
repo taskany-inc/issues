@@ -6,6 +6,7 @@ import z from 'zod';
 import toast from 'react-hot-toast';
 import useSWR from 'swr';
 import { useTheme } from 'next-themes';
+import { signOut } from 'next-auth/react';
 
 import { gql } from '../../utils/gql';
 import { shallowEqual } from '../../utils/shallowEqual';
@@ -234,6 +235,18 @@ const UserSettingsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<
                                 <FormRadioInput value="dark" label="Dark" />
                                 <FormRadioInput value="light" label="Light" />
                             </FormRadio>
+                        </Fieldset>
+                    </Form>
+                </SettingsCard>
+
+                <SettingsCard view="warning">
+                    <Form>
+                        <Fieldset title={t('Danger zone')} view="warning">
+                            <FormActions>
+                                <FormAction left>
+                                    <Button view="warning" text={t('Sign out')} onClick={() => signOut()} />
+                                </FormAction>
+                            </FormActions>
                         </Fieldset>
                     </Form>
                 </SettingsCard>

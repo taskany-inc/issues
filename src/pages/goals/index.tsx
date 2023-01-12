@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Goal, Project } from '../../../graphql/@generated/genql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
@@ -18,7 +17,6 @@ import { useMounted } from '../../hooks/useMounted';
 import { useUrlParams } from '../../hooks/useUrlParams';
 import { Text } from '../../components/Text';
 import { PageSep } from '../../components/PageSep';
-import { Button } from '../../components/Button';
 import { defaultLimit } from '../../components/LimitFilterDropdown';
 
 const GoalPreview = dynamic(() => import('../../components/GoalPreview'));
@@ -214,14 +212,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
                 onUserChange={setOwnerFilter}
                 onTagChange={setTagsFilter}
                 onLimitChange={setLimitFilter}
-            >
-                <Button
-                    view="primary"
-                    size="m"
-                    text={t('New goal')}
-                    onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
-                />
-            </FiltersPanel>
+            />
 
             <PageContent>
                 {projects?.map((project) => {

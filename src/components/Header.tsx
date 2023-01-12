@@ -1,17 +1,24 @@
+import { useCallback } from 'react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 
 import { routes } from '../hooks/router';
 import { textColor, gray7, colorPrimary, gray3 } from '../design/@generated/themes';
+import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMenu } from './HeaderMenu';
 import { Icon } from './Icon';
+import { Button } from './Button';
+import { MenuItem } from './MenuItem';
+
+const Dropdown = dynamic(() => import('./Dropdown'));
 
 const StyledHeader = styled.header`
     display: grid;
-    grid-template-columns: 20px 11fr 100px;
+    grid-template-columns: 20px 10fr 150px 55px;
     align-items: center;
     padding: 20px 40px;
 
@@ -59,8 +66,17 @@ const StyledHeaderNavLink = styled.a<{ disabled?: boolean }>`
     }
 `;
 
+const StyledCreateButton = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
 export const Header: React.FC = () => {
     const t = useTranslations('Header');
+
+    const onMenuItemClick = useCallback(({ event }: { event: ModalEvent }) => {
+        dispatchModalEvent(event)();
+    }, []);
 
     return (
         <StyledHeader>
@@ -81,7 +97,56 @@ export const Header: React.FC = () => {
                 </StyledSearch>
             </StyledNav>
 
-            <HeaderMenu notifications />
+            <StyledCreateButton>
+                <Button
+                    text={t('Create')}
+                    view="primary"
+                    outline
+                    brick="right"
+                    onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                />
+                <Dropdown
+                    onChange={onMenuItemClick}
+                    items={[
+                        {
+                            title: t('Create goal'),
+                            event: ModalEvent.GoalCreateModal,
+                        },
+                        {
+                            title: t('Create project'),
+                            event: ModalEvent.ProjectCreateModal,
+                        },
+                        {
+                            title: t('Create team'),
+                            event: ModalEvent.TeamCreateModal,
+                        },
+                    ]}
+                    renderTrigger={(props) => (
+                        <Button
+                            view="primary"
+                            outline
+                            brick="left"
+                            iconRight={
+                                <Icon size="s" noWrap type={props.visible ? 'arrowUpSmall' : 'arrowDownSmall'} />
+                            }
+                            ref={props.ref}
+                            onClick={props.onClick}
+                        />
+                    )}
+                    renderItem={(props) => (
+                        <MenuItem
+                            key={props.item.title}
+                            focused={props.cursor === props.index}
+                            onClick={props.onClick}
+                            view="primary"
+                            ghost
+                        >
+                            {props.item.title}
+                        </MenuItem>
+                    )}
+                />
+            </StyledCreateButton>
+            <HeaderMenu />
         </StyledHeader>
     );
 };

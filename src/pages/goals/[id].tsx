@@ -75,8 +75,6 @@ const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
         `}
 `;
 
-const StyledIssueInfoRow = styled.div``;
-
 const IssueBaseActions = styled.div`
     display: flex;
     align-items: center;
@@ -267,14 +265,6 @@ const GoalPage = ({
                             onToggle={toggleGoalStar(onStarToggle, t, stargizer)}
                         />
                     </PageActions>
-
-                    <StyledIssueInfoRow>
-                        <Button
-                            view="primary"
-                            text={t('New goal')}
-                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
-                        />
-                    </StyledIssueInfoRow>
                 </StyledIssueInfo>
             </IssueHeader>
 
