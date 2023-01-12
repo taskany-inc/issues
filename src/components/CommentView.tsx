@@ -53,8 +53,6 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
     position: relative;
     min-height: 60px;
 
-    user-select: none;
-
     transition: border-color 200ms ease-in-out;
 
     ${({ isNew }) =>
