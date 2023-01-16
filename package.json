@@ -72,7 +72,7 @@
     "teenyicons": "0.4.1",
     "tinykeys": "1.4.0",
     "unified": "10.1.2",
-    "zod": "3.19.1"
+    "zod": "3.20.2"
   },
   "devDependencies": {
     "@babel/core": "7.20.5",
