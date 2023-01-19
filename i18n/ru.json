@@ -143,6 +143,9 @@
             "Goal's title must be a string": "Название цели должно быть строкой",
             "Goal's title must be longer than 10 symbols": "Название цели должно быть длинее 10х символов",
             "Goal's description must be longer than 10 symbols": "Описание цели должно быть длинее 10х символов",
+            "Goal's project or team are required": "Проект или команда обязательны",
+            "Enter project or team title": "Проект или команда",
+            "Enter owner name or email": "Имя или почта владельца",
             "Goal's description is required": "Описание цели обязательно",
             "Goal's description must be a string": "Описание цели должно быть строкой",
             "Something went wrong 😿": "Упс! Что-то пошло не так 😿",
@@ -374,5 +377,9 @@
             "Low": "Низкий",
             "Lowest": "Самый низкий"
         }
+    },
+    "GoalParentComboBox": {
+        "project": "Project",
+        "team": "Team"
     }
 }

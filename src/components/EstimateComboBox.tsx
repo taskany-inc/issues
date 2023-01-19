@@ -213,7 +213,9 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                         onClick={onQButtonClick(props.item)}
                     />
                 )}
-                renderItems={(children) => <StyledButtonsContainer>{children}</StyledButtonsContainer>}
+                renderItems={(children) => (
+                    <StyledButtonsContainer>{children as React.ReactNode}</StyledButtonsContainer>
+                )}
             />
         );
     },

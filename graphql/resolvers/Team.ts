@@ -242,6 +242,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     },
                 },
                 include: {
+                    flow: true,
                     activity: {
                         include: {
                             user: true,
@@ -259,7 +260,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: TeamCreateInput })),
         },
-        resolve: async (_, { data: { title, parent, description } }, { db, activity }) => {
+        resolve: async (_, { data: { key, title, parent, description } }, { db, activity }) => {
             if (!activity) return null;
 
             let parentTeam;
@@ -275,6 +276,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 const newTeam = await db.team.create({
                     data: {
+                        key,
                         slug: slugify(title, {
                             replacement: '_',
                             lower: true,
@@ -296,7 +298,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         },
                         data: {
                             children: {
-                                connect: [newTeam],
+                                connect: [{ id: newTeam.id }],
                             },
                         },
                     });

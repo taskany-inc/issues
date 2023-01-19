@@ -143,6 +143,9 @@
             "Goal's title must be a string": "Goal's title must be a string",
             "Goal's title must be longer than 10 symbols": "Goal's title must be longer than 10 symbols",
             "Goal's description must be longer than 10 symbols": "Goal's description must be longer than 10 symbols",
+            "Goal's project or team are required": "Goal's project or team are required",
+            "Enter project or team title": "Enter project or team title",
+            "Enter owner name or email": "Enter owner name or email",
             "Goal's description is required": "Goal's description is required",
             "Goal's description must be a string": "Goal's description must be a string",
             "Something went wrong 😿": "Something went wrong 😿",
@@ -377,5 +380,9 @@
             "Low": "Low",
             "Lowest": "Lowest"
         }
+    },
+    "GoalParentComboBox": {
+        "project": "Project",
+        "team": "Team"
     }
 }

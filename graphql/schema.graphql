@@ -120,6 +120,8 @@ type Goal {
   state: State
   stateId: String
   tags: [Tag]
+  team: Team
+  teamId: Int
   title: String!
   updatedAt: DateTime!
   watchers: [Activity]
@@ -134,12 +136,13 @@ input GoalCreateInput {
   description: String!
   estimate: EstimateInput
   key: Boolean
+  kind: String
   ownerId: String
+  parent: Int
   participants: [ActivityInput]
   personal: Boolean
   priority: String
   private: Boolean
-  projectId: Int
   stateId: String
   tags: [TagInput]
   title: String!
@@ -157,12 +160,13 @@ input GoalUpdateInput {
   estimate: EstimateInput
   id: ID!
   key: Boolean
+  kind: String
   ownerId: String
+  parent: Int
   participants: [String]
   personal: Boolean
   priority: String
   private: Boolean
-  projectId: Int
   stateId: String
   tags: [TagInput]
   title: String
@@ -386,6 +390,7 @@ type TeamAggregation {
 input TeamCreateInput {
   children: [Int!]
   description: String
+  key: String
   parent: Int
   projects: [String!]
   title: String!
