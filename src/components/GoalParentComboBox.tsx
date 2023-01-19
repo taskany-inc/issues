@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/@generated/genql';
@@ -76,6 +77,7 @@ const fetcher = createFetcher((_, query: string) => ({
 export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentComboBoxProps>(
     ({ text, query = '', value, placeholder, disabled, error, onChange }, ref) => {
         const { user } = usePageContext();
+        const t = useTranslations('GoalParentComboBox');
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(value?.title || query);
         const [recentProjectsCache] = useLocalStorage('recentProjectsCache', {});
@@ -141,7 +143,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                     }, Object.create(null));
 
                     return Object.values(groups).map((gr: any) => (
-                        <MenuGroupItem key={gr[0].kind} title={gr[0].kind}>
+                        <MenuGroupItem key={gr[0].kind} title={t(gr[0].kind)}>
                             {gr.map((entity: any) => (
                                 <ProjectMenuItem
                                     key={entity.id}

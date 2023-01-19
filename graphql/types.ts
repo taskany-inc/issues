@@ -178,6 +178,8 @@ export const Goal = objectType({
         t.list.field('reactions', { type: Reaction });
         t.field(GoalModel.projectId);
         t.field('project', { type: Project });
+        t.field(GoalModel.teamId);
+        t.field('team', { type: Team });
         t.field(GoalModel.stateId);
         t.field('state', { type: State });
         t.list.field('tags', { type: Tag });
@@ -303,7 +305,8 @@ export const GoalCreateInput = inputObjectType({
         t.field(GoalModel.private);
         t.field('estimate', { type: EstimateInput });
         t.field(GoalModel.ownerId);
-        t.field(GoalModel.projectId);
+        t.int('parent');
+        t.string('kind'); // team, project
         t.field(GoalModel.stateId);
         t.field(GoalModel.priority);
         t.list.field('tags', { type: TagCreateInput });
@@ -322,7 +325,8 @@ export const GoalUpdateInput = inputObjectType({
         t.field(GoalModel.private);
         t.field('estimate', { type: EstimateInput });
         t.field(GoalModel.ownerId);
-        t.field(GoalModel.projectId);
+        t.int('parent');
+        t.string('kind'); // team, project
         t.field(GoalModel.stateId);
         t.field(GoalModel.priority);
         t.list.field('tags', { type: TagCreateInput });
@@ -493,6 +497,7 @@ export const FindActivityInput = inputObjectType({
 export const TeamCreateInput = inputObjectType({
     name: 'TeamCreateInput',
     definition(t) {
+        t.field(TeamModel.key);
         t.field(TeamModel.title);
         t.field(TeamModel.description);
         t.int('parent');

@@ -39,7 +39,8 @@ const GoalCreateForm: React.FC = () => {
                         title: form.title,
                         description: form.description,
                         ownerId: form.owner.id,
-                        projectId: form.project.id,
+                        parent: form.parent.id,
+                        kind: form.parent.kind,
                         stateId: form.state.id,
                         priority: form.priority,
                         tags: form.tags,
@@ -62,17 +63,17 @@ const GoalCreateForm: React.FC = () => {
 
         if (res?.createGoal?.id) {
             const newRecentProjectsCache = { ...recentProjectsCache };
-            if (newRecentProjectsCache[form.project.id]) {
-                newRecentProjectsCache[form.project.id].rate += 1;
+            if (newRecentProjectsCache[form.parent.id]) {
+                newRecentProjectsCache[form.parent.id].rate += 1;
             } else {
-                newRecentProjectsCache[form.project.id] = {
+                newRecentProjectsCache[form.parent.id] = {
                     rate: 1,
-                    cache: form.project,
+                    cache: form.parent,
                 };
             }
 
             setRecentProjectsCache(newRecentProjectsCache);
-            setLastProjectCache(form.project);
+            setLastProjectCache(form.parent);
 
             router.goal(res.createGoal.id);
         }
@@ -83,7 +84,7 @@ const GoalCreateForm: React.FC = () => {
             i18nKeyset="goals.new"
             formTitle={t('Create new goal')}
             owner={{ id: user?.activityId, user } as Partial<Activity>}
-            project={currentProjectCache || lastProjectCache || undefined}
+            parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}
         >

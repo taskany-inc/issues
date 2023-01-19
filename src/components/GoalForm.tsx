@@ -6,7 +6,15 @@ import z from 'zod';
 import styled from 'styled-components';
 
 import { gapS } from '../design/@generated/themes';
-import { Project, EstimateInput, State, Tag as TagModel, Activity, Priority } from '../../graphql/@generated/genql';
+import {
+    Project,
+    EstimateInput,
+    State,
+    Tag as TagModel,
+    Activity,
+    Priority,
+    Team,
+} from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
@@ -17,7 +25,7 @@ import { FormInput } from './FormInput';
 import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
 import { UserComboBox } from './UserComboBox';
-import { ProjectComboBox } from './ProjectComboBox';
+import { GoalParentComboBox } from './GoalParentComboBox';
 import { EstimateComboBox } from './EstimateComboBox';
 import { TagComboBox } from './TagComboBox';
 import { StateDropdown } from './StateDropdown';
@@ -50,15 +58,16 @@ const schemaProvider = (t: (key: string) => string) =>
         owner: z.object({
             id: z.string(),
         }),
-        project: z.object(
+        parent: z.object(
             {
                 id: z.number(),
                 title: z.string(),
                 flowId: z.string(),
+                kind: z.string(),
             },
             {
-                invalid_type_error: "Goal's project is required",
-                required_error: "Goal's project is required",
+                invalid_type_error: "Goal's project or team are required",
+                required_error: "Goal's project or team are required",
             },
         ),
         state: z.object({
@@ -92,7 +101,7 @@ interface GoalFormProps {
     owner?: Partial<Activity>;
     title?: string;
     description?: string;
-    project?: Partial<Project>;
+    parent?: Partial<Project | Team>;
     tags?: Array<TagModel | undefined>;
     state?: Partial<State>;
     priority?: Priority | string;
@@ -111,7 +120,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     title,
     description,
     owner,
-    project,
+    parent,
     tags = [],
     state,
     priority,
@@ -141,7 +150,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
             title,
             description,
             owner,
-            project,
+            parent,
             state,
             priority,
             estimate,
@@ -149,7 +158,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         },
     });
 
-    const projectWatcher = watch('project');
+    const parentWatcher = watch('parent');
     const tagsWatcher = watch('tags');
     const errorsResolver = errorsProvider(errors, isSubmitted);
 
@@ -208,7 +217,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 render={({ field }) => (
                                     <UserComboBox
                                         text={t('Assign')}
-                                        placeholder={t('Enter project title')}
+                                        placeholder={t('Enter owner name or email')}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />
@@ -216,12 +225,12 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             />
 
                             <Controller
-                                name="project"
+                                name="parent"
                                 control={control}
                                 render={({ field }) => (
-                                    <ProjectComboBox
-                                        text={t('Enter project title')}
-                                        placeholder={t('Enter project title')}
+                                    <GoalParentComboBox
+                                        text={t('Enter project or team title')}
+                                        placeholder={t('Enter project or team title')}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />
@@ -234,7 +243,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 render={({ field }) => (
                                     <StateDropdown
                                         text={t('State')}
-                                        flowId={projectWatcher?.flowId}
+                                        flowId={parentWatcher?.flowId}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />
