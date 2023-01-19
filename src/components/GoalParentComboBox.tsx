@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
@@ -11,10 +11,11 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './Button';
 import { Input } from './Input';
 import { ProjectMenuItem } from './ProjectMenuItem';
+import { MenuGroupItem } from './MenuGroupItem';
 
 const ComboBox = dynamic(() => import('./ComboBox'));
 
-interface ProjectComboBoxProps {
+interface GoalParentComboBoxProps {
     text: React.ComponentProps<typeof ComboBox>['text'];
     value?: Partial<Project>;
     query?: string;
@@ -50,9 +51,29 @@ const fetcher = createFetcher((_, query: string) => ({
             },
         },
     ],
+    teamCompletion: [
+        {
+            query,
+        },
+        {
+            id: true,
+            title: true,
+            description: true,
+            flowId: true,
+            flow: {
+                id: true,
+                title: true,
+                states: {
+                    id: true,
+                    title: true,
+                    default: true,
+                },
+            },
+        },
+    ],
 }));
 
-export const ProjectComboBox = React.forwardRef<HTMLDivElement, ProjectComboBoxProps>(
+export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentComboBoxProps>(
     ({ text, query = '', value, placeholder, disabled, error, onChange }, ref) => {
         const { user } = usePageContext();
         const [completionVisible, setCompletionVisibility] = useState(false);
@@ -70,8 +91,18 @@ export const ProjectComboBox = React.forwardRef<HTMLDivElement, ProjectComboBoxP
             .slice(0, 10) // top 10
             .map((p) => p.cache);
 
-        const items =
-            data?.projectCompletion && data?.projectCompletion?.length > 0 ? data?.projectCompletion : recentProjects;
+        const items = useMemo(
+            () => [
+                [
+                    (data?.projectCompletion && data?.projectCompletion?.length > 0
+                        ? data?.projectCompletion
+                        : recentProjects
+                    )?.map((p) => ({ ...p, kind: 'project' })),
+                ],
+                [data?.teamCompletion?.map((p) => ({ ...p, kind: 'team' }))],
+            ],
+            [data, recentProjects],
+        );
 
         return (
             <ComboBox
@@ -95,14 +126,33 @@ export const ProjectComboBox = React.forwardRef<HTMLDivElement, ProjectComboBoxP
                         {...props}
                     />
                 )}
-                renderItem={(props) => (
-                    <ProjectMenuItem
-                        key={props.item.id}
-                        title={props.item.title}
-                        focused={props.cursor === props.index}
-                        onClick={props.onClick}
-                    />
-                )}
+                renderItem={(props) => ({
+                    id: props.item.id,
+                    title: props.item.title,
+                    kind: props.item.kind,
+                    focused: props.cursor === props.index,
+                    onClick: props.onClick,
+                })}
+                renderItems={(entities) => {
+                    const groups = (entities as Array<Record<any, any>>)?.reduce((r, a) => {
+                        r[a.kind] = r[a.kind] || [];
+                        r[a.kind].push(a);
+                        return r;
+                    }, Object.create(null));
+
+                    return Object.values(groups).map((gr: any) => (
+                        <MenuGroupItem key={gr[0].kind} title={gr[0].kind}>
+                            {gr.map((entity: any) => (
+                                <ProjectMenuItem
+                                    key={entity.id}
+                                    title={entity.title}
+                                    focused={entity.focused}
+                                    onClick={entity.onClick}
+                                />
+                            ))}
+                        </MenuGroupItem>
+                    ));
+                }}
             />
         );
     },
