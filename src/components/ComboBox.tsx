@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
@@ -7,6 +7,7 @@ import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode, KeyboardEvents } from '../hooks/useKeyboard';
 import { danger10 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
+import { flatten } from '../utils/flatten';
 
 const Popup = dynamic(() => import('./Popup'));
 
@@ -35,9 +36,9 @@ interface ComboBoxItemProps {
 
 interface ComboBoxProps {
     renderInput: (props: ComboBoxInputProps) => React.ReactNode;
-    renderItem: (props: ComboBoxItemProps) => React.ReactNode;
+    renderItem: (props: ComboBoxItemProps) => React.ReactNode | Record<any, any>;
     renderTrigger?: (props: ComboBoxTriggerProps) => React.ReactNode;
-    renderItems?: (children: React.ReactNode) => React.ReactNode;
+    renderItems?: (children: React.ReactNode | Array<Record<any, any>> | undefined) => React.ReactNode;
     text?: string;
     value?: any;
     items?: any[];
@@ -94,6 +95,8 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
         const downPress = useKeyPress('ArrowDown');
         const upPress = useKeyPress('ArrowUp');
         const [cursor, setCursor] = useState(0);
+        // eslint-disable-next-line prefer-spread
+        const flatItems = useMemo(() => flatten(items), [items]);
 
         useEffect(() => {
             setPopupVisibility(visible);
@@ -126,22 +129,24 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
         });
 
         const [onENTER] = useKeyboard([KeyCode.Enter], () => {
-            onItemClick(items[cursor])();
+            onItemClick(flatItems[cursor])();
         });
 
         useEffect(() => {
-            if (items.length && downPress) {
-                setCursor((prevState) => (prevState < items.length - 1 ? prevState + 1 : prevState));
+            if (flatItems.length && downPress) {
+                setCursor((prevState) => (prevState < flatItems.length - 1 ? prevState + 1 : prevState));
             }
-        }, [items, downPress]);
+        }, [flatItems, downPress]);
 
         useEffect(() => {
-            if (items.length && upPress) {
+            if (flatItems.length && upPress) {
                 setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
             }
-        }, [items, upPress]);
+        }, [flatItems, upPress]);
 
-        const children = items.map((item, index) => renderItem({ item, index, cursor, onClick: onItemClick(item) }));
+        const children = flatItems.map((item: any, index: number) =>
+            renderItem({ item, index, cursor, onClick: onItemClick(item) }),
+        );
 
         return (
             <StyledComboBox ref={ref}>
@@ -179,7 +184,7 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
 
                 <Popup
                     placement="bottom-start"
-                    visible={popupVisible && Boolean(items.length)}
+                    visible={popupVisible && Boolean(flatItems.length)}
                     onClickOutside={onClickOutside}
                     reference={popupRef}
                     interactive
@@ -188,7 +193,9 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
                     maxWidth={maxWidth}
                     offset={[-4, 8]}
                 >
-                    <div {...onESC}>{renderItems ? renderItems(children) : children}</div>
+                    <div {...onESC}>
+                        {renderItems ? renderItems(children as React.ReactNode) : (children as React.ReactNode)}
+                    </div>
                 </Popup>
             </StyledComboBox>
         );
