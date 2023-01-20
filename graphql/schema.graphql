@@ -373,6 +373,7 @@ type Team {
   flowId: String
   goals: [Goal]
   id: Int!
+  key: String
   parent: Team
   participants: [Activity]
   projects: [Project]

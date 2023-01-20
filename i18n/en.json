@@ -279,7 +279,8 @@
         "Change color and create": "to change color. Click on it to create."
     },
     "IssueTitle": {
-        "Project": "Project"
+        "Project": "Project",
+        "Team": "Team"
     },
     "IssueStats": {
         "comments": {

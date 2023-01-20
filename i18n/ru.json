@@ -276,7 +276,8 @@
         "Change color and create": "чтобы сменить цвет. Нажми на тэк чтобы создать."
     },
     "IssueTitle": {
-        "Project": "Проект"
+        "Project": "Проект",
+        "Team": "Команда"
     },
     "IssueStats": {
         "comments": {

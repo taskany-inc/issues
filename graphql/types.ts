@@ -126,6 +126,7 @@ export const Team = objectType({
     definition(t) {
         t.field(TeamModel.id);
         t.field(TeamModel.slug);
+        t.field(TeamModel.key);
         t.field(TeamModel.title);
         t.field(TeamModel.description);
         t.field(TeamModel.activityId);
