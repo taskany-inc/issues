@@ -28,7 +28,7 @@ import { Button } from '../../components/Button';
 import { Reactions } from '../../components/Reactions';
 import { CommentView } from '../../components/CommentView';
 import { StateDot } from '../../components/StateDot';
-import { IssueProject } from '../../components/IssueProject';
+import { IssueParent } from '../../components/IssueParent';
 import { IssueTags } from '../../components/IssueTags';
 import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
@@ -243,8 +243,12 @@ const GoalPage = ({
                         ))}
                     </IssueKey>
 
+                    {nullable(goal.team, (team) => (
+                        <IssueParent kind="team" parent={team} />
+                    ))}
+
                     {nullable(goal.project, (project) => (
-                        <IssueProject project={project} />
+                        <IssueParent kind="project" parent={project} />
                     ))}
 
                     <IssueTitle title={goal.title} />

@@ -206,6 +206,15 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     },
                     tags: true,
                     state: true,
+                    team: {
+                        include: {
+                            flow: {
+                                include: {
+                                    states: true,
+                                },
+                            },
+                        },
+                    },
                     project: {
                         include: {
                             flow: {

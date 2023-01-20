@@ -19,7 +19,7 @@ import { ModalHeader, ModalContent } from './Modal';
 import { ModalPreview } from './ModalPreview';
 import { IssueKey } from './IssueKey';
 import { IssueTitle } from './IssueTitle';
-import { IssueProject } from './IssueProject';
+import { IssueParent } from './IssueParent';
 import { IssueTags } from './IssueTags';
 import { Button } from './Button';
 import { StateDot } from './StateDot';
@@ -126,8 +126,12 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                     </IssueKey>
                 ))}
 
+                {nullable(goal.team, (team) => (
+                    <IssueParent kind="team" as="span" mode="compact" parent={team} size="m" />
+                ))}
+
                 {nullable(goal.project, (project) => (
-                    <IssueProject as="span" mode="compact" project={project} size="m" />
+                    <IssueParent kind="project" as="span" mode="compact" parent={project} size="m" />
                 ))}
 
                 <IssueStats mode="compact" comments={goal.comments?.length || 0} updatedAt={goal.updatedAt} />
