@@ -21,7 +21,9 @@
             "And its description": "Можно и описание, пригодится ведь",
             "Pro tip!": "Держи совет!",
             "Press key to create the team": "Нажми <key></key> чтобы создать команду.",
-            "Project with title already exists": "Команда с названием <b><title></title></b> уже существует. Попробуй другое."
+            "Project with title already exists": "Команда с названием <b><title></title></b> уже существует. Попробуй другое.",
+            "Team with key already exists": "Команда с ключом <b><key></key></b> уже существует. Попробуй другой.",
+            "Perfect! Issues in your team will look like": "<b>Супер!</b> Задачи в твоей команде будут выглядеть примерно так: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>."
         },
         "index": {
             "title": "Taskany — <team></team> — Проекты"

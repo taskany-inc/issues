@@ -10,7 +10,7 @@ import { Text } from './Text';
 
 const Popup = dynamic(() => import('./Popup'));
 
-interface ProjectKeyInputProps {
+interface KeyInputProps {
     size?: React.ComponentProps<typeof Button>['size'];
     view?: React.ComponentProps<typeof Button>['view'];
     tabIndex?: React.ComponentProps<typeof Button>['tabIndex'];
@@ -31,7 +31,7 @@ const StyledButton = styled(Button)`
     font-weight: 600;
 `;
 
-const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
+const KeyInput: React.FC<KeyInputProps> = ({
     size,
     value,
     placeholder,
@@ -123,4 +123,4 @@ const ProjectKeyInput: React.FC<ProjectKeyInputProps> = ({
     );
 };
 
-export default ProjectKeyInput;
+export default KeyInput;

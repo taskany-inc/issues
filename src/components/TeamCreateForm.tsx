@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import z from 'zod';
 import useSWR from 'swr';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -13,8 +14,10 @@ import { nullable } from '../utils/nullable';
 import { gql } from '../utils/gql';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
+import { keyPredictor } from '../utils/keyPredictor';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
+import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -28,6 +31,9 @@ import { FormTitle } from './FormTitle';
 import { Link } from './Link';
 import { ModalContent, ModalHeader } from './Modal';
 import { InputContainer } from './InputContaier';
+import { Text } from './Text';
+
+const KeyInput = dynamic(() => import('./KeyInput'));
 
 const teamsFetcher = createFetcher((_, title: string) => ({
     teams: [
@@ -47,7 +53,7 @@ const StyledTitleContainer = styled.div`
     position: relative;
 `;
 
-const StyledProjectKeyContainer = styled.div`
+const StyledTeamKeyContainer = styled.div`
     position: relative;
 `;
 
@@ -59,7 +65,7 @@ const StyledFormBottom = styled.div`
     padding: ${gapS} ${gapS} 0 ${gapS};
 `;
 
-const StyledProjectKeyInputContainer = styled(InputContainer)`
+const StyledTeamKeyInputContainer = styled(InputContainer)`
     box-sizing: border-box;
     width: fit-content;
     padding-right: ${gapS};
@@ -67,6 +73,7 @@ const StyledProjectKeyInputContainer = styled(InputContainer)`
 
 const schemaProvider = (t: (key: string) => string) =>
     z.object({
+        key: z.string().min(3),
         title: z
             .string({
                 required_error: t("Team's title is required"),
@@ -96,6 +103,8 @@ const TeamCreateForm: React.FC = () => {
         handleSubmit,
         watch,
         setFocus,
+        setValue,
+        control,
         formState: { errors, isValid, isSubmitted },
     } = useForm<TeamFormType>({
         resolver: zodResolver(schema),
@@ -110,6 +119,15 @@ const TeamCreateForm: React.FC = () => {
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
     const titleWatcher = watch('title');
+    const keyWatcher = watch('key');
+
+    useDebouncedEffect(
+        () => {
+            setValue('key', titleWatcher && titleWatcher !== '' ? keyPredictor(titleWatcher) : '');
+        },
+        300,
+        [setValue, titleWatcher],
+    );
 
     const { data: teamsData } = useSWR(titleWatcher && titleWatcher !== '' ? [user, titleWatcher] : null, (...args) =>
         teamsFetcher(...args),
@@ -120,6 +138,7 @@ const TeamCreateForm: React.FC = () => {
             createTeam: [
                 {
                     data: {
+                        key: form.key,
                         title: form.title,
                         description: form.description,
                     },
@@ -142,6 +161,14 @@ const TeamCreateForm: React.FC = () => {
     };
 
     const isTeamTitleAvailable = Boolean(teamsData?.teams?.length === 0);
+    const richProps = {
+        b: (c: React.ReactNode) => (
+            <Text as="span" size="s" weight="bolder">
+                {c}
+            </Text>
+        ),
+        key: () => keyWatcher,
+    };
 
     return (
         <>
@@ -165,13 +192,32 @@ const TeamCreateForm: React.FC = () => {
                         />
 
                         {nullable(titleWatcher, () => (
-                            <StyledProjectKeyContainer>
-                                <StyledProjectKeyInputContainer
-                                    brick="left"
-                                    hovered={hoveredInput}
-                                    focused={focusedInput}
-                                ></StyledProjectKeyInputContainer>
-                            </StyledProjectKeyContainer>
+                            <StyledTeamKeyContainer>
+                                <Controller
+                                    name="key"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <StyledTeamKeyInputContainer
+                                            brick="left"
+                                            hovered={hoveredInput}
+                                            focused={focusedInput}
+                                        >
+                                            <KeyInput
+                                                available={isTeamTitleAvailable}
+                                                tooltip={
+                                                    isTeamTitleAvailable
+                                                        ? t.rich(
+                                                              'Perfect! Issues in your team will look like',
+                                                              richProps,
+                                                          )
+                                                        : t.rich('Team with key already exists', richProps)
+                                                }
+                                                {...field}
+                                            />
+                                        </StyledTeamKeyInputContainer>
+                                    )}
+                                />
+                            </StyledTeamKeyContainer>
                         ))}
                     </StyledTitleContainer>
 
