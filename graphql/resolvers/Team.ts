@@ -322,7 +322,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: TeamCreateInput })),
         },
-        resolve: async (_, { data: { key, title, parent, description } }, { db, activity }) => {
+        resolve: async (_, { data: { key, title, parent, description, flowId } }, { db, activity }) => {
             if (!activity) return null;
 
             let parentTeam;
@@ -346,6 +346,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         }),
                         title,
                         description,
+                        flowId,
                         activityId: activity.id,
                         watchers: {
                             connect: [activity.id].map((id) => ({ id })),

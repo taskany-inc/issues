@@ -32,9 +32,20 @@ import { Link } from './Link';
 import { ModalContent, ModalHeader } from './Modal';
 import { InputContainer } from './InputContaier';
 import { Text } from './Text';
+import { FlowComboBox } from './FlowComboBox';
 
 const KeyInput = dynamic(() => import('./KeyInput'));
 
+const flowFetcher = createFetcher(() => ({
+    flowRecommended: {
+        id: true,
+        title: true,
+        states: {
+            id: true,
+            title: true,
+        },
+    },
+}));
 const teamsFetcher = createFetcher((_, title: string) => ({
     teams: [
         {
@@ -83,6 +94,9 @@ const schemaProvider = (t: (key: string) => string) =>
                 message: t("Team's title must be longer than 2 symbols"),
             }),
         description: z.string().optional(),
+        flow: z.object({
+            id: z.string(),
+        }),
     });
 
 export type TeamFormType = z.infer<ReturnType<typeof schemaProvider>>;
@@ -129,9 +143,16 @@ const TeamCreateForm: React.FC = () => {
         [setValue, titleWatcher],
     );
 
+    const { data: flowData } = useSWR('flow', () => flowFetcher(user));
     const { data: teamsData } = useSWR(titleWatcher && titleWatcher !== '' ? [user, titleWatcher] : null, (...args) =>
         teamsFetcher(...args),
     );
+
+    useEffect(() => {
+        if (flowData?.flowRecommended) {
+            setValue('flow', flowData?.flowRecommended[0]);
+        }
+    }, [setValue, flowData?.flowRecommended]);
 
     const createTeam = async (form: TeamFormType) => {
         const promise = gql.mutation({
@@ -141,6 +162,7 @@ const TeamCreateForm: React.FC = () => {
                         key: form.key,
                         title: form.title,
                         description: form.description,
+                        flowId: form.flow.id,
                     },
                 },
                 {
@@ -229,7 +251,21 @@ const TeamCreateForm: React.FC = () => {
                     />
 
                     <FormActions flat="top">
-                        <FormAction left inline></FormAction>
+                        <FormAction left inline>
+                            <Controller
+                                name="flow"
+                                control={control}
+                                render={({ field }) => (
+                                    <FlowComboBox
+                                        disabled
+                                        text={t('Flow')}
+                                        placeholder={t('Flow or state title')}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormAction>
                         <FormAction right inline>
                             <Button view="primary" outline={!isValid} type="submit" text={t('Create team')} />
                         </FormAction>

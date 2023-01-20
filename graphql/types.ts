@@ -501,6 +501,7 @@ export const TeamCreateInput = inputObjectType({
         t.field(TeamModel.key);
         t.field(TeamModel.title);
         t.field(TeamModel.description);
+        t.field(TeamModel.flowId);
         t.int('parent');
         t.list.nonNull.int('children');
         t.list.nonNull.string('projects');
