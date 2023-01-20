@@ -41,7 +41,7 @@ const StyledContent = styled.div`
 `;
 
 export const PageContent = styled.div`
-    padding: 10px 40px 0 40px;
+    padding: 10px 40px 20px 40px;
 `;
 
 export const PageActions = styled.div`
