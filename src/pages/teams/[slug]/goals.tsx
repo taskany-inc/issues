@@ -214,7 +214,7 @@ const fetcher = createFetcher((_, slug, states = [], query = '', tags = [], owne
 }));
 
 const StyledGoalsList = styled.div`
-    padding: 0;
+    padding: 0 0 20px 0;
     margin: 0 -20px;
 `;
 
