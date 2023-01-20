@@ -518,6 +518,17 @@ export const TeamUpdateInput = inputObjectType({
     },
 });
 
+export const TeamProjectsInput = inputObjectType({
+    name: 'TeamProjectsInput',
+    definition(t) {
+        t.field(TeamModel.slug);
+        t.nonNull.list.nonNull.string('states');
+        t.nonNull.list.nonNull.string('tags');
+        t.nonNull.list.nonNull.string('owner');
+        t.nonNull.string('query');
+    },
+});
+
 export const TeamGoalsInput = inputObjectType({
     name: 'TeamGoalsInput',
     definition(t) {

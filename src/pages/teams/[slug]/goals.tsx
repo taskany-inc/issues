@@ -83,7 +83,7 @@ const fetcher = createFetcher((_, slug, states = [], query = '', tags = [], owne
             },
         },
     ],
-    teamGoals: [
+    teamProjects: [
         {
             data: {
                 slug,
@@ -150,6 +150,67 @@ const fetcher = createFetcher((_, slug, states = [], query = '', tags = [], owne
             },
         },
     ],
+    teamGoals: [
+        {
+            data: {
+                slug,
+                states,
+                tags,
+                owner,
+                query,
+            },
+        },
+        {
+            id: true,
+            title: true,
+            description: true,
+            project: {
+                id: true,
+                title: true,
+            },
+            state: {
+                id: true,
+                title: true,
+                hue: true,
+            },
+            activity: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
+            },
+            owner: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
+            },
+            tags: {
+                id: true,
+                title: true,
+                description: true,
+            },
+            comments: {
+                id: true,
+            },
+            createdAt: true,
+            updatedAt: true,
+        },
+    ],
 }));
 
 const StyledGoalsList = styled.div`
@@ -187,7 +248,7 @@ const TeamGoalsPage = ({
     ssrTime,
     ssrData,
     params: { slug },
-}: ExternalPageProps<{ team: Team; teamGoals: Project[] }, { slug: string }>) => {
+}: ExternalPageProps<{ team: Team; teamProjects: Project[]; teamGoals: Goal[] }, { slug: string }>) => {
     const t = useTranslations('teams');
     const router = useRouter();
 
@@ -212,7 +273,8 @@ const TeamGoalsPage = ({
     }, []);
 
     const team: Team = data?.team ?? ssrData.team;
-    const projects: Project[] = data?.teamGoals ?? ssrData.teamGoals;
+    const projects: Project[] = data?.teamProjects ?? ssrData.teamProjects;
+    const goals: Goal[] = data?.teamGoals ?? ssrData.teamGoals;
 
     const [usersFilterData, tagsFilterData, goalsCount] = useMemo(() => {
         const projectsData = new Map();
@@ -233,13 +295,19 @@ const TeamGoalsPage = ({
             });
         });
 
+        goals?.forEach((g) => {
+            goalsCount++;
+            usersData.set(g?.owner?.id, g?.owner);
+            g?.tags?.forEach((t) => tagsData.set(t?.id, t));
+        });
+
         return [
             Array.from(usersData.values()),
             Array.from(tagsData.values()),
             goalsCount,
             Array.from(projectsData.values()), // https://github.com/taskany-inc/issues/issues/438
         ];
-    }, [projects]);
+    }, [projects, goals]);
 
     useUrlParams(stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
 
@@ -284,6 +352,28 @@ const TeamGoalsPage = ({
                     onTagChange={setTagsFilter}
                     onLimitChange={setLimitFilter}
                 />
+
+                <PageContent>
+                    <StyledGoalsList>
+                        {goals?.map((goal) =>
+                            nullable(goal, (g) => (
+                                <GoalListItem
+                                    createdAt={g.createdAt}
+                                    id={g.id}
+                                    state={g.state}
+                                    title={g.title}
+                                    issuer={g.activity}
+                                    owner={g.owner}
+                                    tags={g.tags}
+                                    comments={g.comments?.length}
+                                    key={g.id}
+                                    focused={g.id === preview?.id}
+                                    onClick={onGoalPrewiewShow(g)}
+                                />
+                            )),
+                        )}
+                    </StyledGoalsList>
+                </PageContent>
 
                 <PageContent>
                     {projects?.map((project) => {

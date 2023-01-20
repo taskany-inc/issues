@@ -7,12 +7,14 @@ import {
     SubscriptionToggleInput,
     Activity,
     Team,
-    TeamGoalsInput,
+    TeamProjectsInput,
     TeamCreateInput,
     TeamUpdateInput,
     TeamsInput,
     TeamDeleteInput,
     Project,
+    Goal,
+    TeamGoalsInput,
 } from '../types';
 
 const connectionMap: Record<string, string> = {
@@ -20,7 +22,10 @@ const connectionMap: Record<string, string> = {
     false: 'disconnect',
 };
 
-const projectGoalsFilter = (data: { query: string; states: string[]; tags: string[]; owner: string[] }): any => {
+const projectGoalsFilter = (
+    data: { query: string; states: string[]; tags: string[]; owner: string[] },
+    extra: any = {},
+): any => {
     const statesFilter = data.states.length
         ? {
               state: {
@@ -72,6 +77,7 @@ const projectGoalsFilter = (data: { query: string; states: string[]; tags: strin
             ...statesFilter,
             ...tagsFilter,
             ...ownerFilter,
+            ...extra,
         },
     };
 };
@@ -156,10 +162,10 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         },
     });
 
-    t.list.field('teamGoals', {
+    t.list.field('teamProjects', {
         type: Project,
         args: {
-            data: nonNull(arg({ type: TeamGoalsInput })),
+            data: nonNull(arg({ type: TeamProjectsInput })),
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
@@ -216,6 +222,62 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             comments: true,
                         },
                     },
+                },
+            });
+        },
+    });
+
+    t.list.field('teamGoals', {
+        type: Goal,
+        args: {
+            data: nonNull(arg({ type: TeamGoalsInput })),
+        },
+        resolve: async (_, { data }, { db, activity }) => {
+            if (!activity) return null;
+
+            return db.goal.findMany({
+                ...projectGoalsFilter(data, {
+                    team: {
+                        slug: data.slug,
+                    },
+                }),
+                orderBy: {
+                    createdAt: 'asc',
+                },
+                include: {
+                    team: true,
+                    owner: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                    activity: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                    tags: true,
+                    state: true,
+                    project: true,
+                    estimate: true,
+                    dependsOn: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    relatedTo: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    blocks: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                    comments: true,
                 },
             });
         },
