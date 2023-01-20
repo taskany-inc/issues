@@ -23,7 +23,9 @@
             "Press key to create the team": "Нажми <key></key> чтобы создать команду.",
             "Project with title already exists": "Команда с названием <b><title></title></b> уже существует. Попробуй другое.",
             "Team with key already exists": "Команда с ключом <b><key></key></b> уже существует. Попробуй другой.",
-            "Perfect! Issues in your team will look like": "<b>Супер!</b> Задачи в твоей команде будут выглядеть примерно так: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>."
+            "Perfect! Issues in your team will look like": "<b>Супер!</b> Задачи в твоей команде будут выглядеть примерно так: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>.",
+            "Flow": "Флоу",
+            "Flow or state title": "Модель или статус"
         },
         "index": {
             "title": "Taskany — <team></team> — Проекты"

@@ -392,6 +392,7 @@ type TeamAggregation {
 input TeamCreateInput {
   children: [Int!]
   description: String
+  flowId: String
   key: String
   parent: Int
   projects: [String!]
