@@ -32,7 +32,7 @@ import { FlowComboBox } from './FlowComboBox';
 import { ModalContent, ModalHeader } from './Modal';
 import { InputContainer } from './InputContaier';
 
-const ProjectKeyInput = dynamic(() => import('./ProjectKeyInput'));
+const KeyInput = dynamic(() => import('./KeyInput'));
 
 const flowFetcher = createFetcher(() => ({
     flowRecommended: {
@@ -177,7 +177,7 @@ const ProjectCreateForm: React.FC = () => {
                                             hovered={hoveredInput}
                                             focused={focusedInput}
                                         >
-                                            <ProjectKeyInput
+                                            <KeyInput
                                                 available={isProjectKeyAvailable}
                                                 tooltip={
                                                     isProjectKeyAvailable

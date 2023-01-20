@@ -21,7 +21,9 @@
             "And its description": "And its description",
             "Pro tip!": "Pro tip!",
             "Press key to create the team": "Press <key></key> to create the team.",
-            "Team with title already exists": "Team with title <b><title></title></b> already exists. Please, try to use another title."
+            "Team with title already exists": "Team with title <b><title></title></b> already exists. Please, try to use another title.",
+            "Team with key already exists": "Team with key <b><key></key></b> already exists. Please, try to use another key.",
+            "Perfect! Issues in your team will look like": "<b>Perfect!</b> Issues in your team will look like: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>."
         },
         "index": {
             "title": "Taskany — <team></team> — Projects"
