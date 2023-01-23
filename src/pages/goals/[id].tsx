@@ -144,7 +144,11 @@ const GoalPage = ({
     }, [stargizer]);
 
     useEffect(() => {
-        goal.project && setCurrentProjectCache(goal.project);
+        goal.project &&
+            setCurrentProjectCache({
+                ...goal.project,
+                kind: 'project',
+            });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

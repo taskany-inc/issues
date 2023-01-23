@@ -202,6 +202,7 @@ model Goal {
   id           String     @id
   title        String
   description  String
+  kind         String?
   key          Boolean?
   personal     Boolean?
   private      Boolean?

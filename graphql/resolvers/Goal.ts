@@ -510,7 +510,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 }
 
                 delete goalFields.parent;
-                delete goalFields.kind;
 
                 return db.goal.create({
                     data: {

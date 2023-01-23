@@ -15,6 +15,7 @@ export const goalFetcher = createFetcher((_, id: string) => ({
             description: true,
             activityId: true,
             ownerId: true,
+            kind: true,
             state: {
                 id: true,
                 title: true,
