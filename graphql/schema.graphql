@@ -106,6 +106,7 @@ type Goal {
   estimate: [Estimate]
   id: ID!
   key: Boolean
+  kind: String
   owner: Activity
   ownerId: String
   participants: [Activity]

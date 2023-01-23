@@ -162,6 +162,7 @@ export const Goal = objectType({
         t.field(GoalModel.id);
         t.field(GoalModel.title);
         t.field(GoalModel.description);
+        t.field(GoalModel.kind);
         t.field(GoalModel.key);
         t.field(GoalModel.personal);
         t.field(GoalModel.private);

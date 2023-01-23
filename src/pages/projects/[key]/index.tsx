@@ -243,6 +243,7 @@ const ProjectPage = ({
             title: project.title,
             description: project.description,
             flowId: project.flowId,
+            kind: 'project',
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

@@ -101,7 +101,7 @@ interface GoalFormProps {
     owner?: Partial<Activity>;
     title?: string;
     description?: string;
-    parent?: Partial<Project | Team>;
+    parent?: Partial<Project | Team> & { kind: string };
     tags?: Array<TagModel | undefined>;
     state?: Partial<State>;
     priority?: Priority | string;
@@ -161,8 +161,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     const parentWatcher = watch('parent');
     const tagsWatcher = watch('tags');
     const errorsResolver = errorsProvider(errors, isSubmitted);
-
-    console.log(parent, errors);
 
     useEffect(() => {
         setTimeout(() => setFocus('title'), 0);
