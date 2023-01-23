@@ -162,6 +162,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     const tagsWatcher = watch('tags');
     const errorsResolver = errorsProvider(errors, isSubmitted);
 
+    console.log(parent, errors);
+
     useEffect(() => {
         setTimeout(() => setFocus('title'), 0);
     }, [setFocus]);
@@ -217,7 +219,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 render={({ field }) => (
                                     <UserComboBox
                                         text={t('Assign')}
-                                        placeholder={t('Enter owner name or email')}
+                                        placeholder={t('Enter name or email')}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />

@@ -49,6 +49,18 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         onSubmit(res.updateGoal?.id);
     };
 
+    // FIXME: https://github.com/taskany-inc/issues/issues/517
+
+    let parent;
+    if (goal.project) {
+        // @ts-ignore
+        parent = { ...goal.project, kind: 'project' };
+    }
+    if (goal.team) {
+        // @ts-ignore
+        parent = { ...goal.team, kind: 'team' };
+    }
+
     return (
         <GoalForm
             i18nKeyset="goals.edit"
@@ -56,7 +68,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             title={goal.title}
             description={goal.description}
             owner={goal.owner}
-            parent={goal.project || goal.team}
+            parent={parent}
             state={goal.state}
             priority={goal.priority}
             tags={goal.tags}
