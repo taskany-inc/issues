@@ -237,7 +237,15 @@
             }
         },
         "item": {
-            "by": "by"
+            "by": "by",
+            "Priority": {
+                "Priority": "Priority",
+                "Highest": "Highest",
+                "High": "High",
+                "Medium": "Medium",
+                "Low": "Low",
+                "Lowest": "Lowest"
+            }
         }
     },
     "explore": {
