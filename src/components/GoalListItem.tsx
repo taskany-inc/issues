@@ -3,11 +3,14 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import useSWR from 'swr';
 
 import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
+import { createFetcher } from '../utils/createFetcher';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { Text } from './Text';
 import { Tag as TagItem } from './Tag';
@@ -29,13 +32,19 @@ interface GoalListItemProps {
     hasForks?: boolean;
     isNotViewed?: boolean;
     focused?: boolean;
+    priority?: string;
 
     onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
 
+const fetcher = createFetcher(() => ({
+    goalPriorityKind: true,
+    goalPriorityColors: true,
+}));
+
 const StyledGoal = styled.a<{ focused?: boolean }>`
     display: grid;
-    grid-template-columns: 15px 30px 600px repeat(3, 40px);
+    grid-template-columns: 15px 30px 600px repeat(4, 40px);
     align-items: center;
 
     color: ${textColor};
@@ -135,9 +144,15 @@ export const GoalListItem: React.FC<GoalListItemProps> = ({
     isNotViewed,
     state,
     focused,
+    priority,
     onClick,
 }) => {
     const t = useTranslations('goals.item');
+    const { user } = usePageContext();
+
+    const { data } = useSWR('priority', () => fetcher(user));
+
+    const priorityColorIndex = data?.goalPriorityKind?.indexOf(priority || '') ?? -1;
 
     return (
         <Link href={routes.goal(id)} passHref>
@@ -166,6 +181,16 @@ export const GoalListItem: React.FC<GoalListItemProps> = ({
                         {`  ${t('by')} ${issuer?.user?.name}`}
                     </StyledSubTitle>
                 </StyledName>
+
+                <StyledAddon>
+                    {nullable(priority, (p) => (
+                        <StateDot
+                            size="s"
+                            hue={data?.goalPriorityColors?.[priorityColorIndex]}
+                            title={t(`Priority.${p}`)}
+                        />
+                    ))}
+                </StyledAddon>
 
                 <StyledAddon>
                     <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />

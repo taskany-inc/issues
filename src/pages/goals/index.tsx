@@ -25,6 +25,8 @@ const refreshInterval = 3000;
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
 const fetcher = createFetcher((_, states = [], query = '', tags = [], owner = []) => ({
+    goalPriorityColors: true,
+    goalPriorityKind: true,
     userGoals: [
         {
             data: {
@@ -47,6 +49,12 @@ const fetcher = createFetcher((_, states = [], query = '', tags = [], owner = []
                     key: true,
                     title: true,
                 },
+                team: {
+                    id: true,
+                    key: true,
+                    title: true,
+                },
+                priority: true,
                 state: {
                     id: true,
                     title: true,
@@ -235,6 +243,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
                                             issuer={g.activity}
                                             owner={g.owner}
                                             tags={g.tags}
+                                            priority={g.priority}
                                             comments={g.comments?.length}
                                             key={g.id}
                                             focused={g.id === preview?.id}
