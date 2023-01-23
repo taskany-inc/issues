@@ -54,7 +54,7 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                 renderTrigger={(props) => (
                     <Button
                         ref={props.ref}
-                        text={props.text}
+                        ghost
                         onClick={props.onClick}
                         disabled={props.disabled}
                         iconLeft={

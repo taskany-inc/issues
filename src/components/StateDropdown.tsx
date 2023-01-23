@@ -81,6 +81,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                 disabled={!flowId || disabled}
                 renderTrigger={(props) => (
                     <Button
+                        ghost
                         ref={props.ref}
                         text={props.text}
                         onClick={props.onClick}

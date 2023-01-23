@@ -76,6 +76,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                 onChange={onChange}
                 renderTrigger={(props) => (
                     <Button
+                        ghost
                         ref={props.ref}
                         text={props.text}
                         disabled={props.disabled}

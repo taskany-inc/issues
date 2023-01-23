@@ -124,6 +124,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                 items={items}
                 renderTrigger={(props) => (
                     <Button
+                        ghost
                         ref={props.ref}
                         text={props.text}
                         disabled={props.disabled}

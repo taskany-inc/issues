@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -115,6 +115,10 @@ const StyledTagsContainer = styled.div`
     padding-left: ${gapS};
 `;
 
+const StyledFormActions = styled(FormActions)`
+    padding-top: 50px;
+`;
+
 export const GoalForm: React.FC<GoalFormProps> = ({
     formTitle,
     title,
@@ -132,6 +136,15 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     const t = useTranslations(i18nKeyset);
     const schema = schemaProvider(t);
     const { locale } = usePageContext();
+    const [descriptionFocused, setDescriptionFocused] = useState(false);
+
+    const onDescriptionFocus = useCallback(() => {
+        setDescriptionFocused(true);
+    }, []);
+
+    const onDescriptionCancel = useCallback(() => {
+        setDescriptionFocused(false);
+    }, []);
 
     const {
         control,
@@ -198,6 +211,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 flat="both"
                                 placeholder={t('And its description')}
                                 error={errorsResolver(field.name)}
+                                onFocus={onDescriptionFocus}
+                                onCancel={onDescriptionCancel}
                                 {...field}
                             />
                         )}
@@ -209,21 +224,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         ))}
                     </StyledTagsContainer>
 
-                    <FormActions flat="top">
+                    <StyledFormActions flat="top" focused={descriptionFocused}>
                         <FormAction left inline>
-                            <Controller
-                                name="owner"
-                                control={control}
-                                render={({ field }) => (
-                                    <UserComboBox
-                                        text={t('Assign')}
-                                        placeholder={t('Enter name or email')}
-                                        error={errorsResolver(field.name)}
-                                        {...field}
-                                    />
-                                )}
-                            />
-
                             <Controller
                                 name="parent"
                                 control={control}
@@ -231,19 +233,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     <GoalParentComboBox
                                         text={t('Enter project or team title')}
                                         placeholder={t('Enter project or team title')}
-                                        error={errorsResolver(field.name)}
-                                        {...field}
-                                    />
-                                )}
-                            />
-
-                            <Controller
-                                name="state"
-                                control={control}
-                                render={({ field }) => (
-                                    <StateDropdown
-                                        text={t('State')}
-                                        flowId={parentWatcher?.flowId}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />
@@ -263,6 +252,19 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             />
 
                             <Controller
+                                name="owner"
+                                control={control}
+                                render={({ field }) => (
+                                    <UserComboBox
+                                        text={t('Assign')}
+                                        placeholder={t('Enter name or email')}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
+
+                            <Controller
                                 name="estimate"
                                 control={control}
                                 render={({ field }) => (
@@ -271,6 +273,19 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                         placeholder={t('Date input mask placeholder')}
                                         mask={t('Date input mask')}
                                         defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                name="state"
+                                control={control}
+                                render={({ field }) => (
+                                    <StateDropdown
+                                        text={t('State')}
+                                        flowId={parentWatcher?.flowId}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />
@@ -294,7 +309,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         <FormAction right inline>
                             <Button view="primary" outline={!isValid} type="submit" text={t('Submit')} />
                         </FormAction>
-                    </FormActions>
+                    </StyledFormActions>
                 </Form>
 
                 {children}
