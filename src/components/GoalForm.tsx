@@ -66,8 +66,8 @@ const schemaProvider = (t: (key: string) => string) =>
                 kind: z.string(),
             },
             {
-                invalid_type_error: "Goal's project or team are required",
-                required_error: "Goal's project or team are required",
+                invalid_type_error: t("Goal's project or team are required"),
+                required_error: t("Goal's project or team are required"),
             },
         ),
         state: z.object({
@@ -158,7 +158,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         resolver: zodResolver(schema),
         mode: 'onChange',
         reValidateMode: 'onChange',
-        shouldFocusError: true,
+        shouldFocusError: false,
         defaultValues: {
             title,
             description,

@@ -124,7 +124,7 @@ const TeamCreateForm: React.FC = () => {
         resolver: zodResolver(schema),
         mode: 'onChange',
         reValidateMode: 'onChange',
-        shouldFocusError: true,
+        shouldFocusError: false,
     });
 
     useEffect(() => {
