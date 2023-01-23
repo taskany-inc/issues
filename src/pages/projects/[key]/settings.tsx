@@ -30,6 +30,7 @@ import {
     useProjectResource,
 } from '../../../hooks/useProjectResource';
 import { errorsProvider } from '../../../utils/forms';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
 
 const ModalOnEvent = dynamic(() => import('../../../components/ModalOnEvent'));
 
@@ -102,6 +103,9 @@ const ProjectSettingsPage = ({
 }: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) => {
     const t = useTranslations('projects');
     const router = useRouter();
+    const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
+    const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
+    const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
     const { data } = useSWR([user, key], (...args) => fetcher(...args), {
         refreshInterval,
@@ -153,8 +157,31 @@ const ProjectSettingsPage = ({
     }, []);
 
     const onProjectDelete = useCallback(() => {
+        const newRecentProjectsCache = { ...recentProjectsCache };
+        if (recentProjectsCache[project.id]) {
+            delete newRecentProjectsCache[project.id];
+            setRecentProjectsCache(newRecentProjectsCache);
+        }
+
+        if (currentProjectCache?.id === project.id) {
+            setCurrentProjectCache(null);
+        }
+
+        if (lastProjectCache?.id === project.id) {
+            setLastProjectCache(null);
+        }
+
         router.exploreProjects();
-    }, [router]);
+    }, [
+        router,
+        project.id,
+        recentProjectsCache,
+        currentProjectCache,
+        lastProjectCache,
+        setRecentProjectsCache,
+        setCurrentProjectCache,
+        setLastProjectCache,
+    ]);
 
     return (
         <Page
