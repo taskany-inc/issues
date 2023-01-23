@@ -29,9 +29,9 @@ const StyledStateDot = styled.div<{
 
     background-color: var(--bkg);
 
-    &:hover {
+    /* &:hover {
         background-color: var(--bkg-hover);
-    }
+    } */
 
     ${({ onClick }) =>
         onClick &&

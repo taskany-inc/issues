@@ -116,7 +116,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                 disabled={disabled}
                 items={items}
                 onChange={onChange}
-                renderTrigger={(props) => <Button ref={props.ref} text={props.text} onClick={props.onClick} />}
+                renderTrigger={(props) => <Button ghost ref={props.ref} text={props.text} onClick={props.onClick} />}
                 renderInput={(props) => (
                     <StyledInput
                         autoFocus

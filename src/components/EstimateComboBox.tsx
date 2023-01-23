@@ -184,6 +184,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                     <StyledTriggerContainer>
                         {changed && <StyledCleanButton onClick={onCleanClick}>+</StyledCleanButton>}
                         <Button
+                            ghost
                             ref={props.ref}
                             text={buttonText}
                             iconLeft={<Icon noWrap type="calendarTick" size="xs" />}
