@@ -160,6 +160,16 @@ const UserSettingsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<
         setTheme(appearanceTheme);
     }, [setTheme, appearanceTheme, resolvedTheme]);
 
+    const clearLocalCache = useCallback(() => {
+        try {
+            window.localStorage.clear();
+            toast.success(t('Local cache cleared successfully'));
+            // eslint-disable-next-line no-empty
+        } catch (e) {
+            toast.error(t('Something went wrong 😿'));
+        }
+    }, [t]);
+
     return (
         <Page
             user={user}
@@ -242,6 +252,16 @@ const UserSettingsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<
                 <SettingsCard view="warning">
                     <Form>
                         <Fieldset title={t('Danger zone')} view="warning">
+                            <FormActions>
+                                <FormAction left>
+                                    <Button
+                                        view="warning"
+                                        outline
+                                        text={t('Clear local cache')}
+                                        onClick={clearLocalCache}
+                                    />
+                                </FormAction>
+                            </FormActions>
                             <FormActions>
                                 <FormAction left>
                                     <Button view="warning" text={t('Sign out')} onClick={() => signOut()} />
