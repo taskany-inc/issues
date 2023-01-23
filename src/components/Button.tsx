@@ -23,6 +23,7 @@ import {
     danger1,
     danger2,
     radiusM,
+    backgroundColor,
 } from '../design/@generated/themes';
 
 interface ButtonProps {
@@ -187,7 +188,7 @@ const StyledButton = styled(
             :hover:not([disabled]),
             :focus:not([disabled]),
             :active:not([disabled]) {
-                color: ${textColor};
+                color: ${backgroundColor};
             }
         `}
 
