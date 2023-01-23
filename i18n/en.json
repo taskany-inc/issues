@@ -130,7 +130,9 @@
             "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",
             "Pro tip!": "Pro tip!",
             "Press key to save settings": "Press <key></key> to save settings.",
-            "Save": "Save"
+            "Save": "Save",
+            "Clear local cache": "Clear local cache",
+            "Local cache cleared successfully": "Local cache cleared successfully"
         }
     },
     "goals": {
