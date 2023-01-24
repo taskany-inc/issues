@@ -24,7 +24,17 @@ const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
 const fetcher = createFetcher(
-    (_, key: string, offset = 0, states = [], query = '', limitFilter = defaultLimit, tags = [], owner = []) => ({
+    (
+        _,
+        key: string,
+        offset = 0,
+        priority = [],
+        states = [],
+        query = '',
+        limitFilter = defaultLimit,
+        tags = [],
+        owner = [],
+    ) => ({
         project: [
             {
                 key,
@@ -87,6 +97,7 @@ const fetcher = createFetcher(
                     key,
                     offset,
                     pageSize: limitFilter,
+                    priority,
                     states,
                     tags,
                     owner,
@@ -97,6 +108,7 @@ const fetcher = createFetcher(
                 id: true,
                 title: true,
                 description: true,
+                priority: true,
                 project: {
                     id: true,
                     title: true,
@@ -148,6 +160,7 @@ const fetcher = createFetcher(
             {
                 data: {
                     key,
+                    priority,
                     states,
                     tags,
                     owner,
@@ -165,6 +178,7 @@ export const getServerSideProps = declareSsrProps(
                 user,
                 key,
                 0,
+                parseQueryParam(query.priority as string),
                 parseQueryParam(query.state as string),
                 parseQueryParam(query.search as string).toString(),
                 Number(parseQueryParam(query.limit as string)),
@@ -206,6 +220,7 @@ const ProjectPage = ({
 
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
+    const [priorityFilter, setPriorityFilter] = useState<string[]>(parseQueryParam(router.query.priority as string));
     const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
     const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));
     const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user as string));
@@ -217,14 +232,25 @@ const ProjectPage = ({
     const { data, setSize, size } = useSWRInfinite(
         (index: number) => ({
             offset: index * limitFilter,
+            priorityFilter,
             stateFilter,
             fulltextFilter,
             limitFilter,
             tagsFilter,
             ownerFilter,
         }),
-        ({ offset, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter }) =>
-            fetcher(user, key, offset, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter),
+        ({ offset, priorityFilter, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter }) =>
+            fetcher(
+                user,
+                key,
+                offset,
+                priorityFilter,
+                stateFilter,
+                fulltextFilter,
+                limitFilter,
+                tagsFilter,
+                ownerFilter,
+            ),
     );
 
     const shouldRenderMoreButton =
@@ -256,7 +282,7 @@ const ProjectPage = ({
         setFulltextFilter(e.currentTarget.value);
     }, []);
 
-    useUrlParams(stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
+    useUrlParams(priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
 
     const onGoalPrewiewShow = useCallback(
         (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
@@ -288,12 +314,14 @@ const ProjectPage = ({
                     flowId={project.flow?.id}
                     users={project.participants}
                     tags={project.tags}
+                    priorityFilter={priorityFilter}
                     stateFilter={stateFilter}
                     tagsFilter={tagsFilter}
                     ownerFilter={ownerFilter}
                     searchFilter={fulltextFilter}
                     limitFilter={limitFilter}
                     onSearchChange={onSearchChange}
+                    onPriorityChange={setPriorityFilter}
                     onStateChange={setStateFilter}
                     onUserChange={setOwnerFilter}
                     onTagChange={setTagsFilter}
@@ -311,6 +339,7 @@ const ProjectPage = ({
                                 issuer={g.activity}
                                 owner={g.owner}
                                 tags={g.tags}
+                                priority={g.priority}
                                 comments={g.comments?.length}
                                 key={g.id}
                                 onClick={onGoalPrewiewShow(g)}

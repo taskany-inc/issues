@@ -23,7 +23,7 @@ const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
 const refreshInterval = 3000;
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
-const fetcher = createFetcher((_, slug, states = [], query = '', tags = [], owner = []) => ({
+const fetcher = createFetcher((_, slug, priority = [], states = [], query = '', tags = [], owner = []) => ({
     team: [
         {
             slug,
@@ -87,6 +87,7 @@ const fetcher = createFetcher((_, slug, states = [], query = '', tags = [], owne
         {
             data: {
                 slug,
+                priority,
                 states,
                 tags,
                 owner,
@@ -101,6 +102,7 @@ const fetcher = createFetcher((_, slug, states = [], query = '', tags = [], owne
                 id: true,
                 title: true,
                 description: true,
+                priority: true,
                 project: {
                     id: true,
                     key: true,
@@ -154,6 +156,7 @@ const fetcher = createFetcher((_, slug, states = [], query = '', tags = [], owne
         {
             data: {
                 slug,
+                priority,
                 states,
                 tags,
                 owner,
@@ -164,6 +167,7 @@ const fetcher = createFetcher((_, slug, states = [], query = '', tags = [], owne
             id: true,
             title: true,
             description: true,
+            priority: true,
             project: {
                 id: true,
                 title: true,
@@ -252,6 +256,7 @@ const TeamGoalsPage = ({
     const t = useTranslations('teams');
     const router = useRouter();
 
+    const [priorityFilter, setPriorityFilter] = useState<string[]>(parseQueryParam(router.query.priority as string));
     const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
     const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));
     const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user as string));
@@ -261,7 +266,7 @@ const TeamGoalsPage = ({
     const [preview, setPreview] = useState<Goal | null>(null);
 
     const { data } = useSWR(
-        [user, slug, stateFilter, fulltextFilter, tagsFilter, ownerFilter, limitFilter],
+        [user, slug, priorityFilter, stateFilter, fulltextFilter, tagsFilter, ownerFilter, limitFilter],
         (...args) => fetcher(...args),
         {
             refreshInterval,
@@ -309,7 +314,7 @@ const TeamGoalsPage = ({
         ];
     }, [projects, goals]);
 
-    useUrlParams(stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
+    useUrlParams(priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
 
     const onGoalPrewiewShow = useCallback(
         (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
@@ -341,12 +346,14 @@ const TeamGoalsPage = ({
                     flowId={projects[0]?.flowId}
                     users={usersFilterData}
                     tags={tagsFilterData}
+                    priorityFilter={priorityFilter}
                     stateFilter={stateFilter}
                     tagsFilter={tagsFilter}
                     ownerFilter={ownerFilter}
                     searchFilter={fulltextFilter}
                     limitFilter={limitFilter}
                     onSearchChange={onSearchChange}
+                    onPriorityChange={setPriorityFilter}
                     onStateChange={setStateFilter}
                     onUserChange={setOwnerFilter}
                     onTagChange={setTagsFilter}
@@ -365,6 +372,7 @@ const TeamGoalsPage = ({
                                     issuer={g.activity}
                                     owner={g.owner}
                                     tags={g.tags}
+                                    priority={g.priority}
                                     comments={g.comments?.length}
                                     key={g.id}
                                     focused={g.id === preview?.id}
@@ -396,6 +404,7 @@ const TeamGoalsPage = ({
                                                 issuer={g.activity}
                                                 owner={g.owner}
                                                 tags={g.tags}
+                                                priority={g.priority}
                                                 comments={g.comments?.length}
                                                 key={g.id}
                                                 focused={g.id === preview?.id}

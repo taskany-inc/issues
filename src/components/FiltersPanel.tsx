@@ -12,12 +12,14 @@ import { StateFilterDropdown } from './StateFilterDropdown';
 import { UserFilterDropdown } from './UserFilterDropdown';
 import { TagsFilterDropdown } from './TagsFilterDropdown';
 import { LimitFilterDropdown } from './LimitFilterDropdown';
+import { PriorityFilterDropdown } from './PriorityFilterDropdown';
 
 interface FiltersPanelProps {
     count?: number;
     flowId?: React.ComponentProps<typeof StateFilterDropdown>['flowId'];
     users?: React.ComponentProps<typeof UserFilterDropdown>['activity'];
     tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
+    priorityFilter?: Array<string>;
     stateFilter?: Array<string>;
     ownerFilter?: Array<string>;
     tagsFilter?: Array<string>;
@@ -26,6 +28,7 @@ interface FiltersPanelProps {
     children?: React.ReactNode;
 
     onSearchChange: React.ComponentProps<typeof Input>['onChange'];
+    onPriorityChange?: React.ComponentProps<typeof PriorityFilterDropdown>['onChange'];
     onStateChange?: React.ComponentProps<typeof StateFilterDropdown>['onChange'];
     onUserChange?: React.ComponentProps<typeof UserFilterDropdown>['onChange'];
     onTagChange?: React.ComponentProps<typeof TagsFilterDropdown>['onChange'];
@@ -63,11 +66,13 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     flowId,
     users,
     tags,
+    priorityFilter,
     stateFilter,
     ownerFilter,
     tagsFilter,
     searchFilter,
     limitFilter,
+    onPriorityChange,
     onSearchChange,
     onStateChange,
     onUserChange,
@@ -88,6 +93,10 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                     ))}
 
                     <StyledFiltersMenu>
+                        {nullable(onPriorityChange, (opc) => (
+                            <PriorityFilterDropdown text={t('Priority')} value={priorityFilter} onChange={opc} />
+                        ))}
+
                         {nullable(flowId, (id) => (
                             <StateFilterDropdown
                                 text={t('State')}
