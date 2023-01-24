@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import { Goal, Project } from '../../../graphql/@generated/genql';
+import { Goal, Project, Team } from '../../../graphql/@generated/genql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Page, PageContent } from '../../components/Page';
@@ -38,66 +38,65 @@ const fetcher = createFetcher((_, priority = [], states = [], query = '', tags =
             },
         },
         {
-            key: true,
+            id: true,
             title: true,
-            flowId: true,
-            goals: {
+            description: true,
+            project: {
+                id: true,
+                key: true,
+                title: true,
+                teams: {
+                    id: true,
+                    title: true,
+                },
+            },
+            team: {
+                id: true,
+                key: true,
+                title: true,
+            },
+            priority: true,
+            state: {
+                id: true,
+                title: true,
+                hue: true,
+            },
+            activity: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
+            },
+            owner: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
+            },
+            tags: {
                 id: true,
                 title: true,
                 description: true,
-                project: {
-                    id: true,
-                    key: true,
-                    title: true,
-                },
-                team: {
-                    id: true,
-                    key: true,
-                    title: true,
-                },
-                priority: true,
-                state: {
-                    id: true,
-                    title: true,
-                    hue: true,
-                },
-                activity: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                owner: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                tags: {
-                    id: true,
-                    title: true,
-                    description: true,
-                },
-                comments: {
-                    id: true,
-                },
-                createdAt: true,
-                updatedAt: true,
             },
+            comments: {
+                id: true,
+            },
+            createdAt: true,
+            updatedAt: true,
         },
     ],
 }));
@@ -131,7 +130,7 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userGoals: Project[] }>) => {
+const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userGoals: Goal[] }>) => {
     const t = useTranslations('goals.index');
     const mounted = useMounted(refreshInterval);
     const router = useRouter();
@@ -158,34 +157,29 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
     }, []);
 
     // NB: this line is compensation for first render before delayed swr will bring updates
-    const projects: Project[] = data?.userGoals ?? ssrData.userGoals;
+    const goals: Goal[] = data?.userGoals ?? ssrData.userGoals;
+    const goalsCount = goals.length;
 
-    const [usersFilterData, tagsFilterData, goalsCount] = useMemo(() => {
+    const [usersFilterData, tagsFilterData, projectsData] = useMemo(() => {
         const projectsData = new Map();
         const tagsData = new Map();
         const usersData = new Map();
-        let goalsCount = 0;
 
-        projects.forEach((p) => {
-            projectsData.set(p.id, {
-                id: p.id,
-                tittle: p.title,
+        goals.forEach((g) => {
+            usersData.set(g?.owner?.id, g?.owner);
+            projectsData.set(g.project?.id, {
+                id: g.project?.id,
+                tittle: g.project?.title,
             });
-
-            p.goals?.forEach((g) => {
-                goalsCount++;
-                usersData.set(g?.owner?.id, g?.owner);
-                g?.tags?.forEach((t) => tagsData.set(t?.id, t));
-            });
+            g?.tags?.forEach((t) => tagsData.set(t?.id, t));
         });
 
         return [
             Array.from(usersData.values()),
             Array.from(tagsData.values()),
-            goalsCount,
             Array.from(projectsData.values()), // https://github.com/taskany-inc/issues/issues/438
         ];
-    }, [projects]);
+    }, [goals]);
 
     useUrlParams(priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
 
@@ -204,13 +198,54 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
         setPreview(null);
     }, []);
 
+    const groups = useMemo(() => {
+        return goals.reduce(
+            (acc, goal) => {
+                if (goal.team?.id) {
+                    const team = acc.teams[goal.team.id] || {
+                        data: goal.team,
+                        goals: [],
+                    };
+
+                    team.goals.push(goal);
+                    acc.teams[goal.team.id] = team;
+                }
+
+                if (goal.project) {
+                    const project = acc.projects[goal.project.id] || {
+                        data: goal.project,
+                        goals: [],
+                    };
+
+                    // sort teams by title
+                    project.teams = goal.project.teams?.length
+                        ? goal.project.teams
+                              // @ts-ignore
+                              ?.sort((a, b) => (a?.title > b?.title ? 1 : -1))
+                              .map((t) => t?.title)
+                              .join(', ')
+                        : undefined;
+
+                    project.goals.push(goal);
+                    acc.projects[goal.project.id] = project;
+                }
+
+                return acc;
+            },
+            { teams: {}, projects: {} } as {
+                teams: Record<number, { data: Team; goals: Goal[] }>;
+                projects: Record<number, { data: Project; teams?: string; goals: Goal[] }>;
+            },
+        );
+    }, [goals]);
+
     return (
         <Page user={user} ssrTime={ssrTime} locale={locale} title={t('title')}>
             <CommonHeader title={t('Dashboard')} description={t('This is your personal goals bundle')}></CommonHeader>
 
             <FiltersPanel
                 count={goalsCount}
-                flowId={projects[0]?.flowId}
+                flowId={projectsData[0]?.flowId}
                 users={usersFilterData}
                 tags={tagsFilterData}
                 priorityFilter={priorityFilter}
@@ -228,17 +263,17 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
             />
 
             <PageContent>
-                {projects?.map((project) => {
-                    return nullable(project.goals?.length, () => (
-                        <StyledProjectGroup key={project.key}>
+                {Object.values(groups.teams).map((team) => {
+                    return nullable(team.goals?.length, () => (
+                        <StyledProjectGroup key={team.data.key}>
                             <Text size="l" weight="bolder">
-                                {project.title}
+                                {team.data.title}
                             </Text>
 
                             <PageSep />
 
                             <StyledGoalsList>
-                                {project.goals?.map((goal) =>
+                                {team.goals?.map((goal) =>
                                     nullable(goal, (g) => (
                                         <GoalListItem
                                             createdAt={g.createdAt}
@@ -260,6 +295,41 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
                         </StyledProjectGroup>
                     ));
                 })}
+
+                {Object.values(groups.projects)
+                    .sort((a, b) => (a.teams && !b.teams ? -1 : 1))
+                    .map((project) => {
+                        return nullable(project.goals?.length, () => (
+                            <StyledProjectGroup key={project.data.key}>
+                                <Text size="l" weight="bolder">
+                                    {project.teams ? `${project.teams} —` : ''} {project.data.title}
+                                </Text>
+
+                                <PageSep />
+
+                                <StyledGoalsList>
+                                    {project.goals?.map((goal) =>
+                                        nullable(goal, (g) => (
+                                            <GoalListItem
+                                                createdAt={g.createdAt}
+                                                id={g.id}
+                                                state={g.state}
+                                                title={g.title}
+                                                issuer={g.activity}
+                                                owner={g.owner}
+                                                tags={g.tags}
+                                                priority={g.priority}
+                                                comments={g.comments?.length}
+                                                key={g.id}
+                                                focused={g.id === preview?.id}
+                                                onClick={onGoalPrewiewShow(g)}
+                                            />
+                                        )),
+                                    )}
+                                </StyledGoalsList>
+                            </StyledProjectGroup>
+                        ));
+                    })}
             </PageContent>
 
             {nullable(preview, (p) => (

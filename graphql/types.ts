@@ -195,6 +195,9 @@ export const Goal = objectType({
         t.field('_count', { type: GoalAggregation });
         t.boolean('_isStarred');
         t.boolean('_isWatching');
+        t.boolean('_isOwner');
+        t.boolean('_isIssuer');
+        t.boolean('_isParticipant');
     },
 });
 
@@ -202,6 +205,7 @@ export const GoalAggregation = objectType({
     name: 'GoalAggregation',
     definition(t) {
         t.int('stargizers');
+        t.int('watchers');
         t.int('comments');
     },
 });
