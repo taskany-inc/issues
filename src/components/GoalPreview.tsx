@@ -149,10 +149,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                         <Button ghost text={t(`Priority.${ip}`)} iconLeft={<StateDot hue={priorityColor} />} />
                     ))}
 
-                    {nullable(issueEstimate, (ie) => (
-                        <Button ghost text={formatEstimate(ie, locale)} />
-                    ))}
-
                     <Button
                         ghost
                         text={goal.owner?.user?.name || goal.owner?.user?.email || goal.owner?.ghost?.email}
@@ -164,6 +160,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                             />
                         }
                     />
+
+                    {nullable(issueEstimate, (ie) => (
+                        <Button ghost text={formatEstimate(ie, locale)} />
+                    ))}
 
                     <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(goal.id)}>
                         {nullable(!reactionsProps.limited, () => (
