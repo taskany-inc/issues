@@ -23,6 +23,15 @@ const nextConfig = {
 
         return config;
     },
+    async redirects() {
+        return [
+            {
+                source: '/',
+                destination: '/goals',
+                permanent: true,
+            },
+        ];
+    },
 };
 
 module.exports = withBundleAnalyzer(nextConfig);
