@@ -1,6 +1,7 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
+import { Goal as GoalModel } from '../@generated/genql';
 import {
     Goal,
     GoalUpdateInput,
@@ -10,7 +11,6 @@ import {
     GoalDependencyToggleInput,
     dependencyKind,
     UserGoalsInput,
-    Project,
     priorityKind,
     priorityColors,
 } from '../types';
@@ -21,7 +21,133 @@ const connectionMap: Record<string, string> = {
     false: 'disconnect',
 };
 
-const projectGoalsFilter = (data: {
+const goalDeepQuery = {
+    owner: {
+        include: {
+            user: true,
+            ghost: true,
+        },
+    },
+    activity: {
+        include: {
+            user: true,
+            ghost: true,
+        },
+    },
+    tags: true,
+    state: true,
+    estimate: true,
+    team: {
+        include: {
+            flow: {
+                include: {
+                    states: true,
+                },
+            },
+        },
+    },
+    project: {
+        include: {
+            flow: {
+                include: {
+                    states: true,
+                },
+            },
+            teams: true,
+        },
+    },
+    dependsOn: {
+        include: {
+            state: true,
+        },
+    },
+    relatedTo: {
+        include: {
+            state: true,
+        },
+    },
+    blocks: {
+        include: {
+            state: true,
+        },
+    },
+    comments: {
+        orderBy: {
+            createdAt: 'asc',
+        },
+        include: {
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            reactions: {
+                include: {
+                    activity: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                },
+            },
+        },
+    },
+    reactions: {
+        include: {
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+        },
+    },
+    stargizers: {
+        include: {
+            user: true,
+            ghost: true,
+        },
+    },
+    watchers: {
+        include: {
+            user: true,
+            ghost: true,
+        },
+    },
+    participants: {
+        include: {
+            user: true,
+            ghost: true,
+        },
+    },
+    _count: {
+        select: {
+            stargizers: true,
+            watchers: true,
+            comments: true,
+        },
+    },
+};
+
+const addCalclulatedGoalsFields = (goal: GoalModel, activityId: string) => {
+    const _isOwner = goal.ownerId === activityId;
+    const _isParticipant = goal.participants?.some((participant) => participant?.id === activityId);
+    const _isWatching = goal.watchers?.some((watcher) => watcher?.id === activityId);
+    const _isStarred = goal.stargizers?.some((stargizer) => stargizer?.id === activityId);
+    const _isIssuer = goal.activityId === activityId;
+
+    return {
+        _isOwner,
+        _isParticipant,
+        _isWatching,
+        _isStarred,
+        _isIssuer,
+    };
+};
+
+const goalsFilter = (data: {
     query: string;
     priority: string[];
     states: string[];
@@ -83,108 +209,159 @@ const projectGoalsFilter = (data: {
             ...tagsFilter,
             ...ownerFilter,
         },
+        orderBy: {
+            createdAt: 'asc',
+        },
     };
 };
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('userGoals', {
-        type: Project,
+        type: Goal,
         args: {
             data: nonNull(arg({ type: UserGoalsInput })),
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            return db.project.findMany({
-                where: {
-                    OR: [
-                        {
-                            activityId: activity.id,
-                        },
-                        {
-                            participants: {
-                                some: {
-                                    id: activity.id,
-                                },
-                            },
-                        },
-                        {
-                            watchers: {
-                                some: {
-                                    id: activity.id,
-                                },
-                            },
-                        },
-                        {
-                            goals: {
-                                some: {
-                                    participants: {
-                                        some: {
-                                            id: activity.id,
-                                        },
+            const uniqGoals = new Map();
+
+            const [teams, projects, goals] = await Promise.all([
+                db.team.findMany({
+                    where: {
+                        OR: [
+                            // all teams where the user is a participant
+                            {
+                                participants: {
+                                    some: {
+                                        id: activity.id,
                                     },
                                 },
                             },
-                        },
-                        {
-                            goals: {
-                                some: {
-                                    watchers: {
-                                        some: {
-                                            id: activity.id,
-                                        },
+                            // all teams where the user is a watcher
+                            {
+                                watchers: {
+                                    some: {
+                                        id: activity.id,
                                     },
                                 },
                             },
+                            // all teams where the user is owner
+                            {
+                                activityId: activity.id,
+                            },
+                        ],
+                    },
+                    include: {
+                        goals: {
+                            ...goalsFilter(data),
+                            include: {
+                                ...goalDeepQuery,
+                            },
                         },
-                    ],
-                },
-                orderBy: {
-                    createdAt: 'asc',
-                },
-                include: {
-                    goals: {
-                        ...projectGoalsFilter(data),
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                        include: {
-                            owner: {
-                                include: {
-                                    user: true,
-                                    ghost: true,
+                        projects: {
+                            include: {
+                                goals: {
+                                    ...goalsFilter(data),
+                                    include: {
+                                        ...goalDeepQuery,
+                                    },
                                 },
                             },
-                            activity: {
-                                include: {
-                                    user: true,
-                                    ghost: true,
-                                },
-                            },
-                            tags: true,
-                            state: true,
-                            project: true,
-                            estimate: true,
-                            dependsOn: {
-                                include: {
-                                    state: true,
-                                },
-                            },
-                            relatedTo: {
-                                include: {
-                                    state: true,
-                                },
-                            },
-                            blocks: {
-                                include: {
-                                    state: true,
-                                },
-                            },
-                            comments: true,
                         },
                     },
-                },
+                }),
+
+                db.project.findMany({
+                    where: {
+                        OR: [
+                            // all projects where the user is a participant
+                            {
+                                participants: {
+                                    some: {
+                                        id: activity.id,
+                                    },
+                                },
+                            },
+                            // all projects where the user is a watcher
+                            {
+                                watchers: {
+                                    some: {
+                                        id: activity.id,
+                                    },
+                                },
+                            },
+                            // all projects where the user is owner
+                            {
+                                activityId: activity.id,
+                            },
+                        ],
+                    },
+                    include: {
+                        goals: {
+                            ...goalsFilter(data),
+                            include: {
+                                ...goalDeepQuery,
+                            },
+                        },
+                    },
+                }),
+
+                db.goal.findMany({
+                    where: {
+                        OR: [
+                            // all goals where the user is a participant
+                            {
+                                participants: {
+                                    some: {
+                                        id: activity.id,
+                                    },
+                                },
+                            },
+                            // all goals where the user is a watcher
+                            {
+                                watchers: {
+                                    some: {
+                                        id: activity.id,
+                                    },
+                                },
+                            },
+                            // all goals where the user is issuer
+                            {
+                                activityId: activity.id,
+                            },
+                            // all goals where the user is owner
+                            {
+                                ownerId: activity.id,
+                            },
+                        ],
+                    },
+                    ...goalsFilter(data),
+                    include: {
+                        ...goalDeepQuery,
+                    },
+                }),
+            ]);
+
+            teams.forEach((team) => {
+                team.goals.forEach((goal) => uniqGoals.set(goal.id, goal));
+                team.projects.forEach((project) => {
+                    project.goals.forEach((goal) => uniqGoals.set(goal.id, goal));
+                });
             });
+
+            projects.forEach((project) => {
+                project.goals.forEach((goal) => uniqGoals.set(goal.id, goal));
+            });
+
+            goals.forEach((goal) => uniqGoals.set(goal.id, goal));
+
+            const res = Array.from(uniqGoals.values()).map((goal) => ({
+                ...goal,
+                ...addCalclulatedGoalsFields(goal, activity.id),
+            }));
+
+            return res;
         },
     });
 
