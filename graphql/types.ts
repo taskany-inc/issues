@@ -460,6 +460,7 @@ export const ProjectGoalsInput = inputObjectType({
         t.nonNull.string('key');
         t.nonNull.int('pageSize');
         t.nonNull.int('offset');
+        t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('owner');
@@ -470,6 +471,7 @@ export const ProjectGoalsInput = inputObjectType({
 export const UserGoalsInput = inputObjectType({
     name: 'UserGoalsInput',
     definition(t) {
+        t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('owner');
@@ -481,6 +483,7 @@ export const ProjectGoalsCountInput = inputObjectType({
     name: 'ProjectGoalsCountInput',
     definition(t) {
         t.nonNull.string('key');
+        t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('owner');
@@ -525,6 +528,7 @@ export const TeamProjectsInput = inputObjectType({
     name: 'TeamProjectsInput',
     definition(t) {
         t.field(TeamModel.slug);
+        t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('owner');
@@ -536,6 +540,7 @@ export const TeamGoalsInput = inputObjectType({
     name: 'TeamGoalsInput',
     definition(t) {
         t.field(TeamModel.slug);
+        t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('owner');

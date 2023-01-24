@@ -21,7 +21,15 @@ const connectionMap: Record<string, string> = {
     false: 'disconnect',
 };
 
-const projectGoalsFilter = (data: { query: string; states: string[]; tags: string[]; owner: string[] }): any => {
+const projectGoalsFilter = (data: {
+    query: string;
+    priority: string[];
+    states: string[];
+    tags: string[];
+    owner: string[];
+}): any => {
+    const priorityFilter = data.priority.length ? { priority: { in: data.priority } } : {};
+
     const statesFilter = data.states.length
         ? {
               state: {
@@ -70,6 +78,7 @@ const projectGoalsFilter = (data: { query: string; states: string[]; tags: strin
                     },
                 },
             ],
+            ...priorityFilter,
             ...statesFilter,
             ...tagsFilter,
             ...ownerFilter,

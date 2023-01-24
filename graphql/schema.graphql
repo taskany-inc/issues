@@ -248,6 +248,7 @@ input ProjectDelete {
 input ProjectGoalsCountInput {
   key: String!
   owner: [String!]!
+  priority: [String!]!
   query: String!
   states: [String!]!
   tags: [String!]!
@@ -258,6 +259,7 @@ input ProjectGoalsInput {
   offset: Int!
   owner: [String!]!
   pageSize: Int!
+  priority: [String!]!
   query: String!
   states: [String!]!
   tags: [String!]!
@@ -406,6 +408,7 @@ input TeamDelete {
 
 input TeamGoalsInput {
   owner: [String!]!
+  priority: [String!]!
   query: String!
   slug: String!
   states: [String!]!
@@ -414,6 +417,7 @@ input TeamGoalsInput {
 
 input TeamProjectsInput {
   owner: [String!]!
+  priority: [String!]!
   query: String!
   slug: String!
   states: [String!]!
@@ -448,6 +452,7 @@ type User {
 
 input UserGoalsInput {
   owner: [String!]!
+  priority: [String!]!
   query: String!
   states: [String!]!
   tags: [String!]!
