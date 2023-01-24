@@ -22,10 +22,13 @@ const connectionMap: Record<string, string> = {
 const projectGoalsFilter = (data: {
     key: string;
     query: string;
+    priority: string[];
     states: string[];
     tags: string[];
     owner: string[];
 }): any => {
+    const priorityFilter = data.priority.length ? { priority: { in: data.priority } } : {};
+
     const statesFilter = data.states.length
         ? {
               state: {
@@ -77,6 +80,7 @@ const projectGoalsFilter = (data: {
             project: {
                 key: data.key,
             },
+            ...priorityFilter,
             ...statesFilter,
             ...tagsFilter,
             ...ownerFilter,
