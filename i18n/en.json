@@ -382,20 +382,19 @@
         "State": "State",
         "Owner": "Owner",
         "Limit": "Limit",
-        "Tags": "Tags"
-    },
-    "PriorityDropdown": {
-        "Priority": {
-            "Priority": "Priority",
-            "Highest": "Highest",
-            "High": "High",
-            "Medium": "Medium",
-            "Low": "Low",
-            "Lowest": "Lowest"
-        }
+        "Tags": "Tags",
+        "Priority": "Priority"
     },
     "GoalParentComboBox": {
         "project": "Project",
         "team": "Team"
+    },
+    "Priority": {
+        "Priority": "Priority",
+        "Highest": "Highest",
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low",
+        "Lowest": "Lowest"
     }
 }

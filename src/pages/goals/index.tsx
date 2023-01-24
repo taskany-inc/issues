@@ -24,12 +24,13 @@ const GoalPreview = dynamic(() => import('../../components/GoalPreview'));
 const refreshInterval = 3000;
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
-const fetcher = createFetcher((_, states = [], query = '', tags = [], owner = []) => ({
+const fetcher = createFetcher((_, priority = [], states = [], query = '', tags = [], owner = []) => ({
     goalPriorityColors: true,
     goalPriorityKind: true,
     userGoals: [
         {
             data: {
+                priority,
                 states,
                 tags,
                 owner,
@@ -116,6 +117,7 @@ export const getServerSideProps = declareSsrProps(
         return {
             ssrData: await fetcher(
                 user,
+                parseQueryParam(query.priority as string),
                 parseQueryParam(query.state as string),
                 parseQueryParam(query.search as string).toString(),
                 parseQueryParam(query.tags as string),
@@ -134,6 +136,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
     const mounted = useMounted(refreshInterval);
     const router = useRouter();
 
+    const [priorityFilter, setPriorityFilter] = useState<string[]>(parseQueryParam(router.query.priority as string));
     const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
     const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));
     const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user as string));
@@ -143,7 +146,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
     const [preview, setPreview] = useState<Goal | null>(null);
 
     const { data } = useSWR(
-        mounted ? [user, stateFilter, fulltextFilter, tagsFilter, ownerFilter, limitFilter] : null,
+        mounted ? [user, priorityFilter, stateFilter, fulltextFilter, tagsFilter, ownerFilter, limitFilter] : null,
         (...args) => fetcher(...args),
         {
             refreshInterval,
@@ -184,7 +187,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
         ];
     }, [projects]);
 
-    useUrlParams(stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
+    useUrlParams(priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
 
     const onGoalPrewiewShow = useCallback(
         (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
@@ -210,12 +213,14 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
                 flowId={projects[0]?.flowId}
                 users={usersFilterData}
                 tags={tagsFilterData}
+                priorityFilter={priorityFilter}
                 stateFilter={stateFilter}
                 tagsFilter={tagsFilter}
                 ownerFilter={ownerFilter}
                 searchFilter={fulltextFilter}
                 limitFilter={limitFilter}
                 onSearchChange={onSearchChange}
+                onPriorityChange={setPriorityFilter}
                 onStateChange={setStateFilter}
                 onUserChange={setOwnerFilter}
                 onTagChange={setTagsFilter}

@@ -8,6 +8,7 @@ import { useMounted } from './useMounted';
 const refreshInterval = 3000;
 
 export const useUrlParams = (
+    priorityFilter: string[],
     stateFilter: string[],
     tagsFilter: string[],
     ownerFilter: string[],
@@ -24,12 +25,16 @@ export const useUrlParams = (
             return;
         }
         if (
+            priorityFilter.length > 0 ||
             stateFilter.length > 0 ||
             tagsFilter.length > 0 ||
             ownerFilter.length > 0 ||
             fulltextFilter.length > 0 ||
             limitFilter !== defaultLimit
         ) {
+            priorityFilter.length > 0
+                ? urlParams.set('priority', Array.from(priorityFilter).toString())
+                : urlParams.delete('priority');
             stateFilter.length > 0
                 ? urlParams.set('state', Array.from(stateFilter).toString())
                 : urlParams.delete('state');
@@ -43,5 +48,5 @@ export const useUrlParams = (
         } else {
             window.history.pushState({ path: newurl }, '', newurl);
         }
-    }, [stateFilter, mounted, ownerFilter, tagsFilter, limitFilter, fulltextFilter, router.query]);
+    }, [priorityFilter, stateFilter, mounted, ownerFilter, tagsFilter, limitFilter, fulltextFilter, router.query]);
 };

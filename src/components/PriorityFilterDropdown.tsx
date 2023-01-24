@@ -1,26 +1,24 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { useTranslations } from 'next-intl';
-import dynamic from 'next/dynamic';
 import colorLayer from 'color-layer';
+import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Priority } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Button } from './Button';
-import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
+import { FiltersMenuItem } from './FiltersMenuItem';
 
 const Dropdown = dynamic(() => import('./Dropdown'));
 
-interface PriorityDropdownProps {
-    text: React.ComponentProps<typeof Button>['text'];
-    value?: string | null;
+interface PriorityFilterDropdownProps {
+    text: React.ComponentProps<typeof Dropdown>['text'];
+    value?: Array<string>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
-    error?: React.ComponentProps<typeof Dropdown>['error'];
 
-    onChange?: (priority: Priority) => void;
+    onChange?: (selected: string[]) => void;
 }
 
 const fetcher = createFetcher(() => ({
@@ -28,10 +26,11 @@ const fetcher = createFetcher(() => ({
     goalPriorityColors: true,
 }));
 
-export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
-    ({ text, value, disabled, error, onChange }, ref) => {
+export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityFilterDropdownProps>(
+    ({ text, value, disabled, onChange }, ref) => {
         const t = useTranslations('Priority');
         const { user, themeId } = usePageContext();
+        const [selected, setSelected] = useState<Set<string>>(new Set(value));
 
         const { data } = useSWR('priority', () => fetcher(user));
 
@@ -40,35 +39,42 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
             [themeId, data?.goalPriorityColors],
         );
 
-        const colorIndex = data?.goalPriorityKind?.indexOf(value || '') ?? -1;
+        const onPriorityClick = useCallback(
+            (p: Priority) => {
+                selected.has(p) ? selected.delete(p) : selected.add(p);
+                const newSelected = new Set(selected);
+                setSelected(newSelected);
+
+                onChange?.(Array.from(newSelected));
+            },
+            [onChange, selected],
+        );
 
         return (
             <Dropdown
                 ref={ref}
-                error={error}
-                text={value || text}
+                text={text}
                 value={value}
-                onChange={onChange}
+                onChange={onPriorityClick}
                 items={data?.goalPriorityKind}
                 disabled={disabled}
                 renderTrigger={(props) => (
-                    <Button
+                    <FiltersMenuItem
                         ref={props.ref}
-                        ghost
-                        onClick={props.onClick}
+                        active={Boolean(Array.from(selected).length)}
                         disabled={props.disabled}
-                        iconLeft={
-                            colorIndex !== -1 ? <StateDot hue={data?.goalPriorityColors?.[colorIndex]} /> : undefined
-                        }
-                    />
+                        onClick={props.onClick}
+                    >
+                        {props.text}
+                    </FiltersMenuItem>
                 )}
                 renderItem={(props) => (
                     <ColorizedMenuItem
                         key={props.item}
-                        hue={data?.goalPriorityColors?.[props.index]}
+                        hue={data?.goalPriorityColors?.[data?.goalPriorityKind?.indexOf(props.item || '') ?? -1]}
                         title={t(props.item)}
                         hoverColor={colors[props.index]}
-                        focused={props.cursor === props.index}
+                        checked={selected?.has(props.item)}
                         onClick={props.onClick}
                     />
                 )}
