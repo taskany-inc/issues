@@ -147,13 +147,16 @@ const addCalclulatedGoalsFields = (goal: GoalModel, activityId: string) => {
     };
 };
 
-const goalsFilter = (data: {
-    query: string;
-    priority: string[];
-    states: string[];
-    tags: string[];
-    owner: string[];
-}): any => {
+const goalsFilter = (
+    data: {
+        query: string;
+        priority: string[];
+        states: string[];
+        tags: string[];
+        owner: string[];
+    },
+    extra: any = {},
+): any => {
     const priorityFilter = data.priority.length ? { priority: { in: data.priority } } : {};
 
     const statesFilter = data.states.length
@@ -208,6 +211,7 @@ const goalsFilter = (data: {
             ...statesFilter,
             ...tagsFilter,
             ...ownerFilter,
+            ...extra,
         },
         orderBy: {
             createdAt: 'asc',
@@ -308,35 +312,36 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 }),
 
                 db.goal.findMany({
-                    where: {
-                        OR: [
-                            // all goals where the user is a participant
-                            {
-                                participants: {
-                                    some: {
-                                        id: activity.id,
+                    ...goalsFilter(data, {
+                        AND: {
+                            OR: [
+                                // all goals where the user is a participant
+                                {
+                                    participants: {
+                                        some: {
+                                            id: activity.id,
+                                        },
                                     },
                                 },
-                            },
-                            // all goals where the user is a watcher
-                            {
-                                watchers: {
-                                    some: {
-                                        id: activity.id,
+                                // all goals where the user is a watcher
+                                {
+                                    watchers: {
+                                        some: {
+                                            id: activity.id,
+                                        },
                                     },
                                 },
-                            },
-                            // all goals where the user is issuer
-                            {
-                                activityId: activity.id,
-                            },
-                            // all goals where the user is owner
-                            {
-                                ownerId: activity.id,
-                            },
-                        ],
-                    },
-                    ...goalsFilter(data),
+                                // all goals where the user is issuer
+                                {
+                                    activityId: activity.id,
+                                },
+                                // all goals where the user is owner
+                                {
+                                    ownerId: activity.id,
+                                },
+                            ],
+                        },
+                    }),
                     include: {
                         ...goalDeepQuery,
                     },
