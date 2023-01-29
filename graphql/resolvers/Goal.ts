@@ -772,9 +772,59 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 switch (data.kind) {
                     case 'project':
+                        if (actualGoal.kind === 'team') {
+                            await db.team.update({
+                                where: {
+                                    id: actualGoal.teamId!,
+                                },
+                                data: {
+                                    goals: {
+                                        disconnect: [{ id: actualGoal.id }],
+                                    },
+                                },
+                            });
+
+                            const project = await db.project.findUnique({
+                                where: { id: data.parent! },
+                            });
+
+                            if (!project) return null;
+
+                            const pre = `${project.key}-`;
+
+                            const lastGoal = await db.goal.findFirst({
+                                where: { id: { contains: pre } },
+                                orderBy: { createdAt: 'desc' },
+                            });
+
+                            const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
+                            const id = `${pre}${numId}`;
+
+                            await db.goal.update({
+                                where: { id: actualGoal.id },
+                                data: {
+                                    kind: 'project',
+                                    id,
+                                },
+                            });
+
+                            await db.project.update({
+                                where: {
+                                    id: data.parent!,
+                                },
+                                data: {
+                                    goals: {
+                                        connect: [{ id }],
+                                    },
+                                },
+                            });
+
+                            data.id = id;
+                        }
+
                         await db.project.update({
                             where: {
-                                id: actualGoal.projectId!,
+                                id: data.parent!,
                             },
                             data: {
                                 tags: data.tags
@@ -790,9 +840,59 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         });
                         break;
                     case 'team':
+                        if (actualGoal.kind === 'project') {
+                            await db.project.update({
+                                where: {
+                                    id: actualGoal.projectId!,
+                                },
+                                data: {
+                                    goals: {
+                                        disconnect: [{ id: actualGoal.id }],
+                                    },
+                                },
+                            });
+
+                            const team = await db.team.findUnique({
+                                where: { id: data.parent! },
+                            });
+
+                            if (!team) return null;
+
+                            const pre = `${team.key}-`;
+
+                            const lastGoal = await db.goal.findFirst({
+                                where: { id: { contains: pre } },
+                                orderBy: { createdAt: 'desc' },
+                            });
+
+                            const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
+                            const id = `${pre}${numId}`;
+
+                            await db.goal.update({
+                                where: { id: actualGoal.id },
+                                data: {
+                                    kind: 'team',
+                                    id,
+                                },
+                            });
+
+                            await db.team.update({
+                                where: {
+                                    id: data.parent!,
+                                },
+                                data: {
+                                    goals: {
+                                        connect: [{ id }],
+                                    },
+                                },
+                            });
+
+                            data.id = id;
+                        }
+
                         await db.team.update({
                             where: {
-                                id: actualGoal.teamId!,
+                                id: data.parent!,
                             },
                             data: {
                                 participants: {
