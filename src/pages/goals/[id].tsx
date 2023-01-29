@@ -39,6 +39,7 @@ import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { WatchButton } from '../../components/WatchButton';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { StarButton } from '../../components/StarButton';
+import { useRouter } from '../../hooks/router';
 
 const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
@@ -112,6 +113,7 @@ const GoalPage = ({
     ssrData,
     params: { id },
 }: ExternalPageProps<{ goal: Goal; goalPriorityKind: string[]; goalPriorityColors: number[] }, { id: string }>) => {
+    const router = useRouter();
     const t = useTranslations('goals.id');
     const mounted = useMounted(refreshInterval);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
@@ -222,10 +224,18 @@ const GoalPage = ({
     }, [refresh]);
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
-    const onGoalEdit = useCallback(() => {
-        setGoalEditModalVisible(false);
-        refresh();
-    }, [refresh]);
+    const onGoalEdit = useCallback(
+        (id?: string) => {
+            setGoalEditModalVisible(false);
+
+            if (goal.id !== id) {
+                router.goal(id);
+            } else {
+                refresh();
+            }
+        },
+        [refresh, goal.id, router],
+    );
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
     }, []);

@@ -15,6 +15,8 @@ interface GoalEditFormProps {
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const t = useTranslations('goals.edit');
 
+    console.log(goal);
+
     const updateGoal = async (form: GoalFormType) => {
         const promise = gql.mutation({
             updateGoal: [
