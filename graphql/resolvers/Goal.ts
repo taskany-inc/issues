@@ -413,6 +413,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                                     states: true,
                                 },
                             },
+                            teams: true,
                         },
                     },
                     reactions: {

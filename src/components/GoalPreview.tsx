@@ -33,6 +33,7 @@ import { CommentView } from './CommentView';
 import { ActivityFeed } from './ActivityFeed';
 import { Reactions } from './Reactions';
 import ReactionsDropdown from './ReactionsDropdown';
+import { Dot } from './Dot';
 
 const StateSwitch = dynamic(() => import('./StateSwitch'));
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm'));
@@ -128,6 +129,13 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
 
                 {nullable(goal.team, (team) => (
                     <IssueParent kind="team" as="span" mode="compact" parent={team} size="m" />
+                ))}
+
+                {nullable(goal.project?.teams, (teams) => (
+                    <>
+                        <IssueParent kind="team" as="span" mode="compact" parent={teams} size="m" />
+                        <Dot />
+                    </>
                 ))}
 
                 {nullable(goal.project, (project) => (

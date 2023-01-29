@@ -61,6 +61,12 @@ export const goalFetcher = createFetcher((_, id: string) => ({
                         hue: true,
                     },
                 },
+                teams: {
+                    id: true,
+                    key: true,
+                    slug: true,
+                    title: true,
+                },
             },
             activity: {
                 id: true,
