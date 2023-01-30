@@ -778,7 +778,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 switch (data.kind) {
                     case 'project':
-                        if (actualGoal.projectId !== data.parent) {
+                        if (actualGoal.kind === 'project' && actualGoal.projectId !== data.parent) {
                             await db.project.update({
                                 where: {
                                     id: actualGoal.projectId!,
