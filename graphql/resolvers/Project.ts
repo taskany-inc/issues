@@ -134,11 +134,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     },
                     stargizers: true,
                     watchers: true,
-                    teams: {
-                        include: {
-                            _count: true,
-                        },
-                    },
+                    teams: true,
                     tags: true,
                     participants: {
                         include: {
@@ -155,6 +151,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     _count: {
                         select: {
                             stargizers: true,
+                            teams: true,
                         },
                     },
                 },
@@ -314,13 +311,31 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: ProjectUpdateInput })),
         },
-        resolve: async (_, { data: { id, ...data } }, { db, activity }) => {
+        resolve: async (_, { data: { id, teams, ...data } }, { db, activity }) => {
             if (!activity) return null;
+
+            const project = await db.project.findUnique({
+                where: { id },
+                include: {
+                    teams: true,
+                },
+            });
+
+            if (!project) return null;
+
+            const teamsToConnect = teams.filter((teamId) => !project.teams.some((team) => team.id === teamId));
+            const teamsToDisconnect = project.teams.filter((team) => !teams.includes(team.id));
 
             try {
                 return db.project.update({
                     where: { id },
-                    data,
+                    data: {
+                        ...data,
+                        teams: {
+                            connect: teamsToConnect.map((id) => ({ id })),
+                            disconnect: teamsToDisconnect.map((team) => ({ id: team.id })),
+                        },
+                    },
                 });
 
                 // await mailServer.sendMail({

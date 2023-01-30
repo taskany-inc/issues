@@ -35,6 +35,14 @@ export const updateProjectSchemaProvider = (t: KeySet) =>
                 message: t("Project's title must be longer than 2 symbols"),
             }),
         description: z.string().optional(),
+        teams: z
+            .array(
+                z.object({
+                    id: z.number(),
+                    title: z.string(),
+                }),
+            )
+            .optional(),
     });
 
 export type CreateProjectFormType = z.infer<ReturnType<typeof createProjectSchemaProvider>>;
@@ -79,7 +87,9 @@ export const useProjectResource = (id: number) => {
                     {
                         data: {
                             id,
-                            ...data,
+                            title: data.title,
+                            description: data.description,
+                            teams: data.teams?.map((team) => team.id) || [],
                         },
                     },
                     {

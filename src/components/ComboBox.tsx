@@ -49,6 +49,7 @@ interface ComboBoxProps {
     };
     maxWidth?: React.ComponentProps<typeof Popup>['maxWidth'];
     minWidth?: React.ComponentProps<typeof Popup>['minWidth'];
+    className?: string;
 
     onChange?: (value: any) => void;
 }
@@ -79,6 +80,7 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
             error,
             maxWidth = 250,
             minWidth = 150,
+            className,
             renderItem,
             renderTrigger,
             renderInput,
@@ -149,7 +151,7 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
         );
 
         return (
-            <StyledComboBox ref={ref}>
+            <StyledComboBox ref={ref} className={className}>
                 {nullable(error, (err) => (
                     <>
                         <StyledErrorTrigger
