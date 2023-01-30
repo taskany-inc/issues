@@ -434,7 +434,7 @@ input TeamUpdateInput {
   description: String
   id: Int!
   parent: Int
-  projects: [String!]
+  projects: [Int!]!
   title: String!
 }
 

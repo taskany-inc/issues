@@ -95,6 +95,10 @@ export const useProjectResource = (id: number) => {
                     {
                         title: true,
                         description: true,
+                        teams: {
+                            id: true,
+                            title: true,
+                        },
                     },
                 ],
             });

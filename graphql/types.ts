@@ -525,7 +525,7 @@ export const TeamUpdateInput = inputObjectType({
         t.field(TeamModel.description);
         t.int('parent');
         t.list.nonNull.int('children');
-        t.list.nonNull.string('projects');
+        t.nonNull.list.nonNull.int('projects');
     },
 });
 

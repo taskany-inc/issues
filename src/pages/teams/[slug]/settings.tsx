@@ -1,29 +1,29 @@
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import toast from 'react-hot-toast';
 
 import { createFetcher } from '../../../utils/createFetcher';
-import { Project, Team } from '../../../../graphql/@generated/genql';
+import { Team } from '../../../../graphql/@generated/genql';
 import { Button } from '../../../components/Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { PageSep } from '../../../components/PageSep';
 import { SettingsCard, SettingsContent } from '../../../components/SettingsContent';
 import { Form } from '../../../components/Form';
 import { Fieldset } from '../../../components/Fieldset';
-import { shallowEqual } from '../../../utils/shallowEqual';
 import { gql } from '../../../utils/gql';
 import { FormInput } from '../../../components/FormInput';
 import { FormAction, FormActions } from '../../../components/FormActions';
 import { TeamPageLayout } from '../../../components/TeamPageLayout';
 import { Page } from '../../../components/Page';
+import { FormMultiInput } from '../../../components/FormMultiInput';
 
 const refreshInterval = 3000;
 
-const fetcher = createFetcher((_, slug: string) => ({
+const teamFetcher = createFetcher((_, slug: string) => ({
     team: [
         {
             slug,
@@ -35,6 +35,7 @@ const fetcher = createFetcher((_, slug: string) => ({
             description: true,
             activityId: true,
             projects: {
+                id: true,
                 key: true,
                 title: true,
                 description: true,
@@ -85,10 +86,23 @@ const fetcher = createFetcher((_, slug: string) => ({
     ],
 }));
 
+const projectsFetcher = createFetcher((_, query: string) => ({
+    projectCompletion: [
+        {
+            query,
+        },
+        {
+            id: true,
+            title: true,
+            description: true,
+        },
+    ],
+}));
+
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { slug } }) => {
         const ssrProps = {
-            ssrData: await fetcher(user, slug),
+            ssrData: await teamFetcher(user, slug),
         };
 
         if (!ssrProps.ssrData.team) {
@@ -115,6 +129,14 @@ const schemaProvider = (t: (key: string) => string) =>
                 message: t("settings.Team's title must be longer than 2 symbols"),
             }),
         description: z.string().optional(),
+        projects: z
+            .array(
+                z.object({
+                    id: z.number(),
+                    title: z.string(),
+                }),
+            )
+            .optional(),
     });
 
 type FormType = z.infer<ReturnType<typeof schemaProvider>>;
@@ -129,18 +151,19 @@ const TeamSettingsPage = ({
     const t = useTranslations('teams');
     const schema = schemaProvider(t);
 
-    const { data } = useSWR([user, slug], (...args) => fetcher(...args), {
+    const { data } = useSWR([user, slug], (...args) => teamFetcher(...args), {
         refreshInterval,
     });
     const team: Team = data?.team ?? ssrData.team;
 
-    const [actualFields, setActualFields] = useState<Pick<Project, 'title' | 'description'>>({
+    const [actualFields, setActualFields] = useState<Pick<Team, 'title' | 'description' | 'projects'>>({
         title: team.title,
         description: team.description || '',
+        projects: team.projects ?? [],
     });
     const [formChanged, setFormChanged] = useState(false);
 
-    const { handleSubmit, watch, register, formState } = useForm<FormType>({
+    const { handleSubmit, watch, register, control, formState } = useForm<FormType>({
         resolver: zodResolver(schema),
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -151,7 +174,20 @@ const TeamSettingsPage = ({
     const formValues = watch();
 
     useEffect(() => {
-        setFormChanged(!shallowEqual(formValues, actualFields));
+        if (
+            formValues.title !== actualFields.title ||
+            formValues.description !== actualFields.description ||
+            formValues.projects
+                ?.map((t) => t.id)
+                .sort()
+                .join() !==
+                actualFields.projects
+                    ?.map((p) => p!.id)
+                    .sort()
+                    .join()
+        ) {
+            setFormChanged(true);
+        }
     }, [formValues, actualFields]);
 
     const update = async (data: FormType) => {
@@ -160,12 +196,18 @@ const TeamSettingsPage = ({
                 {
                     data: {
                         id: team.id,
-                        ...data,
+                        title: data.title,
+                        description: data.description,
+                        projects: data.projects?.map((project) => project.id) || [],
                     },
                 },
                 {
                     title: true,
                     description: true,
+                    projects: {
+                        id: true,
+                        title: true,
+                    },
                 },
             ],
         });
@@ -178,8 +220,14 @@ const TeamSettingsPage = ({
 
         const res = await promise;
 
+        // @ts-ignore
         res.updateTeam && setActualFields(res.updateTeam);
+        setFormChanged(false);
     };
+
+    const teamProjectsIds = formValues.projects?.map((project) => project!.id) ?? [];
+    const [projectsQuery, setProjectsQuery] = useState('');
+    const { data: projects } = useSWR(projectsQuery, (q) => projectsFetcher(user, q));
 
     return (
         <Page
@@ -210,6 +258,22 @@ const TeamSettingsPage = ({
                                     label={t('settings.Description')}
                                     flat="both"
                                     error={formState.isSubmitted ? formState.errors.description : undefined}
+                                />
+
+                                <Controller
+                                    name="projects"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <FormMultiInput
+                                            label={t('Projects')}
+                                            query={projectsQuery}
+                                            items={projects?.projectCompletion?.filter(
+                                                (p) => !teamProjectsIds.includes(p.id),
+                                            )}
+                                            onInput={(q) => setProjectsQuery(q)}
+                                            {...field}
+                                        />
+                                    )}
                                 />
                             </Fieldset>
 

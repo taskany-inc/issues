@@ -410,7 +410,19 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 }
             }
 
-            // TODO: filter projects and children to disconnect
+            const team = await db.team.findUnique({
+                where: { id },
+                include: {
+                    projects: true,
+                },
+            });
+
+            if (!team) return null;
+
+            const projectsToConnect = projects.filter(
+                (projectId) => !team.projects.some((project) => project.id === projectId),
+            );
+            const projectsToDisconnect = team.projects.filter((project) => !projects.includes(project.id));
 
             try {
                 return db.team.update({
@@ -421,8 +433,12 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                             connect: children?.map((child) => ({ id: child })),
                         },
                         projects: {
-                            connect: projects?.map((p) => ({ key: p })),
+                            connect: projectsToConnect.map((id) => ({ id })),
+                            disconnect: projectsToDisconnect.map((project) => ({ id: project.id })),
                         },
+                    },
+                    include: {
+                        projects: true,
                     },
                 });
 
