@@ -336,6 +336,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                             disconnect: teamsToDisconnect.map((team) => ({ id: team.id })),
                         },
                     },
+                    include: {
+                        teams: true,
+                    },
                 });
 
                 // await mailServer.sendMail({

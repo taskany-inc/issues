@@ -188,6 +188,7 @@ const ProjectSettingsPage = ({
     const onProjectUpdate = useCallback((data: UpdateProjectFormType) => {
         // @ts-ignore
         setActualFields(data);
+        setFormChanged(false);
     }, []);
 
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
@@ -276,7 +277,7 @@ const ProjectSettingsPage = ({
                                     control={control}
                                     render={({ field }) => (
                                         <FormMultiInput
-                                            label="Teams"
+                                            label={t('Teams')}
                                             query={teamsQuery}
                                             items={teams?.teamCompletion?.filter(
                                                 (t) => !projectTeamsIds.includes(t.id),
