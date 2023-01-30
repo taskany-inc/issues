@@ -261,9 +261,8 @@ const GoalPage = ({
                         <IssueParent kind="team" parent={team} />
                     ))}
 
-                    {nullable(goal.project?.teams, (teams) => (
-                        <IssueParent kind="team" parent={teams} />
-                    ))}
+                    {Boolean(goal.project?.teams?.length) &&
+                        nullable(goal.project?.teams, (teams) => <IssueParent kind="team" parent={teams} />)}
 
                     {nullable(goal.project, (project) => (
                         <IssueParent kind="project" parent={project} />
