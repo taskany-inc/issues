@@ -49,7 +49,6 @@ const StyledFormInputContainer = styled.div<{ flat: FormInputProps['flat'] }>`
     font-weight: 600;
     font-size: 22px;
     width: 100%;
-    box-sizing: border-box;
 
     ${({ flat }) =>
         flat === 'top' &&

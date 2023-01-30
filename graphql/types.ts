@@ -448,6 +448,7 @@ export const ProjectUpdateInput = inputObjectType({
         t.field(ProjectModel.id);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
+        t.nonNull.list.nonNull.int('teams');
     },
 });
 

@@ -1,7 +1,7 @@
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
 
@@ -14,7 +14,6 @@ import { useRouter } from '../../../hooks/router';
 import { SettingsCard, SettingsContent } from '../../../components/SettingsContent';
 import { Form } from '../../../components/Form';
 import { Fieldset } from '../../../components/Fieldset';
-import { shallowEqual } from '../../../utils/shallowEqual';
 import { FormInput } from '../../../components/FormInput';
 import { FormAction, FormActions } from '../../../components/FormActions';
 import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
@@ -31,12 +30,13 @@ import {
 } from '../../../hooks/useProjectResource';
 import { errorsProvider } from '../../../utils/forms';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { FormMultiInput } from '../../../components/FormMultiInput';
 
 const ModalOnEvent = dynamic(() => import('../../../components/ModalOnEvent'));
 
 const refreshInterval = 3000;
 
-const fetcher = createFetcher((_, key: string) => ({
+const projectFetcher = createFetcher((_, key: string) => ({
     project: [
         {
             key,
@@ -71,6 +71,35 @@ const fetcher = createFetcher((_, key: string) => ({
                     email: true,
                 },
             },
+            teams: {
+                id: true,
+                title: true,
+                key: true,
+                slug: true,
+            },
+        },
+    ],
+}));
+
+const teamsFetcher = createFetcher((_, query: string) => ({
+    teamCompletion: [
+        {
+            query,
+        },
+        {
+            id: true,
+            title: true,
+            description: true,
+            flowId: true,
+            flow: {
+                id: true,
+                title: true,
+                states: {
+                    id: true,
+                    title: true,
+                    default: true,
+                },
+            },
         },
     ],
 }));
@@ -78,7 +107,7 @@ const fetcher = createFetcher((_, key: string) => ({
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key } }) => {
         const ssrProps = {
-            ssrData: await fetcher(user, key),
+            ssrData: await projectFetcher(user, key),
         };
 
         if (!ssrProps.ssrData.project) {
@@ -107,7 +136,7 @@ const ProjectSettingsPage = ({
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
-    const { data } = useSWR([user, key], (...args) => fetcher(...args), {
+    const { data } = useSWR([user, key], (...args) => projectFetcher(...args), {
         refreshInterval,
     });
     const project = data?.project ?? ssrData.project;
@@ -115,9 +144,10 @@ const ProjectSettingsPage = ({
     const { updateProject, deleteProject } = useProjectResource(project.id);
     const schema = updateProjectSchemaProvider(t);
 
-    const [actualFields, setActualFields] = useState<Pick<Project, 'title' | 'description'>>({
+    const [actualFields, setActualFields] = useState<Pick<Project, 'title' | 'description' | 'teams'>>({
         title: project.title,
         description: project.description ?? '',
+        teams: project.teams ?? [],
     });
 
     const [formChanged, setFormChanged] = useState(false);
@@ -125,6 +155,7 @@ const ProjectSettingsPage = ({
         watch,
         handleSubmit,
         register,
+        control,
         formState: { errors, isSubmitted },
     } = useForm<UpdateProjectFormType>({
         resolver: zodResolver(schema),
@@ -138,10 +169,24 @@ const ProjectSettingsPage = ({
     const formValues = watch();
 
     useEffect(() => {
-        setFormChanged(!shallowEqual(formValues, actualFields));
+        if (
+            formValues.title !== actualFields.title ||
+            formValues.description !== actualFields.description ||
+            formValues.teams
+                ?.map((t) => t.id)
+                .sort()
+                .join() !==
+                actualFields.teams
+                    ?.map((t) => t!.id)
+                    .sort()
+                    .join()
+        ) {
+            setFormChanged(true);
+        }
     }, [formValues, actualFields]);
 
     const onProjectUpdate = useCallback((data: UpdateProjectFormType) => {
+        // @ts-ignore
         setActualFields(data);
     }, []);
 
@@ -183,6 +228,10 @@ const ProjectSettingsPage = ({
         setLastProjectCache,
     ]);
 
+    const projectTeamsIds = formValues.teams?.map((team) => team!.id) ?? [];
+    const [teamsQuery, setTeamsQuery] = useState('');
+    const { data: teams } = useSWR(teamsQuery, (q) => teamsFetcher(user, q));
+
     return (
         <Page
             user={user}
@@ -220,6 +269,22 @@ const ProjectSettingsPage = ({
                                     label={t('settings.Description')}
                                     flat="both"
                                     error={errorsResolver('description')}
+                                />
+
+                                <Controller
+                                    name="teams"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <FormMultiInput
+                                            label="Teams"
+                                            query={teamsQuery}
+                                            items={teams?.teamCompletion?.filter(
+                                                (t) => !projectTeamsIds.includes(t.id),
+                                            )}
+                                            onInput={(q) => setTeamsQuery(q)}
+                                            {...field}
+                                        />
+                                    )}
                                 />
                             </Fieldset>
 
