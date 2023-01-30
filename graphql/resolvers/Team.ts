@@ -75,6 +75,22 @@ const projectGoalsFilter = (
                         mode: 'insensitive',
                     },
                 },
+                {
+                    project: {
+                        title: {
+                            contains: data.query,
+                            mode: 'insensitive',
+                        },
+                    },
+                },
+                {
+                    project: {
+                        description: {
+                            contains: data.query,
+                            mode: 'insensitive',
+                        },
+                    },
+                },
             ],
             ...priorityFilter,
             ...statesFilter,
