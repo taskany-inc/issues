@@ -20,7 +20,7 @@ export const useUrlParams = (
 
     useEffect(() => {
         const newurl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
-        const urlParams = new URLSearchParams(router.query as unknown as string);
+        const urlParams = new URLSearchParams();
         if (!mounted) {
             return;
         }
@@ -44,9 +44,7 @@ export const useUrlParams = (
                 : urlParams.delete('user');
             fulltextFilter.length > 0 ? urlParams.set('search', fulltextFilter) : urlParams.delete('search');
             urlParams.set('limit', limitFilter.toString());
-            window.history.pushState({ path: `${newurl}?${urlParams}` }, '', `${newurl}?${urlParams}`);
-        } else {
-            window.history.pushState({ path: newurl }, '', newurl);
+            window.history.replaceState({}, '', `${newurl}?${urlParams}`);
         }
     }, [priorityFilter, stateFilter, mounted, ownerFilter, tagsFilter, limitFilter, fulltextFilter, router.query]);
 };
