@@ -107,7 +107,7 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
                 <TabsMenu>
                     {tabsMenuOptions.map(([title, href, ownerOnly]) =>
                         nullable(ownerOnly ? user?.activityId === project.activityId : true, () => (
-                            <NextLink key={href} href={href} passHref>
+                            <NextLink key={title} href={href} passHref>
                                 <TabsMenuItem active={router.asPath === href}>{title}</TabsMenuItem>
                             </NextLink>
                         )),
