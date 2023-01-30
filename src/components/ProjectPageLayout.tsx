@@ -70,13 +70,16 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
                     {nullable(project.teams?.length, () => (
                         <StyledProjectTeamsTitle weight="bold" color={gray9}>
                             {t('Teams')}:{' '}
-                            {project.teams?.map((team) =>
+                            {project.teams?.map((team, i) =>
                                 nullable(team, (te) => (
-                                    <NextLink key={te.slug} passHref href={routes.team(te.slug)}>
-                                        <Link inline title={te.description}>
-                                            {te.title}
-                                        </Link>
-                                    </NextLink>
+                                    <span key={te.title}>
+                                        <NextLink key={te.slug} passHref href={routes.team(te.slug)}>
+                                            <Link inline title={te.description}>
+                                                {te.title}
+                                            </Link>
+                                        </NextLink>
+                                        {i < (project.teams ?? []).length - 1 ? ', ' : ''}
+                                    </span>
                                 )),
                             )}
                         </StyledProjectTeamsTitle>
