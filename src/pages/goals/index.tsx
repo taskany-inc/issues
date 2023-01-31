@@ -45,6 +45,7 @@ const fetcher = createFetcher((_, priority = [], states = [], query = '', tags =
                 id: true,
                 key: true,
                 title: true,
+                flowId: true,
                 teams: {
                     id: true,
                     title: true,
@@ -166,11 +167,13 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
         const usersData = new Map();
 
         goals.forEach((g) => {
-            usersData.set(g?.owner?.id, g?.owner);
-            projectsData.set(g.project?.id, {
-                id: g.project?.id,
-                tittle: g.project?.title,
-            });
+            g?.owner?.id && usersData.set(g?.owner?.id, g?.owner);
+            g.project?.id &&
+                projectsData.set(g.project?.id, {
+                    id: g.project?.id,
+                    title: g.project?.title,
+                    flowId: g.project?.flowId,
+                });
             g?.tags?.forEach((t) => tagsData.set(t?.id, t));
         });
 
@@ -245,7 +248,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
 
             <FiltersPanel
                 count={goalsCount}
-                flowId={projectsData[0]?.flowId}
+                flowId={Array.from(projectsData.values())[0]?.flowId}
                 users={usersFilterData}
                 tags={tagsFilterData}
                 priorityFilter={priorityFilter}
