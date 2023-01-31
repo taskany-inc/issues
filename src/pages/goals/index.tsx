@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import { Goal, Project, Team } from '../../../graphql/@generated/genql';
+import { Flow, Goal, Project, Team } from '../../../graphql/@generated/genql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Page, PageContent } from '../../components/Page';
@@ -27,6 +27,14 @@ const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 const fetcher = createFetcher((_, priority = [], states = [], query = '', tags = [], owner = []) => ({
     goalPriorityColors: true,
     goalPriorityKind: true,
+    flowRecommended: {
+        id: true,
+        title: true,
+        states: {
+            id: true,
+            title: true,
+        },
+    },
     userGoals: [
         {
             data: {
@@ -131,7 +139,12 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userGoals: Goal[] }>) => {
+const GoalsPage = ({
+    user,
+    ssrTime,
+    locale,
+    ssrData,
+}: ExternalPageProps<{ userGoals: Goal[]; flowRecommended: Flow[] }>) => {
     const t = useTranslations('goals.index');
     const mounted = useMounted(refreshInterval);
     const router = useRouter();
@@ -160,8 +173,9 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
     // NB: this line is compensation for first render before delayed swr will bring updates
     const goals: Goal[] = data?.userGoals ?? ssrData.userGoals;
     const goalsCount = goals.length;
+    const flowRecommended = data?.flowRecommended ?? ssrData.flowRecommended;
 
-    const [usersFilterData, tagsFilterData, projectsData] = useMemo(() => {
+    const [usersFilterData, tagsFilterData] = useMemo(() => {
         const projectsData = new Map();
         const tagsData = new Map();
         const usersData = new Map();
@@ -248,7 +262,7 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<{ userG
 
             <FiltersPanel
                 count={goalsCount}
-                flowId={Array.from(projectsData.values())[0]?.flowId}
+                flowId={flowRecommended?.[0].id}
                 users={usersFilterData}
                 tags={tagsFilterData}
                 priorityFilter={priorityFilter}
