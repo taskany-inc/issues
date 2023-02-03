@@ -44,3 +44,9 @@ postgres
 /cypress/screenshots
 
 TODO.md
+
+# Sentry
+.sentryclirc
+
+# Sentry
+next.config.original.js
