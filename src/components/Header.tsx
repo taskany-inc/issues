@@ -105,6 +105,14 @@ export const Header: React.FC = () => {
                     brick="right"
                     onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
                 />
+                <button
+                    type="button"
+                    onClick={() => {
+                        throw new Error('Sentry Frontend Error');
+                    }}
+                >
+                    Throw error
+                </button>
                 <Dropdown
                     onChange={onMenuItemClick}
                     items={[
