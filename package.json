@@ -61,7 +61,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "14.2.3",
-    "react-hook-form": "7.39.4",
+    "react-hook-form": "7.43.0",
     "react-hot-toast": "2.4.0",
     "react-input-mask": "2.0.4",
     "react-remark": "2.1.0",
