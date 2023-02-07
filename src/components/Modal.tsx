@@ -29,7 +29,7 @@ interface ModalProps {
 
 const StyledModalSurface = styled.div`
     position: fixed;
-    z-index: 100;
+    z-index: 101;
     top: 0;
     left: 0;
     right: 0;

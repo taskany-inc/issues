@@ -21,7 +21,7 @@ interface ModalPreviewProps {
 const StyledModal = styled.div`
     box-sizing: border-box;
     position: fixed;
-    z-index: 101;
+    z-index: 100;
     right: ${gapM};
     top: ${gapM};
     bottom: ${gapM};
