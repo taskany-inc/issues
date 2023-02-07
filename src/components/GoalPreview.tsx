@@ -131,12 +131,13 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                     <IssueParent kind="team" as="span" mode="compact" parent={team} size="m" />
                 ))}
 
-                {nullable(goal.project?.teams, (teams) => (
-                    <>
-                        <IssueParent kind="team" as="span" mode="compact" parent={teams} size="m" />
-                        <Dot />
-                    </>
-                ))}
+                {Boolean(goal.project?.teams?.length) &&
+                    nullable(goal.project?.teams, (teams) => (
+                        <>
+                            <IssueParent kind="team" as="span" mode="compact" parent={teams} size="m" />
+                            <Dot />
+                        </>
+                    ))}
 
                 {nullable(goal.project, (project) => (
                     <IssueParent kind="project" as="span" mode="compact" parent={project} size="m" />
