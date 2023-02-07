@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import md5Hash from 'md5';
 import styled from 'styled-components';
 
@@ -32,9 +32,12 @@ const Gravatar = ({
     onClick,
 }: GravatarProps) => {
     const [modernBrowser, setModernBrowser] = useState(true);
+    const [mounted, setMounted] = useState(false);
+    const imgRef = useRef<HTMLImageElement>(null);
 
     useLayoutEffect(() => {
         setModernBrowser('srcset' in document.createElement('img'));
+        setMounted(true);
     }, []);
 
     const base = `//${domain}/avatar/`;
@@ -72,10 +75,17 @@ const Gravatar = ({
     const src = `${base}${hash}?${query}`;
     const retinaSrc = `${base}${hash}?${retinaQuery}`;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+        if (imgRef.current && mounted) {
+            imgRef.current.src = modernBrowser && isRetina() ? retinaSrc : src;
+        }
+    }, [imgRef, mounted, modernBrowser, src, retinaSrc]);
+
     return (
         <StyledImage
+            ref={imgRef}
             alt={`Gravatar for ${formattedEmail}`}
-            src={modernBrowser && isRetina() ? retinaSrc : src}
             height={size}
             width={size}
             className={className}
