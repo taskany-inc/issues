@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
@@ -14,6 +14,8 @@ import { useGoalUpdate } from '../hooks/useGoalUpdate';
 import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 import { useReactionsResource } from '../hooks/useReactionsResource';
+import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
+import { editGoalKeys } from '../utils/hotkeys';
 
 import { ModalHeader, ModalContent } from './Modal';
 import { ModalPreview } from './ModalPreview';
@@ -34,9 +36,12 @@ import { ActivityFeed } from './ActivityFeed';
 import { Reactions } from './Reactions';
 import ReactionsDropdown from './ReactionsDropdown';
 import { Dot } from './Dot';
+import { Icon } from './Icon';
 
 const StateSwitch = dynamic(() => import('./StateSwitch'));
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm'));
+const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
+const GoalEditForm = dynamic(() => import('./GoalEditForm'));
 
 interface GoalPreviewProps {
     goal: Goal;
@@ -47,6 +52,12 @@ interface GoalPreviewProps {
 }
 
 const StyledImportantActions = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+`;
+
+const StyledPublicActions = styled.div`
     display: flex;
     align-items: center;
 
@@ -84,6 +95,17 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
 
     const goal: Goal = data?.goal ?? partialGoal;
 
+    const isUserAllowedToEdit = user?.activityId === goal?.activityId || user?.activityId === goal?.ownerId;
+    const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
+    const onGoalEdit = useCallback(() => {
+        setGoalEditModalVisible(false);
+
+        refresh();
+    }, [refresh]);
+    const onGoalEditModalShow = useCallback(() => {
+        setGoalEditModalVisible(true);
+    }, []);
+
     const updateGoal = useGoalUpdate(t, goal);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
 
@@ -116,105 +138,133 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
         [refresh, commentReaction],
     );
 
+    const onPreviewClose = useCallback(() => {
+        setGoalEditModalVisible(false);
+        onClose?.();
+    }, [onClose]);
+
     return (
-        <ModalPreview visible={visible} onClose={onClose}>
-            <StyledModalHeader>
-                {nullable(goal.id, (id) => (
-                    <IssueKey size="s" id={id}>
-                        {nullable(goal.tags, (tags) => (
-                            <IssueTags tags={tags} size="s" />
+        <>
+            <ModalPreview visible={visible} onClose={onPreviewClose}>
+                <StyledModalHeader>
+                    {nullable(goal.id, (id) => (
+                        <IssueKey size="s" id={id}>
+                            {nullable(goal.tags, (tags) => (
+                                <IssueTags tags={tags} size="s" />
+                            ))}
+                        </IssueKey>
+                    ))}
+
+                    {nullable(goal.team, (team) => (
+                        <IssueParent kind="team" as="span" mode="compact" parent={team} size="m" />
+                    ))}
+
+                    {Boolean(goal.project?.teams?.length) &&
+                        nullable(goal.project?.teams, (teams) => (
+                            <>
+                                <IssueParent kind="team" as="span" mode="compact" parent={teams} size="m" />
+                                <Dot />
+                            </>
                         ))}
-                    </IssueKey>
-                ))}
 
-                {nullable(goal.team, (team) => (
-                    <IssueParent kind="team" as="span" mode="compact" parent={team} size="m" />
-                ))}
-
-                {Boolean(goal.project?.teams?.length) &&
-                    nullable(goal.project?.teams, (teams) => (
-                        <>
-                            <IssueParent kind="team" as="span" mode="compact" parent={teams} size="m" />
-                            <Dot />
-                        </>
+                    {nullable(goal.project, (project) => (
+                        <IssueParent kind="project" as="span" mode="compact" parent={project} size="m" />
                     ))}
 
-                {nullable(goal.project, (project) => (
-                    <IssueParent kind="project" as="span" mode="compact" parent={project} size="m" />
-                ))}
+                    <IssueStats mode="compact" comments={goal.comments?.length || 0} updatedAt={goal.updatedAt} />
 
-                <IssueStats mode="compact" comments={goal.comments?.length || 0} updatedAt={goal.updatedAt} />
-
-                {nullable(goal.title, (title) => (
-                    <IssueTitle title={title} href={routes.goal(goal.id)} size="xl" />
-                ))}
-
-                <StyledImportantActions>
-                    {nullable(goal.state, (s) => (
-                        <StateSwitch state={s} flowId={goal.project?.flowId} onClick={onGoalStateChange} />
+                    {nullable(goal.title, (title) => (
+                        <IssueTitle title={title} href={routes.goal(goal.id)} size="xl" />
                     ))}
 
-                    {nullable(goal.priority, (ip) => (
-                        <Button ghost text={t(`Priority.${ip}`)} iconLeft={<StateDot hue={priorityColor} />} />
-                    ))}
+                    <StyledImportantActions>
+                        <StyledPublicActions>
+                            {nullable(goal.state, (s) => (
+                                <StateSwitch state={s} flowId={goal.project?.flowId} onClick={onGoalStateChange} />
+                            ))}
 
-                    <Button
-                        ghost
-                        text={goal.owner?.user?.name || goal.owner?.user?.email || goal.owner?.ghost?.email}
-                        iconLeft={
-                            <UserPic
-                                src={goal.owner?.user?.image}
-                                email={goal.owner?.user?.email || goal.owner?.ghost?.email}
-                                size={16}
+                            {nullable(goal.priority, (ip) => (
+                                <Button ghost text={t(`Priority.${ip}`)} iconLeft={<StateDot hue={priorityColor} />} />
+                            ))}
+
+                            <Button
+                                ghost
+                                text={goal.owner?.user?.name || goal.owner?.user?.email || goal.owner?.ghost?.email}
+                                iconLeft={
+                                    <UserPic
+                                        src={goal.owner?.user?.image}
+                                        email={goal.owner?.user?.email || goal.owner?.ghost?.email}
+                                        size={16}
+                                    />
+                                }
                             />
-                        }
-                    />
 
-                    {nullable(issueEstimate, (ie) => (
-                        <Button ghost text={formatEstimate(ie, locale)} />
-                    ))}
+                            {nullable(issueEstimate, (ie) => (
+                                <Button ghost text={formatEstimate(ie, locale)} />
+                            ))}
 
-                    <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(goal.id)}>
-                        {nullable(!reactionsProps.limited, () => (
-                            <ReactionsDropdown onClick={onGoalReactionToggle(goal.id)} />
+                            <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(goal.id)}>
+                                {nullable(!reactionsProps.limited, () => (
+                                    <ReactionsDropdown onClick={onGoalReactionToggle(goal.id)} />
+                                ))}
+                            </Reactions>
+                        </StyledPublicActions>
+
+                        {nullable(isUserAllowedToEdit, () => (
+                            <Button
+                                ghost
+                                iconLeft={<Icon noWrap type="edit" size="xs" />}
+                                onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
+                            />
                         ))}
-                    </Reactions>
-                </StyledImportantActions>
-            </StyledModalHeader>
-            <StyledModalContent>
-                <StyledCard>
-                    <CardInfo>
-                        <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
-                    </CardInfo>
+                    </StyledImportantActions>
+                </StyledModalHeader>
+                <StyledModalContent>
+                    <StyledCard>
+                        <CardInfo>
+                            <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
+                        </CardInfo>
 
-                    <CardComment>
-                        <Md>{goal.description}</Md>
-                    </CardComment>
-                </StyledCard>
+                        <CardComment>
+                            <Md>{goal.description}</Md>
+                        </CardComment>
+                    </StyledCard>
 
-                {nullable(data, () => (
-                    <ActivityFeed id="comments">
-                        {goal.comments?.map((comment) =>
-                            nullable(comment, (c) => (
-                                <CommentView
-                                    key={c.id}
-                                    id={c.id}
-                                    author={c.activity?.user}
-                                    description={c.description}
-                                    createdAt={c.createdAt}
-                                    isEditable={c.activity?.id === user?.activityId}
-                                    isNew={c.id === highlightCommentId}
-                                    reactions={c.reactions}
-                                    onReactionToggle={onCommentReactionToggle(c.id)}
-                                />
-                            )),
-                        )}
+                    {nullable(data, () => (
+                        <ActivityFeed id="comments">
+                            {goal.comments?.map((comment) =>
+                                nullable(comment, (c) => (
+                                    <CommentView
+                                        key={c.id}
+                                        id={c.id}
+                                        author={c.activity?.user}
+                                        description={c.description}
+                                        createdAt={c.createdAt}
+                                        isEditable={c.activity?.id === user?.activityId}
+                                        isNew={c.id === highlightCommentId}
+                                        reactions={c.reactions}
+                                        onReactionToggle={onCommentReactionToggle(c.id)}
+                                    />
+                                )),
+                            )}
 
-                        <CommentCreateForm goalId={goal.id} onSubmit={onCommentPublish} />
-                    </ActivityFeed>
-                ))}
-            </StyledModalContent>
-        </ModalPreview>
+                            <CommentCreateForm goalId={goal.id} onSubmit={onCommentPublish} />
+                        </ActivityFeed>
+                    ))}
+                </StyledModalContent>
+            </ModalPreview>
+
+            {nullable(isUserAllowedToEdit, () => (
+                <ModalOnEvent
+                    event={ModalEvent.GoalEditModal}
+                    hotkeys={editGoalKeys}
+                    visible={goalEditModalVisible}
+                    onShow={onGoalEditModalShow}
+                >
+                    <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
+                </ModalOnEvent>
+            ))}
+        </>
     );
 };
 
