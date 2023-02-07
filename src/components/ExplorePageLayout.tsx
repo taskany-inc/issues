@@ -19,7 +19,7 @@ export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ children }
     const tabsMenuOptions: Array<[string, string]> = [
         [t('Teams'), routes.exploreTeams()],
         [t('Projects'), routes.exploreProjects()],
-        [t('Goals'), routes.exploreGoals()],
+        // [t('Goals'), routes.exploreGoals()],
     ];
 
     return (
