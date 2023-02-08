@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import NextLink from 'next/link';
 
-import { gapM, gapS } from '../design/@generated/themes';
+import { gapM, gapS, gapXs } from '../design/@generated/themes';
 import { routes } from '../hooks/router';
 
 import { StateDot } from './StateDot';
@@ -21,14 +21,22 @@ interface IssueListItemProps {
 
 const StyledIssueListItem = styled.div`
     padding: ${gapS} ${gapM} ${gapS} 0;
+    display: flex;
+    align-items: top;
 `;
 
 const StyledIssueListItemTitle = styled(Text)`
+    padding-top: 0;
+    margin-top: 0;
     padding-left: ${gapS};
 `;
 
 const StyledLink = styled(Link)`
-    display: 'inline-block';
+    display: inline-block;
+`;
+
+const StyledDotWrapper = styled.div`
+    padding-top: ${gapXs};
 `;
 
 export const IssueListItem: React.FC<IssueListItemProps> = ({ issue }) => {
@@ -36,7 +44,9 @@ export const IssueListItem: React.FC<IssueListItemProps> = ({ issue }) => {
         <NextLink passHref href={routes.goal(issue.id)}>
             <StyledLink inline>
                 <StyledIssueListItem>
-                    <StateDot {...issue.state} />
+                    <StyledDotWrapper>
+                        <StateDot {...issue.state} />
+                    </StyledDotWrapper>
                     <StyledIssueListItemTitle size="s" weight="bold" color="inherit">
                         {issue.title}
                     </StyledIssueListItemTitle>
