@@ -34,9 +34,6 @@ const StyledCommonHeaderInfo = styled.div<{ align: 'left' | 'right' }>`
 
 const StyledCommonHeaderTitle = styled(Text)`
     width: 850px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     padding-top: ${gapM};
 `;
 
