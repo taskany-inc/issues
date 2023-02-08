@@ -21,8 +21,6 @@ interface IssueListItemProps {
 
 const StyledIssueListItem = styled.div`
     padding: ${gapS} ${gapM} ${gapS} 0;
-    display: flex;
-    align-items: center;
 `;
 
 const StyledIssueListItemTitle = styled(Text)`
