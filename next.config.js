@@ -46,7 +46,7 @@ const nextConfig = {
 const SentryWebpackPluginOptions = {
     silent: true,
     hideSourcemaps: true,
-    ignore: [],
+    ignore: ['node_modules'],
 };
 
 module.exports = withPlugins(nextPlugins, withSentryConfig(nextConfig, SentryWebpackPluginOptions));
