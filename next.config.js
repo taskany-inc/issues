@@ -22,6 +22,7 @@ const nextConfig = {
     sentry: {
         disableServerWebpackPlugin: process.env.SENTRY_DISABLED === '1',
         disableClientWebpackPlugin: process.env.SENTRY_DISABLED === '1',
+        widenClientFileUpload: true,
     },
     webpack(config) {
         config.module.rules.push({
@@ -45,6 +46,7 @@ const nextConfig = {
 const SentryWebpackPluginOptions = {
     silent: true,
     hideSourcemaps: true,
+    ignore: [],
 };
 
 module.exports = withPlugins(nextPlugins, withSentryConfig(nextConfig, SentryWebpackPluginOptions));
