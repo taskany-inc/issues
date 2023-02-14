@@ -13,6 +13,7 @@ import {
     UserGoalsInput,
     priorityKind,
     priorityColors,
+    GoalArchiveInput,
 } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
@@ -244,6 +245,16 @@ const goalsFilter = (
             ...tagsFilter,
             ...ownerFilter,
             ...extra,
+            AND: {
+                OR: [
+                    {
+                        archived: false,
+                    },
+                    {
+                        archived: null,
+                    },
+                ],
+            },
         },
         orderBy: {
             createdAt: 'asc',
@@ -410,9 +421,19 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { id }, { db, activity }) => {
             if (!activity) return null;
 
-            const goal = await db.goal.findUnique({
+            const goal = await db.goal.findFirst({
                 where: {
                     id,
+                    AND: {
+                        OR: [
+                            {
+                                archived: false,
+                            },
+                            {
+                                archived: null,
+                            },
+                        ],
+                    },
                 },
                 include: {
                     owner: {
@@ -576,6 +597,16 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             },
                         },
                     ],
+                    AND: {
+                        OR: [
+                            {
+                                archived: false,
+                            },
+                            {
+                                archived: null,
+                            },
+                        ],
+                    },
                 },
                 take: 5,
                 include: {
@@ -1115,6 +1146,35 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                     data: {
                         id, // this is hack to force updatedAt field
                         [String(dependency)]: { [connectionMap[String(direction)]]: connection },
+                    },
+                });
+
+                // await mailServer.sendMail({
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('toggleGoalArchive', {
+        type: Activity,
+        args: {
+            data: nonNull(arg({ type: GoalArchiveInput })),
+        },
+        resolve: async (_, { data: { id, archived } }, { db, activity }) => {
+            if (!activity) return null;
+
+            try {
+                return db.goal.update({
+                    where: { id },
+                    data: {
+                        archived,
                     },
                 });
 
