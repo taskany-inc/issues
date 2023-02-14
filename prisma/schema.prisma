@@ -206,6 +206,7 @@ model Goal {
   key          Boolean?
   personal     Boolean?
   private      Boolean?
+  archived     Boolean?
   priority     String?
   estimate     Estimate[]
   project      Project?   @relation("projectGoals", fields: [projectId], references: [id])

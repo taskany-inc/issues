@@ -100,6 +100,7 @@ type Goal {
   _isWatching: Boolean
   activity: Activity
   activityId: String
+  archived: Boolean
   blocks: [Goal]
   comments: [Comment]
   connected: [Goal]
@@ -135,6 +136,11 @@ type GoalAggregation {
   comments: Int
   stargizers: Int
   watchers: Int
+}
+
+input GoalArchiveInput {
+  archived: Boolean
+  id: ID!
 }
 
 input GoalCreateInput {
@@ -186,6 +192,7 @@ type Mutation {
   deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
   deleteTeam(data: TeamDelete!): Team
+  toggleGoalArchive(data: GoalArchiveInput!): Activity
   toggleGoalDependency(toggle: GoalDependencyToggleInput!): Goal
   toggleGoalStargizer(data: SubscriptionToggleInput!): Activity
   toggleGoalWatcher(data: SubscriptionToggleInput!): Activity

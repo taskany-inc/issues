@@ -166,6 +166,7 @@ export const Goal = objectType({
         t.field(GoalModel.key);
         t.field(GoalModel.personal);
         t.field(GoalModel.private);
+        t.field(GoalModel.archived);
         t.field(GoalModel.priority);
         t.list.field('estimate', { type: Estimate });
         t.field(GoalModel.createdAt);
@@ -337,6 +338,14 @@ export const GoalUpdateInput = inputObjectType({
         t.field(GoalModel.priority);
         t.list.field('tags', { type: TagCreateInput });
         t.list.string('participants');
+    },
+});
+
+export const GoalArchiveInput = inputObjectType({
+    name: 'GoalArchiveInput',
+    definition(t) {
+        t.field(GoalModel.id);
+        t.field(GoalModel.archived);
     },
 });
 

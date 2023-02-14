@@ -97,6 +97,16 @@ const projectGoalsFilter = (
             ...tagsFilter,
             ...ownerFilter,
             ...extra,
+            AND: {
+                OR: [
+                    {
+                        archived: false,
+                    },
+                    {
+                        archived: null,
+                    },
+                ],
+            },
         },
     };
 };
