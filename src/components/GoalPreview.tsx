@@ -3,9 +3,11 @@ import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
+import toast from 'react-hot-toast';
 
+import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
-import { gapM, gapS } from '../design/@generated/themes';
+import { danger0, gapM, gapS } from '../design/@generated/themes';
 import { goalFetcher, refreshInterval } from '../utils/entityFetcher';
 import { nullable } from '../utils/nullable';
 import { formatEstimate } from '../utils/dateTime';
@@ -37,11 +39,14 @@ import { Reactions } from './Reactions';
 import ReactionsDropdown from './ReactionsDropdown';
 import { Dot } from './Dot';
 import { Icon } from './Icon';
+import { MenuItem } from './MenuItem';
+import { GoalDeleteModal } from './GoalDeleteModal';
 
 const StateSwitch = dynamic(() => import('./StateSwitch'));
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm'));
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('./GoalEditForm'));
+const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface GoalPreviewProps {
     goal: Goal;
@@ -143,6 +148,36 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
         onClose?.();
     }, [onClose]);
 
+    const onEditMenuChange = useCallback((item: { onClick: () => void }) => {
+        item.onClick?.();
+    }, []);
+
+    const onGoalDeleteConfirm = useCallback(async () => {
+        const promise = gql.mutation({
+            toggleGoalArchive: [
+                {
+                    data: {
+                        id: goal.id,
+                        archived: true,
+                    },
+                },
+                {
+                    id: true,
+                },
+            ],
+        });
+
+        toast.promise(promise, {
+            error: t('Something went wrong 😿'),
+            loading: t('We are deleting the goal'),
+            success: t('Deleted successfully 🎉'),
+        });
+
+        await promise;
+
+        refresh();
+    }, [t, goal, refresh]);
+
     return (
         <>
             <ModalPreview visible={visible} onClose={onPreviewClose}>
@@ -211,10 +246,41 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                         </StyledPublicActions>
 
                         {nullable(isUserAllowedToEdit, () => (
-                            <Button
-                                ghost
-                                iconLeft={<Icon noWrap type="edit" size="xs" />}
-                                onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
+                            <Dropdown
+                                onChange={onEditMenuChange}
+                                items={[
+                                    {
+                                        label: t('Edit'),
+                                        icon: <Icon type="edit" size="xxs" />,
+                                        onClick: dispatchModalEvent(ModalEvent.GoalEditModal),
+                                    },
+                                    {
+                                        label: t('Delete'),
+                                        color: danger0,
+                                        icon: <Icon type="bin" size="xxs" />,
+                                        onClick: dispatchModalEvent(ModalEvent.GoalDeleteModal),
+                                    },
+                                ]}
+                                renderTrigger={({ ref, onClick }) => (
+                                    <Button
+                                        ref={ref}
+                                        ghost
+                                        iconLeft={<Icon noWrap type="moreVertical" size="xs" />}
+                                        onClick={onClick}
+                                    />
+                                )}
+                                renderItem={({ item, cursor, index, onClick }) => (
+                                    <MenuItem
+                                        key={item.label}
+                                        ghost
+                                        color={item.color}
+                                        focused={cursor === index}
+                                        icon={item.icon}
+                                        onClick={onClick}
+                                    >
+                                        {item.label}
+                                    </MenuItem>
+                                )}
                             />
                         ))}
                     </StyledImportantActions>
@@ -263,6 +329,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
                 >
                     <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
                 </ModalOnEvent>
+            ))}
+
+            {nullable(isUserAllowedToEdit, () => (
+                <GoalDeleteModal id={goal.id} onConfirm={onGoalDeleteConfirm} />
             ))}
         </>
     );

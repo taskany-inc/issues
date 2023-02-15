@@ -216,6 +216,8 @@
             "Set owner": "Set owner",
             "Something went wrong 😿": "Something went wrong 😿",
             "We are updating the goal": "We are updating the goal...",
+            "We are deleting the goal": "We are deleting the goal...",
+            "Deleted successfully 🎉": "Deleted successfully 🎉",
             "Voila! Goal is up to date 🎉": "Voila! Goal is up to date 🎉",
             "We are calling owner": "We are calling owner...",
             "Voila! You are stargizer now 🎉": "Voila! You are stargizer now 🎉",
@@ -228,7 +230,8 @@
             "Watching": "Watching",
             "Stars": "Stars",
             "Starred": "Starred",
-            "Edit goal": "Edit goal",
+            "Edit": "Edit",
+            "Delete": "Delete",
             "New goal": "New goal",
             "Priority": {
                 "Priority": "Priority",
@@ -399,5 +402,11 @@
         "Medium": "Medium",
         "Low": "Low",
         "Lowest": "Lowest"
+    },
+    "GoalDeleteModal": {
+        "You are trying to delete goal": "You are trying to delete goal",
+        "To confirm deleting goal please type goal key below": "To confirm deleting goal <goal></goal> please type goal key below.",
+        "Yes, delete it": "Yes, delete it",
+        "Cancel": "Cancel"
     }
 }

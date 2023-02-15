@@ -1,6 +1,7 @@
 export enum ModalEvent {
     GoalCreateModal = 'GoalCreateModal',
     GoalEditModal = 'GoalEditModal',
+    GoalDeleteModal = 'GoalDeleteModal',
     IssueParticipantsModal = 'IssueParticipantsModal',
     IssueDependenciesModal = 'IssueDependenciesModal',
     TeamCreateModal = 'TeamCreateModal',

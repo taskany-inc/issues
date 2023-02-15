@@ -15,7 +15,7 @@ import { editGoalKeys } from '../../utils/hotkeys';
 import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useMounted } from '../../hooks/useMounted';
-import { gapM, gapS } from '../../design/@generated/themes';
+import { danger0, gapM, gapS } from '../../design/@generated/themes';
 import { Page, PageContent, PageActions } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { Link } from '../../components/Link';
@@ -40,6 +40,9 @@ import { WatchButton } from '../../components/WatchButton';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { StarButton } from '../../components/StarButton';
 import { useRouter } from '../../hooks/router';
+import { Icon } from '../../components/Icon';
+import { MenuItem } from '../../components/MenuItem';
+import { GoalDeleteModal } from '../../components/GoalDeleteModal';
 
 const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
@@ -50,6 +53,7 @@ const CommentCreateForm = dynamic(() => import('../../components/CommentCreateFo
 const ReactionsDropdown = dynamic(() => import('../../components/ReactionsDropdown'));
 const IssueDependencies = dynamic(() => import('../../components/IssueDependencies'));
 const IssueParticipants = dynamic(() => import('../../components/IssueParticipants'));
+const Dropdown = dynamic(() => import('../../components/Dropdown'));
 
 const IssueHeader = styled(PageContent)`
     display: grid;
@@ -82,6 +86,23 @@ const IssueBaseActions = styled.div`
 
     & > * {
         margin-right: ${gapS};
+    }
+`;
+
+const StyledCardInfo = styled(CardInfo)`
+    display: grid;
+    grid-template-columns: 6fr 6fr;
+`;
+
+const StyledCardActions = styled.div`
+    display: flex;
+    align-items: center;
+    justify-self: end;
+
+    margin-right: -10px;
+
+    & > span + span {
+        margin-left: ${gapS};
     }
 `;
 
@@ -240,6 +261,36 @@ const GoalPage = ({
         setGoalEditModalVisible(true);
     }, []);
 
+    const onEditMenuChange = useCallback((item: { onClick: () => void }) => {
+        item.onClick?.();
+    }, []);
+
+    const onGoalDeleteConfirm = useCallback(async () => {
+        const promise = gql.mutation({
+            toggleGoalArchive: [
+                {
+                    data: {
+                        id: goal.id,
+                        archived: true,
+                    },
+                },
+                {
+                    id: true,
+                },
+            ],
+        });
+
+        toast.promise(promise, {
+            error: t('Something went wrong 😿'),
+            loading: t('We are deleting the goal'),
+            success: t('Deleted successfully 🎉'),
+        });
+
+        await promise;
+
+        router.goals();
+    }, [t, goal, router]);
+
     return (
         <Page
             user={user}
@@ -294,9 +345,48 @@ const GoalPage = ({
             <IssueContent>
                 <div>
                     <Card>
-                        <CardInfo>
-                            <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
-                        </CardInfo>
+                        <StyledCardInfo>
+                            <div>
+                                <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
+                            </div>
+                            <StyledCardActions>
+                                {nullable(isUserAllowedToEdit, () => (
+                                    <span>
+                                        <Dropdown
+                                            onChange={onEditMenuChange}
+                                            items={[
+                                                {
+                                                    label: t('Edit'),
+                                                    icon: <Icon type="edit" size="xxs" />,
+                                                    onClick: dispatchModalEvent(ModalEvent.GoalEditModal),
+                                                },
+                                                {
+                                                    label: t('Delete'),
+                                                    color: danger0,
+                                                    icon: <Icon type="bin" size="xxs" />,
+                                                    onClick: dispatchModalEvent(ModalEvent.GoalDeleteModal),
+                                                },
+                                            ]}
+                                            renderTrigger={({ ref, onClick }) => (
+                                                <Icon type="moreVertical" size="xs" ref={ref} onClick={onClick} />
+                                            )}
+                                            renderItem={({ item, cursor, index, onClick }) => (
+                                                <MenuItem
+                                                    key={item.label}
+                                                    ghost
+                                                    color={item.color}
+                                                    focused={cursor === index}
+                                                    icon={item.icon}
+                                                    onClick={onClick}
+                                                >
+                                                    {item.label}
+                                                </MenuItem>
+                                            )}
+                                        />
+                                    </span>
+                                ))}
+                            </StyledCardActions>
+                        </StyledCardInfo>
 
                         <CardContent>
                             <Md>{goal.description}</Md>
@@ -334,10 +424,6 @@ const GoalPage = ({
                                     ))}
                                 </Reactions>
                             </IssueBaseActions>
-
-                            {nullable(isUserAllowedToEdit, () => (
-                                <Button text={t('Edit goal')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
-                            ))}
                         </CardActions>
                     </Card>
 
@@ -378,6 +464,10 @@ const GoalPage = ({
                 >
                     <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
                 </ModalOnEvent>
+            ))}
+
+            {nullable(isUserAllowedToEdit, () => (
+                <GoalDeleteModal id={goal.id} onConfirm={onGoalDeleteConfirm} />
             ))}
         </Page>
     );

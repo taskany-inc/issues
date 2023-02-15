@@ -82,11 +82,11 @@ export const isPastDate = (date: Date): boolean => date < new Date();
 export const parseLocaleDate = (date: string, { locale }: LocaleArg) => {
     let resolvedLocale: TLocale = locale;
 
-    if (date.includes('/')) {
+    if (date?.includes('/')) {
         resolvedLocale = 'en';
     }
 
-    if (date.includes('.')) {
+    if (date?.includes('.')) {
         resolvedLocale = 'ru';
     }
 
