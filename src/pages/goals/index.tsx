@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import NextLink from 'next/link';
 
 import { Flow, Goal, Project, Team } from '../../../graphql/@generated/genql';
 import { createFetcher } from '../../utils/createFetcher';
@@ -16,8 +17,10 @@ import { FiltersPanel } from '../../components/FiltersPanel';
 import { useMounted } from '../../hooks/useMounted';
 import { useUrlParams } from '../../hooks/useUrlParams';
 import { Text } from '../../components/Text';
+import { Link } from '../../components/Link';
 import { PageSep } from '../../components/PageSep';
 import { defaultLimit } from '../../components/LimitFilterDropdown';
+import { routes } from '../../hooks/router';
 
 const GoalPreview = dynamic(() => import('../../components/GoalPreview'));
 
@@ -56,11 +59,14 @@ const fetcher = createFetcher((_, priority = [], states = [], query = '', tags =
                 flowId: true,
                 teams: {
                     id: true,
+                    slug: true,
+                    key: true,
                     title: true,
                 },
             },
             team: {
                 id: true,
+                slug: true,
                 key: true,
                 title: true,
             },
@@ -245,8 +251,6 @@ const GoalsPage = ({
                         ? goal.project.teams
                               // @ts-ignore
                               ?.sort((a, b) => (a?.title > b?.title ? 1 : -1))
-                              .map((t) => t?.title)
-                              .join(', ')
                         : undefined;
 
                     project.goals.push(goal);
@@ -257,7 +261,7 @@ const GoalsPage = ({
             },
             { teams: {}, projects: {} } as {
                 teams: Record<number, { data: Team; goals: Goal[] }>;
-                projects: Record<number, { data: Project; teams?: string; goals: Goal[] }>;
+                projects: Record<number, { data: Project; teams?: Array<Team | undefined>; goals: Goal[] }>;
             },
         );
     }, [goals]);
@@ -290,7 +294,9 @@ const GoalsPage = ({
                     return nullable(team.goals?.length, () => (
                         <StyledProjectGroup key={team.data.key}>
                             <Text size="l" weight="bolder">
-                                {team.data.title}
+                                <NextLink passHref href={routes.team(team.data.slug)}>
+                                    <Link inline>{team.data.title}</Link>
+                                </NextLink>
                             </Text>
 
                             <PageSep />
@@ -321,11 +327,28 @@ const GoalsPage = ({
 
                 {Object.values(groups.projects)
                     .sort((a, b) => (a.teams && !b.teams ? -1 : 1))
-                    .map((project) => {
-                        return nullable(project.goals?.length, () => (
+                    .map((project) =>
+                        nullable(project.goals?.length, () => (
                             <StyledProjectGroup key={project.data.key}>
                                 <Text size="l" weight="bolder">
-                                    {project.teams ? `${project.teams} —` : ''} {project.data.title}
+                                    {nullable(project.teams, (teams) => (
+                                        <>
+                                            {teams.map((team, i) =>
+                                                nullable(team, (t) => (
+                                                    <>
+                                                        <NextLink key={t.slug} passHref href={routes.team(t.slug)}>
+                                                            <Link inline>{t.title}</Link>
+                                                        </NextLink>
+                                                        {i !== teams.length - 1 ? ', ' : ''}
+                                                    </>
+                                                )),
+                                            )}
+                                            {' — '}
+                                        </>
+                                    ))}
+                                    <NextLink passHref href={routes.project(project.data.key)}>
+                                        <Link inline>{project.data.title}</Link>
+                                    </NextLink>
                                 </Text>
 
                                 <PageSep />
@@ -351,8 +374,8 @@ const GoalsPage = ({
                                     )}
                                 </StyledGoalsList>
                             </StyledProjectGroup>
-                        ));
-                    })}
+                        )),
+                    )}
             </PageContent>
 
             {nullable(preview, (p) => (
