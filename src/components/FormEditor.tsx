@@ -33,6 +33,7 @@ interface FormEditorProps {
 
 const defaultOptions: React.ComponentProps<typeof Editor>['options'] = {
     fontSize: 16,
+    wordWrap: 'on',
     minimap: {
         enabled: false,
     },
