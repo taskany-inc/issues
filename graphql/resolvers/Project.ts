@@ -187,7 +187,6 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
 
             return db.goal.findMany({
                 take: data.pageSize,
-                skip: data.offset,
                 ...projectGoalsFilter(data),
                 orderBy: {
                     createdAt: 'asc',
