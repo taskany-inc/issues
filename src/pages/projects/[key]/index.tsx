@@ -1,5 +1,5 @@
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import useSWRInfinite from 'swr/infinite';
+import useSWR from 'swr';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/router';
@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic';
 
 import { createFetcher } from '../../../utils/createFetcher';
 import { Goal, Project } from '../../../../graphql/@generated/genql';
-import { Button } from '../../../components/Button';
 import { GoalListItem } from '../../../components/GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
@@ -21,20 +20,11 @@ import { Page } from '../../../components/Page';
 
 const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
 
+const refreshInterval = 3000;
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
 const fetcher = createFetcher(
-    (
-        _,
-        key: string,
-        offset = 0,
-        priority = [],
-        states = [],
-        query = '',
-        limitFilter = defaultLimit,
-        tags = [],
-        owner = [],
-    ) => ({
+    (_, key: string, priority = [], states = [], query = '', limitFilter = defaultLimit, tags = [], owner = []) => ({
         project: [
             {
                 key,
@@ -95,7 +85,6 @@ const fetcher = createFetcher(
             {
                 data: {
                     key,
-                    offset,
                     pageSize: limitFilter,
                     priority,
                     states,
@@ -177,7 +166,6 @@ export const getServerSideProps = declareSsrProps(
             ssrData: await fetcher(
                 user,
                 key,
-                0,
                 parseQueryParam(query.priority as string),
                 parseQueryParam(query.state as string),
                 parseQueryParam(query.search as string).toString(),
@@ -204,10 +192,6 @@ const StyledGoalsList = styled.div`
     padding: 20px 20px 0 20px;
 `;
 
-const StyledLoadMore = styled.div`
-    margin: 50px 40px;
-`;
-
 const ProjectPage = ({
     user,
     locale,
@@ -229,42 +213,19 @@ const ProjectPage = ({
 
     const [preview, setPreview] = useState<Goal | null>(null);
 
-    const { data, setSize, size } = useSWRInfinite(
-        (index: number) => ({
-            offset: index * limitFilter,
-            priorityFilter,
-            stateFilter,
-            fulltextFilter,
-            limitFilter,
-            tagsFilter,
-            ownerFilter,
-        }),
-        ({ offset, priorityFilter, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter }) =>
-            fetcher(
-                user,
-                key,
-                offset,
-                priorityFilter,
-                stateFilter,
-                fulltextFilter,
-                limitFilter,
-                tagsFilter,
-                ownerFilter,
-            ),
+    const { data } = useSWR(
+        [user, key, priorityFilter, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter],
+        (...args) => fetcher(...args),
+        {
+            refreshInterval,
+        },
     );
 
-    const shouldRenderMoreButton =
-        data?.[data.length - 1]?.projectGoals?.length === limitFilter &&
-        (data?.[data.length - 1]?.projectGoals?.length || 0) * size < (data?.[0].projectGoalsCount || 0);
-
-    const goals = fulltextFilter
-        ? data?.map((chunk) => chunk.projectGoals).flat()
-        : data?.map((chunk) => chunk.projectGoals).flat() ?? ssrData.projectGoals;
-    const project = data?.[0].project ?? ssrData.project;
-    const goalsCount = data?.[0].projectGoalsCount ?? ssrData.projectGoalsCount;
+    const goals: Goal[] = data?.projectGoals ?? ssrData.projectGoals;
+    const project = data?.project ?? ssrData.project;
+    const goalsCount = data?.projectGoalsCount ?? ssrData.projectGoalsCount;
 
     useEffect(() => {
-        // @ts-ignore wtf!
         if (preview && goals && goals?.filter((g) => g.id === preview.id).length !== 1) {
             setPreview(null);
         }
@@ -353,12 +314,6 @@ const ProjectPage = ({
                             />
                         )),
                     )}
-
-                    <StyledLoadMore>
-                        {shouldRenderMoreButton && (
-                            <Button text={t('index.Load more')} onClick={() => setSize(size + 1)} />
-                        )}
-                    </StyledLoadMore>
                 </StyledGoalsList>
 
                 {nullable(preview, (p) => (

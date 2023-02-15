@@ -267,7 +267,6 @@ input ProjectGoalsCountInput {
 
 input ProjectGoalsInput {
   key: String!
-  offset: Int!
   owner: [String!]!
   pageSize: Int!
   priority: [String!]!

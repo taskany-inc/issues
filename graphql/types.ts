@@ -473,7 +473,6 @@ export const ProjectGoalsInput = inputObjectType({
     definition(t) {
         t.nonNull.string('key');
         t.nonNull.int('pageSize');
-        t.nonNull.int('offset');
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
