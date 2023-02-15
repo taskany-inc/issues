@@ -19,7 +19,7 @@ interface FormEditorProps {
     value?: string;
     autoFocus?: boolean;
     flat?: 'top' | 'bottom' | 'both';
-    height?: string;
+    height?: number;
     placeholder?: string;
     error?: {
         message?: string;
@@ -207,12 +207,12 @@ const StyledDropZone = styled.div`
 
 const mdImageLink = (url: string) => `![](${url})`;
 
+const maxEditorHeight = 450;
+
 export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
-    (
-        { id, value, flat, height = '200px', placeholder, error, autoFocus, onChange, onFocus, onBlur, onCancel },
-        ref,
-    ) => {
+    ({ id, value, flat, height = 200, placeholder, error, autoFocus, onChange, onFocus, onBlur, onCancel }, ref) => {
         const [focused, setFocused] = useState(false);
+        const [contentHeight, setContentHeight] = useState(height);
         const monacoEditorRef = useRef<any>(null);
         const extraRef = useRef<HTMLDivElement>(null);
         const popupRef = useRef<HTMLDivElement>(null);
@@ -231,6 +231,13 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
                     editor.trigger('keyboard', 'type', { text: value });
                 }
             }
+
+            editor.onDidContentSizeChange(() => {
+                const calculatedHeight = Math.min(1000, editor.getContentHeight()) + 20;
+                const nextContentHeight = calculatedHeight > maxEditorHeight ? maxEditorHeight : calculatedHeight;
+                setContentHeight(nextContentHeight);
+                editor.layout();
+            });
 
             setViewValue(value);
         };
@@ -367,12 +374,15 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
                         <StyledPlaceholder>{placeholder}</StyledPlaceholder>
                     ))}
 
-                    <div onFocus={onEditorFocus}>
+                    <div
+                        onFocus={onEditorFocus}
+                        style={{ height: contentHeight, minHeight: height, maxHeight: maxEditorHeight }}
+                    >
                         <Editor
                             loading=""
                             theme="vs-dark"
-                            height={height}
                             defaultLanguage="markdown"
+                            // height={contentHeight + 20}
                             value={viewValue}
                             options={defaultOptions}
                             onChange={onChange}

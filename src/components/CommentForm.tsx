@@ -23,7 +23,7 @@ interface CommentFormProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     control: Control<any>;
     autoFocus?: boolean;
-    height?: string;
+    height?: number;
     isValid?: boolean;
     error?: React.ComponentProps<typeof FormEditor>['error'];
 

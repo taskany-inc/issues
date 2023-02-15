@@ -53,7 +53,7 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onCh
             i18nKeyset="Comment.edit"
             control={control}
             autoFocus
-            height="120px"
+            height={120}
             isValid={isUpdateAllowed && isValid}
             error={errors.description}
             onSubmit={handleSubmit(updateComment)}
