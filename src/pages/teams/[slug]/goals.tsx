@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useCallback, useMemo, useState } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
@@ -280,6 +280,12 @@ const TeamGoalsPage = ({
     const team: Team = data?.team ?? ssrData.team;
     const projects: Project[] = data?.teamProjects ?? ssrData.teamProjects;
     const goals: Goal[] = data?.teamGoals ?? ssrData.teamGoals;
+
+    useEffect(() => {
+        if (preview && goals && goals?.filter((g) => g.id === preview.id).length !== 1) {
+            setPreview(null);
+        }
+    }, [goals, preview]);
 
     const [usersFilterData, tagsFilterData, goalsCount] = useMemo(() => {
         const projectsData = new Map();

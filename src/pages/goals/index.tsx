@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useCallback, useMemo, useState } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
@@ -174,6 +174,12 @@ const GoalsPage = ({
     const goals: Goal[] = data?.userGoals ?? ssrData.userGoals;
     const goalsCount = goals.length;
     const flowRecommended = data?.flowRecommended ?? ssrData.flowRecommended;
+
+    useEffect(() => {
+        if (preview && goals.filter((g) => g.id === preview.id).length !== 1) {
+            setPreview(null);
+        }
+    }, [goals, preview]);
 
     const [usersFilterData, tagsFilterData] = useMemo(() => {
         const projectsData = new Map();

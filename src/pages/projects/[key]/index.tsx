@@ -264,6 +264,13 @@ const ProjectPage = ({
     const goalsCount = data?.[0].projectGoalsCount ?? ssrData.projectGoalsCount;
 
     useEffect(() => {
+        // @ts-ignore wtf!
+        if (preview && goals && goals?.filter((g) => g.id === preview.id).length !== 1) {
+            setPreview(null);
+        }
+    }, [goals, preview]);
+
+    useEffect(() => {
         setCurrentProjectCache({
             id: project.id,
             title: project.title,
