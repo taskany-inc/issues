@@ -50,6 +50,8 @@ interface ComboBoxProps {
     maxWidth?: React.ComponentProps<typeof Popup>['maxWidth'];
     minWidth?: React.ComponentProps<typeof Popup>['minWidth'];
     className?: string;
+    placement?: React.ComponentProps<typeof Popup>['placement'];
+    offset?: React.ComponentProps<typeof Popup>['offset'];
 
     onChange?: (value: any) => void;
 }
@@ -81,6 +83,8 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
             maxWidth = 250,
             minWidth = 150,
             className,
+            placement = 'bottom-start',
+            offset = [-4, 8],
             renderItem,
             renderTrigger,
             renderInput,
@@ -185,7 +189,7 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
                 </span>
 
                 <Popup
-                    placement="bottom-start"
+                    placement={placement}
                     visible={popupVisible && Boolean(flatItems.length)}
                     onClickOutside={onClickOutside}
                     reference={popupRef}
@@ -193,7 +197,7 @@ const ComboBox = React.forwardRef<HTMLDivElement, ComboBoxProps>(
                     arrow={false}
                     minWidth={minWidth}
                     maxWidth={maxWidth}
-                    offset={[-4, 8]}
+                    offset={offset}
                 >
                     <div {...onESC}>
                         {renderItems ? renderItems(children as React.ReactNode) : (children as React.ReactNode)}
