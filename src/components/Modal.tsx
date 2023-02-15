@@ -50,8 +50,6 @@ const StyledModal = styled.div<{ view?: ModalViewType }>`
     position: absolute;
     z-index: 101;
 
-    overflow: auto;
-
     min-width: 300px;
     min-height: 200px;
     max-height: 90%;

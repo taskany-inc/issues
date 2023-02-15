@@ -188,6 +188,8 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                     <ComboBox
                         text={query}
                         value={query}
+                        placement="top-start"
+                        offset={[-4, 38]}
                         visible={completionVisible}
                         items={goalsData?.findGoal}
                         onChange={onDependencyAdd}
