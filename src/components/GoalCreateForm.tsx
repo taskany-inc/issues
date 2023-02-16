@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
@@ -8,6 +9,7 @@ import { Activity } from '../../graphql/@generated/genql';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { Icon } from './Icon';
 import { Tip } from './Tip';
@@ -30,8 +32,11 @@ const GoalCreateForm: React.FC = () => {
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
+    const [busy, setBusy] = useState(false);
 
     const createGoal = async (form: GoalFormType) => {
+        setBusy(true);
+
         const promise = gql.mutation({
             createGoal: [
                 {
@@ -76,11 +81,13 @@ const GoalCreateForm: React.FC = () => {
             setLastProjectCache(form.parent);
 
             router.goal(res.createGoal.id);
+            dispatchModalEvent(ModalEvent.GoalCreateModal)();
         }
     };
 
     return (
         <GoalForm
+            busy={busy}
             i18nKeyset="goals.new"
             formTitle={t('Create new goal')}
             owner={{ id: user?.activityId, user } as Partial<Activity>}

@@ -106,6 +106,7 @@ interface GoalFormProps {
     state?: Partial<State>;
     priority?: Priority | string;
     estimate?: EstimateInput;
+    busy?: boolean;
     children?: React.ReactNode;
 
     onSumbit: (fields: GoalFormType) => void;
@@ -130,6 +131,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     priority,
     estimate,
     i18nKeyset,
+    busy,
     children,
     onSumbit,
 }) => {
@@ -201,6 +203,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         placeholder={t("Goal's title")}
                         autoFocus
                         flat="bottom"
+                        disabled={busy}
                     />
 
                     <Controller
@@ -213,6 +216,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 error={errorsResolver(field.name)}
                                 onFocus={onDescriptionFocus}
                                 onCancel={onDescriptionCancel}
+                                disabled={busy}
                                 {...field}
                             />
                         )}
@@ -234,6 +238,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                         text={t('Enter project or team title')}
                                         placeholder={t('Enter project or team title')}
                                         error={errorsResolver(field.name)}
+                                        disabled={busy}
                                         {...field}
                                     />
                                 )}
@@ -246,6 +251,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     <PriorityDropdown
                                         text={t('Priority.Priority')}
                                         error={errorsResolver(field.name)}
+                                        disabled={busy}
                                         {...field}
                                     />
                                 )}
@@ -259,6 +265,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                         text={t('Assign')}
                                         placeholder={t('Enter name or email')}
                                         error={errorsResolver(field.name)}
+                                        disabled={busy}
                                         {...field}
                                     />
                                 )}
@@ -274,6 +281,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                         mask={t('Date input mask')}
                                         defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
                                         error={errorsResolver(field.name)}
+                                        disabled={busy}
                                         {...field}
                                     />
                                 )}
@@ -287,6 +295,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                         text={t('State')}
                                         flowId={parentWatcher?.flowId}
                                         error={errorsResolver(field.name)}
+                                        disabled={busy}
                                         {...field}
                                     />
                                 )}
@@ -298,7 +307,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 render={({ field }) => (
                                     <TagComboBox
                                         text="Tags"
-                                        disabled={(tagsWatcher || []).length >= tagsLimit}
+                                        disabled={busy || (tagsWatcher || []).length >= tagsLimit}
                                         placeholder={t('Enter tag title')}
                                         error={errorsResolver(field.name)}
                                         {...field}
@@ -307,7 +316,13 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             />
                         </FormAction>
                         <FormAction right inline>
-                            <Button view="primary" outline={!isValid} type="submit" text={t('Submit')} />
+                            <Button
+                                view="primary"
+                                disabled={busy}
+                                outline={!isValid}
+                                type="submit"
+                                text={t('Submit')}
+                            />
                         </FormAction>
                     </StyledFormActions>
                 </Form>
