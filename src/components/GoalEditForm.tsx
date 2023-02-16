@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
@@ -15,7 +16,11 @@ interface GoalEditFormProps {
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const t = useTranslations('goals.edit');
 
+    const [busy, setBusy] = useState(false);
+
     const updateGoal = async (form: GoalFormType) => {
+        setBusy(true);
+
         const promise = gql.mutation({
             updateGoal: [
                 {
@@ -51,6 +56,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
 
     return (
         <GoalForm
+            busy={busy}
             i18nKeyset="goals.edit"
             formTitle={t('Edit the goal')}
             title={goal.title}
