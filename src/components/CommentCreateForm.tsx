@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
+import { z } from 'zod';
 
 import { usePageContext } from '../hooks/usePageContext';
 import { CreateFormType, useCommentResource } from '../hooks/useCommentResource';
@@ -23,13 +24,15 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
     const { user } = usePageContext();
     const { createSchema, create } = useCommentResource({ t });
     const [focus, setFocus] = useState<boolean | undefined>();
+    const [busy, setBusy] = useState(false);
+
+    type CommentFormType = z.infer<typeof createSchema>;
 
     const {
         control,
         handleSubmit,
         reset,
-        clearErrors,
-        formState: { isValid, errors },
+        formState: { isValid },
     } = useForm<CreateFormType>({
         resolver: zodResolver(createSchema),
         mode: 'onChange',
@@ -40,16 +43,25 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
         },
     });
 
-    const createComment = create(({ id }) => {
-        onSubmit?.(id);
-        reset();
-    });
+    const createComment = useCallback(
+        (form: CommentFormType) => {
+            setBusy(true);
+
+            // FIXME: maybe async/await would be better API
+            create(({ id }) => {
+                onSubmit?.(id);
+                reset();
+                setFocus(false);
+                setBusy(false);
+            })(form);
+        },
+        [create, onSubmit, reset],
+    );
 
     const onCommentFocus = useCallback(() => {
         onFocus?.();
-        clearErrors();
         setFocus(true);
-    }, [onFocus, clearErrors]);
+    }, [onFocus]);
 
     const onCancelCreate = useCallback(() => {
         onCancel?.();
@@ -62,10 +74,10 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
             <UserPic size={32} src={user?.image} email={user?.email} />
 
             <CommentForm
+                busy={busy}
                 i18nKeyset="Comment.new"
                 control={control}
                 isValid={isValid}
-                error={errors.description}
                 height={focus ? 120 : 60}
                 onSubmit={handleSubmit(createComment)}
                 onCancel={onCancelCreate}
