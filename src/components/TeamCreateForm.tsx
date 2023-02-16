@@ -18,6 +18,7 @@ import { keyPredictor } from '../utils/keyPredictor';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
+import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -109,6 +110,7 @@ const TeamCreateForm: React.FC = () => {
 
     const [focusedInput, setFocusedInput] = useState(false);
     const [hoveredInput, setHoveredInput] = useState(false);
+    const [busy, setBusy] = useState(false);
 
     const schema = schemaProvider(t);
 
@@ -155,6 +157,8 @@ const TeamCreateForm: React.FC = () => {
     }, [setValue, flowData?.flowRecommended]);
 
     const createTeam = async (form: TeamFormType) => {
+        setBusy(true);
+
         const promise = gql.mutation({
             createTeam: [
                 {
@@ -180,6 +184,7 @@ const TeamCreateForm: React.FC = () => {
         const res = await promise;
 
         res.createTeam?.slug && router.team(res.createTeam.slug);
+        dispatchModalEvent(ModalEvent.TeamCreateModal)();
     };
 
     const isTeamTitleAvailable = Boolean(teamsData?.teams?.length === 0);
@@ -206,6 +211,7 @@ const TeamCreateForm: React.FC = () => {
                             placeholder={t("Team's title")}
                             flat="bottom"
                             brick="right"
+                            disabled={busy}
                             error={errorsResolver('title')}
                             onMouseEnter={() => setHoveredInput(true)}
                             onMouseLeave={() => setHoveredInput(false)}
@@ -225,6 +231,7 @@ const TeamCreateForm: React.FC = () => {
                                             focused={focusedInput}
                                         >
                                             <KeyInput
+                                                disabled={busy}
                                                 available={isTeamTitleAvailable}
                                                 tooltip={
                                                     isTeamTitleAvailable
@@ -247,6 +254,7 @@ const TeamCreateForm: React.FC = () => {
                         {...register('description')}
                         placeholder={t('And its description')}
                         flat="both"
+                        disabled={busy}
                         error={errorsResolver('description')}
                     />
 
@@ -267,7 +275,13 @@ const TeamCreateForm: React.FC = () => {
                             />
                         </FormAction>
                         <FormAction right inline>
-                            <Button view="primary" outline={!isValid} type="submit" text={t('Create team')} />
+                            <Button
+                                view="primary"
+                                disabled={busy}
+                                outline={!isValid}
+                                type="submit"
+                                text={t('Create team')}
+                            />
                         </FormAction>
                     </FormActions>
                 </Form>
