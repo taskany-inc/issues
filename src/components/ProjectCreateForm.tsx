@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import useSWR from 'swr';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
+import { z } from 'zod';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -16,6 +17,7 @@ import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../hooks/useProjectResource';
+import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -85,8 +87,10 @@ const ProjectCreateForm: React.FC = () => {
     const { createProject } = useProjectResource(0);
     const [focusedInput, setFocusedInput] = useState(false);
     const [hoveredInput, setHoveredInput] = useState(false);
+    const [busy, setBusy] = useState(false);
 
     const schema = createProjectSchemaProvider(t);
+    type ProjectFormType = z.infer<typeof schema>;
 
     const {
         register,
@@ -129,10 +133,16 @@ const ProjectCreateForm: React.FC = () => {
     }, [setValue, flowData?.flowRecommended]);
 
     const onCreateProject = useCallback(
-        (key: string) => {
-            router.project(key);
+        (form: ProjectFormType) => {
+            setBusy(true);
+
+            // FIXME: it not looks like the best API
+            createProject((key: string) => {
+                router.project(key);
+                dispatchModalEvent(ModalEvent.ProjectCreateModal)();
+            }, t)(form);
         },
-        [router],
+        [router, createProject, t],
     );
 
     const isProjectKeyAvailable = Boolean(projectData?.project === null || !projectData);
@@ -152,13 +162,14 @@ const ProjectCreateForm: React.FC = () => {
             </ModalHeader>
 
             <ModalContent>
-                <Form onSubmit={handleSubmit(createProject(onCreateProject, t))} submitHotkey={submitKeys}>
+                <Form onSubmit={handleSubmit(onCreateProject)} submitHotkey={submitKeys}>
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
                             placeholder={t("create.Project's title")}
                             flat="bottom"
                             brick="right"
+                            disabled={busy}
                             error={errorsResolver('title')}
                             onMouseEnter={() => setHoveredInput(true)}
                             onMouseLeave={() => setHoveredInput(false)}
@@ -178,6 +189,7 @@ const ProjectCreateForm: React.FC = () => {
                                             focused={focusedInput}
                                         >
                                             <KeyInput
+                                                disabled={busy}
                                                 available={isProjectKeyAvailable}
                                                 tooltip={
                                                     isProjectKeyAvailable
@@ -198,6 +210,7 @@ const ProjectCreateForm: React.FC = () => {
 
                     <FormTextarea
                         {...register('description')}
+                        disabled={busy}
                         placeholder={t('create.And its description')}
                         flat="both"
                         error={errorsResolver('description')}
@@ -220,7 +233,13 @@ const ProjectCreateForm: React.FC = () => {
                             />
                         </FormAction>
                         <FormAction right inline>
-                            <Button view="primary" outline={!isValid} type="submit" text={t('create.Create project')} />
+                            <Button
+                                view="primary"
+                                disabled={busy}
+                                outline={!isValid}
+                                type="submit"
+                                text={t('create.Create project')}
+                            />
                         </FormAction>
                     </FormActions>
                 </Form>
