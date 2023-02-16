@@ -26,6 +26,7 @@ interface CommentFormProps {
     height?: number;
     isValid?: boolean;
     error?: React.ComponentProps<typeof FormEditor>['error'];
+    busy?: boolean;
 
     onSubmit?: () => void;
     onFocus?: () => void;
@@ -72,6 +73,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     height,
     control,
     error,
+    busy,
     isValid,
     onSubmit,
     onFocus,
@@ -91,15 +93,21 @@ export const CommentForm: React.FC<CommentFormProps> = ({
         onCancel?.();
     }, [onCancel]);
 
+    const onCommentSubmit = useCallback(() => {
+        onSubmit?.();
+        setCommentFocused(false);
+    }, [onSubmit]);
+
     return (
         <StyledCommentForm tabIndex={0}>
-            <Form onSubmit={onSubmit} submitHotkey={submitKeys}>
+            <Form onSubmit={onCommentSubmit} submitHotkey={submitKeys}>
                 <Controller
                     name="description"
                     control={control}
                     render={({ field }) => (
                         <FormEditor
                             {...field}
+                            disabled={busy}
                             placeholder={t('Leave a comment')}
                             height={height}
                             onCancel={onCommentCancel}
@@ -114,8 +122,18 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                     <FormActions focused={commentFocused}>
                         <FormAction left inline />
                         <FormAction right inline>
-                            <Button size="m" text={t('Cancel')} onClick={onCommentCancel} />
-                            <Button size="m" view="primary" outline={!isValid} type="submit" text={t('Comment')} />
+                            {nullable(!busy, () => (
+                                <Button size="m" text={t('Cancel')} onClick={onCommentCancel} />
+                            ))}
+
+                            <Button
+                                size="m"
+                                view="primary"
+                                disabled={busy}
+                                outline={!isValid}
+                                type="submit"
+                                text={t('Comment')}
+                            />
                         </FormAction>
                     </FormActions>
                 ))}
