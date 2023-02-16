@@ -49,8 +49,8 @@ export const IssueParent: React.FC<IssueParentProps> = ({ parent, kind, as, mode
     const normalizedParent = ([] as Array<Parent | undefined>).concat(parent).filter(Boolean) as Array<Parent>;
 
     const kindTitleMap = {
-        project: t('Project'),
-        team: t('Team'),
+        project: `${t('Project')} — `,
+        team: `${t('Team')}: `,
     };
 
     const kindContentMap = {
@@ -76,7 +76,7 @@ export const IssueParent: React.FC<IssueParentProps> = ({ parent, kind, as, mode
         ),
     };
 
-    const pre = mode === 'compact' ? '' : `${kindTitleMap[kind]} — `;
+    const pre = mode === 'compact' ? '' : `${kindTitleMap[kind]}`;
 
     return (
         <StyledIssueParentTitle as={as} size={size} weight="bold" color={gray9} mode={mode}>
