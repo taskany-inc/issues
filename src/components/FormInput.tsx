@@ -140,6 +140,7 @@ const StyledFormInput = styled(
         disabled &&
         `
             color: ${gray8};
+            cursor: not-allowed;
         `}
 
 

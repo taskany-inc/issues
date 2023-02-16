@@ -4,7 +4,18 @@ import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { useDropzone } from 'react-dropzone';
 
-import { danger10, gapS, gapXs, gray2, gray3, gray4, gray6, radiusS, textColor } from '../design/@generated/themes';
+import {
+    danger10,
+    gapS,
+    gapXs,
+    gray2,
+    gray3,
+    gray4,
+    gray6,
+    gray8,
+    radiusS,
+    textColor,
+} from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { useMounted } from '../hooks/useMounted';
@@ -21,6 +32,7 @@ interface FormEditorProps {
     flat?: 'top' | 'bottom' | 'both';
     height?: number;
     placeholder?: string;
+    disabled?: boolean;
     error?: {
         message?: string;
     };
@@ -48,7 +60,7 @@ const defaultOptions: React.ComponentProps<typeof Editor>['options'] = {
     scrollBeyondLastLine: false,
 };
 
-const StyledEditor = styled.div<{ flat: FormEditorProps['flat']; value: boolean }>`
+const StyledEditor = styled.div<{ flat: FormEditorProps['flat']; value: boolean; disabled: boolean }>`
     position: relative;
     box-sizing: border-box;
 
@@ -145,6 +157,22 @@ const StyledEditor = styled.div<{ flat: FormEditorProps['flat']; value: boolean 
                 }
             }
         `}
+
+    ${({ disabled }) =>
+        disabled &&
+        `
+            pointer-events: none;
+            cursor: not-allowed;
+
+            .monaco-editor {
+                color: ${gray8};
+
+                .inputarea.ime-input,
+                .mtk1 {
+                    color: ${gray8};
+                }
+            }
+        `}
 `;
 
 const StyledPlaceholder = styled.div`
@@ -210,7 +238,10 @@ const mdImageLink = (url: string) => `![](${url})`;
 const maxEditorHeight = 450;
 
 export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
-    ({ id, value, flat, height = 200, placeholder, error, autoFocus, onChange, onFocus, onBlur, onCancel }, ref) => {
+    (
+        { id, value, flat, height = 200, placeholder, error, autoFocus, disabled, onChange, onFocus, onBlur, onCancel },
+        ref,
+    ) => {
         const [focused, setFocused] = useState(false);
         const [contentHeight, setContentHeight] = useState(height);
         const monacoEditorRef = useRef<any>(null);
@@ -337,12 +368,13 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
                 <StyledEditor
                     {...getRootProps()}
                     value={Boolean(viewValue)}
+                    disabled={disabled}
                     tabIndex={-1}
                     id={id}
                     flat={flat}
                     ref={ref}
                     {...onESC}
-                    onClick={() => {}}
+                    onClick={disabled ? undefined : () => {}}
                 >
                     {nullable(isDragActive, () => (
                         <StyledDropZone>
@@ -382,7 +414,6 @@ export const FormEditor = React.forwardRef<HTMLDivElement, FormEditorProps>(
                             loading=""
                             theme="vs-dark"
                             defaultLanguage="markdown"
-                            // height={contentHeight + 20}
                             value={viewValue}
                             options={defaultOptions}
                             onChange={onChange}
