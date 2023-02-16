@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
 
-import { gapS } from '../design/@generated/themes';
+import { gapS, gray2 } from '../design/@generated/themes';
 import {
     Project,
     EstimateInput,
@@ -113,11 +113,9 @@ interface GoalFormProps {
 }
 
 const StyledTagsContainer = styled.div`
-    padding-left: ${gapS};
-`;
-
-const StyledFormActions = styled(FormActions)`
     padding-top: 50px;
+    padding-left: ${gapS};
+    background-color: ${gray2};
 `;
 
 export const GoalForm: React.FC<GoalFormProps> = ({
@@ -228,7 +226,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         ))}
                     </StyledTagsContainer>
 
-                    <StyledFormActions flat="top" focused={descriptionFocused}>
+                    <FormActions flat="top" focused={descriptionFocused}>
                         <FormAction left inline>
                             <Controller
                                 name="parent"
@@ -324,7 +322,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 text={t('Submit')}
                             />
                         </FormAction>
-                    </StyledFormActions>
+                    </FormActions>
                 </Form>
 
                 {children}
