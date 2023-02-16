@@ -123,9 +123,7 @@ export const CommentView: FC<CommentViewProps> = ({
     const onDoubleCommentClick = useCallback<React.MouseEventHandler>(
         (e) => {
             if (isEditable && e.detail === 2) {
-                setTimeout(() => {
-                    onEditClick();
-                }, 100);
+                onEditClick();
             }
         },
         [isEditable, onEditClick],
@@ -143,7 +141,7 @@ export const CommentView: FC<CommentViewProps> = ({
         setCommentDescription(description);
     }, []);
 
-    // TODO: think twice about this
+    // FIXME: think twice about this
     const onDeleteClick = useCallback(() => {
         remove(({ id }) => {
             id && onDelete?.(id);
