@@ -18,6 +18,7 @@ interface KeyInputProps {
     placeholder?: string;
     available?: boolean;
     tooltip?: React.ReactNode;
+    disabled?: boolean;
 
     onChange?: (key: string) => void;
     onBlur?: (key: string) => void;
@@ -38,6 +39,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
     tabIndex,
     available = true,
     tooltip,
+    disabled,
     onChange,
     onBlur,
 }) => {
@@ -86,6 +88,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                 {editMode ? (
                     <StyledInput
                         autoFocus
+                        disabled={disabled}
                         placeholder={placeholder}
                         value={value}
                         onChange={onInputChange}
@@ -96,6 +99,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                 ) : (
                     <StyledButton
                         outline
+                        disabled={disabled}
                         size={size}
                         text={value}
                         tabIndex={tabIndex}
