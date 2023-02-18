@@ -194,6 +194,7 @@ const goalsFilter = (
 
     return {
         where: {
+            archived: false,
             OR: [
                 {
                     title: {
@@ -244,7 +245,6 @@ const goalsFilter = (
             ...statesFilter,
             ...tagsFilter,
             ...ownerFilter,
-            ...extra,
             AND: {
                 OR: [
                     {
@@ -255,6 +255,7 @@ const goalsFilter = (
                     },
                 ],
             },
+            ...extra,
         },
         orderBy: {
             createdAt: 'asc',

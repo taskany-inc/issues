@@ -62,6 +62,7 @@ const projectGoalsFilter = (
 
     return {
         where: {
+            archived: false,
             OR: [
                 {
                     title: {
@@ -97,16 +98,6 @@ const projectGoalsFilter = (
             ...tagsFilter,
             ...ownerFilter,
             ...extra,
-            AND: {
-                OR: [
-                    {
-                        archived: false,
-                    },
-                    {
-                        archived: null,
-                    },
-                ],
-            },
         },
     };
 };
