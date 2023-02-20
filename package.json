@@ -79,7 +79,7 @@
     "@babel/core": "7.20.5",
     "@faker-js/faker": "7.6.0",
     "@genql/cli": "2.10.0",
-    "@next/bundle-analyzer": "13.0.6",
+    "@next/bundle-analyzer": "13.1.6",
     "@storybook/addon-actions": "6.5.13",
     "@storybook/addon-essentials": "6.5.15",
     "@storybook/addon-interactions": "6.5.16",
