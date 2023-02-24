@@ -18,6 +18,7 @@
     "generate": "concurrently \"npm run generate:nexus\" \"npm run generate:genql\" \"npm run generate:themes\" \"npm run generate:types\"",
     "db:run": "docker-compose -f docker-compose.dev.yml up -d",
     "db:down": "docker-compose down",
+    "db:update": "ts-node -r dotenv/config --compiler-options {\"module\":\"CommonJS\"} unsafe-prod-db-update.ts",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
