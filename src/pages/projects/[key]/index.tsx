@@ -267,6 +267,10 @@ const ProjectPage = ({
         setPreview(null);
     }, []);
 
+    const onGoalPreviewDelete = useCallback(() => {
+        setPreview(null);
+    }, []);
+
     return (
         <Page
             user={user}
@@ -317,7 +321,12 @@ const ProjectPage = ({
                 </StyledGoalsList>
 
                 {nullable(preview, (p) => (
-                    <GoalPreview goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
+                    <GoalPreview
+                        goal={p}
+                        visible={Boolean(p)}
+                        onClose={onGoalPreviewClose}
+                        onDelete={onGoalPreviewDelete}
+                    />
                 ))}
             </ProjectPageLayout>
         </Page>

@@ -339,6 +339,10 @@ const TeamGoalsPage = ({
         setPreview(null);
     }, []);
 
+    const onGoalPreviewDelete = useCallback(() => {
+        setPreview(null);
+    }, []);
+
     return (
         <Page
             user={user}
@@ -427,7 +431,12 @@ const TeamGoalsPage = ({
                 </PageContent>
 
                 {nullable(preview, (p) => (
-                    <GoalPreview goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
+                    <GoalPreview
+                        goal={p}
+                        visible={Boolean(p)}
+                        onClose={onGoalPreviewClose}
+                        onDelete={onGoalPreviewDelete}
+                    />
                 ))}
             </TeamPageLayout>
         </Page>

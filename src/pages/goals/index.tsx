@@ -227,6 +227,10 @@ const GoalsPage = ({
         setPreview(null);
     }, []);
 
+    const onGoalPreviewDelete = useCallback(() => {
+        setPreview(null);
+    }, []);
+
     const groups = useMemo(() => {
         return goals.reduce(
             (acc, goal) => {
@@ -379,7 +383,12 @@ const GoalsPage = ({
             </PageContent>
 
             {nullable(preview, (p) => (
-                <GoalPreview goal={p} visible={Boolean(p)} onClose={onGoalPreviewClose} />
+                <GoalPreview
+                    goal={p}
+                    visible={Boolean(p)}
+                    onClose={onGoalPreviewClose}
+                    onDelete={onGoalPreviewDelete}
+                />
             ))}
         </Page>
     );

@@ -54,6 +54,7 @@ interface GoalPreviewProps {
     visible?: boolean;
 
     onClose?: () => void;
+    onDelete?: () => void;
 }
 
 const StyledImportantActions = styled.div`
@@ -88,7 +89,7 @@ const StyledCard = styled(Card)`
     min-height: 60px;
 `;
 
-const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, onClose }) => {
+const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, onClose, onDelete }) => {
     const t = useTranslations('goals.id');
     const { user, locale } = usePageContext();
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
@@ -153,6 +154,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
     }, []);
 
     const onGoalDeleteConfirm = useCallback(async () => {
+        onDelete?.();
         const promise = gql.mutation({
             toggleGoalArchive: [
                 {
@@ -176,7 +178,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
         await promise;
 
         refresh();
-    }, [t, goal, refresh]);
+    }, [t, goal, refresh, onDelete]);
 
     return (
         <>
