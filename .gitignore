@@ -50,3 +50,6 @@ TODO.md
 
 # Sentry
 next.config.original.js
+
+# dev tools
+unsafe-prod-db-update.ts
