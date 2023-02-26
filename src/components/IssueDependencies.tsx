@@ -54,7 +54,7 @@ const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onChange }
                             key={dependency}
                             title={t(dependency)}
                             dependencies={issue[dependency]}
-                            onEdit={onDependenciesEdit}
+                            onEdit={onChange ? onDependenciesEdit : undefined}
                         />
                     ))}
                 </>
