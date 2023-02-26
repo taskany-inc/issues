@@ -125,17 +125,19 @@ const flow = prisma.flow.create({
         title: 'Goal — Default',
         recommended: true,
         states: {
-            create: [
-                ['Draft', 1],
-                ['InProgress', 194],
-                ['Blocked', 30],
-                ['Finished', 158],
-                ['Failed', 360],
-                ['Canceled', 274],
-                ['AtRisk', 14],
-            ].map(([title, hue]) => ({
-                title: title as string,
-                hue: hue as number,
+            create: (
+                [
+                    ['Draft', 1],
+                    ['InProgress', 194],
+                    ['Blocked', 30],
+                    ['Finished', 158],
+                    ['Failed', 360],
+                    ['Canceled', 274],
+                    ['AtRisk', 14],
+                ] as [string, number][]
+            ).map(([title, hue]) => ({
+                title,
+                hue,
                 default: title === 'Draft',
             })),
         },
@@ -151,24 +153,24 @@ seed('Default projects', async () => {
 
     const allProjects = await Promise.all(
         [
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-            [`${faker.animal.cat()}-${faker.datatype.number()}`, sample(allUsers)?.activityId],
-        ].map(([title, userId]) =>
+            ['Frontend', sample(allUsers).activityId],
+            ['QA Department', sample(allUsers).activityId],
+            ['Python dev team', sample(allUsers).activityId],
+            ['Backend support', sample(allUsers).activityId],
+            ['Marketing', sample(allUsers).activityId],
+            ['Machine Learning RnD', sample(allUsers).activityId],
+            ['Lovely users communications', sample(allUsers).activityId],
+            ['Finance department', sample(allUsers).activityId],
+            ['Social promotion team', sample(allUsers).activityId],
+            ['Cyber security', sample(allUsers).activityId],
+        ].map(([title, activityId]: string[]) =>
             prisma.project.create({
                 data: {
-                    title: title as string,
-                    key: keyPredictor(title as string),
+                    title,
+                    key: keyPredictor(title),
                     flowId: f.id,
                     description: faker.lorem.sentence(5),
-                    activityId: userId as string,
+                    activityId,
                 },
             }),
         ),
@@ -178,26 +180,26 @@ seed('Default projects', async () => {
             // eslint-disable-next-line no-await-in-loop
             const allGoals = await Promise.all(
                 [
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers)?.activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
+                    [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
                     // eslint-disable-next-line no-loop-func
-                ].map(([title, description, userId], index) =>
+                ].map(([title, description, activityId]: string[], index) =>
                     prisma.goal.create({
                         data: {
                             id: `${project.key}-${index}`,
-                            title: title as string,
-                            description: description as string,
+                            title,
+                            description,
                             projectId: project.id,
-                            activityId: userId,
-                            ownerId: userId,
+                            activityId,
+                            ownerId: activityId,
                             priority: sample(priorities),
                             participants: {
                                 connect:
@@ -221,37 +223,37 @@ seed('Default projects', async () => {
                                     Math.random() > 0.66
                                         ? [
                                               {
-                                                  title: sample(tags) as string,
-                                                  activityId: userId as string,
+                                                  title: sample(tags),
+                                                  activityId,
                                               },
                                               {
-                                                  title: sample(tags) as string,
-                                                  activityId: userId as string,
+                                                  title: sample(tags),
+                                                  activityId,
                                               },
                                           ]
                                         : Math.random() > 0.33
                                         ? {
-                                              title: sample(tags) as string,
-                                              activityId: userId as string,
+                                              title: sample(tags),
+                                              activityId,
                                           }
                                         : undefined,
                             },
                             comments: {
                                 createMany: {
                                     data: [
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                        [faker.lorem.sentence(5), sample(allUsers)?.activityId],
-                                    ].map(([description, userId]) => ({
-                                        description: description as string,
-                                        activityId: userId as string,
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                        [faker.lorem.sentence(5), sample(allUsers).activityId],
+                                    ].map(([description, activityId]: string[]) => ({
+                                        description,
+                                        activityId,
                                     })),
                                 },
                             },
