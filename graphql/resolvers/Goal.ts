@@ -540,8 +540,15 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
 
             return {
                 ...goal,
-                _isStarred: goal.stargizers.filter((stargizer) => stargizer?.id === activity.id).length > 0,
-                _isWatching: goal.watchers.filter((watcher) => watcher?.id === activity.id).length > 0,
+                _isStarred: Boolean(goal.stargizers?.filter((stargizer) => stargizer?.id === activity.id).length),
+                _isWatching: Boolean(goal.watchers?.filter((watcher) => watcher?.id === activity.id).length),
+                _isIssuer: goal.activityId === activity.id,
+                _isOwner: goal.ownerId === activity.id,
+                _isEditable: goal.activityId === activity.id || goal.ownerId === activity.id,
+                _lastEstimate: goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined,
+                _isParticipant: Boolean(
+                    goal.participants?.filter((participant) => participant?.id === activity.id).length,
+                ),
             };
         },
     });
