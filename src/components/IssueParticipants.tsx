@@ -31,7 +31,7 @@ const IssueParticipants: React.FC<IssueParticipantsProps> = ({ issue, onChange }
             <IssueParticipantsList
                 title={t('Participants')}
                 participants={issue.participants}
-                onEdit={onParticipantsEdit}
+                onEdit={onChange ? onParticipantsEdit : undefined}
             />
 
             {nullable(onChange, () => (
