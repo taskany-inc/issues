@@ -49,7 +49,7 @@ export const IssueParent: React.FC<IssueParentProps> = ({ parent, kind, as, mode
     const normalizedParent = ([] as Array<Parent | undefined>).concat(parent).filter(Boolean) as Array<Parent>;
 
     const kindTitleMap = {
-        project: `${t('Project')} — `,
+        project: `${t('Project')}: `,
         team: `${t('Team')}: `,
     };
 
