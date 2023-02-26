@@ -199,6 +199,8 @@ export const Goal = objectType({
         t.boolean('_isOwner');
         t.boolean('_isIssuer');
         t.boolean('_isParticipant');
+        t.boolean('_isEditable');
+        t.field('_lastEstimate', { type: Estimate });
     },
 });
 

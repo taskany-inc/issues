@@ -191,6 +191,15 @@ export const goalFetcher = createFetcher((_, id: string) => ({
             },
             _isStarred: true,
             _isWatching: true,
+            _isIssuer: true,
+            _isOwner: true,
+            _isEditable: true,
+            _lastEstimate: {
+                date: true,
+                q: true,
+                y: true,
+            },
+            _isParticipant: true,
         },
     ],
 }));

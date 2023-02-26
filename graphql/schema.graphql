@@ -93,11 +93,13 @@ type Ghost {
 
 type Goal {
   _count: GoalAggregation
+  _isEditable: Boolean
   _isIssuer: Boolean
   _isOwner: Boolean
   _isParticipant: Boolean
   _isStarred: Boolean
   _isWatching: Boolean
+  _lastEstimate: Estimate
   activity: Activity
   activityId: String
   archived: Boolean
