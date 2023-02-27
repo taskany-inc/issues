@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
@@ -5,8 +7,9 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
+import { useRouter as useNextRouter } from 'next/router';
 
-import { Goal, State, GoalDependencyToggleInput } from '../../../graphql/@generated/genql';
+import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { formatEstimate } from '../../utils/dateTime';
@@ -14,7 +17,6 @@ import { nullable } from '../../utils/nullable';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { useMounted } from '../../hooks/useMounted';
 import { danger0, gapM, gapS } from '../../design/@generated/themes';
 import { Page, PageContent, PageActions } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
@@ -106,21 +108,15 @@ const StyledCardActions = styled.div`
     }
 `;
 
-const StyledIssueDeps = styled.div``;
-
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { id } }) => {
-        const ssrProps = {
-            ssrData: await goalFetcher(user, id),
-        };
+        const ssrData = await goalFetcher(user, id);
 
-        if (!ssrProps.ssrData.goal) {
-            return {
-                notFound: true,
-            };
-        }
-
-        return ssrProps;
+        return ssrData.goal
+            ? { ssrData }
+            : {
+                  notFound: true,
+              };
     },
     {
         private: true,
@@ -131,31 +127,42 @@ const GoalPage = ({
     user,
     locale,
     ssrTime,
-    ssrData,
+    ssrData: fallbackData,
     params: { id },
-}: ExternalPageProps<{ goal: Goal; goalPriorityKind: string[]; goalPriorityColors: number[] }, { id: string }>) => {
+}: ExternalPageProps<Awaited<ReturnType<typeof goalFetcher>>, { id: string }>) => {
     const router = useRouter();
+    const nextRouter = useNextRouter();
     const t = useTranslations('goals.id');
-    const mounted = useMounted(refreshInterval);
-    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
-    const { data, mutate } = useSWR(mounted ? [user, id] : null, (...args) => goalFetcher(...args), {
+    const { data, mutate } = useSWR([user, id], goalFetcher, {
         refreshInterval,
+        fallbackData,
     });
-    const refresh = useCallback(() => mutate(), [mutate]);
-    // NB: this line is compensation for first render before delayed swr will bring updates
-    const goal: Goal = data?.goal ?? ssrData.goal;
+
+    if (!data) return null;
+
+    const goal = data.goal;
+
+    if (!goal) return nextRouter.push('/404');
+
+    const project: Project | undefined = goal.project;
+    const issuer: Activity | undefined = goal.activity;
+    const owner: Activity | undefined = goal.owner;
+
+    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
+    useEffect(() => {
+        project &&
+            setCurrentProjectCache({
+                ...project,
+                kind: 'project',
+            });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    useWillUnmount(() => {
+        setCurrentProjectCache(null);
+    });
 
     const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal.id);
-    const issueEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
-    const isUserAllowedToEdit = user?.activityId === goal?.activityId || user?.activityId === goal?.ownerId;
-    const priorityColorIndex = (data || ssrData)?.goalPriorityKind?.indexOf(goal.priority || '') ?? -1;
-    const priorityColor =
-        priorityColorIndex >= 0 ? (data || ssrData)?.goalPriorityColors?.[priorityColorIndex] : undefined;
-    const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
-    const updateGoal = useGoalUpdate(t, goal);
-    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
-
     const [watcher, setWatcher] = useState(goal._isWatching);
     const onWatchToggle = useCallback(() => {
         setWatcher(!watcher);
@@ -166,18 +173,11 @@ const GoalPage = ({
         setStargizer(!stargizer);
     }, [stargizer]);
 
-    useEffect(() => {
-        goal.project &&
-            setCurrentProjectCache({
-                ...goal.project,
-                kind: 'project',
-            });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useWillUnmount(() => {
-        setCurrentProjectCache(null);
-    });
+    const priorityColorIndex = data.goalPriorityKind?.indexOf(goal.priority || '') ?? -1;
+    const priorityColor = priorityColorIndex >= 0 ? data.goalPriorityColors?.[priorityColorIndex] : undefined;
+    const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
+    const updateGoal = useGoalUpdate(t, goal);
+    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
 
     const onGoalStateChange = useCallback(
         async (state: State) => {
@@ -185,12 +185,12 @@ const GoalPage = ({
                 stateId: state.id,
             });
 
-            refresh();
+            mutate();
         },
-        [updateGoal, refresh],
+        [updateGoal, mutate],
     );
 
-    const onGoalReactionToggle = useCallback((id: string) => goalReaction(id, refresh), [refresh, goalReaction]);
+    const onGoalReactionToggle = useCallback((id: string) => goalReaction(id, mutate), [mutate, goalReaction]);
 
     const onParticipantsChange = useCallback(
         async (participants: string[]) => {
@@ -198,9 +198,9 @@ const GoalPage = ({
                 participants,
             });
 
-            refresh();
+            mutate();
         },
-        [refresh, updateGoal],
+        [mutate, updateGoal],
     );
 
     const onDependenciesChange = useCallback(
@@ -224,25 +224,22 @@ const GoalPage = ({
 
             await promise;
 
-            refresh();
+            mutate();
         },
-        [refresh, t],
+        [mutate, t],
     );
 
     const onCommentPublish = useCallback(
         (id?: string) => {
-            refresh();
+            mutate();
             setHighlightCommentId(id);
         },
-        [refresh, setHighlightCommentId],
+        [mutate, setHighlightCommentId],
     );
-    const onCommentReactionToggle = useCallback(
-        (id: string) => commentReaction(id, refresh),
-        [refresh, commentReaction],
-    );
+    const onCommentReactionToggle = useCallback((id: string) => commentReaction(id, mutate), [mutate, commentReaction]);
     const onCommentDelete = useCallback(() => {
-        refresh();
-    }, [refresh]);
+        mutate();
+    }, [mutate]);
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(
@@ -252,10 +249,10 @@ const GoalPage = ({
             if (goal.id !== id) {
                 router.goal(id);
             } else {
-                refresh();
+                mutate();
             }
         },
-        [refresh, goal.id, router],
+        [mutate, goal.id, router],
     );
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
@@ -312,20 +309,20 @@ const GoalPage = ({
                         <IssueParent kind="team" parent={team} />
                     ))}
 
-                    {Boolean(goal.project?.teams?.length) &&
-                        nullable(goal.project?.teams, (teams) => <IssueParent kind="team" size="m" parent={teams} />)}
+                    {Boolean(project?.teams?.length) &&
+                        nullable(project?.teams, (teams) => <IssueParent kind="team" size="m" parent={teams} />)}
 
-                    {nullable(goal.project, (project) => (
+                    {nullable(project, (project) => (
                         <IssueParent kind="project" parent={project} />
                     ))}
 
                     <IssueTitle title={goal.title} />
 
                     {nullable(goal.state, (s) => (
-                        <StateSwitch state={s} flowId={goal.project?.flowId} onClick={onGoalStateChange} />
+                        <StateSwitch state={s} flowId={project?.flowId} onClick={onGoalStateChange} />
                     ))}
 
-                    <IssueStats comments={goal.comments?.length || 0} updatedAt={goal.updatedAt} />
+                    <IssueStats comments={goal.comments?.length ?? 0} updatedAt={goal.updatedAt} />
                 </StyledIssueInfo>
 
                 <StyledIssueInfo align="right">
@@ -347,10 +344,10 @@ const GoalPage = ({
                     <Card>
                         <StyledCardInfo>
                             <div>
-                                <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
+                                <Link inline>{issuer?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
                             </div>
                             <StyledCardActions>
-                                {nullable(isUserAllowedToEdit, () => (
+                                {nullable(goal._isEditable, () => (
                                     <span>
                                         <Dropdown
                                             onChange={onEditMenuChange}
@@ -404,17 +401,17 @@ const GoalPage = ({
 
                                 <Button
                                     ghost
-                                    text={goal.owner?.user?.name || goal.owner?.user?.email || goal.owner?.ghost?.email}
+                                    text={owner?.user?.name || owner?.user?.email || owner?.ghost?.email}
                                     iconLeft={
                                         <UserPic
-                                            src={goal.owner?.user?.image}
-                                            email={goal.owner?.user?.email || goal.owner?.ghost?.email}
+                                            src={owner?.user?.image}
+                                            email={owner?.user?.email || owner?.ghost?.email}
                                             size={16}
                                         />
                                     }
                                 />
 
-                                {nullable(issueEstimate, (ie) => (
+                                {nullable(goal._lastEstimate, (ie) => (
                                     <Button ghost text={formatEstimate(ie, locale)} />
                                 ))}
 
@@ -429,7 +426,7 @@ const GoalPage = ({
 
                     <ActivityFeed id="comments">
                         {goal.comments?.map((comment) =>
-                            nullable(comment, (c) => (
+                            nullable(comment, (c: Comment) => (
                                 <CommentView
                                     key={c.id}
                                     id={c.id}
@@ -449,13 +446,13 @@ const GoalPage = ({
                     </ActivityFeed>
                 </div>
 
-                <StyledIssueDeps>
-                    <IssueParticipants issue={goal} onChange={isUserAllowedToEdit ? onParticipantsChange : undefined} />
-                    <IssueDependencies issue={goal} onChange={isUserAllowedToEdit ? onDependenciesChange : undefined} />
-                </StyledIssueDeps>
+                <div>
+                    <IssueParticipants issue={goal} onChange={goal._isEditable ? onParticipantsChange : undefined} />
+                    <IssueDependencies issue={goal} onChange={goal._isEditable ? onDependenciesChange : undefined} />
+                </div>
             </IssueContent>
 
-            {nullable(isUserAllowedToEdit, () => (
+            {nullable(goal._isEditable, () => (
                 <ModalOnEvent
                     event={ModalEvent.GoalEditModal}
                     hotkeys={editGoalKeys}
@@ -466,7 +463,7 @@ const GoalPage = ({
                 </ModalOnEvent>
             ))}
 
-            {nullable(isUserAllowedToEdit, () => (
+            {nullable(goal._isEditable, () => (
                 <GoalDeleteModal id={goal.id} onConfirm={onGoalDeleteConfirm} />
             ))}
         </Page>

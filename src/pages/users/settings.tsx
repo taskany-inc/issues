@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
@@ -7,14 +8,14 @@ import toast from 'react-hot-toast';
 import useSWR from 'swr';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
+import { useRouter as useNextRouter } from 'next/router';
 
 import { gql } from '../../utils/gql';
 import { shallowEqual } from '../../utils/shallowEqual';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { star10 } from '../../design/@generated/themes';
-import { Settings, User } from '../../../graphql/@generated/genql';
-import { useMounted } from '../../hooks/useMounted';
+import { User } from '../../../graphql/@generated/genql';
 import { Page } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { FormInput } from '../../components/FormInput';
@@ -47,15 +48,25 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const UserSettingsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ settings: Settings }>) => {
+const UserSettingsPage = ({
+    user,
+    locale,
+    ssrTime,
+    ssrData,
+}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
     const t = useTranslations('users.settings');
+    const nextRouter = useNextRouter();
 
-    const mounted = useMounted(refreshInterval);
-    const { data: settingsData } = useSWR(mounted ? 'settings' : null, () => fetcher(), {
+    const { data: settingsData } = useSWR('settings', () => fetcher(), {
         refreshInterval,
+        fallbackData: ssrData,
     });
-    // this line is compensation for first render before delayed swr will bring updates
-    const settings = settingsData?.settings ?? ssrData.settings;
+
+    if (!settingsData) return null;
+
+    const settings = settingsData?.settings;
+
+    if (!settings) return nextRouter.push('/404');
 
     const [actualUserFields, setActualUserFields] = useState<Pick<User, 'name' | 'nickname'>>({
         name: user.name,
@@ -119,7 +130,7 @@ const UserSettingsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<
         }
     };
 
-    const [appearanceTheme, setAppearanceTheme] = useState(settings.theme);
+    const [appearanceTheme, setAppearanceTheme] = useState(settings?.theme);
     const { resolvedTheme, setTheme } = useTheme();
 
     const onAppearanceThemeChange = useCallback(

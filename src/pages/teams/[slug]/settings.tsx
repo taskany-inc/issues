@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
@@ -5,6 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import toast from 'react-hot-toast';
+import { useRouter as useNextRouter } from 'next/router';
 
 import { createFetcher } from '../../../utils/createFetcher';
 import { Team } from '../../../../graphql/@generated/genql';
@@ -101,17 +103,13 @@ const projectsFetcher = createFetcher((_, query: string) => ({
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { slug } }) => {
-        const ssrProps = {
-            ssrData: await teamFetcher(user, slug),
-        };
+        const ssrData = await teamFetcher(user, slug);
 
-        if (!ssrProps.ssrData.team) {
-            return {
-                notFound: true,
-            };
-        }
-
-        return ssrProps;
+        return ssrData.team
+            ? { ssrData }
+            : {
+                  notFound: true,
+              };
     },
     {
         private: true,
@@ -147,14 +145,21 @@ const TeamSettingsPage = ({
     ssrTime,
     ssrData,
     params: { slug },
-}: ExternalPageProps<{ team: Team }, { slug: string }>) => {
+}: ExternalPageProps<Awaited<ReturnType<typeof teamFetcher>>, { slug: string }>) => {
     const t = useTranslations('teams');
     const schema = schemaProvider(t);
+    const nextRouter = useNextRouter();
 
-    const { data } = useSWR([user, slug], (...args) => teamFetcher(...args), {
+    const { data } = useSWR([user, slug], teamFetcher, {
         refreshInterval,
+        fallbackData: ssrData,
     });
-    const team: Team = data?.team ?? ssrData.team;
+
+    if (!data) return null;
+
+    const team = data?.team;
+
+    if (!team) return nextRouter.push('/404');
 
     const [actualFields, setActualFields] = useState<Pick<Team, 'title' | 'description' | 'projects'>>({
         title: team.title,

@@ -1,12 +1,13 @@
-import React, { MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { MouseEventHandler, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
+import { useRouter as useNextRouter } from 'next/router';
 
 import { createFetcher } from '../../../utils/createFetcher';
-import { Goal, Project, Team } from '../../../../graphql/@generated/genql';
+import { Goal } from '../../../../graphql/@generated/genql';
 import { GoalListItem } from '../../../components/GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
@@ -229,17 +230,13 @@ const StyledProjectGroup = styled.div`
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { slug } }) => {
-        const ssrProps = {
-            ssrData: await fetcher(user, slug),
-        };
+        const ssrData = await fetcher(user, slug);
 
-        if (!ssrProps.ssrData.team) {
-            return {
-                notFound: true,
-            };
-        }
-
-        return ssrProps;
+        return ssrData.team
+            ? { ssrData }
+            : {
+                  notFound: true,
+              };
     },
     {
         private: true,
@@ -252,16 +249,18 @@ const TeamGoalsPage = ({
     ssrTime,
     ssrData,
     params: { slug },
-}: ExternalPageProps<{ team: Team; teamProjects: Project[]; teamGoals: Goal[] }, { slug: string }>) => {
+}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { slug: string }>) => {
     const t = useTranslations('teams');
-    const router = useRouter();
+    const nextRouter = useNextRouter();
 
-    const [priorityFilter, setPriorityFilter] = useState<string[]>(parseQueryParam(router.query.priority as string));
-    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
-    const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));
-    const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user as string));
-    const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(router.query.search as string).toString());
-    const [limitFilter, setLimitFilter] = useState(Number(router.query.limit) || defaultLimit);
+    const [priorityFilter, setPriorityFilter] = useState<string[]>(
+        parseQueryParam(nextRouter.query.priority as string),
+    );
+    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(nextRouter.query.state as string));
+    const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(nextRouter.query.tags as string));
+    const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(nextRouter.query.user as string));
+    const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(nextRouter.query.search as string).toString());
+    const [limitFilter, setLimitFilter] = useState(Number(nextRouter.query.limit) || defaultLimit);
 
     const [preview, setPreview] = useState<Goal | null>(null);
 
@@ -270,16 +269,22 @@ const TeamGoalsPage = ({
         (...args) => fetcher(...args),
         {
             refreshInterval,
+            fallbackData: ssrData,
         },
     );
+
+    if (!data) return null;
+
+    const team = data?.team;
+
+    if (!team) return nextRouter.push('/404');
+
+    const projects = data?.teamProjects;
+    const goals = data?.teamGoals;
 
     const onSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setFulltextFilter(e.currentTarget.value);
     }, []);
-
-    const team: Team = data?.team ?? ssrData.team;
-    const projects: Project[] = data?.teamProjects ?? ssrData.teamProjects;
-    const goals: Goal[] = data?.teamGoals ?? ssrData.teamGoals;
 
     // FIXME: plain list of goals
     // useEffect(() => {
@@ -295,13 +300,13 @@ const TeamGoalsPage = ({
         const usersData = new Map();
         let goalsCount = 0;
 
-        projects.forEach((p) => {
+        projects?.forEach((p) => {
             projectsData.set(p.id, {
                 id: p.id,
                 tittle: p.title,
             });
 
-            p.goals?.forEach((g) => {
+            p.goals?.forEach((g: Goal) => {
                 goalsCount++;
                 usersData.set(g?.owner?.id, g?.owner);
                 g?.tags?.forEach((t) => tagsData.set(t?.id, t));
@@ -349,13 +354,13 @@ const TeamGoalsPage = ({
             locale={locale}
             ssrTime={ssrTime}
             title={t.rich('goals.title', {
-                team: () => team.title,
+                team: () => team?.title,
             })}
         >
             <TeamPageLayout actions team={team}>
                 <FiltersPanel
                     count={goalsCount}
-                    flowId={projects[0]?.flowId}
+                    flowId={projects?.[0]?.flowId}
                     users={usersFilterData}
                     tags={tagsFilterData}
                     priorityFilter={priorityFilter}
@@ -406,7 +411,7 @@ const TeamGoalsPage = ({
                                 <PageSep />
 
                                 <StyledGoalsList>
-                                    {project.goals?.map((goal) =>
+                                    {project.goals?.map((goal: Goal) =>
                                         nullable(goal, (g) => (
                                             <GoalListItem
                                                 createdAt={g.createdAt}

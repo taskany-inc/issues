@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
 
-import { Flow, Goal, Project, Team } from '../../../graphql/@generated/genql';
+import { Goal, Project, Team } from '../../../graphql/@generated/genql';
 import { createFetcher } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Page, PageContent } from '../../components/Page';
@@ -14,7 +14,6 @@ import { GoalListItem } from '../../components/GoalListItem';
 import { nullable } from '../../utils/nullable';
 import { CommonHeader } from '../../components/CommonHeader';
 import { FiltersPanel } from '../../components/FiltersPanel';
-import { useMounted } from '../../hooks/useMounted';
 import { useUrlParams } from '../../hooks/useUrlParams';
 import { Text } from '../../components/Text';
 import { Link } from '../../components/Link';
@@ -127,32 +126,24 @@ const StyledProjectGroup = styled.div`
 `;
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, query }) => {
-        return {
-            ssrData: await fetcher(
-                user,
-                parseQueryParam(query.priority as string),
-                parseQueryParam(query.state as string),
-                parseQueryParam(query.search as string).toString(),
-                parseQueryParam(query.tags as string),
-                parseQueryParam(query.user as string),
-                Number(parseQueryParam(query.limit as string)),
-            ),
-        };
-    },
+    async ({ user, query }) => ({
+        ssrData: await fetcher(
+            user,
+            parseQueryParam(query.priority as string),
+            parseQueryParam(query.state as string),
+            parseQueryParam(query.search as string).toString(),
+            parseQueryParam(query.tags as string),
+            parseQueryParam(query.user as string),
+            Number(parseQueryParam(query.limit as string)),
+        ),
+    }),
     {
         private: true,
     },
 );
 
-const GoalsPage = ({
-    user,
-    ssrTime,
-    locale,
-    ssrData,
-}: ExternalPageProps<{ userGoals: Goal[]; flowRecommended: Flow[] }>) => {
+const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
     const t = useTranslations('goals.index');
-    const mounted = useMounted(refreshInterval);
     const router = useRouter();
 
     const [priorityFilter, setPriorityFilter] = useState<string[]>(parseQueryParam(router.query.priority as string));
@@ -165,10 +156,11 @@ const GoalsPage = ({
     const [preview, setPreview] = useState<Goal | null>(null);
 
     const { data } = useSWR(
-        mounted ? [user, priorityFilter, stateFilter, fulltextFilter, tagsFilter, ownerFilter, limitFilter] : null,
+        [user, priorityFilter, stateFilter, fulltextFilter, tagsFilter, ownerFilter, limitFilter],
         (...args) => fetcher(...args),
         {
             refreshInterval,
+            fallbackData: ssrData,
         },
     );
 
@@ -176,13 +168,12 @@ const GoalsPage = ({
         setFulltextFilter(e.currentTarget.value);
     }, []);
 
-    // NB: this line is compensation for first render before delayed swr will bring updates
-    const goals: Goal[] = data?.userGoals ?? ssrData.userGoals;
-    const goalsCount = goals.length;
-    const flowRecommended = data?.flowRecommended ?? ssrData.flowRecommended;
+    const goals = data?.userGoals;
+    const goalsCount = goals?.length ?? 0;
+    const flowRecommended = data?.flowRecommended;
 
     useEffect(() => {
-        if (preview && goals.filter((g) => g.id === preview.id).length !== 1) {
+        if (preview && goals?.filter((g) => g.id === preview.id).length !== 1) {
             setPreview(null);
         }
     }, [goals, preview]);
@@ -192,7 +183,7 @@ const GoalsPage = ({
         const tagsData = new Map();
         const usersData = new Map();
 
-        goals.forEach((g) => {
+        goals?.forEach((g) => {
             g?.owner?.id && usersData.set(g?.owner?.id, g?.owner);
             g.project?.id &&
                 projectsData.set(g.project?.id, {
@@ -232,7 +223,7 @@ const GoalsPage = ({
     }, []);
 
     const groups = useMemo(() => {
-        return goals.reduce(
+        return goals?.reduce(
             (acc, goal) => {
                 if (goal.team?.id) {
                     const team = acc.teams[goal.team.id] || {
@@ -251,8 +242,10 @@ const GoalsPage = ({
                     };
 
                     // sort teams by title
+                    // @ts-ignore — teams doesn't exist on project
                     project.teams = goal.project.teams?.length
-                        ? goal.project.teams
+                        ? // @ts-ignore — teams doesn't exist on project
+                          goal.project.teams
                               // @ts-ignore
                               ?.sort((a, b) => (a?.title > b?.title ? 1 : -1))
                         : undefined;
@@ -294,7 +287,7 @@ const GoalsPage = ({
             />
 
             <PageContent>
-                {Object.values(groups.teams).map((team) => {
+                {Object.values(groups?.teams || {}).map((team) => {
                     return nullable(team.goals?.length, () => (
                         <StyledProjectGroup key={team.data.key}>
                             <Text size="l" weight="bolder">
@@ -329,7 +322,7 @@ const GoalsPage = ({
                     ));
                 })}
 
-                {Object.values(groups.projects)
+                {Object.values(groups?.projects || {})
                     .sort((a, b) => (a.teams && !b.teams ? -1 : 1))
                     .map((project) =>
                         nullable(project.goals?.length, () => (
