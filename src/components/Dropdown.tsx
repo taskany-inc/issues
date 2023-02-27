@@ -97,13 +97,13 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
         });
 
         useEffect(() => {
-            if (items.length && downPress) {
+            if (items?.length && downPress) {
                 setCursor((prevState) => (prevState < items.length - 1 ? prevState + 1 : prevState));
             }
         }, [items, downPress]);
 
         useEffect(() => {
-            if (items.length && upPress) {
+            if (items?.length && upPress) {
                 setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState));
             }
         }, [items, upPress]);
@@ -156,7 +156,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
                     offset={[-4, 8]}
                 >
                     <div {...onESC}>
-                        {items.map((item, index) => renderItem({ item, index, cursor, onClick: onItemClick(item) }))}
+                        {items?.map((item, index) => renderItem({ item, index, cursor, onClick: onItemClick(item) }))}
                     </div>
                 </Popup>
             </StyledDropdown>
