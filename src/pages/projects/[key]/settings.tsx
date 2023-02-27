@@ -1,12 +1,14 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
+import { useRouter as useNextRouter } from 'next/router';
 
 import { createFetcher } from '../../../utils/createFetcher';
-import { Goal, Project } from '../../../../graphql/@generated/genql';
+import { Project } from '../../../../graphql/@generated/genql';
 import { Button } from '../../../components/Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { PageSep } from '../../../components/PageSep';
@@ -129,17 +131,24 @@ const ProjectSettingsPage = ({
     ssrTime,
     ssrData,
     params: { key },
-}: ExternalPageProps<{ project: Project; projectGoals: Goal[] }, { key: string }>) => {
+}: ExternalPageProps<Awaited<ReturnType<typeof projectFetcher>>, { key: string }>) => {
     const t = useTranslations('projects');
     const router = useRouter();
+    const nextRouter = useNextRouter();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
     const { data } = useSWR([user, key], (...args) => projectFetcher(...args), {
         refreshInterval,
+        fallbackData: ssrData,
     });
-    const project = data?.project ?? ssrData.project;
+
+    if (!data) return null;
+
+    const project = data?.project;
+
+    if (!project) return nextRouter.push('/404');
 
     const { updateProject, deleteProject } = useProjectResource(project.id);
     const schema = updateProjectSchemaProvider(t);

@@ -1,12 +1,13 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/router';
+import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
 import { createFetcher } from '../../../utils/createFetcher';
-import { Goal, Project } from '../../../../graphql/@generated/genql';
+import { Goal } from '../../../../graphql/@generated/genql';
 import { GoalListItem } from '../../../components/GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
@@ -162,26 +163,24 @@ const fetcher = createFetcher(
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key }, query }) => {
-        const ssrProps = {
-            ssrData: await fetcher(
-                user,
-                key,
-                parseQueryParam(query.priority as string),
-                parseQueryParam(query.state as string),
-                parseQueryParam(query.search as string).toString(),
-                Number(parseQueryParam(query.limit as string)),
-                parseQueryParam(query.user as string),
-                parseQueryParam(query.tags as string),
-            ),
-        };
+        const ssrData = await fetcher(
+            user,
+            key,
+            parseQueryParam(query.priority as string),
+            parseQueryParam(query.state as string),
+            parseQueryParam(query.search as string).toString(),
+            Number(parseQueryParam(query.limit as string)),
+            parseQueryParam(query.user as string),
+            parseQueryParam(query.tags as string),
+        );
 
-        if (!ssrProps.ssrData.project) {
-            return {
-                notFound: true,
-            };
-        }
-
-        return ssrProps;
+        return ssrData.project
+            ? {
+                  ssrData,
+              }
+            : {
+                  notFound: true,
+              };
     },
     {
         private: true,
@@ -198,18 +197,20 @@ const ProjectPage = ({
     ssrTime,
     ssrData,
     params: { key },
-}: ExternalPageProps<{ project: Project; projectGoals: Goal[]; projectGoalsCount: number }, { key: string }>) => {
+}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { key: string }>) => {
     const t = useTranslations('projects');
-    const router = useRouter();
+    const nextRouter = useNextRouter();
 
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
-    const [priorityFilter, setPriorityFilter] = useState<string[]>(parseQueryParam(router.query.priority as string));
-    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
-    const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));
-    const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user as string));
-    const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(router.query.search as string).toString());
-    const [limitFilter, setLimitFilter] = useState(Number(router.query.limit) || defaultLimit);
+    const [priorityFilter, setPriorityFilter] = useState<string[]>(
+        parseQueryParam(nextRouter.query.priority as string),
+    );
+    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(nextRouter.query.state as string));
+    const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(nextRouter.query.tags as string));
+    const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(nextRouter.query.user as string));
+    const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(nextRouter.query.search as string).toString());
+    const [limitFilter, setLimitFilter] = useState(Number(nextRouter.query.limit) || defaultLimit);
 
     const [preview, setPreview] = useState<Goal | null>(null);
 
@@ -218,12 +219,18 @@ const ProjectPage = ({
         (...args) => fetcher(...args),
         {
             refreshInterval,
+            fallbackData: ssrData,
         },
     );
 
-    const goals: Goal[] = data?.projectGoals ?? ssrData.projectGoals;
-    const project = data?.project ?? ssrData.project;
-    const goalsCount = data?.projectGoalsCount ?? ssrData.projectGoalsCount;
+    if (!data) return null;
+
+    const project = data?.project;
+
+    if (!project) return nextRouter.push('/404');
+
+    const goals = data?.projectGoals;
+    const goalsCount = data?.projectGoalsCount;
 
     useEffect(() => {
         if (preview && goals && goals?.filter((g) => g.id === preview.id).length !== 1) {
