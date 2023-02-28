@@ -310,7 +310,7 @@ model Settings {
 
 model Tag {
   id          String    @id @default(cuid())
-  title       String
+  title       String    @unique
   description String?
   goals       Goal[]
   project     Project[]
