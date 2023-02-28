@@ -33,7 +33,6 @@ export const ReactionsButton = React.memo(
 
         return (
             <StyledButton
-                ghost
                 ref={ref}
                 text={count && count > 1 ? String(count) : undefined}
                 iconLeft={

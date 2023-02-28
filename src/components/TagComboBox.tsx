@@ -19,7 +19,7 @@ import { Input } from './Input';
 const ComboBox = dynamic(() => import('./ComboBox'));
 
 interface TagComboBoxProps {
-    text: React.ComponentProps<typeof Button>['text'];
+    text?: React.ComponentProps<typeof Button>['text'];
     query?: string;
     value?: Array<Partial<TagModel>>;
     disabled?: boolean;
@@ -124,7 +124,6 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                 items={items}
                 renderTrigger={(props) => (
                     <Button
-                        ghost
                         ref={props.ref}
                         text={props.text}
                         disabled={props.disabled}
