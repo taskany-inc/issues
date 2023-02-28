@@ -59,6 +59,7 @@ const fetcher = createFetcher((_, query: string) => ({
         },
         {
             id: true,
+            key: true,
             title: true,
             description: true,
             flowId: true,
@@ -110,7 +111,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
         return (
             <ComboBox
                 ref={ref}
-                text={`#${value?.key}` || text}
+                text={value ? `#${value?.key}` : text}
                 value={inputState}
                 visible={completionVisible}
                 error={error}
