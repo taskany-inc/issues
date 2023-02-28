@@ -76,8 +76,6 @@ const StyledButton = styled(
     outline: none;
     appearance: none;
 
-    cursor: pointer;
-
     border: 1px solid;
     border-radius: ${radiusM};
 
