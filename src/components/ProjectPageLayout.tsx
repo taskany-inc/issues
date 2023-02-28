@@ -31,9 +31,6 @@ const ProjectHeader = styled(PageContent)`
 
 const StyledProjectHeaderTitle = styled(Text)`
     width: 850px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     padding-top: ${gapM};
 `;
 
