@@ -22,7 +22,7 @@ export const UserFilterDropdown = React.forwardRef<HTMLDivElement, UserFilterDro
         const [selected, setSelected] = useState<Set<string>>(new Set(value));
 
         const onUserClick = useCallback(
-            (a: Activity) => () => {
+            (a: Activity) => {
                 selected.has(a.id) ? selected.delete(a.id) : selected.add(a.id);
                 const newSelected = new Set(selected);
                 setSelected(newSelected);
