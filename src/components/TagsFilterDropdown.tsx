@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
-import { Tag } from './Tag';
+import { MenuItem } from './MenuItem';
 
 const Dropdown = dynamic(() => import('./Dropdown'));
 
@@ -24,7 +24,7 @@ export const TagsFilterDropdown: React.FC<TagsFilterDropdownProps> = React.forwa
     const [selected, setSelected] = useState<Set<string>>(new Set(value));
 
     const onTagClick = useCallback(
-        (t: TagModel) => () => {
+        (t: TagModel) => {
             selected.has(t.id) ? selected.delete(t.id) : selected.add(t.id);
             const newSelected = new Set(selected);
             setSelected(newSelected);
@@ -53,12 +53,9 @@ export const TagsFilterDropdown: React.FC<TagsFilterDropdownProps> = React.forwa
                 </FiltersMenuItem>
             )}
             renderItem={(props) => (
-                <Tag
-                    key={props.item.id}
-                    title={props.item.title}
-                    checked={selected.has(props.item.id)}
-                    onClick={props.onClick}
-                />
+                <MenuItem ghost key={props.item.id} selected={selected.has(props.item.id)} onClick={props.onClick}>
+                    {props.item.title}
+                </MenuItem>
             )}
         />
     );
