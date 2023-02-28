@@ -7,7 +7,7 @@ import { MenuItem } from './MenuItem';
 const Dropdown = dynamic(() => import('./Dropdown'));
 
 export const defaultLimit = 100;
-const limitVariants = [defaultLimit, 20, 30, 50, 100];
+const limitVariants = [10, 20, 30, 50, defaultLimit];
 
 interface LimitFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
