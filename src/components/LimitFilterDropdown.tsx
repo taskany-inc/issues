@@ -6,8 +6,7 @@ import { MenuItem } from './MenuItem';
 
 const Dropdown = dynamic(() => import('./Dropdown'));
 
-export const defaultLimit = 100;
-const limitVariants = [10, 20, 30, 50, defaultLimit];
+const limitVariants = [10, 20, 30, 50, 100];
 
 interface LimitFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
@@ -18,7 +17,7 @@ interface LimitFilterDropdownProps {
 }
 
 export const LimitFilterDropdown = React.forwardRef<HTMLDivElement, LimitFilterDropdownProps>(
-    ({ text, value = defaultLimit, disabled, onChange }, ref) => (
+    ({ text, value, disabled, onChange }, ref) => (
         <Dropdown
             ref={ref}
             text={text}
@@ -29,7 +28,7 @@ export const LimitFilterDropdown = React.forwardRef<HTMLDivElement, LimitFilterD
             renderTrigger={(props) => (
                 <FiltersMenuItem
                     ref={props.ref}
-                    active={value !== defaultLimit}
+                    active={Boolean(value)}
                     disabled={props.disabled}
                     onClick={props.onClick}
                 >
