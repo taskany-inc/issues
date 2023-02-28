@@ -1,14 +1,13 @@
 /* eslint-disable no-console */
 import assert from 'assert';
 import { faker } from '@faker-js/faker';
-import { Role, User } from '@prisma/client';
+import { Role, User, Tag } from '@prisma/client';
 
 import { prisma } from '../src/utils/prisma';
 import { keyPredictor } from '../src/utils/keyPredictor';
 
 const adminEmail = process.env.ADMIN_EMAIL || 'tony@taskany.org';
 const adminPassword = process.env.ADMIN_PASSWORD || 'taskany';
-const tags = ['frontend', 'backend'];
 const priorities = ['Highest', 'High', 'Medium', 'Low'];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
@@ -23,6 +22,7 @@ assert(adminEmail, "Admin's email isn't provided. Check your environment variabl
 assert(adminPassword, "Admin's password isn't provided. Check your environment variables: ADMIN_PASSWORD.");
 
 let allUsers: User[];
+let tags: Tag[];
 
 (async () => {
     allUsers = await Promise.all(
@@ -118,6 +118,21 @@ let allUsers: User[];
             }),
         ),
     );
+
+    tags = await Promise.all([
+        prisma.tag.create({
+            data: {
+                title: 'frontend',
+                activityId: sample(allUsers).activityId,
+            },
+        }),
+        prisma.tag.create({
+            data: {
+                title: 'backend',
+                activityId: sample(allUsers).activityId,
+            },
+        }),
+    ]);
 })();
 
 const flow = prisma.flow.create({
@@ -218,24 +233,16 @@ seed('Default projects', async () => {
                             },
                             stateId: sample(f.states)?.id,
                             tags: {
-                                create:
+                                connect:
                                     // eslint-disable-next-line no-nested-ternary
                                     Math.random() > 0.66
-                                        ? [
-                                              {
-                                                  title: sample(tags),
-                                                  activityId,
-                                              },
-                                              {
-                                                  title: sample(tags),
-                                                  activityId,
-                                              },
-                                          ]
+                                        ? tags.map((t) => ({
+                                              id: t.id,
+                                          }))
                                         : Math.random() > 0.33
-                                        ? {
-                                              title: sample(tags),
-                                              activityId,
-                                          }
+                                        ? [sample(tags)].map((t) => ({
+                                              id: t.id,
+                                          }))
                                         : undefined,
                             },
                             comments: {
