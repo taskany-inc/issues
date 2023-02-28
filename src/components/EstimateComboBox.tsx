@@ -23,7 +23,7 @@ import { Input } from './Input';
 const ComboBox = dynamic(() => import('./ComboBox'));
 
 interface EstimateComboBoxProps {
-    text: React.ComponentProps<typeof Button>['text'];
+    text?: React.ComponentProps<typeof Button>['text'];
     mask: string;
     value?: {
         date: string;
@@ -110,7 +110,7 @@ const createValue = (date: string | Date, locale: TLocale) => {
 };
 
 export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBoxProps>(
-    ({ text, value, defaultValuePlaceholder, placeholder, mask, disabled, error, onChange }, ref) => {
+    ({ text = '', value, defaultValuePlaceholder, placeholder, mask, disabled, error, onChange }, ref) => {
         const { locale } = usePageContext();
         const inputVal = parseLocaleDate(value?.date || defaultValuePlaceholder?.date, { locale });
         const [inputState, setInputState] = useState(inputVal ? createLocaleDate(inputVal, { locale }) : '');
@@ -176,6 +176,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                 value={value}
                 disabled={disabled}
                 error={error}
+                placement="top-start"
                 items={['Q1', 'Q2', 'Q3', 'Q4']}
                 maxWidth={100}
                 minWidth={100}
@@ -184,7 +185,6 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                     <StyledTriggerContainer>
                         {changed && <StyledCleanButton onClick={onCleanClick}>+</StyledCleanButton>}
                         <Button
-                            ghost
                             disabled={props.disabled}
                             ref={props.ref}
                             text={buttonText}

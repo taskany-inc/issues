@@ -72,11 +72,11 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                 visible={completionVisible}
                 disabled={disabled}
                 error={error}
+                placement="top-start"
                 items={data?.findActivity}
                 onChange={onChange}
                 renderTrigger={(props) => (
                     <Button
-                        ghost
                         ref={props.ref}
                         text={props.text}
                         disabled={props.disabled}
