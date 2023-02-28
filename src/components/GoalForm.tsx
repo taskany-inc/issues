@@ -112,10 +112,15 @@ interface GoalFormProps {
     onSumbit: (fields: GoalFormType) => void;
 }
 
-const StyledTagsContainer = styled.div`
-    padding-top: 50px;
+const StyledTagsContainer = styled.div<{ focused?: boolean }>`
+    padding-top: 45px;
     padding-left: ${gapS};
-    background-color: ${gray2};
+
+    ${({ focused }) =>
+        focused &&
+        `
+            background-color: ${gray2};
+        `}
 `;
 
 export const GoalForm: React.FC<GoalFormProps> = ({
@@ -220,7 +225,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         )}
                     />
 
-                    <StyledTagsContainer>
+                    <StyledTagsContainer focused={descriptionFocused}>
                         {tagsWatcher?.map((tag) => (
                             <Tag key={tag.id} title={tag.title} onHide={onTagDeleteProvider(tag)} />
                         ))}
@@ -274,7 +279,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <EstimateComboBox
-                                        text={t('Schedule')}
                                         placeholder={t('Date input mask placeholder')}
                                         mask={t('Date input mask')}
                                         defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
@@ -304,7 +308,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <TagComboBox
-                                        text="Tags"
                                         disabled={busy || (tagsWatcher || []).length >= tagsLimit}
                                         placeholder={t('Enter tag title')}
                                         error={errorsResolver(field.name)}
