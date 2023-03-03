@@ -14,9 +14,9 @@ import { nullable } from '../utils/nullable';
 import { PageContent, PageActions } from './Page';
 import { Text } from './Text';
 import { TabsMenu, TabsMenuItem } from './TabsMenu';
-import { Link } from './Link';
 import { WatchButton } from './WatchButton';
 import { StarButton } from './StarButton';
+import { TeamTitleList } from './TeamTitleList';
 
 interface ProjectPageLayoutProps {
     project: Project;
@@ -46,7 +46,7 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(project.id);
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
-        [t('Goals'), routes.project(project.key), false],
+        [t('Goals'), routes.project(project.key), true],
         [t('Settings'), routes.projectSettings(project.key), true],
     ];
 
@@ -64,23 +64,12 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
         <>
             <ProjectHeader>
                 <div>
-                    {nullable(project.teams?.length, () => (
-                        <StyledProjectTeamsTitle weight="bold" color={gray9}>
-                            {t('Teams')}:{' '}
-                            {project.teams?.map((team, i) =>
-                                nullable(team, (te) => (
-                                    <span key={te.title}>
-                                        <NextLink key={te.slug} passHref href={routes.team(te.slug)}>
-                                            <Link inline title={te.description}>
-                                                {te.title}
-                                            </Link>
-                                        </NextLink>
-                                        {i < (project.teams ?? []).length - 1 ? ', ' : ''}
-                                    </span>
-                                )),
-                            )}
-                        </StyledProjectTeamsTitle>
-                    ))}
+                    {Boolean(project.teams?.length) &&
+                        nullable(project.teams, (teams) => (
+                            <StyledProjectTeamsTitle weight="bold" color={gray9}>
+                                {t('Teams')}: <TeamTitleList teams={teams} />
+                            </StyledProjectTeamsTitle>
+                        ))}
 
                     <StyledProjectHeaderTitle size="xxl" weight="bolder" title={project.title}>
                         {project.title}
