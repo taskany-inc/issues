@@ -51,8 +51,6 @@ const Dropdown = dynamic(() => import('./Dropdown'));
 interface GoalPreviewProps {
     goal: Goal;
 
-    visible?: boolean;
-
     onClose?: () => void;
     onDelete?: () => void;
 }
@@ -89,7 +87,7 @@ const StyledCard = styled(Card)`
     min-height: 60px;
 `;
 
-const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, onClose, onDelete }) => {
+const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, onDelete }) => {
     const t = useTranslations('goals.id');
     const { user, locale } = usePageContext();
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
@@ -182,7 +180,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, visible, o
 
     return (
         <>
-            <ModalPreview visible={visible} onClose={onPreviewClose}>
+            <ModalPreview visible onClose={onPreviewClose}>
                 <StyledModalHeader>
                     {nullable(goal.id, (id) => (
                         <IssueKey size="s" id={id}>
