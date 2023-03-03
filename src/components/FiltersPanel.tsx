@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
-import { gapM, gapS, gray5 } from '../design/@generated/themes';
+import { gapM, gapS, gray5, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { Badge } from './Badge';
@@ -13,21 +13,19 @@ import { UserFilterDropdown } from './UserFilterDropdown';
 import { TagsFilterDropdown } from './TagsFilterDropdown';
 import { LimitFilterDropdown } from './LimitFilterDropdown';
 import { PriorityFilterDropdown } from './PriorityFilterDropdown';
+import { Text } from './Text';
 
 interface FiltersPanelProps {
     count?: number;
-    flowId?: React.ComponentProps<typeof StateFilterDropdown>['flowId'];
+    filteredCount?: number;
+    priority?: React.ComponentProps<typeof PriorityFilterDropdown>['priority'];
+    states?: React.ComponentProps<typeof StateFilterDropdown>['states'];
     users?: React.ComponentProps<typeof UserFilterDropdown>['activity'];
     tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
-    priorityFilter?: Array<string>;
-    stateFilter?: Array<string>;
-    ownerFilter?: Array<string>;
-    tagsFilter?: Array<string>;
-    searchFilter?: string;
-    limitFilter?: number;
+    filterValues: [string[], string[], string[], string[], string, number];
     children?: React.ReactNode;
 
-    onSearchChange: React.ComponentProps<typeof Input>['onChange'];
+    onSearchChange: (search: string) => void;
     onPriorityChange?: React.ComponentProps<typeof PriorityFilterDropdown>['onChange'];
     onStateChange?: React.ComponentProps<typeof StateFilterDropdown>['onChange'];
     onUserChange?: React.ComponentProps<typeof UserFilterDropdown>['onChange'];
@@ -63,15 +61,12 @@ const StyledFiltersMenu = styled.div`
 
 export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     count,
-    flowId,
+    filteredCount,
+    states,
+    priority,
     users,
     tags,
-    priorityFilter,
-    stateFilter,
-    ownerFilter,
-    tagsFilter,
-    searchFilter,
-    limitFilter,
+    filterValues,
     onPriorityChange,
     onSearchChange,
     onStateChange,
@@ -82,25 +77,50 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
 }) => {
     const t = useTranslations('FiltersPanel');
 
+    const [priorityFilter, stateFilter, tagsFilter, ownerFilter, searchFilter, limitFilter] = filterValues;
+
+    const onSearchInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            onSearchChange(e.currentTarget.value);
+        },
+        [onSearchChange],
+    );
+
     return (
         <StyledFiltersPanel>
             <StyledFiltersContent>
-                <Input placeholder={t('Search')} value={searchFilter} onChange={onSearchChange} />
+                <Input placeholder={t('Search')} value={searchFilter} onChange={onSearchInputChange} />
 
                 <StyledFiltersMenuWrapper>
                     {nullable(count, () => (
-                        <Badge size="m">{count}</Badge>
+                        <Badge size="m">
+                            {!filteredCount || count === filteredCount ? (
+                                count
+                            ) : (
+                                <>
+                                    <Text weight="bold" color={textColor} size="xs" as="span">
+                                        {filteredCount}
+                                    </Text>
+                                    {` / ${count}`}
+                                </>
+                            )}
+                        </Badge>
                     ))}
 
                     <StyledFiltersMenu>
                         {nullable(onPriorityChange, (opc) => (
-                            <PriorityFilterDropdown text={t('Priority')} value={priorityFilter} onChange={opc} />
+                            <PriorityFilterDropdown
+                                text={t('Priority')}
+                                priority={priority}
+                                value={priorityFilter}
+                                onChange={opc}
+                            />
                         ))}
 
-                        {nullable(flowId, (id) => (
+                        {nullable(states?.length, () => (
                             <StateFilterDropdown
                                 text={t('State')}
-                                flowId={id}
+                                states={states}
                                 value={stateFilter}
                                 onChange={onStateChange}
                             />

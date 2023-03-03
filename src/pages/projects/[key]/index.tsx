@@ -1,178 +1,211 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
-import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import { createFetcher } from '../../../utils/createFetcher';
-import { Goal } from '../../../../graphql/@generated/genql';
+import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
+import { Goal, GoalsMetaOutput } from '../../../../graphql/@generated/genql';
 import { GoalListItem } from '../../../components/GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { nullable } from '../../../utils/nullable';
 import { FiltersPanel } from '../../../components/FiltersPanel';
-import { defaultLimit } from '../../../components/LimitFilterDropdown';
-import { useUrlParams } from '../../../hooks/useUrlParams';
+import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
 import { ProjectPageLayout } from '../../../components/ProjectPageLayout';
 import { Page } from '../../../components/Page';
+import { GoalList } from '../../../components/GoalList';
 
 const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
 
-const refreshInterval = 3000;
-const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
-
-const fetcher = createFetcher(
-    (_, key: string, priority = [], states = [], query = '', limitFilter = defaultLimit, tags = [], owner = []) => ({
-        project: [
-            {
-                key,
+const fetcher = createFetcher((_, key: string, priority = [], states = [], tags = [], owner = [], query = '') => ({
+    project: [
+        {
+            key,
+        },
+        {
+            id: true,
+            key: true,
+            title: true,
+            description: true,
+            activityId: true,
+            flowId: true,
+            flow: {
+                id: true,
             },
-            {
+            teams: {
+                slug: true,
+                title: true,
+                description: true,
+                _count: {
+                    projects: true,
+                },
+            },
+            tags: {
+                id: true,
+                title: true,
+            },
+            participants: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+            },
+            createdAt: true,
+            activity: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
+            },
+            _count: {
+                stargizers: true,
+            },
+            _isStarred: true,
+            _isWatching: true,
+        },
+    ],
+    projectGoals: [
+        {
+            data: {
+                key,
+                priority,
+                states,
+                tags,
+                owner,
+                query,
+            },
+        },
+        {
+            id: true,
+            title: true,
+            description: true,
+            project: {
                 id: true,
                 key: true,
                 title: true,
-                description: true,
-                activityId: true,
                 flowId: true,
-                flow: {
-                    id: true,
-                },
                 teams: {
+                    id: true,
                     slug: true,
-                    title: true,
-                    description: true,
-                    _count: {
-                        projects: true,
-                    },
-                },
-                tags: {
-                    id: true,
+                    key: true,
                     title: true,
                 },
-                participants: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                },
-                createdAt: true,
-                activity: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                _count: {
-                    stargizers: true,
-                },
-                _isStarred: true,
-                _isWatching: true,
             },
-        ],
-        projectGoals: [
-            {
-                data: {
-                    key,
-                    pageSize: limitFilter,
-                    priority,
-                    states,
-                    tags,
-                    owner,
-                    query,
+            team: {
+                id: true,
+                slug: true,
+                key: true,
+                title: true,
+            },
+            priority: true,
+            state: {
+                id: true,
+                title: true,
+                hue: true,
+            },
+            activity: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
                 },
             },
-            {
+            owner: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
+            },
+            tags: {
                 id: true,
                 title: true,
                 description: true,
-                priority: true,
-                project: {
-                    id: true,
-                    title: true,
-                },
-                state: {
-                    id: true,
-                    title: true,
-                    hue: true,
-                },
-                activity: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                owner: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                tags: {
-                    id: true,
-                    title: true,
-                    description: true,
-                },
-                comments: {
-                    id: true,
-                },
-                createdAt: true,
-                updatedAt: true,
             },
-        ],
-        projectGoalsCount: [
-            {
-                data: {
-                    key,
-                    priority,
-                    states,
-                    tags,
-                    owner,
-                    query,
+            comments: {
+                id: true,
+            },
+            createdAt: true,
+            updatedAt: true,
+        },
+    ],
+    projectGoalsMeta: [
+        {
+            data: {
+                key,
+                priority: [],
+                states: [],
+                tags: [],
+                owner: [],
+                query: '',
+            },
+        },
+        {
+            owners: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
                 },
             },
-        ],
-    }),
-);
+            tags: { id: true, title: true, description: true },
+            states: {
+                id: true,
+                title: true,
+                hue: true,
+            },
+            projects: {
+                id: true,
+                key: true,
+                title: true,
+                flowId: true,
+            },
+            teams: {
+                id: true,
+                slug: true,
+                key: true,
+                title: true,
+            },
+            priority: true,
+            count: true,
+        },
+    ],
+}));
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key }, query }) => {
-        const ssrData = await fetcher(
-            user,
-            key,
-            parseQueryParam(query.priority as string),
-            parseQueryParam(query.state as string),
-            parseQueryParam(query.search as string).toString(),
-            Number(parseQueryParam(query.limit as string)),
-            parseQueryParam(query.user as string),
-            parseQueryParam(query.tags as string),
-        );
+        const ssrData = await fetcher(user, key, ...parseFilterValues(query));
 
         return ssrData.project
             ? {
@@ -187,41 +220,25 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const StyledGoalsList = styled.div`
-    padding: 20px 20px 0 20px;
-`;
-
 const ProjectPage = ({
     user,
     locale,
     ssrTime,
-    ssrData,
+    ssrData: fallbackData,
     params: { key },
 }: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { key: string }>) => {
     const t = useTranslations('projects');
     const nextRouter = useNextRouter();
-
+    const [preview, setPreview] = useState<Goal | null>(null);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
-    const [priorityFilter, setPriorityFilter] = useState<string[]>(
-        parseQueryParam(nextRouter.query.priority as string),
-    );
-    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(nextRouter.query.state as string));
-    const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(nextRouter.query.tags as string));
-    const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(nextRouter.query.user as string));
-    const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(nextRouter.query.search as string).toString());
-    const [limitFilter, setLimitFilter] = useState(Number(nextRouter.query.limit) || defaultLimit);
+    const { filterValues, setPriorityFilter, setStateFilter, setTagsFilter, setOwnerFilter, setFulltextFilter } =
+        useUrlFilterParams();
 
-    const [preview, setPreview] = useState<Goal | null>(null);
-
-    const { data } = useSWR(
-        [user, key, priorityFilter, stateFilter, fulltextFilter, limitFilter, tagsFilter, ownerFilter],
-        (...args) => fetcher(...args),
-        {
-            refreshInterval,
-            fallbackData: ssrData,
-        },
-    );
+    const { data } = useSWR([user, key, ...filterValues], fetcher, {
+        refreshInterval,
+        fallbackData,
+    });
 
     if (!data) return null;
 
@@ -230,17 +247,18 @@ const ProjectPage = ({
     if (!project) return nextRouter.push('/404');
 
     const goals = data?.projectGoals;
-    const goalsCount = data?.projectGoalsCount;
+    const meta: GoalsMetaOutput | undefined = data?.projectGoalsMeta;
 
     useEffect(() => {
-        if (preview && goals && goals?.filter((g) => g.id === preview.id).length !== 1) {
-            setPreview(null);
-        }
+        const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
+
+        if (isGoalDeletedAlready) setPreview(null);
     }, [goals, preview]);
 
     useEffect(() => {
         setCurrentProjectCache({
             id: project.id,
+            key: project.key,
             title: project.title,
             description: project.description,
             flowId: project.flowId,
@@ -253,12 +271,6 @@ const ProjectPage = ({
         setCurrentProjectCache(null);
     });
 
-    const onSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setFulltextFilter(e.currentTarget.value);
-    }, []);
-
-    useUrlParams(priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
-
     const onGoalPrewiewShow = useCallback(
         (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
@@ -270,13 +282,11 @@ const ProjectPage = ({
         [],
     );
 
-    const onGoalPreviewClose = useCallback(() => {
+    const onGoalPreviewDestroy = useCallback(() => {
         setPreview(null);
     }, []);
 
-    const onGoalPreviewDelete = useCallback(() => {
-        setPreview(null);
-    }, []);
+    const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
     return (
         <Page
@@ -289,25 +299,21 @@ const ProjectPage = ({
         >
             <ProjectPageLayout actions project={project}>
                 <FiltersPanel
-                    count={goalsCount}
-                    flowId={project.flow?.id}
-                    users={project.participants}
-                    tags={project.tags}
-                    priorityFilter={priorityFilter}
-                    stateFilter={stateFilter}
-                    tagsFilter={tagsFilter}
-                    ownerFilter={ownerFilter}
-                    searchFilter={fulltextFilter}
-                    limitFilter={limitFilter}
-                    onSearchChange={onSearchChange}
+                    count={meta?.count}
+                    filteredCount={goals?.length ?? 0}
+                    priority={meta?.priority}
+                    states={meta?.states}
+                    users={meta?.owners}
+                    tags={meta?.tags}
+                    filterValues={filterValues}
+                    onSearchChange={setFulltextFilter}
                     onPriorityChange={setPriorityFilter}
                     onStateChange={setStateFilter}
                     onUserChange={setOwnerFilter}
                     onTagChange={setTagsFilter}
-                    onLimitChange={setLimitFilter}
                 />
 
-                <StyledGoalsList>
+                <GoalList>
                     {goals?.map((goal) =>
                         nullable(goal, (g) => (
                             <GoalListItem
@@ -320,20 +326,16 @@ const ProjectPage = ({
                                 tags={g.tags}
                                 priority={g.priority}
                                 comments={g.comments?.length}
+                                focused={selectedGoalResolver(g.id)}
                                 key={g.id}
                                 onClick={onGoalPrewiewShow(g)}
                             />
                         )),
                     )}
-                </StyledGoalsList>
+                </GoalList>
 
                 {nullable(preview, (p) => (
-                    <GoalPreview
-                        goal={p}
-                        visible={Boolean(p)}
-                        onClose={onGoalPreviewClose}
-                        onDelete={onGoalPreviewDelete}
-                    />
+                    <GoalPreview goal={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
                 ))}
             </ProjectPageLayout>
         </Page>

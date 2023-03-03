@@ -1,42 +1,22 @@
-import React, { MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
-import styled from 'styled-components';
-import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import NextLink from 'next/link';
 
-import { Goal, Project, Team } from '../../../graphql/@generated/genql';
-import { createFetcher } from '../../utils/createFetcher';
+import { Goal, GoalsMetaOutput } from '../../../graphql/@generated/genql';
+import { createFetcher, refreshInterval } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { Page, PageContent } from '../../components/Page';
-import { GoalListItem } from '../../components/GoalListItem';
 import { nullable } from '../../utils/nullable';
 import { CommonHeader } from '../../components/CommonHeader';
 import { FiltersPanel } from '../../components/FiltersPanel';
-import { useUrlParams } from '../../hooks/useUrlParams';
-import { Text } from '../../components/Text';
-import { Link } from '../../components/Link';
-import { PageSep } from '../../components/PageSep';
-import { defaultLimit } from '../../components/LimitFilterDropdown';
-import { routes } from '../../hooks/router';
+import { parseFilterValues, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import { useGrouppedGoals } from '../../hooks/useGrouppedGoals';
+import { GoalsGroup, GoalsGroupProjectTitle, GoalsGroupTeamTitle } from '../../components/GoalGroup';
 
 const GoalPreview = dynamic(() => import('../../components/GoalPreview'));
 
-const refreshInterval = 3000;
-const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
-
-const fetcher = createFetcher((_, priority = [], states = [], query = '', tags = [], owner = []) => ({
-    goalPriorityColors: true,
-    goalPriorityKind: true,
-    flowRecommended: {
-        id: true,
-        title: true,
-        states: {
-            id: true,
-            title: true,
-        },
-    },
+const fetcher = createFetcher((_, priority = [], states = [], tags = [], owner = [], query = '') => ({
     userGoals: [
         {
             data: {
@@ -113,95 +93,89 @@ const fetcher = createFetcher((_, priority = [], states = [], query = '', tags =
             updatedAt: true,
         },
     ],
+    userGoalsMeta: [
+        {
+            data: {
+                priority: [],
+                states: [],
+                tags: [],
+                owner: [],
+                query: '',
+            },
+        },
+        {
+            owners: {
+                id: true,
+                user: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                },
+                ghost: {
+                    id: true,
+                    email: true,
+                },
+            },
+            tags: { id: true, title: true, description: true },
+            states: {
+                id: true,
+                title: true,
+                hue: true,
+            },
+            projects: {
+                id: true,
+                key: true,
+                title: true,
+                flowId: true,
+            },
+            teams: {
+                id: true,
+                slug: true,
+                key: true,
+                title: true,
+            },
+            priority: true,
+            count: true,
+        },
+    ],
 }));
-
-const StyledGoalsList = styled.div`
-    padding: 0;
-    margin: 0 -20px;
-`;
-
-const StyledProjectGroup = styled.div`
-    padding: 0 20px 40px 20px;
-    margin: 0 -20px;
-`;
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, query }) => ({
-        ssrData: await fetcher(
-            user,
-            parseQueryParam(query.priority as string),
-            parseQueryParam(query.state as string),
-            parseQueryParam(query.search as string).toString(),
-            parseQueryParam(query.tags as string),
-            parseQueryParam(query.user as string),
-            Number(parseQueryParam(query.limit as string)),
-        ),
+        ssrData: await fetcher(user, ...parseFilterValues(query)),
     }),
     {
         private: true,
     },
 );
 
-const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
+const GoalsPage = ({
+    user,
+    ssrTime,
+    locale,
+    ssrData: fallbackData,
+}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
     const t = useTranslations('goals.index');
-    const router = useRouter();
-
-    const [priorityFilter, setPriorityFilter] = useState<string[]>(parseQueryParam(router.query.priority as string));
-    const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state as string));
-    const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags as string));
-    const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user as string));
-    const [fulltextFilter, setFulltextFilter] = useState(parseQueryParam(router.query.search as string).toString());
-    const [limitFilter, setLimitFilter] = useState(Number(router.query.limit) || defaultLimit);
-
     const [preview, setPreview] = useState<Goal | null>(null);
 
-    const { data } = useSWR(
-        [user, priorityFilter, stateFilter, fulltextFilter, tagsFilter, ownerFilter, limitFilter],
-        (...args) => fetcher(...args),
-        {
-            refreshInterval,
-            fallbackData: ssrData,
-        },
-    );
+    const { filterValues, setPriorityFilter, setStateFilter, setTagsFilter, setOwnerFilter, setFulltextFilter } =
+        useUrlFilterParams();
 
-    const onSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setFulltextFilter(e.currentTarget.value);
-    }, []);
+    const { data } = useSWR([user, ...filterValues], fetcher, {
+        refreshInterval,
+        fallbackData,
+    });
 
     const goals = data?.userGoals;
-    const goalsCount = goals?.length ?? 0;
-    const flowRecommended = data?.flowRecommended;
+    const meta: GoalsMetaOutput | undefined = data?.userGoalsMeta;
+    const groups = useGrouppedGoals(goals);
 
     useEffect(() => {
-        if (preview && goals?.filter((g) => g.id === preview.id).length !== 1) {
-            setPreview(null);
-        }
+        const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
+
+        if (isGoalDeletedAlready) setPreview(null);
     }, [goals, preview]);
-
-    const [usersFilterData, tagsFilterData] = useMemo(() => {
-        const projectsData = new Map();
-        const tagsData = new Map();
-        const usersData = new Map();
-
-        goals?.forEach((g) => {
-            g?.owner?.id && usersData.set(g?.owner?.id, g?.owner);
-            g.project?.id &&
-                projectsData.set(g.project?.id, {
-                    id: g.project?.id,
-                    title: g.project?.title,
-                    flowId: g.project?.flowId,
-                });
-            g?.tags?.forEach((t) => tagsData.set(t?.id, t));
-        });
-
-        return [
-            Array.from(usersData.values()),
-            Array.from(tagsData.values()),
-            Array.from(projectsData.values()), // https://github.com/taskany-inc/issues/issues/438
-        ];
-    }, [goals]);
-
-    useUrlParams(priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter);
 
     const onGoalPrewiewShow = useCallback(
         (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
@@ -214,174 +188,61 @@ const GoalsPage = ({ user, ssrTime, locale, ssrData }: ExternalPageProps<Awaited
         [],
     );
 
-    const onGoalPreviewClose = useCallback(() => {
+    const onGoalPreviewDestroy = useCallback(() => {
         setPreview(null);
     }, []);
 
-    const onGoalPreviewDelete = useCallback(() => {
-        setPreview(null);
-    }, []);
-
-    const groups = useMemo(() => {
-        return goals?.reduce(
-            (acc, goal) => {
-                if (goal.team?.id) {
-                    const team = acc.teams[goal.team.id] || {
-                        data: goal.team,
-                        goals: [],
-                    };
-
-                    team.goals.push(goal);
-                    acc.teams[goal.team.id] = team;
-                }
-
-                if (goal.project) {
-                    const project = acc.projects[goal.project.id] || {
-                        data: goal.project,
-                        goals: [],
-                    };
-
-                    // sort teams by title
-                    // @ts-ignore — teams doesn't exist on project
-                    project.teams = goal.project.teams?.length
-                        ? // @ts-ignore — teams doesn't exist on project
-                          goal.project.teams
-                              // @ts-ignore
-                              ?.sort((a, b) => (a?.title > b?.title ? 1 : -1))
-                        : undefined;
-
-                    project.goals.push(goal);
-                    acc.projects[goal.project.id] = project;
-                }
-
-                return acc;
-            },
-            { teams: {}, projects: {} } as {
-                teams: Record<number, { data: Team; goals: Goal[] }>;
-                projects: Record<number, { data: Project; teams?: Array<Team | undefined>; goals: Goal[] }>;
-            },
-        );
-    }, [goals]);
+    const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
     return (
         <Page user={user} ssrTime={ssrTime} locale={locale} title={t('title')}>
-            <CommonHeader title={t('Dashboard')} description={t('This is your personal goals bundle')}></CommonHeader>
+            <CommonHeader title={t('Dashboard')} description={t('This is your personal goals bundle')} />
 
             <FiltersPanel
-                count={goalsCount}
-                flowId={flowRecommended?.[0].id}
-                users={usersFilterData}
-                tags={tagsFilterData}
-                priorityFilter={priorityFilter}
-                stateFilter={stateFilter}
-                tagsFilter={tagsFilter}
-                ownerFilter={ownerFilter}
-                searchFilter={fulltextFilter}
-                limitFilter={limitFilter}
-                onSearchChange={onSearchChange}
+                count={meta?.count}
+                filteredCount={goals?.length ?? 0}
+                priority={meta?.priority}
+                states={meta?.states}
+                users={meta?.owners}
+                tags={meta?.tags}
+                filterValues={filterValues}
+                onSearchChange={setFulltextFilter}
                 onPriorityChange={setPriorityFilter}
                 onStateChange={setStateFilter}
                 onUserChange={setOwnerFilter}
                 onTagChange={setTagsFilter}
-                onLimitChange={setLimitFilter}
             />
 
             <PageContent>
-                {Object.values(groups?.teams || {}).map((team) => {
-                    return nullable(team.goals?.length, () => (
-                        <StyledProjectGroup key={team.data.key}>
-                            <Text size="l" weight="bolder">
-                                <NextLink passHref href={routes.team(team.data.slug)}>
-                                    <Link inline>{team.data.title}</Link>
-                                </NextLink>
-                            </Text>
+                {groups.teams.map((team) =>
+                    nullable(team.goals.length, () => (
+                        <GoalsGroup
+                            key={team.data.id}
+                            goals={team.goals}
+                            selectedResolver={selectedGoalResolver}
+                            onClickProvider={onGoalPrewiewShow}
+                        >
+                            <GoalsGroupTeamTitle team={team} />
+                        </GoalsGroup>
+                    )),
+                )}
 
-                            <PageSep />
-
-                            <StyledGoalsList>
-                                {team.goals?.map((goal) =>
-                                    nullable(goal, (g) => (
-                                        <GoalListItem
-                                            createdAt={g.createdAt}
-                                            id={g.id}
-                                            state={g.state}
-                                            title={g.title}
-                                            issuer={g.activity}
-                                            owner={g.owner}
-                                            tags={g.tags}
-                                            priority={g.priority}
-                                            comments={g.comments?.length}
-                                            key={g.id}
-                                            focused={g.id === preview?.id}
-                                            onClick={onGoalPrewiewShow(g)}
-                                        />
-                                    )),
-                                )}
-                            </StyledGoalsList>
-                        </StyledProjectGroup>
-                    ));
-                })}
-
-                {Object.values(groups?.projects || {})
-                    .sort((a, b) => (a.teams && !b.teams ? -1 : 1))
-                    .map((project) =>
-                        nullable(project.goals?.length, () => (
-                            <StyledProjectGroup key={project.data.key}>
-                                <Text size="l" weight="bolder">
-                                    {nullable(project.teams, (teams) => (
-                                        <>
-                                            {teams.map((team, i) =>
-                                                nullable(team, (t) => (
-                                                    <>
-                                                        <NextLink key={t.slug} passHref href={routes.team(t.slug)}>
-                                                            <Link inline>{t.title}</Link>
-                                                        </NextLink>
-                                                        {i !== teams.length - 1 ? ', ' : ''}
-                                                    </>
-                                                )),
-                                            )}
-                                            {' — '}
-                                        </>
-                                    ))}
-                                    <NextLink passHref href={routes.project(project.data.key)}>
-                                        <Link inline>{project.data.title}</Link>
-                                    </NextLink>
-                                </Text>
-
-                                <PageSep />
-
-                                <StyledGoalsList>
-                                    {project.goals?.map((goal) =>
-                                        nullable(goal, (g) => (
-                                            <GoalListItem
-                                                createdAt={g.createdAt}
-                                                id={g.id}
-                                                state={g.state}
-                                                title={g.title}
-                                                issuer={g.activity}
-                                                owner={g.owner}
-                                                tags={g.tags}
-                                                priority={g.priority}
-                                                comments={g.comments?.length}
-                                                key={g.id}
-                                                focused={g.id === preview?.id}
-                                                onClick={onGoalPrewiewShow(g)}
-                                            />
-                                        )),
-                                    )}
-                                </StyledGoalsList>
-                            </StyledProjectGroup>
-                        )),
-                    )}
+                {groups.projects.map((project) =>
+                    nullable(project.goals.length, () => (
+                        <GoalsGroup
+                            key={project.data.id}
+                            goals={project.goals}
+                            selectedResolver={selectedGoalResolver}
+                            onClickProvider={onGoalPrewiewShow}
+                        >
+                            <GoalsGroupProjectTitle project={project} />
+                        </GoalsGroup>
+                    )),
+                )}
             </PageContent>
 
             {nullable(preview, (p) => (
-                <GoalPreview
-                    goal={p}
-                    visible={Boolean(p)}
-                    onClose={onGoalPreviewClose}
-                    onDelete={onGoalPreviewDelete}
-                />
+                <GoalPreview goal={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
             ))}
         </Page>
     );

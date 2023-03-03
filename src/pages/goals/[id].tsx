@@ -45,6 +45,7 @@ import { useRouter } from '../../hooks/router';
 import { Icon } from '../../components/Icon';
 import { MenuItem } from '../../components/MenuItem';
 import { GoalDeleteModal } from '../../components/GoalDeleteModal';
+import { Priority, priorityColorsMap } from '../../types/priority';
 
 const StateSwitch = dynamic(() => import('../../components/StateSwitch'));
 const Md = dynamic(() => import('../../components/Md'));
@@ -173,8 +174,7 @@ const GoalPage = ({
         setStargizer(!stargizer);
     }, [stargizer]);
 
-    const priorityColorIndex = data.goalPriorityKind?.indexOf(goal.priority || '') ?? -1;
-    const priorityColor = priorityColorIndex >= 0 ? data.goalPriorityColors?.[priorityColorIndex] : undefined;
+    const priorityColor = priorityColorsMap[goal.priority as Priority];
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const updateGoal = useGoalUpdate(t, goal);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
