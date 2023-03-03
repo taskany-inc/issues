@@ -1,105 +1,76 @@
+import { PrismaClient } from '@prisma/client';
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 import slugify from 'slugify';
 
+import { connectionMap } from '../queries/connections';
+import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter, calcGoalsMeta } from '../queries/goals';
 import {
     SortOrder,
     SubscriptionToggleInput,
     Activity,
     Team,
-    TeamProjectsInput,
     TeamCreateInput,
     TeamUpdateInput,
     TeamsInput,
     TeamDeleteInput,
-    Project,
     Goal,
     TeamGoalsInput,
+    GoalsMetaOutput,
 } from '../types';
 
-const connectionMap: Record<string, string> = {
-    true: 'connect',
-    false: 'disconnect',
-};
+const goalsQuery = async (
+    db: PrismaClient,
+    activityId: string,
+    data: {
+        slug: string;
+        query: string;
+        priority: string[];
+        states: string[];
+        tags: string[];
+        owner: string[];
+    },
+) => {
+    const uniqGoals = new Map();
 
-const projectGoalsFilter = (
-    data: { query: string; priority: string[]; states: string[]; tags: string[]; owner: string[] },
-    extra: any = {},
-): any => {
-    const priorityFilter = data.priority.length ? { priority: { in: data.priority } } : {};
-
-    const statesFilter = data.states.length
-        ? {
-              state: {
-                  id: {
-                      in: data.states,
-                  },
-              },
-          }
-        : {};
-
-    const tagsFilter = data.tags.length
-        ? {
-              tags: {
-                  some: {
-                      id: {
-                          in: data.tags,
-                      },
-                  },
-              },
-          }
-        : {};
-
-    const ownerFilter = data.owner.length
-        ? {
-              owner: {
-                  id: {
-                      in: data.owner,
-                  },
-              },
-          }
-        : {};
-
-    return {
-        where: {
-            archived: false,
-            OR: [
-                {
-                    title: {
-                        contains: data.query,
-                        mode: 'insensitive',
+    const [teamGoals, teamProjectsGoals] = await Promise.all([
+        db.goal.findMany({
+            ...goalsFilter(data, {
+                AND: {
+                    team: {
+                        slug: data.slug,
                     },
                 },
-                {
-                    description: {
-                        contains: data.query,
-                        mode: 'insensitive',
-                    },
-                },
-                {
+            }),
+            include: {
+                ...goalDeepQuery,
+            },
+        }),
+        db.goal.findMany({
+            ...goalsFilter(data, {
+                AND: {
                     project: {
-                        title: {
-                            contains: data.query,
-                            mode: 'insensitive',
+                        teams: {
+                            some: {
+                                slug: data.slug,
+                            },
                         },
                     },
                 },
-                {
-                    project: {
-                        description: {
-                            contains: data.query,
-                            mode: 'insensitive',
-                        },
-                    },
-                },
-            ],
-            ...priorityFilter,
-            ...statesFilter,
-            ...tagsFilter,
-            ...ownerFilter,
-            ...extra,
-        },
-    };
+            }),
+            include: {
+                ...goalDeepQuery,
+            },
+        }),
+    ]);
+
+    teamGoals.forEach((goal) => uniqGoals.set(goal.id, goal));
+    teamProjectsGoals.forEach((goal) => uniqGoals.set(goal.id, goal));
+
+    return Array.from(uniqGoals.values()).map((goal) => ({
+        ...goal,
+        ...addCalclulatedGoalsFields(goal, activityId),
+    }));
 };
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -182,71 +153,6 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         },
     });
 
-    t.list.field('teamProjects', {
-        type: Project,
-        args: {
-            data: nonNull(arg({ type: TeamProjectsInput })),
-        },
-        resolve: async (_, { data }, { db, activity }) => {
-            if (!activity) return null;
-
-            return db.project.findMany({
-                where: {
-                    teams: {
-                        some: {
-                            slug: data.slug,
-                        },
-                    },
-                },
-                orderBy: {
-                    createdAt: 'asc',
-                },
-                include: {
-                    goals: {
-                        ...projectGoalsFilter(data),
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                        include: {
-                            owner: {
-                                include: {
-                                    user: true,
-                                    ghost: true,
-                                },
-                            },
-                            activity: {
-                                include: {
-                                    user: true,
-                                    ghost: true,
-                                },
-                            },
-                            tags: true,
-                            state: true,
-                            project: true,
-                            estimate: true,
-                            dependsOn: {
-                                include: {
-                                    state: true,
-                                },
-                            },
-                            relatedTo: {
-                                include: {
-                                    state: true,
-                                },
-                            },
-                            blocks: {
-                                include: {
-                                    state: true,
-                                },
-                            },
-                            comments: true,
-                        },
-                    },
-                },
-            });
-        },
-    });
-
     t.list.field('teamGoals', {
         type: Goal,
         args: {
@@ -255,51 +161,21 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            return db.goal.findMany({
-                ...projectGoalsFilter(data, {
-                    team: {
-                        slug: data.slug,
-                    },
-                }),
-                orderBy: {
-                    createdAt: 'asc',
-                },
-                include: {
-                    team: true,
-                    owner: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    activity: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    tags: true,
-                    state: true,
-                    project: true,
-                    estimate: true,
-                    dependsOn: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    relatedTo: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    blocks: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    comments: true,
-                },
-            });
+            return goalsQuery(db, activity.id, data);
+        },
+    });
+
+    t.field('teamGoalsMeta', {
+        type: GoalsMetaOutput,
+        args: {
+            data: nonNull(arg({ type: TeamGoalsInput })),
+        },
+        resolve: async (_, { data }, { db, activity }) => {
+            if (!activity) return null;
+
+            const allTeamGoals = await goalsQuery(db, activity.id, data);
+
+            return calcGoalsMeta(allTeamGoals);
         },
     });
 
@@ -309,7 +185,6 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             sortBy: arg({ type: SortOrder }),
             query: nonNull(stringArg()),
         },
-        // eslint-disable-next-line no-shadow
         resolve: async (_, { sortBy, query }, { db }) => {
             if (query === '') {
                 return [];
