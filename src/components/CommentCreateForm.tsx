@@ -53,7 +53,10 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
                 reset();
                 setFocus(false);
                 setBusy(false);
-            })(form);
+            })({
+                ...form,
+                goalId,
+            });
         },
         [create, onSubmit, reset],
     );
