@@ -3,8 +3,6 @@ import { createFetcher } from './createFetcher';
 export const refreshInterval = 3000;
 
 export const goalFetcher = createFetcher((_, id: string) => ({
-    goalPriorityColors: true,
-    goalPriorityKind: true,
     goal: [
         {
             id,

@@ -18,6 +18,7 @@ import { usePageContext } from '../hooks/usePageContext';
 import { useReactionsResource } from '../hooks/useReactionsResource';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { editGoalKeys } from '../utils/hotkeys';
+import { Priority, priorityColorsMap } from '../types/priority';
 
 import { ModalHeader, ModalContent } from './Modal';
 import { ModalPreview } from './ModalPreview';
@@ -113,8 +114,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
     const updateGoal = useGoalUpdate(t, goal);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
 
-    const priorityColorIndex = data?.goalPriorityKind?.indexOf(goal.priority || '') ?? -1;
-    const priorityColor = priorityColorIndex >= 0 ? data?.goalPriorityColors?.[priorityColorIndex] : undefined;
+    const priorityColor = priorityColorsMap[goal.priority as Priority];
     const issueEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
 
     const onGoalStateChange = useCallback(

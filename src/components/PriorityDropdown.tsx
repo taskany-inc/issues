@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
-import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import colorLayer from 'color-layer';
 
-import { createFetcher } from '../utils/createFetcher';
-import { Priority } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
+import { Priority, priorityColorsMap } from '../types/priority';
 
 import { Button } from './Button';
 import { StateDot } from './StateDot';
@@ -23,24 +21,22 @@ interface PriorityDropdownProps {
     onChange?: (priority: Priority) => void;
 }
 
-const fetcher = createFetcher(() => ({
-    goalPriorityKind: true,
-    goalPriorityColors: true,
-}));
-
 export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
     ({ text, value, disabled, error, onChange }, ref) => {
         const t = useTranslations('Priority');
-        const { user, themeId } = usePageContext();
+        const { themeId } = usePageContext();
 
-        const { data } = useSWR('priority', () => fetcher(user));
+        const priorityVariants = Object.keys(priorityColorsMap) as Priority[];
 
-        const colors = useMemo(
-            () => data?.goalPriorityColors?.map((hue) => colorLayer(hue!, 5, hue === 1 ? 0 : undefined)[themeId]) || [],
-            [themeId, data?.goalPriorityColors],
-        );
+        const colors = useMemo(() => {
+            const themeColorsMap = priorityVariants.reduce((acc, key: Priority) => {
+                acc[key] = colorLayer(priorityColorsMap[key], 5, priorityColorsMap[key] === 1 ? 0 : undefined)[themeId];
 
-        const colorIndex = data?.goalPriorityKind?.indexOf(value || '') ?? -1;
+                return acc;
+            }, Object.create({}));
+
+            return themeColorsMap;
+        }, [themeId, priorityVariants]);
 
         return (
             <Dropdown
@@ -49,22 +45,20 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                 text={value || text}
                 value={value}
                 onChange={onChange}
-                items={data?.goalPriorityKind}
+                items={priorityVariants}
                 disabled={disabled}
                 renderTrigger={(props) => (
                     <Button
                         ref={props.ref}
                         onClick={props.onClick}
                         disabled={props.disabled}
-                        iconLeft={
-                            colorIndex !== -1 ? <StateDot hue={data?.goalPriorityColors?.[colorIndex]} /> : undefined
-                        }
+                        iconLeft={<StateDot hue={priorityColorsMap[props.value as Priority]} />}
                     />
                 )}
                 renderItem={(props) => (
                     <ColorizedMenuItem
                         key={props.item}
-                        hue={data?.goalPriorityColors?.[props.index]}
+                        hue={priorityColorsMap[props.item as Priority]}
                         title={t(props.item)}
                         hoverColor={colors[props.index]}
                         focused={props.cursor === props.index}
