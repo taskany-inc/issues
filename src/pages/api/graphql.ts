@@ -1,8 +1,5 @@
-/* eslint-disable global-require */
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ApolloServer } from 'apollo-server-micro';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { getSession } from 'next-auth/react';
 
 import { prisma } from '../../utils/prisma';
@@ -22,7 +19,6 @@ const apolloServer = new ApolloServer({
 
         return { db: prisma, req, user, activity: user?.activity };
     },
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground(), require('apollo-tracing').plugin()],
 });
 const startServer = apolloServer.start();
 
