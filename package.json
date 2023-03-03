@@ -47,7 +47,6 @@
     "gray-matter": "4.0.3",
     "md5": "2.3.0",
     "micro": "9.4.1",
-    "micro-cors": "0.1.1",
     "multer": "1.4.5-lts.1",
     "next": "12.2.5",
     "next-auth": "4.19.2",
