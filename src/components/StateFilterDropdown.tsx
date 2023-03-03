@@ -1,9 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import useSWR from 'swr';
 import colorLayer from 'color-layer';
 import dynamic from 'next/dynamic';
 
-import { createFetcher } from '../utils/createFetcher';
 import { State } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
@@ -14,41 +12,21 @@ const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface StateFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
-    flowId?: string;
+    states?: State[];
     value?: Array<string>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
     onChange?: (selected: string[]) => void;
 }
 
-const fetcher = createFetcher((_, id: string) => ({
-    flow: [
-        {
-            id,
-        },
-        {
-            id: true,
-            title: true,
-            states: {
-                id: true,
-                title: true,
-                hue: true,
-                default: true,
-            },
-        },
-    ],
-}));
-
 export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterDropdownProps>(
-    ({ text, flowId, value, disabled, onChange }, ref) => {
-        const { user, themeId } = usePageContext();
+    ({ text, states, value, disabled, onChange }, ref) => {
+        const { themeId } = usePageContext();
         const [selected, setSelected] = useState<Set<string>>(new Set(value));
 
-        const { data } = useSWR(flowId, (id) => fetcher(user, id));
-
         const colors = useMemo(
-            () => data?.flow?.states?.map((f) => colorLayer(f.hue, 5, f.hue === 1 ? 0 : undefined)[themeId]) || [],
-            [themeId, data?.flow?.states],
+            () => states?.map((f) => colorLayer(f.hue, 5, f.hue === 1 ? 0 : undefined)[themeId]) || [],
+            [themeId, states],
         );
 
         const onStateClick = useCallback(
@@ -68,7 +46,7 @@ export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterD
                 text={text}
                 value={value}
                 onChange={onStateClick}
-                items={data?.flow?.states}
+                items={states}
                 disabled={disabled}
                 renderTrigger={(props) => (
                     <FiltersMenuItem
