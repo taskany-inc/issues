@@ -1,12 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import useSWR from 'swr';
 import colorLayer from 'color-layer';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 
-import { createFetcher } from '../utils/createFetcher';
-import { Priority } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
+import { Priority, priorityColorsMap } from '../types/priority';
 
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 import { FiltersMenuItem } from './FiltersMenuItem';
@@ -15,29 +13,30 @@ const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface PriorityFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
+    priority?: string[];
     value?: Array<string>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
     onChange?: (selected: string[]) => void;
 }
 
-const fetcher = createFetcher(() => ({
-    goalPriorityKind: true,
-    goalPriorityColors: true,
-}));
-
 export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityFilterDropdownProps>(
-    ({ text, value, disabled, onChange }, ref) => {
+    ({ text, priority, value, disabled, onChange }, ref) => {
         const t = useTranslations('Priority');
-        const { user, themeId } = usePageContext();
+        const { themeId } = usePageContext();
         const [selected, setSelected] = useState<Set<string>>(new Set(value));
 
-        const { data } = useSWR('priority', () => fetcher(user));
+        const priorityVariants = Object.keys(priorityColorsMap) as Priority[];
 
-        const colors = useMemo(
-            () => data?.goalPriorityColors?.map((hue) => colorLayer(hue!, 5, hue === 1 ? 0 : undefined)[themeId]) || [],
-            [themeId, data?.goalPriorityColors],
-        );
+        const colors = useMemo(() => {
+            const themeColorsMap = priorityVariants.reduce((acc, key: Priority) => {
+                acc[key] = colorLayer(priorityColorsMap[key], 5, priorityColorsMap[key] === 1 ? 0 : undefined)[themeId];
+
+                return acc;
+            }, Object.create({}));
+
+            return themeColorsMap;
+        }, [themeId, priorityVariants]);
 
         const onPriorityClick = useCallback(
             (p: Priority) => {
@@ -56,7 +55,7 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
                 text={text}
                 value={value}
                 onChange={onPriorityClick}
-                items={data?.goalPriorityKind}
+                items={priority}
                 disabled={disabled}
                 renderTrigger={(props) => (
                     <FiltersMenuItem
@@ -71,9 +70,9 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
                 renderItem={(props) => (
                     <ColorizedMenuItem
                         key={props.item}
-                        hue={data?.goalPriorityColors?.[data?.goalPriorityKind?.indexOf(props.item || '') ?? -1]}
+                        hue={priorityColorsMap[props.item as Priority]}
                         title={t(props.item)}
-                        hoverColor={colors[props.index]}
+                        hoverColor={colors[props.item]}
                         checked={selected?.has(props.item)}
                         onClick={props.onClick}
                     />

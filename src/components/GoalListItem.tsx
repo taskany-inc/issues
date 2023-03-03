@@ -1,16 +1,14 @@
-import { MouseEventHandler } from 'react';
+import React, { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
-import useSWR from 'swr';
 
 import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
-import { createFetcher } from '../utils/createFetcher';
-import { usePageContext } from '../hooks/usePageContext';
+import { Priority, priorityColorsMap } from '../types/priority';
 
 import { Text } from './Text';
 import { Tag as TagItem } from './Tag';
@@ -36,11 +34,6 @@ interface GoalListItemProps {
 
     onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
-
-const fetcher = createFetcher(() => ({
-    goalPriorityKind: true,
-    goalPriorityColors: true,
-}));
 
 const StyledGoal = styled.a<{ focused?: boolean }>`
     display: grid;
@@ -132,83 +125,78 @@ const StyledIcon = styled(Icon)`
     vertical-align: middle;
 `;
 
-export const GoalListItem: React.FC<GoalListItemProps> = ({
-    id,
-    owner,
-    issuer,
-    createdAt,
-    tags,
-    title,
-    comments,
-    hasForks,
-    isNotViewed,
-    state,
-    focused,
-    priority,
-    onClick,
-}) => {
-    const t = useTranslations('goals.item');
-    const { user } = usePageContext();
+export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
+    ({
+        id,
+        owner,
+        issuer,
+        createdAt,
+        tags,
+        title,
+        comments,
+        hasForks,
+        isNotViewed,
+        state,
+        focused,
+        priority,
+        onClick,
+    }) => {
+        const t = useTranslations('goals.item');
 
-    const { data } = useSWR('priority', () => fetcher(user));
+        return (
+            <NextLink href={routes.goal(id)} passHref>
+                <StyledGoal focused={focused} onClick={onClick}>
+                    <StyledNotViewed>{isNotViewed && <StyledNotViewedDot />}</StyledNotViewed>
+                    <StyledState>
+                        {nullable(state, (s) => (
+                            <StateDot size="m" hue={s.hue} />
+                        ))}
+                    </StyledState>
 
-    const priorityColorIndex = data?.goalPriorityKind?.indexOf(priority || '') ?? -1;
+                    <StyledName>
+                        <StyledTitle size="m" weight="bold">
+                            {' '}
+                            {title}
+                        </StyledTitle>
 
-    return (
-        <Link href={routes.goal(id)} passHref>
-            <StyledGoal focused={focused} onClick={onClick}>
-                <StyledNotViewed>{isNotViewed && <StyledNotViewedDot />}</StyledNotViewed>
-                <StyledState>
-                    {nullable(state, (s) => (
-                        <StateDot size="m" hue={s.hue} />
-                    ))}
-                </StyledState>
+                        <StyledTags>
+                            {tags?.map((tag) =>
+                                nullable(tag, (t) => (
+                                    <StyledTag key={t.id} title={t.title} description={t.description} />
+                                )),
+                            )}
+                        </StyledTags>
 
-                <StyledName>
-                    <StyledTitle size="m" weight="bold">
-                        {' '}
-                        {title}
-                    </StyledTitle>
+                        <StyledSubTitle size="s">
+                            #{id} <RelativeTime date={createdAt} kind="created" />
+                            {`  ${t('by')} ${issuer?.user?.name}`}
+                        </StyledSubTitle>
+                    </StyledName>
 
-                    <StyledTags>
-                        {tags?.map((tag) =>
-                            nullable(tag, (t) => <StyledTag key={t.id} title={t.title} description={t.description} />),
+                    <StyledAddon>
+                        {nullable(priority, (p) => (
+                            <StateDot size="s" hue={priorityColorsMap[p as Priority]} title={t(`Priority.${p}`)} />
+                        ))}
+                    </StyledAddon>
+
+                    <StyledAddon>
+                        <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
+                    </StyledAddon>
+
+                    <StyledAddon>{hasForks && <Icon type="gitFork" size="s" />}</StyledAddon>
+
+                    <StyledAddon>
+                        {comments !== 0 && (
+                            <>
+                                <StyledIcon type="message" size="s" />
+                                <StyledCommentsCount size="xs" weight="bold">
+                                    {comments}
+                                </StyledCommentsCount>
+                            </>
                         )}
-                    </StyledTags>
-
-                    <StyledSubTitle size="s">
-                        #{id} <RelativeTime date={createdAt} kind="created" />
-                        {`  ${t('by')} ${issuer?.user?.name}`}
-                    </StyledSubTitle>
-                </StyledName>
-
-                <StyledAddon>
-                    {nullable(priority, (p) => (
-                        <StateDot
-                            size="s"
-                            hue={data?.goalPriorityColors?.[priorityColorIndex]}
-                            title={t(`Priority.${p}`)}
-                        />
-                    ))}
-                </StyledAddon>
-
-                <StyledAddon>
-                    <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
-                </StyledAddon>
-
-                <StyledAddon>{hasForks && <Icon type="gitFork" size="s" />}</StyledAddon>
-
-                <StyledAddon>
-                    {comments !== 0 && (
-                        <>
-                            <StyledIcon type="message" size="s" />
-                            <StyledCommentsCount size="xs" weight="bold">
-                                {comments}
-                            </StyledCommentsCount>
-                        </>
-                    )}
-                </StyledAddon>
-            </StyledGoal>
-        </Link>
-    );
-};
+                    </StyledAddon>
+                </StyledGoal>
+            </NextLink>
+        );
+    },
+);
