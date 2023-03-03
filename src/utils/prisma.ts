@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 declare global {
     /* eslint-disable no-var */
@@ -20,12 +20,32 @@ if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
     standard OAuth Account schema names several fields another way
     Link to github issue: https://github.com/nextauthjs/next-auth/issues/3823
 */
-prisma.$use(async (params: Prisma.MiddlewareParams, next: (params: Prisma.MiddlewareParams) => Promise<any>) => {
+prisma.$use(async (params, next) => {
     if (params.action === 'create' && params.model === 'Account') {
-        const { 'not-before-policy': value, refresh_expires_in: refreshExpiresIn, ...rest } = params.args.data;
+        const { refresh_expires_in: refreshExpiresIn, ...rest } = params.args.data;
 
         if (refreshExpiresIn !== undefined) {
             params.args.data = { ...rest, refresh_token_expires_in: refreshExpiresIn };
+        }
+    }
+
+    return next(params);
+});
+
+prisma.$use(async (params, next) => {
+    if (params.model === 'User') {
+        if (params.action === 'create') {
+            const newUserEmail = params.args.data.email;
+            const connectedGhost = await prisma.ghost.findUnique({
+                where: { email: newUserEmail },
+                include: { activity: true },
+            });
+
+            params.args.data.hostId = connectedGhost?.hostId;
+            params.args.data.activityId = connectedGhost?.activity?.id;
+            params.args.data.invitedAt = connectedGhost?.createdAt;
+
+            await prisma.ghost.delete({ where: { id: connectedGhost?.id } });
         }
     }
 
