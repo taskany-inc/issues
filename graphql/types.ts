@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { asNexusMethod, objectType, inputObjectType, enumType } from 'nexus';
+import { asNexusMethod, objectType, inputObjectType, enumType, nonNull } from 'nexus';
 import { DateTimeResolver } from 'graphql-scalars';
 import {
     User as UserModel,
@@ -33,13 +33,6 @@ export const dependencyKind = ['dependsOn', 'blocks', 'relatedTo'];
 export const Dependency = enumType({
     name: 'Dependency',
     members: dependencyKind,
-});
-
-export const priorityKind = ['Highest', 'High', 'Medium', 'Low'];
-export const priorityColors = [360, 30, 1, 274];
-export const Priority = enumType({
-    name: 'Priority',
-    members: priorityKind,
 });
 
 export const User = objectType({
@@ -98,7 +91,7 @@ export const Project = objectType({
         t.field('flow', { type: Flow });
         t.field('parent', { type: Project });
         t.list.field('children', { type: Project });
-        t.list.field('teams', { type: Team });
+        t.list.field('teams', { type: nonNull(Team) });
         t.list.field('goals', { type: Goal });
         t.list.field('tags', { type: Tag });
         t.list.field('participants', { type: Activity });
@@ -474,7 +467,6 @@ export const ProjectGoalsInput = inputObjectType({
     name: 'ProjectGoalsInput',
     definition(t) {
         t.nonNull.string('key');
-        t.nonNull.int('pageSize');
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
@@ -486,18 +478,6 @@ export const ProjectGoalsInput = inputObjectType({
 export const UserGoalsInput = inputObjectType({
     name: 'UserGoalsInput',
     definition(t) {
-        t.nonNull.list.nonNull.string('priority');
-        t.nonNull.list.nonNull.string('states');
-        t.nonNull.list.nonNull.string('tags');
-        t.nonNull.list.nonNull.string('owner');
-        t.nonNull.string('query');
-    },
-});
-
-export const ProjectGoalsCountInput = inputObjectType({
-    name: 'ProjectGoalsCountInput',
-    definition(t) {
-        t.nonNull.string('key');
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
@@ -539,18 +519,6 @@ export const TeamUpdateInput = inputObjectType({
     },
 });
 
-export const TeamProjectsInput = inputObjectType({
-    name: 'TeamProjectsInput',
-    definition(t) {
-        t.field(TeamModel.slug);
-        t.nonNull.list.nonNull.string('priority');
-        t.nonNull.list.nonNull.string('states');
-        t.nonNull.list.nonNull.string('tags');
-        t.nonNull.list.nonNull.string('owner');
-        t.nonNull.string('query');
-    },
-});
-
 export const TeamGoalsInput = inputObjectType({
     name: 'TeamGoalsInput',
     definition(t) {
@@ -574,5 +542,20 @@ export const TeamDeleteInput = inputObjectType({
     name: 'TeamDelete',
     definition(t) {
         t.field(TeamModel.id);
+    },
+});
+
+export const GoalsMetaOutput = objectType({
+    name: 'GoalsMetaOutput',
+    definition(t) {
+        t.list.field('owners', { type: nonNull(Activity) });
+        t.list.field('issuers', { type: nonNull(Activity) });
+        t.list.field('participants', { type: nonNull(Activity) });
+        t.list.field('tags', { type: nonNull(Tag) });
+        t.list.field('states', { type: nonNull(State) });
+        t.list.field('projects', { type: nonNull(Project) });
+        t.list.field('teams', { type: nonNull(Team) });
+        t.list.nonNull.string('priority');
+        t.nonNull.int('count');
     },
 });

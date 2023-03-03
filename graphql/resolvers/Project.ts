@@ -1,6 +1,8 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
+import { connectionMap } from '../queries/connections';
+import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
 import {
     SortOrder,
     Project,
@@ -9,85 +11,10 @@ import {
     ProjectDeleteInput,
     SubscriptionToggleInput,
     Activity,
-    ProjectGoalsCountInput,
     ProjectUpdateInput,
     ProjectCreateInput,
+    GoalsMetaOutput,
 } from '../types';
-
-const connectionMap: Record<string, string> = {
-    true: 'connect',
-    false: 'disconnect',
-};
-
-const projectGoalsFilter = (data: {
-    key: string;
-    query: string;
-    priority: string[];
-    states: string[];
-    tags: string[];
-    owner: string[];
-}): any => {
-    const priorityFilter = data.priority.length ? { priority: { in: data.priority } } : {};
-
-    const statesFilter = data.states.length
-        ? {
-              state: {
-                  id: {
-                      in: data.states,
-                  },
-              },
-          }
-        : {};
-
-    const tagsFilter = data.tags.length
-        ? {
-              tags: {
-                  some: {
-                      id: {
-                          in: data.tags,
-                      },
-                  },
-              },
-          }
-        : {};
-
-    const ownerFilter = data.owner.length
-        ? {
-              owner: {
-                  id: {
-                      in: data.owner,
-                  },
-              },
-          }
-        : {};
-
-    return {
-        where: {
-            archived: false,
-            OR: [
-                {
-                    title: {
-                        contains: data.query,
-                        mode: 'insensitive',
-                    },
-                },
-                {
-                    description: {
-                        contains: data.query,
-                        mode: 'insensitive',
-                    },
-                },
-            ],
-            project: {
-                key: data.key,
-            },
-            ...priorityFilter,
-            ...statesFilter,
-            ...tagsFilter,
-            ...ownerFilter,
-        },
-    };
-};
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('projects', {
@@ -176,60 +103,44 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            return db.goal.findMany({
-                take: data.pageSize,
-                ...projectGoalsFilter(data),
-                orderBy: {
-                    createdAt: 'asc',
-                },
+            const goals = await db.goal.findMany({
+                ...goalsFilter(data, {
+                    project: {
+                        key: data.key,
+                    },
+                }),
                 include: {
-                    owner: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    activity: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    tags: true,
-                    state: true,
-                    project: true,
-                    estimate: true,
-                    dependsOn: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    relatedTo: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    blocks: {
-                        include: {
-                            state: true,
-                        },
-                    },
-                    comments: true,
+                    ...goalDeepQuery,
                 },
             });
+
+            return goals.map((goal: any) => ({
+                ...goal,
+                ...addCalclulatedGoalsFields(goal, activity.id),
+            }));
         },
     });
 
-    t.int('projectGoalsCount', {
+    t.field('projectGoalsMeta', {
+        type: GoalsMetaOutput,
         args: {
-            data: nonNull(arg({ type: ProjectGoalsCountInput })),
+            data: nonNull(arg({ type: ProjectGoalsInput })),
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            return db.goal.count({
-                ...projectGoalsFilter(data),
+            const allProjectGoals: any[] = await db.goal.findMany({
+                ...goalsFilter(data, {
+                    project: {
+                        key: data.key,
+                    },
+                }),
+                include: {
+                    ...goalDeepQuery,
+                },
             });
+
+            return calcGoalsMeta(allProjectGoals);
         },
     });
 
