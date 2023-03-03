@@ -2,6 +2,8 @@ import type { Session } from 'next-auth';
 
 import { createClient, QueryRequest } from '../../graphql/@generated/genql';
 
+export const refreshInterval = 3000;
+
 export function createFetcher(cb: (user?: Session['user'], ...args: any[]) => QueryRequest) {
     return (user?: Session['user'], ...rest: any[]) => {
         const gql = createClient({
