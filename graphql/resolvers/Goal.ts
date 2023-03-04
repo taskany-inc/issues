@@ -116,14 +116,14 @@ const goalsQuery = async (
     ]);
 
     teams.forEach((team) => {
-        team.goals.forEach((goal) => uniqGoals.set(goal.id, goal));
+        team.goals.forEach((goal: any) => uniqGoals.set(goal.id, goal));
         team.projects.forEach((project) => {
-            project.goals.forEach((goal) => uniqGoals.set(goal.id, goal));
+            project.goals.forEach((goal: any) => uniqGoals.set(goal.id, goal));
         });
     });
 
     projects.forEach((project) => {
-        project.goals.forEach((goal) => uniqGoals.set(goal.id, goal));
+        project.goals.forEach((goal: any) => uniqGoals.set(goal.id, goal));
     });
 
     goals.forEach((goal) => uniqGoals.set(goal.id, goal));
