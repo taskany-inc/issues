@@ -161,7 +161,7 @@ model Project {
 model Team {
   id           Int        @id @default(autoincrement())
   key          String     @unique
-  title        String     @unique
+  title        String
   description  String?
   parent       Team?      @relation("teamChildren", fields: [id], references: [id])
   children     Team[]     @relation("teamChildren")
