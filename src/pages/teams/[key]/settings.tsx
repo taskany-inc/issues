@@ -8,7 +8,7 @@ import z from 'zod';
 import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
 
-import { createFetcher } from '../../../utils/createFetcher';
+import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Team } from '../../../../graphql/@generated/genql';
 import { Button } from '../../../components/Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -23,16 +23,14 @@ import { TeamPageLayout } from '../../../components/TeamPageLayout';
 import { Page } from '../../../components/Page';
 import { FormMultiInput } from '../../../components/FormMultiInput';
 
-const refreshInterval = 3000;
-
-const teamFetcher = createFetcher((_, slug: string) => ({
+const teamFetcher = createFetcher((_, key: string) => ({
     team: [
         {
-            slug,
+            key,
         },
         {
             id: true,
-            slug: true,
+            key: true,
             title: true,
             description: true,
             activityId: true,
@@ -102,8 +100,8 @@ const projectsFetcher = createFetcher((_, query: string) => ({
 }));
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { slug } }) => {
-        const ssrData = await teamFetcher(user, slug);
+    async ({ user, params: { key } }) => {
+        const ssrData = await teamFetcher(user, key);
 
         return ssrData.team
             ? { ssrData }
@@ -144,13 +142,13 @@ const TeamSettingsPage = ({
     locale,
     ssrTime,
     ssrData,
-    params: { slug },
-}: ExternalPageProps<Awaited<ReturnType<typeof teamFetcher>>, { slug: string }>) => {
+    params: { key },
+}: ExternalPageProps<Awaited<ReturnType<typeof teamFetcher>>, { key: string }>) => {
     const t = useTranslations('teams');
     const schema = schemaProvider(t);
     const nextRouter = useNextRouter();
 
-    const { data } = useSWR([user, slug], teamFetcher, {
+    const { data } = useSWR([user, key], teamFetcher, {
         refreshInterval,
         fallbackData: ssrData,
     });

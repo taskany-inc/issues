@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
-import slugify from 'slugify';
 
 import { connectionMap } from '../queries/connections';
 import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter, calcGoalsMeta } from '../queries/goals';
@@ -23,7 +22,7 @@ const goalsQuery = async (
     db: PrismaClient,
     activityId: string,
     data: {
-        slug: string;
+        key: string;
         query: string;
         priority: string[];
         states: string[];
@@ -38,7 +37,7 @@ const goalsQuery = async (
             ...goalsFilter(data, {
                 AND: {
                     team: {
-                        slug: data.slug,
+                        key: data.key,
                     },
                 },
             }),
@@ -52,7 +51,7 @@ const goalsQuery = async (
                     project: {
                         teams: {
                             some: {
-                                slug: data.slug,
+                                key: data.key,
                             },
                         },
                     },
@@ -109,14 +108,14 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('team', {
         type: Team,
         args: {
-            slug: nonNull(stringArg()),
+            key: nonNull(stringArg()),
         },
-        resolve: async (_, { slug }, { db, activity }) => {
+        resolve: async (_, { key }, { db, activity }) => {
             if (!activity) return null;
 
             return db.team.findUnique({
                 where: {
-                    slug,
+                    key,
                 },
                 include: {
                     projects: {
@@ -234,11 +233,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 const newTeam = await db.team.create({
                     data: {
                         key,
-                        slug: slugify(title, {
-                            replacement: '_',
-                            lower: true,
-                            strict: true,
-                        }),
                         title,
                         description,
                         flowId,

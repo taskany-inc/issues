@@ -12,14 +12,14 @@ import { PageSep } from '../../../components/PageSep';
 import { Page, PageContent } from '../../../components/Page';
 import { Project } from '../../../../graphql/@generated/genql';
 
-const fetcher = createFetcher((_, slug: string) => ({
+const fetcher = createFetcher((_, key: string) => ({
     team: [
         {
-            slug,
+            key,
         },
         {
             id: true,
-            slug: true,
+            key: true,
             title: true,
             description: true,
             activityId: true,
@@ -75,8 +75,8 @@ const fetcher = createFetcher((_, slug: string) => ({
 }));
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { slug } }) => {
-        const ssrData = await fetcher(user, slug);
+    async ({ user, params: { key } }) => {
+        const ssrData = await fetcher(user, key);
 
         return ssrData.team
             ? { ssrData }
@@ -94,12 +94,12 @@ const TeamPage = ({
     locale,
     ssrTime,
     ssrData,
-    params: { slug },
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { slug: string }>) => {
+    params: { key },
+}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { key: string }>) => {
     const t = useTranslations('teams');
     const nextRouter = useNextRouter();
 
-    const { data } = useSWR([user, slug], fetcher, {
+    const { data } = useSWR([user, key], fetcher, {
         fallbackData: ssrData,
     });
 
@@ -123,16 +123,7 @@ const TeamPage = ({
 
                 <PageContent>
                     {team?.projects?.map((project: Project) =>
-                        nullable(project, (p) => (
-                            <ProjectListItem
-                                key={p.key}
-                                projectKey={p.key}
-                                title={p.title}
-                                description={p.description}
-                                createdAt={p.createdAt}
-                                owner={p.activity}
-                            />
-                        )),
+                        nullable(project, (p) => <ProjectListItem key={p.key} project={p} />),
                     )}
                 </PageContent>
             </TeamPageLayout>

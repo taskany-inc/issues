@@ -160,8 +160,7 @@ model Project {
 
 model Team {
   id           Int        @id @default(autoincrement())
-  key          String?    @unique
-  slug         String     @unique @default(cuid())
+  key          String     @unique
   title        String     @unique
   description  String?
   parent       Team?      @relation("teamChildren", fields: [id], references: [id])

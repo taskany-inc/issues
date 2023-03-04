@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 
 import { routes } from '../hooks/router';
-import type { Activity } from '../../graphql/@generated/genql';
+import type { Team } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
@@ -10,10 +10,7 @@ import { Text } from './Text';
 import { UserPic } from './UserPic';
 
 interface TeamListItemProps {
-    title: string;
-    slug: string;
-    description?: string;
-    owner?: Activity;
+    team: Team;
 }
 
 const StyledTeamListItem = styled.a`
@@ -59,9 +56,9 @@ const StyledSubTitle = styled(Text)`
     padding-top: ${gapS};
 `;
 
-export const TeamListItem: React.FC<TeamListItemProps> = ({ slug, title, description, owner }) => {
+export const TeamListItem: React.FC<TeamListItemProps> = ({ team: { key, title, description, activity } }) => {
     return (
-        <Link href={routes.team(slug)} passHref>
+        <Link href={routes.team(key)} passHref>
             <StyledTeamListItem>
                 <StyledName>
                     <Text size="m" weight="bold">
@@ -78,7 +75,11 @@ export const TeamListItem: React.FC<TeamListItemProps> = ({ slug, title, descrip
                 </StyledName>
 
                 <StyledAddon>
-                    <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
+                    <UserPic
+                        src={activity?.user?.image}
+                        email={activity?.user?.email || activity?.ghost?.email}
+                        size={24}
+                    />
                 </StyledAddon>
             </StyledTeamListItem>
         </Link>

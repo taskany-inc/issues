@@ -1,16 +1,13 @@
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
-import { createFetcher } from '../../utils/createFetcher';
+import { createFetcher, refreshInterval } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
-import { Project } from '../../../graphql/@generated/genql';
 import { Page, PageContent } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { ProjectListItem } from '../../components/ProjectListItem';
 import { nullable } from '../../utils/nullable';
 import { ExplorePageLayout } from '../../components/ExplorePageLayout';
-
-const refreshInterval = 3000;
 
 const fetcher = createFetcher(() => ({
     projects: {
@@ -42,13 +39,19 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const ExploreProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ projects: Project[] }>) => {
+const ExploreProjectsPage = ({
+    user,
+    locale,
+    ssrTime,
+    ssrData: fallbackData,
+}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
     const t = useTranslations('explore');
 
     const { data } = useSWR([user], (...args) => fetcher(...args), {
         refreshInterval,
+        fallbackData,
     });
-    const projects: Project[] | null = data?.projects ?? ssrData.projects;
+    const projects = data?.projects;
 
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={t('projects.title')}>
@@ -56,18 +59,7 @@ const ExploreProjectsPage = ({ user, locale, ssrTime, ssrData }: ExternalPagePro
                 <PageSep />
 
                 <PageContent>
-                    {projects?.map((project) =>
-                        nullable(project, (p) => (
-                            <ProjectListItem
-                                key={p.key}
-                                projectKey={p.key}
-                                title={p.title}
-                                description={p.description}
-                                createdAt={p.createdAt}
-                                owner={p.activity}
-                            />
-                        )),
-                    )}
+                    {projects?.map((project) => nullable(project, (p) => <ProjectListItem key={p.key} project={p} />))}
                 </PageContent>
             </ExplorePageLayout>
         </Page>

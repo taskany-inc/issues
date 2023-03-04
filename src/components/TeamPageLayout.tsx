@@ -24,9 +24,9 @@ export const TeamPageLayout: React.FC<TeamPageLayoutProps> = ({ team, children, 
     const router = useRouter();
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
-        [t('Projects'), routes.team(team.slug), false],
-        [t('Goals'), routes.teamGoals(team.slug), false],
-        [t('Settings'), routes.teamSettings(team.slug), true],
+        [t('Projects'), routes.team(team.key), false],
+        [t('Goals'), routes.teamGoals(team.key), false],
+        [t('Settings'), routes.teamSettings(team.key), true],
     ];
 
     return (

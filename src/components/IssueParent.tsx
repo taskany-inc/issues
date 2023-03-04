@@ -12,7 +12,6 @@ import { Link } from './Link';
 
 interface Parent {
     key?: string;
-    slug?: string;
     title: string;
 }
 
@@ -65,9 +64,9 @@ export const IssueParent: React.FC<IssueParentProps> = ({ parent, kind, as, mode
             )),
         ),
         team: normalizedParent.map((t, i) =>
-            nullable(t.slug, (slug) => (
-                <span key={slug}>
-                    <NextLink passHref href={routes.team(slug)}>
+            nullable(t.key, (key) => (
+                <span key={key}>
+                    <NextLink passHref href={routes.team(key)}>
                         <Link inline>{t.title}</Link>
                     </NextLink>
                     {i < normalizedParent.length - 1 ? ', ' : ''}

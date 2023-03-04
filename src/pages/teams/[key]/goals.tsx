@@ -18,14 +18,14 @@ import { useGrouppedGoals } from '../../../hooks/useGrouppedGoals';
 
 const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
 
-const fetcher = createFetcher((_, slug, priority = [], states = [], tags = [], owner = [], query = '') => ({
+const fetcher = createFetcher((_, key, priority = [], states = [], tags = [], owner = [], query = '') => ({
     team: [
         {
-            slug,
+            key,
         },
         {
             id: true,
-            slug: true,
+            key: true,
             title: true,
             description: true,
             activityId: true,
@@ -81,7 +81,7 @@ const fetcher = createFetcher((_, slug, priority = [], states = [], tags = [], o
     teamGoals: [
         {
             data: {
-                slug,
+                key,
                 priority,
                 states,
                 tags,
@@ -100,14 +100,12 @@ const fetcher = createFetcher((_, slug, priority = [], states = [], tags = [], o
                 flowId: true,
                 teams: {
                     id: true,
-                    slug: true,
                     key: true,
                     title: true,
                 },
             },
             team: {
                 id: true,
-                slug: true,
                 key: true,
                 title: true,
             },
@@ -158,7 +156,7 @@ const fetcher = createFetcher((_, slug, priority = [], states = [], tags = [], o
     teamGoalsMeta: [
         {
             data: {
-                slug,
+                key,
                 priority: [],
                 states: [],
                 tags: [],
@@ -194,7 +192,6 @@ const fetcher = createFetcher((_, slug, priority = [], states = [], tags = [], o
             },
             teams: {
                 id: true,
-                slug: true,
                 key: true,
                 title: true,
             },
@@ -205,8 +202,8 @@ const fetcher = createFetcher((_, slug, priority = [], states = [], tags = [], o
 }));
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { slug }, query }) => {
-        const ssrData = await fetcher(user, slug, ...parseFilterValues(query));
+    async ({ user, params: { key }, query }) => {
+        const ssrData = await fetcher(user, key, ...parseFilterValues(query));
 
         return ssrData.team
             ? { ssrData }
@@ -224,8 +221,8 @@ const TeamGoalsPage = ({
     locale,
     ssrTime,
     ssrData: fallbackData,
-    params: { slug },
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { slug: string }>) => {
+    params: { key },
+}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { key: string }>) => {
     const t = useTranslations('teams');
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
@@ -240,7 +237,7 @@ const TeamGoalsPage = ({
         setFulltextFilter,
     } = useUrlFilterParams();
 
-    const { data } = useSWR([user, slug, ...filterValues], fetcher, {
+    const { data } = useSWR([user, key, ...filterValues], fetcher, {
         refreshInterval,
         fallbackData,
     });

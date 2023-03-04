@@ -118,7 +118,6 @@ export const Team = objectType({
     name: TeamModel.$name,
     definition(t) {
         t.field(TeamModel.id);
-        t.field(TeamModel.slug);
         t.field(TeamModel.key);
         t.field(TeamModel.title);
         t.field(TeamModel.description);
@@ -522,7 +521,7 @@ export const TeamUpdateInput = inputObjectType({
 export const TeamGoalsInput = inputObjectType({
     name: 'TeamGoalsInput',
     definition(t) {
-        t.field(TeamModel.slug);
+        t.nonNull.field(TeamModel.key);
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');

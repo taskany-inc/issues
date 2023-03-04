@@ -1,16 +1,13 @@
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
-import { createFetcher } from '../../utils/createFetcher';
+import { createFetcher, refreshInterval } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
-import { Team } from '../../../graphql/@generated/genql';
 import { Page, PageContent } from '../../components/Page';
 import { PageSep } from '../../components/PageSep';
 import { TeamListItem } from '../../components/TeamListItem';
 import { nullable } from '../../utils/nullable';
 import { ExplorePageLayout } from '../../components/ExplorePageLayout';
-
-const refreshInterval = 3000;
 
 const fetcher = createFetcher(() => ({
     teams: [
@@ -19,7 +16,7 @@ const fetcher = createFetcher(() => ({
         },
         {
             id: true,
-            slug: true,
+            key: true,
             title: true,
             description: true,
             projects: {
@@ -50,13 +47,19 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const ExploreTeamsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<{ teams: Team[] }>) => {
+const ExploreTeamsPage = ({
+    user,
+    locale,
+    ssrTime,
+    ssrData: fallbackData,
+}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
     const t = useTranslations('explore');
 
     const { data } = useSWR([user], (...args) => fetcher(...args), {
         refreshInterval,
+        fallbackData,
     });
-    const teams: Team[] | null = data?.teams ?? ssrData.teams;
+    const teams = data?.teams;
 
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={t('teams.title')}>
@@ -64,17 +67,7 @@ const ExploreTeamsPage = ({ user, locale, ssrTime, ssrData }: ExternalPageProps<
                 <PageSep />
 
                 <PageContent>
-                    {teams?.map((team) =>
-                        nullable(team, (te) => (
-                            <TeamListItem
-                                key={te.id}
-                                slug={te.slug}
-                                title={te.title}
-                                description={te.description}
-                                owner={te.activity}
-                            />
-                        )),
-                    )}
+                    {teams?.map((team) => nullable(team, (te) => <TeamListItem key={te.id} team={te} />))}
                 </PageContent>
             </ExplorePageLayout>
         </Page>
