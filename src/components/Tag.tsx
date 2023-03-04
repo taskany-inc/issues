@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { MouseEventHandler, useCallback } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -11,6 +11,7 @@ import {
     radiusL,
     textColorPrimary,
 } from '../design/@generated/themes';
+import { nullable } from '../utils/nullable';
 
 import { CleanButton } from './CleanButton';
 
@@ -21,7 +22,7 @@ interface TagProps {
     className?: string;
     checked?: boolean;
 
-    onClick?: () => void;
+    onClick?: MouseEventHandler<HTMLDivElement>;
     onHide?: () => void;
 }
 
@@ -100,7 +101,7 @@ export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClic
             e.preventDefault();
             e.stopPropagation();
 
-            onHide && onHide();
+            onHide?.();
         },
         [onHide],
     );
@@ -114,7 +115,9 @@ export const Tag: React.FC<TagProps> = ({ title, description, size = 'm', onClic
             className={className}
             checked={checked}
         >
-            {onHide && <StyledCleanButton onClick={onHideClick} />}
+            {nullable(onHide, () => (
+                <StyledCleanButton onClick={onHideClick} />
+            ))}
             {title}
         </StyledTag>
     );

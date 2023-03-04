@@ -232,8 +232,15 @@ const ProjectPage = ({
     const [preview, setPreview] = useState<Goal | null>(null);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
-    const { filterValues, setPriorityFilter, setStateFilter, setTagsFilter, setOwnerFilter, setFulltextFilter } =
-        useUrlFilterParams();
+    const {
+        filterValues,
+        setPriorityFilter,
+        setStateFilter,
+        setTagsFilter,
+        setTagsFilterOutside,
+        setOwnerFilter,
+        setFulltextFilter,
+    } = useUrlFilterParams();
 
     const { data } = useSWR([user, key, ...filterValues], fetcher, {
         refreshInterval,
@@ -329,6 +336,7 @@ const ProjectPage = ({
                                 focused={selectedGoalResolver(g.id)}
                                 key={g.id}
                                 onClick={onGoalPrewiewShow(g)}
+                                onTagClick={setTagsFilterOutside}
                             />
                         )),
                     )}

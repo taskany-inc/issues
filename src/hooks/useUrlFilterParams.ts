@@ -1,6 +1,8 @@
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { useEffect, useState } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
+
+import { Tag } from '../../graphql/@generated/genql';
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
@@ -24,6 +26,39 @@ export const useUrlFilterParams = () => {
         parseQueryParam(router.query.search?.toString()).toString(),
     );
     const [limitFilter, setLimitFilter] = useState(Number(router.query.limit));
+
+    const [filterValues, setFilterValues] = useState<[string[], string[], string[], string[], string, number]>([
+        priorityFilter,
+        stateFilter,
+        tagsFilter,
+        ownerFilter,
+        fulltextFilter,
+        limitFilter,
+    ]);
+
+    useEffect(() => {
+        setFilterValues([priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter]);
+    }, [priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter]);
+
+    const setTagsFilterOutside = useCallback(
+        (t: Tag): MouseEventHandler<HTMLDivElement> =>
+            (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const [priorityFilter, stateFilter, tagsFilter, ownerFilter, searchFilter, limitFilter] = filterValues;
+
+                const newTagsFilterValue = new Set(tagsFilter);
+
+                newTagsFilterValue.has(t.id) ? newTagsFilterValue.delete(t.id) : newTagsFilterValue.add(t.id);
+
+                const newSelected = Array.from(newTagsFilterValue);
+
+                setTagsFilter(newSelected);
+                setFilterValues([priorityFilter, stateFilter, newSelected, ownerFilter, searchFilter, limitFilter]);
+            },
+        [filterValues, setTagsFilter],
+    );
 
     useEffect(() => {
         const newurl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
@@ -60,17 +95,11 @@ export const useUrlFilterParams = () => {
     }, [priorityFilter, stateFilter, ownerFilter, tagsFilter, limitFilter, fulltextFilter, router.query]);
 
     return {
-        filterValues: [priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter] as [
-            string[],
-            string[],
-            string[],
-            string[],
-            string,
-            number,
-        ],
+        filterValues,
         setPriorityFilter,
         setStateFilter,
         setTagsFilter,
+        setTagsFilterOutside,
         setOwnerFilter,
         setFulltextFilter,
         setLimitFilter,

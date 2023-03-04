@@ -33,6 +33,7 @@ interface GoalListItemProps {
     priority?: string;
 
     onClick?: MouseEventHandler<HTMLAnchorElement>;
+    onTagClick?: (tag: Tag) => MouseEventHandler<HTMLDivElement>;
 }
 
 const StyledGoal = styled.a<{ focused?: boolean }>`
@@ -140,6 +141,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         focused,
         priority,
         onClick,
+        onTagClick,
     }) => {
         const t = useTranslations('goals.item');
 
@@ -162,7 +164,12 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                         <StyledTags>
                             {tags?.map((tag) =>
                                 nullable(tag, (t) => (
-                                    <StyledTag key={t.id} title={t.title} description={t.description} />
+                                    <StyledTag
+                                        key={t.id}
+                                        title={t.title}
+                                        description={t.description}
+                                        onClick={onTagClick?.(t)}
+                                    />
                                 )),
                             )}
                         </StyledTags>
