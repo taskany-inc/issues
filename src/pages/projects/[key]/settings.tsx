@@ -77,7 +77,6 @@ const projectFetcher = createFetcher((_, key: string) => ({
                 id: true,
                 title: true,
                 key: true,
-                slug: true,
             },
         },
     ],

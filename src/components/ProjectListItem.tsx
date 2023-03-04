@@ -3,7 +3,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 import { routes } from '../hooks/router';
-import type { Activity } from '../../graphql/@generated/genql';
+import type { Project } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
@@ -13,11 +13,7 @@ import { UserPic } from './UserPic';
 const RelativeTime = dynamic(() => import('./RelativeTime'));
 
 interface ProjectListItemProps {
-    projectKey: string;
-    title: string;
-    createdAt: string;
-    description?: string;
-    owner?: Activity;
+    project: Project;
 }
 
 const StyledProjectListItem = styled.a`
@@ -64,14 +60,10 @@ const StyledSubTitle = styled(Text)`
 `;
 
 export const ProjectListItem: React.FC<ProjectListItemProps> = ({
-    projectKey,
-    title,
-    description,
-    owner,
-    createdAt,
+    project: { key, title, description, activity, createdAt },
 }) => {
     return (
-        <Link href={routes.project(projectKey)} passHref>
+        <Link href={routes.project(key)} passHref>
             <StyledProjectListItem>
                 <StyledName>
                     <Text size="m" weight="bold">
@@ -90,7 +82,11 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
                 </StyledName>
 
                 <StyledAddon>
-                    <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
+                    <UserPic
+                        src={activity?.user?.image}
+                        email={activity?.user?.email || activity?.ghost?.email}
+                        size={24}
+                    />
                 </StyledAddon>
             </StyledProjectListItem>
         </Link>

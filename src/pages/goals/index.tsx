@@ -38,14 +38,12 @@ const fetcher = createFetcher((_, priority = [], states = [], tags = [], owner =
                 flowId: true,
                 teams: {
                     id: true,
-                    slug: true,
                     key: true,
                     title: true,
                 },
             },
             team: {
                 id: true,
-                slug: true,
                 key: true,
                 title: true,
             },
@@ -131,7 +129,6 @@ const fetcher = createFetcher((_, priority = [], states = [], tags = [], owner =
             },
             teams: {
                 id: true,
-                slug: true,
                 key: true,
                 title: true,
             },

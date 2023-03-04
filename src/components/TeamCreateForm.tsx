@@ -146,9 +146,7 @@ const TeamCreateForm: React.FC = () => {
     );
 
     const { data: flowData } = useSWR('flow', () => flowFetcher(user));
-    const { data: teamsData } = useSWR(titleWatcher && titleWatcher !== '' ? [user, titleWatcher] : null, (...args) =>
-        teamsFetcher(...args),
-    );
+    const { data: teamsData } = useSWR(titleWatcher && titleWatcher !== '' ? [user, titleWatcher] : null, teamsFetcher);
 
     useEffect(() => {
         if (flowData?.flowRecommended) {
@@ -170,7 +168,7 @@ const TeamCreateForm: React.FC = () => {
                     },
                 },
                 {
-                    slug: true,
+                    key: true,
                 },
             ],
         });
@@ -183,7 +181,7 @@ const TeamCreateForm: React.FC = () => {
 
         const res = await promise;
 
-        res.createTeam?.slug && router.team(res.createTeam.slug);
+        res.createTeam?.key && router.team(res.createTeam.key);
         dispatchModalEvent(ModalEvent.TeamCreateModal)();
     };
 

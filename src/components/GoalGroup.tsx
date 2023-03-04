@@ -48,7 +48,7 @@ export const GoalsGroupProjectTitle = ({ project }: { project: ProjectGroup }) =
 
 export const GoalsGroupTeamTitle = ({ team }: { team: TeamGroup }) => (
     <Text size="l" weight="bolder">
-        <NextLink passHref href={routes.team(team.data.slug)}>
+        <NextLink passHref href={routes.team(team.data.key)}>
             <Link inline>{team.data.title}</Link>
         </NextLink>
     </Text>
