@@ -159,8 +159,15 @@ const GoalsPage = ({
     const t = useTranslations('goals.index');
     const [preview, setPreview] = useState<Goal | null>(null);
 
-    const { filterValues, setPriorityFilter, setStateFilter, setTagsFilter, setOwnerFilter, setFulltextFilter } =
-        useUrlFilterParams();
+    const {
+        filterValues,
+        setPriorityFilter,
+        setStateFilter,
+        setTagsFilter,
+        setTagsFilterOutside,
+        setOwnerFilter,
+        setFulltextFilter,
+    } = useUrlFilterParams();
 
     const { data } = useSWR([user, ...filterValues], fetcher, {
         refreshInterval,
@@ -221,6 +228,7 @@ const GoalsPage = ({
                             goals={team.goals}
                             selectedResolver={selectedGoalResolver}
                             onClickProvider={onGoalPrewiewShow}
+                            onTagClick={setTagsFilterOutside}
                         >
                             <GoalsGroupTeamTitle team={team} />
                         </GoalsGroup>
@@ -234,6 +242,7 @@ const GoalsPage = ({
                             goals={project.goals}
                             selectedResolver={selectedGoalResolver}
                             onClickProvider={onGoalPrewiewShow}
+                            onTagClick={setTagsFilterOutside}
                         >
                             <GoalsGroupProjectTitle project={project} />
                         </GoalsGroup>

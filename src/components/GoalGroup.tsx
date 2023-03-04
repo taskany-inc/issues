@@ -13,6 +13,15 @@ import { Text } from './Text';
 import { Link } from './Link';
 import { TeamTitleList } from './TeamTitleList';
 
+interface GoalGroupProps {
+    goals: Goal[];
+    children: React.ReactNode;
+    selectedResolver: (id: string) => boolean;
+
+    onClickProvider: (g: Goal) => MouseEventHandler<HTMLAnchorElement>;
+    onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
+}
+
 const StyledGoalsList = styled.div`
     padding: 0;
     margin: 0 -20px;
@@ -45,18 +54,8 @@ export const GoalsGroupTeamTitle = ({ team }: { team: TeamGroup }) => (
     </Text>
 );
 
-export const GoalsGroup = React.memo(
-    ({
-        goals,
-        children,
-        selectedResolver,
-        onClickProvider,
-    }: {
-        goals: Goal[];
-        children: React.ReactNode;
-        selectedResolver: (id: string) => boolean;
-        onClickProvider: (g: Goal) => MouseEventHandler<HTMLAnchorElement>;
-    }) => (
+export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
+    ({ goals, children, selectedResolver, onClickProvider, onTagClick }) => (
         <StyledGoalsGroup>
             {children}
 
@@ -77,6 +76,7 @@ export const GoalsGroup = React.memo(
                         key={g.id}
                         focused={selectedResolver(g.id)}
                         onClick={onClickProvider(g)}
+                        onTagClick={onTagClick}
                     />
                 ))}
             </StyledGoalsList>

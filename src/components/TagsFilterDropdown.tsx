@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import { Tag as TagModel } from '../../graphql/@generated/genql';
@@ -21,7 +21,11 @@ export const TagsFilterDropdown: React.FC<TagsFilterDropdownProps> = React.forwa
     HTMLDivElement,
     TagsFilterDropdownProps
 >(({ text, tags, value, disabled, onChange }, ref) => {
-    const [selected, setSelected] = useState<Set<string>>(new Set(value));
+    const [selected, setSelected] = useState(new Set(value));
+
+    useEffect(() => {
+        setSelected(new Set(value));
+    }, [value]);
 
     const onTagClick = useCallback(
         (t: TagModel) => {

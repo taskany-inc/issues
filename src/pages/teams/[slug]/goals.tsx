@@ -230,8 +230,15 @@ const TeamGoalsPage = ({
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
 
-    const { filterValues, setPriorityFilter, setStateFilter, setTagsFilter, setOwnerFilter, setFulltextFilter } =
-        useUrlFilterParams();
+    const {
+        filterValues,
+        setPriorityFilter,
+        setStateFilter,
+        setTagsFilter,
+        setTagsFilterOutside,
+        setOwnerFilter,
+        setFulltextFilter,
+    } = useUrlFilterParams();
 
     const { data } = useSWR([user, slug, ...filterValues], fetcher, {
         refreshInterval,
@@ -302,6 +309,7 @@ const TeamGoalsPage = ({
                             goals={groups.teams[0].goals}
                             selectedResolver={selectedGoalResolver}
                             onClickProvider={onGoalPrewiewShow}
+                            onTagClick={setTagsFilterOutside}
                         >
                             <GoalsGroupTeamTitle team={groups.teams[0]} />
                         </GoalsGroup>
@@ -316,6 +324,7 @@ const TeamGoalsPage = ({
                                 goals={project.goals}
                                 selectedResolver={selectedGoalResolver}
                                 onClickProvider={onGoalPrewiewShow}
+                                onTagClick={setTagsFilterOutside}
                             >
                                 <GoalsGroupProjectTitle project={project} />
                             </GoalsGroup>
