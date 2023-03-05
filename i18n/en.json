@@ -23,6 +23,7 @@
             "Press key to create the team": "Press <key></key> to create the team.",
             "Team with title already exists": "Team with title <b><title></title></b> already exists. Please, try to use another title.",
             "Team with key already exists": "Team with key <b><key></key></b> already exists. Please, try to use another key.",
+            "Key must be 3 or longer characters": "Key must be 3 or longer characters",
             "Perfect! Issues in your team will look like": "<b>Perfect!</b> Issues in your team will look like: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>.",
             "Flow": "Flow",
             "Flow or state title": "Flow or state title"
@@ -73,6 +74,7 @@
             "Press key to create the project": "Press <key></key> to create the project.",
             "Project with key already exists": "Project with key <b><key></key></b> already exists. Please, try to use another key.",
             "Perfect! Issues in your project will look like": "<b>Perfect!</b> Issues in your project will look like: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>.",
+            "Key must be 3 or longer characters": "Key must be 3 or longer characters",
             "Assign": "Assign",
             "Enter name or email": "Enter name or email",
             "Flow": "Flow",
