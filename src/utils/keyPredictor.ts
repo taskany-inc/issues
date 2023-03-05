@@ -1,7 +1,7 @@
 import slugify from 'slugify';
 
 export const keyPredictor = (str: string) =>
-    slugify(str, {
+    slugify(str.trim(), {
         // eslint-disable-next-line no-useless-escape
         remove: /[aeiou `~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]|/gi,
     })
