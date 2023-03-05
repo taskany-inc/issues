@@ -206,7 +206,11 @@ export const getServerSideProps = declareSsrProps(
         const ssrData = await fetcher(user, key, ...parseFilterValues(query));
 
         return ssrData.team
-            ? { ssrData }
+            ? {
+                  fallback: {
+                      [key]: ssrData,
+                  },
+              }
             : {
                   notFound: true,
               };
@@ -216,13 +220,7 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const TeamGoalsPage = ({
-    user,
-    locale,
-    ssrTime,
-    ssrData: fallbackData,
-    params: { key },
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { key: string }>) => {
+const TeamGoalsPage = ({ user, locale, ssrTime, fallback, params: { key } }: ExternalPageProps<{ key: string }>) => {
     const t = useTranslations('teams');
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
@@ -237,9 +235,9 @@ const TeamGoalsPage = ({
         setFulltextFilter,
     } = useUrlFilterParams();
 
-    const { data } = useSWR([user, key, ...filterValues], fetcher, {
+    const { data } = useSWR(key, () => fetcher(user, key, ...filterValues), {
+        fallback,
         refreshInterval,
-        fallbackData,
     });
 
     if (!data) return null;

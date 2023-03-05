@@ -10,7 +10,6 @@ import { ProjectListItem } from '../../../components/ProjectListItem';
 import { TeamPageLayout } from '../../../components/TeamPageLayout';
 import { PageSep } from '../../../components/PageSep';
 import { Page, PageContent } from '../../../components/Page';
-import { Project } from '../../../../graphql/@generated/genql';
 
 const fetcher = createFetcher((_, key: string) => ({
     team: [
@@ -79,7 +78,11 @@ export const getServerSideProps = declareSsrProps(
         const ssrData = await fetcher(user, key);
 
         return ssrData.team
-            ? { ssrData }
+            ? {
+                  fallback: {
+                      [key]: ssrData,
+                  },
+              }
             : {
                   notFound: true,
               };
@@ -89,18 +92,12 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const TeamPage = ({
-    user,
-    locale,
-    ssrTime,
-    ssrData,
-    params: { key },
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { key: string }>) => {
+const TeamPage = ({ user, locale, ssrTime, fallback, params: { key } }: ExternalPageProps) => {
     const t = useTranslations('teams');
     const nextRouter = useNextRouter();
 
-    const { data } = useSWR([user, key], fetcher, {
-        fallbackData: ssrData,
+    const { data } = useSWR(key, () => fetcher(user, key), {
+        fallback,
     });
 
     if (!data) return null;
@@ -122,7 +119,7 @@ const TeamPage = ({
                 <PageSep />
 
                 <PageContent>
-                    {team?.projects?.map((project: Project) =>
+                    {team?.projects?.map((project) =>
                         nullable(project, (p) => <ProjectListItem key={p.key} project={p} />),
                     )}
                 </PageContent>

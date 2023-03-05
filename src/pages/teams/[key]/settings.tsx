@@ -104,7 +104,11 @@ export const getServerSideProps = declareSsrProps(
         const ssrData = await teamFetcher(user, key);
 
         return ssrData.team
-            ? { ssrData }
+            ? {
+                  fallback: {
+                      [key]: ssrData,
+                  },
+              }
             : {
                   notFound: true,
               };
@@ -137,20 +141,14 @@ const schemaProvider = (t: (key: string) => string) =>
 
 type FormType = z.infer<ReturnType<typeof schemaProvider>>;
 
-const TeamSettingsPage = ({
-    user,
-    locale,
-    ssrTime,
-    ssrData,
-    params: { key },
-}: ExternalPageProps<Awaited<ReturnType<typeof teamFetcher>>, { key: string }>) => {
+const TeamSettingsPage = ({ user, locale, ssrTime, fallback, params: { key } }: ExternalPageProps<{ key: string }>) => {
     const t = useTranslations('teams');
     const schema = schemaProvider(t);
     const nextRouter = useNextRouter();
 
-    const { data } = useSWR([user, key], teamFetcher, {
+    const { data } = useSWR(key, () => teamFetcher(user, key), {
+        fallback,
         refreshInterval,
-        fallbackData: ssrData,
     });
 
     if (!data) return null;

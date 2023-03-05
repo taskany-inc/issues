@@ -12,7 +12,7 @@ import { useRouter as useNextRouter } from 'next/router';
 
 import { gql } from '../../utils/gql';
 import { shallowEqual } from '../../utils/shallowEqual';
-import { createFetcher } from '../../utils/createFetcher';
+import { createFetcher, refreshInterval } from '../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
 import { star10 } from '../../design/@generated/themes';
 import { User } from '../../../graphql/@generated/genql';
@@ -30,8 +30,6 @@ import { FormRadio, FormRadioInput } from '../../components/FormRadio';
 import { CommonHeader } from '../../components/CommonHeader';
 import { SettingsCard, SettingsContent } from '../../components/SettingsContent';
 
-const refreshInterval = 3000;
-
 const fetcher = createFetcher(() => ({
     settings: {
         id: true,
@@ -41,25 +39,22 @@ const fetcher = createFetcher(() => ({
 
 export const getServerSideProps = declareSsrProps(
     async ({ user }) => ({
-        ssrData: await fetcher(user),
+        fallback: {
+            [user.activityId]: await fetcher(user),
+        },
     }),
     {
         private: true,
     },
 );
 
-const UserSettingsPage = ({
-    user,
-    locale,
-    ssrTime,
-    ssrData,
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
+const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPageProps) => {
     const t = useTranslations('users.settings');
     const nextRouter = useNextRouter();
 
-    const { data: settingsData } = useSWR('settings', () => fetcher(), {
+    const { data: settingsData } = useSWR(user.activityId, () => fetcher(), {
+        fallback,
         refreshInterval,
-        fallbackData: ssrData,
     });
 
     if (!settingsData) return null;

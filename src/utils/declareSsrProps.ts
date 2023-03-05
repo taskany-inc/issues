@@ -5,7 +5,7 @@ import { getSession } from 'next-auth/react';
 import { routes } from '../hooks/router';
 import { TLocale } from '../types/locale';
 
-interface SSRProps<P = Record<string, string>> {
+interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];
     locale: TLocale;
     req: GetServerSidePropsContext['req'];
@@ -14,8 +14,11 @@ interface SSRProps<P = Record<string, string>> {
     ssrTime: number;
 }
 
-export interface ExternalPageProps<D = unknown, P = unknown> extends SSRProps<P> {
-    ssrData: D;
+export interface ExternalPageProps<P = { [key: string]: string }> extends SSRProps<P> {
+    fallback: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
+    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }
