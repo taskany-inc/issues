@@ -23,6 +23,7 @@
             "Press key to create the team": "Нажми <key></key> чтобы создать команду.",
             "Project with title already exists": "Команда с названием <b><title></title></b> уже существует. Попробуй другое.",
             "Team with key already exists": "Команда с ключом <b><key></key></b> уже существует. Попробуй другой.",
+            "Key must be 3 or longer characters": "Ключ не может быть короче 3 символов",
             "Perfect! Issues in your team will look like": "<b>Супер!</b> Задачи в твоей команде будут выглядеть примерно так: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>.",
             "Flow": "Флоу",
             "Flow or state title": "Модель или статус"
@@ -72,6 +73,7 @@
             "Press key to create the project": "Нажми <key></key> чтобы создать проект.",
             "Project with key already exists": "Проект с ключом <b><key></key></b> уже существует. Попробуйте любой другой.",
             "Perfect! Issues in your project will look like": "<b>Супер!</b> Задачи в вашем проекте будут выглядеть примерно так: <b>#<key></key>-42</b>, <b>#<key></key>-911</b>.",
+            "Key must be 3 or longer characters": "Ключ не может быть короче 3 символов",
             "Assign": "Ответственный",
             "Enter name or email": "Имя или почта",
             "Flow": "Флоу",

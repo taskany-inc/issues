@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -47,15 +47,14 @@ const flowFetcher = createFetcher(() => ({
         },
     },
 }));
-const teamsFetcher = createFetcher((_, title: string) => ({
-    teams: [
+const teamsFetcher = createFetcher((_, key: string) => ({
+    team: [
         {
-            data: {
-                title,
-            },
+            key,
         },
         {
             title: true,
+            key: true,
         },
     ],
 }));
@@ -111,6 +110,7 @@ const TeamCreateForm: React.FC = () => {
     const [focusedInput, setFocusedInput] = useState(false);
     const [hoveredInput, setHoveredInput] = useState(false);
     const [busy, setBusy] = useState(false);
+    const [dirtyKey, setDirtyKey] = useState(false);
 
     const schema = schemaProvider(t);
 
@@ -139,14 +139,18 @@ const TeamCreateForm: React.FC = () => {
 
     useDebouncedEffect(
         () => {
-            setValue('key', titleWatcher && titleWatcher !== '' ? keyPredictor(titleWatcher) : '');
+            if (!dirtyKey && titleWatcher && titleWatcher !== '') {
+                setValue('key', keyPredictor(titleWatcher));
+            }
         },
         300,
         [setValue, titleWatcher],
     );
 
+    const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
     const { data: flowData } = useSWR('flow', () => flowFetcher(user));
-    const { data: teamsData } = useSWR(titleWatcher && titleWatcher !== '' ? [user, titleWatcher] : null, teamsFetcher);
+    const { data: teamsData } = useSWR(isKeyEnoughLength ? [user, keyWatcher] : null, teamsFetcher);
+    const isKeyUnique = !teamsData?.team;
 
     useEffect(() => {
         if (flowData?.flowRecommended) {
@@ -185,7 +189,10 @@ const TeamCreateForm: React.FC = () => {
         dispatchModalEvent(ModalEvent.TeamCreateModal)();
     };
 
-    const isTeamTitleAvailable = Boolean(teamsData?.teams?.length === 0);
+    const onKeyDirty = useCallback(() => {
+        setDirtyKey(true);
+    }, []);
+
     const richProps = {
         b: (c: React.ReactNode) => (
             <Text as="span" size="s" weight="bolder">
@@ -195,6 +202,13 @@ const TeamCreateForm: React.FC = () => {
         key: () => keyWatcher,
     };
 
+    // eslint-disable-next-line no-nested-ternary
+    const tooltip = isKeyEnoughLength
+        ? isKeyUnique
+            ? t.rich('Perfect! Issues in your team will look like', richProps)
+            : t.rich('Team with key already exists', richProps)
+        : t('Key must be 3 or longer characters');
+
     return (
         <>
             <ModalHeader>
@@ -202,7 +216,7 @@ const TeamCreateForm: React.FC = () => {
             </ModalHeader>
 
             <ModalContent>
-                <Form onSubmit={handleSubmit(createTeam)} submitHotkey={submitKeys}>
+                <Form onSubmit={isKeyUnique ? handleSubmit(createTeam) : undefined} submitHotkey={submitKeys}>
                     <StyledTitleContainer>
                         <FormInput
                             {...register('title')}
@@ -230,15 +244,10 @@ const TeamCreateForm: React.FC = () => {
                                         >
                                             <KeyInput
                                                 disabled={busy}
-                                                available={isTeamTitleAvailable}
-                                                tooltip={
-                                                    isTeamTitleAvailable
-                                                        ? t.rich(
-                                                              'Perfect! Issues in your team will look like',
-                                                              richProps,
-                                                          )
-                                                        : t.rich('Team with key already exists', richProps)
-                                                }
+                                                available={isKeyUnique && isKeyEnoughLength}
+                                                tooltip={tooltip}
+                                                onDirty={onKeyDirty}
+                                                error={errorsResolver('key')}
                                                 {...field}
                                             />
                                         </StyledTeamKeyInputContainer>
@@ -276,7 +285,7 @@ const TeamCreateForm: React.FC = () => {
                             <Button
                                 view="primary"
                                 disabled={busy}
-                                outline={!isValid}
+                                outline={!isValid || !isKeyUnique || !isKeyEnoughLength}
                                 type="submit"
                                 text={t('Create team')}
                             />

@@ -88,6 +88,7 @@ const ProjectCreateForm: React.FC = () => {
     const [focusedInput, setFocusedInput] = useState(false);
     const [hoveredInput, setHoveredInput] = useState(false);
     const [busy, setBusy] = useState(false);
+    const [dirtyKey, setDirtyKey] = useState(false);
 
     const schema = createProjectSchemaProvider(t);
     type ProjectFormType = z.infer<typeof schema>;
@@ -117,14 +118,18 @@ const ProjectCreateForm: React.FC = () => {
 
     useDebouncedEffect(
         () => {
-            setValue('key', titleWatcher && titleWatcher !== '' ? keyPredictor(titleWatcher) : '');
+            if (!dirtyKey && titleWatcher && titleWatcher !== '') {
+                setValue('key', keyPredictor(titleWatcher));
+            }
         },
         300,
         [setValue, titleWatcher],
     );
 
+    const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
     const { data: flowData } = useSWR('flow', () => flowFetcher(user));
-    const { data: projectData } = useSWR(keyWatcher && keyWatcher !== '' ? [user, keyWatcher] : null, projectFetcher);
+    const { data: projectData } = useSWR(isKeyEnoughLength ? [user, keyWatcher] : null, projectFetcher);
+    const isKeyUnique = Boolean(projectData?.project === null || !projectData);
 
     useEffect(() => {
         if (flowData?.flowRecommended) {
@@ -145,7 +150,10 @@ const ProjectCreateForm: React.FC = () => {
         [router, createProject, t],
     );
 
-    const isProjectKeyAvailable = Boolean(projectData?.project === null || !projectData);
+    const onKeyDirty = useCallback(() => {
+        setDirtyKey(true);
+    }, []);
+
     const richProps = {
         b: (c: React.ReactNode) => (
             <Text as="span" size="s" weight="bolder">
@@ -155,6 +163,13 @@ const ProjectCreateForm: React.FC = () => {
         key: () => keyWatcher,
     };
 
+    // eslint-disable-next-line no-nested-ternary
+    const tooltip = isKeyEnoughLength
+        ? isKeyUnique
+            ? t.rich('create.Perfect! Issues in your project will look like', richProps)
+            : t.rich('create.Project with key already exists', richProps)
+        : t('create.Key must be 3 or longer characters');
+
     return (
         <>
             <ModalHeader>
@@ -162,7 +177,7 @@ const ProjectCreateForm: React.FC = () => {
             </ModalHeader>
 
             <ModalContent>
-                <Form onSubmit={handleSubmit(onCreateProject)} submitHotkey={submitKeys}>
+                <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined} submitHotkey={submitKeys}>
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
@@ -190,15 +205,10 @@ const ProjectCreateForm: React.FC = () => {
                                         >
                                             <KeyInput
                                                 disabled={busy}
-                                                available={isProjectKeyAvailable}
-                                                tooltip={
-                                                    isProjectKeyAvailable
-                                                        ? t.rich(
-                                                              'create.Perfect! Issues in your project will look like',
-                                                              richProps,
-                                                          )
-                                                        : t.rich('create.Project with key already exists', richProps)
-                                                }
+                                                available={isKeyUnique && isKeyEnoughLength}
+                                                tooltip={tooltip}
+                                                onDirty={onKeyDirty}
+                                                error={errorsResolver('key')}
                                                 {...field}
                                             />
                                         </StyledProjectKeyInputContainer>
@@ -236,7 +246,7 @@ const ProjectCreateForm: React.FC = () => {
                             <Button
                                 view="primary"
                                 disabled={busy}
-                                outline={!isValid}
+                                outline={!isValid || !isKeyUnique || !isKeyEnoughLength}
                                 type="submit"
                                 text={t('create.Create project')}
                             />
