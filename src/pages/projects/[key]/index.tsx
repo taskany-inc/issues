@@ -36,7 +36,7 @@ const fetcher = createFetcher((_, key: string, priority = [], states = [], tags 
                 id: true,
             },
             teams: {
-                slug: true,
+                key: true,
                 title: true,
                 description: true,
                 _count: {
@@ -99,14 +99,12 @@ const fetcher = createFetcher((_, key: string, priority = [], states = [], tags 
                 flowId: true,
                 teams: {
                     id: true,
-                    slug: true,
                     key: true,
                     title: true,
                 },
             },
             team: {
                 id: true,
-                slug: true,
                 key: true,
                 title: true,
             },
@@ -193,7 +191,6 @@ const fetcher = createFetcher((_, key: string, priority = [], states = [], tags 
             },
             teams: {
                 id: true,
-                slug: true,
                 key: true,
                 title: true,
             },
