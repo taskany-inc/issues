@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
+import { keyPredictor } from '../utils/keyPredictor';
 
 import { Button } from './Button';
 import { Input } from './Input';
@@ -19,8 +20,12 @@ interface KeyInputProps {
     available?: boolean;
     tooltip?: React.ReactNode;
     disabled?: boolean;
+    error?: {
+        message?: string;
+    };
 
     onChange?: (key: string) => void;
+    onDirty?: () => void;
     onBlur?: (key: string) => void;
 }
 
@@ -40,7 +45,9 @@ const KeyInput: React.FC<KeyInputProps> = ({
     available = true,
     tooltip,
     disabled,
+    error,
     onChange,
+    onDirty,
     onBlur,
 }) => {
     const popupRef = useRef<HTMLSpanElement>(null);
@@ -51,7 +58,8 @@ const KeyInput: React.FC<KeyInputProps> = ({
 
     const [onENTER] = useKeyboard([KeyCode.Enter], () => {
         setEditMode(false);
-        onBlur && onBlur(inputState);
+
+        onBlur?.(inputState);
     });
 
     const [onESC] = useKeyboard([KeyCode.Escape], () => {
@@ -61,17 +69,21 @@ const KeyInput: React.FC<KeyInputProps> = ({
 
     const onInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = e.target.value.toUpperCase();
+            const newValue = keyPredictor(e.target.value);
             setInputState(newValue);
-            onChange && onChange(newValue);
+
+            onDirty?.();
+
+            onChange?.(newValue);
         },
-        [setInputState, onChange],
+        [setInputState, onChange, onDirty],
     );
 
     const onButtonClick = useCallback(() => setEditMode(true), []);
     const onInputBlur = useCallback(() => {
         setEditMode(false);
-        onBlur && onBlur(inputState);
+
+        onBlur?.(inputState);
     }, [onBlur, inputState]);
 
     const onMouseEnter = useCallback(() => {
@@ -103,7 +115,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                         size={size}
                         text={value}
                         tabIndex={tabIndex}
-                        view={available === true ? 'primary' : 'danger'}
+                        view={available === true && !error ? 'primary' : 'danger'}
                         ref={buttonRef}
                         onClick={onButtonClick}
                         onMouseEnter={onMouseEnter}
@@ -114,14 +126,14 @@ const KeyInput: React.FC<KeyInputProps> = ({
 
             <Popup
                 placement="left"
-                visible={Boolean(tooltip) && popupVisible}
-                view={available === true ? 'primary' : 'danger'}
+                visible={(Boolean(tooltip) || error) && popupVisible}
+                view={available === true && !error ? 'primary' : 'danger'}
                 reference={popupRef}
                 interactive
                 minWidth={200}
                 maxWidth={250}
             >
-                <Text size="s">{tooltip}</Text>
+                <Text size="s">{error?.message || tooltip}</Text>
             </Popup>
         </>
     );
