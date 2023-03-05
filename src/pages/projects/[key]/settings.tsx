@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
 import { useRouter as useNextRouter } from 'next/router';
 
-import { createFetcher } from '../../../utils/createFetcher';
+import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Project } from '../../../../graphql/@generated/genql';
 import { Button } from '../../../components/Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -35,8 +35,6 @@ import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { FormMultiInput } from '../../../components/FormMultiInput';
 
 const ModalOnEvent = dynamic(() => import('../../../components/ModalOnEvent'));
-
-const refreshInterval = 3000;
 
 const projectFetcher = createFetcher((_, key: string) => ({
     project: [
@@ -107,17 +105,17 @@ const teamsFetcher = createFetcher((_, query: string) => ({
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key } }) => {
-        const ssrProps = {
-            ssrData: await projectFetcher(user, key),
-        };
+        const ssrData = await projectFetcher(user, key);
 
-        if (!ssrProps.ssrData.project) {
-            return {
-                notFound: true,
-            };
-        }
-
-        return ssrProps;
+        return ssrData.project
+            ? {
+                  fallback: {
+                      [key]: ssrData,
+                  },
+              }
+            : {
+                  notFound: true,
+              };
     },
     {
         private: true,
@@ -128,9 +126,9 @@ const ProjectSettingsPage = ({
     user,
     locale,
     ssrTime,
-    ssrData,
+    fallback,
     params: { key },
-}: ExternalPageProps<Awaited<ReturnType<typeof projectFetcher>>, { key: string }>) => {
+}: ExternalPageProps<{ key: string }>) => {
     const t = useTranslations('projects');
     const router = useRouter();
     const nextRouter = useNextRouter();
@@ -138,9 +136,9 @@ const ProjectSettingsPage = ({
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
-    const { data } = useSWR([user, key], (...args) => projectFetcher(...args), {
+    const { data } = useSWR(key, () => projectFetcher(user, key), {
+        fallback,
         refreshInterval,
-        fallbackData: ssrData,
     });
 
     if (!data) return null;

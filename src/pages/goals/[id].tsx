@@ -114,7 +114,11 @@ export const getServerSideProps = declareSsrProps(
         const ssrData = await goalFetcher(user, id);
 
         return ssrData.goal
-            ? { ssrData }
+            ? {
+                  fallback: {
+                      [id]: ssrData,
+                  },
+              }
             : {
                   notFound: true,
               };
@@ -124,20 +128,14 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const GoalPage = ({
-    user,
-    locale,
-    ssrTime,
-    ssrData: fallbackData,
-    params: { id },
-}: ExternalPageProps<Awaited<ReturnType<typeof goalFetcher>>, { id: string }>) => {
+const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
     const nextRouter = useNextRouter();
     const t = useTranslations('goals.id');
 
-    const { data, mutate } = useSWR([user, id], goalFetcher, {
+    const { data, mutate } = useSWR(id, () => goalFetcher(user, id), {
+        fallback,
         refreshInterval,
-        fallbackData,
     });
 
     if (!data) return null;

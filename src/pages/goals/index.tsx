@@ -140,19 +140,16 @@ const fetcher = createFetcher((_, priority = [], states = [], tags = [], owner =
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, query }) => ({
-        ssrData: await fetcher(user, ...parseFilterValues(query)),
+        fallback: {
+            'goals/index': await fetcher(user, ...parseFilterValues(query)),
+        },
     }),
     {
         private: true,
     },
 );
 
-const GoalsPage = ({
-    user,
-    ssrTime,
-    locale,
-    ssrData: fallbackData,
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
+const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps) => {
     const t = useTranslations('goals.index');
     const [preview, setPreview] = useState<Goal | null>(null);
 
@@ -166,9 +163,9 @@ const GoalsPage = ({
         setFulltextFilter,
     } = useUrlFilterParams();
 
-    const { data } = useSWR([user, ...filterValues], fetcher, {
+    const { data } = useSWR('goals/index', () => fetcher(user, ...filterValues), {
+        fallback,
         refreshInterval,
-        fallbackData,
     });
 
     const goals = data?.userGoals;

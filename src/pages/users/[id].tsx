@@ -7,7 +7,7 @@ export const getServerSideProps = declareSsrProps(async () => ({}), {
     private: true,
 });
 
-const UserSettingsPage = ({ user, ssrTime, locale, params: { id } }: ExternalPageProps<null, { id: string }>) => {
+const UserSettingsPage = ({ user, ssrTime, locale, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const t = useTranslations('users.settings');
 
     return (

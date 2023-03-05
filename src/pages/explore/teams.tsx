@@ -40,24 +40,21 @@ const fetcher = createFetcher(() => ({
 
 export const getServerSideProps = declareSsrProps(
     async ({ user }) => ({
-        ssrData: await fetcher(user),
+        fallback: {
+            'explore/teams': await fetcher(user),
+        },
     }),
     {
         private: true,
     },
 );
 
-const ExploreTeamsPage = ({
-    user,
-    locale,
-    ssrTime,
-    ssrData: fallbackData,
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
+const ExploreTeamsPage = ({ user, locale, ssrTime, fallback }: ExternalPageProps) => {
     const t = useTranslations('explore');
 
-    const { data } = useSWR([user], (...args) => fetcher(...args), {
+    const { data } = useSWR('explore/teams', () => fetcher(user), {
+        fallback,
         refreshInterval,
-        fallbackData,
     });
     const teams = data?.teams;
 

@@ -206,7 +206,9 @@ export const getServerSideProps = declareSsrProps(
 
         return ssrData.project
             ? {
-                  ssrData,
+                  fallback: {
+                      [key]: ssrData,
+                  },
               }
             : {
                   notFound: true,
@@ -217,13 +219,7 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-const ProjectPage = ({
-    user,
-    locale,
-    ssrTime,
-    ssrData: fallbackData,
-    params: { key },
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>, { key: string }>) => {
+const ProjectPage = ({ user, locale, ssrTime, fallback, params: { key } }: ExternalPageProps<{ key: string }>) => {
     const t = useTranslations('projects');
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
@@ -239,9 +235,9 @@ const ProjectPage = ({
         setFulltextFilter,
     } = useUrlFilterParams();
 
-    const { data } = useSWR([user, key, ...filterValues], fetcher, {
+    const { data } = useSWR(key, () => fetcher(user, key, ...filterValues), {
+        fallback,
         refreshInterval,
-        fallbackData,
     });
 
     if (!data) return null;
