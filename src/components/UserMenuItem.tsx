@@ -70,7 +70,7 @@ const StyledUserPick = styled(UserPic)`
 
 export const UserMenuItem: React.FC<UserMenuItemProps> = ({ name, email, image, focused, checked, onClick }) => (
     <StyledUserCard onClick={onClick} focused={focused} checked={checked}>
-        <StyledUserPick src={image} size={24} />
+        <StyledUserPick src={image} email={email} size={24} />
 
         <StyledUserInfo>
             <StyledUserName>{name}</StyledUserName>
