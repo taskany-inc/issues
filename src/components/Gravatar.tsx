@@ -16,9 +16,18 @@ interface GravatarProps {
     onClick?: () => void;
 }
 
-const StyledImage = styled.img`
+const StyledImage = styled.img<{ visible: boolean }>`
     border: 0;
     border-radius: 100%;
+
+    opacity: 1;
+    transition: opacity 50ms ease-in;
+
+    ${({ visible }) =>
+        !visible &&
+        `
+        opacity: 0;
+    `}
 `;
 
 const Gravatar = ({
@@ -33,6 +42,7 @@ const Gravatar = ({
 }: GravatarProps) => {
     const [modernBrowser, setModernBrowser] = useState(true);
     const [mounted, setMounted] = useState(false);
+    const [visible, setVisible] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
 
     useLayoutEffect(() => {
@@ -79,13 +89,16 @@ const Gravatar = ({
     useEffect(() => {
         if (imgRef.current && mounted) {
             imgRef.current.src = modernBrowser && isRetina() ? retinaSrc : src;
+            setVisible(true);
         }
     }, [imgRef, mounted, modernBrowser, src, retinaSrc]);
 
     return (
         <StyledImage
+            visible={visible}
             ref={imgRef}
             alt={`Gravatar for ${formattedEmail}`}
+            src="/anonymous.png"
             height={size}
             width={size}
             className={className}

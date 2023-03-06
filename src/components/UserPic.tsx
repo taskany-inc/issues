@@ -41,7 +41,7 @@ export const UserPic: React.FC<UserPicProps> = ({ src, email, size = 32, classNa
 
     if (email) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return <Gravatar email={email} size={Number(sizePx.split('px')[0])} onClick={onClick} />;
+        return <Gravatar className={className} email={email} size={Number(sizePx.split('px')[0])} onClick={onClick} />;
     }
 
     return <StyledImage className={className} src="/anonymous.png" height={sizePx} width={sizePx} onClick={onClick} />;
