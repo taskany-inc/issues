@@ -5,9 +5,9 @@ import dynamic from 'next/dynamic';
 
 import { ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page } from '../../../components/Page';
-import { TLocale } from '../../../types/locale';
 import { routes } from '../../../hooks/router';
 import { AvailableHelpPages } from '../../../types/@generated/help';
+import { setSSRLocale, TLocale } from '../../../utils/getLang';
 
 const Md = dynamic(() => import('../../../components/Md'));
 
@@ -48,6 +48,8 @@ export async function getStaticProps({ params: { locale, slug } }: { params: { l
         const linkSlug = fileName.replace(sourcesExt, '') as AvailableHelpPages;
         return { slug: linkSlug, link: routes.help(locale, linkSlug) };
     });
+
+    setSSRLocale(locale);
 
     return {
         props: {

@@ -13,8 +13,8 @@ import {
     parseLocaleDate,
     formatEstimate,
 } from '../utils/dateTime';
-import { TLocale } from '../types/locale';
 import { usePageContext } from '../hooks/usePageContext';
+import { TLocale } from '../utils/getLang';
 
 import { Button } from './Button';
 import { Icon } from './Icon';

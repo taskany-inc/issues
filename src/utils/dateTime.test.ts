@@ -1,6 +1,5 @@
-import { TLocale } from '../types/locale';
-
 import { availableYears, createLocaleDate, parseLocaleDate, endOfQuarter, quarters } from './dateTime';
+import { TLocale } from './getLang';
 
 const locales: Array<TLocale> = ['en', 'ru'];
 

@@ -3,7 +3,8 @@ import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 
 import { routes } from '../hooks/router';
-import { TLocale } from '../types/locale';
+
+import { setSSRLocale, TLocale } from './getLang';
 
 interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];
@@ -39,6 +40,10 @@ export function declareSsrProps<T = ExternalPageProps>(
             };
         }
 
+        if (locale) {
+            setSSRLocale(locale as TLocale);
+        }
+
         const ssrTime = Date.now();
 
         const resProps = cb
@@ -47,7 +52,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                   // look at session check in previous condition
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                   user: session!.user,
-                  locale: locale as SSRProps['locale'],
+                  locale: locale as TLocale,
                   params: params as Record<string, string>,
                   query,
                   ssrTime,
