@@ -1,0 +1,22 @@
+{
+    "User name is required": "User name is required",
+    "User name must be a string": "User name must be a string",
+    "User name must be longer than 3 symbols": "User name must be longer than 3 symbol",
+    "Something went wrong 😿": "Something went wrong 😿",
+    "We are updating user settings": "We are updating user settings",
+    "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",
+    "Local cache cleared successfully": "Local cache cleared successfully",
+    "Settings": "Settings",
+    "General": "General",
+    "Email": "Email",
+    "Name": "Name",
+    "Nickname": "Nickname",
+    "Save": "Save",
+    "Appearance": "Appearance",
+    "Danger zone": "Danger zone",
+    "Clear local cache": "Clear local cache",
+    "Sign out": "Sign out",
+    "Pro tip!": "Pro tip!",
+    "Press {key} to save settings": "Press {key} to save settings.",
+    "Taskany — {user} — Settings": "Taskany — {user} — Settings"
+}
