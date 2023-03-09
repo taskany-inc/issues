@@ -22,11 +22,10 @@ if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 */
 prisma.$use(async (params, next) => {
     if (params.action === 'create' && params.model === 'Account') {
-        const { refresh_expires_in: refreshExpiresIn, ...rest } = params.args.data;
+        const { 'not-before-policy': value, refresh_expires_in: refreshExpiresIn, ...rest } = params.args.data;
 
         if (refreshExpiresIn !== undefined) {
             params.args.data = { ...rest, refresh_token_expires_in: refreshExpiresIn };
-            delete params.args.data['not-before-policy'];
         }
     }
 
