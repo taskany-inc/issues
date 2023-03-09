@@ -26,6 +26,7 @@ prisma.$use(async (params, next) => {
 
         if (refreshExpiresIn !== undefined) {
             params.args.data = { ...rest, refresh_token_expires_in: refreshExpiresIn };
+            delete params.args.data['not-before-policy'];
         }
     }
 
