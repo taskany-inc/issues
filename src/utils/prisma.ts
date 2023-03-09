@@ -41,6 +41,8 @@ prisma.$use(async (params, next) => {
                 include: { activity: true },
             });
 
+            if (!connectedGhost) return next(params);
+
             params.args.data.hostId = connectedGhost?.hostId;
             params.args.data.activityId = connectedGhost?.activity?.id;
             params.args.data.invitedAt = connectedGhost?.createdAt;
