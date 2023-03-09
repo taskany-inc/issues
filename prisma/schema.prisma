@@ -309,7 +309,7 @@ model Settings {
 
 model Tag {
   id          String    @id @default(cuid())
-  title       String    @unique
+  title       String
   description String?
   goals       Goal[]
   project     Project[]
