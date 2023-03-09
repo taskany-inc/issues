@@ -83,7 +83,15 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         // @ts-ignore — black magic of adding user data to session
         async session({ session, token, user }) {
+            // DEBUG
+            console.log('SESSION CB:');
+            console.log('session', JSON.stringify(session, null, 2));
+            console.log('token', JSON.stringify(token, null, 2));
+            console.log('user', JSON.stringify(user, null, 2));
+
             const id = (session.user.id || token?.id || user.id) as string;
+            console.log('resolved user id', id);
+
             const dbUser = await prisma.user.findUnique({
                 where: {
                     id,
@@ -96,6 +104,9 @@ export const authOptions: NextAuthOptions = {
                     },
                 },
             });
+
+            console.log('DB User', JSON.stringify(dbUser, null, 2));
+            console.log('========================================');
 
             return {
                 ...session,
@@ -112,24 +123,33 @@ export const authOptions: NextAuthOptions = {
         },
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         async jwt({ token, user, account, profile, isNewUser }) {
+            console.log('JWT CB:');
+            console.log('token', JSON.stringify(token, null, 2));
+            console.log('user', JSON.stringify(user, null, 2));
+            console.log('isNewUser', isNewUser);
+
             if (user && isNewUser) {
-                await prisma.user.update({
-                    where: {
-                        id: user.id,
-                    },
-                    data: {
-                        activity: {
-                            create: {
-                                settings: {
-                                    create: {},
+                try {
+                    await prisma.user.update({
+                        where: {
+                            id: user.id,
+                        },
+                        data: {
+                            activity: {
+                                create: {
+                                    settings: {
+                                        create: {},
+                                    },
                                 },
                             },
                         },
-                    },
-                });
+                    });
+                } catch (error) {
+                    console.log('user update error', JSON.stringify(error, null, 2));
+                }
             }
 
-            return user
+            const resultJWT = user
                 ? {
                       ...token,
                       id: user.id,
@@ -138,6 +158,11 @@ export const authOptions: NextAuthOptions = {
                       activityId: user.activityId,
                   }
                 : token;
+
+            console.log('result JWT', JSON.stringify(resultJWT, null, 2));
+            console.log('========================================');
+
+            return resultJWT;
         },
     },
 };
