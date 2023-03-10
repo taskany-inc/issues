@@ -15,6 +15,8 @@ import { TeamPageLayout } from '../../../components/TeamPageLayout';
 import { Page, PageContent } from '../../../components/Page';
 import { GoalsGroup, GoalsGroupProjectTitle, GoalsGroupTeamTitle } from '../../../components/GoalGroup';
 import { useGrouppedGoals } from '../../../hooks/useGrouppedGoals';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { useWillUnmount } from '../../../hooks/useWillUnmount';
 
 const GoalPreview = dynamic(() => import('../../../components/GoalPreview'));
 
@@ -224,6 +226,7 @@ const TeamGoalsPage = ({ user, locale, ssrTime, fallback, params: { key } }: Ext
     const t = useTranslations('teams');
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
+    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
     const {
         filterValues,
@@ -249,6 +252,22 @@ const TeamGoalsPage = ({ user, locale, ssrTime, fallback, params: { key } }: Ext
     const goals = data?.teamGoals;
     const meta = data?.teamGoalsMeta;
     const groups = useGrouppedGoals(goals);
+
+    useEffect(() => {
+        setCurrentProjectCache({
+            id: team.id,
+            key: team.key,
+            title: team.title,
+            description: team.description,
+            flowId: team.flowId,
+            kind: 'team',
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useWillUnmount(() => {
+        setCurrentProjectCache(null);
+    });
 
     useEffect(() => {
         const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
