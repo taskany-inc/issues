@@ -136,6 +136,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                 renderItem={(props) => ({
                     id: props.item.id,
                     title: props.item.title,
+                    key: props.item.key,
                     kind: props.item.kind,
                     focused: props.cursor === props.index,
                     onClick: props.onClick,
