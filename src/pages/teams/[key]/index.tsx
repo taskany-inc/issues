@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import { useRouter as useNextRouter } from 'next/router';
@@ -10,6 +11,8 @@ import { ProjectListItem } from '../../../components/ProjectListItem';
 import { TeamPageLayout } from '../../../components/TeamPageLayout';
 import { PageSep } from '../../../components/PageSep';
 import { Page, PageContent } from '../../../components/Page';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { useWillUnmount } from '../../../hooks/useWillUnmount';
 
 const fetcher = createFetcher((_, key: string) => ({
     team: [
@@ -95,6 +98,7 @@ export const getServerSideProps = declareSsrProps(
 const TeamPage = ({ user, locale, ssrTime, fallback, params: { key } }: ExternalPageProps) => {
     const t = useTranslations('teams');
     const nextRouter = useNextRouter();
+    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
     const { data } = useSWR(key, () => fetcher(user, key), {
         fallback,
@@ -105,6 +109,22 @@ const TeamPage = ({ user, locale, ssrTime, fallback, params: { key } }: External
     const team = data?.team;
 
     if (!team) return nextRouter.push('/404');
+
+    useEffect(() => {
+        setCurrentProjectCache({
+            id: team.id,
+            key: team.key,
+            title: team.title,
+            description: team.description,
+            flowId: team.flowId,
+            kind: 'team',
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useWillUnmount(() => {
+        setCurrentProjectCache(null);
+    });
 
     return (
         <Page
