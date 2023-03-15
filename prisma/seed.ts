@@ -24,7 +24,7 @@ assert(adminPassword, "Admin's password isn't provided. Check your environment v
 let allUsers: User[];
 let tags: Tag[];
 
-(async () => {
+const init = (async () => {
     allUsers = await Promise.all(
         [
             [adminEmail, 'ADMIN', adminPassword, 'John Doe', faker.lorem.word() + faker.datatype.number()],
@@ -165,6 +165,8 @@ const flow = prisma.flow.create({
 seed('Default projects', async () => {
     const f = await flow;
     if (!f) return;
+
+    await init;
 
     const allProjects = await Promise.all(
         [
