@@ -1,29 +1,5 @@
-import { getSession } from 'next-auth/react';
+import { AdminPage } from '../../components/pages/AdminPage/AdminPage';
 
-import { SSRProps } from '../../types/ssrProps';
+export { getServerSideProps } from '../../components/pages/AdminPage/AdminPage';
 
-export default function AdminPanel() {
-    return (
-        <div>
-            <h1>This page is protected AdminPanel</h1>
-            <p>Only admin users can see this page.</p>
-        </div>
-    );
-}
-
-export const getServerSideProps: SSRProps = async ({ req }) => {
-    const session = await getSession({ req });
-
-    if (session && session.user.role !== 'ADMIN') {
-        return {
-            redirect: {
-                destination: '/',
-                permanent: false,
-            },
-        };
-    }
-
-    return {
-        props: {},
-    };
-};
+export default AdminPage;
