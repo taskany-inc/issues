@@ -20,7 +20,7 @@ import { Icon } from './Icon';
 import { ModalContent, ModalHeader } from './Modal';
 
 const ComboBox = dynamic(() => import('./ComboBox'));
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 interface IssueDependenciesFormProps {
     issue: Goal;

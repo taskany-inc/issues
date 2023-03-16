@@ -5,7 +5,7 @@ import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrPro
 import { Page, PageContent } from '../../Page';
 import { PageSep } from '../../PageSep';
 import { TeamListItem } from '../../TeamListItem';
-import { nullable } from '../../../utils/nullable';
+import { nullable } from '@common/utils/nullable';
 import { ExplorePageLayout } from '../../ExplorePageLayout';
 
 import { tr } from './ExploreTeamsPage.i18n';

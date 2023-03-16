@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { signIn } from 'next-auth/react';
 import NextLink from 'next/link';
 
-import { nullable } from '../utils/nullable';
+import { nullable } from '@common/utils/nullable';
+
 import { routes } from '../hooks/router';
 import { gray3, textColor, link10 } from '../design/@generated/themes';
 import { usePageContext } from '../hooks/usePageContext';

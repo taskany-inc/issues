@@ -1,4 +1,4 @@
-import { KeyCode, KeyMod } from '../hooks/useKeyboard';
+import { KeyCode, KeyMod } from '@common/hooks/useKeyboard';
 
 export const createTeamKeys = ['c t', 'с е'];
 export const createProjectKeys = ['c p', 'с з'];

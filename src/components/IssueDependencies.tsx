@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
+
 import { enumDependency, Goal } from '../../graphql/@generated/genql';
 import { gapS, gray8 } from '../design/@generated/themes';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
-import { nullable } from '../utils/nullable';
 
 import { Link } from './Link';
-import { Text } from './Text';
 import { IssueDependenciesList } from './IssueDependenciesList';
 
 const IssueDependenciesForm = dynamic(() => import('./IssueDependenciesForm'));

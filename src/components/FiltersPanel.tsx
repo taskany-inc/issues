@@ -3,9 +3,10 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { Badge } from '@common/Badge';
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
 
 import { gapM, gapS, gray5, textColor } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
 
 import { Input } from './Input';
 import { PageContent } from './Page';
@@ -14,7 +15,6 @@ import { UserFilterDropdown } from './UserFilterDropdown';
 import { TagsFilterDropdown } from './TagsFilterDropdown';
 import { LimitFilterDropdown } from './LimitFilterDropdown';
 import { PriorityFilterDropdown } from './PriorityFilterDropdown';
-import { Text } from './Text';
 
 interface FiltersPanelProps {
     count?: number;

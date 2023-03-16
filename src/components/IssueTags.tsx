@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
+import { nullable } from '@common/utils/nullable';
+
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { gapS } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
 
 import { Tag } from './Tag';
 

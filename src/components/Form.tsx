@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 
+import { useKeyboard } from '@common/hooks/useKeyboard';
+
 import { gray3 } from '../design/@generated/themes';
-import { useKeyboard } from '../hooks/useKeyboard';
 
 interface FormProps {
     children: React.ReactNode;

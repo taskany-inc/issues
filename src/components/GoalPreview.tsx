@@ -6,12 +6,13 @@ import styled from 'styled-components';
 import toast from 'react-hot-toast';
 
 import { Button } from '@common/Button';
+import { nullable } from '@common/utils/nullable';
+import { Card, CardComment, CardInfo } from '@common/Card';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
 import { danger0, gapM, gapS } from '../design/@generated/themes';
 import { goalFetcher, refreshInterval } from '../utils/entityFetcher';
-import { nullable } from '../utils/nullable';
 import { formatEstimate } from '../utils/dateTime';
 import { useHighlightedComment } from '../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../hooks/useGoalUpdate';
@@ -31,7 +32,6 @@ import { IssueParent } from './IssueParent';
 import { IssueTags } from './IssueTags';
 import { StateDot } from './StateDot';
 import { UserPic } from './UserPic';
-import { Card, CardComment, CardInfo } from './Card';
 import RelativeTime from './RelativeTime';
 import Md from './Md';
 import { Link } from './Link';
@@ -49,7 +49,7 @@ const StateSwitch = dynamic(() => import('./StateSwitch'));
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm'));
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('./GoalEditForm'));
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 interface GoalPreviewProps {
     goal: Goal;

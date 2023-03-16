@@ -13,7 +13,7 @@ import { Icon } from './Icon';
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 interface StateDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];

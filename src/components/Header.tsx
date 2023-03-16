@@ -15,7 +15,7 @@ import { HeaderMenu } from './HeaderMenu';
 import { Icon } from './Icon';
 import { MenuItem } from './MenuItem';
 
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 const StyledHeader = styled.header`
     display: grid;

@@ -2,9 +2,10 @@ import React, { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
+import { nullable } from '@common/utils/nullable';
+
 import { Goal } from '../../graphql/@generated/genql';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
-import { nullable } from '../utils/nullable';
 
 import { IssueParticipantsForm } from './IssueParticipantsForm';
 import { IssueParticipantsList } from './IssueParticipantsList';

@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
+import { Text } from '@common/Text';
+
 import { gapS, gapXs, gray3, radiusM } from '../design/@generated/themes';
 
-import { Text } from './Text';
 import { StateDot } from './StateDot';
 
 const StyledItemCard = styled.div<{ focused?: boolean; checked?: boolean; hoverColor?: string }>`

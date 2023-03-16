@@ -1,6 +1,6 @@
-import { gray6 } from '../design/@generated/themes';
+import { Text } from '@common/Text';
 
-import { Text } from './Text';
+import { gray6 } from '../design/@generated/themes';
 
 interface IssueKeyProps {
     id: string;

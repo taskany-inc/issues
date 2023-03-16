@@ -4,10 +4,10 @@ import { Controller, Control } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 
 import { Button } from '@common/Button';
+import { nullable } from '@common/utils/nullable';
 
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
 import { submitKeys } from '../utils/hotkeys';
-import { nullable } from '../utils/nullable';
 import { usePageContext } from '../hooks/usePageContext';
 import { routes } from '../hooks/router';
 

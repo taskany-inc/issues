@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
-import { gapS, gapXs, gray4, radiusM } from '../design/@generated/themes';
+import { Text } from '@common/Text';
 
-import { Text } from './Text';
+import { gapS, gapXs, gray4, radiusM } from '../design/@generated/themes';
 
 interface ProjectMenuItemProps {
     title?: string;

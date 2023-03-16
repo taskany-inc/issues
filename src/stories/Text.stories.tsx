@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { Text } from '../components/Text';
+import { Text } from '@common/Text';
 
 export default {
     title: 'Taskany/Text',

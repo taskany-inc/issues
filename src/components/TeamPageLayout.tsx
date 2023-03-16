@@ -3,9 +3,10 @@ import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
+import { nullable } from '@common/utils/nullable';
+
 import { Team } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
-import { nullable } from '../utils/nullable';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { PageActions } from './Page';

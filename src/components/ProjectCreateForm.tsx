@@ -8,11 +8,12 @@ import dynamic from 'next/dynamic';
 import { z } from 'zod';
 
 import { Button } from '@common/Button';
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
-import { nullable } from '../utils/nullable';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
@@ -29,7 +30,6 @@ import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
-import { Text } from './Text';
 import { Link } from './Link';
 import { FlowComboBox } from './FlowComboBox';
 import { ModalContent, ModalHeader } from './Modal';

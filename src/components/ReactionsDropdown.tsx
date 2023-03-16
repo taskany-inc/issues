@@ -10,7 +10,7 @@ import { usePageContext } from '../hooks/usePageContext';
 import { Icon } from './Icon';
 import { ReactionsButton } from './ReactionsButton';
 
-const Popup = dynamic(() => import('./Popup'));
+const Popup = dynamic(() => import('@common/Popup'));
 
 interface ReactionsDropdownProps {
     view?: 'button' | 'icon';

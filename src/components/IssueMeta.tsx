@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 
-import { gapS, gapXs, gray4, gray9, textColor } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
 
-import { Text } from './Text';
+import { gapS, gapXs, gray4, gray9, textColor } from '../design/@generated/themes';
+
 import { Icon } from './Icon';
 
 interface IssueMetaProps {

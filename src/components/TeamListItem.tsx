@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 import Link from 'next/link';
 
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
+
 import { routes } from '../hooks/router';
 import type { Team } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
 
-import { Text } from './Text';
 import { UserPic } from './UserPic';
 
 interface TeamListItemProps {

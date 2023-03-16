@@ -3,11 +3,12 @@ import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
+
 import { gapM, gapS, gray9 } from '../design/@generated/themes';
 import { routes } from '../hooks/router';
-import { nullable } from '../utils/nullable';
 
-import { Text } from './Text';
 import { Link } from './Link';
 
 interface Parent {

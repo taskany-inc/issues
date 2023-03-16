@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
-import { gapM, gapS, gapXs, gray7, gray8 } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
 
-import { Text } from './Text';
+import { gapM, gapS, gapXs, gray7, gray8 } from '../design/@generated/themes';
 
 interface TipProps {
     title?: string;

@@ -11,7 +11,7 @@ import { trPriority } from '../i18n/priority';
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];

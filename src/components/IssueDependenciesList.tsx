@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
+import { nullable } from '@common/utils/nullable';
+
 import { Goal } from '../../graphql/@generated/genql';
-import { nullable } from '../utils/nullable';
 
 import { CleanButton } from './CleanButton';
 import { IssueListItem } from './IssueListItem';

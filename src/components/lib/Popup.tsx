@@ -2,7 +2,7 @@ import React, { ComponentProps } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { colorPrimary, danger0, gapXs, gray3, gray4, radiusS, warn0 } from '../design/@generated/themes';
+import { colorPrimary, danger0, gapXs, gray3, gray4, radiusS, warn0 } from '../../design/@generated/themes';
 
 const Tippy = dynamic(() => import('@tippyjs/react/headless'));
 

@@ -3,13 +3,14 @@ import React, { useCallback, useState, ChangeEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
+
 import { gapS, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
 
 import { Icon } from './Icon';
 import { Tag } from './Tag';
 import { Input } from './Input';
-import { Text } from './Text';
 import { MenuItem } from './MenuItem';
 
 const ComboBox = dynamic(() => import('./ComboBox'));

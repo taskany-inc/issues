@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { nullable } from '../utils/nullable';
+import { nullable } from '@common/utils/nullable';
 
 import { ReactionsButton } from './ReactionsButton';
 

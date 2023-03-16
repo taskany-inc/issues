@@ -1,7 +1,8 @@
 import NextLink from 'next/link';
 
+import { nullable } from '@common/utils/nullable';
+
 import { Team } from '../../graphql/@generated/genql';
-import { nullable } from '../utils/nullable';
 import { routes } from '../hooks/router';
 
 import { Link } from './Link';

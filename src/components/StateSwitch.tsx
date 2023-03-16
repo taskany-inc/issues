@@ -3,16 +3,17 @@ import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
+import { useKeyPress } from '@common/hooks/useKeyPress';
+import { useKeyboard, KeyCode } from '@common/hooks/useKeyboard';
+
 import { gapM } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { State as StateModel } from '../../graphql/@generated/genql';
-import { useKeyPress } from '../hooks/useKeyPress';
-import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { State } from './State';
 
-const Popup = dynamic(() => import('./Popup'));
+const Popup = dynamic(() => import('@common/Popup'));
 
 interface StateSwitchProps {
     state: StateModel;

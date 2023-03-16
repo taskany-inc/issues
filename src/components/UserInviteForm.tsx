@@ -6,10 +6,11 @@ import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
 
 import { Button } from '@common/Button';
+import { KeyCode } from '@common/hooks/useKeyboard';
+import { Text } from '@common/Text';
 
 import { gapM, gapS, gray6, gray7, star0 } from '../design/@generated/themes';
 import { gql } from '../utils/gql';
-import { KeyCode } from '../hooks/useKeyboard';
 import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 
@@ -21,7 +22,6 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
 import { Tag } from './Tag';
-import { Text } from './Text';
 import { Link } from './Link';
 import { ModalContent, ModalHeader } from './Modal';
 

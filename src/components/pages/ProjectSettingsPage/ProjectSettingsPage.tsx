@@ -18,7 +18,7 @@ import { Fieldset } from '../../Fieldset';
 import { FormInput } from '../../FormInput';
 import { FormAction, FormActions } from '../../FormActions';
 import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
-import { Text } from '../../Text';
+import { Text } from '@common/Text';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { ModalContent, ModalHeader } from '../../Modal';
 import { FormTitle } from '../../FormTitle';

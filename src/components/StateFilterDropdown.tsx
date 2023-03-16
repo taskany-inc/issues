@@ -8,7 +8,7 @@ import { usePageContext } from '../hooks/usePageContext';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 import { FiltersMenuItem } from './FiltersMenuItem';
 
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 interface StateFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];

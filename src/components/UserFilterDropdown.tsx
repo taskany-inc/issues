@@ -6,7 +6,7 @@ import { Activity } from '../../graphql/@generated/genql';
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { UserMenuItem } from './UserMenuItem';
 
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 interface UserFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];

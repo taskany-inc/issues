@@ -2,9 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 
+import { Text } from '@common/Text';
+
 import { gapS } from '../design/@generated/themes';
 
-import { Text } from './Text';
 import { Link } from './Link';
 
 interface IssueTitleProps {

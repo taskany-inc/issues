@@ -3,13 +3,13 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 
 import { Button } from '@common/Button';
+import { Text } from '@common/Text';
 
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { danger0 } from '../design/@generated/themes';
 
 import { ModalContent, ModalHeader } from './Modal';
 import { FormTitle } from './FormTitle';
-import { Text } from './Text';
 import { Form } from './Form';
 import { FormInput } from './FormInput';
 import { FormAction, FormActions } from './FormActions';

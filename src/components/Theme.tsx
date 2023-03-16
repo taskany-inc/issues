@@ -1,7 +1,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
-import { nullable } from '../utils/nullable';
+import { nullable } from '@common/utils/nullable';
 
 const themes = {
     dark: dynamic(() => import('../design/@generated/themes/dark')),

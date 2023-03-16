@@ -7,7 +7,7 @@ import { useRouter as useNextRouter } from 'next/router';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Goal } from '../../../../graphql/@generated/genql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { nullable } from '../../../utils/nullable';
+import { nullable } from '@common/utils/nullable';
 import { FiltersPanel } from '../../FiltersPanel';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { TeamPageLayout } from '../../TeamPageLayout';

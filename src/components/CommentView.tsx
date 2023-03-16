@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 
+import { nullable } from '@common/utils/nullable';
+import { Card, CardComment, CardInfo } from '@common/Card';
+
 import { Comment, User } from '../../graphql/@generated/genql';
 import { brandColor, danger0, gapM, gapS, gray4 } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
 import { useReactionsResource } from '../hooks/useReactionsResource';
 import { useCommentResource } from '../hooks/useCommentResource';
 
-import { Card, CardComment, CardInfo } from './Card';
 import { Link } from './Link';
 import { UserPic } from './UserPic';
 import { Icon } from './Icon';
@@ -18,7 +19,7 @@ import { ActivityFeedItem } from './ActivityFeed';
 import { MenuItem } from './MenuItem';
 
 const Md = dynamic(() => import('./Md'));
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 const RelativeTime = dynamic(() => import('./RelativeTime'));
 const CommentEditForm = dynamic(() => import('./CommentEditForm'));
 const ReactionsDropdown = dynamic(() => import('./ReactionsDropdown'));

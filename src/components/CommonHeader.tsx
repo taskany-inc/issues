@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
+
 import { gapM, gapS, gray6 } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
 
 import { PageContent } from './Page';
-import { Text } from './Text';
 
 interface CommonHeaderProps {
     title: string;

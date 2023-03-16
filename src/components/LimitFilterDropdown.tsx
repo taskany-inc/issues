@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { MenuItem } from './MenuItem';
 
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 const limitVariants = [10, 20, 30, 50, 100];
 

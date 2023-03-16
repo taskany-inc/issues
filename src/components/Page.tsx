@@ -6,17 +6,18 @@ import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
 
+import { nullable } from '@common/utils/nullable';
+import { TextStyle } from '@common/Text';
+
 import { gapS, gray4, radiusM, textColor } from '../design/@generated/themes';
 import { pageContext, PageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/declareSsrProps';
 import { useHotkeys } from '../hooks/useHotkeys';
 import { ModalEvent } from '../utils/dispatchModal';
 import { createProjectKeys, inviteUserKeys, createGoalKeys, createTeamKeys } from '../utils/hotkeys';
-import { nullable } from '../utils/nullable';
 
 import { Theme } from './Theme';
 import { GlobalStyle } from './GlobalStyle';
-import { TextStyle } from './Text';
 import { Header } from './Header';
 import { Footer } from './Footer';
 

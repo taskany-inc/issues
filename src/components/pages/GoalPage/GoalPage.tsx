@@ -12,7 +12,7 @@ import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '..
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { formatEstimate } from '../../../utils/dateTime';
-import { nullable } from '../../../utils/nullable';
+import { nullable } from '@common/utils/nullable';
 import { editGoalKeys } from '../../../utils/hotkeys';
 import { goalFetcher, refreshInterval } from '../../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
@@ -20,7 +20,7 @@ import { danger0, gapM, gapS } from '../../../design/@generated/themes';
 import { Page, PageContent, PageActions } from '../../Page';
 import { PageSep } from '../../PageSep';
 import { Link } from '../../Link';
-import { Card, CardInfo, CardContent, CardActions } from '../../Card';
+import { Card, CardInfo, CardContent, CardActions } from '@common/Card';
 import { IssueTitle } from '../../IssueTitle';
 import { IssueKey } from '../../IssueKey';
 import { IssueStats } from '../../IssueStats';
@@ -58,7 +58,7 @@ const CommentCreateForm = dynamic(() => import('../../CommentCreateForm'));
 const ReactionsDropdown = dynamic(() => import('../../ReactionsDropdown'));
 const IssueDependencies = dynamic(() => import('../../IssueDependencies'));
 const IssueParticipants = dynamic(() => import('../../IssueParticipants'));
-const Dropdown = dynamic(() => import('../../Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 const IssueHeader = styled(PageContent)`
     display: grid;

@@ -3,13 +3,14 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { useKeyPress } from '../hooks/useKeyPress';
-import { useKeyboard, KeyCode, KeyboardEvents } from '../hooks/useKeyboard';
+import { useKeyPress } from '@common/hooks/useKeyPress';
+import { useKeyboard, KeyCode, KeyboardEvents } from '@common/hooks/useKeyboard';
+import { nullable } from '@common/utils/nullable';
+
 import { danger10 } from '../design/@generated/themes';
-import { nullable } from '../utils/nullable';
 import { flatten } from '../utils/flatten';
 
-const Popup = dynamic(() => import('./Popup'));
+const Popup = dynamic(() => import('@common/Popup'));
 
 interface ComboBoxTriggerProps {
     text: ComboBoxProps['text'];

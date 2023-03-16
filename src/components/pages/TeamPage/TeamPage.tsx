@@ -5,7 +5,7 @@ import { useRouter as useNextRouter } from 'next/router';
 
 import { createFetcher } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { nullable } from '../../../utils/nullable';
+import { nullable } from '@common/utils/nullable';
 import { ProjectListItem } from '../../ProjectListItem';
 import { TeamPageLayout } from '../../TeamPageLayout';
 import { PageSep } from '../../PageSep';

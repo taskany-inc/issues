@@ -6,7 +6,7 @@ import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { MenuItem } from './MenuItem';
 
-const Dropdown = dynamic(() => import('./Dropdown'));
+const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 interface TagsFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];

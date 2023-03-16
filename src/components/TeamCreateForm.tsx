@@ -9,10 +9,11 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
+import { nullable } from '@common/utils/nullable';
+import { Text } from '@common/Text';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
-import { nullable } from '../utils/nullable';
 import { gql } from '../utils/gql';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
@@ -33,7 +34,6 @@ import { FormTitle } from './FormTitle';
 import { Link } from './Link';
 import { ModalContent, ModalHeader } from './Modal';
 import { InputContainer } from './InputContaier';
-import { Text } from './Text';
 import { FlowComboBox } from './FlowComboBox';
 
 const KeyInput = dynamic(() => import('./KeyInput'));
