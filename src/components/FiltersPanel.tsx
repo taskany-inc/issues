@@ -2,10 +2,11 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
+import { Badge } from '@common/Badge';
+
 import { gapM, gapS, gray5, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
-import { Badge } from './Badge';
 import { Input } from './Input';
 import { PageContent } from './Page';
 import { StateFilterDropdown } from './StateFilterDropdown';

@@ -9,6 +9,8 @@ import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { useRouter as useNextRouter } from 'next/router';
 
+import { Button } from '@common/Button';
+
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { shallowEqual } from '../../../utils/shallowEqual';
@@ -23,7 +25,6 @@ import { Tip } from '../../Tip';
 import { Icon } from '../../Icon';
 import { Keyboard } from '../../Keyboard';
 import { FormAction, FormActions } from '../../FormActions';
-import { Button } from '../../Button';
 import { Fieldset } from '../../Fieldset';
 import { FormRadio, FormRadioInput } from '../../FormRadio';
 import { CommonHeader } from '../../CommonHeader';

@@ -1,7 +1,8 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { Button } from '../components/Button';
+import { Button } from '@common/Button';
+
 import { Icon } from '../components/Icon';
 import { UserPic } from '../components/UserPic';
 

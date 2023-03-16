@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
 
+import { Button } from '@common/Button';
+
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
 import { danger0, gapM, gapS } from '../design/@generated/themes';
@@ -27,7 +29,6 @@ import { IssueKey } from './IssueKey';
 import { IssueTitle } from './IssueTitle';
 import { IssueParent } from './IssueParent';
 import { IssueTags } from './IssueTags';
-import { Button } from './Button';
 import { StateDot } from './StateDot';
 import { UserPic } from './UserPic';
 import { Card, CardComment, CardInfo } from './Card';

@@ -7,6 +7,8 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { z } from 'zod';
 
+import { Button } from '@common/Button';
+
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
@@ -20,7 +22,6 @@ import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource 
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { Icon } from './Icon';
-import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
 import { FormActions, FormAction } from './FormActions';

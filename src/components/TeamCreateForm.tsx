@@ -8,6 +8,8 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
+import { Button } from '@common/Button';
+
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { nullable } from '../utils/nullable';
@@ -21,7 +23,6 @@ import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { Icon } from './Icon';
-import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
 import { FormActions, FormAction } from './FormActions';

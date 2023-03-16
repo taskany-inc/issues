@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
+import { Button } from '@common/Button';
+
 import { gapXs } from '../design/@generated/themes';
 
-import { Button } from './Button';
 import { Icon, sizesMap } from './Icon';
 
 interface ReactionsButtonProps {

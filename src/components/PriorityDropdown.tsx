@@ -2,11 +2,12 @@ import React, { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import colorLayer from 'color-layer';
 
+import { Button } from '@common/Button';
+
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
-import { Button } from './Button';
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 

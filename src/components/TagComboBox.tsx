@@ -6,12 +6,13 @@ import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
+import { Button } from '@common/Button';
+
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { gql } from '../utils/gql';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Button } from './Button';
 import { Icon } from './Icon';
 import { Tag } from './Tag';
 import { Input } from './Input';

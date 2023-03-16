@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import InputMask from 'react-input-mask';
 import dynamic from 'next/dynamic';
 
+import { Button } from '@common/Button';
+
 import { EstimateInput } from '../../graphql/@generated/genql';
 import { danger8, danger9, gray6, textColor } from '../design/@generated/themes';
 import {
@@ -16,7 +18,6 @@ import {
 import { usePageContext } from '../hooks/usePageContext';
 import { TLocale } from '../i18n/getLang';
 
-import { Button } from './Button';
 import { Icon } from './Icon';
 import { Input } from './Input';
 

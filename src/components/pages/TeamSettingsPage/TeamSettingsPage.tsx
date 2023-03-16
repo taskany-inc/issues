@@ -9,7 +9,7 @@ import { useRouter as useNextRouter } from 'next/router';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Team } from '../../../../graphql/@generated/genql';
-import { Button } from '../../Button';
+import { Button } from '@common/Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { PageSep } from '../../PageSep';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';

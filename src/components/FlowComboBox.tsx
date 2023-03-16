@@ -4,11 +4,12 @@ import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
+import { Button } from '@common/Button';
+
 import { createFetcher } from '../utils/createFetcher';
 import { Flow } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Button } from './Button';
 import { Input } from './Input';
 import { MenuItem } from './MenuItem';
 import { Icon } from './Icon';

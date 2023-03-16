@@ -4,12 +4,13 @@ import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 
+import { Button } from '@common/Button';
+
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
-import { Button } from './Button';
 import { Input } from './Input';
 import { ProjectMenuItem } from './ProjectMenuItem';
 import { MenuGroupItem } from './MenuGroupItem';

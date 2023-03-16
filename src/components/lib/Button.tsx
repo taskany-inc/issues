@@ -24,7 +24,7 @@ import {
     danger2,
     radiusM,
     backgroundColor,
-} from '../design/@generated/themes';
+} from '../../design/@generated/themes';
 
 interface ButtonProps {
     text?: string;

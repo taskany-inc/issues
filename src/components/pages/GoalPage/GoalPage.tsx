@@ -25,7 +25,7 @@ import { IssueTitle } from '../../IssueTitle';
 import { IssueKey } from '../../IssueKey';
 import { IssueStats } from '../../IssueStats';
 import { UserPic } from '../../UserPic';
-import { Button } from '../../Button';
+import { Button } from '@common/Button';
 import { Reactions } from '../../Reactions';
 import { CommentView } from '../../CommentView';
 import { StateDot } from '../../StateDot';

@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 
-import { Button } from './Button';
+import { Button } from '@common/Button';
+import { Badge } from '@common/Badge';
+
 import { Icon } from './Icon';
-import { Badge } from './Badge';
 
 interface StarButtonProps {
     stargizer?: boolean;
