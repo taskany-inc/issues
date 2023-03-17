@@ -9,7 +9,7 @@ import { routes } from '../../../hooks/router';
 import { AvailableHelpPages } from '../../../types/@generated/help';
 import { setSSRLocale, TLocale } from '../../../i18n/getLang';
 
-const Md = dynamic(() => import('../../Md'));
+const Md = dynamic(() => import('@common/Md'));
 
 const safeUrl = (url: string) => url.replace('/', '__');
 const sourcesDir = (locale: TLocale) => `${process.cwd()}/src/pages/help/source/${locale}`;

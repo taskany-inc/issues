@@ -11,6 +11,8 @@ import { Card, CardComment, CardInfo } from '@common/Card';
 import { ModalHeader, ModalContent } from '@common/Modal';
 import { ModalPreview } from '@common/ModalPreview';
 import { Icon } from '@common/Icon';
+import Md from '@common/Md';
+import { Link } from '@common/Link';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
@@ -34,8 +36,6 @@ import { IssueTags } from './IssueTags';
 import { StateDot } from './StateDot';
 import { UserPic } from './UserPic';
 import RelativeTime from './RelativeTime';
-import Md from './Md';
-import { Link } from './Link';
 import { IssueStats } from './IssueStats';
 import { CommentView } from './CommentView';
 import { ActivityFeed } from './ActivityFeed';

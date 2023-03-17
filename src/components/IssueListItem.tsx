@@ -2,12 +2,12 @@ import styled from 'styled-components';
 import NextLink from 'next/link';
 
 import { Text } from '@common/Text';
+import { Link } from '@common/Link';
 
 import { gapM, gapS, gapXs } from '../design/@generated/themes';
 import { routes } from '../hooks/router';
 
 import { StateDot } from './StateDot';
-import { Link } from './Link';
 
 interface IssueListItemProps {
     issue: {

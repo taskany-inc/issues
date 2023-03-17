@@ -6,7 +6,7 @@ import { Goal, GoalsMetaOutput } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page, PageContent } from '../../Page';
-import { nullable } from '../../../utils/nullable';
+import { nullable } from '@common/utils/nullable';
 import { CommonHeader } from '../../CommonHeader';
 import { FiltersPanel } from '../../FiltersPanel';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';

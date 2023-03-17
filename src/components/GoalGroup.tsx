@@ -4,6 +4,7 @@ import NextLink from 'next/link';
 
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Link } from '@common/Link';
 
 import { Goal } from '../../graphql/@generated/genql';
 import { ProjectGroup, TeamGroup } from '../hooks/useGrouppedGoals';
@@ -11,7 +12,6 @@ import { routes } from '../hooks/router';
 
 import { GoalListItem } from './GoalListItem';
 import { PageSep } from './PageSep';
-import { Link } from './Link';
 import { TeamTitleList } from './TeamTitleList';
 
 interface GoalGroupProps {

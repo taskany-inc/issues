@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { Link } from '../components/Link';
+import { Link } from '@common/Link';
 
 export default {
     title: 'Taskany/Link',

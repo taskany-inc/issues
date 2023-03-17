@@ -13,6 +13,7 @@ import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
 import { Icon } from '@common/Icon';
 import { ModalContent, ModalHeader } from '@common/Modal';
+import { Link } from '@common/Link';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -32,7 +33,6 @@ import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
-import { Link } from './Link';
 import { InputContainer } from './InputContaier';
 import { FlowComboBox } from './FlowComboBox';
 

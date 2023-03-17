@@ -4,13 +4,13 @@ import dynamic from 'next/dynamic';
 
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Link } from '@common/Link';
 
 import { gapXs, gray8 } from '../design/@generated/themes';
 import { pluralize } from '../utils/pluralize';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { Dot } from './Dot';
-import { Link } from './Link';
 
 const RelativeTime = dynamic(() => import('./RelativeTime'));
 

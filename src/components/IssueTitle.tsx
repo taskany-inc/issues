@@ -3,10 +3,9 @@ import styled from 'styled-components';
 import NextLink from 'next/link';
 
 import { Text } from '@common/Text';
+import { Link } from '@common/Link';
 
 import { gapS } from '../design/@generated/themes';
-
-import { Link } from './Link';
 
 interface IssueTitleProps {
     title: string;

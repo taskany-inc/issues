@@ -4,13 +4,13 @@ import { signIn } from 'next-auth/react';
 import NextLink from 'next/link';
 
 import { nullable } from '@common/utils/nullable';
+import { Link } from '@common/Link';
 
 import { routes } from '../hooks/router';
 import { gray3, textColor, link10 } from '../design/@generated/themes';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { UserPic } from './UserPic';
-import { Link } from './Link';
 
 interface HeaderMenuProps {
     notifications?: boolean;

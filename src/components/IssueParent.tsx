@@ -5,11 +5,10 @@ import NextLink from 'next/link';
 
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Link } from '@common/Link';
 
 import { gapM, gapS, gray9 } from '../design/@generated/themes';
 import { routes } from '../hooks/router';
-
-import { Link } from './Link';
 
 interface Parent {
     key?: string;

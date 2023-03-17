@@ -19,7 +19,7 @@ import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
 import { danger0, gapM, gapS } from '../../../design/@generated/themes';
 import { Page, PageContent, PageActions } from '../../Page';
 import { PageSep } from '../../PageSep';
-import { Link } from '../../Link';
+import { Link } from '@common/Link';
 import { Card, CardInfo, CardContent, CardActions } from '@common/Card';
 import { IssueTitle } from '../../IssueTitle';
 import { IssueKey } from '../../IssueKey';
@@ -50,7 +50,7 @@ import { trPriority } from '../../../i18n/priority';
 import { tr } from './GoalPage.i18n';
 
 const StateSwitch = dynamic(() => import('../../StateSwitch'));
-const Md = dynamic(() => import('../../Md'));
+const Md = dynamic(() => import('@common/Md'));
 const RelativeTime = dynamic(() => import('../../RelativeTime'));
 const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../../GoalEditForm'));

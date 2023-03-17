@@ -1,11 +1,10 @@
 import NextLink from 'next/link';
 
 import { nullable } from '@common/utils/nullable';
+import { Link } from '@common/Link';
 
 import { Team } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
-
-import { Link } from './Link';
 
 export const TeamTitleList = ({ teams = [] }: { teams: Team[] }) => (
     <>

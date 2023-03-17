@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import styled from 'styled-components';
 
 import { Icon } from '@common/Icon';
+import { Link } from '@common/Link';
 
 import { gql } from '../utils/gql';
 import { gapS, gray6, star0 } from '../design/@generated/themes';
@@ -16,7 +17,6 @@ import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { GoalForm, GoalFormType } from './GoalForm';
-import { Link } from './Link';
 
 const StyledFormBottom = styled.div`
     display: flex;
