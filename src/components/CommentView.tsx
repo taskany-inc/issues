@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import { nullable } from '@common/utils/nullable';
 import { Card, CardComment, CardInfo } from '@common/Card';
+import { Icon } from '@common/Icon';
 
 import { Comment, User } from '../../graphql/@generated/genql';
 import { brandColor, danger0, gapM, gapS, gray4 } from '../design/@generated/themes';
@@ -13,7 +14,6 @@ import { useCommentResource } from '../hooks/useCommentResource';
 
 import { Link } from './Link';
 import { UserPic } from './UserPic';
-import { Icon } from './Icon';
 import { Reactions } from './Reactions';
 import { ActivityFeedItem } from './ActivityFeed';
 import { MenuItem } from './MenuItem';

@@ -3,12 +3,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { useKeyPress } from '@common/hooks/useKeyPress';
-import { useKeyboard, KeyCode, KeyboardEvents } from '@common/hooks/useKeyboard';
-import { nullable } from '@common/utils/nullable';
+import { danger10 } from '../../design/@generated/themes';
 
-import { danger10 } from '../design/@generated/themes';
-import { flatten } from '../utils/flatten';
+import { useKeyPress } from './hooks/useKeyPress';
+import { useKeyboard, KeyCode, KeyboardEvents } from './hooks/useKeyboard';
+import { nullable } from './utils/nullable';
+import { flatten } from './utils/flatten';
 
 const Popup = dynamic(() => import('@common/Popup'));
 

@@ -8,13 +8,14 @@ import styled from 'styled-components';
 import { Button } from '@common/Button';
 import { KeyCode } from '@common/hooks/useKeyboard';
 import { Text } from '@common/Text';
+import { Icon } from '@common/Icon';
+import { ModalContent, ModalHeader } from '@common/Modal';
 
 import { gapM, gapS, gray6, gray7, star0 } from '../design/@generated/themes';
 import { gql } from '../utils/gql';
 import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Icon } from './Icon';
 import { FormInput } from './FormInput';
 import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';
@@ -23,7 +24,6 @@ import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
 import { Tag } from './Tag';
 import { Link } from './Link';
-import { ModalContent, ModalHeader } from './Modal';
 
 const StyledEmails = styled.div`
     padding: ${gapM} 0;

@@ -10,6 +10,7 @@ import { signOut } from 'next-auth/react';
 import { useRouter as useNextRouter } from 'next/router';
 
 import { Button } from '@common/Button';
+import { Icon } from '@common/Icon';
 
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -22,7 +23,6 @@ import { PageSep } from '../../PageSep';
 import { FormInput } from '../../FormInput';
 import { Form } from '../../Form';
 import { Tip } from '../../Tip';
-import { Icon } from '../../Icon';
 import { Keyboard } from '../../Keyboard';
 import { FormAction, FormActions } from '../../FormActions';
 import { Fieldset } from '../../Fieldset';

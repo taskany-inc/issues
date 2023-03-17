@@ -10,6 +10,8 @@ import { z } from 'zod';
 import { Button } from '@common/Button';
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Icon } from '@common/Icon';
+import { ModalContent, ModalHeader } from '@common/Modal';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -22,7 +24,6 @@ import { usePageContext } from '../hooks/usePageContext';
 import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../hooks/useProjectResource';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
-import { Icon } from './Icon';
 import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
 import { FormActions, FormAction } from './FormActions';
@@ -32,7 +33,6 @@ import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
 import { Link } from './Link';
 import { FlowComboBox } from './FlowComboBox';
-import { ModalContent, ModalHeader } from './Modal';
 import { InputContainer } from './InputContaier';
 
 const KeyInput = dynamic(() => import('./KeyInput'));

@@ -6,6 +6,7 @@ import z from 'zod';
 import styled from 'styled-components';
 
 import { Button } from '@common/Button';
+import { ModalHeader, ModalContent } from '@common/Modal';
 
 import { gapS, gray2 } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
@@ -26,7 +27,6 @@ import { StateDropdown } from './StateDropdown';
 import { PriorityDropdown } from './PriorityDropdown';
 import { Tag } from './Tag';
 import { FormEditor } from './FormEditor';
-import { ModalHeader, ModalContent } from './Modal';
 import { FormTitle } from './FormTitle';
 
 const tagsLimit = 5;

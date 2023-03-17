@@ -2,10 +2,9 @@ import styled from 'styled-components';
 
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Icon } from '@common/Icon';
 
 import { gapS, gapXs, gray4, gray9, textColor } from '../design/@generated/themes';
-
-import { Icon } from './Icon';
 
 interface IssueMetaProps {
     title: string;

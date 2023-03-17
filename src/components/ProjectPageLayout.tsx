@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { TabsMenu, TabsMenuItem } from '@common/TabsMenu';
 
 import { routes } from '../hooks/router';
 import { useProjectResource } from '../hooks/useProjectResource';
@@ -14,7 +15,6 @@ import { Project } from '../../graphql/@generated/genql';
 import { gapM, gapS, gray6, gray9 } from '../design/@generated/themes';
 
 import { PageContent, PageActions } from './Page';
-import { TabsMenu, TabsMenuItem } from './TabsMenu';
 import { WatchButton } from './WatchButton';
 import { StarButton } from './StarButton';
 import { TeamTitleList } from './TeamTitleList';

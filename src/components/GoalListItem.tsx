@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Icon } from '@common/Icon';
 
 import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
@@ -14,7 +15,6 @@ import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
 import { Tag as TagItem } from './Tag';
-import { Icon } from './Icon';
 import { UserPic } from './UserPic';
 import { StateDot } from './StateDot';
 

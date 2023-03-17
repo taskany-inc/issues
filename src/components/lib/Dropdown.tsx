@@ -3,14 +3,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { nullable } from '@common/utils/nullable';
-
 import { danger10 } from '../../design/@generated/themes';
 
+import { nullable } from './utils/nullable';
 import { useKeyPress } from './hooks/useKeyPress';
 import { useKeyboard, KeyCode } from './hooks/useKeyboard';
 
-const Popup = dynamic(() => import('@common/Popup'));
+const Popup = dynamic(() => import('./Popup'));
 
 interface DropdownTriggerProps {
     ref: React.RefObject<HTMLButtonElement>;

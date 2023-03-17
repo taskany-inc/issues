@@ -4,6 +4,7 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
 import { nullable } from '@common/utils/nullable';
+import { TabsMenu, TabsMenuItem } from '@common/TabsMenu';
 
 import { Team } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
@@ -11,7 +12,6 @@ import { usePageContext } from '../hooks/usePageContext';
 
 import { PageActions } from './Page';
 import { CommonHeader } from './CommonHeader';
-import { TabsMenu, TabsMenuItem } from './TabsMenu';
 
 interface TeamPageLayoutProps {
     team: Team;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { Modal } from '../components/Modal';
+import { Modal } from '@common/Modal';
 
 export default {
     title: 'Taskany/Modal',

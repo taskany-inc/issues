@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
+import { ModalContent, ModalHeader } from '@common/Modal';
+
 import { gapL, gapM } from '../design/@generated/themes';
 import { Activity, Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
@@ -13,9 +15,8 @@ import { FormTitle } from './FormTitle';
 import { IssueParticipantsList } from './IssueParticipantsList';
 import { FormInput } from './FormInput';
 import { UserMenuItem } from './UserMenuItem';
-import { ModalContent, ModalHeader } from './Modal';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@common/ComboBox'));
 
 interface IssueParticipantsFormProps {
     issue: Goal;

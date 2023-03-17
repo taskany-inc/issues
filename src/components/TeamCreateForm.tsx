@@ -11,6 +11,8 @@ import dynamic from 'next/dynamic';
 import { Button } from '@common/Button';
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Icon } from '@common/Icon';
+import { ModalContent, ModalHeader } from '@common/Modal';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -23,7 +25,6 @@ import { usePageContext } from '../hooks/usePageContext';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
-import { Icon } from './Icon';
 import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
 import { FormActions, FormAction } from './FormActions';
@@ -32,7 +33,6 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
 import { Link } from './Link';
-import { ModalContent, ModalHeader } from './Modal';
 import { InputContainer } from './InputContaier';
 import { FlowComboBox } from './FlowComboBox';
 

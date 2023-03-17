@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import { Button } from '@common/Button';
 import { nullable } from '@common/utils/nullable';
+import { Icon } from '@common/Icon';
 
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
 import { submitKeys } from '../utils/hotkeys';
@@ -13,7 +14,6 @@ import { routes } from '../hooks/router';
 
 import { FormCard } from './FormCard';
 import { Form } from './Form';
-import { Icon } from './Icon';
 import { FormAction, FormActions } from './FormActions';
 import { Tip } from './Tip';
 import { Link } from './Link';

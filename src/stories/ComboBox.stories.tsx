@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import ComboBox from '../components/ComboBox';
+import ComboBox from '@common/ComboBox';
 
 export default {
     title: 'Taskany/ComboBox',

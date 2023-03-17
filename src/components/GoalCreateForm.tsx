@@ -3,6 +3,8 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
 
+import { Icon } from '@common/Icon';
+
 import { gql } from '../utils/gql';
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { Activity } from '../../graphql/@generated/genql';
@@ -11,7 +13,6 @@ import { usePageContext } from '../hooks/usePageContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
-import { Icon } from './Icon';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { GoalForm, GoalFormType } from './GoalForm';

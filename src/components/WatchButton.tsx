@@ -2,8 +2,7 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Button } from '@common/Button';
-
-import { Icon } from './Icon';
+import { Icon } from '@common/Icon';
 
 interface WatchButtonProps {
     watcher?: boolean;

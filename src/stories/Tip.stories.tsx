@@ -1,8 +1,9 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
+import { Icon } from '@common/Icon';
+
 import { Tip } from '../components/Tip';
-import { Icon } from '../components/Icon';
 
 export default {
     title: 'Taskany/Tip',

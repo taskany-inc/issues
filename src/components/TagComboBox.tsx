@@ -7,17 +7,17 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
+import { Icon } from '@common/Icon';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { gql } from '../utils/gql';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Icon } from './Icon';
 import { Tag } from './Tag';
 import { Input } from './Input';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@common/ComboBox'));
 
 interface TagComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];

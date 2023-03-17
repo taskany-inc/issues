@@ -5,15 +5,15 @@ import dynamic from 'next/dynamic';
 
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Icon } from '@common/Icon';
 
 import { gapS, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
 
-import { Icon } from './Icon';
 import { Tag } from './Tag';
 import { Input } from './Input';
 import { MenuItem } from './MenuItem';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@common/ComboBox'));
 
 interface FormMultiInputProps {
     items?: Array<{ title: string; id: any }>;

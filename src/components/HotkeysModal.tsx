@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 
 import { Text } from '@common/Text';
+import { Modal } from '@common/Modal';
 
 import { gray8, gapM, gray9, gapS } from '../design/@generated/themes';
 import { isEventTargetInputOrTextArea } from '../utils/hotkeys';
 
-import { Modal } from './Modal';
 import { Keyboard } from './Keyboard';
 
 const StyledHotkeys = styled.div`

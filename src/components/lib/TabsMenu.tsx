@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { gapM, gapS, gray4, gray7, radiusXl, textColor } from '../design/@generated/themes';
+import { gapM, gapS, gray4, gray7, radiusXl, textColor } from '../../design/@generated/themes';
 
 export const TabsMenu = styled.div`
     padding: ${gapM} 0 0;

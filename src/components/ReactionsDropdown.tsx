@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import type { EmojiSelection, EmojiPicker } from 'picmo';
 import dynamic from 'next/dynamic';
 
+import { Icon } from '@common/Icon';
+
 import { PageContext } from '../utils/pageContext';
 import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '../design/@generated/themes';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Icon } from './Icon';
 import { ReactionsButton } from './ReactionsButton';
 
 const Popup = dynamic(() => import('@common/Popup'));

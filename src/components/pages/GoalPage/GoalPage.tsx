@@ -41,7 +41,7 @@ import { WatchButton } from '../../WatchButton';
 import { useGoalResource } from '../../../hooks/useGoalResource';
 import { StarButton } from '../../StarButton';
 import { useRouter } from '../../../hooks/router';
-import { Icon } from '../../Icon';
+import { Icon } from '@common/Icon';
 import { MenuItem } from '../../MenuItem';
 import { GoalDeleteModal } from '../../GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../../types/priority';

@@ -8,6 +8,9 @@ import toast from 'react-hot-toast';
 import { Button } from '@common/Button';
 import { nullable } from '@common/utils/nullable';
 import { Card, CardComment, CardInfo } from '@common/Card';
+import { ModalHeader, ModalContent } from '@common/Modal';
+import { ModalPreview } from '@common/ModalPreview';
+import { Icon } from '@common/Icon';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
@@ -24,8 +27,6 @@ import { editGoalKeys } from '../utils/hotkeys';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
-import { ModalHeader, ModalContent } from './Modal';
-import { ModalPreview } from './ModalPreview';
 import { IssueKey } from './IssueKey';
 import { IssueTitle } from './IssueTitle';
 import { IssueParent } from './IssueParent';
@@ -41,7 +42,6 @@ import { ActivityFeed } from './ActivityFeed';
 import { Reactions } from './Reactions';
 import ReactionsDropdown from './ReactionsDropdown';
 import { Dot } from './Dot';
-import { Icon } from './Icon';
 import { MenuItem } from './MenuItem';
 import { GoalDeleteModal } from './GoalDeleteModal';
 

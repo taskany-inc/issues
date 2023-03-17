@@ -5,6 +5,8 @@ import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
+import { Icon } from '@common/Icon';
+import { ModalContent, ModalHeader } from '@common/Modal';
 
 import { gapL, gapM } from '../design/@generated/themes';
 import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
@@ -16,10 +18,8 @@ import { IssueDependenciesList } from './IssueDependenciesList';
 import { FormInput } from './FormInput';
 import { MenuItem } from './MenuItem';
 import { GoalMenuItem } from './GoalMenuItem';
-import { Icon } from './Icon';
-import { ModalContent, ModalHeader } from './Modal';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@common/ComboBox'));
 const Dropdown = dynamic(() => import('@common/Dropdown'));
 
 interface IssueDependenciesFormProps {

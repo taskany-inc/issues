@@ -3,8 +3,7 @@ import { useTranslations } from 'next-intl';
 
 import { Button } from '@common/Button';
 import { Badge } from '@common/Badge';
-
-import { Icon } from './Icon';
+import { Icon } from '@common/Icon';
 
 interface StarButtonProps {
     stargizer?: boolean;

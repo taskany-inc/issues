@@ -15,7 +15,7 @@ import { Input } from './Input';
 import { ProjectMenuItem } from './ProjectMenuItem';
 import { MenuGroupItem } from './MenuGroupItem';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@common/ComboBox'));
 
 interface GoalParentComboBoxProps {
     text: React.ComponentProps<typeof ComboBox>['text'];

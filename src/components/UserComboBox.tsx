@@ -13,7 +13,7 @@ import { Input } from './Input';
 import { UserMenuItem } from './UserMenuItem';
 import { UserPic } from './UserPic';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@common/ComboBox'));
 
 interface UserComboBoxProps {
     text: React.ComponentProps<typeof Button>['text'];

@@ -20,7 +20,7 @@ import { FormAction, FormActions } from '../../FormActions';
 import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
 import { Text } from '@common/Text';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
-import { ModalContent, ModalHeader } from '../../Modal';
+import { ModalContent, ModalHeader } from '@common/Modal';
 import { FormTitle } from '../../FormTitle';
 import { ProjectPageLayout } from '../../ProjectPageLayout';
 import { Page } from '../../Page';

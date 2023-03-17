@@ -4,12 +4,12 @@ import colorLayer from 'color-layer';
 import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
+import { Icon } from '@common/Icon';
 
 import { createFetcher } from '../utils/createFetcher';
 import { State } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Icon } from './Icon';
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 

@@ -3,10 +3,11 @@ import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
+import { TabsMenu, TabsMenuItem } from '@common/TabsMenu';
+
 import { routes } from '../hooks/router';
 
 import { CommonHeader } from './CommonHeader';
-import { TabsMenu, TabsMenuItem } from './TabsMenu';
 
 interface ExplorePageLayoutProps {
     children: React.ReactNode;

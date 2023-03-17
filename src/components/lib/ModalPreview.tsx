@@ -3,11 +3,10 @@ import styled from 'styled-components';
 
 import { useKeyboard, KeyCode } from '@common/hooks/useKeyboard';
 import { nullable } from '@common/utils/nullable';
+import { ModalCross } from '@common/Modal';
+import { Portal } from '@common/Portal';
 
-import { backgroundColor, gapM, radiusM } from '../design/@generated/themes';
-
-import { ModalCross } from './Modal';
-import { Portal } from './Portal';
+import { backgroundColor, gapM, radiusM } from '../../design/@generated/themes';
 
 interface ModalPreviewProps {
     children: React.ReactNode;
