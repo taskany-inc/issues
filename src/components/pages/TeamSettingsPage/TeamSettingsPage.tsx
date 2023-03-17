@@ -14,7 +14,7 @@ import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrPro
 import { PageSep } from '../../PageSep';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 import { Form } from '../../Form';
-import { Fieldset } from '../../Fieldset';
+import { Fieldset } from '@common/Fieldset';
 import { gql } from '../../../utils/gql';
 import { FormInput } from '../../FormInput';
 import { FormAction, FormActions } from '../../FormActions';

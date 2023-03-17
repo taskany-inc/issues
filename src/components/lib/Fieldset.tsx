@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { Text } from '@common/Text';
 
-import { danger0, gapM, gapS, gray9, warn0 } from '../design/@generated/themes';
+import { danger0, gapM, gapS, gray9, warn0 } from '../../design/@generated/themes';
 
 type FieldsetViewType = 'default' | 'warning' | 'danger';
 

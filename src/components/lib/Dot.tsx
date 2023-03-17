@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { colorPrimary, danger9, gray5, warn0 } from '../design/@generated/themes';
+import { colorPrimary, danger9, gray5, warn0 } from '../../design/@generated/themes';
 
 type ViewType = 'default' | 'primary' | 'warning' | 'danger';
 

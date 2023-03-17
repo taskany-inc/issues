@@ -8,6 +8,7 @@ import { Session } from 'next-auth';
 
 import { nullable } from '@common/utils/nullable';
 import { TextStyle } from '@common/Text';
+import { Footer } from '@common/Footer';
 
 import { gapS, gray4, radiusM, textColor } from '../design/@generated/themes';
 import { pageContext, PageContext } from '../utils/pageContext';
@@ -19,7 +20,6 @@ import { createProjectKeys, inviteUserKeys, createGoalKeys, createTeamKeys } fro
 import { Theme } from './Theme';
 import { GlobalStyle } from './GlobalStyle';
 import { Header } from './Header';
-import { Footer } from './Footer';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm'));

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { gray0 } from '../design/@generated/themes';
+import { gray0 } from '../../design/@generated/themes';
 
 import { SheepLogo } from './SheepLogo';
 

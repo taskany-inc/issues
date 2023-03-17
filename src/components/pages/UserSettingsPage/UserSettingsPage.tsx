@@ -11,6 +11,7 @@ import { useRouter as useNextRouter } from 'next/router';
 
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
+import { Fieldset } from '@common/Fieldset';
 
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -25,7 +26,6 @@ import { Form } from '../../Form';
 import { Tip } from '../../Tip';
 import { Keyboard } from '../../Keyboard';
 import { FormAction, FormActions } from '../../FormActions';
-import { Fieldset } from '../../Fieldset';
 import { FormRadio, FormRadioInput } from '../../FormRadio';
 import { CommonHeader } from '../../CommonHeader';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';

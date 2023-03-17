@@ -14,7 +14,7 @@ import { PageSep } from '../../PageSep';
 import { useRouter } from '../../../hooks/router';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 import { Form } from '../../Form';
-import { Fieldset } from '../../Fieldset';
+import { Fieldset } from '@common/Fieldset';
 import { FormInput } from '../../FormInput';
 import { FormAction, FormActions } from '../../FormActions';
 import { gapS, gray9, warn0 } from '../../../design/@generated/themes';

@@ -13,6 +13,7 @@ import { ModalPreview } from '@common/ModalPreview';
 import { Icon } from '@common/Icon';
 import Md from '@common/Md';
 import { Link } from '@common/Link';
+import { Dot } from '@common/Dot';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
@@ -41,7 +42,6 @@ import { CommentView } from './CommentView';
 import { ActivityFeed } from './ActivityFeed';
 import { Reactions } from './Reactions';
 import ReactionsDropdown from './ReactionsDropdown';
-import { Dot } from './Dot';
 import { MenuItem } from './MenuItem';
 import { GoalDeleteModal } from './GoalDeleteModal';
 

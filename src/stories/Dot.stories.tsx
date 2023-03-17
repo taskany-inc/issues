@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { Dot } from '../components/Dot';
+import { Dot } from '@common/Dot';
 
 export default {
     title: 'Taskany/Dot',
