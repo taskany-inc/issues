@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 import { Button } from '@common/Button';
 import { ModalHeader, ModalContent } from '@common/Modal';
+import { Tag } from '@common/Tag';
 
 import { gapS, gray2 } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
@@ -25,7 +26,6 @@ import { EstimateComboBox } from './EstimateComboBox';
 import { TagComboBox } from './TagComboBox';
 import { StateDropdown } from './StateDropdown';
 import { PriorityDropdown } from './PriorityDropdown';
-import { Tag } from './Tag';
 import { FormEditor } from './FormEditor';
 import { FormTitle } from './FormTitle';
 

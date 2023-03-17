@@ -13,6 +13,7 @@ import { Text } from '@common/Text';
 import { Icon } from '@common/Icon';
 import { ModalContent, ModalHeader } from '@common/Modal';
 import { Link } from '@common/Link';
+import { InputContainer } from '@common/InputContainer';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -33,7 +34,6 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
 import { FlowComboBox } from './FlowComboBox';
-import { InputContainer } from './InputContaier';
 
 const KeyInput = dynamic(() => import('./KeyInput'));
 

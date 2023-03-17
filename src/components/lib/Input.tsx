@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { gray10, gray3, gray4, gray6, gray7, radiusM, textColor } from '../design/@generated/themes';
+import { gray10, gray3, gray4, gray6, gray7, radiusM, textColor } from '../../design/@generated/themes';
 
 interface InputProps {
     id?: string;

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { gray10, gray7, gray8 } from '../design/@generated/themes';
+import { gray10, gray7, gray8 } from '../../design/@generated/themes';
 
 interface CleanButtonProps {
     className?: string;

@@ -2,6 +2,7 @@ import React, { MouseEventHandler, useCallback } from 'react';
 import styled from 'styled-components';
 
 import { nullable } from '@common/utils/nullable';
+import { CleanButton } from '@common/CleanButton';
 
 import {
     colorPrimary,
@@ -12,9 +13,7 @@ import {
     gray9,
     radiusL,
     textColorPrimary,
-} from '../design/@generated/themes';
-
-import { CleanButton } from './CleanButton';
+} from '../../design/@generated/themes';
 
 interface TagProps {
     title: string;

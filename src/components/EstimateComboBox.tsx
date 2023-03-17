@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
+import { Input } from '@common/Input';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
 import { danger8, danger9, gray6, textColor } from '../design/@generated/themes';
@@ -18,8 +19,6 @@ import {
 } from '../utils/dateTime';
 import { usePageContext } from '../hooks/usePageContext';
 import { TLocale } from '../i18n/getLang';
-
-import { Input } from './Input';
 
 const ComboBox = dynamic(() => import('@common/ComboBox'));
 

@@ -6,12 +6,12 @@ import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
+import { Input } from '@common/Input';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Flow } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Input } from './Input';
 import { MenuItem } from './MenuItem';
 
 const ComboBox = dynamic(() => import('@common/ComboBox'));

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { Tag } from '../components/Tag';
+import { Tag } from '@common/Tag';
 
 export default {
     title: 'Taskany/Tag',

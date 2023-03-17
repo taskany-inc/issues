@@ -2,11 +2,11 @@ import { useCallback } from 'react';
 import styled from 'styled-components';
 
 import { nullable } from '@common/utils/nullable';
+import { CleanButton } from '@common/CleanButton';
 
 import { Activity } from '../../graphql/@generated/genql';
 import { gapS } from '../design/@generated/themes';
 
-import { CleanButton } from './CleanButton';
 import { IssueMeta } from './IssueMeta';
 import { UserPic } from './UserPic';
 

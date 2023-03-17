@@ -5,10 +5,9 @@ import dynamic from 'next/dynamic';
 import { Button } from '@common/Button';
 import { useKeyboard, KeyCode } from '@common/hooks/useKeyboard';
 import { Text } from '@common/Text';
+import { Input } from '@common/Input';
 
 import { keyPredictor } from '../utils/keyPredictor';
-
-import { Input } from './Input';
 
 const Popup = dynamic(() => import('@common/Popup'));
 

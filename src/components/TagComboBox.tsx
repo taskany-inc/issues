@@ -8,14 +8,13 @@ import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
+import { Tag } from '@common/Tag';
+import { Input } from '@common/Input';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { gql } from '../utils/gql';
 import { usePageContext } from '../hooks/usePageContext';
-
-import { Tag } from './Tag';
-import { Input } from './Input';
 
 const ComboBox = dynamic(() => import('@common/ComboBox'));
 

@@ -1,11 +1,10 @@
 import styled from 'styled-components';
 
 import { nullable } from '@common/utils/nullable';
+import { Tag } from '@common/Tag';
 
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { gapS } from '../design/@generated/themes';
-
-import { Tag } from './Tag';
 
 interface IssueTagsProps {
     tags: Array<TagModel | undefined>;

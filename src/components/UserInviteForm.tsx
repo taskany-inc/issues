@@ -11,6 +11,7 @@ import { Text } from '@common/Text';
 import { Icon } from '@common/Icon';
 import { ModalContent, ModalHeader } from '@common/Modal';
 import { Link } from '@common/Link';
+import { Tag } from '@common/Tag';
 
 import { gapM, gapS, gray6, gray7, star0 } from '../design/@generated/themes';
 import { gql } from '../utils/gql';
@@ -23,7 +24,6 @@ import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
-import { Tag } from './Tag';
 
 const StyledEmails = styled.div`
     padding: ${gapM} 0;

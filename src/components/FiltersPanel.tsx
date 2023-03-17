@@ -5,10 +5,10 @@ import { useTranslations } from 'next-intl';
 import { Badge } from '@common/Badge';
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { Input } from '@common/Input';
 
 import { gapM, gapS, gray5, textColor } from '../design/@generated/themes';
 
-import { Input } from './Input';
 import { PageContent } from './Page';
 import { StateFilterDropdown } from './StateFilterDropdown';
 import { UserFilterDropdown } from './UserFilterDropdown';

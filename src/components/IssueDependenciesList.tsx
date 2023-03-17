@@ -2,10 +2,10 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
 import { nullable } from '@common/utils/nullable';
+import { CleanButton } from '@common/CleanButton';
 
 import { Goal } from '../../graphql/@generated/genql';
 
-import { CleanButton } from './CleanButton';
 import { IssueListItem } from './IssueListItem';
 import { IssueMeta } from './IssueMeta';
 
