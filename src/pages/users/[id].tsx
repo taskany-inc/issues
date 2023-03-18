@@ -1,20 +1,5 @@
-import { useTranslations } from 'next-intl';
+import { UserPage } from '../../components/pages/UserPage/UserPage';
 
-import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
-import { Page } from '../../components/Page';
+export { getServerSideProps } from '../../components/pages/UserPage/UserPage';
 
-export const getServerSideProps = declareSsrProps(async () => ({}), {
-    private: true,
-});
-
-const UserSettingsPage = ({ user, ssrTime, locale, params: { id } }: ExternalPageProps<{ id: string }>) => {
-    const t = useTranslations('users.settings');
-
-    return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={user?.name || 'No name'}>
-            Settings
-        </Page>
-    );
-};
-
-export default UserSettingsPage;
+export default UserPage;
