@@ -5,7 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { pageContext } from '../src/utils/pageContext';
 import { GlobalStyle } from '../src/components/GlobalStyle';
 import { Theme } from '../src/components/Theme';
-import { TextStyle } from '@../src/components/lib/Text';
+import { TextStyle } from '../src/components/lib/Text';
 
 import { NextIntlProvider } from 'next-intl';
 import en from '../i18n/en.json';
