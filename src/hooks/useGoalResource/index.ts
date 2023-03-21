@@ -1,16 +1,15 @@
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
-import z from 'zod';
 
-import { Goal } from '../../graphql/@generated/genql';
-import { gql } from '../utils/gql';
+import { gql } from '../../utils/gql';
 
-type KeySet = (key: string) => string;
+import { tr } from './useGoalResource.i18n';
+
 type Callback<A = []> = (...args: A[]) => void;
 
 export const useGoalResource = (id: string) => {
     const toggleGoalWatching = useCallback(
-        (cb: Callback, t: KeySet, watcher?: boolean) => async () => {
+        (cb: Callback, watcher?: boolean) => async () => {
             const promise = gql.mutation({
                 toggleGoalWatcher: [
                     {
@@ -26,9 +25,9 @@ export const useGoalResource = (id: string) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are calling owner'),
-                success: t(!watcher ? 'Voila! You are watcher now 🎉' : 'So sad! Goal will miss you'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are calling owner'),
+                success: !watcher ? tr('Voila! You are watcher now 🎉') : tr('So sad! Goal will miss you'),
             });
 
             cb();
@@ -39,7 +38,7 @@ export const useGoalResource = (id: string) => {
     );
 
     const toggleGoalStar = useCallback(
-        (cb: Callback, t: KeySet, stargizer?: boolean) => async () => {
+        (cb: Callback, stargizer?: boolean) => async () => {
             const promise = gql.mutation({
                 toggleGoalStargizer: [
                     {
@@ -55,9 +54,9 @@ export const useGoalResource = (id: string) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are calling owner'),
-                success: t(!stargizer ? 'Voila! You are stargizer now 🎉' : 'So sad! Goal will miss you'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are calling owner'),
+                success: !stargizer ? tr('Voila! You are stargizer now 🎉') : tr('So sad! Goal will miss you'),
             });
 
             cb();

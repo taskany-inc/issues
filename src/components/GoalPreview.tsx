@@ -111,7 +111,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
         setGoalEditModalVisible(true);
     }, []);
 
-    const updateGoal = useGoalUpdate(t, goal);
+    const updateGoal = useGoalUpdate(goal);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
 
     const priorityColor = priorityColorsMap[goal.priority as Priority];

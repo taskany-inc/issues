@@ -1,10 +1,12 @@
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 
-import { Goal, GoalUpdateInput } from '../../graphql/@generated/genql';
-import { gql } from '../utils/gql';
+import { Goal, GoalUpdateInput } from '../../../graphql/@generated/genql';
+import { gql } from '../../utils/gql';
 
-export const useGoalUpdate = (t: (k: string) => string, goal: Goal) => {
+import { tr } from './useGoalUpdate.i18n';
+
+export const useGoalUpdate = (goal: Goal) => {
     return useCallback(
         (data: Partial<GoalUpdateInput>) => {
             const promise = gql.mutation({
@@ -22,13 +24,13 @@ export const useGoalUpdate = (t: (k: string) => string, goal: Goal) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are updating the goal'),
-                success: t('Voila! Goal is up to date 🎉'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are updating the goal'),
+                success: tr('Voila! Goal is up to date 🎉'),
             });
 
             return promise;
         },
-        [t, goal],
+        [goal],
     );
 };
