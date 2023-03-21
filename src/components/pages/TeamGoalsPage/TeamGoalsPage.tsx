@@ -303,7 +303,7 @@ export const TeamGoalsPage = ({
             user={user}
             locale={locale}
             ssrTime={ssrTime}
-            title={tr.raw('Taskany — {team} — Goals', {
+            title={tr.raw('title', {
                 team: team?.title,
             })}
         >

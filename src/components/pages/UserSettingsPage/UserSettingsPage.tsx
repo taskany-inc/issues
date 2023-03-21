@@ -181,7 +181,7 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
             user={user}
             locale={locale}
             ssrTime={ssrTime}
-            title={tr.raw('Taskany — {user} — Settings', {
+            title={tr.raw('title', {
                 user: actualUserFields?.name,
             })}
         >

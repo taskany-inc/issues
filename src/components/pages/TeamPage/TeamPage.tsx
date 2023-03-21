@@ -127,12 +127,7 @@ export const TeamPage = ({ user, locale, ssrTime, fallback, params: { key } }: E
     });
 
     return (
-        <Page
-            user={user}
-            locale={locale}
-            ssrTime={ssrTime}
-            title={tr.raw('Taskany — {team} — Projects', { team: team?.title })}
-        >
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={tr.raw('title', { team: team?.title })}>
             <TeamPageLayout actions team={team}>
                 <PageSep />
 

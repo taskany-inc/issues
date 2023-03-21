@@ -293,7 +293,7 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
             user={user}
             locale={locale}
             ssrTime={ssrTime}
-            title={tr.raw('Taskany — Goals — {goal}', {
+            title={tr.raw('title', {
                 goal: goal.title,
             })}
         >

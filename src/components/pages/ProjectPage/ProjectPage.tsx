@@ -299,7 +299,7 @@ export const ProjectPage = ({
             user={user}
             locale={locale}
             ssrTime={ssrTime}
-            title={tr.raw('Taskany — {project}', {
+            title={tr.raw('title', {
                 project: project.title,
             })}
         >
