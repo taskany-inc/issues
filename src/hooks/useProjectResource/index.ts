@@ -2,21 +2,22 @@ import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import z from 'zod';
 
-import { Project } from '../../graphql/@generated/genql';
-import { gql } from '../utils/gql';
+import { Project } from '../../../graphql/@generated/genql';
+import { gql } from '../../utils/gql';
 
-type KeySet = (key: string) => string;
+import { tr } from './useProjectResource.i18n';
+
 type Callback<A = []> = (...args: A[]) => void;
 
-export const createProjectSchemaProvider = (t: KeySet) =>
+export const createProjectSchemaProvider = () =>
     z.object({
         title: z
             .string({
-                required_error: t("Project's title is required"),
-                invalid_type_error: t("Project's title must be a string"),
+                required_error: tr("Project's title is required"),
+                invalid_type_error: tr("Project's title must be a string"),
             })
             .min(2, {
-                message: t("Project's title must be longer than 2 symbols"),
+                message: tr("Project's title must be longer than 2 symbols"),
             }),
         description: z.string().optional(),
         flow: z.object({
@@ -24,15 +25,15 @@ export const createProjectSchemaProvider = (t: KeySet) =>
         }),
         key: z.string().min(3),
     });
-export const updateProjectSchemaProvider = (t: KeySet) =>
+export const updateProjectSchemaProvider = () =>
     z.object({
         title: z
             .string({
-                required_error: t("Project's title is required"),
-                invalid_type_error: t("Project's title must be a string"),
+                required_error: tr("Project's title is required"),
+                invalid_type_error: tr("Project's title must be a string"),
             })
             .min(2, {
-                message: t("Project's title must be longer than 2 symbols"),
+                message: tr("Project's title must be longer than 2 symbols"),
             }),
         description: z.string().optional(),
         teams: z
@@ -50,7 +51,7 @@ export type UpdateProjectFormType = z.infer<ReturnType<typeof updateProjectSchem
 
 export const useProjectResource = (id: number) => {
     const createProject = useCallback(
-        (cb: Callback<Project['key']>, t: KeySet) => async (form: CreateProjectFormType) => {
+        (cb: Callback<Project['key']>) => async (form: CreateProjectFormType) => {
             const promise = gql.mutation({
                 createProject: [
                     {
@@ -68,9 +69,9 @@ export const useProjectResource = (id: number) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are creating new project'),
-                success: t('Voila! Project is here 🎉'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are creating new project'),
+                success: tr('Voila! Project is here 🎉'),
             });
 
             const res = await promise;
@@ -81,7 +82,7 @@ export const useProjectResource = (id: number) => {
     );
 
     const updateProject = useCallback(
-        (cb: Callback<UpdateProjectFormType>, t: KeySet) => async (data: UpdateProjectFormType) => {
+        (cb: Callback<UpdateProjectFormType>) => async (data: UpdateProjectFormType) => {
             const promise = gql.mutation({
                 updateProject: [
                     {
@@ -104,9 +105,9 @@ export const useProjectResource = (id: number) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are updating project settings'),
-                success: t('Voila! Successfully updated 🎉'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are updating project settings'),
+                success: tr('Voila! Successfully updated 🎉'),
             });
 
             const res = await promise;
@@ -118,7 +119,7 @@ export const useProjectResource = (id: number) => {
 
     const deleteProject = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (cb: Callback, t: KeySet) => async () => {
+        (cb: Callback) => async () => {
             const res = await gql.mutation({
                 deleteProject: [
                     {
@@ -138,7 +139,7 @@ export const useProjectResource = (id: number) => {
     );
 
     const toggleProjectWatching = useCallback(
-        (cb: Callback, t: KeySet, watcher?: boolean) => async () => {
+        (cb: Callback, watcher?: boolean) => async () => {
             const promise = gql.mutation({
                 toggleProjectWatcher: [
                     {
@@ -154,9 +155,9 @@ export const useProjectResource = (id: number) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are calling owner'),
-                success: t(!watcher ? 'Voila! You are watcher now 🎉' : 'So sad! Project will miss you'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are calling owner'),
+                success: !watcher ? tr('Voila! You are watcher now 🎉') : tr('So sad! Project will miss you'),
             });
 
             cb();
@@ -167,7 +168,7 @@ export const useProjectResource = (id: number) => {
     );
 
     const toggleProjectStar = useCallback(
-        (cb: Callback, t: KeySet, stargizer?: boolean) => async () => {
+        (cb: Callback, stargizer?: boolean) => async () => {
             const promise = gql.mutation({
                 toggleProjectStargizer: [
                     {
@@ -183,9 +184,9 @@ export const useProjectResource = (id: number) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are calling owner'),
-                success: t(!stargizer ? 'Voila! You are stargizer now 🎉' : 'So sad! Project will miss you'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are calling owner'),
+                success: !stargizer ? tr('Voila! You are stargizer now 🎉') : tr('So sad! Project will miss you'),
             });
 
             cb();

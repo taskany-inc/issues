@@ -90,7 +90,7 @@ const ProjectCreateForm: React.FC = () => {
     const [busy, setBusy] = useState(false);
     const [dirtyKey, setDirtyKey] = useState(false);
 
-    const schema = createProjectSchemaProvider(t);
+    const schema = createProjectSchemaProvider();
     type ProjectFormType = z.infer<typeof schema>;
 
     const {
@@ -145,9 +145,9 @@ const ProjectCreateForm: React.FC = () => {
             createProject((key: string) => {
                 router.project(key);
                 dispatchModalEvent(ModalEvent.ProjectCreateModal)();
-            }, t)(form);
+            })(form);
         },
-        [router, createProject, t],
+        [router, createProject],
     );
 
     const onKeyDirty = useCallback(() => {
