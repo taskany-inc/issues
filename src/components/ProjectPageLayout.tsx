@@ -84,11 +84,11 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
 
                 {nullable(actions, () => (
                     <PageActions>
-                        <WatchButton watcher={watcher} onToggle={toggleProjectWatching(onWatchToggle, t, watcher)} />
+                        <WatchButton watcher={watcher} onToggle={toggleProjectWatching(onWatchToggle, watcher)} />
                         <StarButton
                             stargizer={stargizer}
                             count={project._count?.stargizers}
-                            onToggle={toggleProjectStar(onStarToggle, t, stargizer)}
+                            onToggle={toggleProjectStar(onStarToggle, stargizer)}
                         />
                     </PageActions>
                 ))}

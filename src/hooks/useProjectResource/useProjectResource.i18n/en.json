@@ -1,0 +1,14 @@
+{
+    "Project's title is required": "Project's title is required",
+    "Project's title must be a string": "Project's title must be a string",
+    "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
+    "Something went wrong 😿": "Something went wrong 😿",
+    "We are creating new project": "We are creating new project",
+    "Voila! Project is here 🎉": "Voila! Project is here 🎉",
+    "We are updating project settings": "We are updating project settings",
+    "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",
+    "We are calling owner": "We are calling owner...",
+    "Voila! You are watcher now 🎉": "Voila! You are watcher now 🎉",
+    "So sad! Project will miss you": "So sad! Project will miss you",
+    "Voila! You are stargizer now 🎉": "Voila! You are stargizer now 🎉"
+}

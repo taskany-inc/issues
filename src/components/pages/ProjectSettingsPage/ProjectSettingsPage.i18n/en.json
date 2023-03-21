@@ -1,0 +1,16 @@
+{
+    "Taskany — {project} — Settings": "Taskany — {project} — Settings",
+    "General": "General",
+    "key": "Key",
+    "Title": "Title",
+    "Description": "Description",
+    "Teams": "Teams",
+    "Save": "Save",
+    "Be careful! All data will be lost": "Be careful! All data will be lost.",
+    "Delete project": "Delete project",
+    "You are trying to delete project": "",
+    "To confirm deleting project {project} please type project key below.": "",
+    "Cancel": "Cancel",
+    "Yes, delete it": "Yes, delete it",
+    "Danger zone": "Danger zone"
+}
