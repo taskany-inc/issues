@@ -68,7 +68,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', l
     return (
         <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], locale, ssrTime }}>
             <Head>
-                <title>{title}</title>
+                <title>{Array.isArray(title) ? title.join('') : title}</title>
             </Head>
 
             <GlobalStyle />

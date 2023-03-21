@@ -1,5 +1,5 @@
 {
-    "Taskany — {project} — Settings": "Taskany — {project} — Настройки",
+    "title": "Taskany — {project} — Настройки",
     "General": "Основные",
     "key": "Ключ",
     "Title": "Название",
