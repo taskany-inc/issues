@@ -288,15 +288,14 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
         router.goals();
     }, [goal, router]);
 
+    const pageTitle = tr
+        .raw('title', {
+            goal: goal.title,
+        })
+        .join('');
+
     return (
-        <Page
-            user={user}
-            locale={locale}
-            ssrTime={ssrTime}
-            title={tr.raw('title', {
-                goal: goal.title,
-            })}
-        >
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <IssueHeader>
                 <StyledIssueInfo align="left">
                     <IssueKey id={goal.id}>

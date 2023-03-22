@@ -297,16 +297,14 @@ export const TeamGoalsPage = ({
     }, []);
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
+    const pageTitle = tr
+        .raw('title', {
+            team: team?.title,
+        })
+        .join('');
 
     return (
-        <Page
-            user={user}
-            locale={locale}
-            ssrTime={ssrTime}
-            title={tr.raw('title', {
-                team: team?.title,
-            })}
-        >
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <TeamPageLayout actions team={team}>
                 <FiltersPanel
                     count={meta?.count}

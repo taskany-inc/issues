@@ -293,16 +293,14 @@ export const ProjectPage = ({
     }, []);
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
+    const pageTitle = tr
+        .raw('title', {
+            project: project.title,
+        })
+        .join('');
 
     return (
-        <Page
-            user={user}
-            locale={locale}
-            ssrTime={ssrTime}
-            title={tr.raw('title', {
-                project: project.title,
-            })}
-        >
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <ProjectPageLayout actions project={project}>
                 <FiltersPanel
                     count={meta?.count}

@@ -238,16 +238,14 @@ export const ProjectSettingsPage = ({
     const projectTeamsIds = formValues.teams?.map((team) => team!.id) ?? [];
     const [teamsQuery, setTeamsQuery] = useState('');
     const { data: teams } = useSWR(teamsQuery, (q) => teamsFetcher(user, q));
+    const pageTitle = tr
+        .raw('title', {
+            project: project.title,
+        })
+        .join('');
 
     return (
-        <Page
-            user={user}
-            locale={locale}
-            ssrTime={ssrTime}
-            title={tr.raw('title', {
-                project: project.title,
-            })}
-        >
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <ProjectPageLayout actions project={project}>
                 <PageSep />
 
