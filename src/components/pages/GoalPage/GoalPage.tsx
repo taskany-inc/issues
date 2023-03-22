@@ -45,7 +45,7 @@ import { Icon } from '../../Icon';
 import { MenuItem } from '../../MenuItem';
 import { GoalDeleteModal } from '../../GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../../types/priority';
-import { I18nPriority } from '../../../i18n/priority';
+import { trPriority } from '../../../i18n/priority';
 
 import { tr } from './GoalPage.i18n';
 
@@ -392,7 +392,7 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
                         <CardActions>
                             <IssueBaseActions>
                                 {nullable(priority, (ip) => (
-                                    <Button ghost text={I18nPriority[ip]} iconLeft={<StateDot hue={priorityColor} />} />
+                                    <Button ghost text={trPriority(ip)} iconLeft={<StateDot hue={priorityColor} />} />
                                 ))}
 
                                 <Button

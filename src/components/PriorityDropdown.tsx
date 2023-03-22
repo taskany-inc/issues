@@ -4,7 +4,7 @@ import colorLayer from 'color-layer';
 
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority, priorityColorsMap } from '../types/priority';
-import { I18nPriority } from '../i18n/priority';
+import { trPriority } from '../i18n/priority';
 
 import { Button } from './Button';
 import { StateDot } from './StateDot';
@@ -58,7 +58,7 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                     <ColorizedMenuItem
                         key={props.item}
                         hue={priorityColorsMap[props.item as Priority]}
-                        title={I18nPriority[props.item as Priority]}
+                        title={trPriority(props.item as Priority)}
                         hoverColor={colors[props.index]}
                         focused={props.cursor === props.index}
                         onClick={props.onClick}

@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority, priorityColorsMap } from '../types/priority';
-import { I18nPriority } from '../i18n/priority';
+import { trPriority } from '../i18n/priority';
 
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 import { FiltersMenuItem } from './FiltersMenuItem';
@@ -70,7 +70,7 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
                     <ColorizedMenuItem
                         key={props.item}
                         hue={priorityColorsMap[props.item as Priority]}
-                        title={I18nPriority[props.item as Priority]}
+                        title={trPriority(props.item as Priority)}
                         hoverColor={colors[props.item]}
                         checked={selected?.has(props.item)}
                         onClick={props.onClick}

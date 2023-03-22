@@ -9,7 +9,7 @@ import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/gen
 import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { Priority, priorityColorsMap } from '../types/priority';
-import { I18nPriority } from '../i18n/priority';
+import { trPriority } from '../i18n/priority';
 
 import { Text } from './Text';
 import { Tag as TagItem } from './Tag';
@@ -186,7 +186,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                             <StateDot
                                 size="s"
                                 hue={priorityColorsMap[p as Priority]}
-                                title={I18nPriority[p as Priority]}
+                                title={trPriority(p as Priority)}
                             />
                         ))}
                     </StyledAddon>
