@@ -1,5 +1,6 @@
+import { TLocale } from '../i18n/getLang';
+
 import { availableYears, createLocaleDate, parseLocaleDate, endOfQuarter, quarters } from './dateTime';
-import { TLocale } from './getLang';
 
 const locales: Array<TLocale> = ['en', 'ru'];
 
