@@ -19,7 +19,7 @@ import { useReactionsResource } from '../hooks/useReactionsResource';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { editGoalKeys } from '../utils/hotkeys';
 import { Priority, priorityColorsMap } from '../types/priority';
-import { I18nPriority } from '../i18n/priority';
+import { trPriority } from '../i18n/priority';
 
 import { ModalHeader, ModalContent } from './Modal';
 import { ModalPreview } from './ModalPreview';
@@ -222,7 +222,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                             {nullable(goal.priority, (ip) => (
                                 <Button
                                     ghost
-                                    text={I18nPriority[ip as Priority]}
+                                    text={trPriority(ip as Priority)}
                                     iconLeft={<StateDot hue={priorityColor} />}
                                 />
                             ))}
