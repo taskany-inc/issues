@@ -279,7 +279,7 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
 
                 <Tip title={tr('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star10} />}>
                     {tr.raw('Press {key} to save settings', {
-                        key: <Keyboard command enter />,
+                        key: <Keyboard key="btn" command enter />,
                     })}
                 </Tip>
             </SettingsContent>
