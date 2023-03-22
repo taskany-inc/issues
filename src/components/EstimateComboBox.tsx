@@ -14,7 +14,7 @@ import {
     formatEstimate,
 } from '../utils/dateTime';
 import { usePageContext } from '../hooks/usePageContext';
-import { TLocale } from '../utils/getLang';
+import { TLocale } from '../i18n/getLang';
 
 import { Button } from './Button';
 import { Icon } from './Icon';

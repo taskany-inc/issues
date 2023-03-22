@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import colorLayer from 'color-layer';
 import dynamic from 'next/dynamic';
-import { useTranslations } from 'next-intl';
 
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority, priorityColorsMap } from '../types/priority';
+import { I18nPriority } from '../i18n/priority';
 
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 import { FiltersMenuItem } from './FiltersMenuItem';
@@ -22,7 +22,6 @@ interface PriorityFilterDropdownProps {
 
 export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityFilterDropdownProps>(
     ({ text, priority, value, disabled, onChange }, ref) => {
-        const t = useTranslations('Priority');
         const { themeId } = usePageContext();
         const [selected, setSelected] = useState<Set<string>>(new Set(value));
 
@@ -71,7 +70,7 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
                     <ColorizedMenuItem
                         key={props.item}
                         hue={priorityColorsMap[props.item as Priority]}
-                        title={t(props.item)}
+                        title={I18nPriority[props.item as Priority]}
                         hoverColor={colors[props.item]}
                         checked={selected?.has(props.item)}
                         onClick={props.onClick}

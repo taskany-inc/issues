@@ -7,7 +7,7 @@
     "build": "npm run generate && next build",
     "start": "next start",
     "lint": "next lint && eslint --ext .js,.ts,.tsx .",
-    "generate:i18n": "generate-i18n --func=tr --langs=ru,en --path='./src/{components,hooks,utils}/**/*' --getLang='./src/utils/getLang'",
+    "generate:i18n": "generate-i18n --func=tr --langs=ru,en --path='./src/{components,hooks,i18n}/**/*' --getLang='./src/i18n/getLang'",
     "generate:types": "node ./scripts/types.js",
     "generate:themes": "node ./scripts/themes.js",
     "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json src/pages/api/graphql",

@@ -7,7 +7,7 @@ import { ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page } from '../../../components/Page';
 import { routes } from '../../../hooks/router';
 import { AvailableHelpPages } from '../../../types/@generated/help';
-import { setSSRLocale, TLocale } from '../../../utils/getLang';
+import { setSSRLocale, TLocale } from '../../../i18n/getLang';
 
 const Md = dynamic(() => import('../../../components/Md'));
 

@@ -3,8 +3,7 @@ import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 
 import { routes } from '../hooks/router';
-
-import { setSSRLocale, TLocale } from './getLang';
+import { setSSRLocale, TLocale } from '../i18n/getLang';
 
 interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];

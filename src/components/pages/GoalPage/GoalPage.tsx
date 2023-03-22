@@ -5,7 +5,6 @@ import React, { useCallback, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled from 'styled-components';
-import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
 
@@ -46,6 +45,7 @@ import { Icon } from '../../Icon';
 import { MenuItem } from '../../MenuItem';
 import { GoalDeleteModal } from '../../GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../../types/priority';
+import { I18nPriority } from '../../../i18n/priority';
 
 import { tr } from './GoalPage.i18n';
 
@@ -133,7 +133,6 @@ export const getServerSideProps = declareSsrProps(
 export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
     const nextRouter = useNextRouter();
-    const t = useTranslations('goals.id');
 
     const { data, mutate } = useSWR(id, () => goalFetcher(user, id), {
         fallback,
@@ -174,7 +173,8 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
         setStargizer(!stargizer);
     }, [stargizer]);
 
-    const priorityColor = priorityColorsMap[goal.priority as Priority];
+    const priority = goal.priority as Priority;
+    const priorityColor = priorityColorsMap[priority];
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const updateGoal = useGoalUpdate(goal);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
@@ -391,12 +391,8 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
 
                         <CardActions>
                             <IssueBaseActions>
-                                {nullable(goal.priority, (ip) => (
-                                    <Button
-                                        ghost
-                                        text={t(`Priority.${ip}`)}
-                                        iconLeft={<StateDot hue={priorityColor} />}
-                                    />
+                                {nullable(priority, (ip) => (
+                                    <Button ghost text={I18nPriority[ip]} iconLeft={<StateDot hue={priorityColor} />} />
                                 ))}
 
                                 <Button

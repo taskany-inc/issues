@@ -1,4 +1,4 @@
-import { TLocale } from './getLang';
+import { TLocale } from '../i18n/getLang';
 
 interface PluralizeProps {
     locale: TLocale;

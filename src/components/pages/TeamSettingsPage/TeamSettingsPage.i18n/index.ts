@@ -1,7 +1,7 @@
 /* eslint-disable */
 // Do not edit, use generator to update
 import { i18n, fmt, I18nLangSet } from 'easy-typed-intl';
-import getLang from '../../../../utils/getLang';
+import getLang from '../../../../i18n/getLang';
 
 import ru from './ru.json';
 import en from './en.json';
