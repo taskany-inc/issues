@@ -1,5 +1,4 @@
 import useSWR from 'swr';
-import { useTranslations } from 'next-intl';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -9,7 +8,7 @@ import { ProjectListItem } from '../../ProjectListItem';
 import { nullable } from '../../../utils/nullable';
 import { ExplorePageLayout } from '../../ExplorePageLayout';
 
-import { tr } from './ExporeProjectsPages.i18n';
+import { tr } from './ExporeProjectsPage.i18n';
 
 const fetcher = createFetcher(() => ({
     projects: {

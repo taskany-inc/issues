@@ -31,7 +31,7 @@ interface PageProps {
     user: Session['user'];
     ssrTime: number;
     locale: ExternalPageProps['locale'];
-    title?: React.ReactNode;
+    title?: string;
     children?: React.ReactNode;
 }
 
@@ -68,7 +68,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', l
     return (
         <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], locale, ssrTime }}>
             <Head>
-                <title>{Array.isArray(title) ? title.join('') : title}</title>
+                <title>{title}</title>
             </Head>
 
             <GlobalStyle />

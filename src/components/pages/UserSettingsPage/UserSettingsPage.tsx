@@ -176,15 +176,14 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
         }
     }, []);
 
+    const pageTitle = tr
+        .raw('title', {
+            user: actualUserFields?.name,
+        })
+        .join('');
+
     return (
-        <Page
-            user={user}
-            locale={locale}
-            ssrTime={ssrTime}
-            title={tr.raw('title', {
-                user: actualUserFields?.name,
-            })}
-        >
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <CommonHeader preTitle={`Id: ${user.id}`} title={tr('Settings')} />
 
             <PageSep />
