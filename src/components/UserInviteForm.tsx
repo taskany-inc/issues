@@ -12,6 +12,7 @@ import { Icon } from '@common/Icon';
 import { ModalContent, ModalHeader } from '@common/Modal';
 import { Link } from '@common/Link';
 import { Tag } from '@common/Tag';
+import { Form } from '@common/Form';
 
 import { gapM, gapS, gray6, gray7, star0 } from '../design/@generated/themes';
 import { gql } from '../utils/gql';
@@ -20,7 +21,6 @@ import { usePageContext } from '../hooks/usePageContext';
 
 import { FormInput } from './FormInput';
 import { FormActions, FormAction } from './FormActions';
-import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';

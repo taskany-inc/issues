@@ -7,14 +7,15 @@ import z from 'zod';
 import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
 
+import { Button } from '@common/Button';
+import { Form } from '@common/Form';
+import { Fieldset } from '@common/Fieldset';
+
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Team } from '../../../../graphql/@generated/genql';
-import { Button } from '@common/Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { PageSep } from '../../PageSep';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
-import { Form } from '../../Form';
-import { Fieldset } from '@common/Fieldset';
 import { gql } from '../../../utils/gql';
 import { FormInput } from '../../FormInput';
 import { FormAction, FormActions } from '../../FormActions';

@@ -12,6 +12,7 @@ import { useRouter as useNextRouter } from 'next/router';
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
 import { Fieldset } from '@common/Fieldset';
+import { Form } from '@common/Form';
 
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -22,7 +23,6 @@ import { User } from '../../../../graphql/@generated/genql';
 import { Page } from '../../Page';
 import { PageSep } from '../../PageSep';
 import { FormInput } from '../../FormInput';
-import { Form } from '../../Form';
 import { Tip } from '../../Tip';
 import { Keyboard } from '../../Keyboard';
 import { FormAction, FormActions } from '../../FormActions';

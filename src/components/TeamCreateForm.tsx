@@ -15,6 +15,7 @@ import { Icon } from '@common/Icon';
 import { ModalContent, ModalHeader } from '@common/Modal';
 import { Link } from '@common/Link';
 import { InputContainer } from '@common/InputContainer';
+import { Form } from '@common/Form';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -30,7 +31,6 @@ import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { FormInput } from './FormInput';
 import { FormTextarea } from './FormTextarea';
 import { FormActions, FormAction } from './FormActions';
-import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';

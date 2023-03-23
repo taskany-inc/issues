@@ -5,12 +5,12 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@common/Button';
 import { Text } from '@common/Text';
 import { ModalContent, ModalHeader } from '@common/Modal';
+import { Form } from '@common/Form';
 
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { danger0 } from '../design/@generated/themes';
 
 import { FormTitle } from './FormTitle';
-import { Form } from './Form';
 import { FormInput } from './FormInput';
 import { FormAction, FormActions } from './FormActions';
 

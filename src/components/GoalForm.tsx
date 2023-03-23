@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { Button } from '@common/Button';
 import { ModalHeader, ModalContent } from '@common/Modal';
 import { Tag } from '@common/Tag';
+import { Form } from '@common/Form';
 
 import { gapS, gray2 } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
@@ -19,7 +20,6 @@ import { Priority } from '../types/priority';
 
 import { FormInput } from './FormInput';
 import { FormActions, FormAction } from './FormActions';
-import { Form } from './Form';
 import { UserComboBox } from './UserComboBox';
 import { GoalParentComboBox } from './GoalParentComboBox';
 import { EstimateComboBox } from './EstimateComboBox';

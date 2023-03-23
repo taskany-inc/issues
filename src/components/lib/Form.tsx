@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 import { useKeyboard } from '@common/hooks/useKeyboard';
 
-import { gray3 } from '../design/@generated/themes';
+import { gray3 } from '../../design/@generated/themes';
 
 interface FormProps {
     children: React.ReactNode;
