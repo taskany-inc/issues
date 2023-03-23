@@ -11,6 +11,7 @@ import { Form } from '@common/Form';
 import { Fieldset } from '@common/Fieldset';
 import { Text } from '@common/Text';
 import { ModalContent, ModalHeader } from '@common/Modal';
+import { FormAction, FormActions } from '@common/FormActions';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Project } from '../../../../graphql/@generated/genql';
@@ -19,7 +20,6 @@ import { PageSep } from '../../PageSep';
 import { useRouter } from '../../../hooks/router';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 import { FormInput } from '../../FormInput';
-import { FormAction, FormActions } from '../../FormActions';
 import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { FormTitle } from '../../FormTitle';
@@ -340,7 +340,7 @@ export const ProjectSettingsPage = ({
                     <ModalContent>
                         <Text>
                             {tr.raw('To confirm deleting project {project} please type project key below.', {
-                                project: <b>{project.title}</b>,
+                                project: <b key="title">{project.title}</b>,
                             })}
                         </Text>
 

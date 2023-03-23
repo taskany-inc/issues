@@ -13,6 +13,7 @@ import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
 import { Fieldset } from '@common/Fieldset';
 import { Form } from '@common/Form';
+import { FormAction, FormActions } from '@common/FormActions';
 
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -25,7 +26,6 @@ import { PageSep } from '../../PageSep';
 import { FormInput } from '../../FormInput';
 import { Tip } from '../../Tip';
 import { Keyboard } from '../../Keyboard';
-import { FormAction, FormActions } from '../../FormActions';
 import { FormRadio, FormRadioInput } from '../../FormRadio';
 import { CommonHeader } from '../../CommonHeader';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';

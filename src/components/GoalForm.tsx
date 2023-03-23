@@ -9,6 +9,7 @@ import { Button } from '@common/Button';
 import { ModalHeader, ModalContent } from '@common/Modal';
 import { Tag } from '@common/Tag';
 import { Form } from '@common/Form';
+import { FormActions, FormAction } from '@common/FormActions';
 
 import { gapS, gray2 } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
@@ -19,7 +20,6 @@ import { usePageContext } from '../hooks/usePageContext';
 import { Priority } from '../types/priority';
 
 import { FormInput } from './FormInput';
-import { FormActions, FormAction } from './FormActions';
 import { UserComboBox } from './UserComboBox';
 import { GoalParentComboBox } from './GoalParentComboBox';
 import { EstimateComboBox } from './EstimateComboBox';

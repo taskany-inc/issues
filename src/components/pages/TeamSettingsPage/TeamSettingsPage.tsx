@@ -10,6 +10,7 @@ import { useRouter as useNextRouter } from 'next/router';
 import { Button } from '@common/Button';
 import { Form } from '@common/Form';
 import { Fieldset } from '@common/Fieldset';
+import { FormAction, FormActions } from '@common/FormActions';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Team } from '../../../../graphql/@generated/genql';
@@ -18,7 +19,6 @@ import { PageSep } from '../../PageSep';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 import { gql } from '../../../utils/gql';
 import { FormInput } from '../../FormInput';
-import { FormAction, FormActions } from '../../FormActions';
 import { TeamPageLayout } from '../../TeamPageLayout';
 import { Page } from '../../Page';
 import { FormMultiInput } from '../../FormMultiInput';
