@@ -77,7 +77,7 @@
   "devDependencies": {
     "@babel/core": "7.21.0",
     "@faker-js/faker": "7.6.0",
-    "@genql/cli": "2.10.0",
+    "@genql/cli": "3.0.4",
     "@next/bundle-analyzer": "13.2.1",
     "@storybook/addon-actions": "6.5.13",
     "@storybook/addon-essentials": "6.5.16",
