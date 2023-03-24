@@ -10,7 +10,7 @@ import { useKeyboard, KeyCode, KeyboardEvents } from './hooks/useKeyboard';
 import { nullable } from './utils/nullable';
 import { flatten } from './utils/flatten';
 
-const Popup = dynamic(() => import('@common/Popup'));
+const Popup = dynamic(() => import('./Popup'));
 
 interface ComboBoxTriggerProps {
     text: ComboBoxProps['text'];

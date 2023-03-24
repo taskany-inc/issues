@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { gray2, gray3, gray7, radiusS, textColor } from '../design/@generated/themes';
+import { gray2, gray3, gray7, radiusS, textColor } from '../../design/@generated/themes';
 
 interface FormTextareaProps {
     id?: string;

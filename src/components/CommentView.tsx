@@ -7,6 +7,7 @@ import { nullable } from '@common/utils/nullable';
 import { Card, CardComment, CardInfo } from '@common/Card';
 import { Icon } from '@common/Icon';
 import { Link } from '@common/Link';
+import { MenuItem } from '@common/MenuItem';
 
 import { Comment, User } from '../../graphql/@generated/genql';
 import { brandColor, danger0, gapM, gapS, gray4 } from '../design/@generated/themes';
@@ -16,7 +17,6 @@ import { useCommentResource } from '../hooks/useCommentResource';
 import { UserPic } from './UserPic';
 import { Reactions } from './Reactions';
 import { ActivityFeedItem } from './ActivityFeed';
-import { MenuItem } from './MenuItem';
 
 const Md = dynamic(() => import('@common/Md'));
 const Dropdown = dynamic(() => import('@common/Dropdown'));

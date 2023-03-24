@@ -1,8 +1,9 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
+import { MenuItem } from '@common/MenuItem';
+
 import { FiltersMenuItem } from './FiltersMenuItem';
-import { MenuItem } from './MenuItem';
 
 const Dropdown = dynamic(() => import('@common/Dropdown'));
 

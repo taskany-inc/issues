@@ -5,15 +5,15 @@ import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
 import { ModalContent, ModalHeader } from '@common/Modal';
+import { FormInput } from '@common/FormInput';
+import { FormTitle } from '@common/FormTitle';
 
 import { gapL, gapM } from '../design/@generated/themes';
 import { Activity, Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { FormTitle } from './FormTitle';
 import { IssueParticipantsList } from './IssueParticipantsList';
-import { FormInput } from './FormInput';
 import { UserMenuItem } from './UserMenuItem';
 
 const ComboBox = dynamic(() => import('@common/ComboBox'));

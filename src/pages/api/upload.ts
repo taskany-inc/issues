@@ -9,7 +9,7 @@ import { writeFile } from 'fs';
 import { promisify } from 'util';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-import { formFieldName } from '../../utils/upload';
+import { formFieldName } from '@common/utils/upload';
 
 const writeFileAsync = promisify(writeFile);
 

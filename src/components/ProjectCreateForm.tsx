@@ -16,6 +16,9 @@ import { Link } from '@common/Link';
 import { InputContainer } from '@common/InputContainer';
 import { Form } from '@common/Form';
 import { FormActions, FormAction } from '@common/FormActions';
+import { FormInput } from '@common/FormInput';
+import { FormTextarea } from '@common/FormTextarea';
+import { FormTitle } from '@common/FormTitle';
 
 import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
@@ -28,11 +31,8 @@ import { usePageContext } from '../hooks/usePageContext';
 import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../hooks/useProjectResource';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
-import { FormInput } from './FormInput';
-import { FormTextarea } from './FormTextarea';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { FormTitle } from './FormTitle';
 import { FlowComboBox } from './FlowComboBox';
 
 const KeyInput = dynamic(() => import('./KeyInput'));

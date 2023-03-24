@@ -1,10 +1,10 @@
 import React, { useContext, createContext, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { nullable } from '@common/utils/nullable';
-import { Text } from '@common/Text';
+import { gapS, gray3, gray8, radiusS } from '../../design/@generated/themes';
 
-import { gapS, gray3, gray8, radiusS } from '../design/@generated/themes';
+import { nullable } from './utils/nullable';
+import { Text } from './Text';
 
 interface FormRadioContext {
     name: FormRadioProps['name'];

@@ -9,15 +9,15 @@ import { Icon } from '@common/Icon';
 import { Link } from '@common/Link';
 import { Form } from '@common/Form';
 import { FormAction, FormActions } from '@common/FormActions';
+import { FormCard } from '@common/FormCard';
+import { FormEditor } from '@common/FormEditor';
 
 import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
 import { submitKeys } from '../utils/hotkeys';
 import { usePageContext } from '../hooks/usePageContext';
 import { routes } from '../hooks/router';
 
-import { FormCard } from './FormCard';
 import { Tip } from './Tip';
-import { FormEditor } from './FormEditor';
 
 interface CommentFormProps {
     i18nKeyset: string;

@@ -10,6 +10,9 @@ import { ModalHeader, ModalContent } from '@common/Modal';
 import { Tag } from '@common/Tag';
 import { Form } from '@common/Form';
 import { FormActions, FormAction } from '@common/FormActions';
+import { FormEditor } from '@common/FormEditor';
+import { FormInput } from '@common/FormInput';
+import { FormTitle } from '@common/FormTitle';
 
 import { gapS, gray2 } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
@@ -19,15 +22,12 @@ import { errorsProvider } from '../utils/forms';
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority } from '../types/priority';
 
-import { FormInput } from './FormInput';
 import { UserComboBox } from './UserComboBox';
 import { GoalParentComboBox } from './GoalParentComboBox';
 import { EstimateComboBox } from './EstimateComboBox';
 import { TagComboBox } from './TagComboBox';
 import { StateDropdown } from './StateDropdown';
 import { PriorityDropdown } from './PriorityDropdown';
-import { FormEditor } from './FormEditor';
-import { FormTitle } from './FormTitle';
 
 const tagsLimit = 5;
 

@@ -4,9 +4,6 @@ import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { useDropzone } from 'react-dropzone';
 
-import { nullable } from '@common/utils/nullable';
-import { useKeyboard, KeyCode } from '@common/hooks/useKeyboard';
-
 import {
     danger10,
     gapS,
@@ -18,12 +15,15 @@ import {
     gray8,
     radiusS,
     textColor,
-} from '../design/@generated/themes';
-import { useMounted } from '../hooks/useMounted';
-import { useUpload } from '../hooks/useUpload';
+} from '../../design/@generated/themes';
+
+import { nullable } from './utils/nullable';
+import { useKeyboard, KeyCode } from './hooks/useKeyboard';
+import { useMounted } from './hooks/useMounted';
+import { useUpload } from './hooks/useUpload';
 
 const Editor = dynamic(() => import('@monaco-editor/react'));
-const Popup = dynamic(() => import('@common/Popup'));
+const Popup = dynamic(() => import('./Popup'));
 
 interface FormEditorProps {
     id?: string;

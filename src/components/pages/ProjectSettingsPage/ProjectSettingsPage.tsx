@@ -12,6 +12,9 @@ import { Fieldset } from '@common/Fieldset';
 import { Text } from '@common/Text';
 import { ModalContent, ModalHeader } from '@common/Modal';
 import { FormAction, FormActions } from '@common/FormActions';
+import { FormMultiInput } from '@common/FormMultiInput';
+import { FormInput } from '@common/FormInput';
+import { FormTitle } from '@common/FormTitle';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Project } from '../../../../graphql/@generated/genql';
@@ -19,10 +22,8 @@ import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrPro
 import { PageSep } from '../../PageSep';
 import { useRouter } from '../../../hooks/router';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
-import { FormInput } from '../../FormInput';
 import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
-import { FormTitle } from '../../FormTitle';
 import { ProjectPageLayout } from '../../ProjectPageLayout';
 import { Page } from '../../Page';
 import {
@@ -32,7 +33,6 @@ import {
 } from '../../../hooks/useProjectResource';
 import { errorsProvider } from '../../../utils/forms';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
-import { FormMultiInput } from '../../FormMultiInput';
 
 import { tr } from './ProjectSettingsPage.i18n';
 

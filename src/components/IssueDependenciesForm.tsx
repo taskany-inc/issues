@@ -7,16 +7,16 @@ import dynamic from 'next/dynamic';
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
 import { ModalContent, ModalHeader } from '@common/Modal';
+import { FormInput } from '@common/FormInput';
+import { MenuItem } from '@common/MenuItem';
+import { FormTitle } from '@common/FormTitle';
 
 import { gapL, gapM } from '../design/@generated/themes';
 import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { FormTitle } from './FormTitle';
 import { IssueDependenciesList } from './IssueDependenciesList';
-import { FormInput } from './FormInput';
-import { MenuItem } from './MenuItem';
 import { GoalMenuItem } from './GoalMenuItem';
 
 const ComboBox = dynamic(() => import('@common/ComboBox'));

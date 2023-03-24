@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-import { Icon } from '@common/Icon';
-
 import { backgroundColor, danger0, gapM, gapS, gray4, radiusM, warn0 } from '../../design/@generated/themes';
 
+import { Icon } from './Icon';
 import { useKeyboard, KeyCode } from './hooks/useKeyboard';
 import { nullable } from './utils/nullable';
 import { Portal } from './Portal';

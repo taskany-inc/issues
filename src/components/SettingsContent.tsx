@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
+import { FormCard } from '@common/FormCard';
+
 import { danger0, gapM, gray4, warn0 } from '../design/@generated/themes';
 
-import { FormCard } from './FormCard';
 import { PageContent } from './Page';
 
 type SettingsCardViewType = 'default' | 'warning' | 'danger';

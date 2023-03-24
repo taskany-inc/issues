@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Text } from '@common/Text';
-
 import { danger0, gapM, gapS, gray9, warn0 } from '../../design/@generated/themes';
+
+import { Text } from './Text';
 
 type FieldsetViewType = 'default' | 'warning' | 'danger';
 

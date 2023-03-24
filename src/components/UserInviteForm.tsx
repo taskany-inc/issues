@@ -14,16 +14,16 @@ import { Link } from '@common/Link';
 import { Tag } from '@common/Tag';
 import { Form } from '@common/Form';
 import { FormActions, FormAction } from '@common/FormActions';
+import { FormInput } from '@common/FormInput';
+import { FormTitle } from '@common/FormTitle';
 
 import { gapM, gapS, gray6, gray7, star0 } from '../design/@generated/themes';
 import { gql } from '../utils/gql';
 import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { FormInput } from './FormInput';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { FormTitle } from './FormTitle';
 
 const StyledEmails = styled.div`
     padding: ${gapM} 0;

@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { nullable } from '@common/utils/nullable';
-import { Dot } from '@common/Dot';
+import { gapS, gray4, gray7, gray8, radiusM } from '../../design/@generated/themes';
 
-import { gapS, gray4, gray7, gray8, radiusM } from '../design/@generated/themes';
+import { nullable } from './utils/nullable';
+import { Dot } from './Dot';
 
 interface MenuItemProps {
     selected?: boolean;

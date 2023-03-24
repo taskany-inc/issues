@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
+import { MenuItem } from '@common/MenuItem';
 
 import { routes } from '../hooks/router';
 import { textColor, gray7, colorPrimary, gray3 } from '../design/@generated/themes';
@@ -13,7 +14,6 @@ import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMenu } from './HeaderMenu';
-import { MenuItem } from './MenuItem';
 
 const Dropdown = dynamic(() => import('@common/Dropdown'));
 

@@ -7,12 +7,11 @@ import { Text } from '@common/Text';
 import { ModalContent, ModalHeader } from '@common/Modal';
 import { Form } from '@common/Form';
 import { FormAction, FormActions } from '@common/FormActions';
+import { FormInput } from '@common/FormInput';
+import { FormTitle } from '@common/FormTitle';
 
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { danger0 } from '../design/@generated/themes';
-
-import { FormTitle } from './FormTitle';
-import { FormInput } from './FormInput';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 

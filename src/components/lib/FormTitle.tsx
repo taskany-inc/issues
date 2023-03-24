@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
-import { Text } from '@common/Text';
+import { gapM, gapS } from '../../design/@generated/themes';
 
-import { gapM, gapS } from '../design/@generated/themes';
+import { Text } from './Text';
 
 export const FormTitle = styled(Text)`
     padding: ${gapS} 0 ${gapM};

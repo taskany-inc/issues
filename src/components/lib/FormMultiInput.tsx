@@ -3,17 +3,16 @@ import React, { useCallback, useState, ChangeEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { nullable } from '@common/utils/nullable';
-import { Text } from '@common/Text';
-import { Icon } from '@common/Icon';
-import { Tag } from '@common/Tag';
-import { Input } from '@common/Input';
+import { gapS, gray3, gray8, radiusS, textColor } from '../../design/@generated/themes';
 
-import { gapS, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
-
+import { nullable } from './utils/nullable';
+import { Text } from './Text';
+import { Icon } from './Icon';
+import { Tag } from './Tag';
+import { Input } from './Input';
 import { MenuItem } from './MenuItem';
 
-const ComboBox = dynamic(() => import('@common/ComboBox'));
+const ComboBox = dynamic(() => import('./ComboBox'));
 
 interface FormMultiInputProps {
     items?: Array<{ title: string; id: any }>;
