@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { useRouter as useNextRouter } from 'next/router';
 
+import { nullable } from '@common/utils/nullable';
+
 import { createFetcher } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { nullable } from '@common/utils/nullable';
 import { ProjectListItem } from '../../ProjectListItem';
 import { TeamPageLayout } from '../../TeamPageLayout';
 import { PageSep } from '../../PageSep';

@@ -1,11 +1,12 @@
 import useSWR from 'swr';
 
+import { nullable } from '@common/utils/nullable';
+
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page, PageContent } from '../../Page';
 import { PageSep } from '../../PageSep';
 import { TeamListItem } from '../../TeamListItem';
-import { nullable } from '@common/utils/nullable';
 import { ExplorePageLayout } from '../../ExplorePageLayout';
 
 import { tr } from './ExploreTeamsPage.i18n';

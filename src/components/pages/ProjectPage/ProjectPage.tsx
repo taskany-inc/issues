@@ -4,11 +4,12 @@ import useSWR from 'swr';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
+import { nullable } from '@common/utils/nullable';
+
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Goal, GoalsMetaOutput } from '../../../../graphql/@generated/genql';
 import { GoalListItem } from '../../GoalListItem';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { nullable } from '@common/utils/nullable';
 import { FiltersPanel } from '../../FiltersPanel';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
