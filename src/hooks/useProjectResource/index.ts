@@ -18,6 +18,9 @@ export const createProjectSchemaProvider = () =>
             })
             .min(2, {
                 message: tr("Project's title must be longer than 2 symbols"),
+            })
+            .max(50, {
+                message: tr("Project's title can be 50 symbols maximum"),
             }),
         description: z.string().optional(),
         flow: z.object({
