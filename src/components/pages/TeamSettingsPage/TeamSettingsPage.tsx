@@ -128,6 +128,9 @@ const schemaProvider = () =>
             })
             .min(2, {
                 message: tr("Team's title must be longer than 2 symbols"),
+            })
+            .max(50, {
+                message: tr("Team's title can be 50 symbols maximum"),
             }),
         description: z.string().optional(),
         projects: z

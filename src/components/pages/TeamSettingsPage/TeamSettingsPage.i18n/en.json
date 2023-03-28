@@ -2,6 +2,7 @@
     "Team's title is required": "Team's title is required",
     "Team's title must be a string": "Team's title must be a string",
     "Team's title must be longer than 2 symbols": "Team's title must be longer than 2 symbols",
+    "Team's title can be 50 symbols maximum": "Team's title can be 50 symbols maximum",
     "Something went wrong 😿": "Something went wrong 😿",
     "We are updating team settings": "We are updating team settings",
     "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",
