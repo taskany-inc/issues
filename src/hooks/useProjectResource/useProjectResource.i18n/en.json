@@ -2,6 +2,7 @@
     "Project's title is required": "Project's title is required",
     "Project's title must be a string": "Project's title must be a string",
     "Project's title must be longer than 2 symbols": "Project's title must be longer than 2 symbols",
+    "Project's title can be 50 symbols maximum": "Project's title can be 50 symbols maximum",
     "Something went wrong 😿": "Something went wrong 😿",
     "We are creating new project": "We are creating new project",
     "Voila! Project is here 🎉": "Voila! Project is here 🎉",
