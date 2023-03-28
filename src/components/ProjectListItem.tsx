@@ -62,6 +62,9 @@ const StyledSubTitle = styled(Text)`
 export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     project: { key, title, description, activity, createdAt },
 }) => {
+    const viewDescription = description?.slice(0, 100);
+    const viewDots = description && description.length >= 100;
+
     return (
         <Link href={routes.project(key)} passHref>
             <StyledProjectListItem>
@@ -70,9 +73,10 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
                         {title}
                     </Text>
 
-                    {nullable(description, (d) => (
-                        <StyledDescription size="s" color={gray7}>
+                    {nullable(viewDescription, (d) => (
+                        <StyledDescription size="s" color={gray7} title={viewDots ? description : undefined}>
                             {d}
+                            {viewDots ? '...' : ''}
                         </StyledDescription>
                     ))}
 

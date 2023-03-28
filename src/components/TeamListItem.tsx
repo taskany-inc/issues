@@ -57,6 +57,9 @@ const StyledSubTitle = styled(Text)`
 `;
 
 export const TeamListItem: React.FC<TeamListItemProps> = ({ team: { key, title, description, activity } }) => {
+    const viewDescription = description?.slice(0, 100);
+    const viewDots = description && description.length >= 100;
+
     return (
         <Link href={routes.team(key)} passHref>
             <StyledTeamListItem>
@@ -65,9 +68,10 @@ export const TeamListItem: React.FC<TeamListItemProps> = ({ team: { key, title, 
                         {title}
                     </Text>
 
-                    {nullable(description, (d) => (
-                        <StyledDescription size="s" color={gray7}>
+                    {nullable(viewDescription, (d) => (
+                        <StyledDescription size="s" color={gray7} title={viewDots ? description : undefined}>
                             {d}
+                            {viewDots ? '...' : ''}
                         </StyledDescription>
                     ))}
 

@@ -71,7 +71,7 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
                             </StyledProjectTeamsTitle>
                         ))}
 
-                    <StyledProjectHeaderTitle size="xxl" weight="bolder" title={project.title}>
+                    <StyledProjectHeaderTitle size="xxl" weight="bolder">
                         {project.title}
                     </StyledProjectHeaderTitle>
 
