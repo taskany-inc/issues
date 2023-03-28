@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import dynamic from 'next/dynamic';
 
-const Gravatar = dynamic(() => import('./Gravatar'));
+import { Gravatar } from './Gravatar';
 
 interface UserPicProps {
     src?: string | null;

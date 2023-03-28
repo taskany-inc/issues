@@ -8,6 +8,7 @@ import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
 import { Icon } from '@common/Icon';
 import { Tag as TagItem } from '@common/Tag';
+import { UserPic } from '@common/UserPic';
 
 import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
@@ -15,7 +16,6 @@ import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/theme
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
-import { UserPic } from './UserPic';
 import { StateDot } from './StateDot';
 
 const RelativeTime = dynamic(() => import('./RelativeTime'));

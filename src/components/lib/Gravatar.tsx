@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import md5Hash from 'md5';
 import styled from 'styled-components';
 
-import { isRetina } from '../utils/isRetina';
+import { isRetina } from './utils/isRetina';
 
 interface GravatarProps {
     email: string;
@@ -30,7 +30,7 @@ const StyledImage = styled.img<{ visible: boolean }>`
     `}
 `;
 
-const Gravatar = ({
+export const Gravatar = ({
     size = 50,
     rating = 'g',
     def = 'retro',
@@ -107,5 +107,3 @@ const Gravatar = ({
         />
     );
 };
-
-export default Gravatar;

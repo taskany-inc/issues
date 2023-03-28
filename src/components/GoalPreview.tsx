@@ -15,6 +15,7 @@ import Md from '@common/Md';
 import { Link } from '@common/Link';
 import { Dot } from '@common/Dot';
 import { MenuItem } from '@common/MenuItem';
+import { UserPic } from '@common/UserPic';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
@@ -36,7 +37,6 @@ import { IssueTitle } from './IssueTitle';
 import { IssueParent } from './IssueParent';
 import { IssueTags } from './IssueTags';
 import { StateDot } from './StateDot';
-import { UserPic } from './UserPic';
 import RelativeTime from './RelativeTime';
 import { IssueStats } from './IssueStats';
 import { CommentView } from './CommentView';

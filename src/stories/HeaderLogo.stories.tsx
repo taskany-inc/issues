@@ -1,11 +1,11 @@
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { ComponentMeta } from '@storybook/react';
 
-import { HeaderLogo } from '../components/HeaderLogo';
+import { PageHeaderLogo } from '../components/PageHeaderLogo';
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
     title: 'Taskany/HeaderLogo',
-    component: HeaderLogo,
+    component: PageHeaderLogo,
 } as ComponentMeta<typeof HeaderLogo>;
-export const headerLogo = () => <HeaderLogo />;
+export const HeaderLogo = () => <PageHeaderLogo />;

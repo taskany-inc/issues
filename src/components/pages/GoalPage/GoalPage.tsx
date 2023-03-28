@@ -14,6 +14,7 @@ import { Card, CardInfo, CardContent, CardActions } from '@common/Card';
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
 import { MenuItem } from '@common/MenuItem';
+import { UserPic } from '@common/UserPic';
 
 import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '../../../../graphql/@generated/genql';
 import { gql } from '../../../utils/gql';
@@ -28,7 +29,6 @@ import { PageSep } from '../../PageSep';
 import { IssueTitle } from '../../IssueTitle';
 import { IssueKey } from '../../IssueKey';
 import { IssueStats } from '../../IssueStats';
-import { UserPic } from '../../UserPic';
 import { Reactions } from '../../Reactions';
 import { CommentView } from '../../CommentView';
 import { StateDot } from '../../StateDot';

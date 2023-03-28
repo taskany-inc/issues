@@ -8,13 +8,13 @@ import { Card, CardComment, CardInfo } from '@common/Card';
 import { Icon } from '@common/Icon';
 import { Link } from '@common/Link';
 import { MenuItem } from '@common/MenuItem';
+import { UserPic } from '@common/UserPic';
 
 import { Comment, User } from '../../graphql/@generated/genql';
 import { brandColor, danger0, gapM, gapS, gray4 } from '../design/@generated/themes';
 import { useReactionsResource } from '../hooks/useReactionsResource';
 import { useCommentResource } from '../hooks/useCommentResource';
 
-import { UserPic } from './UserPic';
 import { Reactions } from './Reactions';
 import { ActivityFeedItem } from './ActivityFeed';
 

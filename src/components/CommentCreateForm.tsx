@@ -4,10 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { z } from 'zod';
 
+import { UserPic } from '@common/UserPic';
+
 import { usePageContext } from '../hooks/usePageContext';
 import { CreateFormType, useCommentResource } from '../hooks/useCommentResource';
 
-import { UserPic } from './UserPic';
 import { CommentForm } from './CommentForm';
 import { ActivityFeedItem } from './ActivityFeed';
 

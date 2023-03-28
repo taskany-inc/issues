@@ -4,12 +4,11 @@ import dynamic from 'next/dynamic';
 
 import { nullable } from '@common/utils/nullable';
 import { Text } from '@common/Text';
+import { UserPic } from '@common/UserPic';
 
 import { routes } from '../hooks/router';
 import type { Project } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
-
-import { UserPic } from './UserPic';
 
 const RelativeTime = dynamic(() => import('./RelativeTime'));
 

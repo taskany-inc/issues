@@ -5,13 +5,13 @@ import dynamic from 'next/dynamic';
 
 import { Button } from '@common/Button';
 import { Input } from '@common/Input';
+import { UserPic } from '@common/UserPic';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Activity } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { UserMenuItem } from './UserMenuItem';
-import { UserPic } from './UserPic';
 
 const ComboBox = dynamic(() => import('@common/ComboBox'));
 

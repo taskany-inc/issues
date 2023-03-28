@@ -3,12 +3,12 @@ import styled from 'styled-components';
 
 import { nullable } from '@common/utils/nullable';
 import { CleanButton } from '@common/CleanButton';
+import { UserPic } from '@common/UserPic';
 
 import { Activity } from '../../graphql/@generated/genql';
 import { gapS } from '../design/@generated/themes';
 
 import { IssueMeta } from './IssueMeta';
-import { UserPic } from './UserPic';
 
 interface IssueParticipantsListProps {
     title: string;

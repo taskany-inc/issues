@@ -3,8 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import { Button } from '@common/Button';
 import { Icon } from '@common/Icon';
-
-import { UserPic } from '../components/UserPic';
+import { UserPic } from '@common/UserPic';
 
 export default {
     title: 'Taskany/Button',

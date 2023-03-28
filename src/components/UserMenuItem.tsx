@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
-import { gray4, gray6, radiusM, textColor } from '../design/@generated/themes';
+import { UserPic } from '@common/UserPic';
 
-import { UserPic } from './UserPic';
+import { gray4, gray6, radiusM, textColor } from '../design/@generated/themes';
 
 interface UserMenuItemProps {
     name?: string;
