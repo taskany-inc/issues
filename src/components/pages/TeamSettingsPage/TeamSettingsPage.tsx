@@ -1,16 +1,19 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
+import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Team } from '../../../../graphql/@generated/genql';
 import { Button } from '../../Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { PageSep } from '../../PageSep';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 import { Form } from '../../Form';
@@ -21,8 +24,14 @@ import { FormAction, FormActions } from '../../FormActions';
 import { TeamPageLayout } from '../../TeamPageLayout';
 import { Page } from '../../Page';
 import { FormMultiInput } from '../../FormMultiInput';
+import { Text } from '../../Text';
+import { useRouter } from '../../../hooks/router';
+import { ModalContent, ModalHeader } from '../../Modal';
+import { FormTitle } from '../../FormTitle';
 
 import { tr } from './TeamSettingsPage.i18n';
+
+const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
 
 const teamFetcher = createFetcher((_, key: string) => ({
     team: [
@@ -152,6 +161,7 @@ export const TeamSettingsPage = ({
     fallback,
     params: { key },
 }: ExternalPageProps<{ key: string }>) => {
+    const router = useRouter();
     const schema = schemaProvider();
     const nextRouter = useNextRouter();
 
@@ -235,6 +245,42 @@ export const TeamSettingsPage = ({
         setFormChanged(false);
     };
 
+    const [deleteConfirmation, setDeleteConfirmation] = useState('');
+
+    const onConfirmationInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setDeleteConfirmation(e.currentTarget.value);
+    }, []);
+
+    const onDeleteCancel = useCallback(() => {
+        setDeleteConfirmation('');
+        dispatchModalEvent(ModalEvent.TeamDeleteModal)();
+    }, []);
+
+    const deleteTeam = useCallback(async () => {
+        const promise = gql.mutation({
+            deleteTeam: [
+                {
+                    data: {
+                        id: team.id,
+                    },
+                },
+                {
+                    id: true,
+                },
+            ],
+        });
+
+        toast.promise(promise, {
+            error: tr('Something went wrong 😿'),
+            loading: tr('We are deleting team'),
+            success: tr('Successfully deleted 🎉'),
+        });
+
+        await promise;
+
+        router.exploreTeams();
+    }, [router, team]);
+
     const teamProjectsIds = formValues.projects?.map((project) => project!.id) ?? [];
     const [projectsQuery, setProjectsQuery] = useState('');
     const { data: projects } = useSWR(projectsQuery, (q) => projectsFetcher(user, q));
@@ -300,7 +346,68 @@ export const TeamSettingsPage = ({
                             </FormActions>
                         </Form>
                     </SettingsCard>
+
+                    <SettingsCard view="warning">
+                        <Form>
+                            <Fieldset title={tr('Danger zone')} view="warning">
+                                <FormActions flat="top">
+                                    <FormAction left>
+                                        <Text color={gray9} style={{ paddingLeft: gapS }}>
+                                            {tr('Be careful! All data will be lost')}
+                                        </Text>
+                                    </FormAction>
+                                    <FormAction right inline>
+                                        <Button
+                                            onClick={dispatchModalEvent(ModalEvent.TeamDeleteModal)}
+                                            size="m"
+                                            view="warning"
+                                            text={tr('Delete team')}
+                                        />
+                                    </FormAction>
+                                </FormActions>
+                            </Fieldset>
+                        </Form>
+                    </SettingsCard>
                 </SettingsContent>
+
+                <ModalOnEvent view="warn" event={ModalEvent.TeamDeleteModal}>
+                    <ModalHeader>
+                        <FormTitle color={warn0}>{tr('You are trying to delete team')}</FormTitle>
+                    </ModalHeader>
+
+                    <ModalContent>
+                        <Text>
+                            {tr.raw('To confirm deleting team {team} please type team key below.', {
+                                team: <b key={team.title}>{team.title}</b>,
+                            })}
+                        </Text>
+
+                        <br />
+
+                        <Form>
+                            <FormInput
+                                flat="bottom"
+                                placeholder={team.key}
+                                autoComplete="off"
+                                onChange={onConfirmationInputChange}
+                            />
+
+                            <FormActions flat="top">
+                                <FormAction left />
+                                <FormAction right inline>
+                                    <Button size="m" text={tr('Cancel')} onClick={onDeleteCancel} />
+                                    <Button
+                                        size="m"
+                                        view="warning"
+                                        disabled={deleteConfirmation !== team.key}
+                                        onClick={deleteTeam}
+                                        text={tr('Yes, delete it')}
+                                    />
+                                </FormAction>
+                            </FormActions>
+                        </Form>
+                    </ModalContent>
+                </ModalOnEvent>
             </TeamPageLayout>
         </Page>
     );

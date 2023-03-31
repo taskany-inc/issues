@@ -8,7 +8,7 @@
     "Save": "Сохранить",
     "Be careful! All data will be lost": "Будьте осторожны! Все данные о проекте будут утеряны.",
     "Delete project": "Удалить проект",
-    "You are trying to delete project": "Вы пытаетесь удалить проект",
+    "You are trying to delete project": "Вы собираетесь удалить проект",
     "To confirm deleting project {project} please type project key below.": "Чтобы подтвердить удаление проекта {project} введите ключ проекта в поле ниже.",
     "Cancel": "Отменить",
     "Yes, delete it": "Удалить проект",
