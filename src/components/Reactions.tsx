@@ -23,7 +23,7 @@ const StyledReactions = styled.div`
 // eslint-disable-next-line react/display-name
 export const Reactions = React.memo(({ reactions, children, onClick }: ReactionsProps) => {
     const existingReactions = nullable(reactions, (gr) =>
-        Object.keys(reactions || {}).map((r) =>
+        Object.keys(gr).map((r) =>
             nullable(r, (reaction) => (
                 <ReactionsButton key={reaction} emoji={reaction} count={gr[reaction].count} onClick={onClick} />
             )),
