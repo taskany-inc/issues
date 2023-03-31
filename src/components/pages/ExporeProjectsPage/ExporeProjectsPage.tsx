@@ -1,12 +1,14 @@
 import useSWR from 'swr';
 
+import { Project } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { routes } from '../../../hooks/router';
 import { Page, PageContent } from '../../Page';
 import { PageSep } from '../../PageSep';
-import { ProjectListItem } from '../../ProjectListItem';
 import { nullable } from '../../../utils/nullable';
 import { ExplorePageLayout } from '../../ExplorePageLayout';
+import { ParentListItem } from '../../ParentListItem';
 
 import { tr } from './ExporeProjectsPage.i18n';
 
@@ -60,7 +62,18 @@ export const ExploreProjectsPage = ({
                 <PageSep />
 
                 <PageContent>
-                    {projects?.map((project) => nullable(project, (p) => <ProjectListItem key={p.key} project={p} />))}
+                    {projects?.map((project: Project) =>
+                        nullable(project, (p) => (
+                            <ParentListItem
+                                key={p.key}
+                                href={routes.project(p.key)}
+                                createdAt={p.createdAt}
+                                title={p.title}
+                                description={p.description}
+                                activity={p.activity}
+                            />
+                        )),
+                    )}
                 </PageContent>
             </ExplorePageLayout>
         </Page>

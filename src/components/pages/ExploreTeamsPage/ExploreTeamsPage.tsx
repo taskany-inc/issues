@@ -2,11 +2,12 @@ import useSWR from 'swr';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { routes } from '../../../hooks/router';
 import { Page, PageContent } from '../../Page';
 import { PageSep } from '../../PageSep';
-import { TeamListItem } from '../../TeamListItem';
 import { nullable } from '../../../utils/nullable';
 import { ExplorePageLayout } from '../../ExplorePageLayout';
+import { ParentListItem } from '../../ParentListItem';
 
 import { tr } from './ExploreTeamsPage.i18n';
 
@@ -35,6 +36,7 @@ const fetcher = createFetcher(() => ({
                     email: true,
                 },
             },
+            createdAt: true,
         },
     ],
 }));
@@ -63,7 +65,18 @@ export const ExploreTeamsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
                 <PageSep />
 
                 <PageContent>
-                    {teams?.map((team) => nullable(team, (te) => <TeamListItem key={te.id} team={te} />))}
+                    {teams?.map((team) =>
+                        nullable(team, (te) => (
+                            <ParentListItem
+                                key={te.key}
+                                href={routes.team(te.key)}
+                                createdAt={te.createdAt}
+                                title={te.title}
+                                description={te.description}
+                                activity={te.activity}
+                            />
+                        )),
+                    )}
                 </PageContent>
             </ExplorePageLayout>
         </Page>

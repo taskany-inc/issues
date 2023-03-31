@@ -3,15 +3,17 @@ import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { useRouter as useNextRouter } from 'next/router';
 
+import { Project } from '../../../../graphql/@generated/genql';
 import { createFetcher } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { routes } from '../../../hooks/router';
 import { nullable } from '../../../utils/nullable';
-import { ProjectListItem } from '../../ProjectListItem';
 import { TeamPageLayout } from '../../TeamPageLayout';
 import { PageSep } from '../../PageSep';
 import { Page, PageContent } from '../../Page';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
+import { ParentListItem } from '../../ParentListItem';
 
 import { tr } from './TeamPage.i18n';
 
@@ -134,8 +136,17 @@ export const TeamPage = ({ user, locale, ssrTime, fallback, params: { key } }: E
                 <PageSep />
 
                 <PageContent>
-                    {team?.projects?.map((project) =>
-                        nullable(project, (p) => <ProjectListItem key={p.key} project={p} />),
+                    {team?.projects?.map((project: Project) =>
+                        nullable(project, (p) => (
+                            <ParentListItem
+                                key={p.key}
+                                href={routes.project(p.key)}
+                                createdAt={p.createdAt}
+                                title={p.title}
+                                description={p.description}
+                                activity={p.activity}
+                            />
+                        )),
                     )}
                 </PageContent>
             </TeamPageLayout>
