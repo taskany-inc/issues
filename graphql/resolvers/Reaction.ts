@@ -15,19 +15,15 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         resolve: async (_, { data: { emoji, goalId, commentId } }, { db, activity }) => {
             if (!activity) return null;
 
-            const existingReaction = await db.reaction.findFirst({
-                where: { emoji, goalId, commentId },
+            const isUserReaction = await db.reaction.findFirst({
+                where: { emoji, goalId, commentId, activityId: activity.id },
             });
 
-            const isUserReaction = existingReaction && existingReaction.activityId === activity.id;
-            const isReactionForCurrentGoal = isUserReaction && existingReaction.goalId === goalId;
-            const isReactionForCurrentComment = isUserReaction && existingReaction.commentId === commentId;
-
             try {
-                if (isReactionForCurrentGoal || isReactionForCurrentComment) {
+                if (isUserReaction) {
                     return db.reaction.delete({
                         where: {
-                            id: existingReaction.id,
+                            id: isUserReaction.id,
                         },
                     });
                 }
