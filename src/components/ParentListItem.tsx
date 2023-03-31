@@ -1,22 +1,23 @@
 import styled from 'styled-components';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 
-import { routes } from '../hooks/router';
-import type { Project } from '../../graphql/@generated/genql';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
+import { Activity } from '../../graphql/@generated/genql';
 
 import { Text } from './Text';
 import { UserPic } from './UserPic';
+import RelativeTime from './RelativeTime';
 
-const RelativeTime = dynamic(() => import('./RelativeTime'));
-
-interface ProjectListItemProps {
-    project: Project;
+interface ParentListItemProps {
+    href: string;
+    title: string;
+    description?: string;
+    activity?: Activity;
+    createdAt?: string;
 }
 
-const StyledProjectListItem = styled.a`
+const StyledTeamListItem = styled.a`
     display: grid;
     grid-template-columns: 500px 40px;
     align-items: center;
@@ -59,15 +60,13 @@ const StyledSubTitle = styled(Text)`
     padding-top: ${gapS};
 `;
 
-export const ProjectListItem: React.FC<ProjectListItemProps> = ({
-    project: { key, title, description, activity, createdAt },
-}) => {
+export const ParentListItem: React.FC<ParentListItemProps> = ({ title, description, activity, createdAt, href }) => {
     const viewDescription = description?.slice(0, 100);
     const viewDots = description && description.length >= 100;
 
     return (
-        <Link href={routes.project(key)} passHref>
-            <StyledProjectListItem>
+        <Link href={href} passHref>
+            <StyledTeamListItem>
                 <StyledName>
                     <Text size="m" weight="bold">
                         {title}
@@ -80,19 +79,19 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
                         </StyledDescription>
                     ))}
 
-                    <StyledSubTitle size="s">
-                        <RelativeTime date={createdAt} kind="created" />
-                    </StyledSubTitle>
+                    {nullable(createdAt, (ca) => (
+                        <StyledSubTitle size="s">
+                            <RelativeTime date={ca} kind="created" />
+                        </StyledSubTitle>
+                    ))}
                 </StyledName>
 
-                <StyledAddon>
-                    <UserPic
-                        src={activity?.user?.image}
-                        email={activity?.user?.email || activity?.ghost?.email}
-                        size={24}
-                    />
-                </StyledAddon>
-            </StyledProjectListItem>
+                {nullable(activity, (a) => (
+                    <StyledAddon>
+                        <UserPic src={a.user?.image} email={a.user?.email || a.ghost?.email} size={24} />
+                    </StyledAddon>
+                ))}
+            </StyledTeamListItem>
         </Link>
     );
 };
