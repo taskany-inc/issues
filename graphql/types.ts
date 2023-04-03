@@ -558,3 +558,11 @@ export const GoalsMetaOutput = objectType({
         t.nonNull.int('count');
     },
 });
+
+export const TransferOwnershipInput = inputObjectType({
+    name: 'TransferOwnershipInput',
+    definition(t) {
+        t.field(ProjectModel.id);
+        t.nonNull.string('activityId');
+    },
+});
