@@ -20,5 +20,12 @@
     "You are trying to delete team": "You are trying to delete team",
     "To confirm deleting team {team} please type team key below.": "To confirm deleting team {team} please type team key below.",
     "Cancel": "Cancel",
-    "Yes, delete it": "Yes, delete it"
+    "Yes, delete it": "Yes, delete it",
+    "Transfer team to other person": "Transfer team to other person",
+    "Transfer ownership": "Transfer ownership",
+    "You are trying to transfer team ownership": "You are trying to transfer team ownership",
+    "To confirm transfering {team} ownership please select new owner below.": "To confirm transfering {team} ownership please select new owner below.",
+    "New team owner": "New team owner",
+    "Enter name or email": "Enter name or email",
+    "We are calling owner": "We are calling owner..."
 }
