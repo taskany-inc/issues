@@ -14,6 +14,7 @@ import {
     ProjectUpdateInput,
     ProjectCreateInput,
     GoalsMetaOutput,
+    TransferOwnershipInput,
 } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -337,6 +338,35 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                     where: { id: activity.id },
                     data: {
                         projectStargizers: { [connectionMap[String(direction)]]: connection },
+                    },
+                });
+
+                // await mailServer.sendMail({
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('transferProjectOwnership', {
+        type: Project,
+        args: {
+            data: nonNull(arg({ type: TransferOwnershipInput })),
+        },
+        resolve: async (_, { data: { id, activityId } }, { db, activity }) => {
+            if (!activity) return null;
+
+            try {
+                return db.project.update({
+                    where: { id },
+                    data: {
+                        activityId,
                     },
                 });
 

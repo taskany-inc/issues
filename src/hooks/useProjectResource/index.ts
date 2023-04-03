@@ -199,11 +199,43 @@ export const useProjectResource = (id: number) => {
         [id],
     );
 
+    const transferOwnership = useCallback(
+        (cb: Callback, activityId?: string) => async () => {
+            if (!activityId) return;
+
+            const promise = gql.mutation({
+                transferProjectOwnership: [
+                    {
+                        data: {
+                            id,
+                            activityId,
+                        },
+                    },
+                    {
+                        id: true,
+                    },
+                ],
+            });
+
+            toast.promise(promise, {
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are calling owner'),
+                success: tr('So sad! Project will miss you'),
+            });
+
+            const res = await promise;
+
+            res.transferProjectOwnership && cb();
+        },
+        [id],
+    );
+
     return {
         createProject,
         updateProject,
         deleteProject,
         toggleProjectWatching,
         toggleProjectStar,
+        transferOwnership,
     };
 };

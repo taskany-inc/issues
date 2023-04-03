@@ -6,11 +6,17 @@
     "Description": "Description",
     "Teams": "Teams",
     "Save": "Save",
-    "Be careful! All data will be lost": "Be careful! All data will be lost.",
+    "Be careful — all data will be lost": "Be careful — all data will be lost",
     "Delete project": "Delete project",
     "You are trying to delete project": "",
     "To confirm deleting project {project} please type project key below.": "",
     "Cancel": "Cancel",
     "Yes, delete it": "Yes, delete it",
-    "Danger zone": "Danger zone"
+    "Danger zone": "Danger zone",
+    "Transfer project to other person": "Transfer project to other person",
+    "Transfer ownership": "Transfer ownership",
+    "You are trying to transfer project ownership": "You are trying to transfer project ownership",
+    "To confirm transfering {project} ownership please select new owner below.": "To confirm transfering {project} ownership please select new owner below.",
+    "New project owner": "New project owner",
+    "Enter name or email": "Enter name or email"
 }

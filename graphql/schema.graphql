@@ -215,6 +215,8 @@ type Mutation {
   toggleReaction(data: ReactionToggleInput!): Reaction
   toggleTeamStargizer(data: SubscriptionToggleInput!): Activity
   toggleTeamWatcher(data: SubscriptionToggleInput!): Activity
+  transferProjectOwnership(data: TransferOwnershipInput!): Project
+  transferTeamOwnership(data: TransferOwnershipInput!): Team
   updateComment(data: CommentUpdateInput!): Comment
   updateGoal(data: GoalUpdateInput!): Goal
   updateProject(data: ProjectUpdateInput!): Project
@@ -432,6 +434,11 @@ input TeamUpdateInput {
 
 input TeamsInput {
   title: String
+}
+
+input TransferOwnershipInput {
+  activityId: String!
+  id: Int!
 }
 
 type User {

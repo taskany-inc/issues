@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import { useRouter as useNextRouter } from 'next/router';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
-import { Project } from '../../../../graphql/@generated/genql';
+import { Activity, Project } from '../../../../graphql/@generated/genql';
 import { Button } from '../../Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { PageSep } from '../../PageSep';
@@ -32,6 +32,7 @@ import {
 import { errorsProvider } from '../../../utils/forms';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { FormMultiInput } from '../../FormMultiInput';
+import { UserComboBox } from '../../UserComboBox';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -147,7 +148,7 @@ export const ProjectSettingsPage = ({
 
     if (!project) return nextRouter.push('/404');
 
-    const { updateProject, deleteProject } = useProjectResource(project.id);
+    const { updateProject, deleteProject, transferOwnership } = useProjectResource(project.id);
     const schema = updateProjectSchemaProvider();
 
     const [actualFields, setActualFields] = useState<Pick<Project, 'title' | 'description' | 'teams'>>({
@@ -235,6 +236,14 @@ export const ProjectSettingsPage = ({
         setLastProjectCache,
     ]);
 
+    const [transferTo, setTransferTo] = useState<Activity | undefined>();
+    const onTransferToChange = useCallback((a: Activity) => {
+        setTransferTo(a);
+    }, []);
+    const onProjectTransferOwnership = useCallback(() => {
+        router.project(project.key);
+    }, [router, project]);
+
     const projectTeamsIds = formValues.teams?.map((team) => team!.id) ?? [];
     const [teamsQuery, setTeamsQuery] = useState('');
     const { data: teams } = useSWR(teamsQuery, (q) => teamsFetcher(user, q));
@@ -246,7 +255,7 @@ export const ProjectSettingsPage = ({
 
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
-            <ProjectPageLayout actions project={project}>
+            <ProjectPageLayout project={project}>
                 <PageSep />
 
                 <SettingsContent>
@@ -314,7 +323,7 @@ export const ProjectSettingsPage = ({
                                 <FormActions flat="top">
                                     <FormAction left>
                                         <Text color={gray9} style={{ paddingLeft: gapS }}>
-                                            {tr('Be careful! All data will be lost')}
+                                            {tr('Be careful — all data will be lost')}
                                         </Text>
                                     </FormAction>
                                     <FormAction right inline>
@@ -323,6 +332,22 @@ export const ProjectSettingsPage = ({
                                             size="m"
                                             view="warning"
                                             text={tr('Delete project')}
+                                        />
+                                    </FormAction>
+                                </FormActions>
+
+                                <FormActions flat="top">
+                                    <FormAction left>
+                                        <Text color={gray9} style={{ paddingLeft: gapS }}>
+                                            {tr('Transfer project to other person')}
+                                        </Text>
+                                    </FormAction>
+                                    <FormAction right inline>
+                                        <Button
+                                            onClick={dispatchModalEvent(ModalEvent.ProjectTransferModal)}
+                                            size="m"
+                                            view="warning"
+                                            text={tr('Transfer ownership')}
                                         />
                                     </FormAction>
                                 </FormActions>
@@ -363,6 +388,45 @@ export const ProjectSettingsPage = ({
                                         disabled={deleteConfirmation !== project.key}
                                         onClick={deleteProject(onProjectDelete)}
                                         text={tr('Yes, delete it')}
+                                    />
+                                </FormAction>
+                            </FormActions>
+                        </Form>
+                    </ModalContent>
+                </ModalOnEvent>
+
+                <ModalOnEvent view="warn" event={ModalEvent.ProjectTransferModal}>
+                    <ModalHeader>
+                        <FormTitle color={warn0}>{tr('You are trying to transfer project ownership')}</FormTitle>
+                    </ModalHeader>
+
+                    <ModalContent>
+                        <Text>
+                            {tr.raw('To confirm transfering {project} ownership please select new owner below.', {
+                                project: <b key={project.title}>{project.title}</b>,
+                            })}
+                        </Text>
+
+                        <br />
+
+                        <Form>
+                            <FormActions flat="top">
+                                <FormAction left>
+                                    <UserComboBox
+                                        text={tr('New project owner')}
+                                        placeholder={tr('Enter name or email')}
+                                        value={transferTo}
+                                        onChange={onTransferToChange}
+                                    />
+                                </FormAction>
+                                <FormAction right inline>
+                                    <Button size="m" text={tr('Cancel')} onClick={onDeleteCancel} />
+                                    <Button
+                                        size="m"
+                                        view="warning"
+                                        disabled={!transferTo}
+                                        onClick={transferOwnership(onProjectTransferOwnership, transferTo?.id)}
+                                        text={tr('Transfer ownership')}
                                     />
                                 </FormAction>
                             </FormActions>

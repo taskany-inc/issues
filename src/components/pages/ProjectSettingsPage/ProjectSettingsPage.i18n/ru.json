@@ -6,11 +6,17 @@
     "Description": "Описание",
     "Teams": "Команды",
     "Save": "Сохранить",
-    "Be careful! All data will be lost": "Будьте осторожны! Все данные о проекте будут утеряны.",
+    "Be careful — all data will be lost": "Будьте осторожны — все данные о проекте будут утеряны",
     "Delete project": "Удалить проект",
     "You are trying to delete project": "Вы собираетесь удалить проект",
     "To confirm deleting project {project} please type project key below.": "Чтобы подтвердить удаление проекта {project} введите ключ проекта в поле ниже.",
     "Cancel": "Отменить",
     "Yes, delete it": "Удалить проект",
-    "Danger zone": "Опасная зона"
+    "Danger zone": "Опасная зона",
+    "Transfer project to other person": "Передать проект другому владельцу",
+    "Transfer ownership": "Передать проект",
+    "You are trying to transfer project ownership": "Вы собираетесь передать проект другому владельцу",
+    "To confirm transfering {project} ownership please select new owner below.": "Чтобы подтвердить передачу прав на проект {project} введите ключ проекта в поле ниже.",
+    "New project owner": "Новый владелец",
+    "Enter name or email": "Имя или почта"
 }
