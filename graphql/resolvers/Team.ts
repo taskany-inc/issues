@@ -16,6 +16,7 @@ import {
     Goal,
     TeamGoalsInput,
     GoalsMetaOutput,
+    TransferOwnershipInput,
 } from '../types';
 
 const goalsQuery = async (
@@ -413,6 +414,35 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                     where: { id: activity.id },
                     data: {
                         teamStargizers: { [connectionMap[String(direction)]]: connection },
+                    },
+                });
+
+                // await mailServer.sendMail({
+                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
+                //     to: 'bar@example.com, baz@example.com',
+                //     subject: 'Hello ✔',
+                //     text: `new post '${title}'`,
+                //     html: `new post <b>${title}</b>`,
+                // });
+            } catch (error) {
+                throw Error(`${error}`);
+            }
+        },
+    });
+
+    t.field('transferTeamOwnership', {
+        type: Team,
+        args: {
+            data: nonNull(arg({ type: TransferOwnershipInput })),
+        },
+        resolve: async (_, { data: { id, activityId } }, { db, activity }) => {
+            if (!activity) return null;
+
+            try {
+                return db.team.update({
+                    where: { id },
+                    data: {
+                        activityId,
                     },
                 });
 

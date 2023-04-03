@@ -20,5 +20,12 @@
     "You are trying to delete team": "Вы собираетесь удалить команду",
     "To confirm deleting team {team} please type team key below.": "Чтобы подтвердить удаление команды {team} введите ключ команды в поле ниже.",
     "Cancel": "Отмена",
-    "Yes, delete it": "Удалить проект"
+    "Yes, delete it": "Удалить проект",
+    "Transfer team to other person": "Передать команду другому владельцу",
+    "Transfer ownership": "Передать команду",
+    "You are trying to transfer team ownership": "Вы собираетесь передать команду другому владельцу",
+    "To confirm transfering {team} ownership please select new owner below.": "Чтобы подтвердить передачу прав на команду {team} введите ключ проекта в поле ниже.",
+    "New team owner": "Новый владелец",
+    "Enter name or email": "Имя или почта",
+    "We are calling owner": "Звоним владельцу..."
 }

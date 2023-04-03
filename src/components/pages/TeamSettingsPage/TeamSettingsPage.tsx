@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 
 import { gapS, gray9, warn0 } from '../../../design/@generated/themes';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
-import { Team } from '../../../../graphql/@generated/genql';
+import { Activity, Team } from '../../../../graphql/@generated/genql';
 import { Button } from '../../Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
@@ -28,6 +28,7 @@ import { Text } from '../../Text';
 import { useRouter } from '../../../hooks/router';
 import { ModalContent, ModalHeader } from '../../Modal';
 import { FormTitle } from '../../FormTitle';
+import { UserComboBox } from '../../UserComboBox';
 
 import { tr } from './TeamSettingsPage.i18n';
 
@@ -281,6 +282,38 @@ export const TeamSettingsPage = ({
         router.exploreTeams();
     }, [router, team]);
 
+    const [transferTo, setTransferTo] = useState<Activity | undefined>();
+    const onTransferToChange = useCallback((a: Activity) => {
+        setTransferTo(a);
+    }, []);
+    const onTeamTransferOwnership = useCallback(async () => {
+        if (!transferTo) return;
+
+        const promise = gql.mutation({
+            transferTeamOwnership: [
+                {
+                    data: {
+                        id: team.id,
+                        activityId: transferTo.id,
+                    },
+                },
+                {
+                    id: true,
+                },
+            ],
+        });
+
+        toast.promise(promise, {
+            error: tr('Something went wrong 😿'),
+            loading: tr('We are calling owner'),
+            success: tr('Successfully deleted 🎉'),
+        });
+
+        await promise;
+
+        router.team(team.key);
+    }, [router, team, transferTo]);
+
     const teamProjectsIds = formValues.projects?.map((project) => project!.id) ?? [];
     const [projectsQuery, setProjectsQuery] = useState('');
     const { data: projects } = useSWR(projectsQuery, (q) => projectsFetcher(user, q));
@@ -365,6 +398,22 @@ export const TeamSettingsPage = ({
                                         />
                                     </FormAction>
                                 </FormActions>
+
+                                <FormActions flat="top">
+                                    <FormAction left>
+                                        <Text color={gray9} style={{ paddingLeft: gapS }}>
+                                            {tr('Transfer team to other person')}
+                                        </Text>
+                                    </FormAction>
+                                    <FormAction right inline>
+                                        <Button
+                                            onClick={dispatchModalEvent(ModalEvent.TeamTransferModal)}
+                                            size="m"
+                                            view="warning"
+                                            text={tr('Transfer ownership')}
+                                        />
+                                    </FormAction>
+                                </FormActions>
                             </Fieldset>
                         </Form>
                     </SettingsCard>
@@ -402,6 +451,45 @@ export const TeamSettingsPage = ({
                                         disabled={deleteConfirmation !== team.key}
                                         onClick={deleteTeam}
                                         text={tr('Yes, delete it')}
+                                    />
+                                </FormAction>
+                            </FormActions>
+                        </Form>
+                    </ModalContent>
+                </ModalOnEvent>
+
+                <ModalOnEvent view="warn" event={ModalEvent.TeamTransferModal}>
+                    <ModalHeader>
+                        <FormTitle color={warn0}>{tr('You are trying to transfer team ownership')}</FormTitle>
+                    </ModalHeader>
+
+                    <ModalContent>
+                        <Text>
+                            {tr.raw('To confirm transfering {team} ownership please select new owner below.', {
+                                team: <b key={team.title}>{team.title}</b>,
+                            })}
+                        </Text>
+
+                        <br />
+
+                        <Form>
+                            <FormActions flat="top">
+                                <FormAction left>
+                                    <UserComboBox
+                                        text={tr('New team owner')}
+                                        placeholder={tr('Enter name or email')}
+                                        value={transferTo}
+                                        onChange={onTransferToChange}
+                                    />
+                                </FormAction>
+                                <FormAction right inline>
+                                    <Button size="m" text={tr('Cancel')} onClick={onDeleteCancel} />
+                                    <Button
+                                        size="m"
+                                        view="warning"
+                                        disabled={!transferTo}
+                                        onClick={onTeamTransferOwnership}
+                                        text={tr('Transfer ownership')}
                                     />
                                 </FormAction>
                             </FormActions>
