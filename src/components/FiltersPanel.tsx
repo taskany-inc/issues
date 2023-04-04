@@ -13,6 +13,7 @@ import { UserFilterDropdown } from './UserFilterDropdown';
 import { TagsFilterDropdown } from './TagsFilterDropdown';
 import { LimitFilterDropdown } from './LimitFilterDropdown';
 import { PriorityFilterDropdown } from './PriorityFilterDropdown';
+import { EstimateFilterDropdown } from './EstimateFilterDropdown';
 import { Text } from './Text';
 
 interface FiltersPanelProps {
@@ -22,7 +23,8 @@ interface FiltersPanelProps {
     states?: React.ComponentProps<typeof StateFilterDropdown>['states'];
     users?: React.ComponentProps<typeof UserFilterDropdown>['activity'];
     tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
-    filterValues: [string[], string[], string[], string[], string, number];
+    estimates?: React.ComponentProps<typeof EstimateFilterDropdown>['estimates'];
+    filterValues: [string[], string[], string[], string[], string[], string, number];
     children?: React.ReactNode;
 
     onSearchChange: (search: string) => void;
@@ -30,6 +32,7 @@ interface FiltersPanelProps {
     onStateChange?: React.ComponentProps<typeof StateFilterDropdown>['onChange'];
     onUserChange?: React.ComponentProps<typeof UserFilterDropdown>['onChange'];
     onTagChange?: React.ComponentProps<typeof TagsFilterDropdown>['onChange'];
+    onEstimateChange?: React.ComponentProps<typeof EstimateFilterDropdown>['onChange'];
     onLimitChange?: React.ComponentProps<typeof LimitFilterDropdown>['onChange'];
 }
 
@@ -66,18 +69,21 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     priority,
     users,
     tags,
+    estimates,
     filterValues,
     onPriorityChange,
     onSearchChange,
     onStateChange,
     onUserChange,
     onTagChange,
+    onEstimateChange,
     onLimitChange,
     children,
 }) => {
     const t = useTranslations('FiltersPanel');
 
-    const [priorityFilter, stateFilter, tagsFilter, ownerFilter, searchFilter, limitFilter] = filterValues;
+    const [priorityFilter, stateFilter, tagsFilter, estimateFilter, ownerFilter, searchFilter, limitFilter] =
+        filterValues;
 
     const onSearchInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,6 +131,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 onChange={onStateChange}
                             />
                         ))}
+
                         {nullable(users, (u) => (
                             <UserFilterDropdown
                                 text={t('Owner')}
@@ -133,9 +140,20 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 onChange={onUserChange}
                             />
                         ))}
+
                         {nullable(tags, (ta) => (
                             <TagsFilterDropdown text={t('Tags')} tags={ta} value={tagsFilter} onChange={onTagChange} />
                         ))}
+
+                        {nullable(estimates, (e) => (
+                            <EstimateFilterDropdown
+                                text={t('Estimate')}
+                                estimates={e}
+                                value={estimateFilter}
+                                onChange={onEstimateChange}
+                            />
+                        ))}
+
                         {nullable(onLimitChange, (olc) => (
                             <LimitFilterDropdown text={t('Limit')} value={limitFilter} onChange={olc} />
                         ))}

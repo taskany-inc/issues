@@ -21,185 +21,195 @@ import { tr } from './ProjectPage.i18n';
 
 const GoalPreview = dynamic(() => import('../../GoalPreview'));
 
-const fetcher = createFetcher((_, key: string, priority = [], states = [], tags = [], owner = [], query = '') => ({
-    project: [
-        {
-            key,
-        },
-        {
-            id: true,
-            key: true,
-            title: true,
-            description: true,
-            activityId: true,
-            flowId: true,
-            flow: {
-                id: true,
+const fetcher = createFetcher(
+    (_, key: string, priority = [], states = [], tags = [], estimates = [], owner = [], query = '') => ({
+        project: [
+            {
+                key,
             },
-            teams: {
+            {
+                id: true,
                 key: true,
                 title: true,
                 description: true,
-                _count: {
-                    projects: true,
-                },
-            },
-            tags: {
-                id: true,
-                title: true,
-            },
-            participants: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-            },
-            createdAt: true,
-            activity: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            _count: {
-                stargizers: true,
-            },
-            _isStarred: true,
-            _isWatching: true,
-        },
-    ],
-    projectGoals: [
-        {
-            data: {
-                key,
-                priority,
-                states,
-                tags,
-                owner,
-                query,
-            },
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            project: {
-                id: true,
-                key: true,
-                title: true,
+                activityId: true,
                 flowId: true,
+                flow: {
+                    id: true,
+                },
+                teams: {
+                    key: true,
+                    title: true,
+                    description: true,
+                    _count: {
+                        projects: true,
+                    },
+                },
+                tags: {
+                    id: true,
+                    title: true,
+                },
+                participants: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                },
+                createdAt: true,
+                activity: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                _count: {
+                    stargizers: true,
+                },
+                _isStarred: true,
+                _isWatching: true,
+            },
+        ],
+        projectGoals: [
+            {
+                data: {
+                    key,
+                    priority,
+                    states,
+                    tags,
+                    estimates,
+                    owner,
+                    query,
+                },
+            },
+            {
+                id: true,
+                title: true,
+                description: true,
+                project: {
+                    id: true,
+                    key: true,
+                    title: true,
+                    flowId: true,
+                    teams: {
+                        id: true,
+                        key: true,
+                        title: true,
+                    },
+                },
+                team: {
+                    id: true,
+                    key: true,
+                    title: true,
+                },
+                priority: true,
+                state: {
+                    id: true,
+                    title: true,
+                    hue: true,
+                },
+                activity: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                owner: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                tags: {
+                    id: true,
+                    title: true,
+                    description: true,
+                },
+                comments: {
+                    id: true,
+                },
+                createdAt: true,
+                updatedAt: true,
+            },
+        ],
+        projectGoalsMeta: [
+            {
+                data: {
+                    key,
+                    priority: [],
+                    states: [],
+                    tags: [],
+                    estimates: [],
+                    owner: [],
+                    query: '',
+                },
+            },
+            {
+                owners: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                tags: { id: true, title: true, description: true },
+                states: {
+                    id: true,
+                    title: true,
+                    hue: true,
+                },
+                projects: {
+                    id: true,
+                    key: true,
+                    title: true,
+                    flowId: true,
+                },
                 teams: {
                     id: true,
                     key: true,
                     title: true,
                 },
-            },
-            team: {
-                id: true,
-                key: true,
-                title: true,
-            },
-            priority: true,
-            state: {
-                id: true,
-                title: true,
-                hue: true,
-            },
-            activity: {
-                id: true,
-                user: {
+                estimates: {
                     id: true,
-                    name: true,
-                    email: true,
-                    image: true,
+                    q: true,
+                    y: true,
+                    date: true,
                 },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
+                priority: true,
+                count: true,
             },
-            owner: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            tags: {
-                id: true,
-                title: true,
-                description: true,
-            },
-            comments: {
-                id: true,
-            },
-            createdAt: true,
-            updatedAt: true,
-        },
-    ],
-    projectGoalsMeta: [
-        {
-            data: {
-                key,
-                priority: [],
-                states: [],
-                tags: [],
-                owner: [],
-                query: '',
-            },
-        },
-        {
-            owners: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            tags: { id: true, title: true, description: true },
-            states: {
-                id: true,
-                title: true,
-                hue: true,
-            },
-            projects: {
-                id: true,
-                key: true,
-                title: true,
-                flowId: true,
-            },
-            teams: {
-                id: true,
-                key: true,
-                title: true,
-            },
-            priority: true,
-            count: true,
-        },
-    ],
-}));
+        ],
+    }),
+);
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key }, query }) => {
@@ -237,6 +247,7 @@ export const ProjectPage = ({
         setStateFilter,
         setTagsFilter,
         setTagsFilterOutside,
+        setEstimateFilter,
         setOwnerFilter,
         setFulltextFilter,
     } = useUrlFilterParams();
@@ -309,12 +320,14 @@ export const ProjectPage = ({
                     states={meta?.states}
                     users={meta?.owners}
                     tags={meta?.tags}
+                    estimates={meta?.estimates}
                     filterValues={filterValues}
                     onSearchChange={setFulltextFilter}
                     onPriorityChange={setPriorityFilter}
                     onStateChange={setStateFilter}
                     onUserChange={setOwnerFilter}
                     onTagChange={setTagsFilter}
+                    onEstimateChange={setEstimateFilter}
                 />
 
                 <GoalList>

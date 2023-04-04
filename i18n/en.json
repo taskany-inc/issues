@@ -393,7 +393,8 @@
         "Owner": "Owner",
         "Limit": "Limit",
         "Tags": "Tags",
-        "Priority": "Priority"
+        "Priority": "Priority",
+        "Estimate": "Estimate"
     },
     "GoalParentComboBox": {
         "project": "Project",

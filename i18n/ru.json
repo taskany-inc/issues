@@ -390,7 +390,8 @@
         "Owner": "Ответственный",
         "Limit": "Лимит",
         "Tags": "Теги",
-        "Priority": "Приоритет"
+        "Priority": "Приоритет",
+        "Estimate": "Срок"
     },
     "GoalParentComboBox": {
         "project": "Project",

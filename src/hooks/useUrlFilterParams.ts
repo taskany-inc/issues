@@ -10,6 +10,7 @@ export const parseFilterValues = (query: ParsedUrlQuery) => [
     parseQueryParam(query.priority?.toString()),
     parseQueryParam(query.state?.toString()),
     parseQueryParam(query.tags?.toString()),
+    parseQueryParam(query.estimates?.toString()),
     parseQueryParam(query.user?.toString()),
     parseQueryParam(query.search?.toString()).toString(),
     Number(query.limit),
@@ -21,24 +22,28 @@ export const useUrlFilterParams = () => {
     const [priorityFilter, setPriorityFilter] = useState<string[]>(parseQueryParam(router.query.priority?.toString()));
     const [stateFilter, setStateFilter] = useState<string[]>(parseQueryParam(router.query.state?.toString()));
     const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags?.toString()));
+    const [estimateFilter, setEstimateFilter] = useState<string[]>(parseQueryParam(router.query.estimates?.toString()));
     const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user?.toString()));
     const [fulltextFilter, setFulltextFilter] = useState<string>(
         parseQueryParam(router.query.search?.toString()).toString(),
     );
     const [limitFilter, setLimitFilter] = useState(Number(router.query.limit));
 
-    const [filterValues, setFilterValues] = useState<[string[], string[], string[], string[], string, number]>([
-        priorityFilter,
-        stateFilter,
-        tagsFilter,
-        ownerFilter,
-        fulltextFilter,
-        limitFilter,
-    ]);
+    const [filterValues, setFilterValues] = useState<
+        [string[], string[], string[], string[], string[], string, number]
+    >([priorityFilter, stateFilter, tagsFilter, estimateFilter, ownerFilter, fulltextFilter, limitFilter]);
 
     useEffect(() => {
-        setFilterValues([priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter]);
-    }, [priorityFilter, stateFilter, tagsFilter, ownerFilter, fulltextFilter, limitFilter]);
+        setFilterValues([
+            priorityFilter,
+            stateFilter,
+            tagsFilter,
+            estimateFilter,
+            ownerFilter,
+            fulltextFilter,
+            limitFilter,
+        ]);
+    }, [priorityFilter, stateFilter, tagsFilter, estimateFilter, ownerFilter, fulltextFilter, limitFilter]);
 
     const setTagsFilterOutside = useCallback(
         (t: Tag): MouseEventHandler<HTMLDivElement> =>
@@ -46,7 +51,15 @@ export const useUrlFilterParams = () => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const [priorityFilter, stateFilter, tagsFilter, ownerFilter, searchFilter, limitFilter] = filterValues;
+                const [
+                    priorityFilter,
+                    stateFilter,
+                    tagsFilter,
+                    estimateFilter,
+                    ownerFilter,
+                    searchFilter,
+                    limitFilter,
+                ] = filterValues;
 
                 const newTagsFilterValue = new Set(tagsFilter);
 
@@ -55,7 +68,15 @@ export const useUrlFilterParams = () => {
                 const newSelected = Array.from(newTagsFilterValue);
 
                 setTagsFilter(newSelected);
-                setFilterValues([priorityFilter, stateFilter, newSelected, ownerFilter, searchFilter, limitFilter]);
+                setFilterValues([
+                    priorityFilter,
+                    stateFilter,
+                    newSelected,
+                    estimateFilter,
+                    ownerFilter,
+                    searchFilter,
+                    limitFilter,
+                ]);
             },
         [filterValues, setTagsFilter],
     );
@@ -68,6 +89,7 @@ export const useUrlFilterParams = () => {
             priorityFilter.length > 0 ||
             stateFilter.length > 0 ||
             tagsFilter.length > 0 ||
+            estimateFilter.length > 0 ||
             ownerFilter.length > 0 ||
             fulltextFilter.length > 0 ||
             limitFilter
@@ -82,6 +104,10 @@ export const useUrlFilterParams = () => {
 
             tagsFilter.length > 0 ? urlParams.set('tags', Array.from(tagsFilter).toString()) : urlParams.delete('tags');
 
+            estimateFilter.length > 0
+                ? urlParams.set('estimates', Array.from(estimateFilter).toString())
+                : urlParams.delete('tags');
+
             ownerFilter.length > 0
                 ? urlParams.set('user', Array.from(ownerFilter).toString())
                 : urlParams.delete('user');
@@ -92,7 +118,16 @@ export const useUrlFilterParams = () => {
 
             window.history.replaceState({}, '', `${newurl}?${urlParams}`);
         }
-    }, [priorityFilter, stateFilter, ownerFilter, tagsFilter, limitFilter, fulltextFilter, router.query]);
+    }, [
+        priorityFilter,
+        stateFilter,
+        ownerFilter,
+        tagsFilter,
+        estimateFilter,
+        limitFilter,
+        fulltextFilter,
+        router.query,
+    ]);
 
     return {
         filterValues,
@@ -100,6 +135,7 @@ export const useUrlFilterParams = () => {
         setStateFilter,
         setTagsFilter,
         setTagsFilterOutside,
+        setEstimateFilter,
         setOwnerFilter,
         setFulltextFilter,
         setLimitFilter,
