@@ -47,7 +47,7 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({ preTitle, title, des
                     </Text>
                 ))}
 
-                <StyledCommonHeaderTitle size="xxl" weight="bolder" title={title}>
+                <StyledCommonHeaderTitle size="xxl" weight="bolder">
                     {title}
                 </StyledCommonHeaderTitle>
 
