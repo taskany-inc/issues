@@ -469,6 +469,7 @@ export const ProjectGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
+        t.nonNull.list.nonNull.string('estimates');
         t.nonNull.list.nonNull.string('owner');
         t.nonNull.string('query');
     },
@@ -480,6 +481,7 @@ export const UserGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
+        t.nonNull.list.nonNull.string('estimates');
         t.nonNull.list.nonNull.string('owner');
         t.nonNull.string('query');
     },
@@ -525,6 +527,7 @@ export const TeamGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
+        t.nonNull.list.nonNull.string('estimates');
         t.nonNull.list.nonNull.string('owner');
         t.nonNull.string('query');
     },
@@ -554,6 +557,7 @@ export const GoalsMetaOutput = objectType({
         t.list.field('states', { type: nonNull(State) });
         t.list.field('projects', { type: nonNull(Project) });
         t.list.field('teams', { type: nonNull(Team) });
+        t.list.field('estimates', { type: nonNull(Estimate) });
         t.list.nonNull.string('priority');
         t.nonNull.int('count');
     },

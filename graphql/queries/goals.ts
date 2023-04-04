@@ -6,6 +6,7 @@ export const goalsFilter = (
         priority: string[];
         states: string[];
         tags: string[];
+        estimates: string[];
         owner: string[];
     },
     extra: any = {},
@@ -29,6 +30,23 @@ export const goalsFilter = (
                       id: {
                           in: data.tags,
                       },
+                  },
+              },
+          }
+        : {};
+
+    const estimateFilter = data.estimates.length
+        ? {
+              estimate: {
+                  some: {
+                      OR: data.estimates.map((e) => {
+                          const [q, y] = e.split('/');
+
+                          return {
+                              q,
+                              y,
+                          };
+                      }),
                   },
               },
           }
@@ -96,6 +114,7 @@ export const goalsFilter = (
             ...priorityFilter,
             ...statesFilter,
             ...tagsFilter,
+            ...estimateFilter,
             ...ownerFilter,
             ...extra,
         },
@@ -244,6 +263,7 @@ export const calcGoalsMeta = (goals: GoalModel[]) => {
     const uniqStates = new Map();
     const uniqProjects = new Map();
     const uniqTeams = new Map();
+    const uniqEstimates = new Map();
 
     goals.forEach((goal: GoalModel) => {
         goal.state && uniqStates.set(goal.state?.id, goal.state);
@@ -267,6 +287,11 @@ export const calcGoalsMeta = (goals: GoalModel[]) => {
                 p && uniqParticipants.set(p.id, p);
             });
         goal.activity && uniqIssuers.set(goal.activity.id, goal.activity);
+
+        goal.estimate &&
+            goal.estimate.forEach((e) => {
+                uniqEstimates.set(`${e?.q}/${e?.y}`, e);
+            });
     });
 
     return {
@@ -278,6 +303,7 @@ export const calcGoalsMeta = (goals: GoalModel[]) => {
         states: Array.from(uniqStates.values()),
         projects: Array.from(uniqProjects.values()),
         teams: Array.from(uniqTeams.values()),
+        estimates: Array.from(uniqEstimates.values()),
         count: goals.length,
     };
 };

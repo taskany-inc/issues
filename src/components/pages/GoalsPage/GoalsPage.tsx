@@ -17,13 +17,14 @@ import { tr } from './GoalsPage.i18n';
 
 const GoalPreview = dynamic(() => import('../../GoalPreview'));
 
-const fetcher = createFetcher((_, priority = [], states = [], tags = [], owner = [], query = '') => ({
+const fetcher = createFetcher((_, priority = [], states = [], tags = [], estimates = [], owner = [], query = '') => ({
     userGoals: [
         {
             data: {
                 priority,
                 states,
                 tags,
+                estimates,
                 owner,
                 query,
             },
@@ -98,6 +99,7 @@ const fetcher = createFetcher((_, priority = [], states = [], tags = [], owner =
                 priority: [],
                 states: [],
                 tags: [],
+                estimates: [],
                 owner: [],
                 query: '',
             },
@@ -133,6 +135,12 @@ const fetcher = createFetcher((_, priority = [], states = [], tags = [], owner =
                 key: true,
                 title: true,
             },
+            estimates: {
+                id: true,
+                q: true,
+                y: true,
+                date: true,
+            },
             priority: true,
             count: true,
         },
@@ -159,6 +167,7 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
         setStateFilter,
         setTagsFilter,
         setTagsFilterOutside,
+        setEstimateFilter,
         setOwnerFilter,
         setFulltextFilter,
     } = useUrlFilterParams();
@@ -206,12 +215,14 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
                 states={meta?.states}
                 users={meta?.owners}
                 tags={meta?.tags}
+                estimates={meta?.estimates}
                 filterValues={filterValues}
                 onSearchChange={setFulltextFilter}
                 onPriorityChange={setPriorityFilter}
                 onStateChange={setStateFilter}
                 onUserChange={setOwnerFilter}
                 onTagChange={setTagsFilter}
+                onEstimateChange={setEstimateFilter}
             />
 
             <PageContent>

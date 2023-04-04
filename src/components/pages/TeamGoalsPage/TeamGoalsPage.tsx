@@ -21,23 +21,54 @@ import { tr } from './TeamGoalsPage.i18n';
 
 const GoalPreview = dynamic(() => import('../../GoalPreview'));
 
-const fetcher = createFetcher((_, key, priority = [], states = [], tags = [], owner = [], query = '') => ({
-    team: [
-        {
-            key,
-        },
-        {
-            id: true,
-            key: true,
-            title: true,
-            description: true,
-            activityId: true,
-            projects: {
+const fetcher = createFetcher(
+    (_, key, priority = [], states = [], tags = [], estimates = [], owner = [], query = '') => ({
+        team: [
+            {
+                key,
+            },
+            {
+                id: true,
                 key: true,
                 title: true,
                 description: true,
+                activityId: true,
+                projects: {
+                    key: true,
+                    title: true,
+                    description: true,
+                    createdAt: true,
+                    activity: {
+                        user: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                        },
+                        ghost: {
+                            id: true,
+                            email: true,
+                        },
+                    },
+                },
+                watchers: {
+                    id: true,
+                },
+                stargizers: {
+                    id: true,
+                },
+                participants: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                },
                 createdAt: true,
                 activity: {
+                    id: true,
                     user: {
                         id: true,
                         name: true,
@@ -50,159 +81,132 @@ const fetcher = createFetcher((_, key, priority = [], states = [], tags = [], ow
                     },
                 },
             },
-            watchers: {
-                id: true,
-            },
-            stargizers: {
-                id: true,
-            },
-            participants: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
+        ],
+        teamGoals: [
+            {
+                data: {
+                    key,
+                    priority,
+                    states,
+                    tags,
+                    estimates,
+                    owner,
+                    query,
                 },
             },
-            createdAt: true,
-            activity: {
+            {
                 id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-        },
-    ],
-    teamGoals: [
-        {
-            data: {
-                key,
-                priority,
-                states,
-                tags,
-                owner,
-                query,
-            },
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            project: {
-                id: true,
-                key: true,
                 title: true,
-                flowId: true,
+                description: true,
+                project: {
+                    id: true,
+                    key: true,
+                    title: true,
+                    flowId: true,
+                    teams: {
+                        id: true,
+                        key: true,
+                        title: true,
+                    },
+                },
+                team: {
+                    id: true,
+                    key: true,
+                    title: true,
+                },
+                priority: true,
+                state: {
+                    id: true,
+                    title: true,
+                    hue: true,
+                },
+                activity: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                owner: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                tags: {
+                    id: true,
+                    title: true,
+                    description: true,
+                },
+                comments: {
+                    id: true,
+                },
+                createdAt: true,
+                updatedAt: true,
+            },
+        ],
+        teamGoalsMeta: [
+            {
+                data: {
+                    key,
+                    priority: [],
+                    states: [],
+                    tags: [],
+                    estimates: [],
+                    owner: [],
+                    query: '',
+                },
+            },
+            {
+                owners: {
+                    id: true,
+                    user: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    },
+                    ghost: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                tags: { id: true, title: true, description: true },
+                states: {
+                    id: true,
+                    title: true,
+                    hue: true,
+                },
+                projects: {
+                    id: true,
+                    key: true,
+                    title: true,
+                    flowId: true,
+                },
                 teams: {
                     id: true,
                     key: true,
                     title: true,
                 },
+                priority: true,
+                count: true,
             },
-            team: {
-                id: true,
-                key: true,
-                title: true,
-            },
-            priority: true,
-            state: {
-                id: true,
-                title: true,
-                hue: true,
-            },
-            activity: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            owner: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            tags: {
-                id: true,
-                title: true,
-                description: true,
-            },
-            comments: {
-                id: true,
-            },
-            createdAt: true,
-            updatedAt: true,
-        },
-    ],
-    teamGoalsMeta: [
-        {
-            data: {
-                key,
-                priority: [],
-                states: [],
-                tags: [],
-                owner: [],
-                query: '',
-            },
-        },
-        {
-            owners: {
-                id: true,
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            tags: { id: true, title: true, description: true },
-            states: {
-                id: true,
-                title: true,
-                hue: true,
-            },
-            projects: {
-                id: true,
-                key: true,
-                title: true,
-                flowId: true,
-            },
-            teams: {
-                id: true,
-                key: true,
-                title: true,
-            },
-            priority: true,
-            count: true,
-        },
-    ],
-}));
+        ],
+    }),
+);
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { key }, query }) => {
@@ -240,6 +244,7 @@ export const TeamGoalsPage = ({
         setStateFilter,
         setTagsFilter,
         setTagsFilterOutside,
+        setEstimateFilter,
         setOwnerFilter,
         setFulltextFilter,
     } = useUrlFilterParams();
@@ -313,12 +318,14 @@ export const TeamGoalsPage = ({
                     states={meta?.states}
                     users={meta?.owners}
                     tags={meta?.tags}
+                    estimates={meta?.estimates}
                     filterValues={filterValues}
                     onSearchChange={setFulltextFilter}
                     onPriorityChange={setPriorityFilter}
                     onStateChange={setStateFilter}
                     onUserChange={setOwnerFilter}
                     onTagChange={setTagsFilter}
+                    onEstimateChange={setEstimateFilter}
                 />
 
                 {nullable(groups.teams.length, () => (

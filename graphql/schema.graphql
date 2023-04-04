@@ -187,6 +187,7 @@ input GoalUpdateInput {
 
 type GoalsMetaOutput {
   count: Int!
+  estimates: [Estimate!]
   issuers: [Activity!]
   owners: [Activity!]
   participants: [Activity!]
@@ -266,6 +267,7 @@ input ProjectDelete {
 }
 
 input ProjectGoalsInput {
+  estimates: [String!]!
   key: String!
   owner: [String!]!
   priority: [String!]!
@@ -415,6 +417,7 @@ input TeamDelete {
 }
 
 input TeamGoalsInput {
+  estimates: [String!]!
   key: String!
   owner: [String!]!
   priority: [String!]!
@@ -455,6 +458,7 @@ type User {
 }
 
 input UserGoalsInput {
+  estimates: [String!]!
   owner: [String!]!
   priority: [String!]!
   query: String!

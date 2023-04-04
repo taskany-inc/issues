@@ -28,6 +28,7 @@ const goalsQuery = async (
         priority: string[];
         states: string[];
         tags: string[];
+        estimates: string[];
         owner: string[];
     },
 ) => {
