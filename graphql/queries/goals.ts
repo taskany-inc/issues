@@ -8,6 +8,7 @@ export const goalsFilter = (
         tags: string[];
         estimates: string[];
         owner: string[];
+        projects: number[];
     },
     extra: any = {},
 ): any => {
@@ -57,6 +58,16 @@ export const goalsFilter = (
               owner: {
                   id: {
                       in: data.owner,
+                  },
+              },
+          }
+        : {};
+
+    const projectFilter = data.projects?.length
+        ? {
+              project: {
+                  id: {
+                      in: data.projects,
                   },
               },
           }
@@ -116,6 +127,7 @@ export const goalsFilter = (
             ...tagsFilter,
             ...estimateFilter,
             ...ownerFilter,
+            ...projectFilter,
             ...extra,
         },
         orderBy: {

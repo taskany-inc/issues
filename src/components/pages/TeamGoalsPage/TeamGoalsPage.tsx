@@ -22,7 +22,7 @@ import { tr } from './TeamGoalsPage.i18n';
 const GoalPreview = dynamic(() => import('../../GoalPreview'));
 
 const fetcher = createFetcher(
-    (_, key, priority = [], states = [], tags = [], estimates = [], owner = [], query = '') => ({
+    (_, key, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
         team: [
             {
                 key,
@@ -91,6 +91,7 @@ const fetcher = createFetcher(
                     tags,
                     estimates,
                     owner,
+                    projects,
                     query,
                 },
             },
@@ -167,6 +168,7 @@ const fetcher = createFetcher(
                     tags: [],
                     estimates: [],
                     owner: [],
+                    projects: [],
                     query: '',
                 },
             },
@@ -246,6 +248,7 @@ export const TeamGoalsPage = ({
         setTagsFilterOutside,
         setEstimateFilter,
         setOwnerFilter,
+        setProjectFilter,
         setFulltextFilter,
     } = useUrlFilterParams();
 
@@ -317,6 +320,7 @@ export const TeamGoalsPage = ({
                     priority={meta?.priority}
                     states={meta?.states}
                     users={meta?.owners}
+                    projects={meta?.projects}
                     tags={meta?.tags}
                     estimates={meta?.estimates}
                     filterValues={filterValues}
@@ -324,6 +328,7 @@ export const TeamGoalsPage = ({
                     onPriorityChange={setPriorityFilter}
                     onStateChange={setStateFilter}
                     onUserChange={setOwnerFilter}
+                    onProjectChange={setProjectFilter}
                     onTagChange={setTagsFilter}
                     onEstimateChange={setEstimateFilter}
                 />

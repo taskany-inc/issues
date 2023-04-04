@@ -391,7 +391,8 @@
         "Limit": "Лимит",
         "Tags": "Теги",
         "Priority": "Приоритет",
-        "Estimate": "Срок"
+        "Estimate": "Срок",
+        "Project": "Проект"
     },
     "GoalParentComboBox": {
         "project": "Project",

@@ -271,6 +271,7 @@ input ProjectGoalsInput {
   key: String!
   owner: [String!]!
   priority: [String!]!
+  projects: [Int!]!
   query: String!
   states: [String!]!
   tags: [String!]!
@@ -421,6 +422,7 @@ input TeamGoalsInput {
   key: String!
   owner: [String!]!
   priority: [String!]!
+  projects: [Int!]!
   query: String!
   states: [String!]!
   tags: [String!]!
@@ -461,6 +463,7 @@ input UserGoalsInput {
   estimates: [String!]!
   owner: [String!]!
   priority: [String!]!
+  projects: [Int!]!
   query: String!
   states: [String!]!
   tags: [String!]!

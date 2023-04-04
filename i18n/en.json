@@ -394,7 +394,8 @@
         "Limit": "Limit",
         "Tags": "Tags",
         "Priority": "Priority",
-        "Estimate": "Estimate"
+        "Estimate": "Estimate",
+        "Project": "Project"
     },
     "GoalParentComboBox": {
         "project": "Project",

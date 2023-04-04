@@ -15,6 +15,7 @@ import { LimitFilterDropdown } from './LimitFilterDropdown';
 import { PriorityFilterDropdown } from './PriorityFilterDropdown';
 import { EstimateFilterDropdown } from './EstimateFilterDropdown';
 import { Text } from './Text';
+import { ProjectFilterDropdown } from './ProjectFilterDropdown';
 
 interface FiltersPanelProps {
     count?: number;
@@ -22,15 +23,17 @@ interface FiltersPanelProps {
     priority?: React.ComponentProps<typeof PriorityFilterDropdown>['priority'];
     states?: React.ComponentProps<typeof StateFilterDropdown>['states'];
     users?: React.ComponentProps<typeof UserFilterDropdown>['activity'];
+    projects?: React.ComponentProps<typeof ProjectFilterDropdown>['projects'];
     tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilterDropdown>['estimates'];
-    filterValues: [string[], string[], string[], string[], string[], string, number];
+    filterValues: [string[], string[], string[], string[], string[], number[], string, number];
     children?: React.ReactNode;
 
     onSearchChange: (search: string) => void;
     onPriorityChange?: React.ComponentProps<typeof PriorityFilterDropdown>['onChange'];
     onStateChange?: React.ComponentProps<typeof StateFilterDropdown>['onChange'];
     onUserChange?: React.ComponentProps<typeof UserFilterDropdown>['onChange'];
+    onProjectChange?: React.ComponentProps<typeof ProjectFilterDropdown>['onChange'];
     onTagChange?: React.ComponentProps<typeof TagsFilterDropdown>['onChange'];
     onEstimateChange?: React.ComponentProps<typeof EstimateFilterDropdown>['onChange'];
     onLimitChange?: React.ComponentProps<typeof LimitFilterDropdown>['onChange'];
@@ -68,6 +71,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     states,
     priority,
     users,
+    projects,
     tags,
     estimates,
     filterValues,
@@ -75,6 +79,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     onSearchChange,
     onStateChange,
     onUserChange,
+    onProjectChange,
     onTagChange,
     onEstimateChange,
     onLimitChange,
@@ -82,8 +87,16 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
 }) => {
     const t = useTranslations('FiltersPanel');
 
-    const [priorityFilter, stateFilter, tagsFilter, estimateFilter, ownerFilter, searchFilter, limitFilter] =
-        filterValues;
+    const [
+        priorityFilter,
+        stateFilter,
+        tagsFilter,
+        estimateFilter,
+        ownerFilter,
+        projectFilter,
+        searchFilter,
+        limitFilter,
+    ] = filterValues;
 
     const onSearchInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,6 +151,15 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 activity={u}
                                 value={ownerFilter}
                                 onChange={onUserChange}
+                            />
+                        ))}
+
+                        {nullable(projects, (pr) => (
+                            <ProjectFilterDropdown
+                                text={t('Project')}
+                                projects={pr}
+                                value={projectFilter}
+                                onChange={onProjectChange}
                             />
                         ))}
 
