@@ -30,6 +30,7 @@ const goalsQuery = async (
         tags: string[];
         estimates: string[];
         owner: string[];
+        projects: number[];
     },
 ) => {
     const uniqGoals = new Map();

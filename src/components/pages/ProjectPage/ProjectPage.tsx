@@ -22,7 +22,7 @@ import { tr } from './ProjectPage.i18n';
 const GoalPreview = dynamic(() => import('../../GoalPreview'));
 
 const fetcher = createFetcher(
-    (_, key: string, priority = [], states = [], tags = [], estimates = [], owner = [], query = '') => ({
+    (_, key: string, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
         project: [
             {
                 key,
@@ -88,6 +88,7 @@ const fetcher = createFetcher(
                     tags,
                     estimates,
                     owner,
+                    projects: [],
                     query,
                 },
             },
@@ -164,6 +165,7 @@ const fetcher = createFetcher(
                     tags: [],
                     estimates: [],
                     owner: [],
+                    projects: [],
                     query: '',
                 },
             },

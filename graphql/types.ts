@@ -471,6 +471,7 @@ export const ProjectGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('estimates');
         t.nonNull.list.nonNull.string('owner');
+        t.nonNull.list.nonNull.int('projects');
         t.nonNull.string('query');
     },
 });
@@ -483,6 +484,7 @@ export const UserGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('estimates');
         t.nonNull.list.nonNull.string('owner');
+        t.nonNull.list.nonNull.int('projects');
         t.nonNull.string('query');
     },
 });
@@ -529,6 +531,7 @@ export const TeamGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('estimates');
         t.nonNull.list.nonNull.string('owner');
+        t.nonNull.list.nonNull.int('projects');
         t.nonNull.string('query');
     },
 });
