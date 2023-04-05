@@ -14,7 +14,7 @@ import { tr } from './ExporeProjectsPage.i18n';
 
 const fetcher = createFetcher(() => ({
     projects: {
-        key: true,
+        id: true,
         title: true,
         description: true,
         createdAt: true,
@@ -65,8 +65,8 @@ export const ExploreProjectsPage = ({
                     {projects?.map((project: Project) =>
                         nullable(project, (p) => (
                             <ParentListItem
-                                key={p.key}
-                                href={routes.project(p.key)}
+                                key={p.id}
+                                href={routes.project(p.id)}
                                 createdAt={p.createdAt}
                                 title={p.title}
                                 description={p.description}

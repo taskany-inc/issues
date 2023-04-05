@@ -38,14 +38,13 @@ import { tr } from './ProjectSettingsPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
 
-const projectFetcher = createFetcher((_, key: string) => ({
+const projectFetcher = createFetcher((_, id: string) => ({
     project: [
         {
-            key,
+            id,
         },
         {
             id: true,
-            key: true,
             title: true,
             description: true,
             flowId: true,
@@ -76,7 +75,6 @@ const projectFetcher = createFetcher((_, key: string) => ({
             teams: {
                 id: true,
                 title: true,
-                key: true,
             },
         },
     ],
@@ -106,13 +104,13 @@ const teamsFetcher = createFetcher((_, query: string) => ({
 }));
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { key } }) => {
-        const ssrData = await projectFetcher(user, key);
+    async ({ user, params: { id } }) => {
+        const ssrData = await projectFetcher(user, id);
 
         return ssrData.project
             ? {
                   fallback: {
-                      [key]: ssrData,
+                      [id]: ssrData,
                   },
               }
             : {
@@ -124,20 +122,14 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-export const ProjectSettingsPage = ({
-    user,
-    locale,
-    ssrTime,
-    fallback,
-    params: { key },
-}: ExternalPageProps<{ key: string }>) => {
+export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
     const nextRouter = useNextRouter();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
-    const { data } = useSWR(key, () => projectFetcher(user, key), {
+    const { data } = useSWR(id, () => projectFetcher(user, id), {
         fallback,
         refreshInterval,
     });
@@ -241,7 +233,7 @@ export const ProjectSettingsPage = ({
         setTransferTo(a);
     }, []);
     const onProjectTransferOwnership = useCallback(() => {
-        router.project(project.key);
+        router.project(project.id);
     }, [router, project]);
 
     const projectTeamsIds = formValues.teams?.map((team) => team!.id) ?? [];
@@ -264,7 +256,7 @@ export const ProjectSettingsPage = ({
                             <Fieldset title={tr('General')}>
                                 <FormInput
                                     disabled
-                                    defaultValue={project.key}
+                                    defaultValue={project.id}
                                     label={tr('key')}
                                     autoComplete="off"
                                     flat="bottom"
@@ -373,7 +365,7 @@ export const ProjectSettingsPage = ({
                         <Form>
                             <FormInput
                                 flat="bottom"
-                                placeholder={project.key}
+                                placeholder={project.id}
                                 autoComplete="off"
                                 onChange={onConfirmationInputChange}
                             />
@@ -385,7 +377,7 @@ export const ProjectSettingsPage = ({
                                     <Button
                                         size="m"
                                         view="warning"
-                                        disabled={deleteConfirmation !== project.key}
+                                        disabled={deleteConfirmation !== project.id}
                                         onClick={deleteProject(onProjectDelete)}
                                         text={tr('Yes, delete it')}
                                     />

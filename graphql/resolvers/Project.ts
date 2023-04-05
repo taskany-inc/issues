@@ -46,14 +46,14 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('project', {
         type: Project,
         args: {
-            key: nonNull(stringArg()),
+            id: nonNull(stringArg()),
         },
-        resolve: async (_, { key }, { db, activity }) => {
+        resolve: async (_, { id }, { db, activity }) => {
             if (!activity) return null;
 
             const project = await db.project.findUnique({
                 where: {
-                    key,
+                    id,
                 },
                 include: {
                     flow: {
@@ -107,7 +107,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             const goals = await db.goal.findMany({
                 ...goalsFilter(data, {
                     project: {
-                        key: data.key,
+                        id: data.id,
                     },
                 }),
                 include: {
@@ -133,7 +133,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             const allProjectGoals: any[] = await db.goal.findMany({
                 ...goalsFilter(data, {
                     project: {
-                        key: data.key,
+                        id: data.id,
                     },
                 }),
                 include: {
@@ -188,14 +188,13 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: ProjectCreateInput })),
         },
-        resolve: async (_, { data: { key, title, description, flowId } }, { db, activity }) => {
+        resolve: async (_, { data: { id, title, description, flowId } }, { db, activity }) => {
             if (!activity) return null;
 
             try {
                 return db.project.create({
                     data: {
-                        id: key,
-                        key,
+                        id,
                         title,
                         description,
                         activityId: activity.id,

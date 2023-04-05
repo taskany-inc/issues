@@ -11,7 +11,7 @@ export const TeamTitleList = ({ teams = [] }: { teams: Team[] }) => (
         {teams.map((team, i) =>
             nullable(team, (te) => (
                 <span key={te.title}>
-                    <NextLink key={te.key} passHref href={routes.team(te.key)}>
+                    <NextLink key={te.id} passHref href={routes.team(te.id)}>
                         <Link inline title={te.description}>
                             {te.title}
                         </Link>

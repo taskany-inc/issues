@@ -46,10 +46,10 @@ const flowFetcher = createFetcher(() => ({
         },
     },
 }));
-const projectFetcher = createFetcher((_, key: string) => ({
+const projectFetcher = createFetcher((_, id: string) => ({
     project: [
         {
-            key,
+            id,
         },
         {
             title: true,
@@ -114,12 +114,12 @@ const ProjectCreateForm: React.FC = () => {
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
     const titleWatcher = watch('title');
-    const keyWatcher = watch('key');
+    const keyWatcher = watch('id');
 
     useDebouncedEffect(
         () => {
             if (!dirtyKey && titleWatcher && titleWatcher !== '') {
-                setValue('key', keyPredictor(titleWatcher));
+                setValue('id', keyPredictor(titleWatcher));
             }
         },
         300,
@@ -142,8 +142,8 @@ const ProjectCreateForm: React.FC = () => {
             setBusy(true);
 
             // FIXME: it not looks like the best API
-            createProject((key: string) => {
-                router.project(key);
+            createProject((id: string) => {
+                router.project(id);
                 dispatchModalEvent(ModalEvent.ProjectCreateModal)();
             })(form);
         },
@@ -195,7 +195,7 @@ const ProjectCreateForm: React.FC = () => {
                         {nullable(titleWatcher, () => (
                             <StyledProjectKeyContainer>
                                 <Controller
-                                    name="key"
+                                    name="id"
                                     control={control}
                                     render={({ field }) => (
                                         <StyledProjectKeyInputContainer
@@ -208,7 +208,7 @@ const ProjectCreateForm: React.FC = () => {
                                                 available={isKeyUnique && isKeyEnoughLength}
                                                 tooltip={tooltip}
                                                 onDirty={onKeyDirty}
-                                                error={errorsResolver('key')}
+                                                error={errorsResolver('id')}
                                                 {...field}
                                             />
                                         </StyledProjectKeyInputContainer>

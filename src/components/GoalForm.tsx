@@ -54,7 +54,6 @@ const schemaProvider = (t: (key: string) => string) =>
         parent: z.object(
             {
                 id: z.string(),
-                key: z.string(),
                 title: z.string(),
                 flowId: z.string(),
                 kind: z.string(),

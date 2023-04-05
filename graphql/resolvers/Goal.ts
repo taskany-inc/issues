@@ -426,7 +426,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
 
                         await db.project.update({
                             where: {
-                                key: parent.key,
+                                id: parent.id,
                             },
                             data: {
                                 tags: data.tags?.length
@@ -446,7 +446,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
 
                         await db.team.update({
                             where: {
-                                key: parent.key,
+                                id: parent.id,
                             },
                             data: {
                                 participants: {
@@ -554,7 +554,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
 
                             if (!project) return null;
 
-                            const pre = `${project.key}-`;
+                            const pre = `${project.id}-`;
 
                             const lastGoal = await db.goal.findFirst({
                                 where: { id: { contains: pre } },
@@ -603,7 +603,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
 
                             if (!project) return null;
 
-                            const pre = `${project.key}-`;
+                            const pre = `${project.id}-`;
 
                             const lastGoal = await db.goal.findFirst({
                                 where: { id: { contains: pre } },
@@ -671,7 +671,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
 
                             if (!team) return null;
 
-                            const pre = `${team.key}-`;
+                            const pre = `${team.id}-`;
 
                             const lastGoal = await db.goal.findFirst({
                                 where: { id: { contains: pre } },

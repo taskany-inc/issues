@@ -40,7 +40,7 @@ export const GoalsGroupProjectTitle = ({ project }: { project: ProjectGroup }) =
                 {' — '}
             </>
         ))}
-        <NextLink passHref href={routes.project(project.data.key)}>
+        <NextLink passHref href={routes.project(project.data.id)}>
             <Link inline>{project.data.title}</Link>
         </NextLink>
     </Text>
@@ -48,7 +48,7 @@ export const GoalsGroupProjectTitle = ({ project }: { project: ProjectGroup }) =
 
 export const GoalsGroupTeamTitle = ({ team }: { team: TeamGroup }) => (
     <Text size="l" weight="bolder">
-        <NextLink passHref href={routes.team(team.data.key)}>
+        <NextLink passHref href={routes.team(team.data.id)}>
             <Link inline>{team.data.title}</Link>
         </NextLink>
     </Text>

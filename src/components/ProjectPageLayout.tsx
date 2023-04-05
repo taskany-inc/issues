@@ -46,8 +46,8 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(project.id);
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
-        [t('Goals'), routes.project(project.key), true],
-        [t('Settings'), routes.projectSettings(project.key), true],
+        [t('Goals'), routes.project(project.id), true],
+        [t('Settings'), routes.projectSettings(project.id), true],
     ];
 
     const [watcher, setWatcher] = useState(project._isWatching);

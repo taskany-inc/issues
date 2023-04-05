@@ -240,7 +240,6 @@ type Project {
   flowId: String!
   goals: [Goal]
   id: ID!
-  key: String!
   parent: Project
   participants: [Activity]
   stargizers: [Activity]
@@ -258,7 +257,7 @@ type ProjectAggregation {
 input ProjectCreateInput {
   description: String
   flowId: String!
-  key: String!
+  id: ID!
   title: String!
 }
 
@@ -268,7 +267,7 @@ input ProjectDelete {
 
 input ProjectGoalsInput {
   estimates: [String!]!
-  key: String!
+  id: ID!
   owner: [String!]!
   priority: [String!]!
   projects: [Int!]!
@@ -293,14 +292,14 @@ type Query {
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
   goalDependencyKind: [String]
-  project(key: String!): Project
+  project(id: String!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(data: ProjectGoalsInput!): [Goal]
   projectGoalsMeta(data: ProjectGoalsInput!): GoalsMetaOutput
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
-  team(key: String!): Team
+  team(id: String!): Team
   teamCompletion(query: String!, sortBy: SortOrder): [Team]
   teamGoals(data: TeamGoalsInput!): [Goal]
   teamGoalsMeta(data: TeamGoalsInput!): GoalsMetaOutput
@@ -388,7 +387,6 @@ type Team {
   flowId: String
   goals: [Goal]
   id: ID!
-  key: String!
   parent: Team
   participants: [Activity]
   projects: [Project]
@@ -407,7 +405,7 @@ input TeamCreateInput {
   children: [Int!]
   description: String
   flowId: String
-  key: String!
+  id: ID!
   parent: String
   projects: [String!]
   title: String!
@@ -419,7 +417,7 @@ input TeamDelete {
 
 input TeamGoalsInput {
   estimates: [String!]!
-  key: String!
+  id: ID!
   owner: [String!]!
   priority: [String!]!
   projects: [Int!]!

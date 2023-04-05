@@ -18,7 +18,6 @@ const fetcher = createFetcher(() => ({
         },
         {
             id: true,
-            key: true,
             title: true,
             description: true,
             projects: {
@@ -68,8 +67,8 @@ export const ExploreTeamsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
                     {teams?.map((team) =>
                         nullable(team, (te) => (
                             <ParentListItem
-                                key={te.key}
-                                href={routes.team(te.key)}
+                                key={te.id}
+                                href={routes.team(te.id)}
                                 createdAt={te.createdAt}
                                 title={te.title}
                                 description={te.description}

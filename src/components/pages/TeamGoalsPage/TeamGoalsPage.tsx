@@ -22,19 +22,18 @@ import { tr } from './TeamGoalsPage.i18n';
 const GoalPreview = dynamic(() => import('../../GoalPreview'));
 
 const fetcher = createFetcher(
-    (_, key, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
+    (_, id, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
         team: [
             {
-                key,
+                id,
             },
             {
                 id: true,
-                key: true,
                 title: true,
                 description: true,
                 activityId: true,
                 projects: {
-                    key: true,
+                    id: true,
                     title: true,
                     description: true,
                     createdAt: true,
@@ -85,7 +84,7 @@ const fetcher = createFetcher(
         teamGoals: [
             {
                 data: {
-                    key,
+                    id,
                     priority,
                     states,
                     tags,
@@ -101,18 +100,15 @@ const fetcher = createFetcher(
                 description: true,
                 project: {
                     id: true,
-                    key: true,
                     title: true,
                     flowId: true,
                     teams: {
                         id: true,
-                        key: true,
                         title: true,
                     },
                 },
                 team: {
                     id: true,
-                    key: true,
                     title: true,
                 },
                 priority: true,
@@ -162,7 +158,7 @@ const fetcher = createFetcher(
         teamGoalsMeta: [
             {
                 data: {
-                    key,
+                    id,
                     priority: [],
                     states: [],
                     tags: [],
@@ -194,13 +190,11 @@ const fetcher = createFetcher(
                 },
                 projects: {
                     id: true,
-                    key: true,
                     title: true,
                     flowId: true,
                 },
                 teams: {
                     id: true,
-                    key: true,
                     title: true,
                 },
                 priority: true,
@@ -211,13 +205,13 @@ const fetcher = createFetcher(
 );
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { key }, query }) => {
-        const ssrData = await fetcher(user, key, ...parseFilterValues(query));
+    async ({ user, params: { id }, query }) => {
+        const ssrData = await fetcher(user, id, ...parseFilterValues(query));
 
         return ssrData.team
             ? {
                   fallback: {
-                      [key]: ssrData,
+                      [id]: ssrData,
                   },
               }
             : {
@@ -229,13 +223,7 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-export const TeamGoalsPage = ({
-    user,
-    locale,
-    ssrTime,
-    fallback,
-    params: { key },
-}: ExternalPageProps<{ key: string }>) => {
+export const TeamGoalsPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
@@ -252,7 +240,7 @@ export const TeamGoalsPage = ({
         setFulltextFilter,
     } = useUrlFilterParams();
 
-    const { data } = useSWR(key, () => fetcher(user, key, ...filterValues), {
+    const { data } = useSWR(id, () => fetcher(user, id, ...filterValues), {
         fallback,
         refreshInterval,
     });
@@ -270,7 +258,6 @@ export const TeamGoalsPage = ({
     useEffect(() => {
         setCurrentProjectCache({
             id: team.id,
-            key: team.key,
             title: team.title,
             description: team.description,
             flowId: team.flowId,
