@@ -84,7 +84,7 @@ const ProjectCreateForm: React.FC = () => {
     const t = useTranslations('projects');
     const router = useRouter();
     const { locale, user } = usePageContext();
-    const { createProject } = useProjectResource(0);
+    const { createProject } = useProjectResource('');
     const [focusedInput, setFocusedInput] = useState(false);
     const [hoveredInput, setHoveredInput] = useState(false);
     const [busy, setBusy] = useState(false);

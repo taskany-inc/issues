@@ -42,7 +42,7 @@ export const updateProjectSchemaProvider = () =>
         teams: z
             .array(
                 z.object({
-                    id: z.number(),
+                    id: z.string(),
                     title: z.string(),
                 }),
             )
@@ -52,7 +52,7 @@ export const updateProjectSchemaProvider = () =>
 export type CreateProjectFormType = z.infer<ReturnType<typeof createProjectSchemaProvider>>;
 export type UpdateProjectFormType = z.infer<ReturnType<typeof updateProjectSchemaProvider>>;
 
-export const useProjectResource = (id: number) => {
+export const useProjectResource = (id: string) => {
     const createProject = useCallback(
         (cb: Callback<Project['key']>) => async (form: CreateProjectFormType) => {
             const promise = gql.mutation({

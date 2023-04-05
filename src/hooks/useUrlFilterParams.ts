@@ -25,16 +25,14 @@ export const useUrlFilterParams = () => {
     const [tagsFilter, setTagsFilter] = useState<string[]>(parseQueryParam(router.query.tags?.toString()));
     const [estimateFilter, setEstimateFilter] = useState<string[]>(parseQueryParam(router.query.estimates?.toString()));
     const [ownerFilter, setOwnerFilter] = useState<string[]>(parseQueryParam(router.query.user?.toString()));
-    const [projectFilter, setProjectFilter] = useState<number[]>(
-        parseQueryParam(router.query.projects?.toString()).map((p) => Number(p)),
-    );
+    const [projectFilter, setProjectFilter] = useState<string[]>(parseQueryParam(router.query.projects?.toString()));
     const [fulltextFilter, setFulltextFilter] = useState<string>(
         parseQueryParam(router.query.search?.toString()).toString(),
     );
     const [limitFilter, setLimitFilter] = useState(Number(router.query.limit));
 
     const [filterValues, setFilterValues] = useState<
-        [string[], string[], string[], string[], string[], number[], string, number]
+        [string[], string[], string[], string[], string[], string[], string, number]
     >([
         priorityFilter,
         stateFilter,
