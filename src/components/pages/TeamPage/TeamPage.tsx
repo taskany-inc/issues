@@ -17,19 +17,18 @@ import { ParentListItem } from '../../ParentListItem';
 
 import { tr } from './TeamPage.i18n';
 
-const fetcher = createFetcher((_, key: string) => ({
+const fetcher = createFetcher((_, id: string) => ({
     team: [
         {
-            key,
+            id,
         },
         {
             id: true,
-            key: true,
             title: true,
             description: true,
             activityId: true,
             projects: {
-                key: true,
+                id: true,
                 title: true,
                 description: true,
                 createdAt: true,
@@ -80,13 +79,13 @@ const fetcher = createFetcher((_, key: string) => ({
 }));
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { key } }) => {
-        const ssrData = await fetcher(user, key);
+    async ({ user, params: { id } }) => {
+        const ssrData = await fetcher(user, id);
 
         return ssrData.team
             ? {
                   fallback: {
-                      [key]: ssrData,
+                      [id]: ssrData,
                   },
               }
             : {
@@ -98,11 +97,11 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-export const TeamPage = ({ user, locale, ssrTime, fallback, params: { key } }: ExternalPageProps) => {
+export const TeamPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
-    const { data } = useSWR(key, () => fetcher(user, key), {
+    const { data } = useSWR(id, () => fetcher(user, id), {
         fallback,
     });
 
@@ -115,7 +114,6 @@ export const TeamPage = ({ user, locale, ssrTime, fallback, params: { key } }: E
     useEffect(() => {
         setCurrentProjectCache({
             id: team.id,
-            key: team.key,
             title: team.title,
             description: team.description,
             flowId: team.flowId,
@@ -139,8 +137,8 @@ export const TeamPage = ({ user, locale, ssrTime, fallback, params: { key } }: E
                     {team?.projects?.map((project: Project) =>
                         nullable(project, (p) => (
                             <ParentListItem
-                                key={p.key}
-                                href={routes.project(p.key)}
+                                key={p.id}
+                                href={routes.project(p.id)}
                                 createdAt={p.createdAt}
                                 title={p.title}
                                 description={p.description}

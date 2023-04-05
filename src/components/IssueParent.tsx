@@ -11,7 +11,7 @@ import { Text } from './Text';
 import { Link } from './Link';
 
 interface Parent {
-    key?: string;
+    id?: string;
     title: string;
 }
 
@@ -54,7 +54,7 @@ export const IssueParent: React.FC<IssueParentProps> = ({ parent, kind, as, mode
 
     const kindContentMap = {
         project: normalizedParent.map((p, i) =>
-            nullable(p.key, (key) => (
+            nullable(p.id, (key) => (
                 <span key={key}>
                     <NextLink passHref href={routes.project(key)}>
                         <Link inline>{p.title}</Link>
@@ -64,7 +64,7 @@ export const IssueParent: React.FC<IssueParentProps> = ({ parent, kind, as, mode
             )),
         ),
         team: normalizedParent.map((t, i) =>
-            nullable(t.key, (key) => (
+            nullable(t.id, (key) => (
                 <span key={key}>
                     <NextLink passHref href={routes.team(key)}>
                         <Link inline>{t.title}</Link>

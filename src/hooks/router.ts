@@ -7,12 +7,12 @@ export const routes = {
     index: () => '/',
 
     teams: () => '/teams',
-    team: (key: string) => `/teams/${key}`,
-    teamGoals: (key: string) => `/teams/${key}/goals`,
-    teamSettings: (key: string) => `/teams/${key}/settings`,
+    team: (id: string) => `/teams/${id}`,
+    teamGoals: (id: string) => `/teams/${id}/goals`,
+    teamSettings: (id: string) => `/teams/${id}/settings`,
 
-    project: (key: string) => `/projects/${key}`,
-    projectSettings: (key: string) => `/projects/${key}/settings`,
+    project: (id: string) => `/projects/${id}`,
+    projectSettings: (id: string) => `/projects/${id}/settings`,
 
     goals: () => '/goals',
     goal: (id: string) => `/goals/${id}`,
@@ -35,9 +35,9 @@ export const useRouter = (): Record<keyof typeof routes, any> => {
         index: () => router.push(routes.index()),
 
         teams: () => router.push(routes.teams()),
-        team: (key: string) => router.push(routes.team(key)),
-        teamGoals: (key: string) => router.push(routes.teamGoals(key)),
-        teamSettings: (key: string) => router.push(routes.teamSettings(key)),
+        team: (id: string) => router.push(routes.team(id)),
+        teamGoals: (id: string) => router.push(routes.teamGoals(id)),
+        teamSettings: (id: string) => router.push(routes.teamSettings(id)),
 
         project: (id: string) => router.push(routes.project(id)),
         projectSettings: (id: string) => router.push(routes.projectSettings(id)),

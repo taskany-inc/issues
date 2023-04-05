@@ -37,18 +37,15 @@ const fetcher = createFetcher(
                 description: true,
                 project: {
                     id: true,
-                    key: true,
                     title: true,
                     flowId: true,
                     teams: {
                         id: true,
-                        key: true,
                         title: true,
                     },
                 },
                 team: {
                     id: true,
-                    key: true,
                     title: true,
                 },
                 priority: true,
@@ -129,13 +126,11 @@ const fetcher = createFetcher(
                 },
                 projects: {
                     id: true,
-                    key: true,
                     title: true,
                     flowId: true,
                 },
                 teams: {
                     id: true,
-                    key: true,
                     title: true,
                 },
                 estimates: {

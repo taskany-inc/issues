@@ -70,7 +70,6 @@ const goalsFetcher = createFetcher((_, query: string) => ({
             updatedAt: true,
             project: {
                 id: true,
-                key: true,
                 title: true,
                 description: true,
                 flow: {

@@ -23,7 +23,7 @@ const goalsQuery = async (
     db: PrismaClient,
     activityId: string,
     data: {
-        key: string;
+        id: string;
         query: string;
         priority: string[];
         states: string[];
@@ -40,7 +40,7 @@ const goalsQuery = async (
             ...goalsFilter(data, {
                 AND: {
                     team: {
-                        key: data.key,
+                        id: data.id,
                     },
                 },
             }),
@@ -54,7 +54,7 @@ const goalsQuery = async (
                     project: {
                         teams: {
                             some: {
-                                key: data.key,
+                                id: data.id,
                             },
                         },
                     },
@@ -111,14 +111,14 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('team', {
         type: Team,
         args: {
-            key: nonNull(stringArg()),
+            id: nonNull(stringArg()),
         },
-        resolve: async (_, { key }, { db, activity }) => {
+        resolve: async (_, { id }, { db, activity }) => {
             if (!activity) return null;
 
             return db.team.findUnique({
                 where: {
-                    key,
+                    id,
                 },
                 include: {
                     projects: {
@@ -219,7 +219,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: TeamCreateInput })),
         },
-        resolve: async (_, { data: { key, title, parent, description, flowId } }, { db, activity }) => {
+        resolve: async (_, { data: { id, title, parent, description, flowId } }, { db, activity }) => {
             if (!activity) return null;
 
             let parentTeam;
@@ -235,8 +235,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 const newTeam = await db.team.create({
                     data: {
-                        id: key,
-                        key,
+                        id,
                         title,
                         description,
                         flowId,

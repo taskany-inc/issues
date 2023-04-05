@@ -180,19 +180,17 @@ seed('Default projects', async () => {
             ['Finance department', sample(allUsers).activityId],
             ['Social promotion team', sample(allUsers).activityId],
             ['Cyber security', sample(allUsers).activityId],
-        ].map(([title, activityId]: string[]) => {
-            const key = keyPredictor(title);
-            return prisma.project.create({
+        ].map(([title, activityId]: string[]) =>
+            prisma.project.create({
                 data: {
-                    id: key,
+                    id: keyPredictor(title),
                     title,
-                    key,
                     flowId: f.id,
                     description: faker.lorem.sentence(5),
                     activityId,
                 },
-            });
-        }),
+            }),
+        ),
     );
     for (const project of allProjects) {
         if (project) {
@@ -213,7 +211,7 @@ seed('Default projects', async () => {
                 ].map(([title, description, activityId]: string[], index) =>
                     prisma.goal.create({
                         data: {
-                            id: `${project.key}-${index}`,
+                            id: `${project.id}-${index}`,
                             title,
                             description,
                             projectId: project.id,

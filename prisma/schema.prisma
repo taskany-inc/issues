@@ -135,7 +135,6 @@ model Activity {
 
 model Project {
   id           String        @id
-  key          String     @unique
   title        String
   description  String?
   parent       Project?   @relation("parentChildren", fields: [id], references: [id])
@@ -154,13 +153,11 @@ model Project {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([key])
   @@index([activityId])
 }
 
 model Team {
   id           String        @id
-  key          String     @unique
   title        String
   description  String?
   parent       Team?      @relation("teamChildren", fields: [id], references: [id])

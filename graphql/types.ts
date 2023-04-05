@@ -82,7 +82,6 @@ export const Project = objectType({
     name: ProjectModel.$name,
     definition(t) {
         t.field(ProjectModel.id);
-        t.field(ProjectModel.key);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
         t.field(ProjectModel.activityId);
@@ -118,7 +117,6 @@ export const Team = objectType({
     name: TeamModel.$name,
     definition(t) {
         t.field(TeamModel.id);
-        t.field(TeamModel.key);
         t.field(TeamModel.title);
         t.field(TeamModel.description);
         t.field(TeamModel.activityId);
@@ -438,7 +436,7 @@ export const CommentDeleteInput = inputObjectType({
 export const ProjectCreateInput = inputObjectType({
     name: 'ProjectCreateInput',
     definition(t) {
-        t.field(ProjectModel.key);
+        t.field(ProjectModel.id);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
         t.field(ProjectModel.flowId);
@@ -465,7 +463,7 @@ export const ProjectDeleteInput = inputObjectType({
 export const ProjectGoalsInput = inputObjectType({
     name: 'ProjectGoalsInput',
     definition(t) {
-        t.nonNull.string('key');
+        t.nonNull.field(ProjectModel.id);
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');
@@ -500,7 +498,7 @@ export const FindActivityInput = inputObjectType({
 export const TeamCreateInput = inputObjectType({
     name: 'TeamCreateInput',
     definition(t) {
-        t.field(TeamModel.key);
+        t.field(TeamModel.id);
         t.field(TeamModel.title);
         t.field(TeamModel.description);
         t.field(TeamModel.flowId);
@@ -525,7 +523,7 @@ export const TeamUpdateInput = inputObjectType({
 export const TeamGoalsInput = inputObjectType({
     name: 'TeamGoalsInput',
     definition(t) {
-        t.nonNull.field(TeamModel.key);
+        t.nonNull.field(TeamModel.id);
         t.nonNull.list.nonNull.string('priority');
         t.nonNull.list.nonNull.string('states');
         t.nonNull.list.nonNull.string('tags');

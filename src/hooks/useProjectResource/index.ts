@@ -11,6 +11,7 @@ type Callback<A = []> = (...args: A[]) => void;
 
 export const createProjectSchemaProvider = () =>
     z.object({
+        id: z.string().min(3),
         title: z
             .string({
                 required_error: tr("Project's title is required"),
@@ -26,7 +27,6 @@ export const createProjectSchemaProvider = () =>
         flow: z.object({
             id: z.string(),
         }),
-        key: z.string().min(3),
     });
 export const updateProjectSchemaProvider = () =>
     z.object({
@@ -54,19 +54,19 @@ export type UpdateProjectFormType = z.infer<ReturnType<typeof updateProjectSchem
 
 export const useProjectResource = (id: string) => {
     const createProject = useCallback(
-        (cb: Callback<Project['key']>) => async (form: CreateProjectFormType) => {
+        (cb: Callback<Project['id']>) => async (form: CreateProjectFormType) => {
             const promise = gql.mutation({
                 createProject: [
                     {
                         data: {
-                            key: form.key,
+                            id: form.id,
                             title: form.title,
                             description: form.description,
                             flowId: form.flow.id,
                         },
                     },
                     {
-                        key: true,
+                        id: true,
                     },
                 ],
             });
@@ -79,7 +79,7 @@ export const useProjectResource = (id: string) => {
 
             const res = await promise;
 
-            res.createProject && cb(res.createProject.key);
+            res.createProject && cb(res.createProject.id);
         },
         [],
     );

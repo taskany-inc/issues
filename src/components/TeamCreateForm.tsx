@@ -47,14 +47,14 @@ const flowFetcher = createFetcher(() => ({
         },
     },
 }));
-const teamsFetcher = createFetcher((_, key: string) => ({
+const teamsFetcher = createFetcher((_, id: string) => ({
     team: [
         {
-            key,
+            id,
         },
         {
+            id: true,
             title: true,
-            key: true,
         },
     ],
 }));
@@ -84,7 +84,7 @@ const StyledTeamKeyInputContainer = styled(InputContainer)`
 
 const schemaProvider = (t: (key: string) => string) =>
     z.object({
-        key: z.string().min(3),
+        id: z.string().min(3),
         title: z
             .string({
                 required_error: t("Team's title is required"),
@@ -138,12 +138,12 @@ const TeamCreateForm: React.FC = () => {
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
     const titleWatcher = watch('title');
-    const keyWatcher = watch('key');
+    const keyWatcher = watch('id');
 
     useDebouncedEffect(
         () => {
             if (!dirtyKey && titleWatcher && titleWatcher !== '') {
-                setValue('key', keyPredictor(titleWatcher));
+                setValue('id', keyPredictor(titleWatcher));
             }
         },
         300,
@@ -168,14 +168,14 @@ const TeamCreateForm: React.FC = () => {
             createTeam: [
                 {
                     data: {
-                        key: form.key,
+                        id: form.id,
                         title: form.title,
                         description: form.description,
                         flowId: form.flow.id,
                     },
                 },
                 {
-                    key: true,
+                    id: true,
                 },
             ],
         });
@@ -188,7 +188,7 @@ const TeamCreateForm: React.FC = () => {
 
         const res = await promise;
 
-        res.createTeam?.key && router.team(res.createTeam.key);
+        res.createTeam?.id && router.team(res.createTeam.id);
         dispatchModalEvent(ModalEvent.TeamCreateModal)();
     };
 
@@ -237,7 +237,7 @@ const TeamCreateForm: React.FC = () => {
                         {nullable(titleWatcher, () => (
                             <StyledTeamKeyContainer>
                                 <Controller
-                                    name="key"
+                                    name="id"
                                     control={control}
                                     render={({ field }) => (
                                         <StyledTeamKeyInputContainer
@@ -250,7 +250,7 @@ const TeamCreateForm: React.FC = () => {
                                                 available={isKeyUnique && isKeyEnoughLength}
                                                 tooltip={tooltip}
                                                 onDirty={onKeyDirty}
-                                                error={errorsResolver('key')}
+                                                error={errorsResolver('id')}
                                                 {...field}
                                             />
                                         </StyledTeamKeyInputContainer>

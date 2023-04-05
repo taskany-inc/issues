@@ -34,20 +34,18 @@ import { tr } from './TeamSettingsPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
 
-const teamFetcher = createFetcher((_, key: string) => ({
+const teamFetcher = createFetcher((_, id: string) => ({
     team: [
         {
-            key,
+            id,
         },
         {
             id: true,
-            key: true,
             title: true,
             description: true,
             activityId: true,
             projects: {
                 id: true,
-                key: true,
                 title: true,
                 description: true,
                 createdAt: true,
@@ -111,13 +109,13 @@ const projectsFetcher = createFetcher((_, query: string) => ({
 }));
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { key } }) => {
-        const ssrData = await teamFetcher(user, key);
+    async ({ user, params: { id } }) => {
+        const ssrData = await teamFetcher(user, id);
 
         return ssrData.team
             ? {
                   fallback: {
-                      [key]: ssrData,
+                      [id]: ssrData,
                   },
               }
             : {
@@ -155,18 +153,12 @@ const schemaProvider = () =>
 
 type FormType = z.infer<ReturnType<typeof schemaProvider>>;
 
-export const TeamSettingsPage = ({
-    user,
-    locale,
-    ssrTime,
-    fallback,
-    params: { key },
-}: ExternalPageProps<{ key: string }>) => {
+export const TeamSettingsPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
     const schema = schemaProvider();
     const nextRouter = useNextRouter();
 
-    const { data } = useSWR(key, () => teamFetcher(user, key), {
+    const { data } = useSWR(id, () => teamFetcher(user, id), {
         fallback,
         refreshInterval,
     });
@@ -311,7 +303,7 @@ export const TeamSettingsPage = ({
 
         await promise;
 
-        router.team(team.key);
+        router.team(team.id);
     }, [router, team, transferTo]);
 
     const teamProjectsIds = formValues.projects?.map((project) => project!.id) ?? [];
@@ -436,7 +428,7 @@ export const TeamSettingsPage = ({
                         <Form>
                             <FormInput
                                 flat="bottom"
-                                placeholder={team.key}
+                                placeholder={team.id}
                                 autoComplete="off"
                                 onChange={onConfirmationInputChange}
                             />
@@ -448,7 +440,7 @@ export const TeamSettingsPage = ({
                                     <Button
                                         size="m"
                                         view="warning"
-                                        disabled={deleteConfirmation !== team.key}
+                                        disabled={deleteConfirmation !== team.id}
                                         onClick={deleteTeam}
                                         text={tr('Yes, delete it')}
                                     />
