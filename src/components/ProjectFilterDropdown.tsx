@@ -11,10 +11,10 @@ const Dropdown = dynamic(() => import('./Dropdown'));
 interface ProjectFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
     projects: Project[];
-    value?: number[];
+    value?: string[];
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
-    onChange?: (selected: number[]) => void;
+    onChange?: (selected: string[]) => void;
 }
 
 export const ProjectFilterDropdown: React.FC<ProjectFilterDropdownProps> = React.forwardRef<

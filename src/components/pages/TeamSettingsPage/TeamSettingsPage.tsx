@@ -146,7 +146,7 @@ const schemaProvider = () =>
         projects: z
             .array(
                 z.object({
-                    id: z.number(),
+                    id: z.string(),
                     title: z.string(),
                 }),
             )

@@ -14,8 +14,8 @@ export interface TeamGroup {
 }
 
 export interface GoalsGroups {
-    teams: Record<number, TeamGroup>;
-    projects: Record<number, ProjectGroup>;
+    teams: Record<string, TeamGroup>;
+    projects: Record<string, ProjectGroup>;
 }
 
 // TODO: it may be calculated in gql resolver

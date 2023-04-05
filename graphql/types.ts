@@ -306,7 +306,7 @@ export const GoalCreateInput = inputObjectType({
         t.field(GoalModel.private);
         t.field('estimate', { type: EstimateInput });
         t.field(GoalModel.ownerId);
-        t.int('parent');
+        t.string('parent');
         t.string('kind'); // team, project
         t.field(GoalModel.stateId);
         t.field(GoalModel.priority);
@@ -326,7 +326,7 @@ export const GoalUpdateInput = inputObjectType({
         t.field(GoalModel.private);
         t.field('estimate', { type: EstimateInput });
         t.field(GoalModel.ownerId);
-        t.int('parent');
+        t.string('parent');
         t.string('kind'); // team, project
         t.field(GoalModel.stateId);
         t.field(GoalModel.priority);
@@ -451,7 +451,7 @@ export const ProjectUpdateInput = inputObjectType({
         t.field(ProjectModel.id);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
-        t.nonNull.list.nonNull.int('teams');
+        t.nonNull.list.nonNull.string('teams');
     },
 });
 
@@ -504,7 +504,7 @@ export const TeamCreateInput = inputObjectType({
         t.field(TeamModel.title);
         t.field(TeamModel.description);
         t.field(TeamModel.flowId);
-        t.int('parent');
+        t.string('parent');
         t.list.nonNull.int('children');
         t.list.nonNull.string('projects');
     },
@@ -516,9 +516,9 @@ export const TeamUpdateInput = inputObjectType({
         t.nonNull.field(TeamModel.id);
         t.field(TeamModel.title);
         t.field(TeamModel.description);
-        t.int('parent');
-        t.list.nonNull.int('children');
-        t.nonNull.list.nonNull.int('projects');
+        t.string('parent');
+        t.list.nonNull.string('children');
+        t.nonNull.list.nonNull.string('projects');
     },
 });
 
@@ -569,7 +569,7 @@ export const GoalsMetaOutput = objectType({
 export const TransferOwnershipInput = inputObjectType({
     name: 'TransferOwnershipInput',
     definition(t) {
-        t.field(ProjectModel.id);
+        t.nonNull.string('id');
         t.nonNull.string('activityId');
     },
 });

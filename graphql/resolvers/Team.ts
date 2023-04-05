@@ -235,6 +235,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 const newTeam = await db.team.create({
                     data: {
+                        id: key,
                         key,
                         title,
                         description,

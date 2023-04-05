@@ -134,7 +134,7 @@ model Activity {
 }
 
 model Project {
-  id           Int        @id @default(autoincrement())
+  id           String        @id
   key          String     @unique
   title        String
   description  String?
@@ -159,7 +159,7 @@ model Project {
 }
 
 model Team {
-  id           Int        @id @default(autoincrement())
+  id           String        @id
   key          String     @unique
   title        String
   description  String?
@@ -209,9 +209,9 @@ model Goal {
   priority     String?
   estimate     Estimate[]
   project      Project?   @relation("projectGoals", fields: [projectId], references: [id])
-  projectId    Int?
+  projectId    String?
   team         Team?      @relation("teamGoals", fields: [teamId], references: [id])
-  teamId       Int?
+  teamId       String?
   state        State?     @relation("goalState", fields: [stateId], references: [id])
   stateId      String?
   activity     Activity?  @relation("goalIssuer", fields: [activityId], references: [id])

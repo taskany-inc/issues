@@ -120,7 +120,7 @@ type Goal {
   priority: String
   private: Boolean
   project: Project
-  projectId: Int
+  projectId: String
   reactions: [Reaction]
   relatedTo: [Goal]
   stargizers: [Activity]
@@ -128,7 +128,7 @@ type Goal {
   stateId: String
   tags: [Tag]
   team: Team
-  teamId: Int
+  teamId: String
   title: String!
   updatedAt: DateTime!
   watchers: [Activity]
@@ -151,7 +151,7 @@ input GoalCreateInput {
   key: Boolean
   kind: String
   ownerId: String
-  parent: Int
+  parent: String
   participants: [ActivityInput]
   personal: Boolean
   priority: String
@@ -175,7 +175,7 @@ input GoalUpdateInput {
   key: Boolean
   kind: String
   ownerId: String
-  parent: Int
+  parent: String
   participants: [String]
   personal: Boolean
   priority: String
@@ -239,7 +239,7 @@ type Project {
   flow: Flow
   flowId: String!
   goals: [Goal]
-  id: Int!
+  id: ID!
   key: String!
   parent: Project
   participants: [Activity]
@@ -263,7 +263,7 @@ input ProjectCreateInput {
 }
 
 input ProjectDelete {
-  id: Int!
+  id: ID!
 }
 
 input ProjectGoalsInput {
@@ -279,8 +279,8 @@ input ProjectGoalsInput {
 
 input ProjectUpdateInput {
   description: String
-  id: Int!
-  teams: [Int!]!
+  id: ID!
+  teams: [String!]!
   title: String!
 }
 
@@ -387,7 +387,7 @@ type Team {
   flow: Flow
   flowId: String
   goals: [Goal]
-  id: Int!
+  id: ID!
   key: String!
   parent: Team
   participants: [Activity]
@@ -408,13 +408,13 @@ input TeamCreateInput {
   description: String
   flowId: String
   key: String!
-  parent: Int
+  parent: String
   projects: [String!]
   title: String!
 }
 
 input TeamDelete {
-  id: Int!
+  id: ID!
 }
 
 input TeamGoalsInput {
@@ -429,11 +429,11 @@ input TeamGoalsInput {
 }
 
 input TeamUpdateInput {
-  children: [Int!]
+  children: [String!]
   description: String
-  id: Int!
-  parent: Int
-  projects: [Int!]!
+  id: ID!
+  parent: String
+  projects: [String!]!
   title: String!
 }
 
@@ -443,7 +443,7 @@ input TeamsInput {
 
 input TransferOwnershipInput {
   activityId: String!
-  id: Int!
+  id: String!
 }
 
 type User {

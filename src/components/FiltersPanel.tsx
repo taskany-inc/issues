@@ -26,7 +26,7 @@ interface FiltersPanelProps {
     projects?: React.ComponentProps<typeof ProjectFilterDropdown>['projects'];
     tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilterDropdown>['estimates'];
-    filterValues: [string[], string[], string[], string[], string[], number[], string, number];
+    filterValues: [string[], string[], string[], string[], string[], string[], string, number];
     children?: React.ReactNode;
 
     onSearchChange: (search: string) => void;

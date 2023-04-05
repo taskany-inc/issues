@@ -194,6 +194,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             try {
                 return db.project.create({
                     data: {
+                        id: key,
                         key,
                         title,
                         description,
