@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic';
 import { nullable } from '../utils/nullable';
 
 const themes = {
-    dark: dynamic(() => import('../design/@generated/themes/dark')),
-    light: dynamic(() => import('../design/@generated/themes/light')),
+    dark: dynamic(() => import('@taskany/colors/themes/dark')),
+    light: dynamic(() => import('@taskany/colors/themes/light')),
 };
 
 export const Theme: React.FC<{ theme: keyof typeof themes }> = ({ theme = 'dark' }) => {

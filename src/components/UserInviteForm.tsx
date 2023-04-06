@@ -4,8 +4,8 @@ import toast from 'react-hot-toast';
 import z from 'zod';
 import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
+import { gapM, gapS, gray6, gray7, gray10 } from '@taskany/colors';
 
-import { gapM, gapS, gray6, gray7, star0 } from '../design/@generated/themes';
 import { gql } from '../utils/gql';
 import { KeyCode } from '../hooks/useKeyboard';
 import { routes } from '../hooks/router';
@@ -173,7 +173,7 @@ const UserInviteForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                         {t.rich('Press key to send invites', {
                             key: () => <Keyboard command enter />,
                         })}

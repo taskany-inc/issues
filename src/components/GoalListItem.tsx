@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
+import { gray4, textColor, gray10, gapM, gapS } from '@taskany/colors';
 
 import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
-import { gray4, textColor, gray10, gapM, gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';

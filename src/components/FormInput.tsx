@@ -2,8 +2,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
+import { danger10, gray2, gray3, gray8, radiusS, textColor } from '@taskany/colors';
 
-import { danger10, gray2, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { Text } from './Text';

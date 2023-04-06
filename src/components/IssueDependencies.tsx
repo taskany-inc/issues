@@ -2,9 +2,9 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { gapS, gray8 } from '@taskany/colors';
 
 import { enumDependency, Goal } from '../../graphql/@generated/genql';
-import { gapS, gray8 } from '../design/@generated/themes';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { nullable } from '../utils/nullable';
 

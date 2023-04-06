@@ -1,4 +1,4 @@
-import { gray6 } from '../design/@generated/themes';
+import { gray6 } from '@taskany/colors';
 
 import { Text } from './Text';
 

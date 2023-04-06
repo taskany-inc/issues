@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { backgroundColor, gapM, radiusM } from '@taskany/colors';
 
-import { backgroundColor, gapM, radiusM } from '../design/@generated/themes';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { nullable } from '../utils/nullable';
 

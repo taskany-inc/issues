@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { gapXs, gray8 } from '@taskany/colors';
 
-import { gapXs, gray8 } from '../design/@generated/themes';
 import { pluralize } from '../utils/pluralize';
 import { usePageContext } from '../hooks/usePageContext';
 import { nullable } from '../utils/nullable';

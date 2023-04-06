@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import styled from 'styled-components';
+import { gapS } from '@taskany/colors';
 
 import { Activity } from '../../graphql/@generated/genql';
-import { gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { CleanButton } from './CleanButton';

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
+import { gapS, gray6, gray10 } from '@taskany/colors';
 
 import { gql } from '../utils/gql';
-import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { Activity } from '../../graphql/@generated/genql';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
@@ -96,7 +96,7 @@ const GoalCreateForm: React.FC = () => {
             onSumbit={createGoal}
         >
             <StyledFormBottom>
-                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                     {t.rich('Press key to create the goal', {
                         key: () => <Keyboard command enter />,
                     })}

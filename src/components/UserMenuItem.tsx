@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { gray4, gray6, radiusM, textColor } from '../design/@generated/themes';
+import { gray4, gray6, radiusM, textColor } from '@taskany/colors';
 
 import { UserPic } from './UserPic';
 

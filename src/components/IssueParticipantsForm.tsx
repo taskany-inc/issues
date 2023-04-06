@@ -3,8 +3,8 @@ import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
+import { gapL, gapM } from '@taskany/colors';
 
-import { gapL, gapM } from '../design/@generated/themes';
 import { Activity, Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { usePageContext } from '../hooks/usePageContext';

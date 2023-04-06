@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Link from 'next/link';
+import { gray4, textColor, gray10, gapM, gapS, gray7 } from '@taskany/colors';
 
-import { gray4, textColor, gray10, gapM, gapS, gray7 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { Activity } from '../../graphql/@generated/genql';
 

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
+import { gapM, gapS, gray6 } from '@taskany/colors';
 
-import { gapM, gapS, gray6 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { PageContent } from './Page';

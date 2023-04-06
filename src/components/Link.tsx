@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-import { link10 } from '../design/@generated/themes';
+import { link10 } from '@taskany/colors';
 
 interface LinkProps {
     inline?: boolean;

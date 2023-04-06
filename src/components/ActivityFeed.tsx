@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { gapL, gapM } from '../design/@generated/themes';
+import { gapL, gapM } from '@taskany/colors';
 
 export const ActivityFeed = styled.div`
     display: grid;

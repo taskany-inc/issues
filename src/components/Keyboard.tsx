@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-import { gray4, gray8, gray9, radiusM } from '../design/@generated/themes';
+import { gray4, gray8, gray9, radiusM } from '@taskany/colors';
 
 interface KeyboardProps {
     command?: boolean;

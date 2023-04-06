@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-import { textColor, backgroundColor, colorPrimary, brandColor, gray9 } from '../design/@generated/themes';
+import { textColor, backgroundColor, colorPrimary, brandColor, gray9 } from '@taskany/colors';
 
 interface PlusProps {
     action?: boolean;

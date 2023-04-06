@@ -4,10 +4,10 @@ import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
+import { danger0, gapM, gapS } from '@taskany/colors';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
-import { danger0, gapM, gapS } from '../design/@generated/themes';
 import { goalFetcher, refreshInterval } from '../utils/entityFetcher';
 import { nullable } from '../utils/nullable';
 import { formatEstimate } from '../utils/dateTime';

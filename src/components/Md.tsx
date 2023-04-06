@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import { useRemark, useRemarkSync } from 'react-remark';
 import remarkGFM from 'remark-gfm';
 import remarkEmoji from 'remark-emoji';
-
-import { link10, radiusS } from '../design/@generated/themes';
+import { link10, radiusS } from '@taskany/colors';
 
 const StyledMd = styled.div`
     a {

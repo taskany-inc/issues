@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { gapS, gray2, gray3, radiusS, textColor } from '../design/@generated/themes';
+import { gapS, gray2, gray3, radiusS, textColor } from '@taskany/colors';
 
 interface FormActionsProps {
     flat?: 'top' | 'bottom';

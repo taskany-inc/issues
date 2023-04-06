@@ -1,6 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
-
-import { backgroundColor, fontDisplay, textColor } from '../design/@generated/themes';
+import { backgroundColor, fontDisplay, textColor } from '@taskany/colors';
 
 export const GlobalStyle = createGlobalStyle`
     html, body {

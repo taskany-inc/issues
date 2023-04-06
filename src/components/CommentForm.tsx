@@ -2,8 +2,8 @@ import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { Controller, Control } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { backgroundColor, gapS, gray4, gray6 } from '@taskany/colors';
 
-import { backgroundColor, gapS, gray4, gray6 } from '../design/@generated/themes';
 import { submitKeys } from '../utils/hotkeys';
 import { nullable } from '../utils/nullable';
 import { usePageContext } from '../hooks/usePageContext';

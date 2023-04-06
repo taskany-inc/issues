@@ -1,7 +1,7 @@
 import styled from 'styled-components';
+import { gapS } from '@taskany/colors';
 
 import { Tag as TagModel } from '../../graphql/@generated/genql';
-import { gapS } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { Tag } from './Tag';

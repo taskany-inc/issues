@@ -3,9 +3,9 @@ import NextLink from 'next/link';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { textColor, gray7, colorPrimary, gray3 } from '@taskany/colors';
 
 import { routes } from '../hooks/router';
-import { textColor, gray7, colorPrimary, gray3 } from '../design/@generated/themes';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { HeaderLogo } from './HeaderLogo';

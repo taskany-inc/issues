@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import NextLink from 'next/link';
+import { gapM, gapS, gapXs } from '@taskany/colors';
 
-import { gapM, gapS, gapXs } from '../design/@generated/themes';
 import { routes } from '../hooks/router';
 
 import { StateDot } from './StateDot';

@@ -1,9 +1,9 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
+import { danger0 } from '@taskany/colors';
 
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
-import { danger0 } from '../design/@generated/themes';
 
 import { ModalContent, ModalHeader } from './Modal';
 import { FormTitle } from './FormTitle';

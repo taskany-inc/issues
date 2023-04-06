@@ -6,8 +6,8 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { z } from 'zod';
+import { gapS, gray6, gray10 } from '@taskany/colors';
 
-import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
 import { nullable } from '../utils/nullable';
@@ -255,7 +255,7 @@ const ProjectCreateForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('create.Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                    <Tip title={t('create.Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                         {t.rich('create.Press key to create the project', {
                             key: () => <Keyboard command enter />,
                         })}

@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
+import { gapS, gray4, radiusM, textColor } from '@taskany/colors';
 
-import { gapS, gray4, radiusM, textColor } from '../design/@generated/themes';
 import { pageContext, PageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/declareSsrProps';
 import { useHotkeys } from '../hooks/useHotkeys';

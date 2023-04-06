@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-import { gapS, gray2 } from '../design/@generated/themes';
+import { gapS, gray2 } from '@taskany/colors';
 
 interface InputContainerProps {
     brick?: 'left' | 'right' | 'center';
