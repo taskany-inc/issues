@@ -134,10 +134,11 @@ model Activity {
 }
 
 model Project {
-  id           String        @id
+  id           String     @id
   title        String
   description  String?
-  parent       Project?   @relation("parentChildren", fields: [id], references: [id])
+  team         Boolean?
+  parent       Project[]  @relation("parentChildren")
   children     Project[]  @relation("parentChildren")
   activity     Activity   @relation(fields: [activityId], references: [id])
   activityId   String
@@ -152,30 +153,26 @@ model Project {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-
-  @@index([activityId])
 }
 
 model Team {
-  id           String        @id
+  id           String     @id
   title        String
   description  String?
-  parent       Team?      @relation("teamChildren", fields: [id], references: [id])
+  parent       Team[]     @relation("teamChildren")
   children     Team[]     @relation("teamChildren")
   projects     Project[]  @relation("teamProjects")
   activity     Activity   @relation(fields: [activityId], references: [id])
   activityId   String
   participants Activity[] @relation("teamParticipants")
   goals        Goal[]     @relation("teamGoals")
-  flow         Flow?       @relation(fields: [flowId], references: [id])
+  flow         Flow?      @relation(fields: [flowId], references: [id])
   flowId       String?
   watchers     Activity[] @relation("teamWatchers")
   stargizers   Activity[] @relation("teamStargizers")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-
-  @@index([activityId])
 }
 
 model Estimate {
@@ -202,7 +199,7 @@ model Goal {
   key          Boolean?
   personal     Boolean?
   private      Boolean?
-  archived     Boolean?  @default(false)
+  archived     Boolean?   @default(false)
   priority     String?
   estimate     Estimate[]
   project      Project?   @relation("projectGoals", fields: [projectId], references: [id])

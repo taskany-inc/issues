@@ -84,11 +84,12 @@ export const Project = objectType({
         t.field(ProjectModel.id);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
+        t.field(ProjectModel.team);
         t.field(ProjectModel.activityId);
         t.field('activity', { type: Activity });
         t.field(ProjectModel.flowId);
         t.field('flow', { type: Flow });
-        t.field('parent', { type: Project });
+        t.list.field('parent', { type: Project });
         t.list.field('children', { type: Project });
         t.list.field('teams', { type: nonNull(Team) });
         t.list.field('goals', { type: Goal });
