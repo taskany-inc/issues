@@ -2,9 +2,9 @@ import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
+import { brandColor, danger0, gapM, gapS, gray4 } from '@taskany/colors';
 
 import { Comment, User } from '../../graphql/@generated/genql';
-import { brandColor, danger0, gapM, gapS, gray4 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { useReactionsResource } from '../hooks/useReactionsResource';
 import { useCommentResource } from '../hooks/useCommentResource';

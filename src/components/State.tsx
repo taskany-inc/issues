@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import colorLayer from 'color-layer';
+import { gray6, radiusXl } from '@taskany/colors';
 
-import { gray6, radiusXl } from '../design/@generated/themes';
 import { usePageContext } from '../hooks/usePageContext';
 
 interface StateProps {

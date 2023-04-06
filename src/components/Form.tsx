@@ -1,6 +1,6 @@
 import styled from 'styled-components';
+import { gray3 } from '@taskany/colors';
 
-import { gray3 } from '../design/@generated/themes';
 import { useKeyboard } from '../hooks/useKeyboard';
 
 interface FormProps {

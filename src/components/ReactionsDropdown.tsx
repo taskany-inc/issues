@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import type { EmojiSelection, EmojiPicker } from 'picmo';
 import dynamic from 'next/dynamic';
+import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '@taskany/colors';
 
 import { PageContext } from '../utils/pageContext';
-import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '../design/@generated/themes';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { Icon } from './Icon';

@@ -1,6 +1,5 @@
 import styled, { css, createGlobalStyle } from 'styled-components';
-
-import { fontDisplay, gapL, gapM, gapS, gapSm, gapXl, gapXs, textColor } from '../design/@generated/themes';
+import { fontDisplay, gapL, gapM, gapS, gapSm, gapXl, gapXs, textColor } from '@taskany/colors';
 
 const textSizes = {
     xxs: '0.5rem',

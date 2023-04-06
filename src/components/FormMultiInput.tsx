@@ -2,8 +2,8 @@
 import React, { useCallback, useState, ChangeEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
+import { gapS, gray3, gray8, radiusS, textColor } from '@taskany/colors';
 
-import { gapS, gray3, gray8, radiusS, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { Icon } from './Icon';

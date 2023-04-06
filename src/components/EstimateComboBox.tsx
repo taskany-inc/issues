@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import InputMask from 'react-input-mask';
 import dynamic from 'next/dynamic';
+import { danger8, danger9, gray6, textColor } from '@taskany/colors';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
-import { danger8, danger9, gray6, textColor } from '../design/@generated/themes';
 import {
     createLocaleDate,
     quarterFromDate,

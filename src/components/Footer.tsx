@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { gray0 } from '../design/@generated/themes';
+import { gray0 } from '@taskany/colors';
 
 import { SheepLogo } from './SheepLogo';
 

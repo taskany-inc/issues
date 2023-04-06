@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { brandColor, textColor } from '../design/@generated/themes';
+import { brandColor, textColor } from '@taskany/colors';
 
 const sizesMap = {
     s: 24,

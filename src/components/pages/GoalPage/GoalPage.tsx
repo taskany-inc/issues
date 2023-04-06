@@ -7,6 +7,7 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
+import { danger0, gapM, gapS } from '@taskany/colors';
 
 import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '../../../../graphql/@generated/genql';
 import { gql } from '../../../utils/gql';
@@ -16,7 +17,6 @@ import { nullable } from '../../../utils/nullable';
 import { editGoalKeys } from '../../../utils/hotkeys';
 import { goalFetcher, refreshInterval } from '../../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
-import { danger0, gapM, gapS } from '../../../design/@generated/themes';
 import { Page, PageContent, PageActions } from '../../Page';
 import { PageSep } from '../../PageSep';
 import { Link } from '../../Link';

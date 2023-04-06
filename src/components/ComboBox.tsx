@@ -2,10 +2,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
+import { danger10 } from '@taskany/colors';
 
 import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode, KeyboardEvents } from '../hooks/useKeyboard';
-import { danger10 } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { flatten } from '../utils/flatten';
 

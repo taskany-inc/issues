@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
+import { gapM } from '@taskany/colors';
 
-import { gapM } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { State as StateModel } from '../../graphql/@generated/genql';
 import { useKeyPress } from '../hooks/useKeyPress';

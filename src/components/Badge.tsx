@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { gray7, gray9, radiusL } from '../design/@generated/themes';
+import { gray7, gray9, radiusL } from '@taskany/colors';
 
 interface BadgeProps {
     size?: 's' | 'm';

@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
+import { gapM, gapS, gray5, textColor } from '@taskany/colors';
 
-import { gapM, gapS, gray5, textColor } from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 
 import { Badge } from './Badge';

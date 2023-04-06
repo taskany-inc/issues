@@ -1,8 +1,8 @@
 import React, { useContext, createContext, useCallback } from 'react';
 import styled from 'styled-components';
+import { gapS, gray3, gray8, radiusS } from '@taskany/colors';
 
 import { nullable } from '../utils/nullable';
-import { gapS, gray3, gray8, radiusS } from '../design/@generated/themes';
 
 import { Text } from './Text';
 

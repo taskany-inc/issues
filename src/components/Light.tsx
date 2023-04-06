@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { gray9 } from '../design/@generated/themes';
+import { gray9 } from '@taskany/colors';
 
 export const Light = styled.span`
     display: inline-block;

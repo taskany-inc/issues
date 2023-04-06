@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { gapS, gray9, radiusXl, textColor } from '../design/@generated/themes';
+import { gapS, gray9, radiusXl, textColor } from '@taskany/colors';
 
 interface FiltersMenuItemProps {
     active?: boolean;

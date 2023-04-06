@@ -3,19 +3,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { useDropzone } from 'react-dropzone';
+import { danger10, gapS, gapXs, gray2, gray3, gray4, gray6, gray8, radiusS, textColor } from '@taskany/colors';
 
-import {
-    danger10,
-    gapS,
-    gapXs,
-    gray2,
-    gray3,
-    gray4,
-    gray6,
-    gray8,
-    radiusS,
-    textColor,
-} from '../design/@generated/themes';
 import { nullable } from '../utils/nullable';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { useMounted } from '../hooks/useMounted';

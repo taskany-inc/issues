@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import colorLayer from 'color-layer';
+import { gray6 } from '@taskany/colors';
 
 import { usePageContext } from '../hooks/usePageContext';
-import { gray6 } from '../design/@generated/themes';
 
 interface StateDotProps {
     title?: string;

@@ -8,12 +8,12 @@ import useSWR from 'swr';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { useRouter as useNextRouter } from 'next/router';
+import { gray10 } from '@taskany/colors';
 
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { shallowEqual } from '../../../utils/shallowEqual';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
-import { star10 } from '../../../design/@generated/themes';
 import { User } from '../../../../graphql/@generated/genql';
 import { Page } from '../../Page';
 import { PageSep } from '../../PageSep';
@@ -276,9 +276,9 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
                     </Form>
                 </SettingsCard>
 
-                <Tip title={tr('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star10} />}>
+                <Tip title={tr('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                     {tr.raw('Press {key} to save settings', {
-                        key: <Keyboard command enter />,
+                        key: <Keyboard key="keyboard" command enter />,
                     })}
                 </Tip>
             </SettingsContent>

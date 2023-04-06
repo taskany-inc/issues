@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { gapS, gapXs, gray4, radiusM } from '../design/@generated/themes';
+import { gapS, gapXs, gray4, radiusM } from '@taskany/colors';
 
 import { Text } from './Text';
 

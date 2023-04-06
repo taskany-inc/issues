@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
+import { gray8, gapM, gray9, gapS } from '@taskany/colors';
 
-import { gray8, gapM, gray9, gapS } from '../design/@generated/themes';
 import { isEventTargetInputOrTextArea } from '../utils/hotkeys';
 
 import { Text } from './Text';

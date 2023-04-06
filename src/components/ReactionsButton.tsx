@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-
-import { gapXs } from '../design/@generated/themes';
+import { gapXs } from '@taskany/colors';
 
 import { Button } from './Button';
 import { Icon, sizesMap } from './Icon';

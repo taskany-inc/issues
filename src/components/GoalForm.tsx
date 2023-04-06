@@ -4,8 +4,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
+import { gapS, gray2 } from '@taskany/colors';
 
-import { gapS, gray2 } from '../design/@generated/themes';
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 import { submitKeys } from '../utils/hotkeys';

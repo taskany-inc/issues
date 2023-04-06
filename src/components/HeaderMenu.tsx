@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { signIn } from 'next-auth/react';
 import NextLink from 'next/link';
+import { gray3, textColor, link10 } from '@taskany/colors';
 
 import { nullable } from '../utils/nullable';
 import { routes } from '../hooks/router';
-import { gray3, textColor, link10 } from '../design/@generated/themes';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { UserPic } from './UserPic';

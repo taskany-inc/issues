@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-
-import { gapS } from '../design/@generated/themes';
+import { gapS } from '@taskany/colors';
 
 import { Text } from './Text';
 import { Link } from './Link';

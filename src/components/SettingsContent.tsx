@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-
-import { danger0, gapM, gray4, warn0 } from '../design/@generated/themes';
+import { danger0, gapM, gray4, warn0 } from '@taskany/colors';
 
 import { FormCard } from './FormCard';
 import { PageContent } from './Page';

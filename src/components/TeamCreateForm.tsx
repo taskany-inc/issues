@@ -7,8 +7,8 @@ import z from 'zod';
 import useSWR from 'swr';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
+import { gapS, gray6, gray10 } from '@taskany/colors';
 
-import { gapS, gray6, star0 } from '../design/@generated/themes';
 import { createFetcher } from '../utils/createFetcher';
 import { nullable } from '../utils/nullable';
 import { gql } from '../utils/gql';
@@ -297,7 +297,7 @@ const TeamCreateForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={star0} />}>
+                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
                         {t.rich('Press key to create the team', {
                             key: () => <Keyboard command enter />,
                         })}
