@@ -205,7 +205,6 @@ type Mutation {
   createTag(description: String, title: String!): Tag
   deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
-  deleteTeam(data: TeamDelete!): Team
   toggleGoalArchive(data: GoalArchiveInput!): Activity
   toggleGoalDependency(toggle: GoalDependencyToggleInput!): Goal
   toggleGoalStargizer(data: SubscriptionToggleInput!): Activity
@@ -213,15 +212,11 @@ type Mutation {
   toggleProjectStargizer(data: SubscriptionToggleInput!): Activity
   toggleProjectWatcher(data: SubscriptionToggleInput!): Activity
   toggleReaction(data: ReactionToggleInput!): Reaction
-  toggleTeamStargizer(data: SubscriptionToggleInput!): Activity
-  toggleTeamWatcher(data: SubscriptionToggleInput!): Activity
   transferProjectOwnership(data: TransferOwnershipInput!): Project
-  transferTeamOwnership(data: TransferOwnershipInput!): Team
   updateComment(data: CommentUpdateInput!): Comment
   updateGoal(data: GoalUpdateInput!): Goal
   updateProject(data: ProjectUpdateInput!): Project
   updateSettings(data: SettingsUpdateInput!): Settings
-  updateTeam(data: TeamUpdateInput!): Team
   updateUser(data: UserUpdateInput!): User
   usersInvites(input: UserInvitesInput!): [Ghost]
 }
@@ -293,18 +288,13 @@ type Query {
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
   goalDependencyKind: [String]
-  project(id: String!): Project
+  project(id: String!, team: Boolean): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectGoals(data: ProjectGoalsInput!): [Goal]
   projectGoalsMeta(data: ProjectGoalsInput!): GoalsMetaOutput
-  projects: [Project]
+  projects(team: Boolean): [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
-  team(id: String!): Team
-  teamCompletion(query: String!, sortBy: SortOrder): [Team]
-  teamGoals(data: TeamGoalsInput!): [Goal]
-  teamGoalsMeta(data: TeamGoalsInput!): GoalsMetaOutput
-  teams(data: TeamsInput!): [Team]
   userGoals(data: UserGoalsInput!): [Goal]
   userGoalsMeta(data: UserGoalsInput!): GoalsMetaOutput
   users(sortBy: SortOrder): [User]
