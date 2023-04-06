@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import { nullable } from '@taskany/bricks';
 
+import { Project } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { routes } from '../../../hooks/router';
@@ -12,15 +13,15 @@ import { ParentListItem } from '../../ParentListItem';
 import { tr } from './ExploreTeamsPage.i18n';
 
 const fetcher = createFetcher(() => ({
-    teams: [
+    projects: [
         {
-            data: {},
+            team: true,
         },
         {
             id: true,
             title: true,
             description: true,
-            projects: {
+            children: {
                 id: true,
             },
             activity: {
@@ -56,7 +57,7 @@ export const ExploreTeamsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
         fallback,
         refreshInterval,
     });
-    const teams = data?.teams;
+    const teams = data?.projects;
 
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={tr('title')}>
@@ -65,7 +66,7 @@ export const ExploreTeamsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
 
                 <PageContent>
                     {teams?.map((team) =>
-                        nullable(team, (te) => (
+                        nullable(team, (te: Project) => (
                             <ParentListItem
                                 key={te.id}
                                 href={routes.team(te.id)}
