@@ -203,7 +203,6 @@ type Mutation {
   createGoal(data: GoalCreateInput!): Goal
   createProject(data: ProjectCreateInput!): Project
   createTag(description: String, title: String!): Tag
-  createTeam(data: TeamCreateInput!): Team
   deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
   deleteTeam(data: TeamDelete!): Team
@@ -240,10 +239,11 @@ type Project {
   flowId: String!
   goals: [Goal]
   id: ID!
-  parent: Project
+  parent: [Project]
   participants: [Activity]
   stargizers: [Activity]
   tags: [Tag]
+  team: Boolean
   teams: [Team!]
   title: String!
   updatedAt: DateTime!
@@ -258,6 +258,7 @@ input ProjectCreateInput {
   description: String
   flowId: String!
   id: ID!
+  team: Boolean
   title: String!
 }
 

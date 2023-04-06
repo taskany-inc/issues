@@ -20,7 +20,6 @@ import { Header } from './Header';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm'));
-const TeamCreateForm = dynamic(() => import('./TeamCreateForm'));
 const GoalCreateForm = dynamic(() => import('./GoalCreateForm'));
 const UserInviteForm = dynamic(() => import('./UserInviteForm'));
 const HotkeysModal = dynamic(() => import('./HotkeysModal'));
@@ -88,7 +87,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', l
             <StyledContent>{children}</StyledContent>
 
             <ModalOnEvent event={ModalEvent.TeamCreateModal} hotkeys={createTeamKeys}>
-                <TeamCreateForm />
+                <ProjectCreateForm team />
             </ModalOnEvent>
 
             <ModalOnEvent event={ModalEvent.ProjectCreateModal} hotkeys={createProjectKeys}>

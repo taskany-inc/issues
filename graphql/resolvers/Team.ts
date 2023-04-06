@@ -214,66 +214,6 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
 };
 
 export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
-    t.field('createTeam', {
-        type: Team,
-        args: {
-            data: nonNull(arg({ type: TeamCreateInput })),
-        },
-        resolve: async (_, { data: { id, title, parent, description, flowId } }, { db, activity }) => {
-            if (!activity) return null;
-
-            let parentTeam;
-
-            if (parent) {
-                parentTeam = await db.team.findUnique({
-                    where: {
-                        id: parent,
-                    },
-                });
-            }
-
-            try {
-                const newTeam = await db.team.create({
-                    data: {
-                        id,
-                        title,
-                        description,
-                        flowId,
-                        activityId: activity.id,
-                        watchers: {
-                            connect: [activity.id].map((id) => ({ id })),
-                        },
-                    },
-                });
-
-                if (parentTeam) {
-                    await db.team.update({
-                        where: {
-                            id: parentTeam.id,
-                        },
-                        data: {
-                            children: {
-                                connect: [{ id: newTeam.id }],
-                            },
-                        },
-                    });
-                }
-
-                return newTeam;
-
-                // await mailServer.sendMail({
-                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
-                //     to: 'bar@example.com, baz@example.com',
-                //     subject: 'Hello ✔',
-                //     text: `new post '${title}'`,
-                //     html: `new post <b>${title}</b>`,
-                // });
-            } catch (error) {
-                throw Error(`${error}`);
-            }
-        },
-    });
-
     t.field('updateTeam', {
         type: Team,
         args: {
