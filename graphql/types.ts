@@ -441,6 +441,7 @@ export const ProjectCreateInput = inputObjectType({
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
         t.field(ProjectModel.flowId);
+        t.field(ProjectModel.team);
     },
 });
 

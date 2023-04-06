@@ -188,7 +188,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: ProjectCreateInput })),
         },
-        resolve: async (_, { data: { id, title, description, flowId } }, { db, activity }) => {
+        resolve: async (_, { data: { id, title, description, flowId, team } }, { db, activity }) => {
             if (!activity) return null;
 
             try {
@@ -197,6 +197,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         id,
                         title,
                         description,
+                        team,
                         activityId: activity.id,
                         flowId,
                         watchers: {

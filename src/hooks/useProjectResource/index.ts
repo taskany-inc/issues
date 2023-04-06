@@ -14,29 +14,30 @@ export const createProjectSchemaProvider = () =>
         id: z.string().min(3),
         title: z
             .string({
-                required_error: tr("Project's title is required"),
-                invalid_type_error: tr("Project's title must be a string"),
+                required_error: tr('Title is required'),
+                invalid_type_error: tr('Title must be a string'),
             })
             .min(2, {
-                message: tr("Project's title must be longer than 2 symbols"),
+                message: tr('Title must be longer than 2 symbols'),
             })
             .max(50, {
-                message: tr("Project's title can be 50 symbols maximum"),
+                message: tr('Title can be 50 symbols maximum'),
             }),
         description: z.string().optional(),
         flow: z.object({
             id: z.string(),
         }),
+        team: z.boolean().optional(),
     });
 export const updateProjectSchemaProvider = () =>
     z.object({
         title: z
             .string({
-                required_error: tr("Project's title is required"),
-                invalid_type_error: tr("Project's title must be a string"),
+                required_error: tr('Title is required'),
+                invalid_type_error: tr('Title must be a string'),
             })
             .min(2, {
-                message: tr("Project's title must be longer than 2 symbols"),
+                message: tr('Title must be longer than 2 symbols'),
             }),
         description: z.string().optional(),
         teams: z
@@ -63,6 +64,7 @@ export const useProjectResource = (id: string) => {
                             title: form.title,
                             description: form.description,
                             flowId: form.flow.id,
+                            team: form.team,
                         },
                     },
                     {
@@ -73,8 +75,8 @@ export const useProjectResource = (id: string) => {
 
             toast.promise(promise, {
                 error: tr('Something went wrong 😿'),
-                loading: tr('We are creating new project'),
-                success: tr('Voila! Project is here 🎉'),
+                loading: tr('We are creating something new'),
+                success: tr("Voila! It's here 🎉"),
             });
 
             const res = await promise;

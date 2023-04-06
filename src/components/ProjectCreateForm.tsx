@@ -33,7 +33,6 @@ import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { routes, useRouter } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../hooks/useProjectResource';
-import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
@@ -85,7 +84,7 @@ const StyledProjectKeyInputContainer = styled(InputContainer)`
     padding-right: ${gapS};
 `;
 
-const ProjectCreateForm: React.FC = () => {
+const ProjectCreateForm: React.FC<{ team?: boolean }> = ({ team }) => {
     const t = useTranslations('projects');
     const router = useRouter();
     const { locale, user } = usePageContext();
@@ -94,6 +93,7 @@ const ProjectCreateForm: React.FC = () => {
     const [hoveredInput, setHoveredInput] = useState(false);
     const [busy, setBusy] = useState(false);
     const [dirtyKey, setDirtyKey] = useState(false);
+    const createAs = team ? 'team' : 'project';
 
     const schema = createProjectSchemaProvider();
     type ProjectFormType = z.infer<typeof schema>;
@@ -111,6 +111,9 @@ const ProjectCreateForm: React.FC = () => {
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,
+        defaultValues: {
+            team,
+        },
     });
 
     useEffect(() => {
@@ -148,8 +151,7 @@ const ProjectCreateForm: React.FC = () => {
 
             // FIXME: it not looks like the best API
             createProject((id: string) => {
-                router.project(id);
-                dispatchModalEvent(ModalEvent.ProjectCreateModal)();
+                form.team ? router.team(id) : router.project(id);
             })(form);
         },
         [router, createProject],
@@ -171,14 +173,14 @@ const ProjectCreateForm: React.FC = () => {
     // eslint-disable-next-line no-nested-ternary
     const tooltip = isKeyEnoughLength
         ? isKeyUnique
-            ? t.rich('create.Perfect! Issues in your project will look like', richProps)
-            : t.rich('create.Project with key already exists', richProps)
+            ? t.rich('create.Perfect! Issues and goals will look like', richProps)
+            : t.rich('create.Key already exists', richProps)
         : t('create.Key must be 3 or longer characters');
 
     return (
         <>
             <ModalHeader>
-                <FormTitle>{t('create.Create new project')}</FormTitle>
+                <FormTitle>{t(`create.New ${createAs}`)}</FormTitle>
             </ModalHeader>
 
             <ModalContent>
@@ -186,7 +188,7 @@ const ProjectCreateForm: React.FC = () => {
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
-                            placeholder={t("create.Project's title")}
+                            placeholder={t('create.Title')}
                             flat="bottom"
                             brick="right"
                             disabled={busy}
@@ -226,7 +228,7 @@ const ProjectCreateForm: React.FC = () => {
                     <FormTextarea
                         {...register('description')}
                         disabled={busy}
-                        placeholder={t('create.And its description')}
+                        placeholder={t('create.Short description')}
                         flat="both"
                         error={errorsResolver('description')}
                     />
@@ -253,7 +255,7 @@ const ProjectCreateForm: React.FC = () => {
                                 disabled={busy}
                                 outline={!isValid || !isKeyUnique || !isKeyEnoughLength}
                                 type="submit"
-                                text={t('create.Create project')}
+                                text={t(`create.Create ${createAs}`)}
                             />
                         </FormAction>
                     </FormActions>
