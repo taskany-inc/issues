@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import { gapL, gapM } from '@taskany/colors';
+import { Button } from '@taskany/bricks';
 
 import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
@@ -14,11 +15,10 @@ import { IssueDependenciesList } from './IssueDependenciesList';
 import { FormInput } from './FormInput';
 import { MenuItem } from './MenuItem';
 import { GoalMenuItem } from './GoalMenuItem';
-import { Button } from './Button';
 import { Icon } from './Icon';
 import { ModalContent, ModalHeader } from './Modal';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
 const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface IssueDependenciesFormProps {

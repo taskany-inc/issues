@@ -6,10 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
 import { useRouter as useNextRouter } from 'next/router';
 import { gapS, gray9, warn0 } from '@taskany/colors';
+import { Button } from '@taskany/bricks';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Activity, Project } from '../../../../graphql/@generated/genql';
-import { Button } from '../../Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { PageSep } from '../../PageSep';
 import { useRouter } from '../../../hooks/router';

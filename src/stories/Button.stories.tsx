@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { Button } from '@taskany/bricks';
 
-import { Button } from '../components/Button';
 import { Icon } from '../components/Icon';
 import { UserPic } from '../components/UserPic';
 

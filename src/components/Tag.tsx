@@ -1,10 +1,9 @@
 import React, { MouseEventHandler, useCallback } from 'react';
 import styled from 'styled-components';
 import { colorPrimary, gapXs, gray10, gray5, gray6, gray9, radiusL, textColorPrimary } from '@taskany/colors';
+import { CleanButton } from '@taskany/bricks';
 
 import { nullable } from '../utils/nullable';
-
-import { CleanButton } from './CleanButton';
 
 interface TagProps {
     title: string;

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { textColor, gray7, colorPrimary, gray3 } from '@taskany/colors';
+import { Button } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
@@ -11,7 +12,6 @@ import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMenu } from './HeaderMenu';
 import { Icon } from './Icon';
-import { Button } from './Button';
 import { MenuItem } from './MenuItem';
 
 const Dropdown = dynamic(() => import('./Dropdown'));
