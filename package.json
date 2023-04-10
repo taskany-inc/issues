@@ -79,7 +79,7 @@
     "@genql/cli": "2.10.0",
     "@next/bundle-analyzer": "13.2.1",
     "@storybook/addon-actions": "6.5.13",
-    "@storybook/addon-essentials": "6.5.16",
+    "@storybook/addon-essentials": "7.0.2",
     "@storybook/addon-interactions": "6.5.16",
     "@storybook/addon-links": "6.5.16",
     "@storybook/builder-webpack5": "6.5.13",
