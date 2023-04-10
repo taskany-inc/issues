@@ -2,6 +2,7 @@ import React, { ChangeEvent, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { danger0 } from '@taskany/colors';
+import { Button } from '@taskany/bricks';
 
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
@@ -11,7 +12,6 @@ import { Text } from './Text';
 import { Form } from './Form';
 import { FormInput } from './FormInput';
 import { FormAction, FormActions } from './FormActions';
-import { Button } from './Button';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 

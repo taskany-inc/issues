@@ -8,10 +8,10 @@ import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { gapS, gray9, warn0 } from '@taskany/colors';
+import { Button } from '@taskany/bricks';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Activity, Team } from '../../../../graphql/@generated/genql';
-import { Button } from '../../Button';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { PageSep } from '../../PageSep';

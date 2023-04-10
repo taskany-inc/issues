@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { gapXs } from '@taskany/colors';
+import { Button } from '@taskany/bricks';
 
-import { Button } from './Button';
 import { Icon, sizesMap } from './Icon';
 
 interface ReactionsButtonProps {

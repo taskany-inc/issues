@@ -15,7 +15,7 @@ import { FormInput } from './FormInput';
 import { UserMenuItem } from './UserMenuItem';
 import { ModalContent, ModalHeader } from './Modal';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
 
 interface IssueParticipantsFormProps {
     issue: Goal;

@@ -5,6 +5,7 @@ import z from 'zod';
 import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
 import { gapM, gapS, gray6, gray7, gray10 } from '@taskany/colors';
+import { Button } from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
 import { KeyCode } from '../hooks/useKeyboard';
@@ -12,7 +13,6 @@ import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { Icon } from './Icon';
-import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';

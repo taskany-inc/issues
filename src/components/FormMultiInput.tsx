@@ -12,7 +12,7 @@ import { Input } from './Input';
 import { Text } from './Text';
 import { MenuItem } from './MenuItem';
 
-const ComboBox = dynamic(() => import('./ComboBox'));
+const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
 
 interface FormMultiInputProps {
     items?: Array<{ title: string; id: any }>;

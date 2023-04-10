@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
+import { Button } from '@taskany/bricks';
 
-import { Button } from './Button';
 import { Icon } from './Icon';
 
 interface WatchButtonProps {

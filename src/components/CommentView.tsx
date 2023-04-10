@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { brandColor, danger0, gapM, gapS, gray4 } from '@taskany/colors';
+import { Card, CardComment, CardInfo } from '@taskany/bricks';
 
 import { Comment, User } from '../../graphql/@generated/genql';
 import { nullable } from '../utils/nullable';
 import { useReactionsResource } from '../hooks/useReactionsResource';
 import { useCommentResource } from '../hooks/useCommentResource';
 
-import { Card, CardComment, CardInfo } from './Card';
 import { Link } from './Link';
 import { UserPic } from './UserPic';
 import { Icon } from './Icon';

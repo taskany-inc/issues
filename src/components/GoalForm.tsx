@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
 import { gapS, gray2 } from '@taskany/colors';
+import { Button } from '@taskany/bricks';
 
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
@@ -13,7 +14,6 @@ import { errorsProvider } from '../utils/forms';
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority } from '../types/priority';
 
-import { Button } from './Button';
 import { FormInput } from './FormInput';
 import { FormActions, FormAction } from './FormActions';
 import { Form } from './Form';

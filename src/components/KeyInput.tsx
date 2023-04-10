@@ -1,11 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
+import { Button } from '@taskany/bricks';
 
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { keyPredictor } from '../utils/keyPredictor';
 
-import { Button } from './Button';
 import { Input } from './Input';
 import { Text } from './Text';
 
