@@ -9,7 +9,7 @@ import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { useRouter as useNextRouter } from 'next/router';
 import { gray10 } from '@taskany/colors';
-import { Button, Fieldset } from '@taskany/bricks';
+import { Button, Fieldset, Form, FormInput, FormAction, FormActions, FormRadio, FormRadioInput } from '@taskany/bricks';
 
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -18,13 +18,9 @@ import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { User } from '../../../../graphql/@generated/genql';
 import { Page } from '../../Page';
 import { PageSep } from '../../PageSep';
-import { FormInput } from '../../FormInput';
-import { Form } from '../../Form';
 import { Tip } from '../../Tip';
 import { Icon } from '../../Icon';
 import { Keyboard } from '../../Keyboard';
-import { FormAction, FormActions } from '../../FormActions';
-import { FormRadio, FormRadioInput } from '../../FormRadio';
 import { CommonHeader } from '../../CommonHeader';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 

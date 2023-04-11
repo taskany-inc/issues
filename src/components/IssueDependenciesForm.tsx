@@ -3,15 +3,13 @@ import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { gapL, gapM } from '@taskany/colors';
-import { Button, Dropdown, ComboBox } from '@taskany/bricks';
+import { Button, Dropdown, ComboBox, FormInput, FormTitle } from '@taskany/bricks';
 
 import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { FormTitle } from './FormTitle';
 import { IssueDependenciesList } from './IssueDependenciesList';
-import { FormInput } from './FormInput';
 import { MenuItem } from './MenuItem';
 import { GoalMenuItem } from './GoalMenuItem';
 import { Icon } from './Icon';

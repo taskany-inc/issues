@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
 import { gapS, gray2 } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
+import { Button, Form, FormInput, FormActions, FormAction, FormEditor, FormTitle } from '@taskany/bricks';
 
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
@@ -14,9 +14,6 @@ import { errorsProvider } from '../utils/forms';
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority } from '../types/priority';
 
-import { FormInput } from './FormInput';
-import { FormActions, FormAction } from './FormActions';
-import { Form } from './Form';
 import { UserComboBox } from './UserComboBox';
 import { GoalParentComboBox } from './GoalParentComboBox';
 import { EstimateComboBox } from './EstimateComboBox';
@@ -24,9 +21,7 @@ import { TagComboBox } from './TagComboBox';
 import { StateDropdown } from './StateDropdown';
 import { PriorityDropdown } from './PriorityDropdown';
 import { Tag } from './Tag';
-import { FormEditor } from './FormEditor';
 import { ModalHeader, ModalContent } from './Modal';
-import { FormTitle } from './FormTitle';
 
 const tagsLimit = 5;
 

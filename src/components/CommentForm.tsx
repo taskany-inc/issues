@@ -3,19 +3,15 @@ import styled from 'styled-components';
 import { Controller, Control } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { backgroundColor, gapS, gray4, gray6 } from '@taskany/colors';
-import { Button, Link } from '@taskany/bricks';
+import { Button, Link, Form, FormCard, FormAction, FormActions, FormEditor } from '@taskany/bricks';
 
 import { submitKeys } from '../utils/hotkeys';
 import { nullable } from '../utils/nullable';
 import { usePageContext } from '../hooks/usePageContext';
 import { routes } from '../hooks/router';
 
-import { FormCard } from './FormCard';
-import { Form } from './Form';
 import { Icon } from './Icon';
-import { FormAction, FormActions } from './FormActions';
 import { Tip } from './Tip';
-import { FormEditor } from './FormEditor';
 
 interface CommentFormProps {
     i18nKeyset: string;

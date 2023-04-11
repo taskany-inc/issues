@@ -3,15 +3,13 @@ import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { gapL, gapM } from '@taskany/colors';
-import { ComboBox } from '@taskany/bricks';
+import { ComboBox, FormInput, FormTitle } from '@taskany/bricks';
 
 import { Activity, Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { FormTitle } from './FormTitle';
 import { IssueParticipantsList } from './IssueParticipantsList';
-import { FormInput } from './FormInput';
 import { UserMenuItem } from './UserMenuItem';
 import { ModalContent, ModalHeader } from './Modal';
 
