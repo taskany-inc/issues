@@ -11,7 +11,7 @@ import { useMounted } from '../hooks/useMounted';
 import { useUpload } from '../hooks/useUpload';
 
 const Editor = dynamic(() => import('@monaco-editor/react'));
-const Popup = dynamic(() => import('./Popup'));
+const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 
 interface FormEditorProps {
     id?: string;

@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { gapS, gapXs, gray4, radiusM } from '@taskany/colors';
-
-import { Text } from './Text';
+import { Text } from '@taskany/bricks';
 
 interface ProjectMenuItemProps {
     title?: string;

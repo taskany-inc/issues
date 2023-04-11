@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
 import { gray4, textColor, gray10, gapM, gapS } from '@taskany/colors';
+import { Text } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
@@ -11,7 +12,6 @@ import { nullable } from '../utils/nullable';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
-import { Text } from './Text';
 import { Tag as TagItem } from './Tag';
 import { Icon } from './Icon';
 import { UserPic } from './UserPic';

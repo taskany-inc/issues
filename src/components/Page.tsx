@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
 import { gapS, gray4, radiusM, textColor } from '@taskany/colors';
+import { TextStyle } from '@taskany/bricks';
 
 import { pageContext, PageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/declareSsrProps';
@@ -16,7 +17,6 @@ import { nullable } from '../utils/nullable';
 
 import { Theme } from './Theme';
 import { GlobalStyle } from './GlobalStyle';
-import { TextStyle } from './Text';
 import { Header } from './Header';
 import { Footer } from './Footer';
 

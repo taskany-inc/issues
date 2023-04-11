@@ -12,7 +12,7 @@ import { usePageContext } from '../hooks/usePageContext';
 
 import { State } from './State';
 
-const Popup = dynamic(() => import('./Popup'));
+const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 
 interface StateSwitchProps {
     state: StateModel;

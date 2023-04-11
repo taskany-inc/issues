@@ -5,7 +5,7 @@ import z from 'zod';
 import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
 import { gapM, gapS, gray6, gray7, gray10 } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
+import { Button, Text } from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
 import { KeyCode } from '../hooks/useKeyboard';
@@ -20,7 +20,6 @@ import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
 import { Tag } from './Tag';
-import { Text } from './Text';
 import { Link } from './Link';
 import { ModalContent, ModalHeader } from './Modal';
 

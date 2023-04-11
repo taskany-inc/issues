@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { gapS, gapXs, gray3, radiusM } from '@taskany/colors';
+import { Text } from '@taskany/bricks';
 
-import { Text } from './Text';
 import { StateDot } from './StateDot';
 
 const StyledItemCard = styled.div<{ focused?: boolean; checked?: boolean; hoverColor?: string }>`

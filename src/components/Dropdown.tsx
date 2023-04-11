@@ -8,7 +8,7 @@ import { useKeyPress } from '../hooks/useKeyPress';
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { nullable } from '../utils/nullable';
 
-const Popup = dynamic(() => import('./Popup'));
+const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 
 interface DropdownTriggerProps {
     ref: React.RefObject<HTMLButtonElement>;

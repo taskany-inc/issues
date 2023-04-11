@@ -2,13 +2,12 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { gapXs, gray8 } from '@taskany/colors';
-import { Dot } from '@taskany/bricks';
+import { Dot, Text } from '@taskany/bricks';
 
 import { pluralize } from '../utils/pluralize';
 import { usePageContext } from '../hooks/usePageContext';
 import { nullable } from '../utils/nullable';
 
-import { Text } from './Text';
 import { Link } from './Link';
 
 const RelativeTime = dynamic(() => import('./RelativeTime'));

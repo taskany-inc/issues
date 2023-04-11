@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import { gapXs, gray4, gray7, gray8, radiusM } from '@taskany/colors';
+import { Text } from '@taskany/bricks';
 
 import { IssueKey } from './IssueKey';
-import { Text } from './Text';
 
 interface GoalMenuItemProps {
     id: string;

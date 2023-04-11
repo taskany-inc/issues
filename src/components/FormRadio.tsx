@@ -1,10 +1,9 @@
 import React, { useContext, createContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { gapS, gray3, gray8, radiusS } from '@taskany/colors';
+import { Text } from '@taskany/bricks';
 
 import { nullable } from '../utils/nullable';
-
-import { Text } from './Text';
 
 interface FormRadioContext {
     name: FormRadioProps['name'];
