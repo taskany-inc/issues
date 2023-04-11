@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
 import { danger0, gapM, gapS } from '@taskany/colors';
-import { Button, Card, CardInfo, CardContent, CardActions } from '@taskany/bricks';
+import { Button, Card, CardInfo, CardContent, CardActions, Dropdown, Link } from '@taskany/bricks';
 
 import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '../../../../graphql/@generated/genql';
 import { gql } from '../../../utils/gql';
@@ -20,7 +20,6 @@ import { goalFetcher, refreshInterval } from '../../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
 import { Page, PageContent, PageActions } from '../../Page';
 import { PageSep } from '../../PageSep';
-import { Link } from '../../Link';
 import { IssueTitle } from '../../IssueTitle';
 import { IssueKey } from '../../IssueKey';
 import { IssueStats } from '../../IssueStats';
@@ -57,7 +56,6 @@ const CommentCreateForm = dynamic(() => import('../../CommentCreateForm'));
 const ReactionsDropdown = dynamic(() => import('../../ReactionsDropdown'));
 const IssueDependencies = dynamic(() => import('../../IssueDependencies'));
 const IssueParticipants = dynamic(() => import('../../IssueParticipants'));
-const Dropdown = dynamic(() => import('../../Dropdown'));
 
 const IssueHeader = styled(PageContent)`
     display: grid;

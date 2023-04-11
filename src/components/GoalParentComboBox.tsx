@@ -1,20 +1,16 @@
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
-import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { Button } from '@taskany/bricks';
+import { Button, Input, ComboBox } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Project } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
-import { Input } from './Input';
 import { ProjectMenuItem } from './ProjectMenuItem';
 import { MenuGroupItem } from './MenuGroupItem';
-
-const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
 
 interface GoalParentComboBoxProps {
     text: React.ComponentProps<typeof ComboBox>['text'];

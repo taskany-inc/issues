@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
 import { useRouter as useNextRouter } from 'next/router';
 import { gapS, gray9, warn0 } from '@taskany/colors';
-import { Button, Text } from '@taskany/bricks';
+import { Button, Text, Fieldset } from '@taskany/bricks';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Activity, Project } from '../../../../graphql/@generated/genql';
@@ -15,7 +15,6 @@ import { PageSep } from '../../PageSep';
 import { useRouter } from '../../../hooks/router';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 import { Form } from '../../Form';
-import { Fieldset } from '../../Fieldset';
 import { FormInput } from '../../FormInput';
 import { FormAction, FormActions } from '../../FormActions';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
@@ -355,7 +354,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                     <ModalContent>
                         <Text>
                             {tr.raw('To confirm deleting project {project} please type project key below.', {
-                                project: <b>{project.title}</b>,
+                                project: <b key="project">{project.title}</b>,
                             })}
                         </Text>
 

@@ -8,7 +8,7 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { gapS, gray6, gray10 } from '@taskany/colors';
-import { Button, Text } from '@taskany/bricks';
+import { Button, Text, InputContainer, Link } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { nullable } from '../utils/nullable';
@@ -29,9 +29,7 @@ import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
-import { Link } from './Link';
 import { ModalContent, ModalHeader } from './Modal';
-import { InputContainer } from './InputContaier';
 import { FlowComboBox } from './FlowComboBox';
 
 const KeyInput = dynamic(() => import('./KeyInput'));

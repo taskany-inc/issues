@@ -2,9 +2,8 @@ import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
-import dynamic from 'next/dynamic';
 import { gapL, gapM } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
+import { Button, Dropdown, ComboBox } from '@taskany/bricks';
 
 import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
@@ -17,9 +16,6 @@ import { MenuItem } from './MenuItem';
 import { GoalMenuItem } from './GoalMenuItem';
 import { Icon } from './Icon';
 import { ModalContent, ModalHeader } from './Modal';
-
-const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
-const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface IssueDependenciesFormProps {
     issue: Goal;

@@ -9,7 +9,7 @@ import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { useRouter as useNextRouter } from 'next/router';
 import { gray10 } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
+import { Button, Fieldset } from '@taskany/bricks';
 
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -24,7 +24,6 @@ import { Tip } from '../../Tip';
 import { Icon } from '../../Icon';
 import { Keyboard } from '../../Keyboard';
 import { FormAction, FormActions } from '../../FormActions';
-import { Fieldset } from '../../Fieldset';
 import { FormRadio, FormRadioInput } from '../../FormRadio';
 import { CommonHeader } from '../../CommonHeader';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';

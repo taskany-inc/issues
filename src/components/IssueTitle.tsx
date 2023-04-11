@@ -2,9 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { gapS } from '@taskany/colors';
-import { Text } from '@taskany/bricks';
-
-import { Link } from './Link';
+import { Text, Link } from '@taskany/bricks';
 
 interface IssueTitleProps {
     title: string;

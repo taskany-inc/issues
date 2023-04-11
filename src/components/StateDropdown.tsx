@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import colorLayer from 'color-layer';
-import dynamic from 'next/dynamic';
-import { Button } from '@taskany/bricks';
+import { Button, Dropdown } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { State } from '../../graphql/@generated/genql';
@@ -11,8 +10,6 @@ import { usePageContext } from '../hooks/usePageContext';
 import { Icon } from './Icon';
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
-
-const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface StateDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
