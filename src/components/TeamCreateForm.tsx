@@ -8,7 +8,18 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { gapS, gray6, gray10 } from '@taskany/colors';
-import { Button, Text, InputContainer, Link } from '@taskany/bricks';
+import {
+    Button,
+    Text,
+    InputContainer,
+    Link,
+    Form,
+    FormActions,
+    FormAction,
+    FormTextarea,
+    FormInput,
+    FormTitle,
+} from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { nullable } from '../utils/nullable';
@@ -22,13 +33,8 @@ import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { Icon } from './Icon';
-import { FormInput } from './FormInput';
-import { FormTextarea } from './FormTextarea';
-import { FormActions, FormAction } from './FormActions';
-import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { FormTitle } from './FormTitle';
 import { ModalContent, ModalHeader } from './Modal';
 import { FlowComboBox } from './FlowComboBox';
 

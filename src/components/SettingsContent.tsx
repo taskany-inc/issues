@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { danger0, gapM, gray4, warn0 } from '@taskany/colors';
+import { FormCard } from '@taskany/bricks';
 
-import { FormCard } from './FormCard';
 import { PageContent } from './Page';
 
 type SettingsCardViewType = 'default' | 'warning' | 'danger';
