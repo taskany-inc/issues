@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import { gapS, gapXs, gray4, gray9, textColor } from '@taskany/colors';
+import { Text } from '@taskany/bricks';
 
 import { nullable } from '../utils/nullable';
 
-import { Text } from './Text';
 import { Icon } from './Icon';
 
 interface IssueMetaProps {

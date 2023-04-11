@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
 import { useRouter as useNextRouter } from 'next/router';
 import { gapS, gray9, warn0 } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
+import { Button, Text } from '@taskany/bricks';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Activity, Project } from '../../../../graphql/@generated/genql';
@@ -18,7 +18,6 @@ import { Form } from '../../Form';
 import { Fieldset } from '../../Fieldset';
 import { FormInput } from '../../FormInput';
 import { FormAction, FormActions } from '../../FormActions';
-import { Text } from '../../Text';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { ModalContent, ModalHeader } from '../../Modal';
 import { FormTitle } from '../../FormTitle';

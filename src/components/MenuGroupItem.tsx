@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { gapS, gapXs, gray4, gray7 } from '@taskany/colors';
-
-import { Text } from './Text';
+import { Text } from '@taskany/bricks';
 
 interface MenuGroupItemProps {
     title: string;

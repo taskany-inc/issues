@@ -1,6 +1,5 @@
 import { gray6 } from '@taskany/colors';
-
-import { Text } from './Text';
+import { Text } from '@taskany/bricks';
 
 interface IssueKeyProps {
     id: string;

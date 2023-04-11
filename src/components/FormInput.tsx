@@ -3,12 +3,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { danger10, gray2, gray3, gray8, radiusS, textColor } from '@taskany/colors';
+import { Text } from '@taskany/bricks';
 
 import { nullable } from '../utils/nullable';
 
-import { Text } from './Text';
-
-const Popup = dynamic(() => import('./Popup'));
+const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 
 interface FormInputProps {
     id?: string;

@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import { gapM, gapS, gray5, textColor } from '@taskany/colors';
-import { Badge } from '@taskany/bricks';
+import { Badge, Text } from '@taskany/bricks';
 
 import { nullable } from '../utils/nullable';
 
@@ -14,7 +14,6 @@ import { TagsFilterDropdown } from './TagsFilterDropdown';
 import { LimitFilterDropdown } from './LimitFilterDropdown';
 import { PriorityFilterDropdown } from './PriorityFilterDropdown';
 import { EstimateFilterDropdown } from './EstimateFilterDropdown';
-import { Text } from './Text';
 import { ProjectFilterDropdown } from './ProjectFilterDropdown';
 
 interface FiltersPanelProps {

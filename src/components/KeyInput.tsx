@@ -1,15 +1,14 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { Button } from '@taskany/bricks';
+import { Button, Text } from '@taskany/bricks';
 
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { keyPredictor } from '../utils/keyPredictor';
 
 import { Input } from './Input';
-import { Text } from './Text';
 
-const Popup = dynamic(() => import('./Popup'));
+const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 
 interface KeyInputProps {
     size?: React.ComponentProps<typeof Button>['size'];

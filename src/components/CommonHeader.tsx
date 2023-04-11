@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import { gapM, gapS, gray6 } from '@taskany/colors';
+import { Text } from '@taskany/bricks';
 
 import { nullable } from '../utils/nullable';
 
 import { PageContent } from './Page';
-import { Text } from './Text';
 
 interface CommonHeaderProps {
     title: string;

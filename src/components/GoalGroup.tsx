@@ -1,6 +1,7 @@
 import React, { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
+import { Text } from '@taskany/bricks';
 
 import { Goal } from '../../graphql/@generated/genql';
 import { ProjectGroup, TeamGroup } from '../hooks/useGrouppedGoals';
@@ -9,7 +10,6 @@ import { routes } from '../hooks/router';
 
 import { GoalListItem } from './GoalListItem';
 import { PageSep } from './PageSep';
-import { Text } from './Text';
 import { Link } from './Link';
 import { TeamTitleList } from './TeamTitleList';
 

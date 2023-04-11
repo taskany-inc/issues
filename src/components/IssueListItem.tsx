@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { gapM, gapS, gapXs } from '@taskany/colors';
+import { Text } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 
 import { StateDot } from './StateDot';
-import { Text } from './Text';
 import { Link } from './Link';
 
 interface IssueListItemProps {
