@@ -1,12 +1,10 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { Button, Text } from '@taskany/bricks';
+import { Button, Text, Input } from '@taskany/bricks';
 
 import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { keyPredictor } from '../utils/keyPredictor';
-
-import { Input } from './Input';
 
 const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 

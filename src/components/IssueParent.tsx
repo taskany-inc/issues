@@ -3,12 +3,10 @@ import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { gapM, gapS, gray9 } from '@taskany/colors';
-import { Text } from '@taskany/bricks';
+import { Text, Link } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 import { nullable } from '../utils/nullable';
-
-import { Link } from './Link';
 
 interface Parent {
     id?: string;

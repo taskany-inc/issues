@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
-import dynamic from 'next/dynamic';
 import colorLayer from 'color-layer';
-import { Button } from '@taskany/bricks';
+import { Button, Dropdown } from '@taskany/bricks';
 
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority, priorityColorsMap } from '../types/priority';
@@ -9,8 +8,6 @@ import { trPriority } from '../i18n/priority';
 
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
-
-const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];

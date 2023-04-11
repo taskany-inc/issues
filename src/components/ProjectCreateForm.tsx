@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { z } from 'zod';
 import { gapS, gray6, gray10 } from '@taskany/colors';
-import { Button, Text } from '@taskany/bricks';
+import { Button, Text, InputContainer, Link } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
@@ -28,10 +28,8 @@ import { Form } from './Form';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FormTitle } from './FormTitle';
-import { Link } from './Link';
 import { FlowComboBox } from './FlowComboBox';
 import { ModalContent, ModalHeader } from './Modal';
-import { InputContainer } from './InputContaier';
 
 const KeyInput = dynamic(() => import('./KeyInput'));
 

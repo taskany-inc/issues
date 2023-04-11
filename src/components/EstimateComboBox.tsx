@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import InputMask from 'react-input-mask';
-import dynamic from 'next/dynamic';
 import { danger8, danger9, gray6, textColor } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
+import { Button, Input, ComboBox } from '@taskany/bricks';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
 import {
@@ -18,9 +17,6 @@ import { usePageContext } from '../hooks/usePageContext';
 import { TLocale } from '../i18n/getLang';
 
 import { Icon } from './Icon';
-import { Input } from './Input';
-
-const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
 
 interface EstimateComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];

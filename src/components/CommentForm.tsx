@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Controller, Control } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { backgroundColor, gapS, gray4, gray6 } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
+import { Button, Link } from '@taskany/bricks';
 
 import { submitKeys } from '../utils/hotkeys';
 import { nullable } from '../utils/nullable';
@@ -15,7 +15,6 @@ import { Form } from './Form';
 import { Icon } from './Icon';
 import { FormAction, FormActions } from './FormActions';
 import { Tip } from './Tip';
-import { Link } from './Link';
 import { FormEditor } from './FormEditor';
 
 interface CommentFormProps {

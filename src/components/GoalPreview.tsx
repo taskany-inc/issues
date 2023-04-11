@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
 import { danger0, gapM, gapS } from '@taskany/colors';
-import { Dot, Button, Card, CardComment, CardInfo } from '@taskany/bricks';
+import { Dot, Button, Card, CardComment, CardInfo, Dropdown, Link } from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
@@ -32,7 +32,6 @@ import { StateDot } from './StateDot';
 import { UserPic } from './UserPic';
 import RelativeTime from './RelativeTime';
 import Md from './Md';
-import { Link } from './Link';
 import { IssueStats } from './IssueStats';
 import { CommentView } from './CommentView';
 import { ActivityFeed } from './ActivityFeed';
@@ -46,7 +45,6 @@ const StateSwitch = dynamic(() => import('./StateSwitch'));
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm'));
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('./GoalEditForm'));
-const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface GoalPreviewProps {
     goal: Goal;

@@ -1,18 +1,14 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, ChangeEvent, useEffect } from 'react';
 import styled from 'styled-components';
-import dynamic from 'next/dynamic';
 import { gapS, gray3, gray8, radiusS, textColor } from '@taskany/colors';
-import { Text } from '@taskany/bricks';
+import { Text, ComboBox, Input } from '@taskany/bricks';
 
 import { nullable } from '../utils/nullable';
 
 import { Icon } from './Icon';
 import { Tag } from './Tag';
-import { Input } from './Input';
 import { MenuItem } from './MenuItem';
-
-const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
 
 interface FormMultiInputProps {
     items?: Array<{ title: string; id: any }>;

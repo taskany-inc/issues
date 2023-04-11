@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { gapS, gray9, warn0 } from '@taskany/colors';
-import { Button, Text } from '@taskany/bricks';
+import { Button, Text, Fieldset } from '@taskany/bricks';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Activity, Team } from '../../../../graphql/@generated/genql';
@@ -17,7 +17,6 @@ import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
 import { PageSep } from '../../PageSep';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 import { Form } from '../../Form';
-import { Fieldset } from '../../Fieldset';
 import { gql } from '../../../utils/gql';
 import { FormInput } from '../../FormInput';
 import { FormAction, FormActions } from '../../FormActions';

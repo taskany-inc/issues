@@ -2,8 +2,8 @@ import { useCallback, useMemo, useState, ChangeEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
-import dynamic from 'next/dynamic';
 import { gapL, gapM } from '@taskany/colors';
+import { ComboBox } from '@taskany/bricks';
 
 import { Activity, Goal } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
@@ -14,8 +14,6 @@ import { IssueParticipantsList } from './IssueParticipantsList';
 import { FormInput } from './FormInput';
 import { UserMenuItem } from './UserMenuItem';
 import { ModalContent, ModalHeader } from './Modal';
-
-const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
 
 interface IssueParticipantsFormProps {
     issue: Goal;

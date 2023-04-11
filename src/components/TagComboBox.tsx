@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
-import dynamic from 'next/dynamic';
-import { Button } from '@taskany/bricks';
+import { Button, ComboBox, Input } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
@@ -14,9 +13,6 @@ import { usePageContext } from '../hooks/usePageContext';
 
 import { Icon } from './Icon';
 import { Tag } from './Tag';
-import { Input } from './Input';
-
-const ComboBox = dynamic(() => import('@taskany/bricks/components/ComboBox'));
 
 interface TagComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];

@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import { signIn } from 'next-auth/react';
 import NextLink from 'next/link';
 import { gray3, textColor, link10 } from '@taskany/colors';
+import { Link } from '@taskany/bricks';
 
 import { nullable } from '../utils/nullable';
 import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { UserPic } from './UserPic';
-import { Link } from './Link';
 
 interface HeaderMenuProps {
     notifications?: boolean;

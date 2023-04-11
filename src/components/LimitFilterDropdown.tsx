@@ -1,10 +1,8 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
+import { Dropdown } from '@taskany/bricks';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { MenuItem } from './MenuItem';
-
-const Dropdown = dynamic(() => import('./Dropdown'));
 
 const limitVariants = [10, 20, 30, 50, 100];
 

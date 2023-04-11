@@ -1,12 +1,10 @@
 import React, { useCallback, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { Dropdown } from '@taskany/bricks';
 
 import { Activity } from '../../graphql/@generated/genql';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { UserMenuItem } from './UserMenuItem';
-
-const Dropdown = dynamic(() => import('./Dropdown'));
 
 interface UserFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];

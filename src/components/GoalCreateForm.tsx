@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
 import { gapS, gray6, gray10 } from '@taskany/colors';
+import { Link } from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
 import { Activity } from '../../graphql/@generated/genql';
@@ -15,7 +16,6 @@ import { Icon } from './Icon';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { GoalForm, GoalFormType } from './GoalForm';
-import { Link } from './Link';
 
 const StyledFormBottom = styled.div`
     display: flex;
