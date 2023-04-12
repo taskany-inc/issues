@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { QuestionIcon } from '@taskany/bricks';
 
 import { Tip } from '../components/Tip';
-import { Icon } from '../components/Icon';
 
 export default {
     title: 'Taskany/Tip',
@@ -24,5 +24,5 @@ WithTitle.args = {
 export const WithTitleAndIcon = Template.bind({});
 WithTitleAndIcon.args = {
     title: 'Tip title',
-    icon: <Icon type="question" size="s" />,
+    icon: <QuestionIcon size="s" />,
 };

@@ -2,11 +2,10 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import { gray8, gapM, gray9, gapS } from '@taskany/colors';
-import { Text } from '@taskany/bricks';
+import { Modal, Text } from '@taskany/bricks';
 
 import { isEventTargetInputOrTextArea } from '../utils/hotkeys';
 
-import { Modal } from './Modal';
 import { Keyboard } from './Keyboard';
 
 const StyledHotkeys = styled.div`

@@ -8,7 +8,19 @@ import styled from 'styled-components';
 import toast from 'react-hot-toast';
 import { useRouter as useNextRouter } from 'next/router';
 import { danger0, gapM, gapS } from '@taskany/colors';
-import { Button, Card, CardInfo, CardContent, CardActions, Dropdown, Link } from '@taskany/bricks';
+import {
+    Button,
+    Card,
+    CardInfo,
+    CardContent,
+    CardActions,
+    Dropdown,
+    Link,
+    EditIcon,
+    BinIcon,
+    MoreVerticalIcon,
+    MenuItem,
+} from '@taskany/bricks';
 
 import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '../../../../graphql/@generated/genql';
 import { gql } from '../../../utils/gql';
@@ -39,8 +51,6 @@ import { WatchButton } from '../../WatchButton';
 import { useGoalResource } from '../../../hooks/useGoalResource';
 import { StarButton } from '../../StarButton';
 import { useRouter } from '../../../hooks/router';
-import { Icon } from '../../Icon';
-import { MenuItem } from '../../MenuItem';
 import { GoalDeleteModal } from '../../GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../../types/priority';
 import { trPriority } from '../../../i18n/priority';
@@ -350,18 +360,18 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
                                             items={[
                                                 {
                                                     label: tr('Edit'),
-                                                    icon: <Icon type="edit" size="xxs" />,
+                                                    icon: <EditIcon size="xxs" />,
                                                     onClick: dispatchModalEvent(ModalEvent.GoalEditModal),
                                                 },
                                                 {
                                                     label: tr('Delete'),
                                                     color: danger0,
-                                                    icon: <Icon type="bin" size="xxs" />,
+                                                    icon: <BinIcon size="xxs" />,
                                                     onClick: dispatchModalEvent(ModalEvent.GoalDeleteModal),
                                                 },
                                             ]}
                                             renderTrigger={({ ref, onClick }) => (
-                                                <Icon type="moreVertical" size="xs" ref={ref} onClick={onClick} />
+                                                <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
                                             )}
                                             renderItem={({ item, cursor, index, onClick }) => (
                                                 <MenuItem

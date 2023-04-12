@@ -5,7 +5,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import styled from 'styled-components';
 import { gapS, gray2 } from '@taskany/colors';
-import { Button, Form, FormInput, FormActions, FormAction, FormEditor, FormTitle } from '@taskany/bricks';
+import {
+    Button,
+    Form,
+    FormInput,
+    FormActions,
+    FormAction,
+    FormEditor,
+    FormTitle,
+    ModalContent,
+    ModalHeader,
+    Tag,
+} from '@taskany/bricks';
 
 import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
@@ -20,8 +31,6 @@ import { EstimateComboBox } from './EstimateComboBox';
 import { TagComboBox } from './TagComboBox';
 import { StateDropdown } from './StateDropdown';
 import { PriorityDropdown } from './PriorityDropdown';
-import { Tag } from './Tag';
-import { ModalHeader, ModalContent } from './Modal';
 
 const tagsLimit = 5;
 

@@ -1,9 +1,7 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { gapXs } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
-
-import { Icon, sizesMap } from './Icon';
+import { Button, EmojiIcon, iconSizesMap } from '@taskany/bricks';
 
 interface ReactionsButtonProps {
     emoji?: string;
@@ -17,7 +15,7 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledEmoji = styled.span`
-    font-size: ${sizesMap.s}px;
+    font-size: ${iconSizesMap.s}px;
 `;
 
 // eslint-disable-next-line react/display-name
@@ -35,11 +33,7 @@ export const ReactionsButton = React.memo(
                 ref={ref}
                 text={count && count > 1 ? String(count) : undefined}
                 iconLeft={
-                    emoji ? (
-                        <StyledEmoji dangerouslySetInnerHTML={{ __html: emoji }} />
-                    ) : (
-                        <Icon noWrap type="emoji" size="xs" />
-                    )
+                    emoji ? <StyledEmoji dangerouslySetInnerHTML={{ __html: emoji }} /> : <EmojiIcon noWrap size="xs" />
                 }
                 onClick={onButtonClick(emoji)}
             />

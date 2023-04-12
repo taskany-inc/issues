@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import type { EmojiSelection, EmojiPicker } from 'picmo';
 import dynamic from 'next/dynamic';
 import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '@taskany/colors';
+import { EmojiIcon } from '@taskany/bricks';
 
 import { PageContext } from '../utils/pageContext';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Icon } from './Icon';
 import { ReactionsButton } from './ReactionsButton';
 
 const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
@@ -102,7 +102,7 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
 
     const viewModeMap: Record<'button' | 'icon', React.ReactNode> = {
         button: <ReactionsButton ref={buttonRef} onClick={onButtonClick} />,
-        icon: <Icon ref={buttonRef} noWrap type="emoji" size="xs" onClick={onButtonClick} />,
+        icon: <EmojiIcon ref={buttonRef} noWrap size="xs" onClick={onButtonClick} />,
     };
 
     return (

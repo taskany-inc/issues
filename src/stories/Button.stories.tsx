@@ -1,8 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Button } from '@taskany/bricks';
+import { Button, CogIcon, LocationIcon } from '@taskany/bricks';
 
-import { Icon } from '../components/Icon';
 import { UserPic } from '../components/UserPic';
 
 export default {
@@ -19,12 +18,12 @@ export const Default = Template.bind({});
 
 export const WithIconLeft = Template.bind({});
 WithIconLeft.args = {
-    iconLeft: <Icon noWrap size="xs" type="cog" />,
+    iconLeft: <CogIcon noWrap size="xs" />,
 };
 
 export const WithIconRight = Template.bind({});
 WithIconRight.args = {
-    iconRight: <Icon noWrap size="xs" type="location" />,
+    iconRight: <LocationIcon noWrap size="xs" />,
 };
 
 export const WithUserPic = Template.bind({});

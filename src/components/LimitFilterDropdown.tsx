@@ -1,8 +1,7 @@
 import React from 'react';
-import { Dropdown } from '@taskany/bricks';
+import { Dropdown, MenuItem } from '@taskany/bricks';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
-import { MenuItem } from './MenuItem';
 
 const limitVariants = [10, 20, 30, 50, 100];
 

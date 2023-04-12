@@ -9,7 +9,17 @@ import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { useRouter as useNextRouter } from 'next/router';
 import { gray10 } from '@taskany/colors';
-import { Button, Fieldset, Form, FormInput, FormAction, FormActions, FormRadio, FormRadioInput } from '@taskany/bricks';
+import {
+    Button,
+    Fieldset,
+    Form,
+    FormInput,
+    FormAction,
+    FormActions,
+    FormRadio,
+    FormRadioInput,
+    BulbOnIcon,
+} from '@taskany/bricks';
 
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
@@ -19,7 +29,6 @@ import { User } from '../../../../graphql/@generated/genql';
 import { Page } from '../../Page';
 import { PageSep } from '../../PageSep';
 import { Tip } from '../../Tip';
-import { Icon } from '../../Icon';
 import { Keyboard } from '../../Keyboard';
 import { CommonHeader } from '../../CommonHeader';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
@@ -271,7 +280,7 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
                     </Form>
                 </SettingsCard>
 
-                <Tip title={tr('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
+                <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
                     {tr.raw('Press {key} to save settings', {
                         key: <Keyboard key="keyboard" command enter />,
                     })}

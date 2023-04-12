@@ -19,6 +19,10 @@ import {
     FormTextarea,
     FormInput,
     FormTitle,
+    BulbOnIcon,
+    QuestionIcon,
+    ModalHeader,
+    ModalContent,
 } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
@@ -32,11 +36,9 @@ import { usePageContext } from '../hooks/usePageContext';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
-import { Icon } from './Icon';
-import { Tip } from './Tip';
-import { Keyboard } from './Keyboard';
-import { ModalContent, ModalHeader } from './Modal';
 import { FlowComboBox } from './FlowComboBox';
+import { Keyboard } from './Keyboard';
+import { Tip } from './Tip';
 
 const KeyInput = dynamic(() => import('./KeyInput'));
 
@@ -300,14 +302,14 @@ const TeamCreateForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
+                    <Tip title={t('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
                         {t.rich('Press key to create the team', {
                             key: () => <Keyboard command enter />,
                         })}
                     </Tip>
 
                     <Link href={routes.help(locale, 'teams')}>
-                        <Icon type="question" size="s" color={gray6} />
+                        <QuestionIcon size="s" color={gray6} />
                     </Link>
                 </StyledFormBottom>
             </ModalContent>

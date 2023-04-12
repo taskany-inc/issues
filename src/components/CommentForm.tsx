@@ -3,14 +3,23 @@ import styled from 'styled-components';
 import { Controller, Control } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { backgroundColor, gapS, gray4, gray6 } from '@taskany/colors';
-import { Button, Link, Form, FormCard, FormAction, FormActions, FormEditor } from '@taskany/bricks';
+import {
+    Button,
+    Link,
+    Form,
+    FormCard,
+    FormAction,
+    FormActions,
+    FormEditor,
+    MarkdownIcon,
+    QuestionIcon,
+} from '@taskany/bricks';
 
 import { submitKeys } from '../utils/hotkeys';
 import { nullable } from '../utils/nullable';
 import { usePageContext } from '../hooks/usePageContext';
 import { routes } from '../hooks/router';
 
-import { Icon } from './Icon';
 import { Tip } from './Tip';
 
 interface CommentFormProps {
@@ -136,12 +145,12 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
             {nullable(commentFocused, () => (
                 <StyledFormBottom>
-                    <StyledTip icon={<Icon type="markdown" size="s" color={gray6} />}>
+                    <StyledTip icon={<MarkdownIcon size="s" color={gray6} />}>
                         {t('Styling with markdown is supported')}
                     </StyledTip>
 
                     <Link href={routes.help(locale, 'comments')}>
-                        <Icon type="question" size="s" color={gray6} />
+                        <QuestionIcon size="s" color={gray6} />
                     </Link>
                 </StyledFormBottom>
             ))}

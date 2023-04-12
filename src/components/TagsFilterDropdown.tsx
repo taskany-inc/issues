@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dropdown } from '@taskany/bricks';
+import { Dropdown, MenuItem } from '@taskany/bricks';
 
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
-import { MenuItem } from './MenuItem';
 
 interface TagsFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
