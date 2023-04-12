@@ -6,11 +6,6 @@ import { TLocale } from '../i18n/getLang';
 export const routes = {
     index: () => '/',
 
-    teams: () => '/teams',
-    team: (id: string) => `/teams/${id}`,
-    teamGoals: (id: string) => `/teams/${id}/goals`,
-    teamSettings: (id: string) => `/teams/${id}/settings`,
-
     project: (id: string) => `/projects/${id}`,
     projectSettings: (id: string) => `/projects/${id}/settings`,
 
@@ -20,7 +15,6 @@ export const routes = {
     signIn: () => '/api/auth/signin',
     userSettings: () => '/users/settings',
 
-    exploreTeams: () => '/explore/teams',
     exploreProjects: () => '/explore/projects',
     exploreGoals: () => '/explore/goals',
 
@@ -34,11 +28,6 @@ export const useRouter = (): Record<keyof typeof routes, any> => {
     return {
         index: () => router.push(routes.index()),
 
-        teams: () => router.push(routes.teams()),
-        team: (id: string) => router.push(routes.team(id)),
-        teamGoals: (id: string) => router.push(routes.teamGoals(id)),
-        teamSettings: (id: string) => router.push(routes.teamSettings(id)),
-
         project: (id: string) => router.push(routes.project(id)),
         projectSettings: (id: string) => router.push(routes.projectSettings(id)),
 
@@ -48,7 +37,6 @@ export const useRouter = (): Record<keyof typeof routes, any> => {
         signIn: () => router.push(routes.signIn()),
         userSettings: () => router.push(routes.userSettings()),
 
-        exploreTeams: () => router.push(routes.exploreTeams()),
         exploreProjects: () => router.push(routes.exploreProjects()),
         exploreGoals: () => router.push(routes.exploreGoals()),
 
