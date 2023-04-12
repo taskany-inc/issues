@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dropdown } from '@taskany/bricks';
+import { Dropdown, MenuItem } from '@taskany/bricks';
 
 import { Project } from '../../graphql/@generated/genql';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
-import { MenuItem } from './MenuItem';
 
 interface ProjectFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];

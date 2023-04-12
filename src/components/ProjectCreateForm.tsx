@@ -18,6 +18,10 @@ import {
     FormTextarea,
     FormInput,
     FormTitle,
+    BulbOnIcon,
+    QuestionIcon,
+    ModalHeader,
+    ModalContent,
 } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
@@ -31,11 +35,9 @@ import { usePageContext } from '../hooks/usePageContext';
 import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../hooks/useProjectResource';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
-import { Icon } from './Icon';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { FlowComboBox } from './FlowComboBox';
-import { ModalContent, ModalHeader } from './Modal';
 
 const KeyInput = dynamic(() => import('./KeyInput'));
 
@@ -258,14 +260,14 @@ const ProjectCreateForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('create.Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
+                    <Tip title={t('create.Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
                         {t.rich('create.Press key to create the project', {
                             key: () => <Keyboard command enter />,
                         })}
                     </Tip>
 
                     <Link href={routes.help(locale, 'projects')}>
-                        <Icon type="question" size="s" color={gray6} />
+                        <QuestionIcon size="s" color={gray6} />
                     </Link>
                 </StyledFormBottom>
             </ModalContent>

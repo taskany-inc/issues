@@ -3,17 +3,25 @@ import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { gapL, gapM } from '@taskany/colors';
-import { Button, Dropdown, ComboBox, FormInput, FormTitle } from '@taskany/bricks';
+import {
+    Button,
+    Dropdown,
+    ComboBox,
+    ArrowUpSmallIcon,
+    ArrowDownSmallIcon,
+    MenuItem,
+    ModalHeader,
+    ModalContent,
+    FormInput,
+    FormTitle,
+} from '@taskany/bricks';
 
 import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
 import { createFetcher } from '../utils/createFetcher';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { IssueDependenciesList } from './IssueDependenciesList';
-import { MenuItem } from './MenuItem';
 import { GoalMenuItem } from './GoalMenuItem';
-import { Icon } from './Icon';
-import { ModalContent, ModalHeader } from './Modal';
 
 interface IssueDependenciesFormProps {
     issue: Goal;
@@ -219,11 +227,11 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                                     outline
                                     brick="right"
                                     iconRight={
-                                        <Icon
-                                            size="s"
-                                            noWrap
-                                            type={props.visible ? 'arrowUpSmall' : 'arrowDownSmall'}
-                                        />
+                                        props.visible ? (
+                                            <ArrowUpSmallIcon size="s" noWrap />
+                                        ) : (
+                                            <ArrowDownSmallIcon size="s" noWrap />
+                                        )
                                     }
                                     text={kind ? t(kind) : undefined}
                                     ref={props.ref}

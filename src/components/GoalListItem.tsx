@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
 import { gray4, textColor, gray10, gapM, gapS } from '@taskany/colors';
-import { Text } from '@taskany/bricks';
+import { GitForkIcon, MessageIcon, Text, Tag as TagItem } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
@@ -12,8 +12,6 @@ import { nullable } from '../utils/nullable';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
-import { Tag as TagItem } from './Tag';
-import { Icon } from './Icon';
 import { UserPic } from './UserPic';
 import { StateDot } from './StateDot';
 
@@ -123,7 +121,7 @@ const StyledTag = styled(TagItem)`
     margin-right: ${gapS};
 `;
 
-const StyledIcon = styled(Icon)`
+const StyledMessageIcon = styled(MessageIcon)`
     vertical-align: middle;
 `;
 
@@ -195,12 +193,12 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                         <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
                     </StyledAddon>
 
-                    <StyledAddon>{hasForks && <Icon type="gitFork" size="s" />}</StyledAddon>
+                    <StyledAddon>{hasForks && <GitForkIcon size="s" />}</StyledAddon>
 
                     <StyledAddon>
                         {comments !== 0 && (
                             <>
-                                <StyledIcon type="message" size="s" />
+                                <StyledMessageIcon size="s" />
                                 <StyledCommentsCount size="xs" weight="bold">
                                     {comments}
                                 </StyledCommentsCount>

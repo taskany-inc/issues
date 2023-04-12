@@ -5,7 +5,22 @@ import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
 import { danger0, gapM, gapS } from '@taskany/colors';
-import { Dot, Button, Card, CardComment, CardInfo, Dropdown, Link } from '@taskany/bricks';
+import {
+    Dot,
+    Button,
+    Card,
+    CardComment,
+    CardInfo,
+    Dropdown,
+    Link,
+    MoreVerticalIcon,
+    BinIcon,
+    EditIcon,
+    MenuItem,
+    ModalContent,
+    ModalHeader,
+    ModalPreview,
+} from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
@@ -22,8 +37,6 @@ import { editGoalKeys } from '../utils/hotkeys';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
-import { ModalHeader, ModalContent } from './Modal';
-import { ModalPreview } from './ModalPreview';
 import { IssueKey } from './IssueKey';
 import { IssueTitle } from './IssueTitle';
 import { IssueParent } from './IssueParent';
@@ -37,8 +50,6 @@ import { CommentView } from './CommentView';
 import { ActivityFeed } from './ActivityFeed';
 import { Reactions } from './Reactions';
 import ReactionsDropdown from './ReactionsDropdown';
-import { Icon } from './Icon';
-import { MenuItem } from './MenuItem';
 import { GoalDeleteModal } from './GoalDeleteModal';
 
 const StateSwitch = dynamic(() => import('./StateSwitch'));
@@ -252,13 +263,13 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                                 items={[
                                     {
                                         label: t('Edit'),
-                                        icon: <Icon type="edit" size="xxs" />,
+                                        icon: <EditIcon size="xxs" />,
                                         onClick: dispatchModalEvent(ModalEvent.GoalEditModal),
                                     },
                                     {
                                         label: t('Delete'),
                                         color: danger0,
-                                        icon: <Icon type="bin" size="xxs" />,
+                                        icon: <BinIcon size="xxs" />,
                                         onClick: dispatchModalEvent(ModalEvent.GoalDeleteModal),
                                     },
                                 ]}
@@ -266,7 +277,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                                     <Button
                                         ref={ref}
                                         ghost
-                                        iconLeft={<Icon noWrap type="moreVertical" size="xs" />}
+                                        iconLeft={<MoreVerticalIcon noWrap size="xs" />}
                                         onClick={onClick}
                                     />
                                 )}

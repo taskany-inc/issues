@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import InputMask from 'react-input-mask';
 import { danger8, danger9, gray6, textColor } from '@taskany/colors';
-import { Button, Input, ComboBox } from '@taskany/bricks';
+import { Button, Input, ComboBox, CalendarTickIcon } from '@taskany/bricks';
 
 import { EstimateInput } from '../../graphql/@generated/genql';
 import {
@@ -15,8 +15,6 @@ import {
 } from '../utils/dateTime';
 import { usePageContext } from '../hooks/usePageContext';
 import { TLocale } from '../i18n/getLang';
-
-import { Icon } from './Icon';
 
 interface EstimateComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -184,7 +182,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                             disabled={props.disabled}
                             ref={props.ref}
                             text={buttonText}
-                            iconLeft={<Icon noWrap type="calendarTick" size="xs" />}
+                            iconLeft={<CalendarTickIcon noWrap size="xs" />}
                             onClick={props.onClick}
                         />
                     </StyledTriggerContainer>

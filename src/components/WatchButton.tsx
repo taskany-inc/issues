@@ -1,8 +1,6 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { Button } from '@taskany/bricks';
-
-import { Icon } from './Icon';
+import { Button, EyeClosedIcon, EyeIcon } from '@taskany/bricks';
 
 interface WatchButtonProps {
     watcher?: boolean;
@@ -16,7 +14,7 @@ export const WatchButton: React.FC<WatchButtonProps> = ({ watcher, onToggle }) =
     return (
         <Button
             text={t(watcher ? 'Watching' : 'Watch')}
-            iconLeft={<Icon noWrap type={watcher ? 'eye' : 'eyeClosed'} size="s" />}
+            iconLeft={watcher ? <EyeIcon noWrap size="s" /> : <EyeClosedIcon noWrap size="s" />}
             onClick={onToggle}
         />
     );

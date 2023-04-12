@@ -3,7 +3,17 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { brandColor, danger0, gapM, gapS, gray4 } from '@taskany/colors';
-import { Card, CardComment, CardInfo, Dropdown, Link } from '@taskany/bricks';
+import {
+    BinIcon,
+    Card,
+    CardComment,
+    CardInfo,
+    Dropdown,
+    EditIcon,
+    Link,
+    MenuItem,
+    MoreVerticalIcon,
+} from '@taskany/bricks';
 
 import { Comment, User } from '../../graphql/@generated/genql';
 import { nullable } from '../utils/nullable';
@@ -11,10 +21,8 @@ import { useReactionsResource } from '../hooks/useReactionsResource';
 import { useCommentResource } from '../hooks/useCommentResource';
 
 import { UserPic } from './UserPic';
-import { Icon } from './Icon';
 import { Reactions } from './Reactions';
 import { ActivityFeedItem } from './ActivityFeed';
-import { MenuItem } from './MenuItem';
 
 const Md = dynamic(() => import('./Md'));
 const RelativeTime = dynamic(() => import('./RelativeTime'));
@@ -177,18 +185,18 @@ export const CommentView: FC<CommentViewProps> = ({
                                         items={[
                                             {
                                                 label: 'Edit',
-                                                icon: <Icon type="edit" size="xxs" />,
+                                                icon: <EditIcon size="xxs" />,
                                                 onClick: onEditClick,
                                             },
                                             {
                                                 label: 'Delete',
                                                 color: danger0,
-                                                icon: <Icon type="bin" size="xxs" />,
+                                                icon: <BinIcon size="xxs" />,
                                                 onClick: onDeleteClick,
                                             },
                                         ]}
                                         renderTrigger={({ ref, onClick }) => (
-                                            <Icon type="moreVertical" size="xs" ref={ref} onClick={onClick} />
+                                            <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
                                         )}
                                         renderItem={({ item, cursor, index }) => (
                                             <MenuItem

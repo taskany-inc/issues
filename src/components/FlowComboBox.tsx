@@ -2,14 +2,11 @@
 import React, { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
-import { Button, Input, ComboBox } from '@taskany/bricks';
+import { Button, Input, ComboBox, FlowIcon, MenuItem } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Flow } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
-
-import { MenuItem } from './MenuItem';
-import { Icon } from './Icon';
 
 interface FlowComboBoxProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -67,7 +64,7 @@ export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
                         text={props.text}
                         disabled={props.disabled}
                         onClick={props.onClick}
-                        iconLeft={<Icon noWrap size="s" type="flow" />}
+                        iconLeft={<FlowIcon noWrap size="s" />}
                     />
                 )}
                 renderInput={(props) => (

@@ -1,8 +1,6 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Button } from '@taskany/bricks';
-
-import { Icon } from './Icon';
+import { Badge, Button, StarFilledIcon, StarIcon } from '@taskany/bricks';
 
 interface StarButtonProps {
     stargizer?: boolean;
@@ -17,7 +15,7 @@ export const StarButton: React.FC<StarButtonProps> = ({ stargizer, count, onTogg
     return (
         <Button
             text={t(stargizer ? 'Starred' : 'Stars')}
-            iconLeft={<Icon noWrap type={stargizer ? 'starFilled' : 'star'} size="s" />}
+            iconLeft={stargizer ? <StarFilledIcon size="s" noWrap /> : <StarIcon size="s" noWrap />}
             iconRight={count !== undefined ? <Badge>{count}</Badge> : undefined}
             onClick={onToggle}
         />

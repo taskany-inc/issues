@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
 import { gapS, gray6, gray10 } from '@taskany/colors';
-import { Link } from '@taskany/bricks';
+import { BulbOnIcon, Link, QuestionIcon } from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
 import { Activity } from '../../graphql/@generated/genql';
@@ -12,7 +12,6 @@ import { usePageContext } from '../hooks/usePageContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
-import { Icon } from './Icon';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
 import { GoalForm, GoalFormType } from './GoalForm';
@@ -96,14 +95,14 @@ const GoalCreateForm: React.FC = () => {
             onSumbit={createGoal}
         >
             <StyledFormBottom>
-                <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
+                <Tip title={t('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
                     {t.rich('Press key to create the goal', {
                         key: () => <Keyboard command enter />,
                     })}
                 </Tip>
 
                 <Link href={routes.help(locale, 'goals')}>
-                    <Icon type="question" size="s" color={gray6} />
+                    <QuestionIcon size="s" color={gray6} />
                 </Link>
             </StyledFormBottom>
         </GoalForm>

@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import colorLayer from 'color-layer';
-import { Button, Dropdown } from '@taskany/bricks';
+import { Button, Dropdown, FlowIcon } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { State } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Icon } from './Icon';
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 
@@ -82,7 +81,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                         text={props.text}
                         onClick={props.onClick}
                         disabled={props.disabled}
-                        iconLeft={state ? <StateDot hue={state.hue} /> : <Icon noWrap type="flow" size="xs" />}
+                        iconLeft={state ? <StateDot hue={state.hue} /> : <FlowIcon noWrap size="xs" />}
                     />
                 )}
                 renderItem={(props) => (

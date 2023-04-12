@@ -5,18 +5,29 @@ import z from 'zod';
 import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
 import { gapM, gapS, gray6, gray7, gray10 } from '@taskany/colors';
-import { Button, Text, Link, Form, FormInput, FormAction, FormActions, FormTitle } from '@taskany/bricks';
+import {
+    Button,
+    Text,
+    Link,
+    Form,
+    FormInput,
+    FormAction,
+    FormActions,
+    FormTitle,
+    BulbOnIcon,
+    QuestionIcon,
+    ModalHeader,
+    ModalContent,
+    Tag,
+} from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
 import { KeyCode } from '../hooks/useKeyboard';
 import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { Icon } from './Icon';
 import { Tip } from './Tip';
 import { Keyboard } from './Keyboard';
-import { Tag } from './Tag';
-import { ModalContent, ModalHeader } from './Modal';
 
 const StyledEmails = styled.div`
     padding: ${gapM} 0;
@@ -167,14 +178,14 @@ const UserInviteForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('Pro tip!')} icon={<Icon type="bulbOn" size="s" color={gray10} />}>
+                    <Tip title={t('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
                         {t.rich('Press key to send invites', {
                             key: () => <Keyboard command enter />,
                         })}
                     </Tip>
 
                     <Link href={routes.help(locale, 'users')}>
-                        <Icon type="question" size="s" color={gray6} />
+                        <QuestionIcon size="s" color={gray6} />
                     </Link>
                 </StyledFormBottom>
             </ModalContent>

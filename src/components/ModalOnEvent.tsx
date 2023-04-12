@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import tinykeys from 'tinykeys';
+import { Modal } from '@taskany/bricks';
 
 import { ModalEvent } from '../utils/dispatchModal';
 import { createHotkeys } from '../utils/hotkeys';
-
-import { Modal } from './Modal';
 
 interface ModalOnEventProps {
     event: ModalEvent;

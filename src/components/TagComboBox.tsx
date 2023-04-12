@@ -4,15 +4,12 @@ import styled from 'styled-components';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
-import { Button, ComboBox, Input } from '@taskany/bricks';
+import { Button, ComboBox, Input, Tag, TagIcon } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Tag as TagModel } from '../../graphql/@generated/genql';
 import { gql } from '../utils/gql';
 import { usePageContext } from '../hooks/usePageContext';
-
-import { Icon } from './Icon';
-import { Tag } from './Tag';
 
 interface TagComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -124,7 +121,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                         text={props.text}
                         disabled={props.disabled}
                         onClick={props.onClick}
-                        iconLeft={<Icon noWrap type="tag" size="xs" />}
+                        iconLeft={<TagIcon noWrap size="xs" />}
                     />
                 )}
                 renderInput={(props) => (

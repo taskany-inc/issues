@@ -3,15 +3,13 @@ import NextLink from 'next/link';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import { textColor, gray7, colorPrimary, gray3 } from '@taskany/colors';
-import { Button, Dropdown } from '@taskany/bricks';
+import { ArrowDownSmallIcon, ArrowUpSmallIcon, Button, Dropdown, MenuItem, SearchIcon } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
 
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMenu } from './HeaderMenu';
-import { Icon } from './Icon';
-import { MenuItem } from './MenuItem';
 
 const StyledHeader = styled.header`
     display: grid;
@@ -90,7 +88,7 @@ export const Header: React.FC = () => {
                 </NextLink>
 
                 <StyledSearch>
-                    <Icon type="search" size="s" color={gray7} />
+                    <SearchIcon size="s" color={gray7} />
                 </StyledSearch>
             </StyledNav>
 
@@ -124,7 +122,11 @@ export const Header: React.FC = () => {
                             outline
                             brick="left"
                             iconRight={
-                                <Icon size="s" noWrap type={props.visible ? 'arrowUpSmall' : 'arrowDownSmall'} />
+                                props.visible ? (
+                                    <ArrowUpSmallIcon size="s" noWrap />
+                                ) : (
+                                    <ArrowDownSmallIcon size="s" noWrap />
+                                )
                             }
                             ref={props.ref}
                             onClick={props.onClick}
