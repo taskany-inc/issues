@@ -83,7 +83,7 @@ export const Header: React.FC = () => {
                 </NextLink>
                 {/* <StyledHeaderNavLink disabled>{t('Issues')}</StyledHeaderNavLink> */}
                 {/* <StyledHeaderNavLink disabled>{t('Boards')}</StyledHeaderNavLink> */}
-                <NextLink href={routes.exploreTeams()} passHref>
+                <NextLink href={routes.exploreProjects()} passHref>
                     <StyledHeaderNavLink>{t('Explore')}</StyledHeaderNavLink>
                 </NextLink>
 
