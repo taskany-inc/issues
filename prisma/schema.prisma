@@ -110,17 +110,13 @@ model Activity {
   comments           Comment[]
   reactions          Reaction[]
   projects           Project[]
-  teams              Team[]
   estimates          Estimate[]
-  teamParticipant    Team[]     @relation("teamParticipants")
   projectParticipant Project[]  @relation("projectParticipants")
   goalParticipant    Goal[]     @relation("goalParticipants")
   goalWatchers       Goal[]     @relation("goalWatchers")
   goalStargizers     Goal[]     @relation("goalStargizers")
   projectWatchers    Project[]  @relation("projectWatchers")
   projectStargizers  Project[]  @relation("projectStargizers")
-  teamWatchers       Team[]     @relation("teamWatchers")
-  teamStargizers     Team[]     @relation("teamStargizers")
   goalOwner          Goal[]     @relation("goalOwner")
   goalIssuer         Goal[]     @relation("goalIssuer")
   settings           Settings   @relation(fields: [settingsId], references: [id])
@@ -148,25 +144,6 @@ model Project {
   tags         Tag[]
   watchers     Activity[] @relation("projectWatchers")
   stargizers   Activity[] @relation("projectStargizers")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-}
-
-model Team {
-  id           String     @id
-  title        String
-  description  String?
-  parent       Team[]     @relation("teamChildren")
-  children     Team[]     @relation("teamChildren")
-  activity     Activity   @relation(fields: [activityId], references: [id])
-  activityId   String
-  participants Activity[] @relation("teamParticipants")
-  goals        Goal[]     @relation("teamGoals")
-  flow         Flow?      @relation(fields: [flowId], references: [id])
-  flowId       String?
-  watchers     Activity[] @relation("teamWatchers")
-  stargizers   Activity[] @relation("teamStargizers")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -201,7 +178,6 @@ model Goal {
   estimate     Estimate[]
   project      Project?   @relation("projectGoals", fields: [projectId], references: [id])
   projectId    String?
-  team         Team?      @relation("teamGoals", fields: [teamId], references: [id])
   teamId       String?
   state        State?     @relation("goalState", fields: [stateId], references: [id])
   stateId      String?
@@ -267,7 +243,6 @@ model Flow {
   graph       String? // [[stateId, stateId], [stateId, stateId]] — any transition allowed if undefined
   settings    Settings[]
   projects    Project[]
-  teams       Team[]
   states      State[]
   recommended Boolean?
 
