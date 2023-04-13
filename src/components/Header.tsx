@@ -111,10 +111,6 @@ export const Header: React.FC = () => {
                             title: t('Create project'),
                             event: ModalEvent.ProjectCreateModal,
                         },
-                        {
-                            title: t('Create team'),
-                            event: ModalEvent.TeamCreateModal,
-                        },
                     ]}
                     renderTrigger={(props) => (
                         <Button
