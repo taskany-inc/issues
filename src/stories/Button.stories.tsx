@@ -1,8 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Button, CogIcon, LocationIcon } from '@taskany/bricks';
-
-import { UserPic } from '../components/UserPic';
+import { Button, CogIcon, LocationIcon, UserPic } from '@taskany/bricks';
 
 export default {
     title: 'Taskany/Button',

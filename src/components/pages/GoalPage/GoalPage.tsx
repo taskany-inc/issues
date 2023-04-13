@@ -20,6 +20,7 @@ import {
     BinIcon,
     MoreVerticalIcon,
     MenuItem,
+    UserPic,
     nullable,
 } from '@taskany/bricks';
 
@@ -35,7 +36,6 @@ import { PageSep } from '../../PageSep';
 import { IssueTitle } from '../../IssueTitle';
 import { IssueKey } from '../../IssueKey';
 import { IssueStats } from '../../IssueStats';
-import { UserPic } from '../../UserPic';
 import { Reactions } from '../../Reactions';
 import { CommentView } from '../../CommentView';
 import { StateDot } from '../../StateDot';

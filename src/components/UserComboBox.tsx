@@ -1,14 +1,13 @@
 import React, { useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
-import { Button, ComboBox, Input } from '@taskany/bricks';
+import { Button, ComboBox, UserPic, Input } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { Activity } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { UserMenuItem } from './UserMenuItem';
-import { UserPic } from './UserPic';
 
 interface UserComboBoxProps {
     text: React.ComponentProps<typeof Button>['text'];

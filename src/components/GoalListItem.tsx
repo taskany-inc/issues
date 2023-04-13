@@ -4,14 +4,13 @@ import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
 import { gray4, textColor, gray10, gapM, gapS } from '@taskany/colors';
-import { GitForkIcon, MessageIcon, Text, Tag as TagItem, nullable } from '@taskany/bricks';
+import { GitForkIcon, MessageIcon, Text, Tag as TagItem, nullable, UserPic } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../graphql/@generated/genql';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
-import { UserPic } from './UserPic';
 import { StateDot } from './StateDot';
 
 const RelativeTime = dynamic(() => import('./RelativeTime'));

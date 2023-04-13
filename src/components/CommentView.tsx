@@ -13,6 +13,7 @@ import {
     Link,
     MenuItem,
     MoreVerticalIcon,
+    UserPic,
     nullable,
 } from '@taskany/bricks';
 
@@ -20,7 +21,6 @@ import { Comment, User } from '../../graphql/@generated/genql';
 import { useReactionsResource } from '../hooks/useReactionsResource';
 import { useCommentResource } from '../hooks/useCommentResource';
 
-import { UserPic } from './UserPic';
 import { Reactions } from './Reactions';
 import { ActivityFeedItem } from './ActivityFeed';
 

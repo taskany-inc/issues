@@ -1,11 +1,10 @@
 import styled from 'styled-components';
 import Link from 'next/link';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '@taskany/colors';
-import { Text, nullable } from '@taskany/bricks';
+import { Text, UserPic, nullable } from '@taskany/bricks';
 
 import { Activity } from '../../graphql/@generated/genql';
 
-import { UserPic } from './UserPic';
 import RelativeTime from './RelativeTime';
 
 interface ProjectListItemProps {

@@ -20,6 +20,7 @@ import {
     ModalContent,
     ModalHeader,
     ModalPreview,
+    UserPic,
     nullable,
 } from '@taskany/bricks';
 
@@ -42,7 +43,6 @@ import { IssueTitle } from './IssueTitle';
 import { IssueParent } from './IssueParent';
 import { IssueTags } from './IssueTags';
 import { StateDot } from './StateDot';
-import { UserPic } from './UserPic';
 import RelativeTime from './RelativeTime';
 import Md from './Md';
 import { IssueStats } from './IssueStats';

@@ -16,7 +16,7 @@ import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../utils/hotk
 
 import { Theme } from './Theme';
 import { GlobalStyle } from './GlobalStyle';
-import { Header } from './Header';
+import { PageHeader } from './PageHeader';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm'));
@@ -82,7 +82,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', l
                 position="bottom-right"
             />
 
-            <Header />
+            <PageHeader />
 
             <StyledContent>{children}</StyledContent>
 

@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import { gapS } from '@taskany/colors';
-import { CleanButton, nullable } from '@taskany/bricks';
+import { CleanButton, UserPic, nullable } from '@taskany/bricks';
 
 import { Activity } from '../../graphql/@generated/genql';
 
 import { IssueMeta } from './IssueMeta';
-import { UserPic } from './UserPic';
 
 interface IssueParticipantsListProps {
     title: string;
