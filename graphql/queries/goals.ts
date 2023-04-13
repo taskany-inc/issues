@@ -8,7 +8,7 @@ export const goalsFilter = (
         tags: string[];
         estimates: string[];
         owner: string[];
-        projects: number[];
+        projects: string[];
     },
     extra: any = {},
 ): any => {
@@ -105,22 +105,6 @@ export const goalsFilter = (
                         },
                     },
                 },
-                {
-                    team: {
-                        title: {
-                            contains: data.query,
-                            mode: 'insensitive',
-                        },
-                    },
-                },
-                {
-                    team: {
-                        description: {
-                            contains: data.query,
-                            mode: 'insensitive',
-                        },
-                    },
-                },
             ],
             ...priorityFilter,
             ...statesFilter,
@@ -152,23 +136,9 @@ export const goalDeepQuery = {
     tags: true,
     state: true,
     estimate: true,
-    team: {
-        include: {
-            flow: {
-                include: {
-                    states: true,
-                },
-            },
-        },
-    },
     project: {
         include: {
-            flow: {
-                include: {
-                    states: true,
-                },
-            },
-            teams: true,
+            parent: true,
         },
     },
     dependsOn: {
@@ -274,7 +244,6 @@ export const calcGoalsMeta = (goals: GoalModel[]) => {
     const uniqPriority = new Set<string>();
     const uniqStates = new Map();
     const uniqProjects = new Map();
-    const uniqTeams = new Map();
     const uniqEstimates = new Map();
 
     goals.forEach((goal: GoalModel) => {
@@ -286,12 +255,6 @@ export const calcGoalsMeta = (goals: GoalModel[]) => {
         });
 
         goal.project && uniqProjects.set(goal.project.id, goal.project);
-        goal.project?.teams &&
-            goal.project?.teams.forEach((t) => {
-                t && uniqTeams.set(t.id, t);
-            });
-
-        goal.team && uniqTeams.set(goal.team.id, goal.team);
 
         goal.owner && uniqOwners.set(goal.owner.id, goal.owner);
         goal.participants &&
@@ -314,7 +277,6 @@ export const calcGoalsMeta = (goals: GoalModel[]) => {
         priority: Array.from(uniqPriority),
         states: Array.from(uniqStates.values()),
         projects: Array.from(uniqProjects.values()),
-        teams: Array.from(uniqTeams.values()),
         estimates: Array.from(uniqEstimates.values()),
         count: goals.length,
     };

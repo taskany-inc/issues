@@ -127,8 +127,6 @@ type Goal {
   state: State
   stateId: String
   tags: [Tag]
-  team: Team
-  teamId: String
   title: String!
   updatedAt: DateTime!
   watchers: [Activity]
@@ -149,15 +147,14 @@ input GoalCreateInput {
   description: String!
   estimate: EstimateInput
   key: Boolean
-  kind: String
   ownerId: String
-  parent: String
-  participants: [ActivityInput]
+  participants: [ActivityInput!]
   personal: Boolean
   priority: String
   private: Boolean
+  projectId: String
   stateId: String
-  tags: [TagInput]
+  tags: [TagInput!]
   title: String!
 }
 
@@ -173,15 +170,14 @@ input GoalUpdateInput {
   estimate: EstimateInput
   id: ID!
   key: Boolean
-  kind: String
   ownerId: String
-  parent: String
   participants: [String]
   personal: Boolean
   priority: String
   private: Boolean
+  projectId: String!
   stateId: String
-  tags: [TagInput]
+  tags: [TagInput!]
   title: String
 }
 
@@ -195,7 +191,6 @@ type GoalsMetaOutput {
   projects: [Project!]
   states: [State!]
   tags: [Tag!]
-  teams: [Team!]
 }
 
 type Mutation {
@@ -206,7 +201,7 @@ type Mutation {
   deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
   toggleGoalArchive(data: GoalArchiveInput!): Activity
-  toggleGoalDependency(toggle: GoalDependencyToggleInput!): Goal
+  toggleGoalDependency(data: GoalDependencyToggleInput!): Goal
   toggleGoalStargizer(data: SubscriptionToggleInput!): Activity
   toggleGoalWatcher(data: SubscriptionToggleInput!): Activity
   toggleProjectStargizer(data: SubscriptionToggleInput!): Activity
@@ -227,55 +222,64 @@ type Project {
   _isWatching: Boolean
   activity: Activity
   activityId: String!
-  children: [Project]
+  children: [Project!]
   createdAt: DateTime!
   description: String
   flow: Flow
   flowId: String!
-  goals: [Goal]
+  goals: [Goal!]
   id: ID!
-  parent: [Project]
+  parent: [Project!]
   participants: [Activity]
   stargizers: [Activity]
   tags: [Tag]
-  team: Boolean
-  teams: [Team!]
   title: String!
   updatedAt: DateTime!
   watchers: [Activity]
 }
 
 type ProjectAggregation {
+  children: Int
+  participants: Int
   stargizers: Int
+  watchers: Int
 }
 
 input ProjectCreateInput {
   description: String
   flowId: String!
   id: ID!
-  team: Boolean
   title: String!
+}
+
+input ProjectDeepInput {
+  estimates: [String!]!
+  id: ID!
+  owner: [String!]!
+  priority: [String!]!
+  projects: [String!]!
+  query: String!
+  states: [String!]!
+  tags: [String!]!
+}
+
+type ProjectDeepOutput {
+  goals: [Goal!]
+  meta: GoalsMetaOutput
 }
 
 input ProjectDelete {
   id: ID!
 }
 
-input ProjectGoalsInput {
-  estimates: [String!]!
+input ProjectInput {
   id: ID!
-  owner: [String!]!
-  priority: [String!]!
-  projects: [Int!]!
-  query: String!
-  states: [String!]!
-  tags: [String!]!
 }
 
 input ProjectUpdateInput {
   description: String
   id: ID!
-  teams: [String!]!
+  parent: [String!]!
   title: String!
 }
 
@@ -288,15 +292,13 @@ type Query {
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
   goalDependencyKind: [String]
-  project(id: String!, team: Boolean): Project
+  project(data: ProjectInput!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
-  projectGoals(data: ProjectGoalsInput!): [Goal]
-  projectGoalsMeta(data: ProjectGoalsInput!): GoalsMetaOutput
-  projects(team: Boolean): [Project]
+  projectDeepInfo(data: ProjectDeepInput!): ProjectDeepOutput
+  projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
-  userGoals(data: UserGoalsInput!): [Goal]
-  userGoalsMeta(data: UserGoalsInput!): GoalsMetaOutput
+  userGoals(data: UserGoalsInput!): UserGoalsOutput
   users(sortBy: SortOrder): [User]
 }
 
@@ -367,69 +369,6 @@ input TagInput {
   title: String!
 }
 
-type Team {
-  _count: TeamAggregation
-  activity: Activity
-  activityId: String!
-  children: [Team]
-  createdAt: DateTime!
-  description: String
-  flow: Flow
-  flowId: String
-  goals: [Goal]
-  id: ID!
-  parent: Team
-  participants: [Activity]
-  projects: [Project]
-  stargizers: [Activity]
-  title: String!
-  updatedAt: DateTime!
-  watchers: [Activity]
-}
-
-type TeamAggregation {
-  participants: Int
-  projects: Int
-}
-
-input TeamCreateInput {
-  children: [Int!]
-  description: String
-  flowId: String
-  id: ID!
-  parent: String
-  projects: [String!]
-  title: String!
-}
-
-input TeamDelete {
-  id: ID!
-}
-
-input TeamGoalsInput {
-  estimates: [String!]!
-  id: ID!
-  owner: [String!]!
-  priority: [String!]!
-  projects: [Int!]!
-  query: String!
-  states: [String!]!
-  tags: [String!]!
-}
-
-input TeamUpdateInput {
-  children: [String!]
-  description: String
-  id: ID!
-  parent: String
-  projects: [String!]!
-  title: String!
-}
-
-input TeamsInput {
-  title: String
-}
-
 input TransferOwnershipInput {
   activityId: String!
   id: String!
@@ -452,10 +391,15 @@ input UserGoalsInput {
   estimates: [String!]!
   owner: [String!]!
   priority: [String!]!
-  projects: [Int!]!
+  projects: [String!]!
   query: String!
   states: [String!]!
   tags: [String!]!
+}
+
+type UserGoalsOutput {
+  goals: [Goal!]
+  meta: GoalsMetaOutput
 }
 
 input UserInvitesInput {

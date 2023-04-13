@@ -2,19 +2,19 @@ import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
 import { connectionMap } from '../queries/connections';
-import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
+import { calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
 import {
     SortOrder,
     Project,
-    Goal,
-    ProjectGoalsInput,
+    ProjectInput,
     ProjectDeleteInput,
     SubscriptionToggleInput,
     Activity,
     ProjectUpdateInput,
     ProjectCreateInput,
-    GoalsMetaOutput,
     TransferOwnershipInput,
+    ProjectDeepInput,
+    ProjectDeepOutput,
 } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
@@ -46,25 +46,25 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.field('project', {
         type: Project,
         args: {
-            id: nonNull(stringArg()),
+            data: nonNull(arg({ type: ProjectInput })),
         },
-        resolve: async (_, { id }, { db, activity }) => {
+        resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
             const project = await db.project.findUnique({
                 where: {
-                    id,
+                    id: data.id,
                 },
                 include: {
-                    flow: {
-                        include: {
-                            states: true,
-                        },
-                    },
                     stargizers: true,
                     watchers: true,
-                    teams: true,
+                    parent: true,
                     tags: true,
+                    children: {
+                        include: {
+                            parent: true,
+                        },
+                    },
                     participants: {
                         include: {
                             user: true,
@@ -80,7 +80,9 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                     _count: {
                         select: {
                             stargizers: true,
-                            teams: true,
+                            watchers: true,
+                            participants: true,
+                            children: true,
                         },
                     },
                 },
@@ -96,52 +98,75 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         },
     });
 
-    t.list.field('projectGoals', {
-        type: Goal,
+    t.field('projectDeepInfo', {
+        type: ProjectDeepOutput,
         args: {
-            data: nonNull(arg({ type: ProjectGoalsInput })),
+            data: nonNull(arg({ type: ProjectDeepInput })),
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            const goals = await db.goal.findMany({
-                ...goalsFilter(data, {
-                    project: {
-                        id: data.id,
+            const [allProjectGoals, filtredProjectGoals] = await Promise.all([
+                db.goal.findMany({
+                    ...goalsFilter(
+                        {
+                            priority: [],
+                            states: [],
+                            tags: [],
+                            estimates: [],
+                            owner: [],
+                            projects: [],
+                            query: '',
+                        },
+                        {
+                            OR: [
+                                {
+                                    projectId: data.id,
+                                },
+                                {
+                                    project: {
+                                        parent: {
+                                            some: {
+                                                id: data.id,
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    ),
+                    include: {
+                        ...goalDeepQuery,
                     },
                 }),
-                include: {
-                    ...goalDeepQuery,
-                },
-            });
-
-            return goals.map((goal: any) => ({
-                ...goal,
-                ...addCalclulatedGoalsFields(goal, activity.id),
-            }));
-        },
-    });
-
-    t.field('projectGoalsMeta', {
-        type: GoalsMetaOutput,
-        args: {
-            data: nonNull(arg({ type: ProjectGoalsInput })),
-        },
-        resolve: async (_, { data }, { db, activity }) => {
-            if (!activity) return null;
-
-            const allProjectGoals: any[] = await db.goal.findMany({
-                ...goalsFilter(data, {
-                    project: {
-                        id: data.id,
+                db.goal.findMany({
+                    ...goalsFilter(data, {
+                        OR: [
+                            {
+                                projectId: data.id,
+                            },
+                            {
+                                project: {
+                                    parent: {
+                                        some: {
+                                            id: data.id,
+                                        },
+                                    },
+                                },
+                            },
+                        ],
+                    }),
+                    include: {
+                        ...goalDeepQuery,
                     },
                 }),
-                include: {
-                    ...goalDeepQuery,
-                },
-            });
+            ]);
 
-            return calcGoalsMeta(allProjectGoals);
+            return {
+                goals: filtredProjectGoals,
+                // TODO: try to solve types collision
+                meta: calcGoalsMeta(allProjectGoals as any),
+            };
         },
     });
 
@@ -188,7 +213,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: ProjectCreateInput })),
         },
-        resolve: async (_, { data: { id, title, description, flowId, team } }, { db, activity }) => {
+        resolve: async (_, { data: { id, title, description, flowId } }, { db, activity }) => {
             if (!activity) return null;
 
             try {
@@ -197,7 +222,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                         id,
                         title,
                         description,
-                        team,
                         activityId: activity.id,
                         flowId,
                         watchers: {
@@ -224,33 +248,35 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: ProjectUpdateInput })),
         },
-        resolve: async (_, { data: { id, teams, ...data } }, { db, activity }) => {
+        resolve: async (_, { data: { id, parent, ...data } }, { db, activity }) => {
             if (!activity) return null;
 
             const project = await db.project.findUnique({
                 where: { id },
                 include: {
-                    teams: true,
+                    parent: true,
                 },
             });
 
             if (!project) return null;
 
-            const teamsToConnect = teams.filter((teamId) => !project.teams.some((team) => team.id === teamId));
-            const teamsToDisconnect = project.teams.filter((team) => !teams.includes(team.id));
+            // TODO: support children
+
+            const parentsToConnect = parent.filter((parentId) => !project.parent.some((p) => p.id === parentId));
+            const parentsToDisconnect = project.parent.filter((p) => !parent.includes(p.id));
 
             try {
                 return db.project.update({
                     where: { id },
                     data: {
                         ...data,
-                        teams: {
-                            connect: teamsToConnect.map((id) => ({ id })),
-                            disconnect: teamsToDisconnect.map((team) => ({ id: team.id })),
+                        parent: {
+                            connect: parentsToConnect.map((id) => ({ id })),
+                            disconnect: parentsToDisconnect.map((p) => ({ id: p.id })),
                         },
                     },
                     include: {
-                        teams: true,
+                        parent: true,
                     },
                 });
 

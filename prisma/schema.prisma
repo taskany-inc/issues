@@ -137,12 +137,10 @@ model Project {
   id           String     @id
   title        String
   description  String?
-  team         Boolean?
   parent       Project[]  @relation("parentChildren")
   children     Project[]  @relation("parentChildren")
   activity     Activity   @relation(fields: [activityId], references: [id])
   activityId   String
-  teams        Team[]     @relation("teamProjects")
   participants Activity[] @relation("projectParticipants")
   goals        Goal[]     @relation("projectGoals")
   flow         Flow       @relation(fields: [flowId], references: [id])
@@ -161,7 +159,6 @@ model Team {
   description  String?
   parent       Team[]     @relation("teamChildren")
   children     Team[]     @relation("teamChildren")
-  projects     Project[]  @relation("teamProjects")
   activity     Activity   @relation(fields: [activityId], references: [id])
   activityId   String
   participants Activity[] @relation("teamParticipants")

@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
@@ -14,218 +13,111 @@ import {
     dependencyKind,
     UserGoalsInput,
     GoalArchiveInput,
-    GoalsMetaOutput,
+    UserGoalsOutput,
 } from '../types';
 // import { mailServer } from '../src/utils/mailServer';
 
-const goalsQuery = async (
-    db: PrismaClient,
-    activityId: string,
-    parentFilter: ReturnType<typeof goalsFilter> = {},
-    childrenFilter: ReturnType<typeof goalsFilter> = {},
-) => {
-    const uniqGoals = new Map();
-
-    const [teams, projects, goals] = await Promise.all([
-        db.team.findMany({
-            where: {
-                OR: [
-                    // all teams where the user is a participant
-                    {
-                        participants: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    // all teams where the user is a watcher
-                    {
-                        watchers: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    // all teams where the user is owner
-                    {
-                        activityId,
-                    },
-                ],
-            },
-            include: {
-                goals: {
-                    ...parentFilter,
-                    include: {
-                        ...goalDeepQuery,
-                    },
-                },
-                projects: {
-                    include: {
-                        goals: {
-                            ...parentFilter,
-                            include: {
-                                ...goalDeepQuery,
-                            },
-                        },
-                    },
-                },
-            },
-        }),
-
-        db.project.findMany({
-            where: {
-                OR: [
-                    // all projects where the user is a participant
-                    {
-                        participants: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    // all projects where the user is a watcher
-                    {
-                        watchers: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    // all projects where the user is owner
-                    {
-                        activityId,
-                    },
-                ],
-            },
-            include: {
-                goals: {
-                    ...parentFilter,
-                    include: {
-                        ...goalDeepQuery,
-                    },
-                },
-            },
-        }),
-
-        db.goal.findMany({
-            ...childrenFilter,
-            include: {
-                ...goalDeepQuery,
-            },
-        }),
-    ]);
-
-    teams.forEach((team) => {
-        team.goals.forEach((goal: any) => uniqGoals.set(goal.id, goal));
-        team.projects.forEach((project) => {
-            project.goals.forEach((goal: any) => uniqGoals.set(goal.id, goal));
-        });
-    });
-
-    projects.forEach((project) => {
-        project.goals.forEach((goal: any) => uniqGoals.set(goal.id, goal));
-    });
-
-    goals.forEach((goal) => uniqGoals.set(goal.id, goal));
-
-    return Array.from(uniqGoals.values()).map((goal) => ({
-        ...goal,
-        ...addCalclulatedGoalsFields(goal, activityId),
-    }));
-};
-
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
-    t.list.field('userGoals', {
-        type: Goal,
+    t.field('userGoals', {
+        type: UserGoalsOutput,
         args: {
             data: nonNull(arg({ type: UserGoalsInput })),
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
 
-            return goalsQuery(
-                db,
-                activity.id,
-                goalsFilter(data),
-                goalsFilter(data, {
-                    AND: {
-                        OR: [
-                            // all goals where the user is a participant
-                            {
+            const userDashboardGoals = {
+                AND: {
+                    OR: [
+                        // all projects where the user is a participant
+                        {
+                            project: {
                                 participants: {
                                     some: {
                                         id: activity.id,
                                     },
                                 },
                             },
-                            // all goals where the user is a watcher
-                            {
+                        },
+                        // all projects where the user is a watcher
+                        {
+                            project: {
                                 watchers: {
                                     some: {
                                         id: activity.id,
                                     },
                                 },
                             },
-                            // all goals where the user is issuer
-                            {
+                        },
+                        // all projects where the user is owner
+                        {
+                            project: {
                                 activityId: activity.id,
                             },
-                            // all goals where the user is owner
-                            {
-                                ownerId: activity.id,
-                            },
-                        ],
-                    },
-                }),
-            );
-        },
-    });
-
-    t.field('userGoalsMeta', {
-        type: GoalsMetaOutput,
-        args: {
-            data: nonNull(arg({ type: UserGoalsInput })),
-        },
-        resolve: async (_, { data }, { db, activity }) => {
-            if (!activity) return null;
-
-            const allUserGoals = await goalsQuery(
-                db,
-                activity.id,
-                goalsFilter(data),
-                goalsFilter(data, {
-                    AND: {
-                        OR: [
-                            // all goals where the user is a participant
-                            {
-                                participants: {
-                                    some: {
-                                        id: activity.id,
-                                    },
+                        },
+                        // all goals where the user is a participant
+                        {
+                            participants: {
+                                some: {
+                                    id: activity.id,
                                 },
                             },
-                            // all goals where the user is a watcher
-                            {
-                                watchers: {
-                                    some: {
-                                        id: activity.id,
-                                    },
+                        },
+                        // all goals where the user is a watcher
+                        {
+                            watchers: {
+                                some: {
+                                    id: activity.id,
                                 },
                             },
-                            // all goals where the user is issuer
-                            {
-                                activityId: activity.id,
-                            },
-                            // all goals where the user is owner
-                            {
-                                ownerId: activity.id,
-                            },
-                        ],
+                        },
+                        // all goals where the user is issuer
+                        {
+                            activityId: activity.id,
+                        },
+                        // all goals where the user is owner
+                        {
+                            ownerId: activity.id,
+                        },
+                    ],
+                },
+            };
+
+            const [allUserGoals, filtredUserGoals] = await Promise.all([
+                db.goal.findMany({
+                    ...goalsFilter(
+                        {
+                            priority: [],
+                            states: [],
+                            tags: [],
+                            estimates: [],
+                            owner: [],
+                            projects: [],
+                            query: '',
+                        },
+                        {
+                            ...userDashboardGoals,
+                        },
+                    ),
+                    include: {
+                        ...goalDeepQuery,
                     },
                 }),
-            );
+                db.goal.findMany({
+                    ...goalsFilter(data, {
+                        ...userDashboardGoals,
+                    }),
+                    include: {
+                        ...goalDeepQuery,
+                    },
+                }),
+            ]);
 
-            return calcGoalsMeta(allUserGoals);
+            return {
+                goals: filtredUserGoals,
+                // TODO: try to solve types collision
+                meta: calcGoalsMeta(allUserGoals as any),
+            };
         },
     });
 
@@ -256,6 +148,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         },
     });
 
+    // FIXME: do it in other way
     t.list.string('goalDependencyKind', {
         resolve: async (_, _args, { activity }) => {
             if (!activity) return null;
@@ -383,93 +276,39 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
-            if (!data.parent) return null;
-            if (!data.kind) return null;
+            if (!data.projectId) return null;
             if (!data.ownerId) return null;
 
-            const promises: Promise<any>[] = [db.activity.findUnique({ where: { id: data.ownerId } })];
-
-            switch (data.kind) {
-                case 'project':
-                    promises.push(db.project.findUnique({ where: { id: data.parent } }));
-                    break;
-                case 'team':
-                    promises.push(db.team.findUnique({ where: { id: data.parent } }));
-                    break;
-                default:
-                    break;
-            }
+            const promises = [
+                db.activity.findUnique({ where: { id: data.ownerId } }),
+                db.project.findUnique({ where: { id: data.projectId } }),
+            ];
 
             const [owner, parent] = await Promise.all(promises);
 
             if (!owner?.id) return null;
             if (!parent?.id) return null;
 
-            const pre = `${parent?.key}-`;
+            const pre = `${parent?.id}-`;
 
+            // FIXME: https://github.com/taskany-inc/issues/issues/627
             const lastGoal = await db.goal.findFirst({
                 where: { id: { contains: pre } },
                 orderBy: { createdAt: 'desc' },
             });
-
             const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
             const id = `${pre}${numId}`;
 
-            const goalFields: any = {
-                ...data,
-            };
-
             try {
-                switch (data.kind) {
-                    case 'project':
-                        goalFields.projectId = data.parent;
-
-                        await db.project.update({
-                            where: {
-                                id: parent.id,
-                            },
-                            data: {
-                                tags: data.tags?.length
-                                    ? {
-                                          connect: data.tags.map((t) => ({ id: t!.id })),
-                                      }
-                                    : undefined,
-                                participants: {
-                                    connect: [{ id: owner.id }],
-                                },
-                            },
-                        });
-                        break;
-
-                    case 'team':
-                        goalFields.teamId = data.parent;
-
-                        await db.team.update({
-                            where: {
-                                id: parent.id,
-                            },
-                            data: {
-                                participants: {
-                                    connect: [{ id: owner.id }],
-                                },
-                            },
-                        });
-                        break;
-                    default:
-                        break;
-                }
-
-                delete goalFields.parent;
-
                 return db.goal.create({
                     data: {
-                        ...goalFields,
+                        ...data,
                         id,
                         activityId: activity.id,
                         ownerId: owner?.id,
                         tags: data.tags?.length
                             ? {
-                                  connect: data.tags.map((t) => ({ id: t!.id })),
+                                  connect: data.tags.map((t) => ({ id: t.id })),
                               }
                             : undefined,
                         estimate: data.estimate
@@ -509,220 +348,53 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
+
             const actualGoal = await db.goal.findUnique({
                 where: { id: data.id },
-                include: { participants: true, project: true, team: true, tags: true },
+                include: { participants: true, project: true, tags: true },
             });
 
             if (!actualGoal) return null;
 
+            // FIXME: move out to separated mutations
             let participantsToDisconnect: Array<{ id: string }> = [];
             let tagsToDisconnect: Array<{ id: string }> = [];
 
             if (data.participants) {
                 participantsToDisconnect =
                     actualGoal.participants
-                        ?.filter((p) => !data.participants?.includes(p!.id))
+                        ?.filter((p) => !data.participants?.includes(p.id))
                         .map((a) => ({ id: a.id })) || [];
             }
 
             if (data.tags) {
                 tagsToDisconnect =
                     actualGoal.tags
-                        ?.filter((t) => !data.tags?.filter((tag) => tag!.id === t.id).length)
+                        ?.filter((t) => !data.tags?.filter((tag) => tag.id === t.id).length)
                         .map((a) => ({ id: a.id })) || [];
             }
 
             try {
-                switch (data.kind) {
-                    case 'project':
-                        if (actualGoal.kind === 'project' && actualGoal.projectId !== data.parent) {
-                            await db.project.update({
-                                where: {
-                                    id: actualGoal.projectId!,
-                                },
-                                data: {
-                                    goals: {
-                                        disconnect: [{ id: actualGoal.id }],
-                                    },
-                                },
-                            });
+                if (actualGoal.projectId !== data.projectId) {
+                    const project = await db.project.findUnique({
+                        where: { id: data.projectId },
+                    });
 
-                            const project = await db.project.findUnique({
-                                where: { id: data.parent! },
-                            });
+                    if (!project) return null;
 
-                            if (!project) return null;
+                    // FIXME: https://github.com/taskany-inc/issues/issues/627
+                    const pre = `${project.id}-`;
+                    const lastGoal = await db.goal.findFirst({
+                        where: { id: { contains: pre } },
+                        orderBy: { createdAt: 'desc' },
+                    });
+                    const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
 
-                            const pre = `${project.id}-`;
-
-                            const lastGoal = await db.goal.findFirst({
-                                where: { id: { contains: pre } },
-                                orderBy: { createdAt: 'desc' },
-                            });
-
-                            const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
-                            const id = `${pre}${numId}`;
-
-                            await db.goal.update({
-                                where: { id: actualGoal.id },
-                                data: {
-                                    id,
-                                },
-                            });
-
-                            await db.project.update({
-                                where: {
-                                    id: data.parent!,
-                                },
-                                data: {
-                                    goals: {
-                                        connect: [{ id }],
-                                    },
-                                },
-                            });
-
-                            data.id = id;
-                        }
-
-                        if (actualGoal.kind === 'team') {
-                            await db.team.update({
-                                where: {
-                                    id: actualGoal.teamId!,
-                                },
-                                data: {
-                                    goals: {
-                                        disconnect: [{ id: actualGoal.id }],
-                                    },
-                                },
-                            });
-
-                            const project = await db.project.findUnique({
-                                where: { id: data.parent! },
-                            });
-
-                            if (!project) return null;
-
-                            const pre = `${project.id}-`;
-
-                            const lastGoal = await db.goal.findFirst({
-                                where: { id: { contains: pre } },
-                                orderBy: { createdAt: 'desc' },
-                            });
-
-                            const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
-                            const id = `${pre}${numId}`;
-
-                            await db.goal.update({
-                                where: { id: actualGoal.id },
-                                data: {
-                                    kind: 'project',
-                                    id,
-                                },
-                            });
-
-                            await db.project.update({
-                                where: {
-                                    id: data.parent!,
-                                },
-                                data: {
-                                    goals: {
-                                        connect: [{ id }],
-                                    },
-                                },
-                            });
-
-                            data.id = id;
-                        }
-
-                        await db.project.update({
-                            where: {
-                                id: data.parent!,
-                            },
-                            data: {
-                                tags: data.tags
-                                    ? {
-                                          connect: data.tags.map((t) => ({ id: t!.id })),
-                                          disconnect: tagsToDisconnect,
-                                      }
-                                    : undefined,
-                                participants: {
-                                    connect: [{ id: data.ownerId! || actualGoal.ownerId! }],
-                                },
-                            },
-                        });
-                        break;
-                    case 'team':
-                        if (actualGoal.kind === 'project') {
-                            await db.project.update({
-                                where: {
-                                    id: actualGoal.projectId!,
-                                },
-                                data: {
-                                    goals: {
-                                        disconnect: [{ id: actualGoal.id }],
-                                    },
-                                },
-                            });
-
-                            const team = await db.team.findUnique({
-                                where: { id: data.parent! },
-                            });
-
-                            if (!team) return null;
-
-                            const pre = `${team.id}-`;
-
-                            const lastGoal = await db.goal.findFirst({
-                                where: { id: { contains: pre } },
-                                orderBy: { createdAt: 'desc' },
-                            });
-
-                            const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
-                            const id = `${pre}${numId}`;
-
-                            await db.goal.update({
-                                where: { id: actualGoal.id },
-                                data: {
-                                    kind: 'team',
-                                    id,
-                                },
-                            });
-
-                            await db.team.update({
-                                where: {
-                                    id: data.parent!,
-                                },
-                                data: {
-                                    goals: {
-                                        connect: [{ id }],
-                                    },
-                                },
-                            });
-
-                            data.id = id;
-                        }
-
-                        await db.team.update({
-                            where: {
-                                id: data.parent!,
-                            },
-                            data: {
-                                participants: {
-                                    connect: [{ id: data.ownerId! || actualGoal.ownerId! }],
-                                },
-                            },
-                        });
-                        break;
-                    default:
-                        break;
+                    data.id = `${pre}${numId}`;
                 }
 
-                delete data.parent;
-                delete data.kind;
-
                 return db.goal.update({
-                    where: { id: data.id },
+                    where: { id: actualGoal.id },
                     // @ts-ignore incompatible types of Goal and GoalUpdateInput
                     data: {
                         ...data,
@@ -736,7 +408,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                             : undefined,
                         tags: data.tags
                             ? {
-                                  connect: data.tags.map((t) => ({ id: t!.id })),
+                                  connect: data.tags.map((t) => ({ id: t.id })),
                                   disconnect: tagsToDisconnect,
                               }
                             : undefined,
@@ -828,9 +500,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
     t.field('toggleGoalDependency', {
         type: Goal,
         args: {
-            toggle: nonNull(arg({ type: GoalDependencyToggleInput })),
+            data: nonNull(arg({ type: GoalDependencyToggleInput })),
         },
-        resolve: async (_, { toggle: { id, target, dependency, direction } }, { db, activity }) => {
+        resolve: async (_, { data: { id, target, dependency, direction } }, { db, activity }) => {
             if (!activity) return null;
 
             const connection = { id: target };
