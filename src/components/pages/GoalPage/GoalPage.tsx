@@ -158,11 +158,7 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
 
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     useEffect(() => {
-        project &&
-            setCurrentProjectCache({
-                ...project,
-                kind: 'project',
-            });
+        project && setCurrentProjectCache(project);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     useWillUnmount(() => {
@@ -211,11 +207,11 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
     );
 
     const onDependenciesChange = useCallback(
-        async (toggle: GoalDependencyToggleInput) => {
+        async (data: GoalDependencyToggleInput) => {
             const promise = gql.mutation({
                 toggleGoalDependency: [
                     {
-                        toggle,
+                        data,
                     },
                     {
                         id: true,
@@ -311,15 +307,11 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
                         ))}
                     </IssueKey>
 
-                    {nullable(goal.team, (team) => (
-                        <IssueParent kind="team" parent={team} />
-                    ))}
-
-                    {Boolean(project?.teams?.length) &&
-                        nullable(project?.teams, (teams) => <IssueParent kind="team" size="m" parent={teams} />)}
+                    {Boolean(project?.parent?.length) &&
+                        nullable(project?.parent, (parent) => <IssueParent size="m" parent={parent} />)}
 
                     {nullable(project, (project) => (
-                        <IssueParent kind="project" parent={project} />
+                        <IssueParent parent={project} />
                     ))}
 
                     <IssueTitle title={goal.title} />

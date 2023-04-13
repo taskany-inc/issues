@@ -4,7 +4,7 @@
     "key": "Key",
     "Title": "Title",
     "Description": "Description",
-    "Teams": "Teams",
+    "Parent": "Parent",
     "Save": "Save",
     "Be careful — all data will be lost": "Be careful — all data will be lost",
     "Delete project": "Delete project",

@@ -29,8 +29,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
                         title: form.title,
                         description: form.description,
                         ownerId: form.owner.id,
-                        parent: form.parent.id,
-                        kind: form.parent.kind,
+                        projectId: form.parent.id,
                         stateId: form.state.id,
                         priority: form.priority,
                         tags: form.tags,
@@ -62,7 +61,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             title={goal.title}
             description={goal.description}
             owner={goal.owner}
-            parent={{ ...(goal.team || goal.project), kind: goal.kind! }}
+            parent={goal.project}
             state={goal.state}
             priority={goal.priority}
             tags={goal.tags}
