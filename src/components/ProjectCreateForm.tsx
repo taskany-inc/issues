@@ -53,7 +53,9 @@ const flowFetcher = createFetcher(() => ({
 const projectFetcher = createFetcher((_, id: string) => ({
     project: [
         {
-            id,
+            data: {
+                id,
+            },
         },
         {
             title: true,
@@ -84,7 +86,7 @@ const StyledProjectKeyInputContainer = styled(InputContainer)`
     padding-right: ${gapS};
 `;
 
-const ProjectCreateForm: React.FC<{ team?: boolean }> = ({ team }) => {
+const ProjectCreateForm: React.FC = () => {
     const t = useTranslations('projects');
     const router = useRouter();
     const { locale, user } = usePageContext();
@@ -93,7 +95,6 @@ const ProjectCreateForm: React.FC<{ team?: boolean }> = ({ team }) => {
     const [hoveredInput, setHoveredInput] = useState(false);
     const [busy, setBusy] = useState(false);
     const [dirtyKey, setDirtyKey] = useState(false);
-    const createAs = team ? 'team' : 'project';
 
     const schema = createProjectSchemaProvider();
     type ProjectFormType = z.infer<typeof schema>;
@@ -111,9 +112,6 @@ const ProjectCreateForm: React.FC<{ team?: boolean }> = ({ team }) => {
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,
-        defaultValues: {
-            team,
-        },
     });
 
     useEffect(() => {
@@ -151,7 +149,7 @@ const ProjectCreateForm: React.FC<{ team?: boolean }> = ({ team }) => {
 
             // FIXME: it not looks like the best API
             createProject((id: string) => {
-                form.team ? router.team(id) : router.project(id);
+                router.project(id);
             })(form);
         },
         [router, createProject],
@@ -180,7 +178,7 @@ const ProjectCreateForm: React.FC<{ team?: boolean }> = ({ team }) => {
     return (
         <>
             <ModalHeader>
-                <FormTitle>{t(`create.New ${createAs}`)}</FormTitle>
+                <FormTitle>{t('create.New project')}</FormTitle>
             </ModalHeader>
 
             <ModalContent>
@@ -255,7 +253,7 @@ const ProjectCreateForm: React.FC<{ team?: boolean }> = ({ team }) => {
                                 disabled={busy}
                                 outline={!isValid || !isKeyUnique || !isKeyEnoughLength}
                                 type="submit"
-                                text={t(`create.Create ${createAs}`)}
+                                text={t('create.Create project')}
                             />
                         </FormAction>
                     </FormActions>
