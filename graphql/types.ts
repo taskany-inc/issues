@@ -4,7 +4,6 @@ import { DateTimeResolver } from 'graphql-scalars';
 import {
     User as UserModel,
     Project as ProjectModel,
-    Team as TeamModel,
     Ghost as GhostModel,
     Activity as ActivityModel,
     Goal as GoalModel,
@@ -84,15 +83,13 @@ export const Project = objectType({
         t.field(ProjectModel.id);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
-        t.field(ProjectModel.team);
         t.field(ProjectModel.activityId);
         t.field('activity', { type: Activity });
         t.field(ProjectModel.flowId);
         t.field('flow', { type: Flow });
-        t.list.field('parent', { type: Project });
-        t.list.field('children', { type: Project });
-        t.list.field('teams', { type: nonNull(Team) });
-        t.list.field('goals', { type: Goal });
+        t.list.field('parent', { type: nonNull(Project) });
+        t.list.field('children', { type: nonNull(Project) });
+        t.list.field('goals', { type: nonNull(Goal) });
         t.list.field('tags', { type: Tag });
         t.list.field('participants', { type: Activity });
         t.list.field('watchers', { type: Activity });
@@ -110,39 +107,9 @@ export const Project = objectType({
 export const ProjectAggregation = objectType({
     name: 'ProjectAggregation',
     definition(t) {
+        t.int('children');
         t.int('stargizers');
-    },
-});
-
-export const Team = objectType({
-    name: TeamModel.$name,
-    definition(t) {
-        t.field(TeamModel.id);
-        t.field(TeamModel.title);
-        t.field(TeamModel.description);
-        t.field(TeamModel.activityId);
-        t.field(TeamModel.flowId);
-        t.field('flow', { type: Flow });
-        t.field('activity', { type: Activity });
-        t.field('parent', { type: Team });
-        t.list.field('children', { type: Team });
-        t.list.field('goals', { type: Goal });
-        t.list.field('projects', { type: Project });
-        t.list.field('participants', { type: Activity });
-        t.list.field('watchers', { type: Activity });
-        t.list.field('stargizers', { type: Activity });
-        t.field(TeamModel.createdAt);
-        t.field(TeamModel.updatedAt);
-
-        // calculated fields
-        t.field('_count', { type: TeamAggregation });
-    },
-});
-
-export const TeamAggregation = objectType({
-    name: 'TeamAggregation',
-    definition(t) {
-        t.int('projects');
+        t.int('watchers');
         t.int('participants');
     },
 });
@@ -172,8 +139,6 @@ export const Goal = objectType({
         t.list.field('reactions', { type: Reaction });
         t.field(GoalModel.projectId);
         t.field('project', { type: Project });
-        t.field(GoalModel.teamId);
-        t.field('team', { type: Team });
         t.field(GoalModel.stateId);
         t.field('state', { type: State });
         t.list.field('tags', { type: Tag });
@@ -298,6 +263,7 @@ export const SettingsUpdateInput = inputObjectType({
 export const GoalCreateInput = inputObjectType({
     name: 'GoalCreateInput',
     definition(t) {
+        t.string('projectId');
         t.field(GoalModel.title);
         t.field(GoalModel.description);
         t.field(GoalModel.key);
@@ -305,18 +271,17 @@ export const GoalCreateInput = inputObjectType({
         t.field(GoalModel.private);
         t.field('estimate', { type: EstimateInput });
         t.field(GoalModel.ownerId);
-        t.string('parent');
-        t.string('kind'); // team, project
         t.field(GoalModel.stateId);
         t.field(GoalModel.priority);
-        t.list.field('tags', { type: TagCreateInput });
-        t.list.field('participants', { type: ActivityInput });
+        t.list.field('tags', { type: nonNull(TagCreateInput) });
+        t.list.field('participants', { type: nonNull(ActivityInput) });
     },
 });
 
 export const GoalUpdateInput = inputObjectType({
     name: 'GoalUpdateInput',
     definition(t) {
+        t.nonNull.string('projectId');
         t.field(GoalModel.id);
         t.string('title');
         t.string('description');
@@ -325,11 +290,9 @@ export const GoalUpdateInput = inputObjectType({
         t.field(GoalModel.private);
         t.field('estimate', { type: EstimateInput });
         t.field(GoalModel.ownerId);
-        t.string('parent');
-        t.string('kind'); // team, project
         t.field(GoalModel.stateId);
         t.field(GoalModel.priority);
-        t.list.field('tags', { type: TagCreateInput });
+        t.list.field('tags', { type: nonNull(TagCreateInput) });
         t.list.string('participants');
     },
 });
@@ -441,7 +404,6 @@ export const ProjectCreateInput = inputObjectType({
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
         t.field(ProjectModel.flowId);
-        t.field(ProjectModel.team);
     },
 });
 
@@ -451,7 +413,7 @@ export const ProjectUpdateInput = inputObjectType({
         t.field(ProjectModel.id);
         t.field(ProjectModel.title);
         t.field(ProjectModel.description);
-        t.nonNull.list.nonNull.string('teams');
+        t.nonNull.list.nonNull.string('parent');
     },
 });
 
@@ -462,8 +424,15 @@ export const ProjectDeleteInput = inputObjectType({
     },
 });
 
-export const ProjectGoalsInput = inputObjectType({
-    name: 'ProjectGoalsInput',
+export const ProjectInput = inputObjectType({
+    name: 'ProjectInput',
+    definition(t) {
+        t.nonNull.field(ProjectModel.id);
+    },
+});
+
+export const ProjectDeepInput = inputObjectType({
+    name: 'ProjectDeepInput',
     definition(t) {
         t.nonNull.field(ProjectModel.id);
         t.nonNull.list.nonNull.string('priority');
@@ -471,8 +440,16 @@ export const ProjectGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('estimates');
         t.nonNull.list.nonNull.string('owner');
-        t.nonNull.list.nonNull.int('projects');
+        t.nonNull.list.nonNull.string('projects');
         t.nonNull.string('query');
+    },
+});
+
+export const ProjectDeepOutput = objectType({
+    name: 'ProjectDeepOutput',
+    definition(t) {
+        t.list.field('goals', { type: nonNull(Goal) });
+        t.field('meta', { type: GoalsMetaOutput });
     },
 });
 
@@ -484,8 +461,16 @@ export const UserGoalsInput = inputObjectType({
         t.nonNull.list.nonNull.string('tags');
         t.nonNull.list.nonNull.string('estimates');
         t.nonNull.list.nonNull.string('owner');
-        t.nonNull.list.nonNull.int('projects');
+        t.nonNull.list.nonNull.string('projects');
         t.nonNull.string('query');
+    },
+});
+
+export const UserGoalsOutput = objectType({
+    name: 'UserGoalsOutput',
+    definition(t) {
+        t.list.field('goals', { type: nonNull(Goal) });
+        t.field('meta', { type: GoalsMetaOutput });
     },
 });
 
@@ -494,59 +479,6 @@ export const FindActivityInput = inputObjectType({
     definition(t) {
         t.nonNull.string('query');
         t.list.nonNull.string('filter');
-    },
-});
-
-export const TeamCreateInput = inputObjectType({
-    name: 'TeamCreateInput',
-    definition(t) {
-        t.field(TeamModel.id);
-        t.field(TeamModel.title);
-        t.field(TeamModel.description);
-        t.field(TeamModel.flowId);
-        t.string('parent');
-        t.list.nonNull.int('children');
-        t.list.nonNull.string('projects');
-    },
-});
-
-export const TeamUpdateInput = inputObjectType({
-    name: 'TeamUpdateInput',
-    definition(t) {
-        t.nonNull.field(TeamModel.id);
-        t.field(TeamModel.title);
-        t.field(TeamModel.description);
-        t.string('parent');
-        t.list.nonNull.string('children');
-        t.nonNull.list.nonNull.string('projects');
-    },
-});
-
-export const TeamGoalsInput = inputObjectType({
-    name: 'TeamGoalsInput',
-    definition(t) {
-        t.nonNull.field(TeamModel.id);
-        t.nonNull.list.nonNull.string('priority');
-        t.nonNull.list.nonNull.string('states');
-        t.nonNull.list.nonNull.string('tags');
-        t.nonNull.list.nonNull.string('estimates');
-        t.nonNull.list.nonNull.string('owner');
-        t.nonNull.list.nonNull.int('projects');
-        t.nonNull.string('query');
-    },
-});
-
-export const TeamsInput = inputObjectType({
-    name: 'TeamsInput',
-    definition(t) {
-        t.string('title');
-    },
-});
-
-export const TeamDeleteInput = inputObjectType({
-    name: 'TeamDelete',
-    definition(t) {
-        t.field(TeamModel.id);
     },
 });
 
@@ -559,7 +491,6 @@ export const GoalsMetaOutput = objectType({
         t.list.field('tags', { type: nonNull(Tag) });
         t.list.field('states', { type: nonNull(State) });
         t.list.field('projects', { type: nonNull(Project) });
-        t.list.field('teams', { type: nonNull(Team) });
         t.list.field('estimates', { type: nonNull(Estimate) });
         t.list.nonNull.string('priority');
         t.nonNull.int('count');
