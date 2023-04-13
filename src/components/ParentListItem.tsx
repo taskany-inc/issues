@@ -1,9 +1,8 @@
 import styled from 'styled-components';
 import Link from 'next/link';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '@taskany/colors';
-import { Text } from '@taskany/bricks';
+import { Text, nullable } from '@taskany/bricks';
 
-import { nullable } from '../utils/nullable';
 import { Activity } from '../../graphql/@generated/genql';
 
 import { UserPic } from './UserPic';

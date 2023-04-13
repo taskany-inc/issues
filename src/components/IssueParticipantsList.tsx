@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import { gapS } from '@taskany/colors';
-import { CleanButton } from '@taskany/bricks';
+import { CleanButton, nullable } from '@taskany/bricks';
 
 import { Activity } from '../../graphql/@generated/genql';
-import { nullable } from '../utils/nullable';
 
 import { IssueMeta } from './IssueMeta';
 import { UserPic } from './UserPic';

@@ -20,12 +20,12 @@ import {
     ModalContent,
     ModalHeader,
     ModalPreview,
+    nullable,
 } from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
 import { Goal, State } from '../../graphql/@generated/genql';
 import { goalFetcher, refreshInterval } from '../utils/entityFetcher';
-import { nullable } from '../utils/nullable';
 import { formatEstimate } from '../utils/dateTime';
 import { useHighlightedComment } from '../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../hooks/useGoalUpdate';

@@ -3,11 +3,10 @@ import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { gapS, gray8 } from '@taskany/colors';
-import { Text, Link } from '@taskany/bricks';
+import { Text, Link, nullable } from '@taskany/bricks';
 
 import { enumDependency, Goal } from '../../graphql/@generated/genql';
 import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
-import { nullable } from '../utils/nullable';
 
 import { IssueDependenciesList } from './IssueDependenciesList';
 

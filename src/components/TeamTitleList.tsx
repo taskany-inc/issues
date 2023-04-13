@@ -1,8 +1,7 @@
 import NextLink from 'next/link';
-import { Link } from '@taskany/bricks';
+import { Link, nullable } from '@taskany/bricks';
 
 import { Team } from '../../graphql/@generated/genql';
-import { nullable } from '../utils/nullable';
 import { routes } from '../hooks/router';
 
 export const TeamTitleList = ({ teams = [] }: { teams: Team[] }) => (

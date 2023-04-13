@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-import { nullable } from '../utils/nullable';
+import { nullable } from '@taskany/bricks';
 
 import { ReactionsButton } from './ReactionsButton';
 

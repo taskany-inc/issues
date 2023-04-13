@@ -19,10 +19,10 @@ import {
     ModalHeader,
     ModalContent,
     Tag,
+    KeyCode,
 } from '@taskany/bricks';
 
 import { gql } from '../utils/gql';
-import { KeyCode } from '../hooks/useKeyboard';
 import { routes } from '../hooks/router';
 import { usePageContext } from '../hooks/usePageContext';
 

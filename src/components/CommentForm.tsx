@@ -13,10 +13,10 @@ import {
     FormEditor,
     MarkdownIcon,
     QuestionIcon,
+    nullable,
 } from '@taskany/bricks';
 
 import { submitKeys } from '../utils/hotkeys';
-import { nullable } from '../utils/nullable';
 import { usePageContext } from '../hooks/usePageContext';
 import { routes } from '../hooks/router';
 

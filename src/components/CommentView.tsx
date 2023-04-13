@@ -13,10 +13,10 @@ import {
     Link,
     MenuItem,
     MoreVerticalIcon,
+    nullable,
 } from '@taskany/bricks';
 
 import { Comment, User } from '../../graphql/@generated/genql';
-import { nullable } from '../utils/nullable';
 import { useReactionsResource } from '../hooks/useReactionsResource';
 import { useCommentResource } from '../hooks/useCommentResource';
 

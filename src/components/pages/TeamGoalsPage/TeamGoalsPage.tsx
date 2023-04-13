@@ -3,11 +3,11 @@ import React, { MouseEventHandler, useCallback, useEffect, useState } from 'reac
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import { useRouter as useNextRouter } from 'next/router';
+import { nullable } from '@taskany/bricks';
 
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { Goal } from '../../../../graphql/@generated/genql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { nullable } from '../../../utils/nullable';
 import { FiltersPanel } from '../../FiltersPanel';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { TeamPageLayout } from '../../TeamPageLayout';

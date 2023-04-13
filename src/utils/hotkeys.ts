@@ -1,4 +1,4 @@
-import { KeyCode, KeyMod } from '../hooks/useKeyboard';
+import { KeyCode, KeyMod } from '@taskany/bricks';
 
 export const createTeamKeys = ['c t', 'с е'];
 export const createProjectKeys = ['c p', 'с з'];

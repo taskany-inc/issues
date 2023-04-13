@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import { gapM, gapS, gray6 } from '@taskany/colors';
-import { Text } from '@taskany/bricks';
-
-import { nullable } from '../utils/nullable';
+import { Text, nullable } from '@taskany/bricks';
 
 import { PageContent } from './Page';
 

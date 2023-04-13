@@ -2,11 +2,10 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { TabsMenu, TabsMenuItem } from '@taskany/bricks';
+import { TabsMenu, TabsMenuItem, nullable } from '@taskany/bricks';
 
 import { Team } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
-import { nullable } from '../utils/nullable';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { PageActions } from './Page';

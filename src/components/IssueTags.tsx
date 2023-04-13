@@ -1,9 +1,8 @@
 import styled from 'styled-components';
 import { gapS } from '@taskany/colors';
-import { Tag } from '@taskany/bricks';
+import { Tag, nullable } from '@taskany/bricks';
 
 import { Tag as TagModel } from '../../graphql/@generated/genql';
-import { nullable } from '../utils/nullable';
 
 interface IssueTagsProps {
     tags: Array<TagModel | undefined>;
