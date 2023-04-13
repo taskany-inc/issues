@@ -14,7 +14,7 @@ import { Project } from '../../graphql/@generated/genql';
 import { PageContent, PageActions } from './Page';
 import { WatchButton } from './WatchButton';
 import { StarButton } from './StarButton';
-import { TeamTitleList } from './TeamTitleList';
+import { ProjectTitleList } from './ProjectTitleList';
 
 interface ProjectPageLayoutProps {
     project: Project;
@@ -32,7 +32,7 @@ const StyledProjectHeaderTitle = styled(Text)`
     padding-top: ${gapM};
 `;
 
-const StyledProjectTeamsTitle = styled(Text)`
+const StyledProjectParentTitle = styled(Text)`
     display: inline-block;
     padding-top: ${gapM};
 `;
@@ -62,11 +62,11 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
         <>
             <ProjectHeader>
                 <div>
-                    {Boolean(project.teams?.length) &&
-                        nullable(project.teams, (teams) => (
-                            <StyledProjectTeamsTitle weight="bold" color={gray9}>
-                                {t('Teams')}: <TeamTitleList teams={teams} />
-                            </StyledProjectTeamsTitle>
+                    {Boolean(project.parent?.length) &&
+                        nullable(project.parent, (parent) => (
+                            <StyledProjectParentTitle weight="bold" color={gray9}>
+                                <ProjectTitleList projects={parent} />
+                            </StyledProjectParentTitle>
                         ))}
 
                     <StyledProjectHeaderTitle size="xxl" weight="bolder">

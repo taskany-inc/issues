@@ -45,7 +45,9 @@ const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
 const projectFetcher = createFetcher((_, id: string) => ({
     project: [
         {
-            id,
+            data: {
+                id,
+            },
         },
         {
             id: true,
@@ -76,7 +78,7 @@ const projectFetcher = createFetcher((_, id: string) => ({
                     email: true,
                 },
             },
-            teams: {
+            parent: {
                 id: true,
                 title: true,
             },
@@ -84,8 +86,8 @@ const projectFetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-const teamsFetcher = createFetcher((_, query: string) => ({
-    teamCompletion: [
+const projectsFetcher = createFetcher((_, query: string) => ({
+    projectCompletion: [
         {
             query,
         },
@@ -147,10 +149,10 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
     const { updateProject, deleteProject, transferOwnership } = useProjectResource(project.id);
     const schema = updateProjectSchemaProvider();
 
-    const [actualFields, setActualFields] = useState<Pick<Project, 'title' | 'description' | 'teams'>>({
+    const [actualFields, setActualFields] = useState<Pick<Project, 'title' | 'description' | 'parent'>>({
         title: project.title,
         description: project.description ?? '',
-        teams: project.teams ?? [],
+        parent: project.parent ?? [],
     });
 
     const [formChanged, setFormChanged] = useState(false);
@@ -175,12 +177,12 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
         if (
             formValues.title !== actualFields.title ||
             formValues.description !== actualFields.description ||
-            formValues.teams
-                ?.map((t) => t.id)
+            formValues.parent
+                ?.map((p) => p.id)
                 .sort()
                 .join() !==
-                actualFields.teams
-                    ?.map((t) => t!.id)
+                actualFields.parent
+                    ?.map((p) => p.id)
                     .sort()
                     .join()
         ) {
@@ -189,8 +191,8 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
     }, [formValues, actualFields]);
 
     const onProjectUpdate = useCallback((data: UpdateProjectFormType) => {
-        // @ts-ignore
-        setActualFields(data);
+        // TODO: solve types collision
+        setActualFields(data as any);
         setFormChanged(false);
     }, []);
 
@@ -240,9 +242,9 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
         router.project(project.id);
     }, [router, project]);
 
-    const projectTeamsIds = formValues.teams?.map((team) => team!.id) ?? [];
-    const [teamsQuery, setTeamsQuery] = useState('');
-    const { data: teams } = useSWR(teamsQuery, (q) => teamsFetcher(user, q));
+    const projectParentIds = formValues.parent?.map((p) => p.id) ?? [];
+    const [parentQuery, setParentQuery] = useState('');
+    const { data: parent } = useSWR(parentQuery, (q) => projectsFetcher(user, q));
     const pageTitle = tr
         .raw('title', {
             project: project.title,
@@ -282,16 +284,16 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                                 />
 
                                 <Controller
-                                    name="teams"
+                                    name="parent"
                                     control={control}
                                     render={({ field }) => (
                                         <FormMultiInput
-                                            label={tr('Teams')}
-                                            query={teamsQuery}
-                                            items={teams?.teamCompletion?.filter(
-                                                (t) => !projectTeamsIds.includes(t.id),
+                                            label={tr('Parent')}
+                                            query={parentQuery}
+                                            items={parent?.projectCompletion?.filter(
+                                                (p) => !projectParentIds.includes(p.id),
                                             )}
-                                            onInput={(q) => setTeamsQuery(q)}
+                                            onInput={(q) => setParentQuery(q)}
                                             {...field}
                                         />
                                     )}
@@ -360,7 +362,11 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                     <ModalContent>
                         <Text>
                             {tr.raw('To confirm deleting project {project} please type project key below.', {
+<<<<<<< HEAD
                                 project: <b key="project">{project.title}</b>,
+=======
+                                project: <b key={project.title}>{project.title}</b>,
+>>>>>>> 46d7376 (chore!: remove teams support)
                             })}
                         </Text>
 

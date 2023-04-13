@@ -3,13 +3,12 @@ import styled from 'styled-components';
 import NextLink from 'next/link';
 import { Text, Link, nullable } from '@taskany/bricks';
 
-import { Goal } from '../../graphql/@generated/genql';
-import { ProjectGroup, TeamGroup } from '../hooks/useGrouppedGoals';
+import { Goal, Project } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
 
 import { GoalListItem } from './GoalListItem';
 import { PageSep } from './PageSep';
-import { TeamTitleList } from './TeamTitleList';
+import { ProjectTitleList } from './ProjectTitleList';
 
 interface GoalGroupProps {
     goals: Goal[];
@@ -30,24 +29,17 @@ const StyledGoalsGroup = styled.div`
     margin: 0 -20px;
 `;
 
-export const GoalsGroupProjectTitle = ({ project }: { project: ProjectGroup }) => (
+export const GoalsGroupProjectTitle = ({ project }: { project: Project }) => (
     <Text size="l" weight="bolder">
-        {nullable(project.teams, (teams) => (
-            <>
-                <TeamTitleList teams={teams} />
-                {' — '}
-            </>
-        ))}
-        <NextLink passHref href={routes.project(project.data.id)}>
-            <Link inline>{project.data.title}</Link>
-        </NextLink>
-    </Text>
-);
-
-export const GoalsGroupTeamTitle = ({ team }: { team: TeamGroup }) => (
-    <Text size="l" weight="bolder">
-        <NextLink passHref href={routes.team(team.data.id)}>
-            <Link inline>{team.data.title}</Link>
+        {Boolean(project.parent?.length) &&
+            nullable(project.parent, (parent) => (
+                <>
+                    <ProjectTitleList projects={parent} />
+                    {' / '}
+                </>
+            ))}
+        <NextLink passHref href={routes.project(project.id)}>
+            <Link inline>{project.title}</Link>
         </NextLink>
     </Text>
 );

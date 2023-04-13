@@ -198,20 +198,16 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                         </IssueKey>
                     ))}
 
-                    {nullable(goal.team, (team) => (
-                        <IssueParent kind="team" as="span" mode="compact" parent={team} size="m" />
-                    ))}
-
-                    {Boolean(goal.project?.teams?.length) &&
-                        nullable(goal.project?.teams, (teams) => (
+                    {Boolean(goal.project?.parent?.length) &&
+                        nullable(goal.project?.parent, (parent) => (
                             <>
-                                <IssueParent kind="team" as="span" mode="compact" parent={teams} size="m" />
+                                <IssueParent as="span" mode="compact" parent={parent} size="m" />
                                 <Dot />
                             </>
                         ))}
 
                     {nullable(goal.project, (project) => (
-                        <IssueParent kind="project" as="span" mode="compact" parent={project} size="m" />
+                        <IssueParent as="span" mode="compact" parent={project} size="m" />
                     ))}
 
                     <IssueStats mode="compact" comments={goal.comments?.length || 0} updatedAt={goal.updatedAt} />

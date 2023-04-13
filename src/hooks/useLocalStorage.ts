@@ -3,8 +3,8 @@ import { useCallback, useState } from 'react';
 import { safelyParseJson } from '../utils/safelyParseJson';
 import { Project } from '../../graphql/@generated/genql';
 
-export type LastOrCurrentProject = (Partial<Project> & { kind: string }) | null;
-export type RecentProjectsCache = Record<string, { rate: number; cache: Partial<Project> & { kind: string } }>;
+export type LastOrCurrentProject = Partial<Project> | null;
+export type RecentProjectsCache = Record<string, { rate: number; cache: Partial<Project> }>;
 type SetValue<TValue> = (value: TValue | ((previousValue: TValue) => TValue)) => void;
 interface StorageKey {
     lastProjectCache: LastOrCurrentProject;

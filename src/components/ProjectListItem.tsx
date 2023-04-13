@@ -8,7 +8,7 @@ import { Activity } from '../../graphql/@generated/genql';
 import { UserPic } from './UserPic';
 import RelativeTime from './RelativeTime';
 
-interface ParentListItemProps {
+interface ProjectListItemProps {
     href: string;
     title: string;
     description?: string;
@@ -16,7 +16,7 @@ interface ParentListItemProps {
     createdAt?: string;
 }
 
-const StyledTeamListItem = styled.a`
+const StyledListItem = styled.a`
     display: grid;
     grid-template-columns: 500px 40px;
     align-items: center;
@@ -59,13 +59,13 @@ const StyledSubTitle = styled(Text)`
     padding-top: ${gapS};
 `;
 
-export const ParentListItem: React.FC<ParentListItemProps> = ({ title, description, activity, createdAt, href }) => {
+export const ProjectListItem: React.FC<ProjectListItemProps> = ({ title, description, activity, createdAt, href }) => {
     const viewDescription = description?.slice(0, 100);
     const viewDots = description && description.length >= 100;
 
     return (
         <Link href={href} passHref>
-            <StyledTeamListItem>
+            <StyledListItem>
                 <StyledName>
                     <Text size="m" weight="bold">
                         {title}
@@ -90,7 +90,7 @@ export const ParentListItem: React.FC<ParentListItemProps> = ({ title, descripti
                         <UserPic src={a.user?.image} email={a.user?.email || a.ghost?.email} size={24} />
                     </StyledAddon>
                 ))}
-            </StyledTeamListItem>
+            </StyledListItem>
         </Link>
     );
 };

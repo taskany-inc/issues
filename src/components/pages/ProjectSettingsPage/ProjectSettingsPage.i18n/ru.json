@@ -4,7 +4,7 @@
     "key": "Ключ",
     "Title": "Название",
     "Description": "Описание",
-    "Teams": "Команды",
+    "Parent": "Родители",
     "Save": "Сохранить",
     "Be careful — all data will be lost": "Будьте осторожны — все данные о проекте будут утеряны",
     "Delete project": "Удалить проект",

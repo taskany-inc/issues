@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
-import { useTranslations } from 'next-intl';
 import { Button, Input, ComboBox } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
@@ -10,7 +9,6 @@ import { usePageContext } from '../hooks/usePageContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
 import { ProjectMenuItem } from './ProjectMenuItem';
-import { MenuGroupItem } from './MenuGroupItem';
 
 interface GoalParentComboBoxProps {
     text: React.ComponentProps<typeof ComboBox>['text'];
@@ -48,32 +46,11 @@ const fetcher = createFetcher((_, query: string) => ({
             },
         },
     ],
-    teamCompletion: [
-        {
-            query,
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            flowId: true,
-            flow: {
-                id: true,
-                title: true,
-                states: {
-                    id: true,
-                    title: true,
-                    default: true,
-                },
-            },
-        },
-    ],
 }));
 
 export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentComboBoxProps>(
     ({ text, query = '', value, placeholder, disabled, error, onChange }, ref) => {
         const { user } = usePageContext();
-        const t = useTranslations('GoalParentComboBox');
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(value?.title || query);
         const [recentProjectsCache] = useLocalStorage('recentProjectsCache', {});
@@ -90,15 +67,10 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
             .map((p) => p.cache);
 
         const items = useMemo(
-            () => [
-                [
-                    (data?.projectCompletion && data?.projectCompletion?.length > 0
-                        ? data?.projectCompletion
-                        : recentProjects
-                    )?.map((p) => ({ ...p, kind: 'project' })),
-                ],
-                [data?.teamCompletion?.map((p) => ({ ...p, kind: 'team' }))],
-            ],
+            () =>
+                data?.projectCompletion && data?.projectCompletion?.length > 0
+                    ? data?.projectCompletion
+                    : recentProjects,
             [data, recentProjects],
         );
 
@@ -127,33 +99,14 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                         {...props}
                     />
                 )}
-                renderItem={(props) => ({
-                    id: props.item.id,
-                    title: props.item.title,
-                    kind: props.item.kind,
-                    focused: props.cursor === props.index,
-                    onClick: props.onClick,
-                })}
-                renderItems={(entities) => {
-                    const groups = (entities as Array<Record<any, any>>)?.reduce((r, a) => {
-                        r[a.kind] = r[a.kind] || [];
-                        r[a.kind].push(a);
-                        return r;
-                    }, Object.create(null));
-
-                    return Object.values(groups).map((gr: any) => (
-                        <MenuGroupItem key={gr[0].kind} title={t(gr[0].kind)}>
-                            {gr.map((entity: any) => (
-                                <ProjectMenuItem
-                                    key={entity.id}
-                                    title={entity.title}
-                                    focused={entity.focused}
-                                    onClick={entity.onClick}
-                                />
-                            ))}
-                        </MenuGroupItem>
-                    ));
-                }}
+                renderItem={(props) => (
+                    <ProjectMenuItem
+                        key={props.item.id}
+                        title={props.item.title}
+                        focused={props.cursor === props.index}
+                        onClick={props.onClick}
+                    />
+                )}
             />
         );
     },

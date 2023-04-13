@@ -8,7 +8,7 @@ import { routes } from '../../../hooks/router';
 import { Page, PageContent } from '../../Page';
 import { PageSep } from '../../PageSep';
 import { ExplorePageLayout } from '../../ExplorePageLayout';
-import { ParentListItem } from '../../ParentListItem';
+import { ProjectListItem } from '../../ProjectListItem';
 
 import { tr } from './ExporeProjectsPage.i18n';
 
@@ -64,7 +64,7 @@ export const ExploreProjectsPage = ({
                 <PageContent>
                     {projects?.map((project: Project) =>
                         nullable(project, (p) => (
-                            <ParentListItem
+                            <ProjectListItem
                                 key={p.id}
                                 href={routes.project(p.id)}
                                 createdAt={p.createdAt}

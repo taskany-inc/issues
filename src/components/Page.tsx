@@ -12,7 +12,7 @@ import { pageContext, PageContext } from '../utils/pageContext';
 import { ExternalPageProps } from '../utils/declareSsrProps';
 import { useHotkeys } from '../hooks/useHotkeys';
 import { ModalEvent } from '../utils/dispatchModal';
-import { createProjectKeys, inviteUserKeys, createGoalKeys, createTeamKeys } from '../utils/hotkeys';
+import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../utils/hotkeys';
 
 import { Theme } from './Theme';
 import { GlobalStyle } from './GlobalStyle';
@@ -85,10 +85,6 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', l
             <Header />
 
             <StyledContent>{children}</StyledContent>
-
-            <ModalOnEvent event={ModalEvent.TeamCreateModal} hotkeys={createTeamKeys}>
-                <ProjectCreateForm team />
-            </ModalOnEvent>
 
             <ModalOnEvent event={ModalEvent.ProjectCreateModal} hotkeys={createProjectKeys}>
                 <ProjectCreateForm />

@@ -18,7 +18,7 @@ import {
     Tag,
 } from '@taskany/bricks';
 
-import { Project, EstimateInput, State, Tag as TagModel, Activity, Team } from '../../graphql/@generated/genql';
+import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../graphql/@generated/genql';
 import { estimatedMeta } from '../utils/dateTime';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
@@ -60,7 +60,6 @@ const schemaProvider = (t: (key: string) => string) =>
                 id: z.string(),
                 title: z.string(),
                 flowId: z.string(),
-                kind: z.string(),
             },
             {
                 invalid_type_error: t("Goal's project or team are required"),
@@ -98,7 +97,7 @@ interface GoalFormProps {
     owner?: Partial<Activity>;
     title?: string;
     description?: string;
-    parent?: Partial<Project | Team> & { kind: string };
+    parent?: Partial<Project>;
     tags?: Array<TagModel | undefined>;
     state?: Partial<State>;
     priority?: Priority | string;

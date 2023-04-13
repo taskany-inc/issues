@@ -27,7 +27,6 @@ export const createProjectSchemaProvider = () =>
         flow: z.object({
             id: z.string(),
         }),
-        team: z.boolean().optional(),
     });
 export const updateProjectSchemaProvider = () =>
     z.object({
@@ -40,7 +39,7 @@ export const updateProjectSchemaProvider = () =>
                 message: tr('Title must be longer than 2 symbols'),
             }),
         description: z.string().optional(),
-        teams: z
+        parent: z
             .array(
                 z.object({
                     id: z.string(),
@@ -64,7 +63,6 @@ export const useProjectResource = (id: string) => {
                             title: form.title,
                             description: form.description,
                             flowId: form.flow.id,
-                            team: form.team,
                         },
                     },
                     {
@@ -95,13 +93,13 @@ export const useProjectResource = (id: string) => {
                             id,
                             title: data.title,
                             description: data.description,
-                            teams: data.teams?.map((team) => team.id) || [],
+                            parent: data.parent?.map((p) => p.id) || [],
                         },
                     },
                     {
                         title: true,
                         description: true,
-                        teams: {
+                        parent: {
                             id: true,
                             title: true,
                         },
