@@ -1,17 +1,17 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import { nullable } from '@taskany/bricks';
 
-import { Goal, GoalsMetaOutput } from '../../../../graphql/@generated/genql';
+import { Goal, GoalsMetaOutput, Project } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page, PageContent } from '../../Page';
 import { CommonHeader } from '../../CommonHeader';
 import { FiltersPanel } from '../../FiltersPanel';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
-import { useGrouppedGoals } from '../../../hooks/useGrouppedGoals';
-import { GoalsGroup, GoalsGroupProjectTitle, GoalsGroupTeamTitle } from '../../GoalGroup';
+import { GoalsGroup, GoalsGroupProjectTitle } from '../../GoalsGroup';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -32,115 +32,98 @@ const fetcher = createFetcher(
                 },
             },
             {
-                id: true,
-                title: true,
-                description: true,
-                project: {
-                    id: true,
-                    title: true,
-                    flowId: true,
-                    teams: {
-                        id: true,
-                        title: true,
-                    },
-                },
-                team: {
-                    id: true,
-                    title: true,
-                },
-                priority: true,
-                state: {
-                    id: true,
-                    title: true,
-                    hue: true,
-                },
-                activity: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                owner: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                tags: {
+                goals: {
                     id: true,
                     title: true,
                     description: true,
-                },
-                comments: {
-                    id: true,
-                },
-                createdAt: true,
-                updatedAt: true,
-            },
-        ],
-        userGoalsMeta: [
-            {
-                data: {
-                    priority: [],
-                    states: [],
-                    tags: [],
-                    estimates: [],
-                    owner: [],
-                    projects: [],
-                    query: '',
-                },
-            },
-            {
-                owners: {
-                    id: true,
-                    user: {
+                    projectId: true,
+                    project: {
                         id: true,
-                        name: true,
-                        email: true,
-                        image: true,
+                        title: true,
+                        flowId: true,
+                        parent: {
+                            id: true,
+                            title: true,
+                            description: true,
+                        },
                     },
-                    ghost: {
+                    priority: true,
+                    state: {
                         id: true,
-                        email: true,
+                        title: true,
+                        hue: true,
                     },
+                    activity: {
+                        id: true,
+                        user: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                        },
+                        ghost: {
+                            id: true,
+                            email: true,
+                        },
+                    },
+                    owner: {
+                        id: true,
+                        user: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                        },
+                        ghost: {
+                            id: true,
+                            email: true,
+                        },
+                    },
+                    tags: {
+                        id: true,
+                        title: true,
+                        description: true,
+                    },
+                    comments: {
+                        id: true,
+                    },
+                    createdAt: true,
+                    updatedAt: true,
                 },
-                tags: { id: true, title: true, description: true },
-                states: {
-                    id: true,
-                    title: true,
-                    hue: true,
+                meta: {
+                    owners: {
+                        id: true,
+                        user: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                        },
+                        ghost: {
+                            id: true,
+                            email: true,
+                        },
+                    },
+                    tags: { id: true, title: true, description: true },
+                    states: {
+                        id: true,
+                        title: true,
+                        hue: true,
+                    },
+                    projects: {
+                        id: true,
+                        title: true,
+                        flowId: true,
+                    },
+                    estimates: {
+                        id: true,
+                        q: true,
+                        y: true,
+                        date: true,
+                    },
+                    priority: true,
+                    count: true,
                 },
-                projects: {
-                    id: true,
-                    title: true,
-                    flowId: true,
-                },
-                teams: {
-                    id: true,
-                    title: true,
-                },
-                estimates: {
-                    id: true,
-                    q: true,
-                    y: true,
-                    date: true,
-                },
-                priority: true,
-                count: true,
             },
         ],
     }),
@@ -177,9 +160,28 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
         refreshInterval,
     });
 
-    const goals = data?.userGoals;
-    const meta: GoalsMetaOutput | undefined = data?.userGoalsMeta;
-    const groups = useGrouppedGoals(goals);
+    const goals = data?.userGoals?.goals;
+    const meta: GoalsMetaOutput | undefined = data?.userGoals?.meta;
+
+    if (!data?.userGoals) return null;
+
+    const groupsMap =
+        goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g: Goal) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const k = g.projectId!;
+
+            if (!r[k]) {
+                r[k] = {
+                    project: g.project,
+                    goals: [],
+                };
+            }
+
+            r[k].goals.push(g);
+            return r;
+        }, Object.create(null)) || {};
+
+    const groups = Object.values(groupsMap);
 
     useEffect(() => {
         const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
@@ -228,32 +230,20 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
             />
 
             <PageContent>
-                {groups.teams.map((team) =>
-                    nullable(team.goals.length, () => (
-                        <GoalsGroup
-                            key={team.data.id}
-                            goals={team.goals}
-                            selectedResolver={selectedGoalResolver}
-                            onClickProvider={onGoalPrewiewShow}
-                            onTagClick={setTagsFilterOutside}
-                        >
-                            <GoalsGroupTeamTitle team={team} />
-                        </GoalsGroup>
-                    )),
-                )}
-
-                {groups.projects.map((project) =>
-                    nullable(project.goals.length, () => (
-                        <GoalsGroup
-                            key={project.data.id}
-                            goals={project.goals}
-                            selectedResolver={selectedGoalResolver}
-                            onClickProvider={onGoalPrewiewShow}
-                            onTagClick={setTagsFilterOutside}
-                        >
-                            <GoalsGroupProjectTitle project={project} />
-                        </GoalsGroup>
-                    )),
+                {groups?.map(
+                    (group) =>
+                        Boolean(group.goals.length) &&
+                        group.project && (
+                            <GoalsGroup
+                                key={group.project.id}
+                                goals={group.goals}
+                                selectedResolver={selectedGoalResolver}
+                                onClickProvider={onGoalPrewiewShow}
+                                onTagClick={setTagsFilterOutside}
+                            >
+                                <GoalsGroupProjectTitle project={group.project} />
+                            </GoalsGroup>
+                        ),
                 )}
             </PageContent>
 
