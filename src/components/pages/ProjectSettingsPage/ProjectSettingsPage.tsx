@@ -362,11 +362,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                     <ModalContent>
                         <Text>
                             {tr.raw('To confirm deleting project {project} please type project key below.', {
-<<<<<<< HEAD
-                                project: <b key="project">{project.title}</b>,
-=======
                                 project: <b key={project.title}>{project.title}</b>,
->>>>>>> 46d7376 (chore!: remove teams support)
                             })}
                         </Text>
 
