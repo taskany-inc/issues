@@ -281,7 +281,7 @@ export const GoalCreateInput = inputObjectType({
 export const GoalUpdateInput = inputObjectType({
     name: 'GoalUpdateInput',
     definition(t) {
-        t.nonNull.string('projectId');
+        t.string('projectId');
         t.field(GoalModel.id);
         t.string('title');
         t.string('description');
