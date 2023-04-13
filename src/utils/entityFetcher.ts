@@ -27,21 +27,6 @@ export const goalFetcher = createFetcher((_, id: string) => ({
             },
             createdAt: true,
             updatedAt: true,
-            team: {
-                id: true,
-                title: true,
-                description: true,
-                flowId: true,
-                flow: {
-                    id: true,
-                    states: {
-                        id: true,
-                        title: true,
-                        default: true,
-                        hue: true,
-                    },
-                },
-            },
             project: {
                 id: true,
                 title: true,
@@ -56,7 +41,7 @@ export const goalFetcher = createFetcher((_, id: string) => ({
                         hue: true,
                     },
                 },
-                teams: {
+                parent: {
                     id: true,
                     title: true,
                 },
