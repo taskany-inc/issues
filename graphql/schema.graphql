@@ -175,7 +175,7 @@ input GoalUpdateInput {
   personal: Boolean
   priority: String
   private: Boolean
-  projectId: String!
+  projectId: String
   stateId: String
   tags: [TagInput!]
   title: String
