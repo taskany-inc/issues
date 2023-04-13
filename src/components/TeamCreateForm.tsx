@@ -23,10 +23,10 @@ import {
     QuestionIcon,
     ModalHeader,
     ModalContent,
+    nullable,
 } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
-import { nullable } from '../utils/nullable';
 import { gql } from '../utils/gql';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';

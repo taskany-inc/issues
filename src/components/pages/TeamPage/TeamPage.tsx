@@ -2,12 +2,12 @@
 import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { useRouter as useNextRouter } from 'next/router';
+import { nullable } from '@taskany/bricks';
 
 import { Project } from '../../../../graphql/@generated/genql';
 import { createFetcher } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { routes } from '../../../hooks/router';
-import { nullable } from '../../../utils/nullable';
 import { TeamPageLayout } from '../../TeamPageLayout';
 import { PageSep } from '../../PageSep';
 import { Page, PageContent } from '../../Page';

@@ -3,10 +3,9 @@ import styled, { css } from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { gapM, gapS, gray9 } from '@taskany/colors';
-import { Text, Link } from '@taskany/bricks';
+import { Text, Link, nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
-import { nullable } from '../utils/nullable';
 
 interface Parent {
     id?: string;

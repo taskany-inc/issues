@@ -20,13 +20,13 @@ import {
     BinIcon,
     MoreVerticalIcon,
     MenuItem,
+    nullable,
 } from '@taskany/bricks';
 
 import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '../../../../graphql/@generated/genql';
 import { gql } from '../../../utils/gql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { formatEstimate } from '../../../utils/dateTime';
-import { nullable } from '../../../utils/nullable';
 import { editGoalKeys } from '../../../utils/hotkeys';
 import { goalFetcher, refreshInterval } from '../../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';

@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import { nullable } from '@taskany/bricks';
 
 import { Project } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
@@ -6,7 +7,6 @@ import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrPro
 import { routes } from '../../../hooks/router';
 import { Page, PageContent } from '../../Page';
 import { PageSep } from '../../PageSep';
-import { nullable } from '../../../utils/nullable';
 import { ExplorePageLayout } from '../../ExplorePageLayout';
 import { ParentListItem } from '../../ParentListItem';
 

@@ -22,11 +22,11 @@ import {
     QuestionIcon,
     ModalHeader,
     ModalContent,
+    nullable,
 } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { keyPredictor } from '../utils/keyPredictor';
-import { nullable } from '../utils/nullable';
 import { submitKeys } from '../utils/hotkeys';
 import { errorsProvider } from '../utils/forms';
 import { useDebouncedEffect } from '../hooks/useDebouncedEffect';

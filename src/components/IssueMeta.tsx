@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import { gapS, gapXs, gray4, gray9, textColor } from '@taskany/colors';
-import { EditCircleIcon, Text } from '@taskany/bricks';
-
-import { nullable } from '../utils/nullable';
+import { EditCircleIcon, Text, nullable } from '@taskany/bricks';
 
 interface IssueMetaProps {
     title: string;

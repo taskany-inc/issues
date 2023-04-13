@@ -1,12 +1,12 @@
 import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
+import { nullable } from '@taskany/bricks';
 
 import { Goal, GoalsMetaOutput } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page, PageContent } from '../../Page';
-import { nullable } from '../../../utils/nullable';
 import { CommonHeader } from '../../CommonHeader';
 import { FiltersPanel } from '../../FiltersPanel';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';

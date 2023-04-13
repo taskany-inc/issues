@@ -3,11 +3,10 @@ import styled from 'styled-components';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import { gapM } from '@taskany/colors';
+import { KeyCode, useKeyPress, useKeyboard } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
 import { State as StateModel } from '../../graphql/@generated/genql';
-import { useKeyPress } from '../hooks/useKeyPress';
-import { useKeyboard, KeyCode } from '../hooks/useKeyboard';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { State } from './State';

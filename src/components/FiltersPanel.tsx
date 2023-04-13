@@ -2,9 +2,7 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import { gapM, gapS, gray5, textColor } from '@taskany/colors';
-import { Badge, Text, Input } from '@taskany/bricks';
-
-import { nullable } from '../utils/nullable';
+import { Badge, Text, Input, nullable } from '@taskany/bricks';
 
 import { PageContent } from './Page';
 import { StateFilterDropdown } from './StateFilterDropdown';

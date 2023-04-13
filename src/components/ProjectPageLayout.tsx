@@ -4,13 +4,12 @@ import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { gapM, gapS, gray6, gray9 } from '@taskany/colors';
-import { TabsMenu, TabsMenuItem, Text } from '@taskany/bricks';
+import { TabsMenu, TabsMenuItem, Text, nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 import { useProjectResource } from '../hooks/useProjectResource';
 import { usePageContext } from '../hooks/usePageContext';
 import { Project } from '../../graphql/@generated/genql';
-import { nullable } from '../utils/nullable';
 
 import { PageContent, PageActions } from './Page';
 import { WatchButton } from './WatchButton';
