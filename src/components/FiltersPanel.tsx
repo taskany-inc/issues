@@ -133,45 +133,55 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             />
                         ))}
 
-                        {nullable(states?.length, () => (
-                            <StateFilterDropdown
-                                text={t('State')}
-                                states={states}
-                                value={stateFilter}
-                                onChange={onStateChange}
-                            />
-                        ))}
+                        {Boolean(states?.length) &&
+                            nullable(states, (st) => (
+                                <StateFilterDropdown
+                                    text={t('State')}
+                                    states={st}
+                                    value={stateFilter}
+                                    onChange={onStateChange}
+                                />
+                            ))}
 
-                        {nullable(users, (u) => (
-                            <UserFilterDropdown
-                                text={t('Owner')}
-                                activity={u}
-                                value={ownerFilter}
-                                onChange={onUserChange}
-                            />
-                        ))}
+                        {Boolean(users?.length) &&
+                            nullable(users, (u) => (
+                                <UserFilterDropdown
+                                    text={t('Owner')}
+                                    activity={u}
+                                    value={ownerFilter}
+                                    onChange={onUserChange}
+                                />
+                            ))}
 
-                        {nullable(projects, (pr) => (
-                            <ProjectFilterDropdown
-                                text={t('Project')}
-                                projects={pr}
-                                value={projectFilter}
-                                onChange={onProjectChange}
-                            />
-                        ))}
+                        {Boolean(projects?.length) &&
+                            nullable(projects, (pr) => (
+                                <ProjectFilterDropdown
+                                    text={t('Project')}
+                                    projects={pr}
+                                    value={projectFilter}
+                                    onChange={onProjectChange}
+                                />
+                            ))}
 
-                        {nullable(tags, (ta) => (
-                            <TagsFilterDropdown text={t('Tags')} tags={ta} value={tagsFilter} onChange={onTagChange} />
-                        ))}
+                        {Boolean(tags?.length) &&
+                            nullable(tags, (ta) => (
+                                <TagsFilterDropdown
+                                    text={t('Tags')}
+                                    tags={ta}
+                                    value={tagsFilter}
+                                    onChange={onTagChange}
+                                />
+                            ))}
 
-                        {nullable(estimates, (e) => (
-                            <EstimateFilterDropdown
-                                text={t('Estimate')}
-                                estimates={e}
-                                value={estimateFilter}
-                                onChange={onEstimateChange}
-                            />
-                        ))}
+                        {Boolean(estimates?.length) &&
+                            nullable(estimates, (e) => (
+                                <EstimateFilterDropdown
+                                    text={t('Estimate')}
+                                    estimates={e}
+                                    value={estimateFilter}
+                                    onChange={onEstimateChange}
+                                />
+                            ))}
 
                         {nullable(onLimitChange, (olc) => (
                             <LimitFilterDropdown text={t('Limit')} value={limitFilter} onChange={olc} />

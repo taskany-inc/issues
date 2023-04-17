@@ -130,7 +130,7 @@ export const useUrlFilterParams = () => {
 
             estimateFilter.length > 0
                 ? urlParams.set('estimates', Array.from(estimateFilter).toString())
-                : urlParams.delete('tags');
+                : urlParams.delete('estimates');
 
             ownerFilter.length > 0
                 ? urlParams.set('user', Array.from(ownerFilter).toString())
