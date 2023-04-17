@@ -30,7 +30,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.312.0",
     "@genql/runtime": "2.10.0",
-    "@hookform/resolvers": "2.9.11",
+    "@hookform/resolvers": "3.1.0",
     "@monaco-editor/react": "4.4.6",
     "@next-auth/prisma-adapter": "1.0.5",
     "@prisma/client": "4.11.0",
