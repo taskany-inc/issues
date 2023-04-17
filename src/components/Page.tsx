@@ -52,7 +52,7 @@ export const PageActions = styled.div`
     }
 `;
 
-const mapThemeOnId = { light: 0, dark: 1 };
+const mapThemeOnId = { light: 0, dark: 1 } as const;
 
 export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', locale, children }) => {
     useHotkeys();

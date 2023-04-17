@@ -1,12 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import colorLayer from 'color-layer';
+import React, { useCallback, useState } from 'react';
 import { Dropdown } from '@taskany/bricks';
 
 import { State } from '../../graphql/@generated/genql';
 import { usePageContext } from '../hooks/usePageContext';
 
-import { ColorizedMenuItem } from './ColorizedMenuItem';
 import { FiltersMenuItem } from './FiltersMenuItem';
+import { ColorizedMenuItem } from './ColorizedMenuItem';
 
 interface StateFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
@@ -21,11 +20,6 @@ export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterD
     ({ text, states, value, disabled, onChange }, ref) => {
         const { themeId } = usePageContext();
         const [selected, setSelected] = useState<Set<string>>(new Set(value));
-
-        const colors = useMemo(
-            () => states?.map((f) => colorLayer(f.hue, 5, f.hue === 1 ? 0 : undefined)[themeId]) || [],
-            [themeId, states],
-        );
 
         const onStateClick = useCallback(
             (s: State) => {
@@ -60,11 +54,11 @@ export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterD
                     <ColorizedMenuItem
                         key={props.item.id}
                         hue={props.item.hue}
-                        title={props.item.title}
-                        hoverColor={colors[props.index]}
                         checked={selected?.has(props.item.id)}
                         onClick={props.onClick}
-                    />
+                    >
+                        {props.item.title}
+                    </ColorizedMenuItem>
                 )}
             />
         );
