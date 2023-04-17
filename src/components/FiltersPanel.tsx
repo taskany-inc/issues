@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import { gapM, gapS, gray5, textColor } from '@taskany/colors';
-import { Badge, Text, Input, nullable } from '@taskany/bricks';
+import { gapM, gapS, gray5, gray9, textColor } from '@taskany/colors';
+import { Badge, Text, Input, StarIcon, nullable } from '@taskany/bricks';
 
 import { PageContent } from './Page';
 import { StateFilterDropdown } from './StateFilterDropdown';
@@ -12,6 +12,7 @@ import { LimitFilterDropdown } from './LimitFilterDropdown';
 import { PriorityFilterDropdown } from './PriorityFilterDropdown';
 import { EstimateFilterDropdown } from './EstimateFilterDropdown';
 import { ProjectFilterDropdown } from './ProjectFilterDropdown';
+import { FiltersMenuItem } from './FiltersMenuItem';
 
 interface FiltersPanelProps {
     count?: number;
@@ -109,7 +110,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                 <StyledFiltersMenuWrapper>
                     {nullable(count, () => (
                         <Badge size="m">
-                            {!filteredCount || count === filteredCount ? (
+                            {filteredCount === undefined || count === filteredCount ? (
                                 count
                             ) : (
                                 <>
@@ -175,6 +176,12 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                         {nullable(onLimitChange, (olc) => (
                             <LimitFilterDropdown text={t('Limit')} value={limitFilter} onChange={olc} />
                         ))}
+
+                        <FiltersMenuItem>Presets</FiltersMenuItem>
+
+                        <div style={{ display: 'inline-block', padding: gapS }}>
+                            <StarIcon size="s" color={gray9} noWrap />
+                        </div>
                     </StyledFiltersMenu>
                 </StyledFiltersMenuWrapper>
 
