@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import { gapM, gapS, gray5, gray9, textColor } from '@taskany/colors';
-import { Badge, Text, Input, StarIcon, nullable } from '@taskany/bricks';
+import { gapM, gapS, gray5, textColor } from '@taskany/colors';
+import { Badge, Text, Input, nullable } from '@taskany/bricks';
 
 import { PageContent } from './Page';
 import { StateFilterDropdown } from './StateFilterDropdown';
@@ -12,7 +12,6 @@ import { LimitFilterDropdown } from './LimitFilterDropdown';
 import { PriorityFilterDropdown } from './PriorityFilterDropdown';
 import { EstimateFilterDropdown } from './EstimateFilterDropdown';
 import { ProjectFilterDropdown } from './ProjectFilterDropdown';
-import { FiltersMenuItem } from './FiltersMenuItem';
 
 interface FiltersPanelProps {
     count?: number;
@@ -23,7 +22,7 @@ interface FiltersPanelProps {
     projects?: React.ComponentProps<typeof ProjectFilterDropdown>['projects'];
     tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilterDropdown>['estimates'];
-    filterValues: [string[], string[], string[], string[], string[], string[], string, number];
+    filterValues: [string[], string[], string[], string[], string[], string[], string, number | undefined];
     children?: React.ReactNode;
 
     onSearchChange: (search: string) => void;
@@ -124,16 +123,19 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                     ))}
 
                     <StyledFiltersMenu>
-                        {nullable(onPriorityChange, (opc) => (
-                            <PriorityFilterDropdown
-                                text={t('Priority')}
-                                priority={priority}
-                                value={priorityFilter}
-                                onChange={opc}
-                            />
-                        ))}
+                        {Boolean(priority?.length) &&
+                            onPriorityChange &&
+                            nullable(priority, (pr) => (
+                                <PriorityFilterDropdown
+                                    text={t('Priority')}
+                                    priority={pr}
+                                    value={priorityFilter}
+                                    onChange={onPriorityChange}
+                                />
+                            ))}
 
                         {Boolean(states?.length) &&
+                            onStateChange &&
                             nullable(states, (st) => (
                                 <StateFilterDropdown
                                     text={t('State')}
@@ -144,6 +146,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             ))}
 
                         {Boolean(users?.length) &&
+                            onUserChange &&
                             nullable(users, (u) => (
                                 <UserFilterDropdown
                                     text={t('Owner')}
@@ -154,6 +157,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             ))}
 
                         {Boolean(projects?.length) &&
+                            onProjectChange &&
                             nullable(projects, (pr) => (
                                 <ProjectFilterDropdown
                                     text={t('Project')}
@@ -164,6 +168,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             ))}
 
                         {Boolean(tags?.length) &&
+                            onTagChange &&
                             nullable(tags, (ta) => (
                                 <TagsFilterDropdown
                                     text={t('Tags')}
@@ -174,6 +179,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             ))}
 
                         {Boolean(estimates?.length) &&
+                            onEstimateChange &&
                             nullable(estimates, (e) => (
                                 <EstimateFilterDropdown
                                     text={t('Estimate')}
@@ -183,15 +189,10 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 />
                             ))}
 
-                        {nullable(onLimitChange, (olc) => (
-                            <LimitFilterDropdown text={t('Limit')} value={limitFilter} onChange={olc} />
-                        ))}
-
-                        <FiltersMenuItem>Presets</FiltersMenuItem>
-
-                        <div style={{ display: 'inline-block', padding: gapS }}>
-                            <StarIcon size="s" color={gray9} noWrap />
-                        </div>
+                        {onLimitChange &&
+                            nullable(limitFilter, (lf) => (
+                                <LimitFilterDropdown text={t('Limit')} value={lf} onChange={onLimitChange} />
+                            ))}
                     </StyledFiltersMenu>
                 </StyledFiltersMenuWrapper>
 
