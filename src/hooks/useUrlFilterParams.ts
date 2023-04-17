@@ -14,7 +14,7 @@ export const parseFilterValues = (query: ParsedUrlQuery) => [
     parseQueryParam(query.user?.toString()),
     parseQueryParam(query.projects?.toString()).map((p) => Number(p)),
     parseQueryParam(query.search?.toString()).toString(),
-    Number(query.limit),
+    query.limit ? Number(query.limit) : undefined,
 ];
 
 export const useUrlFilterParams = () => {
@@ -29,10 +29,10 @@ export const useUrlFilterParams = () => {
     const [fulltextFilter, setFulltextFilter] = useState<string>(
         parseQueryParam(router.query.search?.toString()).toString(),
     );
-    const [limitFilter, setLimitFilter] = useState(Number(router.query.limit));
+    const [limitFilter, setLimitFilter] = useState(router.query.limit ? Number(router.query.limit) : undefined);
 
     const [filterValues, setFilterValues] = useState<
-        [string[], string[], string[], string[], string[], string[], string, number]
+        [string[], string[], string[], string[], string[], string[], string, number | undefined]
     >([
         priorityFilter,
         stateFilter,
@@ -108,44 +108,29 @@ export const useUrlFilterParams = () => {
         const newurl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
         const urlParams = new URLSearchParams();
 
-        if (
-            priorityFilter.length > 0 ||
-            stateFilter.length > 0 ||
-            tagsFilter.length > 0 ||
-            estimateFilter.length > 0 ||
-            ownerFilter.length > 0 ||
-            projectFilter.length > 0 ||
-            fulltextFilter.length > 0 ||
-            limitFilter
-        ) {
-            priorityFilter.length > 0
-                ? urlParams.set('priority', Array.from(priorityFilter).toString())
-                : urlParams.delete('priority');
+        priorityFilter.length > 0
+            ? urlParams.set('priority', Array.from(priorityFilter).toString())
+            : urlParams.delete('priority');
 
-            stateFilter.length > 0
-                ? urlParams.set('state', Array.from(stateFilter).toString())
-                : urlParams.delete('state');
+        stateFilter.length > 0 ? urlParams.set('state', Array.from(stateFilter).toString()) : urlParams.delete('state');
 
-            tagsFilter.length > 0 ? urlParams.set('tags', Array.from(tagsFilter).toString()) : urlParams.delete('tags');
+        tagsFilter.length > 0 ? urlParams.set('tags', Array.from(tagsFilter).toString()) : urlParams.delete('tags');
 
-            estimateFilter.length > 0
-                ? urlParams.set('estimates', Array.from(estimateFilter).toString())
-                : urlParams.delete('estimates');
+        estimateFilter.length > 0
+            ? urlParams.set('estimates', Array.from(estimateFilter).toString())
+            : urlParams.delete('estimates');
 
-            ownerFilter.length > 0
-                ? urlParams.set('user', Array.from(ownerFilter).toString())
-                : urlParams.delete('user');
+        ownerFilter.length > 0 ? urlParams.set('user', Array.from(ownerFilter).toString()) : urlParams.delete('user');
 
-            projectFilter.length > 0
-                ? urlParams.set('projects', Array.from(projectFilter).toString())
-                : urlParams.delete('projects');
+        projectFilter.length > 0
+            ? urlParams.set('projects', Array.from(projectFilter).toString())
+            : urlParams.delete('projects');
 
-            fulltextFilter.length > 0 ? urlParams.set('search', fulltextFilter.toString()) : urlParams.delete('search');
+        fulltextFilter.length > 0 ? urlParams.set('search', fulltextFilter.toString()) : urlParams.delete('search');
 
-            limitFilter ? urlParams.set('limit', limitFilter.toString()) : urlParams.delete('limit');
+        limitFilter ? urlParams.set('limit', limitFilter.toString()) : urlParams.delete('limit');
 
-            window.history.replaceState({}, '', `${newurl}?${urlParams}`);
-        }
+        window.history.replaceState({}, '', Array.from(urlParams.keys()).length ? `${newurl}?${urlParams}` : newurl);
     }, [
         priorityFilter,
         stateFilter,
