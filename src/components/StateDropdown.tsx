@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
-import colorLayer from 'color-layer';
 import { Button, Dropdown, FlowIcon } from '@taskany/bricks';
 
 import { createFetcher } from '../utils/createFetcher';
@@ -61,11 +60,6 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
             [onChange],
         );
 
-        const colors = useMemo(
-            () => data?.flow?.states?.map((f) => colorLayer(f.hue, 5, f.hue === 1 ? 0 : undefined)[themeId]) || [],
-            [themeId, data?.flow?.states],
-        );
-
         return (
             <Dropdown
                 ref={ref}
@@ -88,11 +82,11 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                     <ColorizedMenuItem
                         key={props.item.id}
                         hue={props.item.hue}
-                        title={props.item.title}
-                        hoverColor={colors[props.index]}
                         focused={props.cursor === props.index}
                         onClick={props.onClick}
-                    />
+                    >
+                        {props.item.title}
+                    </ColorizedMenuItem>
                 )}
             />
         );

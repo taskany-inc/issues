@@ -1,5 +1,4 @@
-import React, { useMemo } from 'react';
-import colorLayer from 'color-layer';
+import React from 'react';
 import { Button, Dropdown } from '@taskany/bricks';
 
 import { usePageContext } from '../hooks/usePageContext';
@@ -20,19 +19,7 @@ interface PriorityDropdownProps {
 
 export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
     ({ text, value, disabled, error, onChange }, ref) => {
-        const { themeId } = usePageContext();
-
         const priorityVariants = Object.keys(priorityColorsMap) as Priority[];
-
-        const colors = useMemo(() => {
-            const themeColorsMap = priorityVariants.reduce((acc, key: Priority) => {
-                acc[key] = colorLayer(priorityColorsMap[key], 5, priorityColorsMap[key] === 1 ? 0 : undefined)[themeId];
-
-                return acc;
-            }, Object.create({}));
-
-            return themeColorsMap;
-        }, [themeId, priorityVariants]);
 
         return (
             <Dropdown
@@ -55,11 +42,11 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                     <ColorizedMenuItem
                         key={props.item}
                         hue={priorityColorsMap[props.item as Priority]}
-                        title={trPriority(props.item as Priority)}
-                        hoverColor={colors[props.index]}
                         focused={props.cursor === props.index}
                         onClick={props.onClick}
-                    />
+                    >
+                        {trPriority(props.item as Priority)}
+                    </ColorizedMenuItem>
                 )}
             />
         );

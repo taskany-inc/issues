@@ -1,13 +1,12 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import colorLayer from 'color-layer';
+import React, { useCallback, useState } from 'react';
 import { Dropdown } from '@taskany/bricks';
 
 import { usePageContext } from '../hooks/usePageContext';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
-import { ColorizedMenuItem } from './ColorizedMenuItem';
 import { FiltersMenuItem } from './FiltersMenuItem';
+import { ColorizedMenuItem } from './ColorizedMenuItem';
 
 interface PriorityFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
@@ -22,18 +21,6 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
     ({ text, priority, value, disabled, onChange }, ref) => {
         const { themeId } = usePageContext();
         const [selected, setSelected] = useState<Set<string>>(new Set(value));
-
-        const priorityVariants = Object.keys(priorityColorsMap) as Priority[];
-
-        const colors = useMemo(() => {
-            const themeColorsMap = priorityVariants.reduce((acc, key: Priority) => {
-                acc[key] = colorLayer(priorityColorsMap[key], 5, priorityColorsMap[key] === 1 ? 0 : undefined)[themeId];
-
-                return acc;
-            }, Object.create({}));
-
-            return themeColorsMap;
-        }, [themeId, priorityVariants]);
 
         const onPriorityClick = useCallback(
             (p: Priority) => {
@@ -68,11 +55,11 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
                     <ColorizedMenuItem
                         key={props.item}
                         hue={priorityColorsMap[props.item as Priority]}
-                        title={trPriority(props.item as Priority)}
-                        hoverColor={colors[props.item]}
                         checked={selected?.has(props.item)}
                         onClick={props.onClick}
-                    />
+                    >
+                        {trPriority(props.item as Priority)}
+                    </ColorizedMenuItem>
                 )}
             />
         );
