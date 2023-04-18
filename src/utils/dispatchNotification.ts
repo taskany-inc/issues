@@ -13,7 +13,9 @@ export interface NotificationsEventPromiseData {
     };
 }
 
-export const dispatchPromisedNotificationsEvent =
-    (promise: NotificationsEventPromiseData['promise'], events: NotificationsEventPromiseData['events']) => () => {
-        window.dispatchEvent(new CustomEvent('notifyPromise', { detail: { promise, events } }));
-    };
+export const dispatchPromisedNotificationsEvent = (
+    promise: NotificationsEventPromiseData['promise'],
+    events: NotificationsEventPromiseData['events'],
+) => {
+    window.dispatchEvent(new CustomEvent('notifyPromise', { detail: { promise, events } }));
+};
