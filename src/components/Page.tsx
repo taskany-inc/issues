@@ -23,6 +23,7 @@ const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm'));
 const GoalCreateForm = dynamic(() => import('./GoalCreateForm'));
 const UserInviteForm = dynamic(() => import('./UserInviteForm'));
 const HotkeysModal = dynamic(() => import('./HotkeysModal'));
+const NotificationsHub = dynamic(() => import('./NotificationsHub/NotificationsHub'));
 
 interface PageProps {
     user: Session['user'];
@@ -99,6 +100,8 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', l
             </ModalOnEvent>
 
             <HotkeysModal />
+
+            <NotificationsHub />
 
             <Footer />
         </pageContext.Provider>
