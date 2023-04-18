@@ -27,7 +27,6 @@ type Comment {
 }
 
 input CommentCreateInput {
-  activityId: String!
   description: String!
   goalId: String!
 }
@@ -65,6 +64,32 @@ input EstimateInput {
   date: String!
   q: String!
   y: String!
+}
+
+type Filter {
+  activity: Activity
+  activityId: String!
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  mode: FilterMode!
+  params: String!
+  stargizers: [Activity]
+  title: String!
+  updatedAt: DateTime!
+}
+
+input FilterCreateInput {
+  description: String
+  mode: FilterMode!
+  params: String!
+  title: String!
+}
+
+enum FilterMode {
+  Global
+  Project
+  User
 }
 
 input FindActivityInput {
@@ -195,6 +220,7 @@ type GoalsMetaOutput {
 
 type Mutation {
   createComment(data: CommentCreateInput!): Comment
+  createFilter(data: FilterCreateInput!): Filter
   createGoal(data: GoalCreateInput!): Goal
   createProject(data: ProjectCreateInput!): Project
   createTag(description: String, title: String!): Tag
@@ -298,6 +324,7 @@ type Query {
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
+  userFilters: [Filter]
   userGoals(data: UserGoalsInput!): UserGoalsOutput
   users(sortBy: SortOrder): [User]
 }

@@ -20,6 +20,12 @@ enum Role {
   ADMIN
 }
 
+enum FilterMode {
+    Global
+    Project
+    User
+}
+
 enum Priority {
   Highest
   High
@@ -107,6 +113,7 @@ model Activity {
   ghost              Ghost?     @relation(fields: [ghostId], references: [id])
   ghostId            String?    @unique
   user               User?
+  filters             Filter[]
   comments           Comment[]
   reactions          Reaction[]
   projects           Project[]
@@ -117,6 +124,7 @@ model Activity {
   goalStargizers     Goal[]     @relation("goalStargizers")
   projectWatchers    Project[]  @relation("projectWatchers")
   projectStargizers  Project[]  @relation("projectStargizers")
+  filterStargizers    Filter[]   @relation("filterStargizers")
   goalOwner          Goal[]     @relation("goalOwner")
   goalIssuer         Goal[]     @relation("goalIssuer")
   settings           Settings   @relation(fields: [settingsId], references: [id])
@@ -201,6 +209,20 @@ model Goal {
 
   @@index([ownerId])
   @@index([activityId])
+}
+
+model Filter {
+  id          String     @id @default(cuid())
+  mode        FilterMode
+  title       String
+  description String?
+  params      String
+  activity    Activity   @relation(fields: [activityId], references: [id])
+  activityId  String
+  stargizers  Activity[] @relation("filterStargizers")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Comment {
