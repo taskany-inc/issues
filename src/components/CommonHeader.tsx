@@ -5,7 +5,7 @@ import { Text, nullable } from '@taskany/bricks';
 import { PageContent } from './Page';
 
 interface CommonHeaderProps {
-    title: string;
+    title: React.ReactNode;
     preTitle?: React.ReactNode;
     description?: React.ReactNode;
     children?: React.ReactNode;
