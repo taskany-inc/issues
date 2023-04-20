@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
@@ -18,7 +18,9 @@ import { ProjectTitleList } from './ProjectTitleList';
 
 interface ProjectPageLayoutProps {
     project: Project;
+    title: React.ReactNode;
     children: React.ReactNode;
+    description?: React.ReactNode;
     actions?: boolean;
 }
 
@@ -37,11 +39,18 @@ const StyledProjectParentTitle = styled(Text)`
     padding-top: ${gapM};
 `;
 
-export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, children, actions }) => {
+export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
+    project,
+    title,
+    description,
+    children,
+    actions,
+}) => {
     const { user } = usePageContext();
     const t = useTranslations('projects');
     const router = useRouter();
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(project.id);
+    const isCurrentUserOwner = user?.activityId === project.activityId;
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
         [t('Goals'), routes.project(project.id), true],
@@ -70,10 +79,10 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
                         ))}
 
                     <StyledProjectHeaderTitle size="xxl" weight="bolder">
-                        {project.title}
+                        {title}
                     </StyledProjectHeaderTitle>
 
-                    {nullable(project.description, (d) => (
+                    {nullable(description, (d) => (
                         <Text size="m" color={gray6} style={{ paddingTop: gapS }}>
                             {d}
                         </Text>
@@ -93,15 +102,17 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({ project, c
                     ))}
                 </PageActions>
 
-                <TabsMenu>
-                    {tabsMenuOptions.map(([title, href, ownerOnly]) =>
-                        nullable(ownerOnly ? user?.activityId === project.activityId : true, () => (
-                            <NextLink key={title} href={href} passHref>
-                                <TabsMenuItem active={router.asPath === href}>{title}</TabsMenuItem>
-                            </NextLink>
-                        )),
-                    )}
-                </TabsMenu>
+                {isCurrentUserOwner && (
+                    <TabsMenu>
+                        {tabsMenuOptions.map(([title, href, ownerOnly]) =>
+                            nullable(ownerOnly ? isCurrentUserOwner : true, () => (
+                                <NextLink key={title} href={href} passHref>
+                                    <TabsMenuItem active={router.asPath === href}>{title}</TabsMenuItem>
+                                </NextLink>
+                            )),
+                        )}
+                    </TabsMenu>
+                )}
             </ProjectHeader>
 
             {children}

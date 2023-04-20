@@ -3,7 +3,7 @@ import { gray4, gray7 } from '@taskany/colors';
 import styled from 'styled-components';
 
 interface PageTitleProps {
-    title: string;
+    title?: string;
     subtitle?: string;
     onClick?: () => void;
 }

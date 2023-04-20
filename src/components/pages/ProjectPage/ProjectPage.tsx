@@ -1,24 +1,30 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { unstable_serialize } from 'swr';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { nullable } from '@taskany/bricks';
 
+import { Filter, Goal, Project, ProjectDeepOutput } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
-import { Goal, Project, ProjectDeepOutput } from '../../../../graphql/@generated/genql';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { FiltersPanel } from '../../FiltersPanel';
+import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
+import { createFilterKeys } from '../../../utils/hotkeys';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
+import { FiltersPanel } from '../../FiltersPanel';
 import { ProjectPageLayout } from '../../ProjectPageLayout';
 import { Page, PageContent } from '../../Page';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../../GoalsGroup';
+import { PageTitle } from '../../PageTitle';
 
 import { tr } from './ProjectPage.i18n';
 
 const GoalPreview = dynamic(() => import('../../GoalPreview'));
+const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
+const FilterCreateForm = dynamic(() => import('../../FilterCreateForm/FilterCreateForm'));
+const FilterDeleteForm = dynamic(() => import('../../FilterDeleteForm/FilterDeleteForm'));
 
 const goalFields = {
     id: true,
@@ -194,17 +200,50 @@ const fetcher = createFetcher(
                 },
             },
         ],
+        userFilters: {
+            id: true,
+            title: true,
+            description: true,
+            mode: true,
+            params: true,
+        },
     }),
 );
 
+const filterFetcher = createFetcher((_, id = '') => ({
+    filter: [
+        {
+            data: {
+                id,
+            },
+        },
+        {
+            id: true,
+            title: true,
+            description: true,
+            mode: true,
+            params: true,
+        },
+    ],
+}));
+
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { id }, query }) => {
-        const ssrData = await fetcher(user, id, ...parseFilterValues(query));
+        const { filter: preset } = query.filter ? await filterFetcher(user, query.filter) : { filter: null };
+
+        const ssrData = await fetcher(
+            user,
+            id,
+            ...Object.values(
+                parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
+            ),
+        );
 
         return ssrData.project
             ? {
+                  preset,
                   fallback: {
-                      [id]: ssrData,
+                      [unstable_serialize(query)]: ssrData,
                   },
               }
             : {
@@ -216,39 +255,45 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
+export const ProjectPage = ({ user, locale, ssrTime, fallback, preset, params: { id } }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
     const {
-        filterValues,
+        currentPreset,
+        queryState,
+        queryString,
         setPriorityFilter,
         setStateFilter,
         setTagsFilter,
         setTagsFilterOutside,
         setEstimateFilter,
         setOwnerFilter,
+        setProjectFilter,
         setFulltextFilter,
-    } = useUrlFilterParams();
-
-    const { data } = useSWR(id, () => fetcher(user, id, ...filterValues), {
-        fallback,
-        refreshInterval,
+        setPreset,
+    } = useUrlFilterParams({
+        preset,
     });
 
-    if (!data) return null;
+    const { data, isLoading } = useSWR(
+        unstable_serialize(nextRouter.query),
+        () => fetcher(user, id, ...Object.values(queryState)),
+        {
+            fallback,
+            keepPreviousData: true,
+            refreshInterval,
+        },
+    );
 
     const project = data?.project;
-
-    if (!project) return nextRouter.push('/404');
-
     const deepInfo: ProjectDeepOutput | undefined = data?.projectDeepInfo;
-
-    if (!deepInfo) return null;
+    const userFilters = data?.userFilters;
+    const shadowPreset = userFilters?.filter((f) => f.params === queryString)[0];
 
     const groupsMap =
-        deepInfo.goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g) => {
+        deepInfo?.goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g) => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const k = g.projectId!;
 
@@ -272,20 +317,6 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
         if (isGoalDeletedAlready) setPreview(null);
     }, [deepInfo, preview]);
 
-    useEffect(() => {
-        setCurrentProjectCache({
-            id: project.id,
-            title: project.title,
-            description: project.description,
-            flowId: project.flowId,
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useWillUnmount(() => {
-        setCurrentProjectCache(null);
-    });
-
     const onGoalPrewiewShow = useCallback(
         (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
@@ -302,30 +333,95 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
     }, []);
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
+
+    useEffect(() => {
+        if (project) {
+            setCurrentProjectCache({
+                id: project.id,
+                title: project.title,
+                description: project.description,
+                flowId: project.flowId,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useWillUnmount(() => {
+        setCurrentProjectCache(null);
+    });
+
+    const onFilterStar = useCallback(() => {
+        currentPreset
+            ? dispatchModalEvent(ModalEvent.FilterDeleteModal)()
+            : dispatchModalEvent(ModalEvent.FilterCreateModal)();
+    }, [currentPreset]);
+
+    const onFilterCreated = useCallback(
+        (data: Partial<Filter>) => {
+            dispatchModalEvent(ModalEvent.FilterCreateModal)();
+            setPreset(data.id);
+        },
+        [setPreset],
+    );
+
+    const onFilterDeleteCanceled = useCallback(() => {
+        dispatchModalEvent(ModalEvent.FilterDeleteModal)();
+    }, []);
+
+    const onFilterDeleted = useCallback(
+        (filter: Filter) => {
+            nextRouter.push(`${nextRouter.route}?${filter.params}`);
+        },
+        [nextRouter],
+    );
+
     const pageTitle = tr
         .raw('title', {
-            project: project.title,
+            project: project?.title,
         })
         .join('');
 
+    const defaultTitle = <PageTitle title={project?.title} />;
+    const presetTitle = <PageTitle title={project?.title} subtitle={currentPreset?.title} />;
+
+    const onShadowPresetTitleClick = useCallback(() => {
+        if (shadowPreset) setPreset(shadowPreset.id);
+    }, [setPreset, shadowPreset]);
+    const shadowPresetTitle = (
+        <PageTitle title={project?.title} subtitle={shadowPreset?.title} onClick={onShadowPresetTitleClick} />
+    );
+    // eslint-disable-next-line no-nested-ternary
+    const title = currentPreset ? presetTitle : shadowPreset ? shadowPresetTitle : defaultTitle;
+    const description = currentPreset && currentPreset.description ? currentPreset.description : project?.description;
+
+    if (!project) return null;
+
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
-            <ProjectPageLayout actions project={project}>
+            <ProjectPageLayout actions project={project} title={title} description={description}>
                 <FiltersPanel
-                    count={deepInfo.meta?.count}
-                    filteredCount={deepInfo.goals?.length ?? 0}
-                    priority={deepInfo.meta?.priority}
-                    states={deepInfo.meta?.states}
-                    users={deepInfo.meta?.owners}
-                    tags={deepInfo.meta?.tags}
-                    estimates={deepInfo.meta?.estimates}
-                    filterValues={filterValues}
+                    count={deepInfo?.meta?.count}
+                    filteredCount={deepInfo?.goals?.length ?? 0}
+                    priority={deepInfo?.meta?.priority}
+                    states={deepInfo?.meta?.states}
+                    users={deepInfo?.meta?.owners}
+                    tags={deepInfo?.meta?.tags}
+                    estimates={deepInfo?.meta?.estimates}
+                    projects={deepInfo?.meta?.projects}
+                    presets={userFilters}
+                    currentPreset={currentPreset}
+                    queryState={queryState}
+                    queryString={queryString}
+                    loading={isLoading}
                     onSearchChange={setFulltextFilter}
                     onPriorityChange={setPriorityFilter}
                     onStateChange={setStateFilter}
                     onUserChange={setOwnerFilter}
+                    onProjectChange={setProjectFilter}
                     onTagChange={setTagsFilter}
                     onEstimateChange={setEstimateFilter}
+                    onPresetChange={setPreset}
+                    onFilterStar={onFilterStar}
                 />
 
                 <PageContent>
@@ -348,6 +444,18 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
 
                 {nullable(preview, (p) => (
                     <GoalPreview goal={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
+                ))}
+
+                {nullable(queryString, (params) => (
+                    <ModalOnEvent event={ModalEvent.FilterCreateModal} hotkeys={createFilterKeys}>
+                        <FilterCreateForm mode="User" params={params} onSubmit={onFilterCreated} />
+                    </ModalOnEvent>
+                ))}
+
+                {nullable(currentPreset, (cP) => (
+                    <ModalOnEvent view="warn" event={ModalEvent.FilterDeleteModal}>
+                        <FilterDeleteForm preset={cP} onSubmit={onFilterDeleted} onCancel={onFilterDeleteCanceled} />
+                    </ModalOnEvent>
                 ))}
             </ProjectPageLayout>
         </Page>
