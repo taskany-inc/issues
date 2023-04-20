@@ -1,7 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Dropdown } from '@taskany/bricks';
 
-import { usePageContext } from '../hooks/usePageContext';
 import { Priority, priorityColorsMap } from '../types/priority';
 import { trPriority } from '../i18n/priority';
 
@@ -19,18 +18,15 @@ interface PriorityFilterDropdownProps {
 
 export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityFilterDropdownProps>(
     ({ text, priority, value, disabled, onChange }, ref) => {
-        const { themeId } = usePageContext();
-        const [selected, setSelected] = useState<Set<string>>(new Set(value));
-
         const onPriorityClick = useCallback(
             (p: Priority) => {
+                const selected = new Set(value);
                 selected.has(p) ? selected.delete(p) : selected.add(p);
                 const newSelected = new Set(selected);
-                setSelected(newSelected);
 
                 onChange?.(Array.from(newSelected));
             },
-            [onChange, selected],
+            [onChange, value],
         );
 
         return (
@@ -44,7 +40,7 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
                 renderTrigger={(props) => (
                     <FiltersMenuItem
                         ref={props.ref}
-                        active={Boolean(Array.from(selected).length)}
+                        active={Boolean(value?.length)}
                         disabled={props.disabled}
                         onClick={props.onClick}
                     >
@@ -55,7 +51,7 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
                     <ColorizedMenuItem
                         key={props.item}
                         hue={priorityColorsMap[props.item as Priority]}
-                        checked={selected?.has(props.item)}
+                        checked={value?.includes(props.item)}
                         onClick={props.onClick}
                     >
                         {trPriority(props.item as Priority)}

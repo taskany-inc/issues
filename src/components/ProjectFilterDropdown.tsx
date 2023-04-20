@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Dropdown, MenuItem } from '@taskany/bricks';
 
 import { Project } from '../../graphql/@generated/genql';
@@ -18,21 +18,15 @@ export const ProjectFilterDropdown: React.FC<ProjectFilterDropdownProps> = React
     HTMLDivElement,
     ProjectFilterDropdownProps
 >(({ text, projects, value, disabled, onChange }, ref) => {
-    const [selected, setSelected] = useState(new Set(value));
-
-    useEffect(() => {
-        setSelected(new Set(value));
-    }, [value]);
-
     const onProjectClick = useCallback(
         (p: Project) => {
+            const selected = new Set(value);
             selected.has(p.id) ? selected.delete(p.id) : selected.add(p.id);
             const newSelected = new Set(selected);
-            setSelected(newSelected);
 
             onChange?.(Array.from(newSelected));
         },
-        [onChange, selected],
+        [onChange, value],
     );
 
     return (
@@ -46,7 +40,7 @@ export const ProjectFilterDropdown: React.FC<ProjectFilterDropdownProps> = React
             renderTrigger={(props) => (
                 <FiltersMenuItem
                     ref={props.ref}
-                    active={Boolean(Array.from(selected).length)}
+                    active={Boolean(value?.length)}
                     disabled={props.disabled}
                     onClick={props.onClick}
                 >
@@ -54,7 +48,7 @@ export const ProjectFilterDropdown: React.FC<ProjectFilterDropdownProps> = React
                 </FiltersMenuItem>
             )}
             renderItem={(props) => (
-                <MenuItem ghost key={props.item.id} selected={selected.has(props.item.id)} onClick={props.onClick}>
+                <MenuItem ghost key={props.item.id} selected={value?.includes(props.item.id)} onClick={props.onClick}>
                     {props.item.title}
                 </MenuItem>
             )}

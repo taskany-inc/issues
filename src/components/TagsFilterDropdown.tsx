@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Dropdown, MenuItem } from '@taskany/bricks';
 
 import { Tag as TagModel } from '../../graphql/@generated/genql';
@@ -18,21 +18,15 @@ export const TagsFilterDropdown: React.FC<TagsFilterDropdownProps> = React.forwa
     HTMLDivElement,
     TagsFilterDropdownProps
 >(({ text, tags, value, disabled, onChange }, ref) => {
-    const [selected, setSelected] = useState(new Set(value));
-
-    useEffect(() => {
-        setSelected(new Set(value));
-    }, [value]);
-
     const onTagClick = useCallback(
         (t: TagModel) => {
+            const selected = new Set(value);
             selected.has(t.id) ? selected.delete(t.id) : selected.add(t.id);
             const newSelected = new Set(selected);
-            setSelected(newSelected);
 
             onChange?.(Array.from(newSelected));
         },
-        [onChange, selected],
+        [onChange, value],
     );
 
     return (
@@ -46,7 +40,7 @@ export const TagsFilterDropdown: React.FC<TagsFilterDropdownProps> = React.forwa
             renderTrigger={(props) => (
                 <FiltersMenuItem
                     ref={props.ref}
-                    active={Boolean(Array.from(selected).length)}
+                    active={Boolean(value?.length)}
                     disabled={props.disabled}
                     onClick={props.onClick}
                 >
@@ -54,7 +48,7 @@ export const TagsFilterDropdown: React.FC<TagsFilterDropdownProps> = React.forwa
                 </FiltersMenuItem>
             )}
             renderItem={(props) => (
-                <MenuItem ghost key={props.item.id} selected={selected.has(props.item.id)} onClick={props.onClick}>
+                <MenuItem ghost key={props.item.id} selected={value?.includes(props.item.id)} onClick={props.onClick}>
                     {props.item.title}
                 </MenuItem>
             )}

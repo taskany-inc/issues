@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Dropdown, MenuItem } from '@taskany/bricks';
 
 import { Estimate } from '../../graphql/@generated/genql';
@@ -20,23 +20,17 @@ export const EstimateFilterDropdown: React.FC<EstimateFilterDropdownProps> = Rea
     HTMLDivElement,
     EstimateFilterDropdownProps
 >(({ text, estimates, value, disabled, onChange }, ref) => {
-    const [selected, setSelected] = useState(new Set(value));
-
-    useEffect(() => {
-        setSelected(new Set(value));
-    }, [value]);
-
     const onEstimateClick = useCallback(
         (e: Estimate) => {
+            const selected = new Set(value);
             selected.has(estimateToString(e))
                 ? selected.delete(estimateToString(e))
                 : selected.add(estimateToString(e));
             const newSelected = new Set(selected);
-            setSelected(newSelected);
 
             onChange?.(Array.from(newSelected));
         },
-        [onChange, selected],
+        [onChange, value],
     );
 
     return (
@@ -50,7 +44,7 @@ export const EstimateFilterDropdown: React.FC<EstimateFilterDropdownProps> = Rea
             renderTrigger={(props) => (
                 <FiltersMenuItem
                     ref={props.ref}
-                    active={Boolean(Array.from(selected).length)}
+                    active={Boolean(value?.length)}
                     disabled={props.disabled}
                     onClick={props.onClick}
                 >
@@ -61,7 +55,7 @@ export const EstimateFilterDropdown: React.FC<EstimateFilterDropdownProps> = Rea
                 <MenuItem
                     ghost
                     key={estimateToString(props.item)}
-                    selected={selected.has(estimateToString(props.item))}
+                    selected={value?.includes(estimateToString(props.item))}
                     onClick={props.onClick}
                 >
                     {estimateToString(props.item)}

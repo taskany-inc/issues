@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Dropdown } from '@taskany/bricks';
 
 import { Activity } from '../../graphql/@generated/genql';
@@ -17,17 +17,15 @@ interface UserFilterDropdownProps {
 
 export const UserFilterDropdown = React.forwardRef<HTMLDivElement, UserFilterDropdownProps>(
     ({ text, activity, value, disabled, onChange }, ref) => {
-        const [selected, setSelected] = useState<Set<string>>(new Set(value));
-
         const onUserClick = useCallback(
             (a: Activity) => {
+                const selected = new Set(value);
                 selected.has(a.id) ? selected.delete(a.id) : selected.add(a.id);
                 const newSelected = new Set(selected);
-                setSelected(newSelected);
 
                 onChange?.(Array.from(newSelected));
             },
-            [onChange, selected],
+            [onChange, value],
         );
 
         return (
@@ -41,7 +39,7 @@ export const UserFilterDropdown = React.forwardRef<HTMLDivElement, UserFilterDro
                 renderTrigger={(props) => (
                     <FiltersMenuItem
                         ref={props.ref}
-                        active={Boolean(Array.from(selected).length)}
+                        active={Boolean(value?.length)}
                         disabled={props.disabled}
                         onClick={props.onClick}
                     >
@@ -54,7 +52,7 @@ export const UserFilterDropdown = React.forwardRef<HTMLDivElement, UserFilterDro
                         email={props.item.user?.email || props.item.ghost?.email}
                         name={props.item.user?.name}
                         image={props.item.user?.image}
-                        checked={selected.has(props.item.id)}
+                        checked={value?.includes(props.item.id)}
                         onClick={props.onClick}
                     />
                 )}
