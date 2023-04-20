@@ -1,5 +1,6 @@
 import { KeyCode, KeyMod } from '@taskany/bricks';
 
+export const createFilterKeys = ['c f', 'с а'];
 export const createProjectKeys = ['c p', 'с з'];
 export const createGoalKeys = ['c g', 'с п'];
 export const editGoalKeys = ['e', 'у'];
