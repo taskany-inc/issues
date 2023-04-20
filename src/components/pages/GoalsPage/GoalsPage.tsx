@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { unstable_serialize } from 'swr';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import { nullable } from '@taskany/bricks';
 
-import { Goal, GoalsMetaOutput, Project } from '../../../../graphql/@generated/genql';
+import { Filter, Goal, GoalsMetaOutput, Project } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { Page, PageContent } from '../../Page';
@@ -12,10 +13,16 @@ import { CommonHeader } from '../../CommonHeader';
 import { FiltersPanel } from '../../FiltersPanel';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../../GoalsGroup';
+import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
+import { createFilterKeys } from '../../../utils/hotkeys';
+import { PageTitle } from '../../PageTitle';
 
 import { tr } from './GoalsPage.i18n';
 
 const GoalPreview = dynamic(() => import('../../GoalPreview'));
+const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
+const FilterCreateForm = dynamic(() => import('../../FilterCreateForm/FilterCreateForm'));
+const FilterDeleteForm = dynamic(() => import('../../FilterDeleteForm/FilterDeleteForm'));
 
 const fetcher = createFetcher(
     (_, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
@@ -126,25 +133,62 @@ const fetcher = createFetcher(
                 },
             },
         ],
+        userFilters: {
+            id: true,
+            title: true,
+            description: true,
+            mode: true,
+            params: true,
+        },
     }),
 );
 
-export const getServerSideProps = declareSsrProps(
-    async ({ user, query }) => ({
-        fallback: {
-            'goals/index': await fetcher(user, ...parseFilterValues(query)),
+const filterFetcher = createFetcher((_, id = '') => ({
+    filter: [
+        {
+            data: {
+                id,
+            },
         },
-    }),
+        {
+            id: true,
+            title: true,
+            description: true,
+            mode: true,
+            params: true,
+        },
+    ],
+}));
+
+export const getServerSideProps = declareSsrProps(
+    async ({ user, query }) => {
+        const { filter: preset } = query.filter ? await filterFetcher(user, query.filter) : { filter: null };
+
+        return {
+            preset,
+            fallback: {
+                [unstable_serialize(query)]: await fetcher(
+                    user,
+                    ...Object.values(
+                        parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
+                    ),
+                ),
+            },
+        };
+    },
     {
         private: true,
     },
 );
 
-export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps) => {
+export const GoalsPage = ({ user, ssrTime, locale, fallback, preset }: ExternalPageProps) => {
+    const router = useRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
 
     const {
-        filterValues,
+        currentPreset,
+        queryState,
+        queryString,
         setPriorityFilter,
         setStateFilter,
         setTagsFilter,
@@ -153,17 +197,25 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
         setOwnerFilter,
         setProjectFilter,
         setFulltextFilter,
-    } = useUrlFilterParams();
-
-    const { data } = useSWR('goals/index', () => fetcher(user, ...filterValues), {
-        fallback,
-        refreshInterval,
+        setPreset,
+    } = useUrlFilterParams({
+        preset,
     });
+
+    const { data, isLoading } = useSWR(
+        unstable_serialize(router.query),
+        () => fetcher(user, ...Object.values(queryState)),
+        {
+            fallback,
+            keepPreviousData: true,
+            refreshInterval,
+        },
+    );
 
     const goals = data?.userGoals?.goals;
     const meta: GoalsMetaOutput | undefined = data?.userGoals?.meta;
-
-    if (!data?.userGoals) return null;
+    const userFilters = data?.userFilters;
+    const shadowPreset = userFilters?.filter((f) => f.params === queryString)[0];
 
     const groupsMap =
         goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g: Goal) => {
@@ -206,9 +258,51 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
+    const onFilterStar = useCallback(() => {
+        currentPreset
+            ? dispatchModalEvent(ModalEvent.FilterDeleteModal)()
+            : dispatchModalEvent(ModalEvent.FilterCreateModal)();
+    }, [currentPreset]);
+
+    const onFilterCreated = useCallback(
+        (data: Partial<Filter>) => {
+            dispatchModalEvent(ModalEvent.FilterCreateModal)();
+            setPreset(data.id);
+        },
+        [setPreset],
+    );
+
+    const onFilterDeleteCanceled = useCallback(() => {
+        dispatchModalEvent(ModalEvent.FilterDeleteModal)();
+    }, []);
+
+    const onFilterDeleted = useCallback(
+        (filter: Filter) => {
+            router.push(`${router.route}?${filter.params}`);
+        },
+        [router],
+    );
+
+    const defaultTitle = <PageTitle title={tr('Dashboard')} />;
+    const presetTitle = <PageTitle title={tr('Dashboard')} subtitle={currentPreset?.title} />;
+
+    const onShadowPresetTitleClick = useCallback(() => {
+        if (shadowPreset) setPreset(shadowPreset.id);
+    }, [setPreset, shadowPreset]);
+    const shadowPresetTitle = (
+        <PageTitle title={tr('Dashboard')} subtitle={shadowPreset?.title} onClick={onShadowPresetTitleClick} />
+    );
+    // eslint-disable-next-line no-nested-ternary
+    const title = currentPreset ? presetTitle : shadowPreset ? shadowPresetTitle : defaultTitle;
+
+    const description =
+        currentPreset && currentPreset.description
+            ? currentPreset.description
+            : tr('This is your personal goals bundle');
+
     return (
         <Page user={user} ssrTime={ssrTime} locale={locale} title={tr('title')}>
-            <CommonHeader title={tr('Dashboard')} description={tr('This is your personal goals bundle')} />
+            <CommonHeader title={title} description={description} />
 
             <FiltersPanel
                 count={meta?.count}
@@ -219,7 +313,11 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
                 projects={meta?.projects}
                 tags={meta?.tags}
                 estimates={meta?.estimates}
-                filterValues={filterValues}
+                presets={userFilters}
+                currentPreset={currentPreset}
+                queryState={queryState}
+                queryString={queryString}
+                loading={isLoading}
                 onSearchChange={setFulltextFilter}
                 onPriorityChange={setPriorityFilter}
                 onStateChange={setStateFilter}
@@ -227,6 +325,8 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
                 onProjectChange={setProjectFilter}
                 onTagChange={setTagsFilter}
                 onEstimateChange={setEstimateFilter}
+                onPresetChange={setPreset}
+                onFilterStar={onFilterStar}
             />
 
             <PageContent>
@@ -250,6 +350,20 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
             {nullable(preview, (p) => (
                 <GoalPreview goal={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
             ))}
+
+            {nullable(queryString, (params) => (
+                <ModalOnEvent event={ModalEvent.FilterCreateModal} hotkeys={createFilterKeys}>
+                    <FilterCreateForm mode="User" params={params} onSubmit={onFilterCreated} />
+                </ModalOnEvent>
+            ))}
+
+            {nullable(currentPreset, (cP) => (
+                <ModalOnEvent view="warn" event={ModalEvent.FilterDeleteModal}>
+                    <FilterDeleteForm preset={cP} onSubmit={onFilterDeleted} onCancel={onFilterDeleteCanceled} />
+                </ModalOnEvent>
+            ))}
         </Page>
     );
 };
+
+GoalsPage.whyDidYouRender = true;
