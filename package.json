@@ -35,7 +35,7 @@
     "@next-auth/prisma-adapter": "1.0.5",
     "@prisma/client": "4.11.0",
     "@sentry/nextjs": "7.45.0",
-    "@taskany/bricks": "1.0.7",
+    "@taskany/bricks": "1.0.9",
     "@taskany/colors": "1.0.4",
     "@tippyjs/react": "4.2.6",
     "apollo-server-micro": "3.12.0",
