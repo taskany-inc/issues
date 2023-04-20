@@ -36,10 +36,10 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         args: {
             data: nonNull(arg({ type: CommentCreateInput })),
         },
-        resolve: async (_, { data: { goalId, description, activityId } }, { db }) => {
+        resolve: async (_, { data: { goalId, description } }, { db, activity }) => {
             const [commentAuthor, goal] = await Promise.all([
                 db.user.findUnique({
-                    where: { id: activityId },
+                    where: { id: activity?.id },
                     include: { activity: { include: { user: true, ghost: true } } },
                 }),
                 db.goal.findUnique({

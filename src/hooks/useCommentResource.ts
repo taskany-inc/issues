@@ -4,8 +4,6 @@ import toast from 'react-hot-toast';
 import { gql } from '../utils/gql';
 import { Comment, CommentDeleteInput } from '../../graphql/@generated/genql';
 
-import { usePageContext } from './usePageContext';
-
 type i18n = (key: string) => string;
 
 // FIXME: problem with passing this errors
@@ -43,20 +41,15 @@ interface UseCommentResourceParams {
 }
 
 export const useCommentResource = ({ t }: UseCommentResourceParams) => {
-    const { user } = usePageContext();
-
     const create =
         (cb: (params: Partial<Comment>) => void) =>
         async ({ goalId, description }: CreateFormType) => {
-            if (!user) return;
-
             const promise = gql.mutation({
                 createComment: [
                     {
                         data: {
                             goalId,
                             description,
-                            activityId: user.id,
                         },
                     },
                     {
