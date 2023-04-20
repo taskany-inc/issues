@@ -31,7 +31,7 @@ interface FilterCreateFormProps {
 
 const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSubmit }) => {
     const { createFilter } = useFilterResource();
-    // const [formBusy, setFormBusy] = useState(false);
+    const [formBusy, setFormBusy] = useState(false);
 
     const {
         register,
@@ -52,7 +52,7 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
 
     const onPending = useCallback(
         async (form: CreateFormType) => {
-            // setFormBusy(true);
+            setFormBusy(true);
 
             const [data, err] = await createFilter(form);
 
@@ -74,8 +74,7 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
             </ModalHeader>
 
             <ModalContent>
-                {/* TODO: pass disabled via formBusy */}
-                <Form submitHotkey={submitKeys} onSubmit={handleSubmit(onPending, onError)}>
+                <Form disabled={formBusy} submitHotkey={submitKeys} onSubmit={handleSubmit(onPending, onError)}>
                     <FormInput
                         {...register('title')}
                         placeholder={tr('Title')}
