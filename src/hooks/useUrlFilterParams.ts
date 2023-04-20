@@ -52,7 +52,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
             fulltextFilter,
             limitFilter,
         }: QueryState) => {
-            const newurl = router.route;
+            const newurl = router.asPath.split('?')[0];
             const urlParams = new URLSearchParams();
 
             priorityFilter.length > 0
@@ -121,7 +121,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
     const setPreset = useCallback(
         (filter: string | undefined) => {
             router.push({
-                pathname: router.route,
+                pathname: router.asPath.split('?')[0],
                 query: {
                     filter,
                 },
