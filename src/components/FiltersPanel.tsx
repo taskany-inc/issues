@@ -1,8 +1,11 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import { gapM, gapS, gray5, textColor } from '@taskany/colors';
-import { Badge, Text, Input, nullable } from '@taskany/bricks';
+import { gapM, gapS, gray5, gray6, gray9, textColor } from '@taskany/colors';
+import { Badge, Text, Input, StarIcon, nullable, StarFilledIcon } from '@taskany/bricks';
+
+import { Filter } from '../../graphql/@generated/genql';
+import type { QueryState } from '../hooks/useUrlFilterParams';
 
 import { PageContent } from './Page';
 import { StateFilterDropdown } from './StateFilterDropdown';
@@ -12,8 +15,11 @@ import { LimitFilterDropdown } from './LimitFilterDropdown';
 import { PriorityFilterDropdown } from './PriorityFilterDropdown';
 import { EstimateFilterDropdown } from './EstimateFilterDropdown';
 import { ProjectFilterDropdown } from './ProjectFilterDropdown';
+import { PresetFilterDropdown } from './PresetFilterDropdown';
 
 interface FiltersPanelProps {
+    queryState: QueryState;
+    queryString?: string;
     count?: number;
     filteredCount?: number;
     priority?: React.ComponentProps<typeof PriorityFilterDropdown>['priority'];
@@ -22,7 +28,9 @@ interface FiltersPanelProps {
     projects?: React.ComponentProps<typeof ProjectFilterDropdown>['projects'];
     tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilterDropdown>['estimates'];
-    filterValues: [string[], string[], string[], string[], string[], string[], string, number | undefined];
+    presets?: Filter[];
+    currentPreset?: Filter;
+    loading?: boolean;
     children?: React.ReactNode;
 
     onSearchChange: (search: string) => void;
@@ -33,13 +41,41 @@ interface FiltersPanelProps {
     onTagChange?: React.ComponentProps<typeof TagsFilterDropdown>['onChange'];
     onEstimateChange?: React.ComponentProps<typeof EstimateFilterDropdown>['onChange'];
     onLimitChange?: React.ComponentProps<typeof LimitFilterDropdown>['onChange'];
+    onPresetChange?: React.ComponentProps<typeof PresetFilterDropdown>['onChange'];
+    onFilterStar?: () => void;
 }
 
-const StyledFiltersPanel = styled.div`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledFiltersPanel = styled(({ loading, ...props }) => <div {...props} />)<{ loading?: boolean }>`
     margin: ${gapM} 0;
     padding: ${gapS} 0;
 
     background-color: ${gray5};
+
+    animation-name: bkgChange;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+
+    transition: background-color 200ms ease-in-out;
+
+    @keyframes bkgChange {
+        0% {
+            background-color: ${gray5};
+        }
+        50.0% {
+            background-color: ${gray6};
+        }
+        100.0% {
+            background-color: ${gray5};
+        }
+    }
+
+    ${({ loading }) =>
+        loading &&
+        `
+            animation-play-state: running;
+            animation-duration: 1s;
+    `}
 `;
 
 const StyledFiltersContent = styled(PageContent)`
@@ -61,7 +97,17 @@ const StyledFiltersMenu = styled.div`
     padding-left: ${gapM};
 `;
 
+const StyledFiltersAction = styled.div`
+    display: inline-block;
+    padding-left: ${gapS};
+    padding-right: ${gapS};
+    vertical-align: middle;
+    cursor: pointer;
+`;
+
 export const FiltersPanel: React.FC<FiltersPanelProps> = ({
+    queryState,
+    queryString,
     count,
     filteredCount,
     states,
@@ -70,7 +116,10 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     projects,
     tags,
     estimates,
-    filterValues,
+    presets,
+    currentPreset,
+    loading,
+    children,
     onPriorityChange,
     onSearchChange,
     onStateChange,
@@ -79,20 +128,10 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     onTagChange,
     onEstimateChange,
     onLimitChange,
-    children,
+    onPresetChange,
+    onFilterStar,
 }) => {
     const t = useTranslations('FiltersPanel');
-
-    const [
-        priorityFilter,
-        stateFilter,
-        tagsFilter,
-        estimateFilter,
-        ownerFilter,
-        projectFilter,
-        searchFilter,
-        limitFilter,
-    ] = filterValues;
 
     const onSearchInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,9 +141,9 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     );
 
     return (
-        <StyledFiltersPanel>
+        <StyledFiltersPanel loading={loading}>
             <StyledFiltersContent>
-                <Input placeholder={t('Search')} value={searchFilter} onChange={onSearchInputChange} />
+                <Input placeholder={t('Search')} value={queryState.fulltextFilter} onChange={onSearchInputChange} />
 
                 <StyledFiltersMenuWrapper>
                     {nullable(count, () => (
@@ -129,7 +168,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 <PriorityFilterDropdown
                                     text={t('Priority')}
                                     priority={pr}
-                                    value={priorityFilter}
+                                    value={queryState.priorityFilter}
                                     onChange={onPriorityChange}
                                 />
                             ))}
@@ -140,7 +179,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 <StateFilterDropdown
                                     text={t('State')}
                                     states={st}
-                                    value={stateFilter}
+                                    value={queryState.stateFilter}
                                     onChange={onStateChange}
                                 />
                             ))}
@@ -151,7 +190,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 <UserFilterDropdown
                                     text={t('Owner')}
                                     activity={u}
-                                    value={ownerFilter}
+                                    value={queryState.ownerFilter}
                                     onChange={onUserChange}
                                 />
                             ))}
@@ -162,7 +201,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 <ProjectFilterDropdown
                                     text={t('Project')}
                                     projects={pr}
-                                    value={projectFilter}
+                                    value={queryState.projectFilter}
                                     onChange={onProjectChange}
                                 />
                             ))}
@@ -173,7 +212,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 <TagsFilterDropdown
                                     text={t('Tags')}
                                     tags={ta}
-                                    value={tagsFilter}
+                                    value={queryState.tagsFilter}
                                     onChange={onTagChange}
                                 />
                             ))}
@@ -184,15 +223,37 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 <EstimateFilterDropdown
                                     text={t('Estimate')}
                                     estimates={e}
-                                    value={estimateFilter}
+                                    value={queryState.estimateFilter}
                                     onChange={onEstimateChange}
                                 />
                             ))}
 
                         {onLimitChange &&
-                            nullable(limitFilter, (lf) => (
+                            nullable(queryState.limitFilter, (lf) => (
                                 <LimitFilterDropdown text={t('Limit')} value={lf} onChange={onLimitChange} />
                             ))}
+
+                        {Boolean(presets?.length) &&
+                            nullable(presets, (pr) => (
+                                <PresetFilterDropdown
+                                    text={'Preset'}
+                                    presets={pr}
+                                    value={currentPreset ? currentPreset.id : undefined}
+                                    onChange={onPresetChange}
+                                />
+                            ))}
+
+                        {Boolean(queryString) && !currentPreset && (
+                            <StyledFiltersAction onClick={onFilterStar}>
+                                <StarIcon size="s" color={gray9} noWrap />
+                            </StyledFiltersAction>
+                        )}
+
+                        {currentPreset && (
+                            <StyledFiltersAction onClick={onFilterStar}>
+                                <StarFilledIcon size="s" color={gray9} noWrap />
+                            </StyledFiltersAction>
+                        )}
                     </StyledFiltersMenu>
                 </StyledFiltersMenuWrapper>
 
@@ -203,3 +264,5 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
         </StyledFiltersPanel>
     );
 };
+
+FiltersPanel.whyDidYouRender = true;
