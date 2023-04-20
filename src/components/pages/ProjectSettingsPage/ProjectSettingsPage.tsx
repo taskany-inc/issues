@@ -253,7 +253,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
 
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
-            <ProjectPageLayout project={project}>
+            <ProjectPageLayout project={project} title={project.title}>
                 <PageSep />
 
                 <SettingsContent>
