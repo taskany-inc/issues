@@ -7,7 +7,7 @@ import { usePageContext } from '../hooks/usePageContext';
 // eslint-disable-next-line react/display-name
 export const StateDot: React.FC<Omit<StateDotProps & { hue?: number }, 'hoverColor' | 'color'>> = React.memo(
     ({ hue = 1, ...props }) => {
-        const { themeId } = usePageContext();
+        const { themeId = 1 } = usePageContext();
         const { color, hoverColor } = useMemo(() => {
             const sat = hue === 1 ? 0 : undefined;
             return {
