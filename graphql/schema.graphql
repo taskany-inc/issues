@@ -86,6 +86,10 @@ input FilterCreateInput {
   title: String!
 }
 
+input FilterInput {
+  id: ID!
+}
+
 enum FilterMode {
   Global
   Project
@@ -225,6 +229,7 @@ type Mutation {
   createProject(data: ProjectCreateInput!): Project
   createTag(description: String, title: String!): Tag
   deleteComment(data: CommentDeleteInput!): Comment
+  deleteFilter(data: FilterInput!): Filter
   deleteProject(data: ProjectDelete!): Project
   toggleGoalArchive(data: GoalArchiveInput!): Activity
   toggleGoalDependency(data: GoalDependencyToggleInput!): Goal
@@ -310,6 +315,7 @@ input ProjectUpdateInput {
 }
 
 type Query {
+  filter(data: FilterInput!): Filter
   findActivity(data: FindActivityInput!): [Activity]
   findGoal(query: String!): [Goal]
   flow(id: String!): Flow
@@ -324,6 +330,7 @@ type Query {
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
+  userFilters: [Filter]
   userGoals(data: UserGoalsInput!): UserGoalsOutput
   users(sortBy: SortOrder): [User]
 }

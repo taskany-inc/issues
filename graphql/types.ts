@@ -274,6 +274,13 @@ export const Filter = objectType({
     },
 });
 
+export const FilterInput = inputObjectType({
+    name: 'FilterInput',
+    definition(t) {
+        t.field(FilterModel.id);
+    },
+});
+
 export const FilterCreateInput = inputObjectType({
     name: 'FilterCreateInput',
     definition(t) {

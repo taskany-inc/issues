@@ -8,6 +8,8 @@ export enum ModalEvent {
     ProjectTransferModal = 'ProjectTransferModal',
     ProjectDeleteModal = 'ProjectDeleteModal',
     UserInviteModal = 'UserInviteModal',
+    FilterCreateModal = 'FilterCreateModal',
+    FilterDeleteModal = 'FilterDeleteModal',
 }
 
 export const dispatchModalEvent = (e: ModalEvent) => () => {
