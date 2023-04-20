@@ -1,8 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Dropdown } from '@taskany/bricks';
 
 import { State } from '../../graphql/@generated/genql';
-import { usePageContext } from '../hooks/usePageContext';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
@@ -18,18 +17,15 @@ interface StateFilterDropdownProps {
 
 export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterDropdownProps>(
     ({ text, states, value, disabled, onChange }, ref) => {
-        const { themeId } = usePageContext();
-        const [selected, setSelected] = useState<Set<string>>(new Set(value));
-
         const onStateClick = useCallback(
             (s: State) => {
+                const selected = new Set(value);
                 selected.has(s.id) ? selected.delete(s.id) : selected.add(s.id);
                 const newSelected = new Set(selected);
-                setSelected(newSelected);
 
                 onChange?.(Array.from(newSelected));
             },
-            [onChange, selected],
+            [onChange, value],
         );
 
         return (
@@ -43,7 +39,7 @@ export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterD
                 renderTrigger={(props) => (
                     <FiltersMenuItem
                         ref={props.ref}
-                        active={Boolean(Array.from(selected).length)}
+                        active={Boolean(value?.length)}
                         disabled={props.disabled}
                         onClick={props.onClick}
                     >
@@ -54,7 +50,7 @@ export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterD
                     <ColorizedMenuItem
                         key={props.item.id}
                         hue={props.item.hue}
-                        checked={selected?.has(props.item.id)}
+                        checked={value?.includes(props.item.id)}
                         onClick={props.onClick}
                     >
                         {props.item.title}

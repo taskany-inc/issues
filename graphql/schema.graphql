@@ -324,7 +324,6 @@ type Query {
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
-  userFilters: [Filter]
   userGoals(data: UserGoalsInput!): UserGoalsOutput
   users(sortBy: SortOrder): [User]
 }
