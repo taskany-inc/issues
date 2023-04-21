@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import CommentCreateForm from '../components/CommentCreateForm';
+import CommentCreateForm from '../components/CommentCreateForm/CommentCreateForm';
 
 export default {
     title: 'Taskany/CommentCreateForm',

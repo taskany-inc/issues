@@ -1,46 +1,45 @@
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 
-import { gql } from '../utils/gql';
-import { Comment, CommentDeleteInput } from '../../graphql/@generated/genql';
+import { gql } from '../../utils/gql';
+import { Comment, CommentDeleteInput } from '../../../graphql/@generated/genql';
+import { usePageContext } from '../usePageContext';
 
-type i18n = (key: string) => string;
+import { tr } from './useCommentResource.i18n';
 
 // FIXME: problem with passing this errors
-const createSchemaProvider = (t: i18n) =>
+const createSchemaProvider = () =>
     z.object({
         description: z
             .string({
-                required_error: t("Comments's description is required"),
-                invalid_type_error: t("Comments's description must be a string"),
+                required_error: tr("Comments's description is required"),
+                invalid_type_error: tr("Comments's description must be a string"),
             })
             .min(1, {
-                message: t("Comments's description must be longer than 1 symbol"),
+                message: tr("Comments's description must be longer than 1 symbol"),
             }),
         goalId: z.string().min(1),
     });
 
-const updateSchemaProvider = (t: (key: string) => string) =>
+const updateSchemaProvider = () =>
     z.object({
         id: z.string().min(1),
         description: z
             .string({
-                required_error: t("Comments's description is required"),
-                invalid_type_error: t("Comments's description must be a string"),
+                required_error: tr("Comments's description is required"),
+                invalid_type_error: tr("Comments's description must be a string"),
             })
             .min(1, {
-                message: t("Comments's description must be longer than 1 symbol"),
+                message: tr("Comments's description must be longer than 1 symbol"),
             }),
     });
 
 export type CreateFormType = z.infer<ReturnType<typeof createSchemaProvider>>;
 export type UpdateFormType = z.infer<ReturnType<typeof updateSchemaProvider>>;
 
-interface UseCommentResourceParams {
-    t: i18n;
-}
+export const useCommentResource = () => {
+    const { user } = usePageContext();
 
-export const useCommentResource = ({ t }: UseCommentResourceParams) => {
     const create =
         (cb: (params: Partial<Comment>) => void) =>
         async ({ goalId, description }: CreateFormType) => {
@@ -59,9 +58,9 @@ export const useCommentResource = ({ t }: UseCommentResourceParams) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are publishing your comment'),
-                success: t('Voila! Comment is here 🎉'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are publishing your comment'),
+                success: tr('Voila! Comment is here 🎉'),
             });
 
             const data = await promise;
@@ -88,9 +87,9 @@ export const useCommentResource = ({ t }: UseCommentResourceParams) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are updating your comment'),
-                success: t('Comment updated'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are updating your comment'),
+                success: tr('Comment updated'),
             });
 
             const data = await promise;
@@ -115,9 +114,9 @@ export const useCommentResource = ({ t }: UseCommentResourceParams) => {
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are deleting your comment'),
-                success: t('Comment removed'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are deleting your comment'),
+                success: tr('Comment removed'),
             });
 
             const data = await promise;
@@ -125,5 +124,5 @@ export const useCommentResource = ({ t }: UseCommentResourceParams) => {
             data.deleteComment && cb(data.deleteComment);
         };
 
-    return { createSchema: createSchemaProvider(t), updateSchema: updateSchemaProvider(t), create, update, remove };
+    return { createSchema: createSchemaProvider(), updateSchema: updateSchemaProvider(), create, update, remove };
 };

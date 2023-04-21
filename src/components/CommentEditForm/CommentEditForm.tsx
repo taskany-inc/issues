@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { z } from 'zod';
 
-import { UpdateFormType, useCommentResource } from '../hooks/useCommentResource';
-import { Comment } from '../../graphql/@generated/genql';
+import { UpdateFormType, useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
+import { Comment } from '../../../graphql/@generated/genql';
+import { CommentForm } from '../CommentForm/CommentForm';
 
-import { CommentForm } from './CommentForm';
+import { tr } from './CommentEditForm.i18n';
 
 interface CommentEditFormProps {
     id: string;
@@ -20,8 +20,7 @@ interface CommentEditFormProps {
 }
 
 const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onChanged, onUpdate, onCancel }) => {
-    const t = useTranslations('Comment.edit');
-    const { updateSchema, update } = useCommentResource({ t });
+    const { updateSchema, update } = useCommentResource();
     const [busy, setBusy] = useState(false);
 
     type CommentFormType = z.infer<typeof updateSchema>;
@@ -63,7 +62,6 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onCh
     return (
         <CommentForm
             busy={busy}
-            i18nKeyset="Comment.edit"
             control={control}
             autoFocus
             height={120}
@@ -71,6 +69,7 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onCh
             error={errors.description}
             onSubmit={handleSubmit(onCommentUpdate)}
             onCancel={onCancel}
+            actionButtonText={tr('Save')}
         />
     );
 };

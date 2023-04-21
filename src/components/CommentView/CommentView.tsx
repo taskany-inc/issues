@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { useTranslations } from 'next-intl';
 import { brandColor, danger0, gapM, gapS, gray4 } from '@taskany/colors';
 import {
     BinIcon,
@@ -17,17 +16,18 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { Comment, User } from '../../graphql/@generated/genql';
-import { useReactionsResource } from '../hooks/useReactionsResource';
-import { useCommentResource } from '../hooks/useCommentResource';
+import { Comment, User } from '../../../graphql/@generated/genql';
+import { useReactionsResource } from '../../hooks/useReactionsResource';
+import { useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
+import { Reactions } from '../Reactions';
+import { ActivityFeedItem } from '../ActivityFeed';
 
-import { Reactions } from './Reactions';
-import { ActivityFeedItem } from './ActivityFeed';
+import { tr } from './CommentView.i18n';
 
-const Md = dynamic(() => import('./Md'));
-const RelativeTime = dynamic(() => import('./RelativeTime'));
-const CommentEditForm = dynamic(() => import('./CommentEditForm'));
-const ReactionsDropdown = dynamic(() => import('./ReactionsDropdown'));
+const Md = dynamic(() => import('../Md'));
+const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
+const CommentEditForm = dynamic(() => import('../CommentEditForm/CommentEditForm'));
+const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
 
 interface CommentViewProps {
     id: string;
@@ -116,8 +116,7 @@ export const CommentView: FC<CommentViewProps> = ({
     onDelete,
     onReactionToggle,
 }) => {
-    const t = useTranslations('Comment.delete');
-    const { remove } = useCommentResource({ t });
+    const { remove } = useCommentResource();
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);
     const { reactionsProps } = useReactionsResource(reactions);
@@ -184,12 +183,12 @@ export const CommentView: FC<CommentViewProps> = ({
                                     <Dropdown
                                         items={[
                                             {
-                                                label: 'Edit',
+                                                label: tr('Edit'),
                                                 icon: <EditIcon size="xxs" />,
                                                 onClick: onEditClick,
                                             },
                                             {
-                                                label: 'Delete',
+                                                label: tr('Delete'),
                                                 color: danger0,
                                                 icon: <BinIcon size="xxs" />,
                                                 onClick: onDeleteClick,
