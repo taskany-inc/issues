@@ -35,9 +35,9 @@ import { Page, PageContent, PageActions } from '../../Page';
 import { PageSep } from '../../PageSep';
 import { IssueTitle } from '../../IssueTitle';
 import { IssueKey } from '../../IssueKey';
-import { IssueStats } from '../../IssueStats';
+import { IssueStats } from '../../IssueStats/IssueStats';
 import { Reactions } from '../../Reactions';
-import { CommentView } from '../../CommentView';
+import { CommentView } from '../../CommentView/CommentView';
 import { StateDot } from '../../StateDot';
 import { IssueParent } from '../../IssueParent';
 import { IssueTags } from '../../IssueTags';
@@ -47,11 +47,11 @@ import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
 import { ActivityFeed } from '../../ActivityFeed';
 import { useReactionsResource } from '../../../hooks/useReactionsResource';
-import { WatchButton } from '../../WatchButton';
+import { WatchButton } from '../../WatchButton/WatchButton';
 import { useGoalResource } from '../../../hooks/useGoalResource';
-import { StarButton } from '../../StarButton';
+import { StarButton } from '../../StarButton/StarButton';
 import { useRouter } from '../../../hooks/router';
-import { GoalDeleteModal } from '../../GoalDeleteModal';
+import { GoalDeleteModal } from '../../GoalDeleteModal/GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../../types/priority';
 import { trPriority } from '../../../i18n/priority';
 
@@ -59,13 +59,13 @@ import { tr } from './GoalPage.i18n';
 
 const StateSwitch = dynamic(() => import('../../StateSwitch'));
 const Md = dynamic(() => import('../../Md'));
-const RelativeTime = dynamic(() => import('../../RelativeTime'));
+const RelativeTime = dynamic(() => import('../../RelativeTime/RelativeTime'));
 const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
-const GoalEditForm = dynamic(() => import('../../GoalEditForm'));
-const CommentCreateForm = dynamic(() => import('../../CommentCreateForm'));
+const GoalEditForm = dynamic(() => import('../../GoalEditForm/GoalEditForm'));
+const CommentCreateForm = dynamic(() => import('../../CommentCreateForm/CommentCreateForm'));
 const ReactionsDropdown = dynamic(() => import('../../ReactionsDropdown'));
-const IssueDependencies = dynamic(() => import('../../IssueDependencies'));
-const IssueParticipants = dynamic(() => import('../../IssueParticipants'));
+const IssueDependencies = dynamic(() => import('../../IssueDependencies/IssueDependencies'));
+const IssueParticipants = dynamic(() => import('../../IssueParticipants/IssueParticipants'));
 
 const IssueHeader = styled(PageContent)`
     display: grid;

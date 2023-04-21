@@ -11,7 +11,7 @@ import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrPro
 import { Priority } from '../../../types/priority';
 import { Page, PageContent } from '../../Page';
 import { CommonHeader } from '../../CommonHeader';
-import { FiltersPanel } from '../../FiltersPanel';
+import { FiltersPanel } from '../../FiltersPanel/FiltersPanel';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../../GoalsGroup';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
@@ -20,7 +20,7 @@ import { PageTitle } from '../../PageTitle';
 
 import { tr } from './GoalsPage.i18n';
 
-const GoalPreview = dynamic(() => import('../../GoalPreview'));
+const GoalPreview = dynamic(() => import('../../GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../../FilterDeleteForm/FilterDeleteForm'));

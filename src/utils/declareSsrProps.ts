@@ -69,7 +69,6 @@ export function declareSsrProps<T = ExternalPageProps>(
                 locale,
                 params: params as Record<string, string>,
                 user: session ? session.user : null,
-                i18n: (await import(`../../i18n/${locale}.json`)).default,
                 ssrTime,
             },
         };
