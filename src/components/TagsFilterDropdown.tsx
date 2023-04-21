@@ -8,7 +8,7 @@ import { FiltersMenuItem } from './FiltersMenuItem';
 interface TagsFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
     value?: Array<string>;
-    tags?: Array<TagModel | undefined>;
+    tags?: Array<TagModel>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
     onChange?: (selected: string[]) => void;

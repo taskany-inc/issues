@@ -8,6 +8,7 @@ import { nullable } from '@taskany/bricks';
 import { Filter, Goal, GoalsMetaOutput, Project } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { Priority } from '../../../types/priority';
 import { Page, PageContent } from '../../Page';
 import { CommonHeader } from '../../CommonHeader';
 import { FiltersPanel } from '../../FiltersPanel';
@@ -307,7 +308,7 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback, preset }: ExternalP
             <FiltersPanel
                 count={meta?.count}
                 filteredCount={goals?.length ?? 0}
-                priority={meta?.priority}
+                priority={meta?.priority as Priority[]}
                 states={meta?.states}
                 users={meta?.owners}
                 projects={meta?.projects}

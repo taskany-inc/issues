@@ -9,11 +9,11 @@ import { ColorizedMenuItem } from './ColorizedMenuItem';
 
 interface PriorityFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
-    priority?: string[];
-    value?: Array<string>;
+    priority?: Priority[];
+    value?: Array<Priority>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
-    onChange?: (selected: string[]) => void;
+    onChange?: (selected: Priority[]) => void;
 }
 
 export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityFilterDropdownProps>(
