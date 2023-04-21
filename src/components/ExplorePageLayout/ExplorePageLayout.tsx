@@ -1,31 +1,30 @@
 import React from 'react';
-import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { TabsMenu, TabsMenuItem } from '@taskany/bricks';
 
-import { routes } from '../hooks/router';
+import { routes } from '../../hooks/router';
+import { CommonHeader } from '../CommonHeader';
 
-import { CommonHeader } from './CommonHeader';
+import { tr } from './ExplorePageLayout.i18n';
 
 interface ExplorePageLayoutProps {
     children: React.ReactNode;
 }
 
 export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ children }) => {
-    const t = useTranslations('explore');
     const router = useRouter();
 
     const tabsMenuOptions: Array<[string, string]> = [
-        [t('Projects'), routes.exploreProjects()],
-        // [t('Goals'), routes.exploreGoals()],
+        [tr('Projects'), routes.exploreProjects()],
+        // [tr('Goals'), routes.exploreGoals()],
     ];
 
     return (
         <>
             <CommonHeader
-                title={t('Explore')}
-                description={t('see what the Taskany community is most excited about today')}
+                title={tr('Explore')}
+                description={tr('See what the Taskany community is most excited about today')}
             >
                 <div className="exploreActions"></div>
 

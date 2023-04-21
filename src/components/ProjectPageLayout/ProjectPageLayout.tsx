@@ -1,20 +1,20 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { gapM, gapS, gray6, gray9 } from '@taskany/colors';
 import { TabsMenu, TabsMenuItem, Text, nullable } from '@taskany/bricks';
 
-import { routes } from '../hooks/router';
-import { useProjectResource } from '../hooks/useProjectResource';
-import { usePageContext } from '../hooks/usePageContext';
-import { Project } from '../../graphql/@generated/genql';
+import { routes } from '../../hooks/router';
+import { useProjectResource } from '../../hooks/useProjectResource';
+import { usePageContext } from '../../hooks/usePageContext';
+import { Project } from '../../../graphql/@generated/genql';
+import { PageContent, PageActions } from '../Page';
+import { WatchButton } from '../WatchButton/WatchButton';
+import { StarButton } from '../StarButton/StarButton';
+import { ProjectTitleList } from '../ProjectTitleList';
 
-import { PageContent, PageActions } from './Page';
-import { WatchButton } from './WatchButton';
-import { StarButton } from './StarButton';
-import { ProjectTitleList } from './ProjectTitleList';
+import { tr } from './ProjectPageLayout.i18n';
 
 interface ProjectPageLayoutProps {
     project: Project;
@@ -47,14 +47,13 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
     actions,
 }) => {
     const { user } = usePageContext();
-    const t = useTranslations('projects');
     const router = useRouter();
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(project.id);
     const isCurrentUserOwner = user?.activityId === project.activityId;
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
-        [t('Goals'), routes.project(project.id), true],
-        [t('Settings'), routes.projectSettings(project.id), true],
+        [tr('Goals'), routes.project(project.id), true],
+        [tr('Settings'), routes.projectSettings(project.id), true],
     ];
 
     const [watcher, setWatcher] = useState(project._isWatching);

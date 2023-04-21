@@ -27,7 +27,7 @@ import { PageSep } from '../../PageSep';
 import { useRouter } from '../../../hooks/router';
 import { SettingsCard, SettingsContent } from '../../SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../../utils/dispatchModal';
-import { ProjectPageLayout } from '../../ProjectPageLayout';
+import { ProjectPageLayout } from '../../ProjectPageLayout/ProjectPageLayout';
 import { Page } from '../../Page';
 import {
     UpdateProjectFormType,

@@ -7,7 +7,7 @@ import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrPro
 import { routes } from '../../../hooks/router';
 import { Page, PageContent } from '../../Page';
 import { PageSep } from '../../PageSep';
-import { ExplorePageLayout } from '../../ExplorePageLayout';
+import { ExplorePageLayout } from '../../ExplorePageLayout/ExplorePageLayout';
 import { ProjectListItem } from '../../ProjectListItem';
 
 import { tr } from './ExporeProjectsPage.i18n';

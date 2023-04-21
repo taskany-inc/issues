@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useSWR from 'swr';
@@ -25,20 +24,21 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { createFetcher } from '../utils/createFetcher';
-import { keyPredictor } from '../utils/keyPredictor';
-import { submitKeys } from '../utils/hotkeys';
-import { errorsProvider } from '../utils/forms';
-import { useDebouncedEffect } from '../hooks/useDebouncedEffect';
-import { routes, useRouter } from '../hooks/router';
-import { usePageContext } from '../hooks/usePageContext';
-import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../hooks/useProjectResource';
+import { createFetcher } from '../../utils/createFetcher';
+import { keyPredictor } from '../../utils/keyPredictor';
+import { submitKeys } from '../../utils/hotkeys';
+import { errorsProvider } from '../../utils/forms';
+import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
+import { routes, useRouter } from '../../hooks/router';
+import { usePageContext } from '../../hooks/usePageContext';
+import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../../hooks/useProjectResource';
+import { Tip } from '../Tip';
+import { Keyboard } from '../Keyboard';
+import { FlowComboBox } from '../FlowComboBox';
 
-import { Tip } from './Tip';
-import { Keyboard } from './Keyboard';
-import { FlowComboBox } from './FlowComboBox';
+import { tr } from './ProjectCreateForm.i18n';
 
-const KeyInput = dynamic(() => import('./KeyInput'));
+const KeyInput = dynamic(() => import('../KeyInput'));
 
 const flowFetcher = createFetcher(() => ({
     flowRecommended: {
@@ -87,7 +87,6 @@ const StyledProjectKeyInputContainer = styled(InputContainer)`
 `;
 
 const ProjectCreateForm: React.FC = () => {
-    const t = useTranslations('projects');
     const router = useRouter();
     const { locale, user } = usePageContext();
     const { createProject } = useProjectResource('');
@@ -159,26 +158,37 @@ const ProjectCreateForm: React.FC = () => {
         setDirtyKey(true);
     }, []);
 
-    const richProps = {
-        b: (c: React.ReactNode) => (
-            <Text as="span" size="s" weight="bolder">
-                {c}
-            </Text>
-        ),
-        key: () => keyWatcher,
-    };
-
     // eslint-disable-next-line no-nested-ternary
     const tooltip = isKeyEnoughLength
         ? isKeyUnique
-            ? t.rich('create.Perfect! Issues and goals will look like', richProps)
-            : t.rich('create.Key already exists', richProps)
-        : t('create.Key must be 3 or longer characters');
+            ? tr.raw('Perfect! Issues and goals will look like', {
+                  perfect: (
+                      <Text as="span" size="s" weight="bolder">
+                          {tr('Perfect')}
+                      </Text>
+                  ),
+                  issueKeyOne: (
+                      <Text as="span" size="s" weight="bolder">
+                          {tr.raw('issue key one', {
+                              key: keyWatcher,
+                          })}
+                      </Text>
+                  ),
+                  issueKeyTwo: (
+                      <Text as="span" size="s" weight="bolder">
+                          {tr.raw('issue key two', {
+                              key: keyWatcher,
+                          })}
+                      </Text>
+                  ),
+              })
+            : tr.raw('Key already exists', { key: keyWatcher })
+        : tr('Key must be 3 or longer characters');
 
     return (
         <>
             <ModalHeader>
-                <FormTitle>{t('create.New project')}</FormTitle>
+                <FormTitle>{tr('New project')}</FormTitle>
             </ModalHeader>
 
             <ModalContent>
@@ -186,7 +196,7 @@ const ProjectCreateForm: React.FC = () => {
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
-                            placeholder={t('create.Title')}
+                            placeholder={tr('Title')}
                             flat="bottom"
                             brick="right"
                             disabled={busy}
@@ -226,7 +236,7 @@ const ProjectCreateForm: React.FC = () => {
                     <FormTextarea
                         {...register('description')}
                         disabled={busy}
-                        placeholder={t('create.Short description')}
+                        placeholder={tr('Short description')}
                         flat="both"
                         error={errorsResolver('description')}
                     />
@@ -239,8 +249,8 @@ const ProjectCreateForm: React.FC = () => {
                                 render={({ field }) => (
                                     <FlowComboBox
                                         disabled
-                                        text={t('create.Flow')}
-                                        placeholder={t('create.Flow or state title')}
+                                        text={tr('Flow')}
+                                        placeholder={tr('Flow or state title')}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />
@@ -253,16 +263,16 @@ const ProjectCreateForm: React.FC = () => {
                                 disabled={busy}
                                 outline={!isValid || !isKeyUnique || !isKeyEnoughLength}
                                 type="submit"
-                                text={t('create.Create project')}
+                                text={tr('Create project')}
                             />
                         </FormAction>
                     </FormActions>
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('create.Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
-                        {t.rich('create.Press key to create the project', {
-                            key: () => <Keyboard command enter />,
+                    <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                        {tr.raw('Press key to create project', {
+                            key: <Keyboard command enter />,
                         })}
                     </Tip>
 

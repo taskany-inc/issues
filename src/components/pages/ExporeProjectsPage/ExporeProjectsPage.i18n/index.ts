@@ -6,7 +6,7 @@ import getLang from '../../../../i18n/getLang';
 import ru from './ru.json';
 import en from './en.json';
 
-type I18nKey = keyof typeof ru & keyof typeof en;
+export type I18nKey = keyof typeof ru & keyof typeof en;
 type I18nLang = 'ru' | 'en';
 
 const keyset: I18nLangSet<I18nKey> = {};

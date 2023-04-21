@@ -5,7 +5,7 @@ import { Text, UserPic, nullable } from '@taskany/bricks';
 
 import { Activity } from '../../graphql/@generated/genql';
 
-import RelativeTime from './RelativeTime';
+import RelativeTime from './RelativeTime/RelativeTime';
 
 interface ProjectListItemProps {
     href: string;
