@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { CommentView } from '../components/CommentView';
+import { CommentView } from '../components/CommentView/CommentView';
 
 // @ts-ignore
 export default {

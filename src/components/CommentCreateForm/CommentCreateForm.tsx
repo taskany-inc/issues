@@ -1,15 +1,15 @@
 import React, { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { z } from 'zod';
 import { UserPic } from '@taskany/bricks';
 
-import { usePageContext } from '../hooks/usePageContext';
-import { CreateFormType, useCommentResource } from '../hooks/useCommentResource';
+import { usePageContext } from '../../hooks/usePageContext';
+import { CreateFormType, useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
+import { CommentForm } from '../CommentForm/CommentForm';
+import { ActivityFeedItem } from '../ActivityFeed';
 
-import { CommentForm } from './CommentForm';
-import { ActivityFeedItem } from './ActivityFeed';
+import { tr } from './CommentCreateForm.i18n';
 
 interface CommentCreateFormProps {
     goalId: string;
@@ -20,9 +20,8 @@ interface CommentCreateFormProps {
 }
 
 const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus, onCancel, goalId }) => {
-    const t = useTranslations('Comment.new');
     const { user } = usePageContext();
-    const { createSchema, create } = useCommentResource({ t });
+    const { createSchema, create } = useCommentResource();
     const [focus, setFocus] = useState<boolean | undefined>();
     const [busy, setBusy] = useState(false);
 
@@ -58,7 +57,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
                 goalId,
             });
         },
-        [create, onSubmit, reset],
+        [create, goalId, onSubmit, reset],
     );
 
     const onCommentFocus = useCallback(() => {
@@ -78,13 +77,13 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
 
             <CommentForm
                 busy={busy}
-                i18nKeyset="Comment.new"
                 control={control}
                 isValid={isValid}
                 height={focus ? 120 : 60}
                 onSubmit={handleSubmit(createComment)}
                 onCancel={onCancelCreate}
                 onFocus={onCommentFocus}
+                actionButtonText={tr('Comment')}
             />
         </ActivityFeedItem>
     );

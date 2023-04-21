@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { Controller, Control } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
 import { backgroundColor, gapS, gray4, gray6 } from '@taskany/colors';
 import {
     Button,
@@ -16,14 +15,14 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { submitKeys } from '../utils/hotkeys';
-import { usePageContext } from '../hooks/usePageContext';
-import { routes } from '../hooks/router';
+import { submitKeys } from '../../utils/hotkeys';
+import { usePageContext } from '../../hooks/usePageContext';
+import { routes } from '../../hooks/router';
+import { Tip } from '../Tip';
 
-import { Tip } from './Tip';
+import { tr } from './CommentForm.i18n';
 
 interface CommentFormProps {
-    i18nKeyset: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     control: Control<any>;
     autoFocus?: boolean;
@@ -31,6 +30,7 @@ interface CommentFormProps {
     isValid?: boolean;
     error?: React.ComponentProps<typeof FormEditor>['error'];
     busy?: boolean;
+    actionButtonText: string;
 
     onSubmit?: () => void;
     onFocus?: () => void;
@@ -72,7 +72,6 @@ const StyledTip = styled(Tip)`
 `;
 
 export const CommentForm: React.FC<CommentFormProps> = ({
-    i18nKeyset,
     autoFocus,
     height,
     control,
@@ -82,8 +81,8 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     onSubmit,
     onFocus,
     onCancel,
+    actionButtonText,
 }) => {
-    const t = useTranslations(i18nKeyset);
     const { locale } = usePageContext();
     const [commentFocused, setCommentFocused] = useState(false);
 
@@ -112,7 +111,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         <FormEditor
                             {...field}
                             disabled={busy}
-                            placeholder={t('Leave a comment')}
+                            placeholder={tr('Leave a comment')}
                             height={height}
                             onCancel={onCommentCancel}
                             onFocus={onCommentFocus}
@@ -127,7 +126,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         <FormAction left inline />
                         <FormAction right inline>
                             {nullable(!busy, () => (
-                                <Button size="m" text={t('Cancel')} onClick={onCommentCancel} />
+                                <Button size="m" text={tr('Cancel')} onClick={onCommentCancel} />
                             ))}
 
                             <Button
@@ -136,7 +135,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                                 disabled={busy}
                                 outline={!isValid}
                                 type="submit"
-                                text={t('Comment')}
+                                text={actionButtonText}
                             />
                         </FormAction>
                     </FormActions>
@@ -145,10 +144,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
             {nullable(commentFocused, () => (
                 <StyledFormBottom>
-                    <StyledTip icon={<MarkdownIcon size="s" color={gray6} />}>
-                        {t('Styling with markdown is supported')}
-                    </StyledTip>
-
+                    <StyledTip icon={<MarkdownIcon size="s" color={gray6} />}>{tr('Markdown supported')}</StyledTip>
                     <Link href={routes.help(locale, 'comments')}>
                         <QuestionIcon size="s" color={gray6} />
                     </Link>
