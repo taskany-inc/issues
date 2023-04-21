@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
@@ -24,38 +23,39 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { gql } from '../utils/gql';
-import { Goal, State } from '../../graphql/@generated/genql';
-import { goalFetcher, refreshInterval } from '../utils/entityFetcher';
-import { formatEstimate } from '../utils/dateTime';
-import { useHighlightedComment } from '../hooks/useHighlightedComment';
-import { useGoalUpdate } from '../hooks/useGoalUpdate';
-import { routes } from '../hooks/router';
-import { usePageContext } from '../hooks/usePageContext';
-import { useReactionsResource } from '../hooks/useReactionsResource';
-import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
-import { editGoalKeys } from '../utils/hotkeys';
-import { Priority, priorityColorsMap } from '../types/priority';
-import { trPriority } from '../i18n/priority';
+import { gql } from '../../utils/gql';
+import { Goal, State } from '../../../graphql/@generated/genql';
+import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
+import { formatEstimate } from '../../utils/dateTime';
+import { useHighlightedComment } from '../../hooks/useHighlightedComment';
+import { useGoalUpdate } from '../../hooks/useGoalUpdate';
+import { routes } from '../../hooks/router';
+import { usePageContext } from '../../hooks/usePageContext';
+import { useReactionsResource } from '../../hooks/useReactionsResource';
+import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
+import { editGoalKeys } from '../../utils/hotkeys';
+import { Priority, priorityColorsMap } from '../../types/priority';
+import { trPriority } from '../../i18n/priority';
+import { IssueKey } from '../IssueKey';
+import { IssueTitle } from '../IssueTitle';
+import { IssueParent } from '../IssueParent';
+import { IssueTags } from '../IssueTags';
+import { StateDot } from '../StateDot';
+import RelativeTime from '../RelativeTime/RelativeTime';
+import Md from '../Md';
+import { IssueStats } from '../IssueStats/IssueStats';
+import { CommentView } from '../CommentView/CommentView';
+import { ActivityFeed } from '../ActivityFeed';
+import { Reactions } from '../Reactions';
+import ReactionsDropdown from '../ReactionsDropdown';
+import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 
-import { IssueKey } from './IssueKey';
-import { IssueTitle } from './IssueTitle';
-import { IssueParent } from './IssueParent';
-import { IssueTags } from './IssueTags';
-import { StateDot } from './StateDot';
-import RelativeTime from './RelativeTime';
-import Md from './Md';
-import { IssueStats } from './IssueStats';
-import { CommentView } from './CommentView';
-import { ActivityFeed } from './ActivityFeed';
-import { Reactions } from './Reactions';
-import ReactionsDropdown from './ReactionsDropdown';
-import { GoalDeleteModal } from './GoalDeleteModal';
+import { tr } from './GoalPreview.i18n';
 
-const StateSwitch = dynamic(() => import('./StateSwitch'));
-const CommentCreateForm = dynamic(() => import('./CommentCreateForm'));
-const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
-const GoalEditForm = dynamic(() => import('./GoalEditForm'));
+const StateSwitch = dynamic(() => import('../StateSwitch'));
+const CommentCreateForm = dynamic(() => import('../CommentCreateForm/CommentCreateForm'));
+const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
+const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
 
 interface GoalPreviewProps {
     goal: Goal;
@@ -97,7 +97,6 @@ const StyledCard = styled(Card)`
 `;
 
 const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, onDelete }) => {
-    const t = useTranslations('goals.id');
     const { user, locale } = usePageContext();
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
 
@@ -176,15 +175,15 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
         });
 
         toast.promise(promise, {
-            error: t('Something went wrong 😿'),
-            loading: t('We are deleting the goal'),
-            success: t('Deleted successfully 🎉'),
+            error: tr('Something went wrong 😿'),
+            loading: tr('We are deleting the goal'),
+            success: tr('Deleted successfully 🎉'),
         });
 
         await promise;
 
         refresh();
-    }, [t, goal, refresh, onDelete]);
+    }, [goal, refresh, onDelete]);
 
     return (
         <>
@@ -258,12 +257,12 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                                 onChange={onEditMenuChange}
                                 items={[
                                     {
-                                        label: t('Edit'),
+                                        label: tr('Edit'),
                                         icon: <EditIcon size="xxs" />,
                                         onClick: dispatchModalEvent(ModalEvent.GoalEditModal),
                                     },
                                     {
-                                        label: t('Delete'),
+                                        label: tr('Delete'),
                                         color: danger0,
                                         icon: <BinIcon size="xxs" />,
                                         onClick: dispatchModalEvent(ModalEvent.GoalDeleteModal),

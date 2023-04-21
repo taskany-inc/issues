@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
-import { gql } from '../utils/gql';
-import { Goal } from '../../graphql/@generated/genql';
+import { gql } from '../../utils/gql';
+import { Goal } from '../../../graphql/@generated/genql';
+import { GoalForm, GoalFormType } from '../GoalForm/GoalForm';
 
-import { GoalForm, GoalFormType } from './GoalForm';
+import { tr } from './GoalEditForm.i18n';
 
 interface GoalEditFormProps {
     goal: Goal;
@@ -14,8 +14,6 @@ interface GoalEditFormProps {
 }
 
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
-    const t = useTranslations('goals.edit');
-
     const [busy, setBusy] = useState(false);
 
     const updateGoal = async (form: GoalFormType) => {
@@ -43,9 +41,9 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         });
 
         toast.promise(promise, {
-            error: t('Something went wrong 😿'),
-            loading: t('We are saving your goal'),
-            success: t('Voila! Saved successfully 🎉'),
+            error: tr('Something went wrong 😿'),
+            loading: tr('We are saving your goal'),
+            success: tr('Voila! Saved successfully 🎉'),
         });
 
         const res = await promise;
@@ -56,8 +54,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     return (
         <GoalForm
             busy={busy}
-            i18nKeyset="goals.edit"
-            formTitle={t('Edit the goal')}
+            formTitle={tr('Edit the goal')}
             title={goal.title}
             description={goal.description}
             owner={goal.owner}
@@ -67,6 +64,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             tags={goal.tags}
             estimate={goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined}
             onSumbit={updateGoal}
+            actionBtnText={tr('Submit')}
         />
     );
 };
