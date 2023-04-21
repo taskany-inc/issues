@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useRef } from 'react';
-import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import z from 'zod';
 import { FieldError } from 'react-hook-form';
@@ -22,12 +21,13 @@ import {
     KeyCode,
 } from '@taskany/bricks';
 
-import { gql } from '../utils/gql';
-import { routes } from '../hooks/router';
-import { usePageContext } from '../hooks/usePageContext';
+import { gql } from '../../utils/gql';
+import { routes } from '../../hooks/router';
+import { usePageContext } from '../../hooks/usePageContext';
+import { Tip } from '../Tip';
+import { Keyboard } from '../Keyboard';
 
-import { Tip } from './Tip';
-import { Keyboard } from './Keyboard';
+import { tr } from './UserInviteForm.i18n';
 
 const StyledEmails = styled.div`
     padding: ${gapM} 0;
@@ -41,19 +41,18 @@ const StyledFormBottom = styled.div`
     padding: ${gapS} ${gapS} 0 ${gapS};
 `;
 
-const schemaProvider = (t: (key: string) => string) =>
+const schemaProvider = () =>
     z.string().email({
-        message: t('User email is required'),
+        message: tr('User email is required'),
     });
 
 const UserInviteForm: React.FC = () => {
-    const t = useTranslations('users.invite');
     const { locale } = usePageContext();
     const inputRef = useRef<HTMLInputElement>(null);
     const [emails, setEmails] = useState<string[]>([]);
     const [error, setError] = useState<FieldError>();
     const [inputValue, setInputValue] = useState('');
-    const schema = schemaProvider(t);
+    const schema = schemaProvider();
 
     const inviteUser = useCallback(async () => {
         if (emails.length === 0) {
@@ -75,16 +74,16 @@ const UserInviteForm: React.FC = () => {
         });
 
         toast.promise(promise, {
-            error: t('Something went wrong 😿'),
-            loading: t('We are creating invite'),
-            success: t('Voila! Users invited 🎉'),
+            error: tr('Something went wrong 😿'),
+            loading: tr('We are creating invite'),
+            success: tr('Voila! Users invited 🎉'),
         });
 
         await promise;
 
         setEmails([]);
         setInputValue('');
-    }, [emails, t]);
+    }, [emails]);
 
     const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
@@ -129,7 +128,7 @@ const UserInviteForm: React.FC = () => {
     return (
         <>
             <ModalHeader>
-                <FormTitle>{t('Invite new users')}</FormTitle>
+                <FormTitle>{tr('Invite new users')}</FormTitle>
             </ModalHeader>
 
             <ModalContent>
@@ -142,9 +141,9 @@ const UserInviteForm: React.FC = () => {
                         </>
                     ) : (
                         <Text size="s" color={gray7}>
-                            {t.rich('Start typing users emails', {
-                                key1: () => <Keyboard enter />,
-                                key2: () => <Keyboard space />,
+                            {tr.raw('Start typing users emails', {
+                                key1: <Keyboard enter />,
+                                key2: <Keyboard space />,
                             })}
                         </Text>
                     )}
@@ -155,7 +154,7 @@ const UserInviteForm: React.FC = () => {
                         ref={inputRef}
                         value={inputValue}
                         error={error}
-                        placeholder={t('Users emails')}
+                        placeholder={tr('Users emails')}
                         autoFocus
                         flat="bottom"
                         onChange={onInputChange}
@@ -170,7 +169,7 @@ const UserInviteForm: React.FC = () => {
                                 view="primary"
                                 type="submit"
                                 disabled={!isValid}
-                                text={t('Send invites')}
+                                text={tr('Send invites')}
                                 onClick={inviteUser}
                             />
                         </FormAction>
@@ -178,9 +177,9 @@ const UserInviteForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={t('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
-                        {t.rich('Press key to send invites', {
-                            key: () => <Keyboard command enter />,
+                    <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                        {tr.raw('Press key to send invites', {
+                            key: <Keyboard command enter />,
                         })}
                     </Tip>
 

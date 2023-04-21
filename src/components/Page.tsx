@@ -16,13 +16,13 @@ import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../utils/hotk
 
 import { Theme } from './Theme';
 import { GlobalStyle } from './GlobalStyle';
-import { PageHeader } from './PageHeader';
+import { PageHeader } from './PageHeader/PageHeader';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
-const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm'));
-const GoalCreateForm = dynamic(() => import('./GoalCreateForm'));
-const UserInviteForm = dynamic(() => import('./UserInviteForm'));
-const HotkeysModal = dynamic(() => import('./HotkeysModal'));
+const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm/ProjectCreateForm'));
+const GoalCreateForm = dynamic(() => import('./GoalCreateForm/GoalCreateForm'));
+const UserInviteForm = dynamic(() => import('./UserInviteForm/UserInviteForm'));
+const HotkeysModal = dynamic(() => import('./HotkeysModal/HotkeysModal'));
 const NotificationsHub = dynamic(() => import('./NotificationsHub/NotificationsHub'));
 
 interface PageProps {

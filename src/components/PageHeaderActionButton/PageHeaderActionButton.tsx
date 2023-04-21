@@ -1,12 +1,11 @@
 import { FC, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import { ArrowUpSmallIcon, Button, Dropdown, ArrowDownSmallIcon, MenuItem } from '@taskany/bricks';
 
-import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+
+import { tr } from './PageHeaderActionButton.i18n';
 
 export const PageHeaderActionButton: FC = () => {
-    const t = useTranslations('Header');
-
     const onMenuItemClick = useCallback(({ event }: { event: ModalEvent }) => {
         dispatchModalEvent(event)();
     }, []);
@@ -14,7 +13,7 @@ export const PageHeaderActionButton: FC = () => {
     return (
         <>
             <Button
-                text={t('Create')}
+                text={tr('Create')}
                 view="primary"
                 outline
                 brick="right"
@@ -24,11 +23,11 @@ export const PageHeaderActionButton: FC = () => {
                 onChange={onMenuItemClick}
                 items={[
                     {
-                        title: t('Create goal'),
+                        title: tr('Create goal'),
                         event: ModalEvent.GoalCreateModal,
                     },
                     {
-                        title: t('Create project'),
+                        title: tr('Create project'),
                         event: ModalEvent.ProjectCreateModal,
                     },
                 ]}

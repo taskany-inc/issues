@@ -1,7 +1,6 @@
 import { FC, useCallback } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import { useTranslations } from 'next-intl';
 import {
     Header,
     HeaderContent,
@@ -14,11 +13,12 @@ import {
 } from '@taskany/bricks';
 import { gray7 } from '@taskany/colors';
 
-import { usePageContext } from '../hooks/usePageContext';
-import { routes, useRouter } from '../hooks/router';
+import { usePageContext } from '../../hooks/usePageContext';
+import { routes, useRouter } from '../../hooks/router';
+import { PageHeaderActionButton } from '../PageHeaderActionButton/PageHeaderActionButton';
+import { PageHeaderLogo } from '../PageHeaderLogo';
 
-import { PageHeaderActionButton } from './PageHeaderActionButton';
-import { PageHeaderLogo } from './PageHeaderLogo';
+import { tr } from './PageHeader.i18n';
 
 const HeaderSearch = styled.div`
     position: relative;
@@ -30,12 +30,11 @@ const HeaderSearch = styled.div`
 export const PageHeader: FC = () => {
     const { userSettings, signIn } = useRouter();
     const { user } = usePageContext();
-    const t = useTranslations('Header');
 
     const links = [
         {
             href: routes.goals(),
-            title: t('Goals'),
+            title: tr('Goals'),
         },
         // {
         //     href: '',
@@ -47,7 +46,7 @@ export const PageHeader: FC = () => {
         // },
         {
             href: routes.exploreProjects(),
-            title: t('Explore'),
+            title: tr('Explore'),
         },
     ];
 
@@ -57,7 +56,7 @@ export const PageHeader: FC = () => {
         } else {
             signIn();
         }
-    }, [user, userSettings, user]);
+    }, [user, userSettings, signIn]);
 
     return (
         <Header
