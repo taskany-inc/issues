@@ -6,7 +6,7 @@ import { Text, Link, nullable } from '@taskany/bricks';
 import { Goal, Project } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
 
-import { GoalListItem } from './GoalListItem';
+import { GoalListItem } from './GoalListItem/GoalListItem';
 import { PageSep } from './PageSep';
 import { ProjectTitleList } from './ProjectTitleList';
 

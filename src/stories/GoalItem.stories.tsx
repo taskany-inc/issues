@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { GoalListItem } from '../components/GoalListItem';
+import { GoalListItem } from '../components/GoalListItem/GoalListItem';
 import { Tag } from '../../graphql/@generated/genql';
 
 export default {

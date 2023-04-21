@@ -1,20 +1,20 @@
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import styled from 'styled-components';
 import { gapS, gray6, gray10 } from '@taskany/colors';
 import { BulbOnIcon, Link, QuestionIcon } from '@taskany/bricks';
 
-import { gql } from '../utils/gql';
-import { Activity } from '../../graphql/@generated/genql';
-import { routes, useRouter } from '../hooks/router';
-import { usePageContext } from '../hooks/usePageContext';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
+import { gql } from '../../utils/gql';
+import { Activity } from '../../../graphql/@generated/genql';
+import { routes, useRouter } from '../../hooks/router';
+import { usePageContext } from '../../hooks/usePageContext';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
+import { Tip } from '../Tip';
+import { Keyboard } from '../Keyboard';
+import { GoalForm, GoalFormType } from '../GoalForm/GoalForm';
 
-import { Tip } from './Tip';
-import { Keyboard } from './Keyboard';
-import { GoalForm, GoalFormType } from './GoalForm';
+import { tr } from './GoalCreateForm.i18n';
 
 const StyledFormBottom = styled.div`
     display: flex;
@@ -25,7 +25,6 @@ const StyledFormBottom = styled.div`
 `;
 
 const GoalCreateForm: React.FC = () => {
-    const t = useTranslations('goals.new');
     const router = useRouter();
     const { locale, user } = usePageContext();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
@@ -57,9 +56,9 @@ const GoalCreateForm: React.FC = () => {
         });
 
         toast.promise(promise, {
-            error: t('Something went wrong 😿'),
-            loading: t('We are creating new goal'),
-            success: t('Voila! Goal is here 🎉'),
+            error: tr('Something went wrong 😿'),
+            loading: tr('We are creating new goal'),
+            success: tr('Voila! Goal is here 🎉'),
         });
 
         const res = await promise;
@@ -86,17 +85,17 @@ const GoalCreateForm: React.FC = () => {
     return (
         <GoalForm
             busy={busy}
-            i18nKeyset="goals.new"
-            formTitle={t('Create new goal')}
+            formTitle={tr('New goal')}
             owner={{ id: user?.activityId, user } as Partial<Activity>}
             parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}
+            actionBtnText={tr('Create goal')}
         >
             <StyledFormBottom>
-                <Tip title={t('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
-                    {t.rich('Press key to create the goal', {
-                        key: () => <Keyboard command enter />,
+                <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                    {tr.raw('Press key to create the goal', {
+                        key: <Keyboard command enter />,
                     })}
                 </Tip>
 

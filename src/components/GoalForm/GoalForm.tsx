@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
@@ -18,39 +17,40 @@ import {
     Tag,
 } from '@taskany/bricks';
 
-import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../graphql/@generated/genql';
-import { estimatedMeta } from '../utils/dateTime';
-import { submitKeys } from '../utils/hotkeys';
-import { errorsProvider } from '../utils/forms';
-import { usePageContext } from '../hooks/usePageContext';
-import { Priority } from '../types/priority';
+import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../../graphql/@generated/genql';
+import { estimatedMeta } from '../../utils/dateTime';
+import { submitKeys } from '../../utils/hotkeys';
+import { errorsProvider } from '../../utils/forms';
+import { usePageContext } from '../../hooks/usePageContext';
+import { Priority } from '../../types/priority';
+import { UserComboBox } from '../UserComboBox';
+import { GoalParentComboBox } from '../GoalParentComboBox';
+import { EstimateComboBox } from '../EstimateComboBox';
+import { TagComboBox } from '../TagComboBox/TagComboBox';
+import { StateDropdown } from '../StateDropdown';
+import { PriorityDropdown } from '../PriorityDropdown';
 
-import { UserComboBox } from './UserComboBox';
-import { GoalParentComboBox } from './GoalParentComboBox';
-import { EstimateComboBox } from './EstimateComboBox';
-import { TagComboBox } from './TagComboBox';
-import { StateDropdown } from './StateDropdown';
-import { PriorityDropdown } from './PriorityDropdown';
+import { tr } from './GoalForm.i18n';
 
 const tagsLimit = 5;
 
-const schemaProvider = (t: (key: string) => string) =>
+const schemaProvider = () =>
     z.object({
         title: z
             .string({
-                required_error: t("Goal's title is required"),
-                invalid_type_error: t("Goal's title must be a string"),
+                required_error: tr("Goal's title is required"),
+                invalid_type_error: tr("Goal's title must be a string"),
             })
             .min(10, {
-                message: t("Goal's title must be longer than 10 symbols"),
+                message: tr("Goal's description must be longer than 10 symbols"),
             }),
         description: z
             .string({
-                required_error: t("Goal's description is required"),
-                invalid_type_error: t("Goal's description must be a string"),
+                required_error: tr("Goal's description is required"),
+                invalid_type_error: tr("Goal's description must be a string"),
             })
             .min(10, {
-                message: t("Goal's description must be longer than 10 symbols"),
+                message: tr("Goal's description must be longer than 10 symbols"),
             }),
         owner: z.object({
             id: z.string(),
@@ -62,8 +62,8 @@ const schemaProvider = (t: (key: string) => string) =>
                 flowId: z.string(),
             },
             {
-                invalid_type_error: t("Goal's project or team are required"),
-                required_error: t("Goal's project or team are required"),
+                invalid_type_error: tr("Goal's project or team are required"),
+                required_error: tr("Goal's project or team are required"),
             },
         ),
         state: z.object({
@@ -92,8 +92,8 @@ const schemaProvider = (t: (key: string) => string) =>
 export type GoalFormType = z.infer<ReturnType<typeof schemaProvider>>;
 
 interface GoalFormProps {
+    actionBtnText: string;
     formTitle: string;
-    i18nKeyset: string;
     owner?: Partial<Activity>;
     title?: string;
     description?: string;
@@ -121,6 +121,7 @@ const StyledTagsContainer = styled.div<{ focused?: boolean }>`
 
 export const GoalForm: React.FC<GoalFormProps> = ({
     formTitle,
+    actionBtnText,
     title,
     description,
     owner,
@@ -129,13 +130,11 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     state,
     priority,
     estimate,
-    i18nKeyset,
     busy,
     children,
     onSumbit,
 }) => {
-    const t = useTranslations(i18nKeyset);
-    const schema = schemaProvider(t);
+    const schema = schemaProvider();
     const { locale } = usePageContext();
     const [descriptionFocused, setDescriptionFocused] = useState(false);
 
@@ -199,7 +198,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                     <FormInput
                         {...register('title')}
                         error={errorsResolver('title')}
-                        placeholder={t("Goal's title")}
+                        placeholder={tr("Goal's title")}
                         autoFocus
                         flat="bottom"
                         disabled={busy}
@@ -211,7 +210,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         render={({ field }) => (
                             <FormEditor
                                 flat="both"
-                                placeholder={t('And its description')}
+                                placeholder={tr('And its description')}
                                 error={errorsResolver(field.name)}
                                 onFocus={onDescriptionFocus}
                                 onCancel={onDescriptionCancel}
@@ -234,8 +233,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <GoalParentComboBox
-                                        text={t('Enter project or team title')}
-                                        placeholder={t('Enter project or team title')}
+                                        text={tr('Enter project or team title')}
+                                        placeholder={tr('Enter project or team title')}
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
                                         {...field}
@@ -248,7 +247,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <PriorityDropdown
-                                        text={t('Priority.Priority')}
+                                        text={tr('Priority')}
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
                                         {...field}
@@ -261,8 +260,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <UserComboBox
-                                        text={t('Assign')}
-                                        placeholder={t('Enter name or email')}
+                                        text={tr('Assign')}
+                                        placeholder={tr('Enter name or email')}
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
                                         {...field}
@@ -275,8 +274,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <EstimateComboBox
-                                        placeholder={t('Date input mask placeholder')}
-                                        mask={t('Date input mask')}
+                                        placeholder={tr('Date input mask placeholder')}
+                                        mask={tr('Date input mask')}
                                         defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
@@ -290,7 +289,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <StateDropdown
-                                        text={t('State')}
+                                        text={tr('State')}
                                         flowId={parentWatcher?.flowId}
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
@@ -305,7 +304,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 render={({ field }) => (
                                     <TagComboBox
                                         disabled={busy || (tagsWatcher || []).length >= tagsLimit}
-                                        placeholder={t('Enter tag title')}
+                                        placeholder={tr('Enter tag title')}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />
@@ -318,7 +317,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 disabled={busy}
                                 outline={!isValid}
                                 type="submit"
-                                text={t('Submit')}
+                                text={actionBtnText}
                             />
                         </FormAction>
                     </FormActions>
