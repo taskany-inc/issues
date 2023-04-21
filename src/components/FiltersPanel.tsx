@@ -103,7 +103,16 @@ const StyledFiltersAction = styled.div`
     padding-left: ${gapS};
     padding-right: ${gapS};
     vertical-align: middle;
+
     cursor: pointer;
+
+    color: ${gray9};
+
+    :hover {
+        color: ${textColor};
+    }
+
+    transition: color 200ms ease-in-out;
 `;
 
 export const FiltersPanel: React.FC<FiltersPanelProps> = ({
@@ -247,13 +256,13 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
                             {Boolean(queryString) && !currentPreset && (
                                 <StyledFiltersAction onClick={onFilterStar}>
-                                    <StarIcon size="s" color={gray9} noWrap />
+                                    <StarIcon size="s" noWrap />
                                 </StyledFiltersAction>
                             )}
 
                             {currentPreset && (
                                 <StyledFiltersAction onClick={onFilterStar}>
-                                    <StarFilledIcon size="s" color={gray9} noWrap />
+                                    <StarFilledIcon size="s" noWrap />
                                 </StyledFiltersAction>
                             )}
                         </StyledFiltersMenu>
