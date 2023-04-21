@@ -1,5 +1,4 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
-import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { gapL, gapM } from '@taskany/colors';
@@ -16,18 +15,25 @@ import {
     FormTitle,
 } from '@taskany/bricks';
 
-import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../graphql/@generated/genql';
-import { createFetcher } from '../utils/createFetcher';
-import { usePageContext } from '../hooks/usePageContext';
+import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../../graphql/@generated/genql';
+import { createFetcher } from '../../utils/createFetcher';
+import { usePageContext } from '../../hooks/usePageContext';
+import { IssueDependenciesList } from '../IssueDependenciesList/IssueDependenciesList';
+import { GoalMenuItem } from '../GoalMenuItem';
 
-import { IssueDependenciesList } from './IssueDependenciesList';
-import { GoalMenuItem } from './GoalMenuItem';
+import { tr } from './IssueDependenciesForm.i18n';
 
 interface IssueDependenciesFormProps {
     issue: Goal;
 
     onChange?: (input: GoalDependencyToggleInput) => void;
 }
+
+const StyledMenuItem = styled(MenuItem)`
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+`;
 
 const StyledCompletion = styled.div`
     position: relative;
@@ -107,9 +113,14 @@ const goalsFetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
+const map: Record<Dependency, string> = {
+    blocks: tr('blocks'),
+    dependsOn: tr('dependsOn'),
+    relatedTo: tr('relatedTo'),
+};
+
 const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
     const { user } = usePageContext();
-    const t = useTranslations('IssueDependencies');
 
     const [kind, setKind] = useState<Dependency>();
     const [target, setTarget] = useState<Goal>();
@@ -120,7 +131,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
     const { data: depsKindData } = useSWR('depsKind', () => depsKindfetcher(user));
 
     const onDependencyDelete = useCallback(
-        (dependency: keyof typeof enumDependency) => (id: string) => {
+        (id: string, dependency: keyof typeof enumDependency) => {
             onChange &&
                 onChange({
                     id: issue.id,
@@ -172,18 +183,11 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
     return (
         <>
             <ModalHeader>
-                <FormTitle>{t('Edit dependencies')}</FormTitle>
+                <FormTitle>{tr('Edit dependencies')}</FormTitle>
             </ModalHeader>
 
             <ModalContent>
-                {Object.values(enumDependency).map((dependency) => (
-                    <IssueDependenciesList
-                        key={dependency}
-                        title={t(dependency)}
-                        dependencies={issue[dependency]}
-                        onDelete={onDependencyDelete(dependency)}
-                    />
-                ))}
+                <IssueDependenciesList issue={issue} onDelete={onDependencyDelete} />
 
                 <StyledCompletion>
                     <ComboBox
@@ -197,7 +201,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                         renderInput={(props) => (
                             <FormInput
                                 autoFocus
-                                placeholder={t('Add dependency')}
+                                placeholder={tr('Add dependency')}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                     setQuery(e.currentTarget.value);
                                     setCompletionVisible(true);
@@ -233,26 +237,26 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                                             <ArrowDownSmallIcon size="s" noWrap />
                                         )
                                     }
-                                    text={kind ? t(kind) : undefined}
+                                    text={kind ? map[kind] : undefined}
                                     ref={props.ref}
                                     onClick={props.onClick}
                                 />
                             )}
                             renderItem={(props) => (
-                                <MenuItem
+                                <StyledMenuItem
                                     key={props.item}
                                     focused={props.cursor === props.index}
                                     selected={props.item === kind}
                                     onClick={props.onClick}
                                     view="primary"
                                 >
-                                    {t(props.item)}
-                                </MenuItem>
+                                    {map[props.item as Dependency]}
+                                </StyledMenuItem>
                             )}
                         />
                         <Button
                             disabled={disabled || !kind}
-                            text={t('Add')}
+                            text={tr('Add one')}
                             view="primary"
                             brick="left"
                             onClick={onSubmit}

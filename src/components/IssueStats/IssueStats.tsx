@@ -1,13 +1,14 @@
 import styled from 'styled-components';
-import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { gapXs, gray8 } from '@taskany/colors';
 import { Dot, Text, Link, nullable } from '@taskany/bricks';
 
-import { pluralize } from '../utils/pluralize';
-import { usePageContext } from '../hooks/usePageContext';
+import { pluralize } from '../../utils/pluralize';
+import { usePageContext } from '../../hooks/usePageContext';
 
-const RelativeTime = dynamic(() => import('./RelativeTime'));
+import { tr } from './IssueStats.i18n';
+
+const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 
 interface IssueStatsProps {
     updatedAt: string;
@@ -20,7 +21,6 @@ const StyledIssueInfo = styled.span`
 `;
 
 export const IssueStats: React.FC<IssueStatsProps> = ({ comments, updatedAt, mode }) => {
-    const t = useTranslations('IssueStats');
     const { locale } = usePageContext();
 
     return (
@@ -35,9 +35,9 @@ export const IssueStats: React.FC<IssueStatsProps> = ({ comments, updatedAt, mod
                             {pluralize({
                                 locale,
                                 count: comments,
-                                one: t('comments.one'),
-                                few: t('comments.few'),
-                                many: t('comments.many'),
+                                one: tr('one'),
+                                few: tr('few'),
+                                many: tr('many'),
                             })}
                         </Link>
                     </>

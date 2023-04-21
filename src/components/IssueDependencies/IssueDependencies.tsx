@@ -1,17 +1,17 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { gapS, gray8 } from '@taskany/colors';
 import { Text, Link, nullable } from '@taskany/bricks';
 
-import { enumDependency, Goal } from '../../graphql/@generated/genql';
-import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
+import { Goal } from '../../../graphql/@generated/genql';
+import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
+import { IssueDependenciesList } from '../IssueDependenciesList/IssueDependenciesList';
 
-import { IssueDependenciesList } from './IssueDependenciesList';
+import { tr } from './IssueDependencies.i18n';
 
-const IssueDependenciesForm = dynamic(() => import('./IssueDependenciesForm'));
-const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
+const IssueDependenciesForm = dynamic(() => import('../IssueDependenciesForm/IssueDependenciesForm'));
+const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 interface IssueDependenciesProps {
     issue: Goal;
@@ -24,7 +24,6 @@ const StyledActionNotice = styled.div`
 `;
 
 const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onChange }) => {
-    const t = useTranslations('IssueDependencies');
     const issueHasDeps = issue.dependsOn?.length || issue.blocks?.length || issue.relatedTo?.length;
 
     const onDependenciesEdit = useCallback(() => {
@@ -38,24 +37,15 @@ const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onChange }
             {!issueHasDeps && onChange ? (
                 <StyledActionNotice>
                     <Text size="s" color={gray8}>
-                        {t('Does issue have dependencies')}? —{' '}
+                        {tr('Does issue have dependencies')}? —{' '}
                         <Link inline onClick={onDependenciesEdit}>
-                            {t('Add one')}
+                            {tr('Add one')}
                         </Link>
                         .
                     </Text>
                 </StyledActionNotice>
             ) : (
-                <>
-                    {Object.values(enumDependency).map((dependency) => (
-                        <IssueDependenciesList
-                            key={dependency}
-                            title={t(dependency)}
-                            dependencies={issue[dependency]}
-                            onEdit={onChange ? onDependenciesEdit : undefined}
-                        />
-                    ))}
-                </>
+                <IssueDependenciesList issue={issue} onEdit={onChange ? onDependenciesEdit : undefined} />
             )}
 
             {nullable(onChange, () => (
