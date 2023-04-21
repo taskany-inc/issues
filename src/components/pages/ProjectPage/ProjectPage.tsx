@@ -10,6 +10,7 @@ import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
 import { createFilterKeys } from '../../../utils/hotkeys';
+import { Priority } from '../../../types/priority';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
@@ -402,7 +403,7 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, preset, params: {
                 <FiltersPanel
                     count={deepInfo?.meta?.count}
                     filteredCount={deepInfo?.goals?.length ?? 0}
-                    priority={deepInfo?.meta?.priority}
+                    priority={deepInfo?.meta?.priority as Priority[]}
                     states={deepInfo?.meta?.states}
                     users={deepInfo?.meta?.owners}
                     tags={deepInfo?.meta?.tags}

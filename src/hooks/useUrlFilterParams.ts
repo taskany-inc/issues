@@ -3,9 +3,10 @@ import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
 
 import { Filter, Tag } from '../../graphql/@generated/genql';
+import { Priority } from '../types/priority';
 
 export interface QueryState {
-    priorityFilter: string[];
+    priorityFilter: Priority[];
     stateFilter: string[];
     tagsFilter: string[];
     estimateFilter: string[];
@@ -18,7 +19,7 @@ export interface QueryState {
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
 export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
-    priorityFilter: parseQueryParam(query.priority?.toString()),
+    priorityFilter: parseQueryParam(query.priority?.toString()) as Priority[],
     stateFilter: parseQueryParam(query.state?.toString()),
     tagsFilter: parseQueryParam(query.tags?.toString()),
     estimateFilter: parseQueryParam(query.estimates?.toString()),

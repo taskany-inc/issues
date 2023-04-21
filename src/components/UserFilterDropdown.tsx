@@ -9,7 +9,7 @@ import { UserMenuItem } from './UserMenuItem';
 interface UserFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
     value?: Array<string>;
-    activity?: Array<Activity | undefined>;
+    activity?: Array<Activity>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
     onChange?: (selected: string[]) => void;
