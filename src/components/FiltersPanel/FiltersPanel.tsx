@@ -1,22 +1,22 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { useTranslations } from 'next-intl';
 import { gapM, gapS, gray5, gray6, gray9, textColor } from '@taskany/colors';
 import { Badge, Text, Input, StarIcon, nullable, StarFilledIcon } from '@taskany/bricks';
 
-import { Filter } from '../../graphql/@generated/genql';
-import type { QueryState } from '../hooks/useUrlFilterParams';
+import { Filter } from '../../../graphql/@generated/genql';
+import type { QueryState } from '../../hooks/useUrlFilterParams';
+import { PageContent } from '../Page';
+import { StateFilterDropdown } from '../StateFilterDropdown';
+import { UserFilterDropdown } from '../UserFilterDropdown';
+import { TagsFilterDropdown } from '../TagsFilterDropdown';
+import { LimitFilterDropdown } from '../LimitFilterDropdown';
+import { PriorityFilterDropdown } from '../PriorityFilterDropdown';
+import { EstimateFilterDropdown } from '../EstimateFilterDropdown';
+import { ProjectFilterDropdown } from '../ProjectFilterDropdown';
+import { PresetFilterDropdown } from '../PresetFilterDropdown';
+import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
 
-import { PageContent } from './Page';
-import { StateFilterDropdown } from './StateFilterDropdown';
-import { UserFilterDropdown } from './UserFilterDropdown';
-import { TagsFilterDropdown } from './TagsFilterDropdown';
-import { LimitFilterDropdown } from './LimitFilterDropdown';
-import { PriorityFilterDropdown } from './PriorityFilterDropdown';
-import { EstimateFilterDropdown } from './EstimateFilterDropdown';
-import { ProjectFilterDropdown } from './ProjectFilterDropdown';
-import { PresetFilterDropdown } from './PresetFilterDropdown';
-import { FiltersPanelApplied } from './FiltersPanelApplied/FiltersPanelApplied';
+import { tr } from './FiltersPanel.i18n';
 
 interface FiltersPanelProps {
     queryState: QueryState;
@@ -141,8 +141,6 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     onPresetChange,
     onFilterStar,
 }) => {
-    const t = useTranslations('FiltersPanel');
-
     const onSearchInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             onSearchChange(e.currentTarget.value);
@@ -154,7 +152,11 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
         <>
             <StyledFiltersPanel loading={loading}>
                 <StyledFiltersContent>
-                    <Input placeholder={t('Search')} value={queryState.fulltextFilter} onChange={onSearchInputChange} />
+                    <Input
+                        placeholder={tr('Search')}
+                        value={queryState.fulltextFilter}
+                        onChange={onSearchInputChange}
+                    />
 
                     <StyledFiltersMenuWrapper>
                         {nullable(count, () => (
@@ -177,7 +179,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 onPriorityChange &&
                                 nullable(priority, (pr) => (
                                     <PriorityFilterDropdown
-                                        text={t('Priority')}
+                                        text={tr('Priority')}
                                         priority={pr}
                                         value={queryState.priorityFilter}
                                         onChange={onPriorityChange}
@@ -188,7 +190,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 onStateChange &&
                                 nullable(states, (st) => (
                                     <StateFilterDropdown
-                                        text={t('State')}
+                                        text={tr('State')}
                                         states={st}
                                         value={queryState.stateFilter}
                                         onChange={onStateChange}
@@ -199,7 +201,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 onUserChange &&
                                 nullable(users, (u) => (
                                     <UserFilterDropdown
-                                        text={t('Owner')}
+                                        text={tr('Owner')}
                                         activity={u}
                                         value={queryState.ownerFilter}
                                         onChange={onUserChange}
@@ -210,7 +212,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 onProjectChange &&
                                 nullable(projects, (pr) => (
                                     <ProjectFilterDropdown
-                                        text={t('Project')}
+                                        text={tr('Project')}
                                         projects={pr}
                                         value={queryState.projectFilter}
                                         onChange={onProjectChange}
@@ -221,7 +223,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 onTagChange &&
                                 nullable(tags, (ta) => (
                                     <TagsFilterDropdown
-                                        text={t('Tags')}
+                                        text={tr('Tags')}
                                         tags={ta}
                                         value={queryState.tagsFilter}
                                         onChange={onTagChange}
@@ -232,7 +234,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 onEstimateChange &&
                                 nullable(estimates, (e) => (
                                     <EstimateFilterDropdown
-                                        text={t('Estimate')}
+                                        text={tr('Estimate')}
                                         estimates={e}
                                         value={queryState.estimateFilter}
                                         onChange={onEstimateChange}
@@ -241,13 +243,13 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
                             {onLimitChange &&
                                 nullable(queryState.limitFilter, (lf) => (
-                                    <LimitFilterDropdown text={t('Limit')} value={lf} onChange={onLimitChange} />
+                                    <LimitFilterDropdown text={tr('Limit')} value={lf} onChange={onLimitChange} />
                                 ))}
 
                             {Boolean(presets?.length) &&
                                 nullable(presets, (pr) => (
                                     <PresetFilterDropdown
-                                        text={'Preset'}
+                                        text={tr('Preset')}
                                         presets={pr}
                                         value={currentPreset ? currentPreset.id : undefined}
                                         onChange={onPresetChange}
@@ -286,5 +288,3 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
         </>
     );
 };
-
-FiltersPanel.whyDidYouRender = true;
