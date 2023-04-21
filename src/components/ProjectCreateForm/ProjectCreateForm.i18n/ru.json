@@ -1,0 +1,21 @@
+{
+    "New project": "Новый проект",
+    "New team": "Новая команда",
+    "Create project": "Создать проект",
+    "Create team": "Создать команду",
+    "Title": "Название",
+    "Short description": "Короткое описание",
+    "Pro tip!": "Держи совет!",
+    "Press key to create project": "Нажми {key} чтобы создать проект.",
+    "Press key to create team": "Нажми {key} чтобы создать команду.",
+    "Key already exists": "Ключ {key} уже существует. Попробуй другой.",
+    "Perfect! Issues and goals will look like": "{perfect} Задачи и цели будут выглядеть примерно так: {issueKeyOne}, {issueKeyTwo}.",
+    "Key must be 3 or longer characters": "Ключ не может быть короче 3 символов",
+    "Assign": "Ответственный",
+    "Enter name or email": "Имя или почта",
+    "Flow": "Флоу",
+    "Flow or state title": "Модель или статус",
+    "issue key one": "#{key}-42",
+    "issue key two": "#{key}-911",
+    "Perfect": "Супер!"
+}
