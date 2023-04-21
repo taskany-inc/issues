@@ -1,0 +1,11 @@
+{
+    "Edit dependencies": "Зависимости",
+    "dependsOn": "Зависит от",
+    "blocks": "Заблокировано",
+    "relatedTo": "Связано",
+    "Does issue have dependencies": "Ни от чего не зависит",
+    "Add one": "Добавить",
+    "Add dependency": "Добавить зависимость",
+    "Kind": "Тип зависимости",
+    "Add": "Добавить"
+}

@@ -1,15 +1,15 @@
 import React, { useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { nullable } from '@taskany/bricks';
 
-import { Goal } from '../../graphql/@generated/genql';
-import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
+import { Goal } from '../../../graphql/@generated/genql';
+import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
+import { IssueParticipantsForm } from '../IssueParticipantsForm/IssueParticipantsForm';
+import { IssueParticipantsList } from '../IssueParticipantsList';
 
-import { IssueParticipantsForm } from './IssueParticipantsForm';
-import { IssueParticipantsList } from './IssueParticipantsList';
+import { tr } from './IssueParticipants.i18n';
 
-const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
+const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 interface IssueParticipantsProps {
     issue: Goal;
@@ -18,8 +18,6 @@ interface IssueParticipantsProps {
 }
 
 const IssueParticipants: React.FC<IssueParticipantsProps> = ({ issue, onChange }) => {
-    const t = useTranslations('IssueParticipants');
-
     const onParticipantsEdit = useCallback(() => {
         if (onChange) {
             dispatchModalEvent(ModalEvent.IssueParticipantsModal)();
@@ -29,7 +27,7 @@ const IssueParticipants: React.FC<IssueParticipantsProps> = ({ issue, onChange }
     return (
         <>
             <IssueParticipantsList
-                title={t('Participants')}
+                title={tr('Participants')}
                 participants={issue.participants}
                 onEdit={onChange ? onParticipantsEdit : undefined}
             />

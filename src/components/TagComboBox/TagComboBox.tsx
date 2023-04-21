@@ -3,13 +3,14 @@ import React, { useCallback, useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
-import { useTranslations } from 'next-intl';
 import { Button, ComboBox, Input, Tag, TagIcon } from '@taskany/bricks';
 
-import { createFetcher } from '../utils/createFetcher';
-import { Tag as TagModel } from '../../graphql/@generated/genql';
-import { gql } from '../utils/gql';
-import { usePageContext } from '../hooks/usePageContext';
+import { createFetcher } from '../../utils/createFetcher';
+import { Tag as TagModel } from '../../../graphql/@generated/genql';
+import { gql } from '../../utils/gql';
+import { usePageContext } from '../../hooks/usePageContext';
+
+import { tr } from './TagComboBox.i18n';
 
 interface TagComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -46,7 +47,6 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
         const [inputState, setInputState] = useState(query);
         const [tags, setTags] = useState(value);
 
-        const t = useTranslations('TagCompletion');
         const { data } = useSWR(inputState, (q) => fetcher(user, q));
 
         const createTag = useCallback(async () => {
@@ -63,9 +63,9 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
             });
 
             toast.promise(promise, {
-                error: t('Something went wrong 😿'),
-                loading: t('We are creating new tag'),
-                success: t('Voila! Tag is here 🎉'),
+                error: tr('Something went wrong 😿'),
+                loading: tr('We are creating new tag'),
+                success: tr('Voila! Tag is here 🎉'),
             });
 
             const res = await promise;
@@ -77,7 +77,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                 setInputState('');
                 setCompletionVisibility(false);
             }
-        }, [inputState, onChange, t, tags]);
+        }, [inputState, onChange, tags]);
 
         const onTagClick = useCallback(
             async (tag: TagModel) => {

@@ -2,17 +2,25 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { CleanButton, nullable } from '@taskany/bricks';
 
-import { Goal } from '../../graphql/@generated/genql';
+import { Goal, enumDependency } from '../../../graphql/@generated/genql';
+import { IssueListItem } from '../IssueListItem';
+import { IssueMeta } from '../IssueMeta';
 
-import { IssueListItem } from './IssueListItem';
-import { IssueMeta } from './IssueMeta';
+import { tr } from './IssueDependenciesList.i18n';
 
-interface IssueDependenciesListProps {
+interface IssueDependenciesListItemProps {
     title: string;
     dependencies?: Array<Goal | undefined>;
+    type: keyof typeof enumDependency;
 
     onEdit?: () => void;
-    onDelete?: (id: string) => void;
+    onDelete?: (id: Goal['id'], type: IssueDependenciesListItemProps['type']) => void;
+}
+
+interface IssueDependenciesListPropsV2 {
+    issue: Goal;
+    onEdit?: () => void;
+    onDelete?: (id: Goal['id'], type: IssueDependenciesListItemProps['type']) => void;
 }
 
 const StyledCleanButton = styled(CleanButton)`
@@ -33,17 +41,18 @@ const StyledDependency = styled.span`
     }
 `;
 
-export const IssueDependenciesList: React.FC<IssueDependenciesListProps> = ({
+export const IssueDependenciesListItem: React.FC<IssueDependenciesListItemProps> = ({
     dependencies,
+    type,
     title,
     onDelete,
     onEdit,
 }) => {
     const onDependencyDelete = useCallback(
         (id: string) => () => {
-            onDelete && onDelete(id);
+            onDelete && onDelete(id, type);
         },
-        [onDelete],
+        [onDelete, type],
     );
 
     return (
@@ -64,6 +73,29 @@ export const IssueDependenciesList: React.FC<IssueDependenciesListProps> = ({
                         )),
                     )}
                 </IssueMeta>
+            ))}
+        </>
+    );
+};
+
+const depsLinkType = {
+    [enumDependency.blocks]: tr('blocks'),
+    [enumDependency.dependsOn]: tr('dependsOn'),
+    [enumDependency.relatedTo]: tr('relatedTo'),
+};
+
+export const IssueDependenciesList: React.FC<IssueDependenciesListPropsV2> = ({ issue, onDelete, onEdit }) => {
+    return (
+        <>
+            {Object.values(enumDependency).map((dependency) => (
+                <IssueDependenciesListItem
+                    key={dependency}
+                    type={dependency}
+                    title={depsLinkType[dependency]}
+                    dependencies={issue[dependency]}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                />
             ))}
         </>
     );

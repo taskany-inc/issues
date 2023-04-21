@@ -1,16 +1,16 @@
 import { useCallback, useMemo, useState, ChangeEvent } from 'react';
-import { useTranslations } from 'next-intl';
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { gapL, gapM } from '@taskany/colors';
 import { ComboBox, FormInput, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
 
-import { Activity, Goal } from '../../graphql/@generated/genql';
-import { createFetcher } from '../utils/createFetcher';
-import { usePageContext } from '../hooks/usePageContext';
+import { Activity, Goal } from '../../../graphql/@generated/genql';
+import { createFetcher } from '../../utils/createFetcher';
+import { usePageContext } from '../../hooks/usePageContext';
+import { IssueParticipantsList } from '../IssueParticipantsList';
+import { UserMenuItem } from '../UserMenuItem';
 
-import { IssueParticipantsList } from './IssueParticipantsList';
-import { UserMenuItem } from './UserMenuItem';
+import { tr } from './IssueParticipantsForm.i18n';
 
 interface IssueParticipantsFormProps {
     issue: Goal;
@@ -48,7 +48,6 @@ const fetcher = createFetcher((_, query: string, filter?: string[]) => ({
 
 export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ issue, onChange }) => {
     const { user } = usePageContext();
-    const t = useTranslations('IssueParticipants');
 
     const [query, setQuery] = useState('');
     const [completionVisible, setCompletionVisible] = useState(false);
@@ -81,12 +80,12 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ is
     return (
         <>
             <ModalHeader>
-                <FormTitle>{t('Edit participants')}</FormTitle>
+                <FormTitle>{tr('Edit participants')}</FormTitle>
             </ModalHeader>
 
             <ModalContent>
                 <IssueParticipantsList
-                    title={t('Participants')}
+                    title={tr('Participants')}
                     participants={issue.participants}
                     onDelete={onParticipantDelete}
                 />
@@ -101,7 +100,7 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ is
                         renderInput={(props) => (
                             <FormInput
                                 autoFocus
-                                placeholder={t('Add participants')}
+                                placeholder={tr('Add participants')}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                     setQuery(e.currentTarget.value);
                                     setCompletionVisible(true);
