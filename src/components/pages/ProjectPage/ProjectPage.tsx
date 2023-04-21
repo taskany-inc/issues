@@ -3,7 +3,7 @@ import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWR, { unstable_serialize } from 'swr';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import { nullable } from '@taskany/bricks';
+import { Button, nullable } from '@taskany/bricks';
 
 import { Filter, Goal, Project, ProjectDeepOutput } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
@@ -273,6 +273,7 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, preset, params: {
         setOwnerFilter,
         setProjectFilter,
         setFulltextFilter,
+        resetQueryState,
         setPreset,
     } = useUrlFilterParams({
         preset,
@@ -423,7 +424,9 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, preset, params: {
                     onEstimateChange={setEstimateFilter}
                     onPresetChange={setPreset}
                     onFilterStar={onFilterStar}
-                />
+                >
+                    {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
+                </FiltersPanel>
 
                 <PageContent>
                     {groups?.map(
