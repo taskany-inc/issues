@@ -99,6 +99,18 @@ export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
         [pushNewState, queryState],
     );
 
+    const resetQueryState = useCallback(() => {
+        pushNewState({
+            priorityFilter: [],
+            stateFilter: [],
+            ownerFilter: [],
+            projectFilter: [],
+            tagsFilter: [],
+            estimateFilter: [],
+            fulltextFilter: '',
+        });
+    }, [pushNewState]);
+
     const setTagsFilterOutside = useCallback(
         (t: Tag): MouseEventHandler<HTMLDivElement> =>
             (e) => {
@@ -150,6 +162,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
         queryString,
         currentPreset,
         setTagsFilterOutside,
+        resetQueryState,
         setPreset,
         ...setters,
     };
