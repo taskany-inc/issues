@@ -37,7 +37,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
     const queryState = useMemo<QueryState>(() => parseFilterValues(query), [query]);
     const queryString = router.asPath.split('?')[1];
 
-    if (prevPreset !== preset) {
+    if (prevPreset?.id !== preset?.id || prevPreset?._isStarred !== preset?._isStarred) {
         setPrevPreset(preset);
         setCurrentPreset(preset);
     }
