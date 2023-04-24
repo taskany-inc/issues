@@ -19,7 +19,6 @@ import {
 
 import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../../graphql/@generated/genql';
 import { estimatedMeta } from '../../utils/dateTime';
-import { submitKeys } from '../../utils/hotkeys';
 import { errorsProvider } from '../../utils/forms';
 import { usePageContext } from '../../hooks/usePageContext';
 import { Priority } from '../../types/priority';
@@ -194,7 +193,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
             </ModalHeader>
 
             <ModalContent>
-                <Form onSubmit={handleSubmit(onSumbit)} submitHotkey={submitKeys}>
+                <Form onSubmit={handleSubmit(onSumbit)}>
                     <FormInput
                         {...register('title')}
                         error={errorsResolver('title')}

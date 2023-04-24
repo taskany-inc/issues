@@ -13,7 +13,6 @@ import {
     ModalContent,
 } from '@taskany/bricks';
 
-import { submitKeys } from '../../utils/hotkeys';
 import { errorsProvider } from '../../utils/forms';
 import { CreateFormType, createSchema } from '../../schema/filter';
 import { Filter, FilterCreateInput } from '../../../graphql/@generated/genql';
@@ -74,7 +73,7 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
             </ModalHeader>
 
             <ModalContent>
-                <Form disabled={formBusy} submitHotkey={submitKeys} onSubmit={handleSubmit(onPending, onError)}>
+                <Form disabled={formBusy} onSubmit={handleSubmit(onPending, onError)}>
                     <FormInput
                         {...register('title')}
                         placeholder={tr('Title')}
