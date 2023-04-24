@@ -10,7 +10,6 @@ import {
     FormInput,
     FormActions,
     FormAction,
-    FormEditor,
     FormTitle,
     ModalContent,
     ModalHeader,
@@ -18,6 +17,7 @@ import {
 } from '@taskany/bricks';
 
 import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../../graphql/@generated/genql';
+import { FormEditor } from '../FormEditor/FormEditor';
 import { estimatedMeta } from '../../utils/dateTime';
 import { errorsProvider } from '../../utils/forms';
 import { usePageContext } from '../../hooks/usePageContext';

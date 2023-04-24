@@ -9,12 +9,12 @@ import {
     FormCard,
     FormAction,
     FormActions,
-    FormEditor,
     MarkdownIcon,
     QuestionIcon,
     nullable,
 } from '@taskany/bricks';
 
+import { FormEditor } from '../FormEditor/FormEditor';
 import { usePageContext } from '../../hooks/usePageContext';
 import { routes } from '../../hooks/router';
 import { Tip } from '../Tip';
