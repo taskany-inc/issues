@@ -67,6 +67,8 @@ input EstimateInput {
 }
 
 type Filter {
+  _isOwner: Boolean
+  _isStarred: Boolean
   activity: Activity
   activityId: String!
   createdAt: DateTime!
@@ -231,6 +233,7 @@ type Mutation {
   deleteComment(data: CommentDeleteInput!): Comment
   deleteFilter(data: FilterInput!): Filter
   deleteProject(data: ProjectDelete!): Project
+  toggleFilterStargizer(data: SubscriptionToggleInput!): Activity
   toggleGoalArchive(data: GoalArchiveInput!): Activity
   toggleGoalDependency(data: GoalDependencyToggleInput!): Goal
   toggleGoalStargizer(data: SubscriptionToggleInput!): Activity
