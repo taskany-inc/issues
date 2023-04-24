@@ -1,7 +1,7 @@
 import { gql } from '../utils/gql';
 import { notifyPromise } from '../utils/notifyPromise';
 import { CreateFormType } from '../schema/filter';
-import { FilterInput } from '../../graphql/@generated/genql';
+import { FilterInput, SubscriptionToggleInput } from '../../graphql/@generated/genql';
 
 export const useFilterResource = () => {
     const createFilter = (data: CreateFormType) =>
@@ -19,6 +19,25 @@ export const useFilterResource = () => {
             {
                 onPending: 'We are saving your filter...',
                 onSuccess: 'Voila! Saved successfully 🎉! Use and share it with teammates 😉',
+                onError: 'Something went wrong 😿',
+            },
+        );
+
+    const toggleFilterStar = (data: SubscriptionToggleInput) =>
+        notifyPromise(
+            gql.mutation({
+                toggleFilterStargizer: [
+                    {
+                        data,
+                    },
+                    {
+                        id: true,
+                    },
+                ],
+            }),
+            {
+                onPending: 'We are calling owner...',
+                onSuccess: data.direction ? 'Voila! You are stargizer now 🎉' : 'So sad! We will miss you',
                 onError: 'Something went wrong 😿',
             },
         );
@@ -44,6 +63,7 @@ export const useFilterResource = () => {
 
     return {
         createFilter,
+        toggleFilterStar,
         deleteFilter,
     };
 };

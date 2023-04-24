@@ -271,6 +271,10 @@ export const Filter = objectType({
         t.list.field('stargizers', { type: Activity });
         t.field(FilterModel.createdAt);
         t.field(FilterModel.updatedAt);
+
+        // calculated fields
+        t.boolean('_isStarred');
+        t.boolean('_isOwner');
     },
 });
 

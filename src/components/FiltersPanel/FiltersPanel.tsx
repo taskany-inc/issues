@@ -256,13 +256,14 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                     />
                                 ))}
 
-                            {Boolean(queryString) && !currentPreset && (
+                            {((Boolean(queryString) && !currentPreset) ||
+                                (currentPreset && !currentPreset._isOwner && !currentPreset._isStarred)) && (
                                 <StyledFiltersAction onClick={onFilterStar}>
                                     <StarIcon size="s" noWrap />
                                 </StyledFiltersAction>
                             )}
 
-                            {currentPreset && (
+                            {currentPreset && (currentPreset._isOwner || currentPreset._isStarred) && (
                                 <StyledFiltersAction onClick={onFilterStar}>
                                     <StarFilledIcon size="s" noWrap />
                                 </StyledFiltersAction>

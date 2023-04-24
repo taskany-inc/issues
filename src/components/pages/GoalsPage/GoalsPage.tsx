@@ -8,14 +8,15 @@ import { nullable, Button } from '@taskany/bricks';
 import { Filter, Goal, GoalsMetaOutput, Project } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
+import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
+import { createFilterKeys } from '../../../utils/hotkeys';
+import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
+import { useFilterResource } from '../../../hooks/useFilterResource';
 import { Priority } from '../../../types/priority';
 import { Page, PageContent } from '../../Page';
 import { CommonHeader } from '../../CommonHeader';
 import { FiltersPanel } from '../../FiltersPanel/FiltersPanel';
-import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../../GoalsGroup';
-import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
-import { createFilterKeys } from '../../../utils/hotkeys';
 import { PageTitle } from '../../PageTitle';
 
 import { tr } from './GoalsPage.i18n';
@@ -157,23 +158,29 @@ const filterFetcher = createFetcher((_, id = '') => ({
             description: true,
             mode: true,
             params: true,
+            _isOwner: true,
+            _isStarred: true,
         },
     ],
 }));
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, query }) => {
-        const { filter: preset } = query.filter ? await filterFetcher(user, query.filter) : { filter: null };
+        const presetData = query.filter ? await filterFetcher(user, query.filter) : { filter: null };
 
         return {
-            preset,
             fallback: {
                 [unstable_serialize(query)]: await fetcher(
                     user,
                     ...Object.values(
-                        parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
+                        parseFilterValues(
+                            presetData.filter
+                                ? Object.fromEntries(new URLSearchParams(presetData.filter.params))
+                                : query,
+                        ),
                     ),
                 ),
+                [unstable_serialize(query.filter)]: presetData,
             },
         };
     },
@@ -182,9 +189,18 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-export const GoalsPage = ({ user, ssrTime, locale, fallback, preset }: ExternalPageProps) => {
+export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps) => {
     const router = useRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
+    const { toggleFilterStar } = useFilterResource();
+
+    const { data: presetData, mutate: presetMutate } = useSWR(
+        unstable_serialize(router.query.filter),
+        (f: string) => filterFetcher(user, f),
+        {
+            fallback,
+        },
+    );
 
     const {
         currentPreset,
@@ -201,7 +217,7 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback, preset }: ExternalP
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset,
+        preset: presetData?.filter,
     });
 
     const { data, isLoading } = useSWR(
@@ -260,11 +276,21 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback, preset }: ExternalP
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
-    const onFilterStar = useCallback(() => {
-        currentPreset
-            ? dispatchModalEvent(ModalEvent.FilterDeleteModal)()
-            : dispatchModalEvent(ModalEvent.FilterCreateModal)();
-    }, [currentPreset]);
+    const onFilterStar = useCallback(async () => {
+        if (currentPreset) {
+            if (currentPreset._isOwner) {
+                dispatchModalEvent(ModalEvent.FilterDeleteModal)();
+            } else {
+                await toggleFilterStar({
+                    id: currentPreset.id,
+                    direction: !currentPreset._isStarred,
+                });
+                await presetMutate();
+            }
+        } else {
+            dispatchModalEvent(ModalEvent.FilterCreateModal)();
+        }
+    }, [currentPreset, toggleFilterStar, presetMutate]);
 
     const onFilterCreated = useCallback(
         (data: Partial<Filter>) => {

@@ -12,6 +12,7 @@ import { FiltersPanel } from '../../FiltersPanel/FiltersPanel';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { useFilterResource } from '../../../hooks/useFilterResource';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
 import { ProjectPageLayout } from '../../ProjectPageLayout/ProjectPageLayout';
 import { Page, PageContent } from '../../Page';
@@ -224,27 +225,31 @@ const filterFetcher = createFetcher((_, id = '') => ({
             description: true,
             mode: true,
             params: true,
+            _isOwner: true,
+            _isStarred: true,
         },
     ],
 }));
 
 export const getServerSideProps = declareSsrProps(
     async ({ user, params: { id }, query }) => {
-        const { filter: preset } = query.filter ? await filterFetcher(user, query.filter) : { filter: null };
+        const presetData = query.filter ? await filterFetcher(user, query.filter) : { filter: null };
 
         const ssrData = await fetcher(
             user,
             id,
             ...Object.values(
-                parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
+                parseFilterValues(
+                    presetData.filter ? Object.fromEntries(new URLSearchParams(presetData.filter.params)) : query,
+                ),
             ),
         );
 
         return ssrData.project
             ? {
-                  preset,
                   fallback: {
                       [unstable_serialize(query)]: ssrData,
+                      [unstable_serialize(query.filter)]: presetData,
                   },
               }
             : {
@@ -256,10 +261,19 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-export const ProjectPage = ({ user, locale, ssrTime, fallback, preset, params: { id } }: ExternalPageProps) => {
+export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
+    const { toggleFilterStar } = useFilterResource();
+
+    const { data: presetData, mutate: presetMutate } = useSWR(
+        unstable_serialize(nextRouter.query.filter),
+        (f: string) => filterFetcher(user, f),
+        {
+            fallback,
+        },
+    );
 
     const {
         currentPreset,
@@ -276,7 +290,7 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, preset, params: {
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset,
+        preset: presetData?.filter,
     });
 
     const { data, isLoading } = useSWR(
@@ -352,11 +366,21 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, preset, params: {
         setCurrentProjectCache(null);
     });
 
-    const onFilterStar = useCallback(() => {
-        currentPreset
-            ? dispatchModalEvent(ModalEvent.FilterDeleteModal)()
-            : dispatchModalEvent(ModalEvent.FilterCreateModal)();
-    }, [currentPreset]);
+    const onFilterStar = useCallback(async () => {
+        if (currentPreset) {
+            if (currentPreset._isOwner) {
+                dispatchModalEvent(ModalEvent.FilterDeleteModal)();
+            } else {
+                await toggleFilterStar({
+                    id: currentPreset.id,
+                    direction: !currentPreset._isStarred,
+                });
+                await presetMutate();
+            }
+        } else {
+            dispatchModalEvent(ModalEvent.FilterCreateModal)();
+        }
+    }, [currentPreset, toggleFilterStar, presetMutate]);
 
     const onFilterCreated = useCallback(
         (data: Partial<Filter>) => {
