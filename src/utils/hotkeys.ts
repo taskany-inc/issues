@@ -1,5 +1,3 @@
-import { KeyCode, KeyMod } from '@taskany/bricks';
-
 export const createFilterKeys = ['c f', 'с а'];
 export const createProjectKeys = ['c p', 'с з'];
 export const createGoalKeys = ['c g', 'с п'];
@@ -8,7 +6,6 @@ export const showHomeKeys = ['g h', 'п р'];
 export const showProjectsKeys = ['g p', 'п з'];
 export const showGoalsKeys = ['g g', 'п п'];
 export const inviteUserKeys = ['c u', 'с г'];
-export const submitKeys = [KeyMod.CtrlCmd, KeyCode.Enter];
 
 export function isEventTargetInputOrTextArea(eventTarget: EventTarget | null) {
     if (eventTarget === null) return false;

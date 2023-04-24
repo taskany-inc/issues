@@ -15,7 +15,6 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { submitKeys } from '../../utils/hotkeys';
 import { usePageContext } from '../../hooks/usePageContext';
 import { routes } from '../../hooks/router';
 import { Tip } from '../Tip';
@@ -103,7 +102,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
     return (
         <StyledCommentForm tabIndex={0}>
-            <Form onSubmit={onCommentSubmit} submitHotkey={submitKeys}>
+            <Form onSubmit={onCommentSubmit}>
                 <Controller
                     name="description"
                     control={control}

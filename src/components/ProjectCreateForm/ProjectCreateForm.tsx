@@ -26,7 +26,6 @@ import {
 
 import { createFetcher } from '../../utils/createFetcher';
 import { keyPredictor } from '../../utils/keyPredictor';
-import { submitKeys } from '../../utils/hotkeys';
 import { errorsProvider } from '../../utils/forms';
 import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
 import { routes, useRouter } from '../../hooks/router';
@@ -192,7 +191,7 @@ const ProjectCreateForm: React.FC = () => {
             </ModalHeader>
 
             <ModalContent>
-                <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined} submitHotkey={submitKeys}>
+                <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined}>
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
