@@ -43,10 +43,9 @@ export const PageContent = styled.div`
 `;
 
 export const PageActions = styled.div`
-    justify-self: right;
-    justify-items: end;
-
-    align-content: space-between;
+    display: flex;
+    align-items: start;
+    justify-content: right;
 
     > * + * {
         margin-left: ${gapS};
