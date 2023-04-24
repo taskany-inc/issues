@@ -9,6 +9,7 @@ import { Filter, Goal, Project, ProjectDeepOutput } from '../../../../graphql/@g
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { FiltersPanel } from '../../FiltersPanel/FiltersPanel';
+import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
 import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
@@ -16,10 +17,12 @@ import { ProjectPageLayout } from '../../ProjectPageLayout/ProjectPageLayout';
 import { Page, PageContent } from '../../Page';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../../GoalsGroup';
 import { PageTitle } from '../../PageTitle';
+import { Priority } from '../../../types/priority';
+import { createFilterKeys } from '../../../utils/hotkeys';
 
 import { tr } from './ProjectPage.i18n';
 
-const GoalPreview = dynamic(() => import('../../GoalPreview'));
+const GoalPreview = dynamic(() => import('../../GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('../../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../../FilterDeleteForm/FilterDeleteForm'));

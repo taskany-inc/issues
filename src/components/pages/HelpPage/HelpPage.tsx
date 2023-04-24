@@ -57,7 +57,6 @@ export async function getStaticProps({ params: { locale, slug } }: { params: { l
             stat,
             yml,
             menu,
-            i18n: (await import(`../../../../i18n/${locale}.json`)).default,
         },
         revalidate: 10,
     };
