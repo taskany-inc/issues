@@ -9,13 +9,13 @@ interface PageTitleProps {
 }
 
 const StyledText = styled(Text)`
-    cursor: pointer;
-
     transition: color 200ms ease-in-out;
 
     ${({ onClick }) =>
         onClick &&
         `
+            cursor: pointer;
+
             :hover {
                 color: ${gray7};
             }
