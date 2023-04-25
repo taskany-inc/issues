@@ -96,6 +96,9 @@ const fetcher = createFetcher(
                     comments: {
                         id: true,
                     },
+                    _count: {
+                        comments: true,
+                    },
                     createdAt: true,
                     updatedAt: true,
                 },
