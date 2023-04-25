@@ -348,7 +348,6 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { data }, { db, activity }) => {
             if (!activity) return null;
-            if (!data.projectId) return null;
 
             const actualGoal = await db.goal.findUnique({
                 where: { id: data.id },
@@ -376,7 +375,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
             }
 
             try {
-                if (actualGoal.projectId !== data.projectId) {
+                if (data.projectId && actualGoal.projectId !== data.projectId) {
                     const project = await db.project.findUnique({
                         where: { id: data.projectId },
                     });
