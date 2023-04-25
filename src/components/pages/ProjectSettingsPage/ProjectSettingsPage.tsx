@@ -82,6 +82,7 @@ const projectFetcher = createFetcher((_, id: string) => ({
                 id: true,
                 title: true,
             },
+            _isOwner: true,
         },
     ],
 }));
