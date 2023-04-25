@@ -1,7 +1,7 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import styled from 'styled-components';
@@ -297,6 +297,11 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
         })
         .join('');
 
+    const commentsRef = useRef<HTMLDivElement>(null);
+    const onCommentsClick = useCallback(() => {
+        commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, []);
+
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <IssueHeader>
@@ -320,7 +325,11 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
                         <StateSwitch state={s} flowId={project?.flowId} onClick={onGoalStateChange} />
                     ))}
 
-                    <IssueStats comments={goal.comments?.length ?? 0} updatedAt={goal.updatedAt} />
+                    <IssueStats
+                        comments={goal._count?.comments ?? 0}
+                        onCommentsClick={onCommentsClick}
+                        updatedAt={goal.updatedAt}
+                    />
                 </StyledIssueInfo>
 
                 <StyledIssueInfo align="right">
@@ -422,7 +431,7 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
                         </CardActions>
                     </Card>
 
-                    <ActivityFeed id="comments">
+                    <ActivityFeed ref={commentsRef}>
                         {goal.comments?.map((comment) =>
                             nullable(comment, (c: Comment) => (
                                 <CommentView
