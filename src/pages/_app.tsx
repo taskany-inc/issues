@@ -1,10 +1,15 @@
 import type { AppProps } from 'next/app';
 import '../../scripts/wdyr';
+import { PageLoadProgress } from '@taskany/bricks';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
 
-const App = ({ Component, pageProps }: AppProps) => {
+import { usePageLoad } from '../hooks/usePageLoad';
+
+const App = ({ Component, pageProps, router }: AppProps) => {
+    const pageLoadRef = usePageLoad(router);
+
     return (
         <>
             <Head>
@@ -13,6 +18,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
             <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
                 <ThemeProvider themes={['light', 'dark']}>
+                    <PageLoadProgress ref={pageLoadRef} />
                     <Component {...pageProps} />
                 </ThemeProvider>
             </SessionProvider>
