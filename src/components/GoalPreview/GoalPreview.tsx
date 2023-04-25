@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
@@ -80,6 +80,7 @@ const StyledPublicActions = styled.div`
 `;
 
 const StyledModalHeader = styled(ModalHeader)`
+    top: 0;
     position: sticky;
 
     box-shadow: 0 2px 5px 2px rgb(0 0 0 / 10%);
@@ -185,10 +186,23 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
         refresh();
     }, [goal, refresh, onDelete]);
 
+    const commentsRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
+    const onCommentsClick = useCallback(() => {
+        commentsRef.current &&
+            contentRef.current &&
+            headerRef.current &&
+            contentRef.current.scrollTo({
+                behavior: 'smooth',
+                top: commentsRef.current.offsetTop - headerRef.current.offsetHeight,
+            });
+    }, []);
+
     return (
         <>
             <ModalPreview visible onClose={onPreviewClose}>
-                <StyledModalHeader>
+                <StyledModalHeader ref={headerRef}>
                     {nullable(goal.id, (id) => (
                         <IssueKey size="s" id={id}>
                             {nullable(goal.tags, (tags) => (
@@ -209,7 +223,12 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                         <IssueParent as="span" mode="compact" parent={project} size="m" />
                     ))}
 
-                    <IssueStats mode="compact" comments={goal.comments?.length || 0} updatedAt={goal.updatedAt} />
+                    <IssueStats
+                        mode="compact"
+                        comments={goal._count?.comments ?? 0}
+                        onCommentsClick={onCommentsClick}
+                        updatedAt={goal.updatedAt}
+                    />
 
                     {nullable(goal.title, (title) => (
                         <IssueTitle title={title} href={routes.goal(goal.id)} size="xl" />
@@ -292,7 +311,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                         ))}
                     </StyledImportantActions>
                 </StyledModalHeader>
-                <StyledModalContent>
+                <StyledModalContent ref={contentRef}>
                     <StyledCard>
                         <CardInfo>
                             <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
@@ -304,7 +323,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                     </StyledCard>
 
                     {nullable(data, () => (
-                        <ActivityFeed id="comments">
+                        <ActivityFeed ref={commentsRef}>
                             {goal.comments?.map((comment) =>
                                 nullable(comment, (c) => (
                                     <CommentView

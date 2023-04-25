@@ -14,13 +14,14 @@ interface IssueStatsProps {
     updatedAt: string;
     comments: number;
     mode?: 'compact' | 'default';
+    onCommentsClick?: () => void;
 }
 
 const StyledIssueInfo = styled.span`
     padding-left: ${gapXs};
 `;
 
-export const IssueStats: React.FC<IssueStatsProps> = ({ comments, updatedAt, mode }) => {
+export const IssueStats: React.FC<IssueStatsProps> = ({ comments, updatedAt, mode, onCommentsClick }) => {
     const { locale } = usePageContext();
 
     return (
@@ -30,7 +31,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({ comments, updatedAt, mod
                 {nullable(comments, () => (
                     <>
                         <Dot />{' '}
-                        <Link inline href="#comments">
+                        <Link inline onClick={onCommentsClick}>
                             <b>{comments}</b>{' '}
                             {pluralize({
                                 locale,
