@@ -119,6 +119,31 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                             query: '',
                         },
                         {
+                            AND: {
+                                OR: [
+                                    {
+                                        projectId: data.id,
+                                    },
+                                    {
+                                        project: {
+                                            parent: {
+                                                some: {
+                                                    id: data.id,
+                                                },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ),
+                    include: {
+                        ...goalDeepQuery,
+                    },
+                }),
+                db.goal.findMany({
+                    ...goalsFilter(data, {
+                        AND: {
                             OR: [
                                 {
                                     projectId: data.id,
@@ -134,27 +159,6 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                                 },
                             ],
                         },
-                    ),
-                    include: {
-                        ...goalDeepQuery,
-                    },
-                }),
-                db.goal.findMany({
-                    ...goalsFilter(data, {
-                        OR: [
-                            {
-                                projectId: data.id,
-                            },
-                            {
-                                project: {
-                                    parent: {
-                                        some: {
-                                            id: data.id,
-                                        },
-                                    },
-                                },
-                            },
-                        ],
                     }),
                     include: {
                         ...goalDeepQuery,
