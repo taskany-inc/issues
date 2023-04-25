@@ -39,6 +39,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
         shouldFocusError: true,
         defaultValues: {
             goalId,
+            description: '',
         },
     });
 
