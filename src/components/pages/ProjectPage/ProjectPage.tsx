@@ -83,6 +83,7 @@ const goalFields = {
     _count: {
         comments: true,
     },
+    _isEditable: true,
     createdAt: true,
     updatedAt: true,
 } as const;
