@@ -18,7 +18,7 @@ const App = ({ Component, pageProps, router }: AppProps) => {
 
             <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
                 <ThemeProvider themes={['light', 'dark']}>
-                    <PageLoadProgress ref={pageLoadRef} />
+                    <PageLoadProgress height={2} ref={pageLoadRef} />
                     <Component {...pageProps} />
                 </ThemeProvider>
             </SessionProvider>
