@@ -21,7 +21,7 @@ import { usePageContext } from '../../hooks/usePageContext';
 import { IssueDependenciesList } from '../IssueDependenciesList/IssueDependenciesList';
 import { GoalMenuItem } from '../GoalMenuItem';
 
-import { tr } from './IssueDependenciesForm.i18n';
+import { I18nKey, tr } from './IssueDependenciesForm.i18n';
 
 interface IssueDependenciesFormProps {
     issue: Goal;
@@ -113,10 +113,10 @@ const goalsFetcher = createFetcher((_, query: string) => ({
     ],
 }));
 
-const map: Record<Dependency, string> = {
-    blocks: tr('blocks'),
-    dependsOn: tr('dependsOn'),
-    relatedTo: tr('relatedTo'),
+const map: Record<Dependency, I18nKey> = {
+    blocks: 'blocks',
+    dependsOn: 'dependsOn',
+    relatedTo: 'relatedTo',
 };
 
 const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
@@ -237,7 +237,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                                             <ArrowDownSmallIcon size="s" noWrap />
                                         )
                                     }
-                                    text={kind ? map[kind] : undefined}
+                                    text={kind ? tr(map[kind]) : undefined}
                                     ref={props.ref}
                                     onClick={props.onClick}
                                 />
