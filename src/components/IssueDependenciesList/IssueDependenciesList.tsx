@@ -6,7 +6,7 @@ import { Goal, enumDependency } from '../../../graphql/@generated/genql';
 import { IssueListItem } from '../IssueListItem';
 import { IssueMeta } from '../IssueMeta';
 
-import { tr } from './IssueDependenciesList.i18n';
+import { I18nKey, tr } from './IssueDependenciesList.i18n';
 
 interface IssueDependenciesListItemProps {
     title: string;
@@ -78,10 +78,10 @@ export const IssueDependenciesListItem: React.FC<IssueDependenciesListItemProps>
     );
 };
 
-const depsLinkType = {
-    [enumDependency.blocks]: tr('blocks'),
-    [enumDependency.dependsOn]: tr('dependsOn'),
-    [enumDependency.relatedTo]: tr('relatedTo'),
+const depsLinkType: Record<keyof typeof enumDependency, I18nKey> = {
+    [enumDependency.blocks]: 'blocks',
+    [enumDependency.dependsOn]: 'dependsOn',
+    [enumDependency.relatedTo]: 'relatedTo',
 };
 
 export const IssueDependenciesList: React.FC<IssueDependenciesListPropsV2> = ({ issue, onDelete, onEdit }) => {
@@ -91,7 +91,7 @@ export const IssueDependenciesList: React.FC<IssueDependenciesListPropsV2> = ({ 
                 <IssueDependenciesListItem
                     key={dependency}
                     type={dependency}
-                    title={depsLinkType[dependency]}
+                    title={tr(depsLinkType[dependency])}
                     dependencies={issue[dependency]}
                     onEdit={onEdit}
                     onDelete={onDelete}
