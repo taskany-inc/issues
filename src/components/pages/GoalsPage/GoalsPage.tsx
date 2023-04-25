@@ -99,6 +99,7 @@ const fetcher = createFetcher(
                     _count: {
                         comments: true,
                     },
+                    _isEditable: true,
                     createdAt: true,
                     updatedAt: true,
                 },

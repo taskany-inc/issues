@@ -108,7 +108,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
 
     const goal: Goal = data?.goal ?? partialGoal;
 
-    const isUserAllowedToEdit = user?.activityId === goal?.activityId || user?.activityId === goal?.ownerId;
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(() => {
         setGoalEditModalVisible(false);
@@ -271,7 +270,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                             </Reactions>
                         </StyledPublicActions>
 
-                        {nullable(isUserAllowedToEdit, () => (
+                        {nullable(goal._isEditable, () => (
                             <Dropdown
                                 onChange={onEditMenuChange}
                                 items={[
@@ -346,7 +345,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                 </StyledModalContent>
             </ModalPreview>
 
-            {nullable(isUserAllowedToEdit, () => (
+            {nullable(goal._isEditable, () => (
                 <ModalOnEvent
                     event={ModalEvent.GoalEditModal}
                     hotkeys={editGoalKeys}
@@ -357,7 +356,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                 </ModalOnEvent>
             ))}
 
-            {nullable(isUserAllowedToEdit, () => (
+            {nullable(goal._isEditable, () => (
                 <GoalDeleteModal id={goal.id} onConfirm={onGoalDeleteConfirm} />
             ))}
         </>
