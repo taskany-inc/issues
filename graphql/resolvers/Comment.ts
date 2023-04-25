@@ -38,9 +38,9 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         },
         resolve: async (_, { data: { goalId, description } }, { db, activity }) => {
             const [commentAuthor, goal] = await Promise.all([
-                db.user.findUnique({
+                db.activity.findUnique({
                     where: { id: activity?.id },
-                    include: { activity: { include: { user: true, ghost: true } } },
+                    include: { user: true, ghost: true },
                 }),
                 db.goal.findUnique({
                     where: { id: goalId },
@@ -51,7 +51,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 }),
             ]);
 
-            if (!commentAuthor || !commentAuthor.activity) return null;
+            if (!commentAuthor) return null;
             if (!goal) return null;
 
             if (!goal.participants.length) {
@@ -71,15 +71,15 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
                 const newComment = await db.comment.create({
                     data: {
                         description,
-                        activityId: commentAuthor.activity.id,
+                        activityId: commentAuthor.id,
                         goalId,
                     },
                 });
 
                 let toEmails = goal.participants;
 
-                if (commentAuthor.activity.user?.email === goal.activity?.user?.email) {
-                    toEmails = toEmails.filter((p) => p.user?.email !== commentAuthor.activity?.user?.email);
+                if (commentAuthor.user?.email === goal.activity?.user?.email) {
+                    toEmails = toEmails.filter((p) => p.user?.email !== commentAuthor?.user?.email);
                 }
 
                 if (toEmails.length) {
