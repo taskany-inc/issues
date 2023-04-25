@@ -80,6 +80,9 @@ const goalFields = {
         title: true,
         description: true,
     },
+    _count: {
+        comments: true,
+    },
     createdAt: true,
     updatedAt: true,
 } as const;
