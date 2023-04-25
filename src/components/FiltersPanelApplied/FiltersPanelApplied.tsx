@@ -10,7 +10,7 @@ import { ProjectFilterDropdown } from '../ProjectFilterDropdown';
 import { StateFilterDropdown } from '../StateFilterDropdown';
 import { TagsFilterDropdown } from '../TagsFilterDropdown';
 import { UserFilterDropdown } from '../UserFilterDropdown';
-import { trPriority } from '../../i18n/priority';
+import { getPriorityText } from '../PriorityText/PriorityText';
 
 import { tr } from './FiltersPanelApplied.i18n';
 
@@ -64,7 +64,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }, [states, users, projects, tags]);
 
     if (queryState.priorityFilter.length && priority?.length) {
-        infoString += `${tr('Priority')}: ${queryState.priorityFilter.map((p) => trPriority(p)).join(', ')}. `;
+        infoString += `${tr('Priority')}: ${queryState.priorityFilter.map((p) => getPriorityText(p)).join(', ')}. `;
     }
 
     if (queryState.stateFilter.length && states?.length) {

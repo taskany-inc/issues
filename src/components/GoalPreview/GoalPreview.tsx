@@ -35,7 +35,6 @@ import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { Priority, priorityColorsMap } from '../../types/priority';
-import { trPriority } from '../../i18n/priority';
 import { IssueKey } from '../IssueKey';
 import { IssueTitle } from '../IssueTitle';
 import { IssueParent } from '../IssueParent';
@@ -49,6 +48,7 @@ import { ActivityFeed } from '../ActivityFeed';
 import { Reactions } from '../Reactions';
 import ReactionsDropdown from '../ReactionsDropdown';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
+import { getPriorityText } from '../PriorityText/PriorityText';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -224,7 +224,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                             {nullable(goal.priority, (ip) => (
                                 <Button
                                     ghost
-                                    text={trPriority(ip as Priority)}
+                                    text={getPriorityText(ip as Priority)}
                                     iconLeft={<StateDot hue={priorityColor} />}
                                 />
                             ))}

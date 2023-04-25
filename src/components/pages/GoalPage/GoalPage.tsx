@@ -41,6 +41,7 @@ import { CommentView } from '../../CommentView/CommentView';
 import { StateDot } from '../../StateDot';
 import { IssueParent } from '../../IssueParent';
 import { IssueTags } from '../../IssueTags';
+import { getPriorityText } from '../../PriorityText/PriorityText';
 import { useHighlightedComment } from '../../../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../../../hooks/useGoalUpdate';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
@@ -53,7 +54,6 @@ import { StarButton } from '../../StarButton/StarButton';
 import { useRouter } from '../../../hooks/router';
 import { GoalDeleteModal } from '../../GoalDeleteModal/GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../../types/priority';
-import { trPriority } from '../../../i18n/priority';
 
 import { tr } from './GoalPage.i18n';
 
@@ -390,7 +390,11 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
                         <CardActions>
                             <IssueBaseActions>
                                 {nullable(priority, (ip) => (
-                                    <Button ghost text={trPriority(ip)} iconLeft={<StateDot hue={priorityColor} />} />
+                                    <Button
+                                        ghost
+                                        text={getPriorityText(ip)}
+                                        iconLeft={<StateDot hue={priorityColor} />}
+                                    />
                                 ))}
 
                                 <Button

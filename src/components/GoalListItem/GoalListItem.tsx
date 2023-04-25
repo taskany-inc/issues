@@ -8,7 +8,7 @@ import { GitForkIcon, MessageIcon, Text, Tag as TagItem, nullable, UserPic } fro
 import { routes } from '../../hooks/router';
 import type { Scalars, State, Tag, Activity } from '../../../graphql/@generated/genql';
 import { Priority, priorityColorsMap } from '../../types/priority';
-import { trPriority } from '../../i18n/priority';
+import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
 
 import { tr } from './GoalListItem.i18n';
@@ -176,7 +176,11 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
 
                 <StyledAddon>
                     {nullable(priority, (p) => (
-                        <StateDot size="s" hue={priorityColorsMap[p as Priority]} title={trPriority(p as Priority)} />
+                        <StateDot
+                            size="s"
+                            hue={priorityColorsMap[p as Priority]}
+                            title={getPriorityText(p as Priority)}
+                        />
                     ))}
                 </StyledAddon>
 
