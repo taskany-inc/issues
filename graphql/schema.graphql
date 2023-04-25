@@ -274,6 +274,7 @@ type Project {
 
 type ProjectAggregation {
   children: Int
+  parent: Int
   participants: Int
   stargizers: Int
   watchers: Int
@@ -333,6 +334,7 @@ type Query {
   projects: [Project]
   settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
+  topProjects: [Project]
   userFilters: [Filter]
   userGoals(data: UserGoalsInput!): UserGoalsOutput
   users(sortBy: SortOrder): [User]

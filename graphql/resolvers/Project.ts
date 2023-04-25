@@ -43,6 +43,43 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
         },
     });
 
+    t.list.field('topProjects', {
+        type: Project,
+        resolve: async (_, __, { db, activity }) => {
+            if (!activity) return null;
+
+            const allProjects = await db.project.findMany({
+                orderBy: {
+                    createdAt: 'asc',
+                },
+                include: {
+                    activity: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                    children: true,
+                    parent: true,
+                    _count: {
+                        select: {
+                            parent: true,
+                        },
+                    },
+                },
+            });
+
+            if (!allProjects.length) return [];
+
+            // FIX: it is hack!
+            const projects = allProjects.filter((p) => p._count.parent === 0);
+
+            if (!projects.length) return [];
+
+            return projects;
+        },
+    });
+
     t.field('project', {
         type: Project,
         args: {

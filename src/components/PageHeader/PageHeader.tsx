@@ -45,7 +45,7 @@ export const PageHeader: FC = () => {
         //     title: t('Boards'),
         // },
         {
-            href: routes.exploreProjects(),
+            href: routes.exploreTopProjects(),
             title: tr('Explore'),
         },
     ];

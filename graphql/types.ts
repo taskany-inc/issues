@@ -113,6 +113,7 @@ export const Project = objectType({
 export const ProjectAggregation = objectType({
     name: 'ProjectAggregation',
     definition(t) {
+        t.int('parent');
         t.int('children');
         t.int('stargizers');
         t.int('watchers');
