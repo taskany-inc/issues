@@ -68,6 +68,7 @@
     "styled-components": "5.3.6",
     "swr": "2.1.2",
     "teenyicons": "0.4.1",
+    "throttle-debounce": "5.0.0",
     "tinykeys": "1.4.0",
     "unified": "10.1.2",
     "zod": "3.20.2"
@@ -96,6 +97,7 @@
     "@types/react-dom": "18.0.10",
     "@types/react-input-mask": "3.0.2",
     "@types/styled-components": "5.1.26",
+    "@types/throttle-debounce": "5.0.0",
     "@typescript-eslint/eslint-plugin": "5.43.0",
     "@typescript-eslint/parser": "5.56.0",
     "@welldone-software/why-did-you-render": "7.0.1",
