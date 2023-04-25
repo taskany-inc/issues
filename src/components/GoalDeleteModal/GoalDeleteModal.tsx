@@ -48,7 +48,7 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ id, onConfirm,
             <ModalContent>
                 <Text>
                     {tr.raw('To confirm deleting goal please type goal key below', {
-                        goal: <b>{id}</b>,
+                        goal: <b key={id}>{id}</b>,
                     })}
                 </Text>
 
