@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import { debounce } from 'throttle-debounce';
 import { gapM, gapS, gray5, gray6, gray9, textColor } from '@taskany/colors';
 import { Badge, Text, Input, StarIcon, nullable, StarFilledIcon } from '@taskany/bricks';
 
@@ -141,11 +142,11 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     onPresetChange,
     onFilterStar,
 }) => {
+    const debouncedSearchHandler = debounce(200, onSearchChange);
+
     const onSearchInputChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            onSearchChange(e.currentTarget.value);
-        },
-        [onSearchChange],
+        (e: React.ChangeEvent<HTMLInputElement>) => debouncedSearchHandler(e.currentTarget.value),
+        [debouncedSearchHandler],
     );
 
     return (
@@ -154,7 +155,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                 <StyledFiltersContent>
                     <Input
                         placeholder={tr('Search')}
-                        value={queryState.fulltextFilter}
+                        defaultValue={queryState.fulltextFilter}
                         onChange={onSearchInputChange}
                     />
 
