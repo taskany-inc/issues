@@ -1,12 +1,11 @@
 import React from 'react';
 import { Button, Dropdown } from '@taskany/bricks';
 
-import { usePageContext } from '../hooks/usePageContext';
 import { Priority, priorityColorsMap } from '../types/priority';
-import { trPriority } from '../i18n/priority';
 
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
+import { PriorityText } from './PriorityText/PriorityText';
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -45,7 +44,7 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                         focused={props.cursor === props.index}
                         onClick={props.onClick}
                     >
-                        {trPriority(props.item as Priority)}
+                        <PriorityText value={props.item} />
                     </ColorizedMenuItem>
                 )}
             />

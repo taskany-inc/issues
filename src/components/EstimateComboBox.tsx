@@ -14,7 +14,7 @@ import {
     formatEstimate,
 } from '../utils/dateTime';
 import { usePageContext } from '../hooks/usePageContext';
-import { TLocale } from '../i18n/getLang';
+import { TLocale } from '../utils/getLang';
 
 interface EstimateComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];

@@ -1,7 +1,7 @@
 import { Session } from 'next-auth';
 import React from 'react';
 
-import { TLocale } from '../i18n/getLang';
+import { TLocale } from './getLang';
 
 export interface PageContext {
     locale: TLocale;

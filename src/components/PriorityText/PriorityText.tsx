@@ -1,8 +1,10 @@
+import { FC } from 'react';
+
 import { Priority as PriorityType } from '../../types/priority';
 
-import { tr } from './priority.i18n';
+import { tr } from './PriorityText.i18n';
 
-export const trPriority = (priority: PriorityType) => {
+export const getPriorityText = (priority: PriorityType) => {
     const map: Record<PriorityType, string> = {
         High: tr('High'),
         Highest: tr('Highest'),
@@ -12,3 +14,5 @@ export const trPriority = (priority: PriorityType) => {
 
     return map[priority];
 };
+
+export const PriorityText: FC<{ value: PriorityType }> = ({ value }) => <>{getPriorityText(value)}</>;

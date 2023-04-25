@@ -2,10 +2,10 @@ import React, { useCallback } from 'react';
 import { Dropdown } from '@taskany/bricks';
 
 import { Priority, priorityColorsMap } from '../types/priority';
-import { trPriority } from '../i18n/priority';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
+import { PriorityText } from './PriorityText/PriorityText';
 
 interface PriorityFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
@@ -54,7 +54,7 @@ export const PriorityFilterDropdown = React.forwardRef<HTMLDivElement, PriorityF
                         checked={value?.includes(props.item)}
                         onClick={props.onClick}
                     >
-                        {trPriority(props.item as Priority)}
+                        <PriorityText value={props.item} />
                     </ColorizedMenuItem>
                 )}
             />
