@@ -16,6 +16,7 @@ export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ children }
     const router = useRouter();
 
     const tabsMenuOptions: Array<[string, string]> = [
+        [tr('Top'), routes.exploreTopProjects()],
         [tr('Projects'), routes.exploreProjects()],
         // [tr('Goals'), routes.exploreGoals()],
     ];

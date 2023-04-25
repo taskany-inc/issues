@@ -16,6 +16,7 @@ export const routes = {
     userSettings: () => '/users/settings',
 
     exploreProjects: () => '/explore/projects',
+    exploreTopProjects: () => '/explore/top',
     exploreGoals: () => '/explore/goals',
 
     help: (locale: TLocale, slug: AvailableHelpPages) => `/help/${locale}/${slug}`,
@@ -38,6 +39,7 @@ export const useRouter = (): Record<keyof typeof routes, any> => {
         userSettings: () => router.push(routes.userSettings()),
 
         exploreProjects: () => router.push(routes.exploreProjects()),
+        exploreTopProjects: () => router.push(routes.exploreTopProjects()),
         exploreGoals: () => router.push(routes.exploreGoals()),
 
         help: (locale: TLocale, slug: AvailableHelpPages) => router.push(locale, slug),
