@@ -107,6 +107,7 @@ export const Project = objectType({
         t.field('_count', { type: ProjectAggregation });
         t.boolean('_isStarred');
         t.boolean('_isWatching');
+        t.boolean('_isOwner');
     },
 });
 

@@ -131,6 +131,7 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 ...project,
                 _isStarred: project.stargizers.filter((stargizer) => stargizer?.id === activity.id).length > 0,
                 _isWatching: project.watchers.filter((watcher) => watcher?.id === activity.id).length > 0,
+                _isOwner: project.activityId === activity.id,
             };
         },
     });

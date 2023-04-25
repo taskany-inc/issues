@@ -7,7 +7,6 @@ import { TabsMenu, TabsMenuItem, Text, nullable } from '@taskany/bricks';
 
 import { routes } from '../../hooks/router';
 import { useProjectResource } from '../../hooks/useProjectResource';
-import { usePageContext } from '../../hooks/usePageContext';
 import { Project } from '../../../graphql/@generated/genql';
 import { PageContent, PageActions } from '../Page';
 import { WatchButton } from '../WatchButton/WatchButton';
@@ -46,10 +45,8 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
     children,
     actions,
 }) => {
-    const { user } = usePageContext();
     const router = useRouter();
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(project.id);
-    const isCurrentUserOwner = user?.activityId === project.activityId;
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
         [tr('Goals'), routes.project(project.id), true],
@@ -101,10 +98,10 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
                     ))}
                 </PageActions>
 
-                {isCurrentUserOwner && (
+                {project._isOwner && (
                     <TabsMenu>
                         {tabsMenuOptions.map(([title, href, ownerOnly]) =>
-                            nullable(ownerOnly ? isCurrentUserOwner : true, () => (
+                            nullable(ownerOnly ? project._isOwner : true, () => (
                                 <NextLink key={title} href={href} passHref>
                                     <TabsMenuItem active={router.asPath === href}>{title}</TabsMenuItem>
                                 </NextLink>

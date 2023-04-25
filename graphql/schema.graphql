@@ -252,6 +252,7 @@ type Mutation {
 
 type Project {
   _count: ProjectAggregation
+  _isOwner: Boolean
   _isStarred: Boolean
   _isWatching: Boolean
   activity: Activity

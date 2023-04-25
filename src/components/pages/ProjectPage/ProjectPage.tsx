@@ -150,6 +150,7 @@ const fetcher = createFetcher(
                 },
                 _isStarred: true,
                 _isWatching: true,
+                _isOwner: true,
             },
         ],
         projectDeepInfo: [
