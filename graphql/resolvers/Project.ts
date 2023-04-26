@@ -369,7 +369,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         resolve: async (_, { data: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
 
-            const connection = { id: Number(id) };
+            const connection = { id };
 
             try {
                 return db.activity.update({
@@ -400,7 +400,7 @@ export const mutation = (t: ObjectDefinitionBlock<'Mutation'>) => {
         resolve: async (_, { data: { id, direction } }, { db, activity }) => {
             if (!activity) return null;
 
-            const connection = { id: Number(id) };
+            const connection = { id };
 
             try {
                 return db.activity.update({
