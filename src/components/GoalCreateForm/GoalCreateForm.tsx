@@ -95,7 +95,7 @@ const GoalCreateForm: React.FC = () => {
             <StyledFormBottom>
                 <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
                     {tr.raw('Press key to create the goal', {
-                        key: <Keyboard command enter />,
+                        key: <Keyboard key={'cmd/enter'} command enter />,
                     })}
                 </Tip>
 
