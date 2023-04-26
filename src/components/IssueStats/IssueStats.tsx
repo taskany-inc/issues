@@ -27,7 +27,8 @@ export const IssueStats: React.FC<IssueStatsProps> = ({ comments, updatedAt, mod
     return (
         <Text as="span" size="m" color={gray8}>
             <StyledIssueInfo>
-                <Dot /> <RelativeTime kind={mode === 'compact' ? undefined : 'updated'} date={updatedAt} />
+                <Dot />{' '}
+                <RelativeTime key={Date.now()} kind={mode === 'compact' ? undefined : 'updated'} date={updatedAt} />
                 {nullable(comments, () => (
                     <>
                         <Dot />{' '}

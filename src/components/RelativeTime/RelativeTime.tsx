@@ -33,9 +33,11 @@ const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
     }, [mounted]);
 
     useEffect(() => {
-        setTimeout(() => {
+        const interval = setInterval(() => {
             setTime(Date.now());
-        }, 100); // TODO: use a better interval?
+        }, 60000);
+
+        return () => clearInterval(interval);
     }, []);
 
     return (
