@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  build:
+    name: Scheduled Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.15.0
+
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: npm-deps-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-deps-${{ hashFiles('package-lock.json') }}
+            
+      - name: Setup packages
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Unit
+        run: npm run test
+      - name: Shipit
+        run: npx standard-version
