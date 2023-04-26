@@ -101,6 +101,7 @@ const fetcher = createFetcher(
                 title: true,
                 description: true,
                 activityId: true,
+                flowId: true,
                 parent: {
                     id: true,
                     title: true,
