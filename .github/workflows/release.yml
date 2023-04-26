@@ -36,3 +36,4 @@ jobs:
           git config --global user.name "Taskany Sheep"
           npx standard-version
           git push --follow-tags --no-verify origin main
+          gh release create -F CHANGELOG.md
