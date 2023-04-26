@@ -32,7 +32,7 @@ jobs:
         run: npm run test
       - name: Shipit
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: | 
           git config --global user.email "sheep@taskany.org"
           git config --global user.name "Taskany Sheep"
