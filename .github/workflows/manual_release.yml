@@ -6,7 +6,7 @@ on:
 
 jobs:
   if_merged:
-    if: github.event.issue.title == Manual release
+    if: github.event.issue.title == 'Manual release'
     name: Manual Release
     runs-on: ubuntu-latest
     steps:
