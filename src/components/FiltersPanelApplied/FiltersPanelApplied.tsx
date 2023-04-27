@@ -63,29 +63,37 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
         };
     }, [states, users, projects, tags]);
 
+    const appliedMap: Record<string, string[]> = {};
+
     if (queryState.priorityFilter.length && priority?.length) {
-        infoString += `${tr('Priority')}: ${queryState.priorityFilter.map((p) => getPriorityText(p)).join(', ')}. `;
+        appliedMap[tr('Priority')] = queryState.priorityFilter.map((p) => getPriorityText(p)).filter(Boolean);
     }
 
     if (queryState.stateFilter.length && states?.length) {
-        infoString += `${tr('State')}: ${queryState.stateFilter.map((s) => statesMap[s]?.title).join(', ')}. `;
+        appliedMap[tr('State')] = queryState.stateFilter.map((s) => statesMap[s]?.title).filter(Boolean);
     }
 
     if (queryState.ownerFilter.length && users?.length) {
-        infoString += `${tr('Owner')}: ${queryState.ownerFilter.map((u) => ownersMap[u]?.user?.name).join(', ')}. `;
+        appliedMap[tr('Owner')] = queryState.ownerFilter
+            .map((u) => ownersMap[u]?.user?.name)
+            .filter(Boolean) as string[];
     }
 
     if (queryState.projectFilter.length && projects?.length) {
-        infoString += `${tr('Project')}: ${queryState.projectFilter.map((p) => projectsMap[p]?.title).join(', ')}. `;
+        appliedMap[tr('Project')] = queryState.projectFilter.map((p) => projectsMap[p]?.title).filter(Boolean);
     }
 
     if (queryState.tagsFilter.length && tags?.length) {
-        infoString += `${tr('Tag')}: ${queryState.tagsFilter.map((t) => tagsMap[t]?.title).join(', ')}. `;
+        appliedMap[tr('Tag')] = queryState.tagsFilter.map((t) => tagsMap[t]?.title).filter(Boolean);
     }
 
     if (queryState.estimateFilter.length && estimates?.length) {
-        infoString += `${tr('Estimate')}: ${queryState.estimateFilter.join(', ')}. `;
+        appliedMap[tr('Estimate')] = queryState.estimateFilter.filter(Boolean);
     }
+
+    Object.entries(appliedMap).forEach(([k, v]) => {
+        if (v.length) infoString += `${k}: ${v.join(' ,')}. `;
+    });
 
     return (
         <StyledApplied size="s" weight="bold" color={gray7}>
