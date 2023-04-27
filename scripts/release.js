@@ -103,10 +103,9 @@ function changelog(newVersion, tagPrefix = 'v') {
 
     createReleaseBotDirIfMissing();
     createReleaseNotesDirIfMissing();
-    fs.writeFileSync(path.join(releaseBotDir, 'version'), release.newVersion);
-    fs.writeFileSync(path.join(releaseBotDir, 'pr_title'), `Release ${release.newVersion}`);
+    fs.writeFileSync('version', release.newVersion);
     // add release.summary
-    fs.writeFileSync(path.join(releaseBotDir, 'pr_body'), log.release);
+    fs.writeFileSync(path.join(releaseBotDir, 'body'), log.release);
     fs.writeFileSync(path.join(releaseNotesDir, `${release.newVersion}.md`), log.release);
     fs.writeFileSync(changelogFile, (log.header + log.release + log.history).replace(/\n+$/, '\n'));
 
