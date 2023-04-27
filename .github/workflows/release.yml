@@ -37,7 +37,7 @@ jobs:
           git checkout -b releases/$(cat version)
           git add .
           git commit -n -m "chore: release $(cat version)"
-          git push --no-verify origin release/$(cat version)
+          git push --no-verify origin releases/$(cat version)
           
       - name: Pull Request
         env:
