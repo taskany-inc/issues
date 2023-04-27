@@ -24,6 +24,8 @@
 - [ ] Specs
 - [ ] Refactor
 - [ ] Feature
+- [ ] DX
+- [ ] DevOps
 
 ## Related issues
 
