@@ -7,29 +7,29 @@ on:
 
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
     env:
       PR_NAME: pr-${{ github.event.number }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Use NodeJS
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16.15.0
+          node-version: 18.12.0
 
-      - name: Cache node_modules
-        uses: actions/cache@v1
+      - name: Cache
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: npm-deps-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             npm-deps-${{ hashFiles('package-lock.json') }}
+        
       - name: Setup packages
-        run: |
-          npm i
+        run: npm ci
+        
       - name: Lint
         run: npm run lint
+      
       - name: Unit
         run: npm run test
