@@ -41,4 +41,4 @@ jobs:
           git add .
           git commit -n -m "chore: release $(cat .release_bot/version)"
           git push --no-verify origin release/$(cat .release_bot/version)
-          gh pr create --title "${$(cat .release_bot/pr_title)}" --body "${$(cat .release_bot/pr_body)}"
+          gh pr create --title $(cat .release_bot/pr_title) --body $(cat .release_bot/pr_body)
