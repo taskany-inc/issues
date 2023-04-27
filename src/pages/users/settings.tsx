@@ -1,5 +1,5 @@
-import { UserSettingsPage } from '../../components/pages/UserSettingsPage/UserSettingsPage';
+import { UserSettingsPage } from '../../components/UserSettingsPage/UserSettingsPage';
 
-export { getServerSideProps } from '../../components/pages/UserSettingsPage/UserSettingsPage';
+export { getServerSideProps } from '../../components/UserSettingsPage/UserSettingsPage';
 
 export default UserSettingsPage;
