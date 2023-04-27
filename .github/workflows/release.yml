@@ -9,15 +9,17 @@ jobs:
     name: Scheduled Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with: 
+          fetch-depth: 0
 
       - name: Use NodeJS
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.15.0
+          node-version: 18.12.0
 
       - name: Cache node_modules
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: npm-deps-${{ hashFiles('package-lock.json') }}
@@ -41,4 +43,4 @@ jobs:
           git add .
           git commit -n -m "chore: release $(cat .release_bot/version)"
           git push --no-verify origin release/$(cat .release_bot/version)
-          gh pr create --title $(cat .release_bot/pr_title) --body $(cat .release_bot/pr_body)
+          gh pr create --title "Release $(cat .release_bot/version)" -F .release_bot/pr_body
