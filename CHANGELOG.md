@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.0.1](https://github.com/taskany-inc/issues/compare/v1.0.0...v1.0.1) (2023-04-27)
+
 ## 1.0.0 (2023-04-27)
 
 
