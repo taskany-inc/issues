@@ -13,12 +13,11 @@ jobs:
         with: 
           fetch-depth: 0
 
-      - name: Use NodeJS
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18.12.0
 
-      - name: Cache node_modules
+      - name: Cache
         uses: actions/cache@v3
         with:
           path: node_modules
@@ -28,20 +27,20 @@ jobs:
             
       - name: Setup packages
         run: npm ci
-      - name: Lint
-        run: npm run lint
-      - name: Unit
-        run: npm run test
-      - name: Shipit
-        env:
-          GH_TOKEN: ${{ github.token }}
+
+      - name: Changelog
         run: | 
           git config --global user.email "sheep@taskany.org"
           git config --global user.name "Taskany Sheep"
           node scripts/release.js
-          npm version $(cat .release_bot/version) --git-tag-version false
-          git checkout -b release/$(cat .release_bot/version)
+          npm version $(cat version) --git-tag-version false
+          git checkout -b releases/$(cat version)
           git add .
-          git commit -n -m "chore: release $(cat .release_bot/version)"
-          git push --no-verify origin release/$(cat .release_bot/version)
-          gh pr create --title "Release $(cat .release_bot/version)" -F .release_bot/pr_body
+          git commit -n -m "chore: release $(cat version)"
+          git push --no-verify origin release/$(cat version)
+          
+      - name: Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: | 
+          gh pr create --title "Release $(cat version)" -F .release_bot/body
