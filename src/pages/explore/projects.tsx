@@ -1,5 +1,5 @@
-import { ExploreProjectsPage } from '../../components/pages/ExporeProjectsPage/ExporeProjectsPage';
+import { ExploreProjectsPage } from '../../components/ExporeProjectsPage/ExporeProjectsPage';
 
-export { getServerSideProps } from '../../components/pages/ExporeProjectsPage/ExporeProjectsPage';
+export { getServerSideProps } from '../../components/ExporeProjectsPage/ExporeProjectsPage';
 
 export default ExploreProjectsPage;

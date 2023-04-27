@@ -1,5 +1,5 @@
-import { ProjectPage } from '../../../components/pages/ProjectPage/ProjectPage';
+import { ProjectPage } from '../../../components/ProjectPage/ProjectPage';
 
-export { getServerSideProps } from '../../../components/pages/ProjectPage/ProjectPage';
+export { getServerSideProps } from '../../../components/ProjectPage/ProjectPage';
 
 export default ProjectPage;

@@ -1,5 +1,5 @@
-import { GoalsPage } from '../../components/pages/GoalsPage/GoalsPage';
+import { GoalsPage } from '../../components/GoalsPage/GoalsPage';
 
-export { getServerSideProps } from '../../components/pages/GoalsPage/GoalsPage';
+export { getServerSideProps } from '../../components/GoalsPage/GoalsPage';
 
 export default GoalsPage;
