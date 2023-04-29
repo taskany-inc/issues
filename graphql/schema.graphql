@@ -66,32 +66,6 @@ input EstimateInput {
   y: String!
 }
 
-type Filter {
-  _isOwner: Boolean
-  _isStarred: Boolean
-  activity: Activity
-  activityId: String!
-  createdAt: DateTime!
-  description: String
-  id: ID!
-  mode: FilterMode!
-  params: String!
-  stargizers: [Activity]
-  title: String!
-  updatedAt: DateTime!
-}
-
-input FilterCreateInput {
-  description: String
-  mode: FilterMode!
-  params: String!
-  title: String!
-}
-
-input FilterInput {
-  id: ID!
-}
-
 enum FilterMode {
   Global
   Project

@@ -1,16 +1,7 @@
 import { arg, nonNull } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import {
-    User,
-    SortOrder,
-    Ghost,
-    UserUpdateInput,
-    UserInvitesInput,
-    Activity,
-    // Filter,
-    FindActivityInput,
-} from '../types';
+import { User, SortOrder, Ghost, UserUpdateInput, UserInvitesInput, Activity, FindActivityInput } from '../types';
 
 export const query = (t: ObjectDefinitionBlock<'Query'>) => {
     t.list.field('users', {
@@ -23,30 +14,6 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
                 orderBy: { createdAt: sortBy || undefined },
             }),
     });
-
-    // t.list.field('userFilters', {
-    //     type: Filter,
-    //     resolve: async (_, __, { db, activity }) => {
-    //         if (!activity) return null;
-
-    //         return db.filter.findMany({
-    //             where: {
-    //                 OR: [
-    //                     {
-    //                         activityId: activity.id,
-    //                     },
-    //                     {
-    //                         stargizers: {
-    //                             some: {
-    //                                 id: activity.id,
-    //                             },
-    //                         },
-    //                     },
-    //                 ],
-    //             },
-    //         });
-    //     },
-    // });
 
     t.list.field('findActivity', {
         type: Activity,

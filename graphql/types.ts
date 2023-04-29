@@ -14,7 +14,6 @@ import {
     Settings as SettingsModel,
     Reaction as ReactionModel,
     Comment as CommentModel,
-    Filter as FilterModel,
 } from 'nexus-prisma';
 
 export const DateTime = asNexusMethod(DateTimeResolver, 'DateTime');
@@ -257,43 +256,6 @@ export const Comment = objectType({
         t.list.field('reactions', { type: Reaction });
         t.field(CommentModel.createdAt);
         t.field(CommentModel.updatedAt);
-    },
-});
-
-export const Filter = objectType({
-    name: FilterModel.$name,
-    definition(t) {
-        t.field(FilterModel.id);
-        t.field(FilterModel.title);
-        t.field(FilterModel.description);
-        t.field(FilterModel.params);
-        t.field(FilterModel.mode);
-        t.field(FilterModel.activityId);
-        t.field('activity', { type: Activity });
-        t.list.field('stargizers', { type: Activity });
-        t.field(FilterModel.createdAt);
-        t.field(FilterModel.updatedAt);
-
-        // calculated fields
-        t.boolean('_isStarred');
-        t.boolean('_isOwner');
-    },
-});
-
-export const FilterInput = inputObjectType({
-    name: 'FilterInput',
-    definition(t) {
-        t.field(FilterModel.id);
-    },
-});
-
-export const FilterCreateInput = inputObjectType({
-    name: 'FilterCreateInput',
-    definition(t) {
-        t.field(FilterModel.title);
-        t.field(FilterModel.description);
-        t.field(FilterModel.mode);
-        t.field(FilterModel.params);
     },
 });
 
