@@ -14,18 +14,18 @@ import {
 } from '@taskany/bricks';
 
 import { errorsProvider } from '../../utils/forms';
-import { CreateFormType, createSchema } from '../../schema/filter';
-import { Filter, FilterCreateInput } from '../../../graphql/@generated/genql';
+import { createFilterSchema, CreateFilter } from '../../schema/filter';
+import { Nullish, Void } from '../../types/void';
+import { FilterById } from '../../../trpc/inferredTypes';
 import { useFilterResource } from '../../hooks/useFilterResource';
-import { Void } from '../../types/void';
 
 import { tr } from './FilterCreateForm.i18n';
 
 interface FilterCreateFormProps {
-    mode: FilterCreateInput['mode'];
-    params: FilterCreateInput['params'];
+    mode: CreateFilter['mode'];
+    params: CreateFilter['params'];
 
-    onSubmit?: Void<Partial<Filter>>;
+    onSubmit?: Void<Nullish<FilterById>>;
 }
 
 const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSubmit }) => {
@@ -36,8 +36,8 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
         register,
         handleSubmit,
         formState: { errors, isValid, isSubmitted },
-    } = useForm<CreateFormType>({
-        resolver: zodResolver(createSchema),
+    } = useForm<CreateFilter>({
+        resolver: zodResolver(createFilterSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
@@ -50,13 +50,13 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
     const errorsResolver = errorsProvider(errors, isSubmitted);
 
     const onPending = useCallback(
-        async (form: CreateFormType) => {
+        async (form: CreateFilter) => {
             setFormBusy(true);
 
             const [data, err] = await createFilter(form);
 
-            if (data && data.createFilter && !err) {
-                onSubmit?.(data.createFilter);
+            if (data && !err) {
+                onSubmit?.(data);
             }
         },
         [createFilter, onSubmit],

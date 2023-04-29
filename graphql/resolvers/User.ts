@@ -8,7 +8,7 @@ import {
     UserUpdateInput,
     UserInvitesInput,
     Activity,
-    Filter,
+    // Filter,
     FindActivityInput,
 } from '../types';
 
@@ -24,29 +24,29 @@ export const query = (t: ObjectDefinitionBlock<'Query'>) => {
             }),
     });
 
-    t.list.field('userFilters', {
-        type: Filter,
-        resolve: async (_, __, { db, activity }) => {
-            if (!activity) return null;
+    // t.list.field('userFilters', {
+    //     type: Filter,
+    //     resolve: async (_, __, { db, activity }) => {
+    //         if (!activity) return null;
 
-            return db.filter.findMany({
-                where: {
-                    OR: [
-                        {
-                            activityId: activity.id,
-                        },
-                        {
-                            stargizers: {
-                                some: {
-                                    id: activity.id,
-                                },
-                            },
-                        },
-                    ],
-                },
-            });
-        },
-    });
+    //         return db.filter.findMany({
+    //             where: {
+    //                 OR: [
+    //                     {
+    //                         activityId: activity.id,
+    //                     },
+    //                     {
+    //                         stargizers: {
+    //                             some: {
+    //                                 id: activity.id,
+    //                             },
+    //                         },
+    //                     },
+    //                 ],
+    //             },
+    //         });
+    //     },
+    // });
 
     t.list.field('findActivity', {
         type: Activity,

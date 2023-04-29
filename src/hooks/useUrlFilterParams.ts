@@ -2,7 +2,8 @@ import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
 
-import { Filter, Tag } from '../../graphql/@generated/genql';
+import { FilterById } from '../../trpc/inferredTypes';
+import { Tag } from '../../graphql/@generated/genql';
 import { Priority } from '../types/priority';
 
 export interface QueryState {
@@ -29,7 +30,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     limitFilter: query.limit ? Number(query.limit) : undefined,
 });
 
-export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
+export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
@@ -132,7 +133,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
     );
 
     const setPreset = useCallback(
-        (filter: string | undefined) => {
+        (filter: string | undefined | null) => {
             router.push({
                 pathname: router.asPath.split('?')[0],
                 query: {

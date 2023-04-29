@@ -2,15 +2,15 @@ import { useCallback, useMemo } from 'react';
 import { Button, Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader, Text } from '@taskany/bricks';
 import { warn0 } from '@taskany/colors';
 
-import { Filter } from '../../../graphql/@generated/genql';
+import { FilterById } from '../../../trpc/inferredTypes';
 import { useFilterResource } from '../../hooks/useFilterResource';
 
 import { tr } from './FilterDeleteForm.i18n';
 
 interface FilterDeleteFormProps {
-    preset: Filter;
+    preset: FilterById;
 
-    onSubmit: (preset: Filter) => void;
+    onSubmit: (preset: FilterById) => void;
     onCancel: () => void;
 }
 
@@ -18,10 +18,10 @@ const FilterDeleteForm: React.FC<FilterDeleteFormProps> = ({ preset, onSubmit, o
     const { deleteFilter } = useFilterResource();
 
     const onSubmitProvider = useCallback(
-        (preset: Filter) => async () => {
-            const [data, err] = await deleteFilter({ id: preset.id });
+        (preset: FilterById) => async () => {
+            const [data, err] = await deleteFilter(preset.id);
 
-            if (data && data.deleteFilter && !err) {
+            if (data) {
                 onSubmit(preset);
             }
         },

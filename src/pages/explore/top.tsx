@@ -1,5 +1,18 @@
-import { ExploreTopProjectsPage } from '../../components/ExploreTopProjectsPage/ExploreTopProjectsPage';
+import {
+    ExploreTopProjectsPage,
+    exploreTopProjectsFetcher,
+} from '../../components/ExploreTopProjectsPage/ExploreTopProjectsPage';
+import { declareSsrProps } from '../../utils/declareSsrProps';
 
-export { getServerSideProps } from '../../components/ExploreTopProjectsPage/ExploreTopProjectsPage';
+export const getServerSideProps = declareSsrProps(
+    async ({ user }) => ({
+        fallback: {
+            'explore/projects': await exploreTopProjectsFetcher(user),
+        },
+    }),
+    {
+        private: true,
+    },
+);
 
 export default ExploreTopProjectsPage;

@@ -26,7 +26,7 @@ import {
 
 import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
-import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
+import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { formatEstimate } from '../../utils/dateTime';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
@@ -117,25 +117,6 @@ const StyledCardActions = styled.div`
         margin-left: ${gapS};
     }
 `;
-
-export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { id } }) => {
-        const ssrData = await goalFetcher(user, id);
-
-        return ssrData.goal
-            ? {
-                  fallback: {
-                      [id]: ssrData,
-                  },
-              }
-            : {
-                  notFound: true,
-              };
-    },
-    {
-        private: true,
-    },
-);
 
 export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();

@@ -5,12 +5,12 @@ import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { Button, nullable } from '@taskany/bricks';
 
-import { Filter, Goal, Project, ProjectDeepOutput } from '../../../graphql/@generated/genql';
+import { Goal, Project, ProjectDeepOutput } from '../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../utils/createFetcher';
-import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
+import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { parseFilterValues, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useFilterResource } from '../../hooks/useFilterResource';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
@@ -20,6 +20,9 @@ import { GoalsGroup, GoalsGroupProjectTitle } from '../GoalsGroup';
 import { PageTitle } from '../PageTitle';
 import { Priority } from '../../types/priority';
 import { createFilterKeys } from '../../utils/hotkeys';
+import { Nullish } from '../../types/void';
+import { trpc } from '../../utils/trpcClient';
+import { FilterById } from '../../../trpc/inferredTypes';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -208,63 +211,7 @@ const fetcher = createFetcher(
                 },
             },
         ],
-        userFilters: {
-            id: true,
-            title: true,
-            description: true,
-            mode: true,
-            params: true,
-        },
     }),
-);
-
-const filterFetcher = createFetcher((_, id = '') => ({
-    filter: [
-        {
-            data: {
-                id,
-            },
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            mode: true,
-            params: true,
-            _isOwner: true,
-            _isStarred: true,
-        },
-    ],
-}));
-
-export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { id }, query }) => {
-        const presetData = query.filter ? await filterFetcher(user, query.filter) : { filter: null };
-
-        const ssrData = await fetcher(
-            user,
-            id,
-            ...Object.values(
-                parseFilterValues(
-                    presetData.filter ? Object.fromEntries(new URLSearchParams(presetData.filter.params)) : query,
-                ),
-            ),
-        );
-
-        return ssrData.project
-            ? {
-                  fallback: {
-                      [unstable_serialize(query)]: ssrData,
-                      [unstable_serialize(query.filter)]: presetData,
-                  },
-              }
-            : {
-                  notFound: true,
-              };
-    },
-    {
-        private: true,
-    },
 );
 
 export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
@@ -273,13 +220,9 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     const { toggleFilterStar } = useFilterResource();
 
-    const { data: presetData, mutate: presetMutate } = useSWR(
-        unstable_serialize(nextRouter.query.filter),
-        (f: string) => filterFetcher(user, f),
-        {
-            fallback,
-        },
-    );
+    const utils = trpc.useContext();
+
+    const presetData = trpc.filter.getById.useQuery(nextRouter.query.filter as string);
 
     const {
         currentPreset,
@@ -296,7 +239,7 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset: presetData?.filter,
+        preset: presetData?.data,
     });
 
     const { data, isLoading } = useSWR(
@@ -311,8 +254,8 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
 
     const project = data?.project;
     const deepInfo: ProjectDeepOutput | undefined = data?.projectDeepInfo;
-    const userFilters = data?.userFilters;
-    const shadowPreset = userFilters?.filter((f) => f.params === queryString)[0];
+    const userFilters = trpc.filter.getUserFilters.useQuery();
+    const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
     const groupsMap =
         deepInfo?.goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g) => {
@@ -381,15 +324,15 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
                     id: currentPreset.id,
                     direction: !currentPreset._isStarred,
                 });
-                await presetMutate();
+                await utils.filter.getById.invalidate();
             }
         } else {
             dispatchModalEvent(ModalEvent.FilterCreateModal)();
         }
-    }, [currentPreset, toggleFilterStar, presetMutate]);
+    }, [currentPreset, toggleFilterStar, utils]);
 
     const onFilterCreated = useCallback(
-        (data: Partial<Filter>) => {
+        (data: Nullish<FilterById>) => {
             dispatchModalEvent(ModalEvent.FilterCreateModal)();
             setPreset(data.id);
         },
@@ -401,7 +344,7 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
     }, []);
 
     const onFilterDeleted = useCallback(
-        (filter: Filter) => {
+        (filter: FilterById) => {
             nextRouter.push(`${nextRouter.route}?${filter.params}`);
         },
         [nextRouter],
@@ -440,7 +383,7 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
                     tags={deepInfo?.meta?.tags}
                     estimates={deepInfo?.meta?.estimates}
                     projects={deepInfo?.meta?.projects}
-                    presets={userFilters}
+                    presets={userFilters.data}
                     currentPreset={currentPreset}
                     queryState={queryState}
                     queryString={queryString}

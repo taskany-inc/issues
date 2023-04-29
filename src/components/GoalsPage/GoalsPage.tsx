@@ -5,12 +5,12 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
 
-import { Filter, Goal, GoalsMetaOutput, Project } from '../../../graphql/@generated/genql';
+import { Goal, GoalsMetaOutput, Project } from '../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../utils/createFetcher';
-import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
+import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
-import { parseFilterValues, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../hooks/useFilterResource';
 import { Priority } from '../../types/priority';
 import { Page, PageContent } from '../Page';
@@ -18,6 +18,9 @@ import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../GoalsGroup';
 import { PageTitle } from '../PageTitle';
+import { Nullish } from '../../types/void';
+import { trpc } from '../../utils/trpcClient';
+import { FilterById } from '../../../trpc/inferredTypes';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -139,58 +142,7 @@ const fetcher = createFetcher(
                 },
             },
         ],
-        userFilters: {
-            id: true,
-            title: true,
-            description: true,
-            mode: true,
-            params: true,
-        },
     }),
-);
-
-const filterFetcher = createFetcher((_, id = '') => ({
-    filter: [
-        {
-            data: {
-                id,
-            },
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            mode: true,
-            params: true,
-            _isOwner: true,
-            _isStarred: true,
-        },
-    ],
-}));
-
-export const getServerSideProps = declareSsrProps(
-    async ({ user, query }) => {
-        const presetData = query.filter ? await filterFetcher(user, query.filter) : { filter: null };
-
-        return {
-            fallback: {
-                [unstable_serialize(query)]: await fetcher(
-                    user,
-                    ...Object.values(
-                        parseFilterValues(
-                            presetData.filter
-                                ? Object.fromEntries(new URLSearchParams(presetData.filter.params))
-                                : query,
-                        ),
-                    ),
-                ),
-                [unstable_serialize(query.filter)]: presetData,
-            },
-        };
-    },
-    {
-        private: true,
-    },
 );
 
 export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps) => {
@@ -198,13 +150,9 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
     const [preview, setPreview] = useState<Goal | null>(null);
     const { toggleFilterStar } = useFilterResource();
 
-    const { data: presetData, mutate: presetMutate } = useSWR(
-        unstable_serialize(router.query.filter),
-        (f: string) => filterFetcher(user, f),
-        {
-            fallback,
-        },
-    );
+    const utils = trpc.useContext();
+
+    const presetData = trpc.filter.getById.useQuery(router.query.filter as string);
 
     const {
         currentPreset,
@@ -221,7 +169,7 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset: presetData?.filter,
+        preset: presetData?.data,
     });
 
     const { data, isLoading } = useSWR(
@@ -236,8 +184,8 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
 
     const goals = data?.userGoals?.goals;
     const meta: GoalsMetaOutput | undefined = data?.userGoals?.meta;
-    const userFilters = data?.userFilters;
-    const shadowPreset = userFilters?.filter((f) => f.params === queryString)[0];
+    const userFilters = trpc.filter.getUserFilters.useQuery();
+    const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
     const groupsMap =
         goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g: Goal) => {
@@ -289,15 +237,15 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
                     id: currentPreset.id,
                     direction: !currentPreset._isStarred,
                 });
-                await presetMutate();
+                await utils.filter.getById.invalidate();
             }
         } else {
             dispatchModalEvent(ModalEvent.FilterCreateModal)();
         }
-    }, [currentPreset, toggleFilterStar, presetMutate]);
+    }, [currentPreset, toggleFilterStar, utils]);
 
     const onFilterCreated = useCallback(
-        (data: Partial<Filter>) => {
+        (data: Nullish<FilterById>) => {
             dispatchModalEvent(ModalEvent.FilterCreateModal)();
             setPreset(data.id);
         },
@@ -309,7 +257,7 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
     }, []);
 
     const onFilterDeleted = useCallback(
-        (filter: Filter) => {
+        (filter: FilterById) => {
             router.push(`${router.route}?${filter.params}`);
         },
         [router],
@@ -345,7 +293,7 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
                 projects={meta?.projects}
                 tags={meta?.tags}
                 estimates={meta?.estimates}
-                presets={userFilters}
+                presets={userFilters.data}
                 currentPreset={currentPreset}
                 queryState={queryState}
                 queryString={queryString}

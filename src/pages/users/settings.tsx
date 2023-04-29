@@ -1,5 +1,15 @@
-import { UserSettingsPage } from '../../components/UserSettingsPage/UserSettingsPage';
+import { UserSettingsPage, userSettingsFetcher } from '../../components/UserSettingsPage/UserSettingsPage';
+import { declareSsrProps } from '../../utils/declareSsrProps';
 
-export { getServerSideProps } from '../../components/UserSettingsPage/UserSettingsPage';
+export const getServerSideProps = declareSsrProps(
+    async ({ user }) => ({
+        fallback: {
+            [user.activityId]: await userSettingsFetcher(user),
+        },
+    }),
+    {
+        private: true,
+    },
+);
 
 export default UserSettingsPage;
