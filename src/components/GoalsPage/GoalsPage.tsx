@@ -152,7 +152,9 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
 
     const utils = trpc.useContext();
 
-    const presetData = trpc.filter.getById.useQuery(router.query.filter as string);
+    const presetData = router.query.filter
+        ? trpc.filter.getById.useQuery(router.query.filter as string)
+        : { data: undefined };
 
     const {
         currentPreset,
