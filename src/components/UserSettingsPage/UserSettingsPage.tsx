@@ -22,7 +22,7 @@ import {
 } from '@taskany/bricks';
 
 import { gql } from '../../utils/gql';
-import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
+import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { shallowEqual } from '../../utils/shallowEqual';
 import { createFetcher, refreshInterval } from '../../utils/createFetcher';
 import { User } from '../../../graphql/@generated/genql';
@@ -35,23 +35,12 @@ import { SettingsCard, SettingsContent } from '../SettingsContent';
 
 import { tr } from './UserSettingsPage.i18n';
 
-const userSettingsFetcher = createFetcher(() => ({
+export const userSettingsFetcher = createFetcher(() => ({
     settings: {
         id: true,
         theme: true,
     },
 }));
-
-export const getServerSideProps = declareSsrProps(
-    async ({ user }) => ({
-        fallback: {
-            [user.activityId]: await userSettingsFetcher(user),
-        },
-    }),
-    {
-        private: true,
-    },
-);
 
 export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPageProps) => {
     const nextRouter = useNextRouter();

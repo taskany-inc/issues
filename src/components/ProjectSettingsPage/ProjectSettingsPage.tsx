@@ -83,7 +83,7 @@ const projectFetcher = createFetcher((_, id: string) => ({
     ],
 }));
 
-const projectsFetcher = createFetcher((_, query: string) => ({
+export const projectsFetcher = createFetcher((_, query: string) => ({
     projectCompletion: [
         {
             query,
@@ -105,25 +105,6 @@ const projectsFetcher = createFetcher((_, query: string) => ({
         },
     ],
 }));
-
-export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { id } }) => {
-        const ssrData = await projectFetcher(user, id);
-
-        return ssrData.project
-            ? {
-                  fallback: {
-                      [id]: ssrData,
-                  },
-              }
-            : {
-                  notFound: true,
-              };
-    },
-    {
-        private: true,
-    },
-);
 
 export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
     const router = useRouter();

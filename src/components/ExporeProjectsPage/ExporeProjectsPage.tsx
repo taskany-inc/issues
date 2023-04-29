@@ -3,7 +3,7 @@ import { nullable } from '@taskany/bricks';
 
 import { Project } from '../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../utils/createFetcher';
-import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
+import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { routes } from '../../hooks/router';
 import { Page, PageContent } from '../Page';
 import { PageSep } from '../PageSep';
@@ -12,7 +12,7 @@ import { ProjectListItem } from '../ProjectListItem';
 
 import { tr } from './ExporeProjectsPage.i18n';
 
-const fetcher = createFetcher(() => ({
+export const exploreProjectsFetcher = createFetcher(() => ({
     projects: {
         id: true,
         title: true,
@@ -33,24 +33,13 @@ const fetcher = createFetcher(() => ({
     },
 }));
 
-export const getServerSideProps = declareSsrProps(
-    async ({ user }) => ({
-        fallback: {
-            'explore/projects': await fetcher(user),
-        },
-    }),
-    {
-        private: true,
-    },
-);
-
 export const ExploreProjectsPage = ({
     user,
     locale,
     ssrTime,
     fallback,
-}: ExternalPageProps<Awaited<ReturnType<typeof fetcher>>>) => {
-    const { data } = useSWR('explore/projects', () => fetcher(user), {
+}: ExternalPageProps<Awaited<ReturnType<typeof exploreProjectsFetcher>>>) => {
+    const { data } = useSWR('explore/projects', () => exploreProjectsFetcher(user), {
         fallback,
         refreshInterval,
     });

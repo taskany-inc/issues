@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import { debounce } from 'throttle-debounce';
 import { gapM, gapS, gray5, gray6, gray9, textColor } from '@taskany/colors';
 import { Badge, Text, Input, StarIcon, nullable, StarFilledIcon } from '@taskany/bricks';
+import { Filter } from '@prisma/client';
 
-import { Filter } from '../../../graphql/@generated/genql';
+import { FilterById } from '../../../trpc/inferredTypes';
 import type { QueryState } from '../../hooks/useUrlFilterParams';
 import { PageContent } from '../Page';
 import { StateFilterDropdown } from '../StateFilterDropdown';
@@ -31,7 +32,7 @@ interface FiltersPanelProps {
     tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilterDropdown>['estimates'];
     presets?: Filter[];
-    currentPreset?: Filter;
+    currentPreset?: FilterById;
     loading?: boolean;
     children?: React.ReactNode;
 

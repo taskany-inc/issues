@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { Dropdown, MenuItem } from '@taskany/bricks';
+import { Filter } from '@prisma/client';
 
-import { Filter } from '../../graphql/@generated/genql';
+import { FilterById } from '../../trpc/inferredTypes';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
 
@@ -19,7 +20,7 @@ export const PresetFilterDropdown: React.FC<PresetFilterDropdownProps> = React.f
     PresetFilterDropdownProps
 >(({ text, presets, value, disabled, onChange }, ref) => {
     const onPresetClick = useCallback(
-        (p: Filter) => {
+        (p: FilterById) => {
             const newSelected = value === p.id ? undefined : p.id;
 
             onChange?.(newSelected);

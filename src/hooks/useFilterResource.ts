@@ -1,20 +1,19 @@
-import { gql } from '../utils/gql';
 import { notifyPromise } from '../utils/notifyPromise';
-import { CreateFormType } from '../schema/filter';
-import { FilterInput, SubscriptionToggleInput } from '../../graphql/@generated/genql';
+import { CreateFilter, ToggleStargizer } from '../schema/filter';
+import { trpc } from '../utils/trpcClient';
 
 export const useFilterResource = () => {
-    const createFilter = (data: CreateFormType) =>
+    const createMutation = trpc.filter.create.useMutation();
+    const deleteMutation = trpc.filter.delete.useMutation();
+    const toggleMutation = trpc.filter.toggleStargizer.useMutation();
+    const utils = trpc.useContext();
+
+    const createFilter = (data: CreateFilter) =>
         notifyPromise(
-            gql.mutation({
-                createFilter: [
-                    {
-                        data,
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+            createMutation.mutateAsync(data, {
+                onSuccess: () => {
+                    utils.filter.getUserFilters.invalidate();
+                },
             }),
             {
                 onPending: 'We are saving your filter...',
@@ -23,17 +22,12 @@ export const useFilterResource = () => {
             },
         );
 
-    const toggleFilterStar = (data: SubscriptionToggleInput) =>
+    const toggleFilterStar = (data: ToggleStargizer) =>
         notifyPromise(
-            gql.mutation({
-                toggleFilterStargizer: [
-                    {
-                        data,
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+            toggleMutation.mutateAsync(data, {
+                onSuccess: () => {
+                    utils.filter.getUserFilters.invalidate();
+                },
             }),
             {
                 onPending: 'We are calling owner...',
@@ -42,17 +36,12 @@ export const useFilterResource = () => {
             },
         );
 
-    const deleteFilter = (data: FilterInput) =>
+    const deleteFilter = (id: string) =>
         notifyPromise(
-            gql.mutation({
-                deleteFilter: [
-                    {
-                        data,
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+            deleteMutation.mutateAsync(id, {
+                onSuccess: () => {
+                    utils.filter.getUserFilters.invalidate();
+                },
             }),
             {
                 onPending: 'We are deleting your filter...',

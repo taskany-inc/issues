@@ -1,8 +1,9 @@
+import { FilterMode } from '@prisma/client';
 import { z } from 'zod';
 
 import { tr } from './schema.i18n';
 
-export const createSchema = z.object({
+export const createFilterSchema = z.object({
     title: z
         .string({
             required_error: tr('Title is required'),
@@ -11,9 +12,16 @@ export const createSchema = z.object({
         .min(1, {
             message: tr('Title must be longer than 1 symbol'),
         }),
-    mode: z.union([z.literal('Global'), z.literal('Project'), z.literal('User')]),
+    mode: z.nativeEnum(FilterMode),
     params: z.string().min(1),
     description: z.string().optional(),
 });
 
-export type CreateFormType = z.infer<typeof createSchema>;
+export type CreateFilter = z.infer<typeof createFilterSchema>;
+
+export const ToggleStargizerSchema = z.object({
+    id: z.string().nullish(),
+    direction: z.boolean().nullish(),
+});
+
+export type ToggleStargizer = z.infer<typeof ToggleStargizerSchema>;

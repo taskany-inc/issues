@@ -1,4 +1,6 @@
 import { HomePage } from '../components/HomePage/HomePage';
+import { declareSsrProps } from '../utils/declareSsrProps';
 
-export { getServerSideProps } from '../components/HomePage/HomePage';
+export const getServerSideProps = declareSsrProps();
+
 export default HomePage;

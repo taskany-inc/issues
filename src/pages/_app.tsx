@@ -4,8 +4,10 @@ import { PageLoadProgress } from '@taskany/bricks';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { usePageLoad } from '../hooks/usePageLoad';
+import { trpc } from '../utils/trpcClient';
 
 const App = ({ Component, pageProps, router }: AppProps) => {
     const pageLoadRef = usePageLoad(router);
@@ -20,10 +22,11 @@ const App = ({ Component, pageProps, router }: AppProps) => {
                 <ThemeProvider themes={['light', 'dark']}>
                     <PageLoadProgress height={2} ref={pageLoadRef} />
                     <Component {...pageProps} />
+                    <ReactQueryDevtools />
                 </ThemeProvider>
             </SessionProvider>
         </>
     );
 };
 
-export default App;
+export default trpc.withTRPC(App);

@@ -1,8 +1,11 @@
 import { GetServerSidePropsContext } from 'next';
 import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
+import { createServerSideHelpers, DecoratedProcedureSSGRecord } from '@trpc/react-query/server';
 
 import { routes } from '../hooks/router';
+import { trpcRouter } from '../../trpc/routers/_trpcRouter';
+import type { TrpcRouter } from '../../trpc/routers/_trpcRouter';
 
 import { setSSRLocale, TLocale } from './getLang';
 
@@ -13,6 +16,7 @@ interface SSRProps<P = { [key: string]: string }> {
     params: P;
     query: Record<string, string | string[] | undefined>;
     ssrTime: number;
+    ssrHelpers: DecoratedProcedureSSGRecord<TrpcRouter>;
 }
 
 export interface ExternalPageProps<P = { [key: string]: string }> extends SSRProps<P> {
@@ -44,6 +48,8 @@ export function declareSsrProps<T = ExternalPageProps>(
             setSSRLocale(locale as TLocale);
         }
 
+        const ssrHelpers = createServerSideHelpers({ router: trpcRouter, ctx: { session } });
+
         const ssrTime = Date.now();
 
         const resProps = cb
@@ -56,6 +62,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                   params: params as Record<string, string>,
                   query,
                   ssrTime,
+                  ssrHelpers,
               })
             : {};
 
@@ -71,6 +78,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                 params: params as Record<string, string>,
                 user: session ? session.user : null,
                 ssrTime,
+                trpcState: ssrHelpers.dehydrate(),
             },
         };
     };
