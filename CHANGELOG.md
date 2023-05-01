@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.0.1](https://github.com/taskany-inc/issues/compare/v1.0.0...v1.0.1) (2023-05-01)
+
+
+### Bug Fixes
+
+* do not show empty values in applied filters ([eff70c8](https://github.com/taskany-inc/issues/commit/eff70c8380e613d30305b1b02c79fbbe0d726d23))
+* vulnerabilities audit ([fd282d1](https://github.com/taskany-inc/issues/commit/fd282d1fdce960d59c0be8fca7ac006af5cd86fe))
+
 ## 1.0.0 (2023-04-27)
 
 
