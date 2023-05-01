@@ -222,8 +222,23 @@ export const addCalclulatedGoalsFields = (goal: Partial<GoalModel>, activityId: 
     const _isWatching = goal.watchers?.some((watcher) => watcher?.id === activityId);
     const _isStarred = goal.stargizers?.some((stargizer) => stargizer?.id === activityId);
     const _isIssuer = goal.activityId === activityId;
-    const _isEditable = _isOwner || _isIssuer;
     const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
+
+    let parentOwner = false;
+    function checkParent(project?: GoalModel['project']) {
+        if (project?.activityId === activityId) {
+            parentOwner = true;
+        }
+
+        if (project?.parent?.length) {
+            project?.parent.forEach((p) => {
+                checkParent(p);
+            });
+        }
+    }
+    checkParent(goal.project);
+
+    const _isEditable = _isOwner || _isIssuer || parentOwner;
 
     return {
         _isOwner,
