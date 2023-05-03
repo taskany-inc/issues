@@ -2,6 +2,7 @@ import { GetServerSidePropsContext } from 'next';
 import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import { createServerSideHelpers, DecoratedProcedureSSGRecord } from '@trpc/react-query/server';
+import superjson from 'superjson';
 
 import { routes } from '../hooks/router';
 import { trpcRouter } from '../../trpc/routers/_trpcRouter';
@@ -48,7 +49,7 @@ export function declareSsrProps<T = ExternalPageProps>(
             setSSRLocale(locale as TLocale);
         }
 
-        const ssrHelpers = createServerSideHelpers({ router: trpcRouter, ctx: { session } });
+        const ssrHelpers = createServerSideHelpers({ router: trpcRouter, ctx: { session }, transformer: superjson });
 
         const ssrTime = Date.now();
 
