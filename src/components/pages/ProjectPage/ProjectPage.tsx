@@ -3,14 +3,13 @@ import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWR, { unstable_serialize } from 'swr';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import { Button, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 
 import { Filter, Goal, Project, ProjectDeepOutput } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
-import { FiltersPanel } from '../../FiltersPanel/FiltersPanel';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
-import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
+import { buildFetcherArgs, useFilterControls, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useFilterResource } from '../../../hooks/useFilterResource';
 import { useWillUnmount } from '../../../hooks/useWillUnmount';
@@ -20,6 +19,7 @@ import { GoalsGroup, GoalsGroupProjectTitle } from '../../GoalsGroup';
 import { PageTitle } from '../../PageTitle';
 import { Priority } from '../../../types/priority';
 import { createFilterKeys } from '../../../utils/hotkeys';
+import { Filters } from '../../Filters/Filters';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -243,10 +243,8 @@ export const getServerSideProps = declareSsrProps(
         const ssrData = await fetcher(
             user,
             id,
-            ...Object.values(
-                parseFilterValues(
-                    presetData.filter ? Object.fromEntries(new URLSearchParams(presetData.filter.params)) : query,
-                ),
+            ...buildFetcherArgs(
+                presetData.filter ? Object.fromEntries(new URLSearchParams(presetData.filter.params)) : query,
             ),
         );
 
@@ -280,33 +278,17 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
         },
     );
 
-    const {
-        currentPreset,
-        queryState,
-        queryString,
-        setPriorityFilter,
-        setStateFilter,
-        setTagsFilter,
-        setTagsFilterOutside,
-        setEstimateFilter,
-        setOwnerFilter,
-        setProjectFilter,
-        setFulltextFilter,
-        resetQueryState,
-        setPreset,
-    } = useUrlFilterParams({
+    const { fetchArgs, currentPreset, setPreset, query, queryString, pushFilterState } = useUrlFilterParams({
         preset: presetData?.filter,
     });
 
-    const { data, isLoading } = useSWR(
-        unstable_serialize(nextRouter.query),
-        () => fetcher(user, id, ...Object.values(queryState)),
-        {
-            fallback,
-            keepPreviousData: true,
-            refreshInterval,
-        },
-    );
+    const { ref, setTagsFilterOutside } = useFilterControls(query);
+
+    const { data, isLoading } = useSWR(unstable_serialize(nextRouter.query), () => fetcher(user, id, ...fetchArgs), {
+        fallback,
+        keepPreviousData: true,
+        refreshInterval,
+    });
 
     const project = data?.project;
     const deepInfo: ProjectDeepOutput | undefined = data?.projectDeepInfo;
@@ -430,32 +412,25 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <ProjectPageLayout actions project={project} title={title} description={description}>
-                <FiltersPanel
-                    count={deepInfo?.meta?.count}
-                    filteredCount={deepInfo?.goals?.length ?? 0}
-                    priority={deepInfo?.meta?.priority as Priority[]}
-                    states={deepInfo?.meta?.states}
-                    users={deepInfo?.meta?.owners}
-                    tags={deepInfo?.meta?.tags}
-                    estimates={deepInfo?.meta?.estimates}
-                    projects={deepInfo?.meta?.projects}
-                    presets={userFilters}
-                    currentPreset={currentPreset}
-                    queryState={queryState}
-                    queryString={queryString}
+                <Filters
+                    ref={ref}
                     loading={isLoading}
-                    onSearchChange={setFulltextFilter}
-                    onPriorityChange={setPriorityFilter}
-                    onStateChange={setStateFilter}
-                    onUserChange={setOwnerFilter}
-                    onProjectChange={setProjectFilter}
-                    onTagChange={setTagsFilter}
-                    onEstimateChange={setEstimateFilter}
-                    onPresetChange={setPreset}
+                    onStateChange={pushFilterState}
+                    preset={currentPreset}
+                    counter={deepInfo?.goals?.length ?? 0}
+                    total={deepInfo?.meta?.count}
+                    states={deepInfo?.meta?.states}
+                    activities={deepInfo?.meta?.owners}
+                    priority={deepInfo?.meta?.priority as Priority[]}
+                    projects={deepInfo?.meta?.projects}
+                    estimates={deepInfo?.meta?.estimates}
+                    tags={deepInfo?.meta?.tags}
+                    presets={userFilters}
                     onFilterStar={onFilterStar}
-                >
-                    {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
-                </FiltersPanel>
+                    onPresetChange={setPreset}
+                    queryString={queryString}
+                    query={query}
+                />
 
                 <PageContent>
                     {groups?.map(

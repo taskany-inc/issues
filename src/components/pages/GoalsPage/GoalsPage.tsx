@@ -3,21 +3,21 @@ import React, { MouseEventHandler, useCallback, useEffect, useState } from 'reac
 import useSWR, { unstable_serialize } from 'swr';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { nullable, Button } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 
 import { Filter, Goal, GoalsMetaOutput, Project } from '../../../../graphql/@generated/genql';
 import { createFetcher, refreshInterval } from '../../../utils/createFetcher';
 import { declareSsrProps, ExternalPageProps } from '../../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../../utils/dispatchModal';
 import { createFilterKeys } from '../../../utils/hotkeys';
-import { parseFilterValues, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
+import { buildFetcherArgs, useFilterControls, useUrlFilterParams } from '../../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../../hooks/useFilterResource';
 import { Priority } from '../../../types/priority';
 import { Page, PageContent } from '../../Page';
 import { CommonHeader } from '../../CommonHeader';
-import { FiltersPanel } from '../../FiltersPanel/FiltersPanel';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../../GoalsGroup';
 import { PageTitle } from '../../PageTitle';
+import { Filters } from '../../Filters/Filters';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -176,12 +176,8 @@ export const getServerSideProps = declareSsrProps(
             fallback: {
                 [unstable_serialize(query)]: await fetcher(
                     user,
-                    ...Object.values(
-                        parseFilterValues(
-                            presetData.filter
-                                ? Object.fromEntries(new URLSearchParams(presetData.filter.params))
-                                : query,
-                        ),
+                    ...buildFetcherArgs(
+                        presetData.filter ? Object.fromEntries(new URLSearchParams(presetData.filter.params)) : query,
                     ),
                 ),
                 [unstable_serialize(query.filter)]: presetData,
@@ -206,33 +202,17 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
         },
     );
 
-    const {
-        currentPreset,
-        queryState,
-        queryString,
-        setPriorityFilter,
-        setStateFilter,
-        setTagsFilter,
-        setTagsFilterOutside,
-        setEstimateFilter,
-        setOwnerFilter,
-        setProjectFilter,
-        setFulltextFilter,
-        resetQueryState,
-        setPreset,
-    } = useUrlFilterParams({
+    const { fetchArgs, currentPreset, setPreset, query, queryString, pushFilterState } = useUrlFilterParams({
         preset: presetData?.filter,
     });
 
-    const { data, isLoading } = useSWR(
-        unstable_serialize(router.query),
-        () => fetcher(user, ...Object.values(queryState)),
-        {
-            fallback,
-            keepPreviousData: true,
-            refreshInterval,
-        },
-    );
+    const { ref, setTagsFilterOutside } = useFilterControls(query);
+
+    const { data, isLoading } = useSWR(unstable_serialize(router.query), () => fetcher(user, ...fetchArgs), {
+        fallback,
+        keepPreviousData: true,
+        refreshInterval,
+    });
 
     const goals = data?.userGoals?.goals;
     const meta: GoalsMetaOutput | undefined = data?.userGoals?.meta;
@@ -336,32 +316,25 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
         <Page user={user} ssrTime={ssrTime} locale={locale} title={tr('title')}>
             <CommonHeader title={title} description={description} />
 
-            <FiltersPanel
-                count={meta?.count}
-                filteredCount={goals?.length ?? 0}
-                priority={meta?.priority as Priority[]}
+            <Filters
+                ref={ref}
+                loading={isLoading}
+                onStateChange={pushFilterState}
+                preset={currentPreset}
+                counter={goals?.length}
+                total={meta?.count}
                 states={meta?.states}
-                users={meta?.owners}
+                activities={meta?.owners}
+                priority={meta?.priority as Priority[]}
                 projects={meta?.projects}
-                tags={meta?.tags}
                 estimates={meta?.estimates}
                 presets={userFilters}
-                currentPreset={currentPreset}
-                queryState={queryState}
-                queryString={queryString}
-                loading={isLoading}
-                onSearchChange={setFulltextFilter}
-                onPriorityChange={setPriorityFilter}
-                onStateChange={setStateFilter}
-                onUserChange={setOwnerFilter}
-                onProjectChange={setProjectFilter}
-                onTagChange={setTagsFilter}
-                onEstimateChange={setEstimateFilter}
-                onPresetChange={setPreset}
                 onFilterStar={onFilterStar}
-            >
-                {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
-            </FiltersPanel>
+                onPresetChange={setPreset}
+                tags={meta?.tags}
+                queryString={queryString}
+                query={query}
+            />
 
             <PageContent>
                 {groups?.map(

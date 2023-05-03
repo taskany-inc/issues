@@ -1,115 +1,128 @@
+import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
+import { FiltersControlRef, FiltersState } from '@taskany/bricks';
 import { ParsedUrlQuery } from 'querystring';
-import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
 
+import { TagFilterId, filtersFields } from '../components/Filters/Filters';
 import { Filter, Tag } from '../../graphql/@generated/genql';
-import { Priority } from '../types/priority';
 
-export interface QueryState {
-    priorityFilter: Priority[];
-    stateFilter: string[];
-    tagsFilter: string[];
-    estimateFilter: string[];
-    ownerFilter: string[];
-    projectFilter: string[];
-    fulltextFilter: string;
-    limitFilter?: number;
-}
+// Order FecherArgs:
+//
+// [
+//     priority,
+//     state,
+//     tags,
+//     estimates,
+//     owner,
+//     projects,
+//     query,
+//     limit
+// ]
+
+type FecherArgs = [string[], string[], string[], string[], string[], string[], string, number | undefined];
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
-export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
-    priorityFilter: parseQueryParam(query.priority?.toString()) as Priority[],
-    stateFilter: parseQueryParam(query.state?.toString()),
-    tagsFilter: parseQueryParam(query.tags?.toString()),
-    estimateFilter: parseQueryParam(query.estimates?.toString()),
-    ownerFilter: parseQueryParam(query.user?.toString()),
-    projectFilter: parseQueryParam(query.projects?.toString()),
-    fulltextFilter: parseQueryParam(query.search?.toString()).toString(),
-    limitFilter: query.limit ? Number(query.limit) : undefined,
-});
+export const buildFetcherArgs = (query: ParsedUrlQuery): FecherArgs => [
+    parseQueryParam(query.priority?.toString()),
+    parseQueryParam(query.state?.toString()),
+    parseQueryParam(query.tags?.toString()),
+    parseQueryParam(query.estimates?.toString()),
+    parseQueryParam(query.user?.toString()),
+    parseQueryParam(query.projects?.toString()),
+    parseQueryParam(query.search?.toString()).toString(),
+    query.limit ? Number(query.limit) : undefined,
+];
+
+export const buildQueryString = (state: FiltersState): string => {
+    const urlParams = filtersFields.reduce((acum, filterId) => {
+        const filter = state[filterId];
+
+        if (filter && filter.value.length) {
+            acum.set(filterId, filter.value.toString());
+        } else {
+            acum.delete(filterId);
+        }
+
+        return acum;
+    }, new URLSearchParams());
+
+    return urlParams.toString();
+};
+
+type FilterId = string;
+type FilterValueId = string;
+type FilterValue = [FilterId, FilterValueId[]];
+
+export const buildFilterValues = (query: ParsedUrlQuery): FilterValue[] => {
+    return filtersFields.reduce((acum, filterId) => {
+        acum.push([filterId, parseQueryParam(query[filterId]?.toString())]);
+
+        return acum;
+    }, [] as FilterValue[]);
+};
 
 export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
-    const router = useRouter();
+    const { push, asPath, query: routerQuery } = useRouter();
+    const [baseUrl, queryString] = asPath.split('?');
+
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
-    const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
-    const queryState = useMemo<QueryState>(() => parseFilterValues(query), [query]);
-    const queryString = router.asPath.split('?')[1];
 
     if (prevPreset?.id !== preset?.id || prevPreset?._isStarred !== preset?._isStarred) {
         setPrevPreset(preset);
         setCurrentPreset(preset);
     }
 
-    const pushNewState = useCallback(
-        ({
-            priorityFilter,
-            stateFilter,
-            tagsFilter,
-            estimateFilter,
-            ownerFilter,
-            projectFilter,
-            fulltextFilter,
-            limitFilter,
-        }: QueryState) => {
-            const newurl = router.asPath.split('?')[0];
-            const urlParams = new URLSearchParams();
+    const query = useMemo(
+        () => (currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : routerQuery),
+        [currentPreset, routerQuery],
+    );
 
-            priorityFilter.length > 0
-                ? urlParams.set('priority', Array.from(priorityFilter).toString())
-                : urlParams.delete('priority');
+    const fetchArgs = useMemo(() => buildFetcherArgs(query), [query]);
 
-            stateFilter.length > 0
-                ? urlParams.set('state', Array.from(stateFilter).toString())
-                : urlParams.delete('state');
+    const pushFilterState = useCallback(
+        (state: FiltersState) => {
+            const query = buildQueryString(state);
 
-            tagsFilter.length > 0 ? urlParams.set('tags', Array.from(tagsFilter).toString()) : urlParams.delete('tags');
+            push(query.length ? `${baseUrl}?${query}` : baseUrl);
 
-            estimateFilter.length > 0
-                ? urlParams.set('estimates', Array.from(estimateFilter).toString())
-                : urlParams.delete('estimates');
-
-            ownerFilter.length > 0
-                ? urlParams.set('user', Array.from(ownerFilter).toString())
-                : urlParams.delete('user');
-
-            projectFilter.length > 0
-                ? urlParams.set('projects', Array.from(projectFilter).toString())
-                : urlParams.delete('projects');
-
-            fulltextFilter.length > 0 ? urlParams.set('search', fulltextFilter.toString()) : urlParams.delete('search');
-
-            limitFilter ? urlParams.set('limit', limitFilter.toString()) : urlParams.delete('limit');
-
-            router.push(Array.from(urlParams.keys()).length ? `${newurl}?${urlParams}` : newurl);
+            return query;
         },
-        [router],
+        [baseUrl, push],
     );
 
-    const pushStateProvider = useCallback(
-        <T extends keyof QueryState>(key: T) =>
-            (value: QueryState[T]) => {
-                setCurrentPreset(undefined);
-                pushNewState({
-                    ...queryState,
-                    [key]: value,
-                });
-            },
-        [pushNewState, queryState],
+    const setPreset = useCallback(
+        (filter: string | undefined) => {
+            push({
+                pathname: baseUrl,
+                query: {
+                    filter,
+                },
+            });
+        },
+        [push, baseUrl],
     );
 
-    const resetQueryState = useCallback(() => {
-        pushNewState({
-            priorityFilter: [],
-            stateFilter: [],
-            ownerFilter: [],
-            projectFilter: [],
-            tagsFilter: [],
-            estimateFilter: [],
-            fulltextFilter: '',
-        });
-    }, [pushNewState]);
+    return useMemo(
+        () => ({
+            query,
+            queryString,
+            currentPreset,
+            pushFilterState,
+            setPreset,
+            fetchArgs,
+        }),
+        [query, queryString, pushFilterState, setPreset, currentPreset, fetchArgs],
+    );
+};
+
+export const useFilterControls = (query: ParsedUrlQuery) => {
+    const ref = useRef<FiltersControlRef>(null);
+
+    useEffect(() => {
+        ref.current?.setFilterValues(buildFilterValues(query));
+    }, [query]);
 
     const setTagsFilterOutside = useCallback(
         (t: Tag): MouseEventHandler<HTMLDivElement> =>
@@ -117,53 +130,19 @@ export const useUrlFilterParams = ({ preset }: { preset?: Filter }) => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const newTagsFilterValue = new Set(queryState.tagsFilter);
+                if (ref.current) {
+                    const newTagsFilterValue = new Set(ref.current.getFilterValue(TagFilterId));
 
-                newTagsFilterValue.has(t.id) ? newTagsFilterValue.delete(t.id) : newTagsFilterValue.add(t.id);
+                    newTagsFilterValue.has(t.id) ? newTagsFilterValue.delete(t.id) : newTagsFilterValue.add(t.id);
 
-                const newSelected = Array.from(newTagsFilterValue);
-
-                pushNewState({
-                    ...queryState,
-                    tagsFilter: newSelected,
-                });
+                    ref.current.setFilterValues([[TagFilterId, Array.from(newTagsFilterValue)]], false);
+                }
             },
-        [queryState, pushNewState],
-    );
-
-    const setPreset = useCallback(
-        (filter: string | undefined) => {
-            router.push({
-                pathname: router.asPath.split('?')[0],
-                query: {
-                    filter,
-                },
-            });
-        },
-        [router],
-    );
-
-    const setters = useMemo(
-        () => ({
-            setPriorityFilter: pushStateProvider('priorityFilter'),
-            setStateFilter: pushStateProvider('stateFilter'),
-            setTagsFilter: pushStateProvider('tagsFilter'),
-            setEstimateFilter: pushStateProvider('estimateFilter'),
-            setOwnerFilter: pushStateProvider('ownerFilter'),
-            setProjectFilter: pushStateProvider('projectFilter'),
-            setFulltextFilter: pushStateProvider('fulltextFilter'),
-            setLimitFilter: pushStateProvider('limitFilter'),
-        }),
-        [pushStateProvider],
+        [],
     );
 
     return {
-        queryState,
-        queryString,
-        currentPreset,
+        ref,
         setTagsFilterOutside,
-        resetQueryState,
-        setPreset,
-        ...setters,
     };
 };
