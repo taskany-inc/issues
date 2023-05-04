@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import useSWR, { unstable_serialize } from 'swr';
+import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
@@ -29,7 +29,7 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-const fetcher = createFetcher(
+export const goalsPageFetcher = createFetcher(
     (_, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
         userGoals: [
             {
@@ -172,13 +172,13 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
         preset: presetData?.data,
     });
 
-    const { data, isLoading } = useSWR(
-        unstable_serialize(router.query),
-        () => fetcher(user, ...Object.values(queryState)),
+    const { data, isLoading } = useQuery(
+        ['goals-page', router.query],
+        () => goalsPageFetcher(user, ...Object.values(queryState)),
         {
-            fallback,
+            initialData: fallback as Awaited<ReturnType<typeof goalsPageFetcher>>,
             keepPreviousData: true,
-            refreshInterval,
+            staleTime: refreshInterval,
         },
     );
 
