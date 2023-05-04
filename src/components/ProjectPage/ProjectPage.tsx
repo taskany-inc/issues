@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import useSWR, { unstable_serialize } from 'swr';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { Button, nullable } from '@taskany/bricks';
@@ -91,7 +92,7 @@ const goalFields = {
     updatedAt: true,
 } as const;
 
-const fetcher = createFetcher(
+export const projectPageFetcher = createFetcher(
     (_, id: string, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
         project: [
             {
@@ -242,13 +243,13 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
         preset: presetData?.data,
     });
 
-    const { data, isLoading } = useSWR(
-        unstable_serialize(nextRouter.query),
-        () => fetcher(user, id, ...Object.values(queryState)),
+    const { data, isLoading } = useQuery(
+        ['project-page', nextRouter.query],
+        () => projectPageFetcher(user, id, ...Object.values(queryState)),
         {
-            fallback,
+            initialData: fallback as Awaited<ReturnType<typeof projectPageFetcher>>,
             keepPreviousData: true,
-            refreshInterval,
+            staleTime: refreshInterval,
         },
     );
 
