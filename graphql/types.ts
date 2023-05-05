@@ -314,15 +314,6 @@ export const ActivityInput = inputObjectType({
     },
 });
 
-export const UserUpdateInput = inputObjectType({
-    name: 'UserUpdateInput',
-    definition(t) {
-        t.field(UserModel.id);
-        t.field(UserModel.nickname);
-        t.field(UserModel.name);
-    },
-});
-
 export const ReactionToggleInput = inputObjectType({
     name: 'ReactionToggleInput',
     definition(t) {

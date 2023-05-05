@@ -21,7 +21,7 @@ import {
     KeyCode,
 } from '@taskany/bricks';
 
-import { gql } from '../../utils/gql';
+import { trpc } from '../../utils/trpcClient';
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { Tip } from '../Tip';
@@ -53,25 +53,14 @@ const UserInviteForm: React.FC = () => {
     const [error, setError] = useState<FieldError>();
     const [inputValue, setInputValue] = useState('');
     const schema = schemaProvider();
+    const inviteMutation = trpc.user.invite.useMutation();
 
     const inviteUser = useCallback(async () => {
         if (emails.length === 0) {
             return;
         }
 
-        const promise = gql.mutation({
-            usersInvites: [
-                {
-                    input: {
-                        emails,
-                    },
-                },
-                {
-                    id: true,
-                    email: true,
-                },
-            ],
-        });
+        const promise = inviteMutation.mutateAsync(emails);
 
         toast.promise(promise, {
             error: tr('Something went wrong 😿'),
@@ -83,7 +72,7 @@ const UserInviteForm: React.FC = () => {
 
         setEmails([]);
         setInputValue('');
-    }, [emails]);
+    }, [emails, inviteMutation]);
 
     const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);

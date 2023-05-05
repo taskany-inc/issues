@@ -209,8 +209,6 @@ type Mutation {
   updateGoal(data: GoalUpdateInput!): Goal
   updateProject(data: ProjectUpdateInput!): Project
   updateSettings(data: SettingsUpdateInput!): Settings
-  updateUser(data: UserUpdateInput!): User
-  usersInvites(input: UserInvitesInput!): [Ghost]
 }
 
 type Project {
@@ -282,7 +280,6 @@ input ProjectUpdateInput {
 }
 
 type Query {
-  findActivity(data: FindActivityInput!): [Activity]
   findGoal(query: String!): [Goal]
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
@@ -295,7 +292,6 @@ type Query {
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
   topProjects: [Project]
   userGoals(data: UserGoalsInput!): UserGoalsOutput
-  users(sortBy: SortOrder): [User]
 }
 
 type Reaction {
@@ -399,10 +395,4 @@ type UserGoalsOutput {
 
 input UserInvitesInput {
   emails: [String]
-}
-
-input UserUpdateInput {
-  id: ID!
-  name: String
-  nickname: String
 }
