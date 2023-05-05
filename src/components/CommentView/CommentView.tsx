@@ -15,8 +15,9 @@ import {
     UserPic,
     nullable,
 } from '@taskany/bricks';
+import { Reaction } from '@prisma/client';
 
-import { Comment, User } from '../../../graphql/@generated/genql';
+import { User } from '../../../graphql/@generated/genql';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
 import { Reactions } from '../Reactions';
@@ -34,7 +35,7 @@ interface CommentViewProps {
     description: string;
     createdAt: string;
     updatedAt?: string;
-    reactions?: Comment['reactions'];
+    reactions?: Reaction[];
     author?: User;
     isNew?: boolean;
     isEditable?: boolean;

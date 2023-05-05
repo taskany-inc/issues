@@ -203,7 +203,6 @@ type Mutation {
   toggleGoalWatcher(data: SubscriptionToggleInput!): Activity
   toggleProjectStargizer(data: SubscriptionToggleInput!): Activity
   toggleProjectWatcher(data: SubscriptionToggleInput!): Activity
-  toggleReaction(data: ReactionToggleInput!): Reaction
   transferProjectOwnership(data: TransferOwnershipInput!): Project
   updateComment(data: CommentUpdateInput!): Comment
   updateGoal(data: GoalUpdateInput!): Goal
@@ -301,12 +300,6 @@ type Reaction {
   goalId: String
   id: ID!
   updatedAt: DateTime!
-}
-
-input ReactionToggleInput {
-  commentId: String
-  emoji: String!
-  goalId: String
 }
 
 enum Role {
