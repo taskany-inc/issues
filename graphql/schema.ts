@@ -5,7 +5,6 @@ import * as Types from './types';
 import * as Project from './resolvers/Project';
 import * as Goal from './resolvers/Goal';
 import * as Tag from './resolvers/Tag';
-import * as Reaction from './resolvers/Reaction';
 import * as Comment from './resolvers/Comment';
 
 const Query = queryType({
@@ -13,7 +12,6 @@ const Query = queryType({
         Project.query(t);
         Goal.query(t);
         Tag.query(t);
-        Reaction.query(t);
         Comment.query(t);
     },
 });
@@ -23,7 +21,6 @@ const Mutation = mutationType({
         Project.mutation(t);
         Goal.mutation(t);
         Tag.mutation(t);
-        Reaction.mutation(t);
         Comment.mutation(t);
     },
 });

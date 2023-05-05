@@ -306,15 +306,6 @@ export const ActivityInput = inputObjectType({
     },
 });
 
-export const ReactionToggleInput = inputObjectType({
-    name: 'ReactionToggleInput',
-    definition(t) {
-        t.field(ReactionModel.emoji);
-        t.field(ReactionModel.goalId);
-        t.field(ReactionModel.commentId);
-    },
-});
-
 export const TagCreateInput = inputObjectType({
     name: 'TagInput',
     definition(t) {

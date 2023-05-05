@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
+import { Reaction } from '@prisma/client';
 
-import { gql } from '../utils/gql';
-import { Reaction } from '../../graphql/@generated/genql';
+import { trpc } from '../utils/trpcClient';
 
 const reactionsGroupsLimit = 10;
 type ReactionsMap = Record<string, { count: number; authors: Set<string> }>;
 
-export const useReactionsResource = (r?: Array<Reaction | undefined>) => {
+export const useReactionsResource = (r?: Reaction[]) => {
+    const toggleMutation = trpc.reaction.toggle.useMutation();
+
     const reactions = useMemo(
         () =>
             r?.reduce((acc, curr) => {
@@ -34,18 +36,9 @@ export const useReactionsResource = (r?: Array<Reaction | undefined>) => {
     const goalReaction = (goalId: string, cb?: () => void) => async (emoji?: string) => {
         if (!emoji) return;
 
-        await gql.mutation({
-            toggleReaction: [
-                {
-                    data: {
-                        emoji,
-                        goalId,
-                    },
-                },
-                {
-                    id: true,
-                },
-            ],
+        await toggleMutation.mutateAsync({
+            emoji,
+            goalId,
         });
 
         cb?.();
@@ -54,18 +47,9 @@ export const useReactionsResource = (r?: Array<Reaction | undefined>) => {
     const commentReaction = (commentId: string, cb?: () => void) => async (emoji?: string) => {
         if (!emoji) return;
 
-        await gql.mutation({
-            toggleReaction: [
-                {
-                    data: {
-                        emoji,
-                        commentId,
-                    },
-                },
-                {
-                    id: true,
-                },
-            ],
+        await toggleMutation.mutateAsync({
+            emoji,
+            commentId,
         });
 
         cb?.();
