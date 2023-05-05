@@ -34,21 +34,12 @@ import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource 
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
 import { FlowComboBox } from '../FlowComboBox';
+import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './ProjectCreateForm.i18n';
 
 const KeyInput = dynamic(() => import('../KeyInput'));
 
-const flowFetcher = createFetcher(() => ({
-    flowRecommended: {
-        id: true,
-        title: true,
-        states: {
-            id: true,
-            title: true,
-        },
-    },
-}));
 const projectFetcher = createFetcher((_, id: string) => ({
     project: [
         {
@@ -131,15 +122,16 @@ const ProjectCreateForm: React.FC = () => {
     );
 
     const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
-    const { data: flowData } = useSWR('flow', () => flowFetcher(user));
+    const flowRecomendations = trpc.flow.recommedations.useQuery();
+
     const { data: projectData } = useSWR(isKeyEnoughLength ? [user, keyWatcher] : null, projectFetcher);
     const isKeyUnique = Boolean(projectData?.project === null || !projectData);
 
     useEffect(() => {
-        if (flowData?.flowRecommended) {
-            setValue('flow', flowData?.flowRecommended[0]);
+        if (flowRecomendations.data) {
+            setValue('flow', flowRecomendations.data[0]);
         }
-    }, [setValue, flowData?.flowRecommended]);
+    }, [setValue, flowRecomendations]);
 
     const onCreateProject = useCallback(
         (form: ProjectFormType) => {

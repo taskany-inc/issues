@@ -1,6 +1,6 @@
 import { inferRouterOutputs } from '@trpc/server';
 
-import { TrpcRouter } from './routers/_trpcRouter';
+import { TrpcRouter } from './router';
 
 type RouterOutputs = inferRouterOutputs<TrpcRouter>;
 
