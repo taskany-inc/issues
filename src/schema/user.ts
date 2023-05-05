@@ -11,3 +11,7 @@ export const suggestionsUserSchema = z.object({
     query: z.string(),
     filter: z.array(z.string()).optional(),
 });
+
+export const settingsUserSchema = z.object({
+    theme: z.string(),
+});

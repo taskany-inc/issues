@@ -208,7 +208,6 @@ type Mutation {
   updateComment(data: CommentUpdateInput!): Comment
   updateGoal(data: GoalUpdateInput!): Goal
   updateProject(data: ProjectUpdateInput!): Project
-  updateSettings(data: SettingsUpdateInput!): Settings
 }
 
 type Project {
@@ -288,7 +287,6 @@ type Query {
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectDeepInfo(data: ProjectDeepInput!): ProjectDeepOutput
   projects: [Project]
-  settings: Settings
   tagCompletion(query: String!, sortBy: SortOrder): [Tag]
   topProjects: [Project]
   userGoals(data: UserGoalsInput!): UserGoalsOutput
@@ -318,11 +316,6 @@ enum Role {
 
 type Settings {
   activity: Activity
-  id: ID!
-  theme: String!
-}
-
-input SettingsUpdateInput {
   id: ID!
   theme: String!
 }
@@ -391,8 +384,4 @@ input UserGoalsInput {
 type UserGoalsOutput {
   goals: [Goal!]
   meta: GoalsMetaOutput
-}
-
-input UserInvitesInput {
-  emails: [String]
 }

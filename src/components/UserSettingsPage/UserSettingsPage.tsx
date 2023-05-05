@@ -3,10 +3,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
-import useSWR from 'swr';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
-import { useRouter as useNextRouter } from 'next/router';
 import { gray10 } from '@taskany/colors';
 import {
     Button,
@@ -19,11 +17,10 @@ import {
     FormRadioInput,
     BulbOnIcon,
 } from '@taskany/bricks';
+import { useRouter } from 'next/router';
 
-import { gql } from '../../utils/gql';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { shallowEqual } from '../../utils/shallowEqual';
-import { createFetcher, refreshInterval } from '../../utils/createFetcher';
 import { trpc } from '../../utils/trpcClient';
 import { Page } from '../Page';
 import { PageSep } from '../PageSep';
@@ -35,27 +32,12 @@ import { UpdateUser, updateUserSchema } from '../../schema/user';
 
 import { tr } from './UserSettingsPage.i18n';
 
-export const userSettingsFetcher = createFetcher(() => ({
-    settings: {
-        id: true,
-        theme: true,
-    },
-}));
-
-export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPageProps) => {
-    const nextRouter = useNextRouter();
+export const UserSettingsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
+    const router = useRouter();
+    const settings = trpc.user.settings.useQuery();
     const updateMutation = trpc.user.update.useMutation();
-
-    const { data: settingsData } = useSWR(user.activityId, () => userSettingsFetcher(), {
-        fallback,
-        refreshInterval,
-    });
-
-    if (!settingsData) return null;
-
-    const settings = settingsData?.settings;
-
-    if (!settings) return nextRouter.push('/404');
+    const updateSettingsMutation = trpc.user.updateSettings.useMutation();
+    const utils = trpc.useContext();
 
     const [actualUserFields, setActualUserFields] = useState({
         name: user.name,
@@ -90,27 +72,24 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
         if (res) setActualUserFields(res);
     };
 
-    const [appearanceTheme, setAppearanceTheme] = useState(settings?.theme);
+    const [appearanceTheme, setAppearanceTheme] = useState(settings?.data?.theme);
     const { resolvedTheme, setTheme } = useTheme();
 
     const onAppearanceThemeChange = useCallback(
         async (theme?: string) => {
             if (!theme) return;
 
-            const promise = gql.mutation({
-                updateSettings: [
-                    {
-                        data: {
-                            id: settings.id,
-                            theme,
-                        },
+            const promise = updateSettingsMutation.mutateAsync(
+                {
+                    theme,
+                },
+                {
+                    onSuccess: () => {
+                        utils.user.settings.invalidate();
+                        router.reload();
                     },
-                    {
-                        id: true,
-                        theme: true,
-                    },
-                ],
-            });
+                },
+            );
 
             toast.promise(promise, {
                 error: tr('Something went wrong 😿'),
@@ -120,15 +99,15 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
 
             const res = await promise;
 
-            if (res.updateSettings) {
-                setAppearanceTheme(res.updateSettings?.theme);
+            if (res.theme) {
+                setAppearanceTheme(res.theme);
             }
         },
-        [settings],
+        [updateSettingsMutation, utils.user.settings, router],
     );
 
     useEffect(() => {
-        setTheme(appearanceTheme);
+        if (appearanceTheme) setTheme(appearanceTheme);
     }, [setTheme, appearanceTheme, resolvedTheme]);
 
     const clearLocalCache = useCallback(() => {
