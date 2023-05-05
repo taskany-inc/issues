@@ -1,11 +1,9 @@
 import React, { useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
-import { Button, ComboBox, UserPic, Input } from '@taskany/bricks';
+import { Button, ComboBox, UserPic, Input, UserMenuItem } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
-
-import { UserMenuItem } from './UserMenuItem';
 
 interface UserComboBoxProps {
     text: React.ComponentProps<typeof Button>['text'];

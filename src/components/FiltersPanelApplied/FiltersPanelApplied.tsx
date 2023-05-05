@@ -1,35 +1,27 @@
 import { useMemo } from 'react';
-import styled from 'styled-components';
-import { Text } from '@taskany/bricks';
+import { FiltersApplied, Text } from '@taskany/bricks';
 import { gapM, gray7 } from '@taskany/colors';
 
 import { QueryState } from '../../hooks/useUrlFilterParams';
-import { EstimateFilterDropdown } from '../EstimateFilterDropdown';
-import { PriorityFilterDropdown } from '../PriorityFilterDropdown';
-import { ProjectFilterDropdown } from '../ProjectFilterDropdown';
-import { StateFilterDropdown } from '../StateFilterDropdown';
-import { TagsFilterDropdown } from '../TagsFilterDropdown';
-import { UserFilterDropdown } from '../UserFilterDropdown';
 import { getPriorityText } from '../PriorityText/PriorityText';
+import { PriorityFilter } from '../PriorityFilter';
+import { StateFilter } from '../StateFilter';
+import { UserFilter } from '../UserFilter';
+import { ProjectFilter } from '../ProjectFilter';
+import { TagFilter } from '../TagFilter';
+import { EstimateFilter } from '../EstimateFilter';
 
 import { tr } from './FiltersPanelApplied.i18n';
 
 interface FiltersPanelAppliedProps {
     queryState: QueryState;
-    priority?: React.ComponentProps<typeof PriorityFilterDropdown>['priority'];
-    states?: React.ComponentProps<typeof StateFilterDropdown>['states'];
-    users?: React.ComponentProps<typeof UserFilterDropdown>['activity'];
-    projects?: React.ComponentProps<typeof ProjectFilterDropdown>['projects'];
-    tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
-    estimates?: React.ComponentProps<typeof EstimateFilterDropdown>['estimates'];
+    priority?: React.ComponentProps<typeof PriorityFilter>['priorities'];
+    states?: React.ComponentProps<typeof StateFilter>['states'];
+    users?: React.ComponentProps<typeof UserFilter>['users'];
+    projects?: React.ComponentProps<typeof ProjectFilter>['projects'];
+    tags?: React.ComponentProps<typeof TagFilter>['tags'];
+    estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
 }
-
-const StyledApplied = styled(Text)`
-    display: block;
-
-    margin-top: -10px;
-    padding: 0 40px ${gapM} 45px;
-`;
 
 const arrToMap = <T extends Array<{ id: string }>>(arr: T): { [key: string]: T[number] } =>
     arr.reduce(
@@ -94,8 +86,8 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     });
 
     return (
-        <StyledApplied size="s" weight="bold" color={gray7}>
+        <FiltersApplied size="s" weight="bold" color={gray7}>
             {infoString}
-        </StyledApplied>
+        </FiltersApplied>
     );
 };

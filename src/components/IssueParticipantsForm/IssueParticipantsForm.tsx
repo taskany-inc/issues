@@ -1,11 +1,10 @@
 import { useCallback, useMemo, useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { gapL, gapM } from '@taskany/colors';
-import { ComboBox, FormInput, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
+import { ComboBox, FormInput, FormTitle, ModalContent, ModalHeader, UserMenuItem } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
 import { IssueParticipantsList } from '../IssueParticipantsList';
-import { UserMenuItem } from '../UserMenuItem';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './IssueParticipantsForm.i18n';

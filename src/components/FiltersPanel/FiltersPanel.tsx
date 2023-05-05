@@ -1,291 +1,172 @@
-import React, { useCallback } from 'react';
-import styled from 'styled-components';
-import { debounce } from 'throttle-debounce';
-import { gapM, gapS, gray5, gray6, gray9, textColor } from '@taskany/colors';
-import { Badge, Text, Input, StarIcon, nullable, StarFilledIcon } from '@taskany/bricks';
-import { Filter } from '@prisma/client';
+import { FC, ReactNode } from 'react';
+import {
+    FiltersAction,
+    FiltersCounter,
+    FiltersCounterContainer,
+    FiltersMenuContainer,
+    FiltersPanelContainer,
+    FiltersPanelContent,
+    FiltersSearchContainer,
+    StarFilledIcon,
+    StarIcon,
+    nullable,
+} from '@taskany/bricks';
 
-import { FilterById } from '../../../trpc/inferredTypes';
-import type { QueryState } from '../../hooks/useUrlFilterParams';
-import { PageContent } from '../Page';
-import { StateFilterDropdown } from '../StateFilterDropdown';
-import { UserFilterDropdown } from '../UserFilterDropdown';
-import { TagsFilterDropdown } from '../TagsFilterDropdown';
-import { LimitFilterDropdown } from '../LimitFilterDropdown';
-import { PriorityFilterDropdown } from '../PriorityFilterDropdown';
-import { EstimateFilterDropdown } from '../EstimateFilterDropdown';
-import { ProjectFilterDropdown } from '../ProjectFilterDropdown';
-import { PresetFilterDropdown } from '../PresetFilterDropdown';
+import { QueryState } from '../../hooks/useUrlFilterParams';
+import { SearchFilter } from '../SearchFilter';
+import { ProjectFilter } from '../ProjectFilter';
+import { TagFilter } from '../TagFilter';
+import { EstimateFilter } from '../EstimateFilter';
+import { PresetDropdown } from '../PresetDropdown';
+import { LimitDropdown } from '../LimitDropdown';
+import { UserFilter } from '../UserFilter';
+import { PriorityFilter } from '../PriorityFilter';
+import { StateFilter } from '../StateFilter';
 import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
+import { Priority } from '../../types/priority';
+import { FilterById } from '../../../trpc/inferredTypes';
 
 import { tr } from './FiltersPanel.i18n';
 
-interface FiltersPanelProps {
+export const FiltersPanel: FC<{
+    children?: ReactNode;
+    loading?: boolean;
+    total?: number;
+    counter?: number;
     queryState: QueryState;
     queryString?: string;
-    count?: number;
-    filteredCount?: number;
-    priority?: React.ComponentProps<typeof PriorityFilterDropdown>['priority'];
-    states?: React.ComponentProps<typeof StateFilterDropdown>['states'];
-    users?: React.ComponentProps<typeof UserFilterDropdown>['activity'];
-    projects?: React.ComponentProps<typeof ProjectFilterDropdown>['projects'];
-    tags?: React.ComponentProps<typeof TagsFilterDropdown>['tags'];
-    estimates?: React.ComponentProps<typeof EstimateFilterDropdown>['estimates'];
-    presets?: Filter[];
-    currentPreset?: FilterById;
-    loading?: boolean;
-    children?: React.ReactNode;
+
+    preset?: FilterById;
+    priorities?: React.ComponentProps<typeof PriorityFilter>['priorities'];
+    states?: React.ComponentProps<typeof StateFilter>['states'];
+    projects?: React.ComponentProps<typeof ProjectFilter>['projects'];
+    tags?: React.ComponentProps<typeof TagFilter>['tags'];
+    estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
+    presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
+    users?: React.ComponentProps<typeof UserFilter>['users'];
 
     onSearchChange: (search: string) => void;
-    onPriorityChange?: React.ComponentProps<typeof PriorityFilterDropdown>['onChange'];
-    onStateChange?: React.ComponentProps<typeof StateFilterDropdown>['onChange'];
-    onUserChange?: React.ComponentProps<typeof UserFilterDropdown>['onChange'];
-    onProjectChange?: React.ComponentProps<typeof ProjectFilterDropdown>['onChange'];
-    onTagChange?: React.ComponentProps<typeof TagsFilterDropdown>['onChange'];
-    onEstimateChange?: React.ComponentProps<typeof EstimateFilterDropdown>['onChange'];
-    onLimitChange?: React.ComponentProps<typeof LimitFilterDropdown>['onChange'];
-    onPresetChange?: React.ComponentProps<typeof PresetFilterDropdown>['onChange'];
+    onPriorityChange: React.ComponentProps<typeof PriorityFilter>['onChange'];
+    onStateChange: React.ComponentProps<typeof StateFilter>['onChange'];
+    onUserChange: React.ComponentProps<typeof UserFilter>['onChange'];
+    onProjectChange: React.ComponentProps<typeof ProjectFilter>['onChange'];
+    onTagChange: React.ComponentProps<typeof TagFilter>['onChange'];
+    onEstimateChange: React.ComponentProps<typeof EstimateFilter>['onChange'];
+    onPresetChange: React.ComponentProps<typeof PresetDropdown>['onChange'];
+    onLimitChange?: React.ComponentProps<typeof LimitDropdown>['onChange'];
     onFilterStar?: () => void;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledFiltersPanel = styled(({ loading, ...props }) => <div {...props} />)<{ loading?: boolean }>`
-    margin: ${gapM} 0;
-    padding: ${gapS} 0;
-
-    background-color: ${gray5};
-
-    animation-name: bkgChange;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
-
-    transition: background-color 200ms ease-in-out;
-
-    @keyframes bkgChange {
-        0% {
-            background-color: ${gray5};
-        }
-        50.0% {
-            background-color: ${gray6};
-        }
-        100.0% {
-            background-color: ${gray5};
-        }
-    }
-
-    ${({ loading }) =>
-        loading &&
-        `
-            animation-play-state: running;
-            animation-duration: 1s;
-    `}
-`;
-
-const StyledFiltersContent = styled(PageContent)`
-    padding-top: 0;
-
-    display: grid;
-    grid-template-columns: 2fr 9fr 1fr;
-    align-items: center;
-`;
-
-const StyledFiltersMenuWrapper = styled.div`
-    display: flex;
-    align-items: center;
-
-    padding-left: ${gapS};
-`;
-
-const StyledFiltersMenu = styled.div`
-    padding-left: ${gapM};
-`;
-
-const StyledFiltersAction = styled.div`
-    display: inline-block;
-    padding-left: ${gapS};
-    padding-right: ${gapS};
-    vertical-align: middle;
-
-    cursor: pointer;
-
-    color: ${gray9};
-
-    :hover {
-        color: ${textColor};
-    }
-
-    transition: color 200ms ease-in-out;
-`;
-
-export const FiltersPanel: React.FC<FiltersPanelProps> = ({
+}> = ({
+    children,
+    loading,
+    total = 0,
+    counter = 0,
     queryState,
     queryString,
-    count,
-    filteredCount,
-    states,
-    priority,
-    users,
-    projects,
-    tags,
-    estimates,
-    presets,
-    currentPreset,
-    loading,
-    children,
+    preset,
+    projects = [],
+    tags = [],
+    estimates = [],
+    presets = [],
+    users = [],
+    priorities = [],
+    states = [],
     onPriorityChange,
-    onSearchChange,
     onStateChange,
     onUserChange,
+    onSearchChange,
     onProjectChange,
-    onTagChange,
     onEstimateChange,
-    onLimitChange,
     onPresetChange,
+    onTagChange,
+    onLimitChange,
     onFilterStar,
-}) => {
-    const debouncedSearchHandler = debounce(200, onSearchChange);
-
-    const onSearchInputChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => debouncedSearchHandler(e.currentTarget.value),
-        [debouncedSearchHandler],
-    );
-
-    return (
-        <>
-            <StyledFiltersPanel loading={loading}>
-                <StyledFiltersContent>
-                    <Input placeholder={tr('Search')} defaultValue={queryState.query} onChange={onSearchInputChange} />
-
-                    <StyledFiltersMenuWrapper>
-                        {nullable(count, () => (
-                            <Badge size="m">
-                                {filteredCount === undefined || count === filteredCount ? (
-                                    count
-                                ) : (
-                                    <>
-                                        <Text weight="bold" color={textColor} size="xs" as="span">
-                                            {filteredCount}
-                                        </Text>
-                                        {` / ${count}`}
-                                    </>
-                                )}
-                            </Badge>
+}) => (
+    <>
+        <FiltersPanelContainer loading={loading}>
+            <FiltersPanelContent>
+                <FiltersSearchContainer>
+                    <SearchFilter
+                        placeholder={tr('Search')}
+                        defaultValue={queryState.query}
+                        onChange={onSearchChange}
+                    />
+                </FiltersSearchContainer>
+                <FiltersCounterContainer>
+                    <FiltersCounter total={total} counter={counter} />
+                </FiltersCounterContainer>
+                <FiltersMenuContainer>
+                    {Boolean(priorities.length) && (
+                        <PriorityFilter
+                            text={tr('Priority')}
+                            value={queryState.priority}
+                            priorities={priorities}
+                            onChange={onPriorityChange}
+                        />
+                    )}
+                    {Boolean(priorities.length) && (
+                        <StateFilter
+                            text={tr('State')}
+                            value={queryState.state}
+                            states={states}
+                            onChange={onStateChange}
+                        />
+                    )}
+                    {Boolean(users.length) && (
+                        <UserFilter text={tr('Owner')} value={queryState.owner} users={users} onChange={onUserChange} />
+                    )}
+                    {Boolean(projects.length) && (
+                        <ProjectFilter
+                            text={tr('Project')}
+                            value={queryState.project}
+                            projects={projects}
+                            onChange={onProjectChange}
+                        />
+                    )}
+                    {Boolean(tags.length) && (
+                        <TagFilter text={tr('Tags')} value={queryState.tag} tags={tags} onChange={onTagChange} />
+                    )}
+                    {Boolean(estimates.length) && (
+                        <EstimateFilter
+                            text={tr('Estimate')}
+                            value={queryState.estimate}
+                            estimates={estimates}
+                            onChange={onEstimateChange}
+                        />
+                    )}
+                    {Boolean(presets.length) && (
+                        <PresetDropdown
+                            text={tr('Preset')}
+                            value={preset}
+                            presets={presets}
+                            onChange={onPresetChange}
+                        />
+                    )}
+                    {onLimitChange &&
+                        nullable(queryState.limit, (lf) => (
+                            <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={onLimitChange} />
                         ))}
-
-                        <StyledFiltersMenu>
-                            {Boolean(priority?.length) &&
-                                onPriorityChange &&
-                                nullable(priority, (pr) => (
-                                    <PriorityFilterDropdown
-                                        text={tr('Priority')}
-                                        priority={pr}
-                                        value={queryState.priority}
-                                        onChange={onPriorityChange}
-                                    />
-                                ))}
-
-                            {Boolean(states?.length) &&
-                                onStateChange &&
-                                nullable(states, (st) => (
-                                    <StateFilterDropdown
-                                        text={tr('State')}
-                                        states={st}
-                                        value={queryState.state}
-                                        onChange={onStateChange}
-                                    />
-                                ))}
-
-                            {Boolean(users?.length) &&
-                                onUserChange &&
-                                nullable(users, (u) => (
-                                    <UserFilterDropdown
-                                        text={tr('Owner')}
-                                        activity={u}
-                                        value={queryState.owner}
-                                        onChange={onUserChange}
-                                    />
-                                ))}
-
-                            {Boolean(projects?.length) &&
-                                onProjectChange &&
-                                nullable(projects, (pr) => (
-                                    <ProjectFilterDropdown
-                                        text={tr('Project')}
-                                        projects={pr}
-                                        value={queryState.project}
-                                        onChange={onProjectChange}
-                                    />
-                                ))}
-
-                            {Boolean(tags?.length) &&
-                                onTagChange &&
-                                nullable(tags, (ta) => (
-                                    <TagsFilterDropdown
-                                        text={tr('Tags')}
-                                        tags={ta}
-                                        value={queryState.tag}
-                                        onChange={onTagChange}
-                                    />
-                                ))}
-
-                            {Boolean(estimates?.length) &&
-                                onEstimateChange &&
-                                nullable(estimates, (e) => (
-                                    <EstimateFilterDropdown
-                                        text={tr('Estimate')}
-                                        estimates={e}
-                                        value={queryState.estimate}
-                                        onChange={onEstimateChange}
-                                    />
-                                ))}
-
-                            {onLimitChange &&
-                                nullable(queryState.limit, (lf) => (
-                                    <LimitFilterDropdown text={tr('Limit')} value={lf} onChange={onLimitChange} />
-                                ))}
-
-                            {Boolean(presets?.length) &&
-                                nullable(presets, (pr) => (
-                                    <PresetFilterDropdown
-                                        text={tr('Preset')}
-                                        presets={pr}
-                                        value={currentPreset ? currentPreset.id : undefined}
-                                        onChange={onPresetChange}
-                                    />
-                                ))}
-
-                            {((Boolean(queryString) && !currentPreset) ||
-                                (currentPreset && !currentPreset._isOwner && !currentPreset._isStarred)) && (
-                                <StyledFiltersAction onClick={onFilterStar}>
-                                    <StarIcon size="s" noWrap />
-                                </StyledFiltersAction>
-                            )}
-
-                            {currentPreset && (currentPreset._isOwner || currentPreset._isStarred) && (
-                                <StyledFiltersAction onClick={onFilterStar}>
-                                    <StarFilledIcon size="s" noWrap />
-                                </StyledFiltersAction>
-                            )}
-                        </StyledFiltersMenu>
-                    </StyledFiltersMenuWrapper>
-
-                    {nullable(children, (ch) => (
-                        <div style={{ textAlign: 'right' }}>{ch}</div>
-                    ))}
-                </StyledFiltersContent>
-            </StyledFiltersPanel>
-
-            <FiltersPanelApplied
-                queryState={queryState}
-                states={states}
-                priority={priority}
-                users={users}
-                projects={projects}
-                tags={tags}
-                estimates={estimates}
-            />
-        </>
-    );
-};
-
-FiltersPanel.whyDidYouRender = true;
+                    {((Boolean(queryString) && !preset) || (preset && !preset._isOwner && !preset._isStarred)) && (
+                        <FiltersAction onClick={onFilterStar}>
+                            <StarIcon size="s" noWrap />
+                        </FiltersAction>
+                    )}
+                    {preset && (preset._isOwner || preset._isStarred) && (
+                        <FiltersAction onClick={onFilterStar}>
+                            <StarFilledIcon size="s" noWrap />
+                        </FiltersAction>
+                    )}
+                </FiltersMenuContainer>
+                {children}
+            </FiltersPanelContent>
+        </FiltersPanelContainer>
+        <FiltersPanelApplied
+            queryState={queryState}
+            priority={priorities as Priority[]}
+            states={states}
+            users={users}
+            projects={projects}
+            tags={tags}
+            estimates={estimates}
+        />
+    </>
+);
