@@ -2,7 +2,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import z from 'zod';
 import toast from 'react-hot-toast';
 import useSWR from 'swr';
 import { useTheme } from 'next-themes';
@@ -25,13 +24,14 @@ import { gql } from '../../utils/gql';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { shallowEqual } from '../../utils/shallowEqual';
 import { createFetcher, refreshInterval } from '../../utils/createFetcher';
-import { User } from '../../../graphql/@generated/genql';
+import { trpc } from '../../utils/trpcClient';
 import { Page } from '../Page';
 import { PageSep } from '../PageSep';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
 import { CommonHeader } from '../CommonHeader';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
+import { UpdateUser, updateUserSchema } from '../../schema/user';
 
 import { tr } from './UserSettingsPage.i18n';
 
@@ -44,6 +44,7 @@ export const userSettingsFetcher = createFetcher(() => ({
 
 export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
+    const updateMutation = trpc.user.update.useMutation();
 
     const { data: settingsData } = useSWR(user.activityId, () => userSettingsFetcher(), {
         fallback,
@@ -56,28 +57,14 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
 
     if (!settings) return nextRouter.push('/404');
 
-    const [actualUserFields, setActualUserFields] = useState<Pick<User, 'name' | 'nickname'>>({
+    const [actualUserFields, setActualUserFields] = useState({
         name: user.name,
-        nickname: user.nickname || '',
+        nickname: user.nickname,
     });
     const [generalFormChanged, setGeneralFormChanged] = useState(false);
 
-    const generalSchema = z.object({
-        name: z
-            .string({
-                required_error: tr('User name is required'),
-                invalid_type_error: tr('User name must be a string'),
-            })
-            .min(3, {
-                message: tr('User name must be longer than 3 symbols'),
-            }),
-        nickname: z.string().optional(),
-    });
-
-    type GeneralFormType = z.infer<typeof generalSchema>;
-
-    const generalForm = useForm<GeneralFormType>({
-        resolver: zodResolver(generalSchema),
+    const generalForm = useForm<UpdateUser>({
+        resolver: zodResolver(updateUserSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
@@ -89,21 +76,8 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
         setGeneralFormChanged(!shallowEqual(generalFormValues, actualUserFields));
     }, [generalFormValues, actualUserFields]);
 
-    const updateUser = async (data: GeneralFormType) => {
-        const promise = gql.mutation({
-            updateUser: [
-                {
-                    data: {
-                        id: user.id,
-                        ...data,
-                    },
-                },
-                {
-                    name: true,
-                    nickname: true,
-                },
-            ],
-        });
+    const updateUser = async (data: UpdateUser) => {
+        const promise = updateMutation.mutateAsync(data);
 
         toast.promise(promise, {
             error: tr('Something went wrong 😿'),
@@ -113,9 +87,7 @@ export const UserSettingsPage = ({ user, locale, ssrTime, fallback }: ExternalPa
 
         const res = await promise;
 
-        if (res.updateUser) {
-            setActualUserFields(res.updateUser);
-        }
+        if (res) setActualUserFields(res);
     };
 
     const [appearanceTheme, setAppearanceTheme] = useState(settings?.theme);
