@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import useSWR from 'swr';
 import { Button, Dropdown, FlowIcon } from '@taskany/bricks';
+import { State } from '@prisma/client';
 
-import { createFetcher } from '../utils/createFetcher';
-import { State } from '../../graphql/@generated/genql';
-import { usePageContext } from '../hooks/usePageContext';
+import { trpc } from '../utils/trpcClient';
 
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
@@ -19,38 +17,19 @@ interface StateDropdownProps {
     onChange?: (state: State) => void;
 }
 
-const fetcher = createFetcher((_, id: string) => ({
-    flow: [
-        {
-            id,
-        },
-        {
-            id: true,
-            title: true,
-            states: {
-                id: true,
-                title: true,
-                hue: true,
-                default: true,
-            },
-        },
-    ],
-}));
-
 export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps>(
     ({ text, value, flowId, error, disabled, onChange }, ref) => {
-        const { user, themeId } = usePageContext();
         const [state, setState] = useState(value);
 
-        const { data } = useSWR(flowId, (id) => fetcher(user, id));
+        const flowById = flowId ? trpc.flow.getById.useQuery(flowId) : undefined;
 
         useEffect(() => {
-            const defaultState = data?.flow?.states?.filter((s) => s?.default)[0];
+            const defaultState = flowById?.data?.states?.filter((s) => s?.default)[0];
             if (!value && defaultState) {
                 setState(defaultState);
                 onChange?.(defaultState);
             }
-        }, [value, onChange, data?.flow?.states]);
+        }, [value, onChange, flowById]);
 
         const onStateChange = useCallback(
             (s: Partial<State>) => {
@@ -67,7 +46,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                 text={state?.title || text}
                 value={state}
                 onChange={onStateChange}
-                items={data?.flow?.states}
+                items={flowById?.data?.states}
                 disabled={!flowId || disabled}
                 renderTrigger={(props) => (
                     <Button

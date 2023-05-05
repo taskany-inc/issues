@@ -4,7 +4,6 @@ import { makeSchema, queryType, mutationType } from 'nexus';
 import * as Types from './types';
 import * as User from './resolvers/User';
 import * as Project from './resolvers/Project';
-import * as Flow from './resolvers/Flow';
 import * as Goal from './resolvers/Goal';
 import * as Tag from './resolvers/Tag';
 import * as Settings from './resolvers/Settings';
@@ -15,7 +14,6 @@ const Query = queryType({
     definition(t) {
         User.query(t);
         Project.query(t);
-        Flow.query(t);
         Goal.query(t);
         Tag.query(t);
         Settings.query(t);
@@ -28,7 +26,6 @@ const Mutation = mutationType({
     definition(t) {
         User.mutation(t);
         Project.mutation(t);
-        Flow.mutation(t);
         Goal.mutation(t);
         Tag.mutation(t);
         Settings.mutation(t);

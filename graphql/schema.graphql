@@ -77,14 +77,6 @@ input FindActivityInput {
   query: String!
 }
 
-type Flow {
-  graph: String
-  id: ID!
-  projects: [Project]
-  states: [State]
-  title: String!
-}
-
 type Ghost {
   activity: Activity
   createdAt: DateTime!
@@ -231,7 +223,6 @@ type Project {
   children: [Project!]
   createdAt: DateTime!
   description: String
-  flow: Flow
   flowId: String!
   goals: [Goal!]
   id: ID!
@@ -293,9 +284,6 @@ input ProjectUpdateInput {
 type Query {
   findActivity(data: FindActivityInput!): [Activity]
   findGoal(query: String!): [Goal]
-  flow(id: String!): Flow
-  flowCompletion(query: String!, sortBy: SortOrder): [Flow]
-  flowRecommended: [Flow]
   goal(id: String!): Goal
   goalComment(goalId: String!): [Comment]
   goalDependencyKind: [String]
@@ -350,7 +338,6 @@ enum SortOrder {
 
 type State {
   default: Boolean
-  flows: [Flow]
   hue: Int!
   id: ID!
   title: String!

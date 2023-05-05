@@ -1,56 +1,41 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import { gapM } from '@taskany/colors';
 import { KeyCode, useKeyPress, useKeyboard } from '@taskany/bricks';
 
-import { createFetcher } from '../utils/createFetcher';
-import { State as StateModel } from '../../graphql/@generated/genql';
-import { usePageContext } from '../hooks/usePageContext';
+import { trpc } from '../utils/trpcClient';
 
 import { State } from './State';
 
 const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 
+interface StateObject {
+    id: string;
+    title: string;
+    hue: number;
+}
+
 interface StateSwitchProps {
-    state: StateModel;
+    state: StateObject;
     flowId?: string;
 
-    onClick?: (state: StateModel) => void;
+    onClick?: (id: string) => void;
 }
 
 const StyledStates = styled.div`
     padding-left: ${gapM};
 `;
 
-const fetcher = createFetcher((_, id: string) => ({
-    flow: [
-        {
-            id,
-        },
-        {
-            id: true,
-            title: true,
-            states: {
-                id: true,
-                title: true,
-                hue: true,
-                default: true,
-            },
-        },
-    ],
-}));
-
 const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => {
-    const { user } = usePageContext();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLDivElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
     const downPress = useKeyPress('ArrowDown');
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState<number>();
-    const { data } = useSWR(flowId, (id) => fetcher(user, id));
+
+    const flowById = flowId ? trpc.flow.getById.useQuery(flowId) : undefined;
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
@@ -61,9 +46,9 @@ const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => 
     }, [popupVisible]);
 
     const onItemClick = useCallback(
-        (s: StateModel) => () => {
+        (s: StateObject) => () => {
             setPopupVisibility(false);
-            onClick && onClick(s);
+            onClick && onClick(s.id);
         },
         [onClick],
     );
@@ -71,36 +56,36 @@ const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => 
     const [onESC] = useKeyboard([KeyCode.Escape], () => popupVisible && setPopupVisibility(false));
 
     const [onENTER] = useKeyboard([KeyCode.Enter], () => {
-        if (data?.flow?.states?.length && cursor) {
-            onItemClick(data?.flow?.states[cursor])();
+        if (flowById?.data?.states?.length && cursor) {
+            onItemClick(flowById?.data?.states[cursor])();
             setPopupVisibility(false);
         }
     });
 
     useEffect(() => {
-        const states = data?.flow?.states;
+        const states = flowById?.data?.states;
 
         if (states?.length && downPress) {
             setCursor((prevState = 0) => (prevState < states.length - 1 ? prevState + 1 : prevState));
         }
-    }, [data?.flow, downPress]);
+    }, [flowById, downPress]);
 
     useEffect(() => {
-        if (data?.flow?.states?.length && upPress) {
+        if (flowById?.data?.states?.length && upPress) {
             setCursor((prevState = 0) => (prevState > 0 ? prevState - 1 : prevState));
         }
-    }, [data?.flow, upPress]);
+    }, [flowById, upPress]);
 
     useEffect(() => {
-        if (data?.flow?.states?.length && state) {
-            for (let currCursor = 0; currCursor < data?.flow?.states.length; currCursor++) {
-                if (data?.flow?.states[currCursor].id === state.id) {
+        if (flowById?.data?.states?.length && state) {
+            for (let currCursor = 0; currCursor < flowById?.data?.states.length; currCursor++) {
+                if (flowById?.data?.states[currCursor].id === state.id) {
                     setCursor(currCursor);
                     break;
                 }
             }
         }
-    }, [data?.flow, state]);
+    }, [flowById, state]);
 
     return (
         <>
@@ -111,16 +96,16 @@ const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => 
             <Popup
                 placement="right"
                 overflow="hidden"
-                visible={popupVisible && Boolean(data?.flow?.states?.length)}
+                visible={popupVisible && Boolean(flowById?.data?.states?.length)}
                 onClickOutside={onClickOutside}
                 reference={popupRef}
                 interactive
                 offset={[0, 4]}
             >
                 <StyledStates>
-                    {data?.flow?.states
+                    {flowById?.data?.states
                         ?.filter((s) => s.id !== state.id)
-                        .map((s) => (
+                        .map((s: StateObject) => (
                             <State
                                 key={s.id}
                                 hue={s.hue}

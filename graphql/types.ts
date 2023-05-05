@@ -8,7 +8,6 @@ import {
     Activity as ActivityModel,
     Goal as GoalModel,
     Estimate as EstimateModel,
-    Flow as FlowModel,
     State as StateModel,
     Tag as TagModel,
     Settings as SettingsModel,
@@ -91,7 +90,6 @@ export const Project = objectType({
         t.field(ProjectModel.activityId);
         t.field('activity', { type: Activity });
         t.field(ProjectModel.flowId);
-        t.field('flow', { type: Flow });
         t.list.field('parent', { type: nonNull(Project) });
         t.list.field('children', { type: nonNull(Project) });
         t.list.field('goals', { type: nonNull(Goal) });
@@ -188,17 +186,6 @@ export const Estimate = objectType({
     },
 });
 
-export const Flow = objectType({
-    name: FlowModel.$name,
-    definition(t) {
-        t.field(FlowModel.id);
-        t.field(FlowModel.title);
-        t.field(FlowModel.graph);
-        t.list.field('projects', { type: Project });
-        t.list.field('states', { type: State });
-    },
-});
-
 export const State = objectType({
     name: StateModel.$name,
     definition(t) {
@@ -206,7 +193,6 @@ export const State = objectType({
         t.field(StateModel.title);
         t.field(StateModel.hue);
         t.field(StateModel.default);
-        t.list.field('flows', { type: Flow });
     },
 });
 

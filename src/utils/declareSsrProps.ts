@@ -5,8 +5,8 @@ import { createServerSideHelpers, DecoratedProcedureSSGRecord } from '@trpc/reac
 import superjson from 'superjson';
 
 import { routes } from '../hooks/router';
-import { trpcRouter } from '../../trpc/routers/_trpcRouter';
-import type { TrpcRouter } from '../../trpc/routers/_trpcRouter';
+import { trpcRouter } from '../../trpc/router';
+import type { TrpcRouter } from '../../trpc/router';
 
 import { setSSRLocale, TLocale } from './getLang';
 

@@ -24,7 +24,7 @@ import {
 } from '@taskany/bricks';
 
 import { gql } from '../../utils/gql';
-import { Goal, State } from '../../../graphql/@generated/genql';
+import { Goal } from '../../../graphql/@generated/genql';
 import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
 import { formatEstimate } from '../../utils/dateTime';
 import { useHighlightedComment } from '../../hooks/useHighlightedComment';
@@ -125,9 +125,9 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
     const issueEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
 
     const onGoalStateChange = useCallback(
-        async (state: State) => {
+        async (stateId: string) => {
             await updateGoal({
-                stateId: state.id,
+                stateId,
             });
 
             refresh();

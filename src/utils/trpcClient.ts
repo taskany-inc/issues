@@ -2,7 +2,7 @@ import { httpBatchLink } from '@trpc/client';
 import { createTRPCNext } from '@trpc/next';
 import superjson from 'superjson';
 
-import type { TrpcRouter } from '../../trpc/routers/_trpcRouter';
+import type { TrpcRouter } from '../../trpc/router';
 
 function getBaseUrl() {
     if (typeof window !== 'undefined') {

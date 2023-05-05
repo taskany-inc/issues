@@ -1,12 +1,10 @@
 /* eslint-disable react/display-name */
 import React, { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
-import useSWR from 'swr';
+import { Flow } from '@prisma/client';
 import { Button, Input, ComboBox, FlowIcon, MenuItem } from '@taskany/bricks';
 
-import { createFetcher } from '../utils/createFetcher';
-import { Flow } from '../../graphql/@generated/genql';
-import { usePageContext } from '../hooks/usePageContext';
+import { trpc } from '../utils/trpcClient';
 
 interface FlowComboBoxProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -23,29 +21,12 @@ const StyledInput = styled(Input)`
     min-width: 100px;
 `;
 
-const fetcher = createFetcher((_, query: string) => ({
-    flowCompletion: [
-        {
-            query,
-        },
-        {
-            id: true,
-            title: true,
-            states: {
-                id: true,
-                title: true,
-            },
-        },
-    ],
-}));
-
 export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
     ({ text, value, disabled, query = '', error, placeholder, onChange }, ref) => {
-        const { user } = usePageContext();
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(value?.title || query);
 
-        const { data } = useSWR(inputState, (q) => fetcher(user, q));
+        const suggestions = trpc.flow.suggestions.useQuery(inputState);
 
         return (
             <ComboBox
@@ -55,7 +36,7 @@ export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
                 visible={completionVisible}
                 error={error}
                 disabled={disabled}
-                items={data?.flowCompletion}
+                items={suggestions.data}
                 onChange={onChange}
                 renderTrigger={(props) => (
                     <Button

@@ -24,7 +24,7 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { State, GoalDependencyToggleInput, Project, Activity, Comment } from '../../../graphql/@generated/genql';
+import { GoalDependencyToggleInput, Project, Activity, Comment } from '../../../graphql/@generated/genql';
 import { gql } from '../../utils/gql';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { formatEstimate } from '../../utils/dateTime';
@@ -164,9 +164,9 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
 
     const onGoalStateChange = useCallback(
-        async (state: State) => {
+        async (stateId: string) => {
             await updateGoal({
-                stateId: state.id,
+                stateId,
             });
 
             mutate();
