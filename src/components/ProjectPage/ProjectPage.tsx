@@ -17,7 +17,6 @@ import { ProjectPageLayout } from '../ProjectPageLayout/ProjectPageLayout';
 import { Page, PageContent } from '../Page';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../GoalsGroup';
 import { PageTitle } from '../PageTitle';
-import { Priority } from '../../types/priority';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
@@ -209,26 +208,26 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                 parent={project.data.parent}
             >
                 <FiltersPanel
-                    count={projectDeepInfo?.meta?.count}
-                    filteredCount={projectDeepInfo?.goals?.length ?? 0}
-                    priority={projectDeepInfo?.meta?.priority as Priority[]}
-                    states={projectDeepInfo?.meta?.states}
-                    users={projectDeepInfo?.meta?.owners}
-                    tags={projectDeepInfo?.meta?.tags}
-                    estimates={projectDeepInfo?.meta?.estimates}
-                    projects={projectDeepInfo?.meta?.projects}
-                    presets={userFilters.data}
-                    currentPreset={currentPreset}
+                    loading={isLoading}
+                    total={projectDeepInfo?.meta?.count}
+                    counter={projectDeepInfo?.goals?.length}
                     queryState={queryState}
                     queryString={queryString}
-                    loading={isLoading}
+                    users={projectDeepInfo?.meta?.owners}
+                    priorities={projectDeepInfo?.meta?.priority}
+                    projects={projectDeepInfo?.meta?.projects}
+                    preset={currentPreset}
+                    presets={userFilters.data}
+                    tags={projectDeepInfo?.meta?.tags}
+                    states={projectDeepInfo?.meta?.states}
+                    estimates={projectDeepInfo?.meta?.estimates}
                     onSearchChange={setFulltextFilter}
-                    onPriorityChange={setPriorityFilter}
-                    onStateChange={setStateFilter}
                     onUserChange={setOwnerFilter}
                     onProjectChange={setProjectFilter}
+                    onStateChange={setStateFilter}
                     onTagChange={setTagsFilter}
                     onEstimateChange={setEstimateFilter}
+                    onPriorityChange={setPriorityFilter}
                     onPresetChange={setPreset}
                     onFilterStar={onFilterStar}
                 >

@@ -11,7 +11,6 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../hooks/useFilterResource';
-import { Priority } from '../../types/priority';
 import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
@@ -171,26 +170,26 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
             <CommonHeader title={title} description={description} />
 
             <FiltersPanel
-                count={meta?.count}
-                filteredCount={goals?.length ?? 0}
-                priority={meta?.priority as Priority[]}
-                states={meta?.states}
-                users={meta?.owners}
-                projects={meta?.projects}
-                tags={meta?.tags}
-                estimates={meta?.estimates}
-                presets={userFilters.data}
-                currentPreset={currentPreset}
+                loading={isLoading}
+                total={meta?.count}
+                counter={goals?.length}
                 queryState={queryState}
                 queryString={queryString}
-                loading={isLoading}
+                users={meta?.owners}
+                priorities={meta?.priority}
+                projects={meta?.projects}
+                preset={currentPreset}
+                presets={userFilters.data}
+                tags={meta?.tags}
+                states={meta?.states}
+                estimates={meta?.estimates}
                 onSearchChange={setFulltextFilter}
-                onPriorityChange={setPriorityFilter}
-                onStateChange={setStateFilter}
                 onUserChange={setOwnerFilter}
                 onProjectChange={setProjectFilter}
+                onStateChange={setStateFilter}
                 onTagChange={setTagsFilter}
                 onEstimateChange={setEstimateFilter}
+                onPriorityChange={setPriorityFilter}
                 onPresetChange={setPreset}
                 onFilterStar={onFilterStar}
             >
