@@ -34,6 +34,7 @@ export function declareSsrProps<T = ExternalPageProps>(
     options?: { private: boolean },
 ) {
     return async ({ locale, req, params = {}, query }: GetServerSidePropsContext) => {
+        // FIXME: getServerSession. Problem with serialazing createdAt, updatedAt
         const session = await getSession({ req });
 
         if (options?.private && !session) {
@@ -68,7 +69,7 @@ export function declareSsrProps<T = ExternalPageProps>(
             : {};
 
         // @ts-ignore
-        if (resProps.notFound) {
+        if (resProps?.notFound) {
             return resProps;
         }
 

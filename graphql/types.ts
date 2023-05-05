@@ -245,14 +245,6 @@ export const Comment = objectType({
     },
 });
 
-export const SettingsUpdateInput = inputObjectType({
-    name: 'SettingsUpdateInput',
-    definition(t) {
-        t.field(SettingsModel.id);
-        t.field(SettingsModel.theme);
-    },
-});
-
 export const GoalCreateInput = inputObjectType({
     name: 'GoalCreateInput',
     definition(t) {
@@ -347,13 +339,6 @@ export const GoalDependencyToggleInput = inputObjectType({
         t.string('target');
         t.field('dependency', { type: Dependency });
         t.boolean('direction');
-    },
-});
-
-export const UserInvitesInput = inputObjectType({
-    name: 'UserInvitesInput',
-    definition(t) {
-        t.list.string('emails');
     },
 });
 

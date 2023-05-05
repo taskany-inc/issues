@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { suggestionsUserSchema, updateUserSchema } from '../../src/schema/user';
+import { settingsUserSchema, suggestionsUserSchema, updateUserSchema } from '../../src/schema/user';
 
 export const userRouter = router({
     suggestions: protectedProcedure.input(suggestionsUserSchema).query(async ({ input: { query, filter } }) => {
@@ -86,5 +86,31 @@ export const userRouter = router({
     }),
     update: protectedProcedure.input(updateUserSchema).mutation(({ ctx, input }) => {
         return prisma.user.update({ where: { id: ctx.session.user.id }, data: input });
+    }),
+    settings: protectedProcedure.query(async ({ ctx }) => {
+        const activityWithSettings = await prisma.activity.findUnique({
+            where: {
+                id: ctx.session.user.activityId,
+            },
+            include: {
+                settings: true,
+            },
+        });
+
+        if (!activityWithSettings) return null;
+
+        return activityWithSettings.settings;
+    }),
+    updateSettings: protectedProcedure.input(settingsUserSchema).mutation(async ({ ctx, input }) => {
+        const activity = await prisma.activity.findUnique({
+            where: {
+                id: ctx.session.user.activityId,
+            },
+            include: {
+                settings: true,
+            },
+        });
+
+        return prisma.settings.update({ where: { id: activity?.settingsId }, data: input });
     }),
 });
