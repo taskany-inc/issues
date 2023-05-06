@@ -258,8 +258,8 @@ export const GoalCreateInput = inputObjectType({
         t.field(GoalModel.ownerId);
         t.field(GoalModel.stateId);
         t.field(GoalModel.priority);
-        t.list.field('tags', { type: nonNull(TagCreateInput) });
-        t.list.field('participants', { type: nonNull(ActivityInput) });
+        // t.list.field('tags', { type: nonNull(TagCreateInput) });
+        // t.list.field('participants', { type: nonNull(ActivityInput) });
     },
 });
 
@@ -277,7 +277,6 @@ export const GoalUpdateInput = inputObjectType({
         t.field(GoalModel.ownerId);
         t.field(GoalModel.stateId);
         t.field(GoalModel.priority);
-        t.list.field('tags', { type: nonNull(TagCreateInput) });
         t.list.string('participants');
     },
 });
@@ -299,22 +298,6 @@ export const EstimateInput = inputObjectType({
     },
 });
 
-export const ActivityInput = inputObjectType({
-    name: 'ActivityInput',
-    definition(t) {
-        t.field(ActivityModel.id);
-    },
-});
-
-export const TagCreateInput = inputObjectType({
-    name: 'TagInput',
-    definition(t) {
-        t.field(TagModel.id);
-        t.field(TagModel.title);
-        t.field(TagModel.description);
-    },
-});
-
 export const SubscriptionToggleInput = inputObjectType({
     name: 'SubscriptionToggleInput',
     definition(t) {
@@ -330,29 +313,6 @@ export const GoalDependencyToggleInput = inputObjectType({
         t.string('target');
         t.field('dependency', { type: Dependency });
         t.boolean('direction');
-    },
-});
-
-export const CommentCreateInput = inputObjectType({
-    name: 'CommentCreateInput',
-    definition(t) {
-        t.field(CommentModel.description);
-        t.field(CommentModel.goalId);
-    },
-});
-
-export const CommentUpdateInput = inputObjectType({
-    name: 'CommentUpdateInput',
-    definition(t) {
-        t.field(CommentModel.id);
-        t.field(CommentModel.description);
-    },
-});
-
-export const CommentDeleteInput = inputObjectType({
-    name: 'CommentDeleteInput',
-    definition(t) {
-        t.field(CommentModel.id);
     },
 });
 

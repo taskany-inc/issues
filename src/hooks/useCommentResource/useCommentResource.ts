@@ -1,60 +1,22 @@
-import { z } from 'zod';
 import toast from 'react-hot-toast';
+import { Comment } from '@prisma/client';
 
-import { gql } from '../../utils/gql';
-import { Comment, CommentDeleteInput } from '../../../graphql/@generated/genql';
-import { usePageContext } from '../usePageContext';
+import { trpc } from '../../utils/trpcClient';
+import { CommentCreate, CommentUpdate } from '../../schema/comment';
 
 import { tr } from './useCommentResource.i18n';
 
-// FIXME: problem with passing this errors
-const createSchemaProvider = () =>
-    z.object({
-        description: z
-            .string({
-                required_error: tr("Comments's description is required"),
-                invalid_type_error: tr("Comments's description must be a string"),
-            })
-            .min(1, {
-                message: tr("Comments's description must be longer than 1 symbol"),
-            }),
-        goalId: z.string().min(1),
-    });
-
-const updateSchemaProvider = () =>
-    z.object({
-        id: z.string().min(1),
-        description: z
-            .string({
-                required_error: tr("Comments's description is required"),
-                invalid_type_error: tr("Comments's description must be a string"),
-            })
-            .min(1, {
-                message: tr("Comments's description must be longer than 1 symbol"),
-            }),
-    });
-
-export type CreateFormType = z.infer<ReturnType<typeof createSchemaProvider>>;
-export type UpdateFormType = z.infer<ReturnType<typeof updateSchemaProvider>>;
-
 export const useCommentResource = () => {
-    const { user } = usePageContext();
+    const createMutation = trpc.comment.create.useMutation();
+    const updateMutation = trpc.comment.update.useMutation();
+    const deleteMutation = trpc.comment.delete.useMutation();
 
     const create =
-        (cb: (params: Partial<Comment>) => void) =>
-        async ({ goalId, description }: CreateFormType) => {
-            const promise = gql.mutation({
-                createComment: [
-                    {
-                        data: {
-                            goalId,
-                            description,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+        (cb: (params: Comment) => void) =>
+        async ({ goalId, description }: CommentCreate) => {
+            const promise = createMutation.mutateAsync({
+                goalId,
+                description,
             });
 
             toast.promise(promise, {
@@ -65,25 +27,15 @@ export const useCommentResource = () => {
 
             const data = await promise;
 
-            data?.createComment && cb(data.createComment);
+            data && cb(data);
         };
 
     const update =
-        (cb: (params: Partial<Comment>) => void) =>
-        async ({ id, description }: UpdateFormType) => {
-            const promise = gql.mutation({
-                updateComment: [
-                    {
-                        data: {
-                            id,
-                            description,
-                        },
-                    },
-                    {
-                        id: true,
-                        description: true,
-                    },
-                ],
+        (cb: (params: Comment) => void) =>
+        async ({ id, description }: CommentUpdate) => {
+            const promise = updateMutation.mutateAsync({
+                id,
+                description,
             });
 
             toast.promise(promise, {
@@ -94,24 +46,13 @@ export const useCommentResource = () => {
 
             const data = await promise;
 
-            data.updateComment && cb(data.updateComment);
+            data && cb(data);
         };
 
     const remove =
         (cb: (params: Partial<Comment>) => void) =>
-        async ({ id }: CommentDeleteInput) => {
-            const promise = gql.mutation({
-                deleteComment: [
-                    {
-                        data: {
-                            id,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
-            });
+        async ({ id }: { id: string }) => {
+            const promise = deleteMutation.mutateAsync(id);
 
             toast.promise(promise, {
                 error: tr('Something went wrong 😿'),
@@ -121,8 +62,8 @@ export const useCommentResource = () => {
 
             const data = await promise;
 
-            data.deleteComment && cb(data.deleteComment);
+            data && cb(data);
         };
 
-    return { createSchema: createSchemaProvider(), updateSchema: updateSchemaProvider(), create, update, remove };
+    return { create, update, remove };
 };
