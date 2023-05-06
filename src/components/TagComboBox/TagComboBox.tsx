@@ -1,40 +1,30 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
-import useSWR from 'swr';
 import toast from 'react-hot-toast';
 import { Button, ComboBox, Input, Tag, TagIcon } from '@taskany/bricks';
 
-import { createFetcher } from '../../utils/createFetcher';
+import { trpc } from '../../utils/trpcClient';
 import { Tag as TagModel } from '../../../graphql/@generated/genql';
-import { gql } from '../../utils/gql';
-import { usePageContext } from '../../hooks/usePageContext';
 
 import { tr } from './TagComboBox.i18n';
+
+interface TagObject {
+    id: string;
+    title: string;
+    description?: string | null;
+}
 
 interface TagComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
     query?: string;
-    value?: Array<Partial<TagModel>>;
+    value?: TagObject[];
     disabled?: boolean;
     placeholder?: string;
     error?: React.ComponentProps<typeof ComboBox>['error'];
 
-    onChange?: (value: Array<Partial<TagModel>>) => void;
+    onChange?: (value: TagObject[]) => void;
 }
-
-const fetcher = createFetcher((_, query: string) => ({
-    tagCompletion: [
-        {
-            query,
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-        },
-    ],
-}));
 
 const StyledInput = styled(Input)`
     min-width: 100px;
@@ -42,25 +32,15 @@ const StyledInput = styled(Input)`
 
 export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
     ({ text, value = [], query = '', error, disabled, placeholder, onChange }, ref) => {
-        const { user } = usePageContext();
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(query);
         const [tags, setTags] = useState(value);
 
-        const { data } = useSWR(inputState, (q) => fetcher(user, q));
+        const suggestions = trpc.tag.suggestions.useQuery(inputState);
+        const createMutation = trpc.tag.create.useMutation();
 
         const createTag = useCallback(async () => {
-            const promise = gql.mutation({
-                createTag: [
-                    {
-                        title: inputState,
-                    },
-                    {
-                        id: true,
-                        title: true,
-                    },
-                ],
-            });
+            const promise = createMutation.mutateAsync({ title: inputState });
 
             toast.promise(promise, {
                 error: tr('Something went wrong 😿'),
@@ -70,18 +50,18 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
 
             const res = await promise;
 
-            if (res.createTag) {
-                const newTags = [...tags, res.createTag as TagModel];
+            if (res) {
+                const newTags = [...tags, res];
                 setTags(newTags);
                 onChange?.(newTags);
                 setInputState('');
                 setCompletionVisibility(false);
             }
-        }, [inputState, onChange, tags]);
+        }, [inputState, onChange, tags, createMutation]);
 
         const onTagClick = useCallback(
             async (tag: TagModel) => {
-                if (!data?.tagCompletion?.length) {
+                if (!suggestions.data?.length) {
                     await createTag();
                     return;
                 }
@@ -90,12 +70,12 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                 onChange?.(newTags);
                 setInputState('');
             },
-            [onChange, tags, data?.tagCompletion, createTag],
+            [onChange, tags, suggestions.data, createTag],
         );
 
         const filterIds = value.map((t) => t.id);
-        const items = data?.tagCompletion?.length
-            ? data?.tagCompletion?.filter((t) => !filterIds.includes(t.id))
+        const items = suggestions.data?.length
+            ? suggestions.data?.filter((t) => !filterIds.includes(t.id))
             : inputState !== ''
             ? [
                   {
@@ -141,7 +121,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                         key={props.item.id}
                         title={props.item.title}
                         description={props.item.description}
-                        onClick={data?.tagCompletion?.length ? props.onClick : createTag}
+                        onClick={suggestions.data?.length ? props.onClick : createTag}
                     />
                 )}
             />

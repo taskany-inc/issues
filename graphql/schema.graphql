@@ -194,7 +194,6 @@ type Mutation {
   createComment(data: CommentCreateInput!): Comment
   createGoal(data: GoalCreateInput!): Goal
   createProject(data: ProjectCreateInput!): Project
-  createTag(description: String, title: String!): Tag
   deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
   toggleGoalArchive(data: GoalArchiveInput!): Activity
@@ -286,7 +285,6 @@ type Query {
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
   projectDeepInfo(data: ProjectDeepInput!): ProjectDeepOutput
   projects: [Project]
-  tagCompletion(query: String!, sortBy: SortOrder): [Tag]
   topProjects: [Project]
   userGoals(data: UserGoalsInput!): UserGoalsOutput
 }
