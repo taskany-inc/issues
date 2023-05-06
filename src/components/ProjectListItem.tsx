@@ -3,16 +3,15 @@ import Link from 'next/link';
 import { gray4, textColor, gray10, gapM, gapS, gray7 } from '@taskany/colors';
 import { Text, UserPic, nullable } from '@taskany/bricks';
 
-import { Activity } from '../../graphql/@generated/genql';
-
 import RelativeTime from './RelativeTime/RelativeTime';
 
 interface ProjectListItemProps {
     href: string;
     title: string;
-    description?: string;
-    activity?: Activity;
-    createdAt?: string;
+    description?: string | null;
+    ownerImage?: string | null;
+    onwerEmail?: string;
+    createdAt?: Date;
 }
 
 const StyledListItem = styled.a`
@@ -58,7 +57,14 @@ const StyledSubTitle = styled(Text)`
     padding-top: ${gapS};
 `;
 
-export const ProjectListItem: React.FC<ProjectListItemProps> = ({ title, description, activity, createdAt, href }) => {
+export const ProjectListItem: React.FC<ProjectListItemProps> = ({
+    title,
+    description,
+    ownerImage,
+    onwerEmail,
+    createdAt,
+    href,
+}) => {
     const viewDescription = description?.slice(0, 100);
     const viewDots = description && description.length >= 100;
 
@@ -84,11 +90,9 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({ title, descrip
                     ))}
                 </StyledName>
 
-                {nullable(activity, (a) => (
-                    <StyledAddon>
-                        <UserPic src={a.user?.image} email={a.user?.email || a.ghost?.email} size={24} />
-                    </StyledAddon>
-                ))}
+                <StyledAddon>
+                    <UserPic src={ownerImage} email={onwerEmail} size={24} />
+                </StyledAddon>
             </StyledListItem>
         </Link>
     );

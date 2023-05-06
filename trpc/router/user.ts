@@ -4,7 +4,7 @@ import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import { settingsUserSchema, suggestionsUserSchema, updateUserSchema } from '../../src/schema/user';
 
-export const userRouter = router({
+export const user = router({
     suggestions: protectedProcedure.input(suggestionsUserSchema).query(async ({ input: { query, filter } }) => {
         return prisma.activity.findMany({
             take: 5,

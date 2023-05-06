@@ -1,75 +1,26 @@
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
-import z from 'zod';
 
-import { Project } from '../../../graphql/@generated/genql';
-import { gql } from '../../utils/gql';
+import { ProjectCreate, ProjectUpdate } from '../../schema/project';
+import { trpc } from '../../utils/trpcClient';
+import { ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './useProjectResource.i18n';
 
 type Callback<A = []> = (...args: A[]) => void;
 
-export const createProjectSchemaProvider = () =>
-    z.object({
-        id: z.string().min(3),
-        title: z
-            .string({
-                required_error: tr('Title is required'),
-                invalid_type_error: tr('Title must be a string'),
-            })
-            .min(2, {
-                message: tr('Title must be longer than 2 symbols'),
-            })
-            .max(50, {
-                message: tr('Title can be 50 symbols maximum'),
-            }),
-        description: z.string().optional(),
-        flow: z.object({
-            id: z.string(),
-        }),
-    });
-export const updateProjectSchemaProvider = () =>
-    z.object({
-        title: z
-            .string({
-                required_error: tr('Title is required'),
-                invalid_type_error: tr('Title must be a string'),
-            })
-            .min(2, {
-                message: tr('Title must be longer than 2 symbols'),
-            }),
-        description: z.string().optional(),
-        parent: z
-            .array(
-                z.object({
-                    id: z.string(),
-                    title: z.string(),
-                }),
-            )
-            .optional(),
-    });
-
-export type CreateProjectFormType = z.infer<ReturnType<typeof createProjectSchemaProvider>>;
-export type UpdateProjectFormType = z.infer<ReturnType<typeof updateProjectSchemaProvider>>;
-
 export const useProjectResource = (id: string) => {
+    const utils = trpc.useContext();
+    const createMutation = trpc.project.create.useMutation();
+    const updateMutation = trpc.project.update.useMutation();
+    const deleteMutation = trpc.project.delete.useMutation();
+    const toggleWatcherMutation = trpc.project.toggleWatcher.useMutation();
+    const toggleStargizerMutation = trpc.project.toggleStargizer.useMutation();
+    const transferOwnershipMutation = trpc.project.transferOwnership.useMutation();
+
     const createProject = useCallback(
-        (cb: Callback<Project['id']>) => async (form: CreateProjectFormType) => {
-            const promise = gql.mutation({
-                createProject: [
-                    {
-                        data: {
-                            id: form.id,
-                            title: form.title,
-                            description: form.description,
-                            flowId: form.flow.id,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
-            });
+        (cb: Callback<string>) => async (form: ProjectCreate) => {
+            const promise = createMutation.mutateAsync(form);
 
             toast.promise(promise, {
                 error: tr('Something went wrong 😿'),
@@ -79,33 +30,14 @@ export const useProjectResource = (id: string) => {
 
             const res = await promise;
 
-            res.createProject && cb(res.createProject.id);
+            res && cb(res.id);
         },
-        [],
+        [createMutation],
     );
 
     const updateProject = useCallback(
-        (cb: Callback<UpdateProjectFormType>) => async (data: UpdateProjectFormType) => {
-            const promise = gql.mutation({
-                updateProject: [
-                    {
-                        data: {
-                            id,
-                            title: data.title,
-                            description: data.description,
-                            parent: data.parent?.map((p) => p.id) || [],
-                        },
-                    },
-                    {
-                        title: true,
-                        description: true,
-                        parent: {
-                            id: true,
-                            title: true,
-                        },
-                    },
-                ],
-            });
+        (cb?: Callback<ProjectUpdateReturnType>) => async (data: ProjectUpdate) => {
+            const promise = updateMutation.mutateAsync(data);
 
             toast.promise(promise, {
                 error: tr('Something went wrong 😿'),
@@ -115,46 +47,28 @@ export const useProjectResource = (id: string) => {
 
             const res = await promise;
 
-            res.updateProject && cb(res.updateProject);
+            utils.project.getById.invalidate(id);
+
+            res && cb?.(res);
         },
-        [id],
+        [id, updateMutation, utils],
     );
 
     const deleteProject = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (cb: Callback) => async () => {
-            const res = await gql.mutation({
-                deleteProject: [
-                    {
-                        data: {
-                            id,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
-            });
+            const res = await deleteMutation.mutateAsync(id);
 
-            res.deleteProject && cb();
+            res && cb();
         },
-        [id],
+        [id, deleteMutation],
     );
 
     const toggleProjectWatching = useCallback(
         (cb: Callback, watcher?: boolean) => async () => {
-            const promise = gql.mutation({
-                toggleProjectWatcher: [
-                    {
-                        data: {
-                            id: String(id),
-                            direction: !watcher,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+            const promise = toggleWatcherMutation.mutateAsync({
+                id,
+                direction: !watcher,
             });
 
             toast.promise(promise, {
@@ -167,23 +81,14 @@ export const useProjectResource = (id: string) => {
 
             await promise;
         },
-        [id],
+        [id, toggleWatcherMutation],
     );
 
     const toggleProjectStar = useCallback(
         (cb: Callback, stargizer?: boolean) => async () => {
-            const promise = gql.mutation({
-                toggleProjectStargizer: [
-                    {
-                        data: {
-                            id: String(id),
-                            direction: !stargizer,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+            const promise = toggleStargizerMutation.mutateAsync({
+                id,
+                direction: !stargizer,
             });
 
             toast.promise(promise, {
@@ -196,25 +101,14 @@ export const useProjectResource = (id: string) => {
 
             await promise;
         },
-        [id],
+        [id, toggleStargizerMutation],
     );
 
     const transferOwnership = useCallback(
-        (cb: Callback, activityId?: string) => async () => {
-            if (!activityId) return;
-
-            const promise = gql.mutation({
-                transferProjectOwnership: [
-                    {
-                        data: {
-                            id,
-                            activityId,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+        (cb: Callback, activityId: string) => async () => {
+            const promise = transferOwnershipMutation.mutateAsync({
+                id,
+                activityId,
             });
 
             toast.promise(promise, {
@@ -225,9 +119,9 @@ export const useProjectResource = (id: string) => {
 
             const res = await promise;
 
-            res.transferProjectOwnership && cb();
+            res && cb();
         },
-        [id],
+        [id, transferOwnershipMutation],
     );
 
     return {

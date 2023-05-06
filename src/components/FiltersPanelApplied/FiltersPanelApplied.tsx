@@ -65,30 +65,28 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
 
     const appliedMap: Record<string, string[]> = {};
 
-    if (queryState.priorityFilter.length && priority?.length) {
-        appliedMap[tr('Priority')] = queryState.priorityFilter.map((p) => getPriorityText(p)).filter(Boolean);
+    if (queryState.priority.length && priority?.length) {
+        appliedMap[tr('Priority')] = queryState.priority.map((p) => getPriorityText(p)).filter(Boolean);
     }
 
-    if (queryState.stateFilter.length && states?.length) {
-        appliedMap[tr('State')] = queryState.stateFilter.map((s) => statesMap[s]?.title).filter(Boolean);
+    if (queryState.state.length && states?.length) {
+        appliedMap[tr('State')] = queryState.state.map((s) => statesMap[s]?.title).filter(Boolean);
     }
 
-    if (queryState.ownerFilter.length && users?.length) {
-        appliedMap[tr('Owner')] = queryState.ownerFilter
-            .map((u) => ownersMap[u]?.user?.name)
-            .filter(Boolean) as string[];
+    if (queryState.owner.length && users?.length) {
+        appliedMap[tr('Owner')] = queryState.owner.map((u) => ownersMap[u]?.user?.name).filter(Boolean) as string[];
     }
 
-    if (queryState.projectFilter.length && projects?.length) {
-        appliedMap[tr('Project')] = queryState.projectFilter.map((p) => projectsMap[p]?.title).filter(Boolean);
+    if (queryState.project.length && projects?.length) {
+        appliedMap[tr('Project')] = queryState.project.map((p) => projectsMap[p]?.title).filter(Boolean);
     }
 
-    if (queryState.tagsFilter.length && tags?.length) {
-        appliedMap[tr('Tag')] = queryState.tagsFilter.map((t) => tagsMap[t]?.title).filter(Boolean);
+    if (queryState.tag.length && tags?.length) {
+        appliedMap[tr('Tag')] = queryState.tag.map((t) => tagsMap[t]?.title).filter(Boolean);
     }
 
-    if (queryState.estimateFilter.length && estimates?.length) {
-        appliedMap[tr('Estimate')] = queryState.estimateFilter.filter(Boolean);
+    if (queryState.estimate.length && estimates?.length) {
+        appliedMap[tr('Estimate')] = queryState.estimate.filter(Boolean);
     }
 
     Object.entries(appliedMap).forEach(([k, v]) => {

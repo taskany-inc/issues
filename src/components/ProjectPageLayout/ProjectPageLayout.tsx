@@ -7,7 +7,6 @@ import { TabsMenu, TabsMenuItem, Text, nullable } from '@taskany/bricks';
 
 import { routes } from '../../hooks/router';
 import { useProjectResource } from '../../hooks/useProjectResource';
-import { Project } from '../../../graphql/@generated/genql';
 import { PageContent, PageActions } from '../Page';
 import { WatchButton } from '../WatchButton/WatchButton';
 import { StarButton } from '../StarButton/StarButton';
@@ -16,9 +15,14 @@ import { ProjectTitleList } from '../ProjectTitleList';
 import { tr } from './ProjectPageLayout.i18n';
 
 interface ProjectPageLayoutProps {
-    project: Project;
+    id: string;
     title: React.ReactNode;
     children: React.ReactNode;
+    parent?: React.ComponentProps<typeof ProjectTitleList>['projects'];
+    owned?: boolean;
+    starred?: boolean;
+    stargizers?: number;
+    watching?: boolean;
     description?: React.ReactNode;
     actions?: boolean;
 }
@@ -39,26 +43,32 @@ const StyledProjectParentTitle = styled(Text)`
 `;
 
 export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
-    project,
+    id,
     title,
+    parent,
     description,
+    owned,
+    starred,
+    stargizers,
+    watching,
     children,
     actions,
 }) => {
     const router = useRouter();
-    const { toggleProjectWatching, toggleProjectStar } = useProjectResource(project.id);
+    const { toggleProjectWatching, toggleProjectStar } = useProjectResource(id);
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
-        [tr('Goals'), routes.project(project.id), true],
-        [tr('Settings'), routes.projectSettings(project.id), true],
+        [tr('Goals'), routes.project(id), true],
+        [tr('Settings'), routes.projectSettings(id), true],
     ];
 
-    const [watcher, setWatcher] = useState(project._isWatching);
+    // FIXME: invalidate getById instead
+    const [watcher, setWatcher] = useState(watching);
     const onWatchToggle = useCallback(() => {
         setWatcher(!watcher);
     }, [watcher]);
 
-    const [stargizer, setStargizer] = useState(project._isStarred);
+    const [stargizer, setStargizer] = useState(starred);
     const onStarToggle = useCallback(() => {
         setStargizer(!stargizer);
     }, [stargizer]);
@@ -67,8 +77,8 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
         <>
             <ProjectHeader>
                 <div>
-                    {Boolean(project.parent?.length) &&
-                        nullable(project.parent, (parent) => (
+                    {Boolean(parent?.length) &&
+                        nullable(parent, (parent) => (
                             <StyledProjectParentTitle weight="bold" color={gray9}>
                                 <ProjectTitleList projects={parent} />
                             </StyledProjectParentTitle>
@@ -91,17 +101,17 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
                             <WatchButton watcher={watcher} onToggle={toggleProjectWatching(onWatchToggle, watcher)} />
                             <StarButton
                                 stargizer={stargizer}
-                                count={project._count?.stargizers}
+                                count={stargizers}
                                 onToggle={toggleProjectStar(onStarToggle, stargizer)}
                             />
                         </>
                     ))}
                 </PageActions>
 
-                {project._isOwner && (
+                {owned && (
                     <TabsMenu>
                         {tabsMenuOptions.map(([title, href, ownerOnly]) =>
-                            nullable(ownerOnly ? project._isOwner : true, () => (
+                            nullable(ownerOnly ? owned : true, () => (
                                 <NextLink key={title} href={href} passHref>
                                     <TabsMenuItem active={router.asPath.split('?')[0] === href}>{title}</TabsMenuItem>
                                 </NextLink>

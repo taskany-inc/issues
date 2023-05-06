@@ -1,12 +1,10 @@
-import { ExploreProjectsPage, exploreProjectsFetcher } from '../../components/ExporeProjectsPage/ExporeProjectsPage';
+import { ExploreProjectsPage } from '../../components/ExporeProjectsPage/ExporeProjectsPage';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user }) => ({
-        fallback: {
-            'explore/projects': await exploreProjectsFetcher(user),
-        },
-    }),
+    async ({ ssrHelpers }) => {
+        await ssrHelpers.project.getAll.fetch();
+    },
     {
         private: true,
     },

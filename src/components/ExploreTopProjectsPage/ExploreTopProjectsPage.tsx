@@ -1,49 +1,19 @@
-import useSWR from 'swr';
 import { nullable } from '@taskany/bricks';
 
-import { Project } from '../../../graphql/@generated/genql';
-import { createFetcher, refreshInterval } from '../../utils/createFetcher';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { routes } from '../../hooks/router';
 import { Page, PageContent } from '../Page';
 import { PageSep } from '../PageSep';
 import { ExplorePageLayout } from '../ExplorePageLayout/ExplorePageLayout';
 import { ProjectListItem } from '../ProjectListItem';
+import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './ExploreTopProjectsPage.i18n';
 
-export const exploreTopProjectsFetcher = createFetcher(() => ({
-    topProjects: {
-        id: true,
-        title: true,
-        description: true,
-        createdAt: true,
-        activity: {
-            user: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-            },
-            ghost: {
-                id: true,
-                email: true,
-            },
-        },
-    },
-}));
+export const ExploreProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
+    const projects = trpc.project.getTop.useQuery();
 
-export const ExploreTopProjectsPage = ({
-    user,
-    locale,
-    ssrTime,
-    fallback,
-}: ExternalPageProps<Awaited<ReturnType<typeof exploreTopProjectsFetcher>>>) => {
-    const { data } = useSWR('explore/projects', () => exploreTopProjectsFetcher(user), {
-        fallback,
-        refreshInterval,
-    });
-    const projects = data?.topProjects;
+    if (!projects.data) return null;
 
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={tr('title')}>
@@ -51,7 +21,7 @@ export const ExploreTopProjectsPage = ({
                 <PageSep />
 
                 <PageContent>
-                    {projects?.map((project: Project) =>
+                    {projects.data.map((project) =>
                         nullable(project, (p) => (
                             <ProjectListItem
                                 key={p.id}
@@ -59,7 +29,8 @@ export const ExploreTopProjectsPage = ({
                                 createdAt={p.createdAt}
                                 title={p.title}
                                 description={p.description}
-                                activity={p.activity}
+                                ownerImage={p.activity.user?.image}
+                                onwerEmail={p.activity.user?.email || p.activity.ghost?.email}
                             />
                         )),
                     )}

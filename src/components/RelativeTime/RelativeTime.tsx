@@ -12,7 +12,7 @@ type RelativeTimeKindCommon = 'created' | 'updated';
 type RelativeTimeKind = RelativeTimeKindCommon | Capitalize<RelativeTimeKindCommon>;
 
 interface RelativeTimeProps {
-    date: string;
+    date: Date;
     kind?: RelativeTimeKind;
 }
 const map: Record<RelativeTimeKind, I18nKey> = {

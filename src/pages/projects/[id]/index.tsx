@@ -1,31 +1,23 @@
-import { ProjectPage, projectPageFetcher } from '../../../components/ProjectPage/ProjectPage';
+import { ProjectPage } from '../../../components/ProjectPage/ProjectPage';
 import { parseFilterValues } from '../../../hooks/useUrlFilterParams';
 import { declareSsrProps } from '../../../utils/declareSsrProps';
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { id }, query, ssrHelpers }) => {
+    async ({ params: { id }, query, ssrHelpers }) => {
         const preset =
             typeof query.filter === 'string' ? await ssrHelpers.filter.getById.fetch(query.filter) : undefined;
-
         await ssrHelpers.filter.getUserFilters.fetch();
-
-        const ssrData = await projectPageFetcher(
-            user,
+        const project = await ssrHelpers.project.getById.fetch(id);
+        await ssrHelpers.project.getDeepInfo.fetch({
             id,
-            ...Object.values(
-                parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
-            ),
-        );
+            ...parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
+        });
 
-        return ssrData.project
-            ? {
-                  fallback: {
-                      ...ssrData,
-                  },
-              }
-            : {
-                  notFound: true,
-              };
+        if (!project) {
+            return {
+                notFound: true,
+            };
+        }
     },
     {
         private: true,

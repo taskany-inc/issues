@@ -3,10 +3,11 @@ import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { connectionMap } from '../../graphql/queries/connections';
-import { ToggleStargizerSchema, createFilterSchema } from '../../src/schema/filter';
+import { connectionMap } from '../queries/connections';
+import { createFilterSchema } from '../../src/schema/filter';
+import { ToggleSubscriptionSchema } from '../../src/schema/common';
 
-export const filterRouter = router({
+export const filter = router({
     getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
         const filter = await prisma.filter.findUnique({
             where: {
@@ -27,7 +28,6 @@ export const filterRouter = router({
             _isStarred: filter.stargizers.some((stargizer) => stargizer.id === ctx.session.user.activityId),
         };
     }),
-
     getUserFilters: protectedProcedure.query(({ ctx }) => {
         const { activityId } = ctx.session.user;
 
@@ -46,27 +46,25 @@ export const filterRouter = router({
             },
         });
     }),
-
     create: protectedProcedure.input(createFilterSchema).mutation(({ ctx, input }) => {
         return prisma.filter.create({ data: { ...input, activityId: ctx.session.user.activityId } });
     }),
+    toggleStargizer: protectedProcedure
+        .input(ToggleSubscriptionSchema)
+        .mutation(({ ctx, input: { id, direction } }) => {
+            const connection = { id };
 
-    toggleStargizer: protectedProcedure.input(ToggleStargizerSchema).mutation(({ ctx, input }) => {
-        const { id, direction } = input;
-        const connection = { id };
-
-        try {
-            return prisma.activity.update({
-                where: { id: ctx.session.user.activityId },
-                data: {
-                    filterStargizers: { [connectionMap[String(direction)]]: connection },
-                },
-            });
-        } catch (error: any) {
-            throw new TRPCError({ code: 'CONFLICT', message: String(error.message), cause: error });
-        }
-    }),
-
+            try {
+                return prisma.activity.update({
+                    where: { id: ctx.session.user.activityId },
+                    data: {
+                        filterStargizers: { [connectionMap[String(direction)]]: connection },
+                    },
+                });
+            } catch (error: any) {
+                throw new TRPCError({ code: 'CONFLICT', message: String(error.message), cause: error });
+            }
+        }),
     delete: protectedProcedure.input(z.string()).mutation(({ input }) => {
         try {
             return prisma.filter.delete({

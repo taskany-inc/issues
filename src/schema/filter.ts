@@ -18,10 +18,3 @@ export const createFilterSchema = z.object({
 });
 
 export type CreateFilter = z.infer<typeof createFilterSchema>;
-
-export const ToggleStargizerSchema = z.object({
-    id: z.string().nullish(),
-    direction: z.boolean().nullish(),
-});
-
-export type ToggleStargizer = z.infer<typeof ToggleStargizerSchema>;

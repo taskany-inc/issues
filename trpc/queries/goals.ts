@@ -1,46 +1,44 @@
-import { Goal as GoalModel } from '../@generated/genql';
-
 export const goalsFilter = (
     data: {
-        query: string;
-        priority: string[];
-        states: string[];
-        tags: string[];
-        estimates: string[];
-        owner: string[];
-        projects: string[];
+        query?: string;
+        priority?: string[];
+        state?: string[];
+        tag?: string[];
+        estimate?: string[];
+        owner?: string[];
+        project?: string[];
     },
     extra: any = {},
 ): any => {
-    const priorityFilter = data.priority.length ? { priority: { in: data.priority } } : {};
+    const priorityFilter = data.priority?.length ? { priority: { in: data.priority } } : {};
 
-    const statesFilter = data.states.length
+    const statesFilter = data.state?.length
         ? {
               state: {
                   id: {
-                      in: data.states,
+                      in: data.state,
                   },
               },
           }
         : {};
 
-    const tagsFilter = data.tags.length
+    const tagsFilter = data.tag?.length
         ? {
               tags: {
                   some: {
                       id: {
-                          in: data.tags,
+                          in: data.tag,
                       },
                   },
               },
           }
         : {};
 
-    const estimateFilter = data.estimates.length
+    const estimateFilter = data.estimate?.length
         ? {
               estimate: {
                   some: {
-                      OR: data.estimates.map((e) => {
+                      OR: data.estimate.map((e) => {
                           const [q, y] = e.split('/');
 
                           return {
@@ -53,7 +51,7 @@ export const goalsFilter = (
           }
         : {};
 
-    const ownerFilter = data.owner.length
+    const ownerFilter = data.owner?.length
         ? {
               owner: {
                   id: {
@@ -63,11 +61,11 @@ export const goalsFilter = (
           }
         : {};
 
-    const projectFilter = data.projects?.length
+    const projectFilter = data.project?.length
         ? {
               project: {
                   id: {
-                      in: data.projects,
+                      in: data.project,
                   },
               },
           }
@@ -216,22 +214,22 @@ export const goalDeepQuery = {
     },
 } as const;
 
-export const addCalclulatedGoalsFields = (goal: Partial<GoalModel>, activityId: string) => {
+export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     const _isOwner = goal.ownerId === activityId;
-    const _isParticipant = goal.participants?.some((participant) => participant?.id === activityId);
-    const _isWatching = goal.watchers?.some((watcher) => watcher?.id === activityId);
-    const _isStarred = goal.stargizers?.some((stargizer) => stargizer?.id === activityId);
+    const _isParticipant = goal.participants?.some((participant: any) => participant?.id === activityId);
+    const _isWatching = goal.watchers?.some((watcher: any) => watcher?.id === activityId);
+    const _isStarred = goal.stargizers?.some((stargizer: any) => stargizer?.id === activityId);
     const _isIssuer = goal.activityId === activityId;
     const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
 
     let parentOwner = false;
-    function checkParent(project?: GoalModel['project']) {
+    function checkParent(project?: any) {
         if (project?.activityId === activityId) {
             parentOwner = true;
         }
 
         if (project?.parent?.length) {
-            project?.parent.forEach((p) => {
+            project?.parent.forEach((p: any) => {
                 checkParent(p);
             });
         }
@@ -251,7 +249,7 @@ export const addCalclulatedGoalsFields = (goal: Partial<GoalModel>, activityId: 
     };
 };
 
-export const calcGoalsMeta = (goals: GoalModel[]) => {
+export const calcGoalsMeta = (goals: any[]) => {
     const uniqTags = new Map();
     const uniqOwners = new Map();
     const uniqParticipants = new Map();
@@ -261,11 +259,11 @@ export const calcGoalsMeta = (goals: GoalModel[]) => {
     const uniqProjects = new Map();
     const uniqEstimates = new Map();
 
-    goals.forEach((goal: GoalModel) => {
+    goals.forEach((goal: any) => {
         goal.state && uniqStates.set(goal.state?.id, goal.state);
         goal.priority && uniqPriority.add(goal.priority);
 
-        goal.tags?.forEach((t) => {
+        goal.tags?.forEach((t: any) => {
             t && uniqTags.set(t.id, t);
         });
 
@@ -273,13 +271,13 @@ export const calcGoalsMeta = (goals: GoalModel[]) => {
 
         goal.owner && uniqOwners.set(goal.owner.id, goal.owner);
         goal.participants &&
-            goal.participants.forEach((p) => {
+            goal.participants.forEach((p: any) => {
                 p && uniqParticipants.set(p.id, p);
             });
         goal.activity && uniqIssuers.set(goal.activity.id, goal.activity);
 
         goal.estimate &&
-            goal.estimate.forEach((e) => {
+            goal.estimate.forEach((e: any) => {
                 uniqEstimates.set(`${e?.q}/${e?.y}`, e);
             });
     });

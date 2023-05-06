@@ -2,8 +2,8 @@ import React, { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { Text, Link, nullable } from '@taskany/bricks';
+import { Goal, Project } from '@prisma/client';
 
-import { Goal, Project } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
 
 import { GoalListItem } from './GoalListItem/GoalListItem';
