@@ -7,27 +7,27 @@ import { Tag } from '../../graphql/@generated/genql';
 import { Priority } from '../types/priority';
 
 export interface QueryState {
-    priorityFilter: Priority[];
-    stateFilter: string[];
-    tagsFilter: string[];
-    estimateFilter: string[];
-    ownerFilter: string[];
-    projectFilter: string[];
-    fulltextFilter: string;
-    limitFilter?: number;
+    priority: Priority[];
+    state: string[];
+    tag: string[];
+    estimate: string[];
+    owner: string[];
+    project: string[];
+    query: string;
+    limit?: number;
 }
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
 export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
-    priorityFilter: parseQueryParam(query.priority?.toString()) as Priority[],
-    stateFilter: parseQueryParam(query.state?.toString()),
-    tagsFilter: parseQueryParam(query.tags?.toString()),
-    estimateFilter: parseQueryParam(query.estimates?.toString()),
-    ownerFilter: parseQueryParam(query.user?.toString()),
-    projectFilter: parseQueryParam(query.projects?.toString()),
-    fulltextFilter: parseQueryParam(query.search?.toString()).toString(),
-    limitFilter: query.limit ? Number(query.limit) : undefined,
+    priority: parseQueryParam(query.priority?.toString()) as Priority[],
+    state: parseQueryParam(query.state?.toString()),
+    tag: parseQueryParam(query.tag?.toString()),
+    estimate: parseQueryParam(query.estimate?.toString()),
+    owner: parseQueryParam(query.owner?.toString()),
+    project: parseQueryParam(query.project?.toString()),
+    query: parseQueryParam(query.query?.toString()).toString(),
+    limit: query.limit ? Number(query.limit) : undefined,
 });
 
 export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
@@ -44,44 +44,29 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     }
 
     const pushNewState = useCallback(
-        ({
-            priorityFilter,
-            stateFilter,
-            tagsFilter,
-            estimateFilter,
-            ownerFilter,
-            projectFilter,
-            fulltextFilter,
-            limitFilter,
-        }: QueryState) => {
+        ({ priority, state, tag, estimate, owner, project, query, limit }: QueryState) => {
             const newurl = router.asPath.split('?')[0];
             const urlParams = new URLSearchParams();
 
-            priorityFilter.length > 0
-                ? urlParams.set('priority', Array.from(priorityFilter).toString())
+            priority.length > 0
+                ? urlParams.set('priority', Array.from(priority).toString())
                 : urlParams.delete('priority');
 
-            stateFilter.length > 0
-                ? urlParams.set('state', Array.from(stateFilter).toString())
-                : urlParams.delete('state');
+            state.length > 0 ? urlParams.set('state', Array.from(state).toString()) : urlParams.delete('state');
 
-            tagsFilter.length > 0 ? urlParams.set('tags', Array.from(tagsFilter).toString()) : urlParams.delete('tags');
+            tag.length > 0 ? urlParams.set('tag', Array.from(tag).toString()) : urlParams.delete('tag');
 
-            estimateFilter.length > 0
-                ? urlParams.set('estimates', Array.from(estimateFilter).toString())
-                : urlParams.delete('estimates');
+            estimate.length > 0
+                ? urlParams.set('estimate', Array.from(estimate).toString())
+                : urlParams.delete('estimate');
 
-            ownerFilter.length > 0
-                ? urlParams.set('user', Array.from(ownerFilter).toString())
-                : urlParams.delete('user');
+            owner.length > 0 ? urlParams.set('owner', Array.from(owner).toString()) : urlParams.delete('owner');
 
-            projectFilter.length > 0
-                ? urlParams.set('projects', Array.from(projectFilter).toString())
-                : urlParams.delete('projects');
+            project.length > 0 ? urlParams.set('project', Array.from(project).toString()) : urlParams.delete('project');
 
-            fulltextFilter.length > 0 ? urlParams.set('search', fulltextFilter.toString()) : urlParams.delete('search');
+            query.length > 0 ? urlParams.set('query', query.toString()) : urlParams.delete('query');
 
-            limitFilter ? urlParams.set('limit', limitFilter.toString()) : urlParams.delete('limit');
+            limit ? urlParams.set('limit', limit.toString()) : urlParams.delete('limit');
 
             router.push(Array.from(urlParams.keys()).length ? `${newurl}?${urlParams}` : newurl);
         },
@@ -102,13 +87,13 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
 
     const resetQueryState = useCallback(() => {
         pushNewState({
-            priorityFilter: [],
-            stateFilter: [],
-            ownerFilter: [],
-            projectFilter: [],
-            tagsFilter: [],
-            estimateFilter: [],
-            fulltextFilter: '',
+            priority: [],
+            state: [],
+            owner: [],
+            project: [],
+            tag: [],
+            estimate: [],
+            query: '',
         });
     }, [pushNewState]);
 
@@ -118,7 +103,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const newTagsFilterValue = new Set(queryState.tagsFilter);
+                const newTagsFilterValue = new Set(queryState.tag);
 
                 newTagsFilterValue.has(t.id) ? newTagsFilterValue.delete(t.id) : newTagsFilterValue.add(t.id);
 
@@ -126,7 +111,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
 
                 pushNewState({
                     ...queryState,
-                    tagsFilter: newSelected,
+                    tag: newSelected,
                 });
             },
         [queryState, pushNewState],
@@ -146,14 +131,14 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
 
     const setters = useMemo(
         () => ({
-            setPriorityFilter: pushStateProvider('priorityFilter'),
-            setStateFilter: pushStateProvider('stateFilter'),
-            setTagsFilter: pushStateProvider('tagsFilter'),
-            setEstimateFilter: pushStateProvider('estimateFilter'),
-            setOwnerFilter: pushStateProvider('ownerFilter'),
-            setProjectFilter: pushStateProvider('projectFilter'),
-            setFulltextFilter: pushStateProvider('fulltextFilter'),
-            setLimitFilter: pushStateProvider('limitFilter'),
+            setPriorityFilter: pushStateProvider('priority'),
+            setStateFilter: pushStateProvider('state'),
+            setTagsFilter: pushStateProvider('tag'),
+            setEstimateFilter: pushStateProvider('estimate'),
+            setOwnerFilter: pushStateProvider('owner'),
+            setProjectFilter: pushStateProvider('project'),
+            setFulltextFilter: pushStateProvider('query'),
+            setLimitFilter: pushStateProvider('limit'),
         }),
         [pushStateProvider],
     );

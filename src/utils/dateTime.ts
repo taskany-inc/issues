@@ -79,26 +79,29 @@ export const dateAgo = (date: Date, pastDate: number, { locale }: LocaleArg) => 
 
 export const isPastDate = (date: Date): boolean => date < new Date();
 
-export const parseLocaleDate = (date: string, { locale }: LocaleArg) => {
+export const parseLocaleDate = (date: string | Date, { locale }: LocaleArg) => {
     let resolvedLocale: TLocale = locale;
 
-    if (date?.includes('/')) {
+    if (date?.toString().includes('/')) {
         resolvedLocale = 'en';
     }
 
-    if (date?.includes('.')) {
+    if (date?.toString().includes('.')) {
         resolvedLocale = 'ru';
     }
 
-    const parsers: Record<TLocale, (date: string) => Date> = {
+    const parsers: Record<TLocale, (date: string | Date) => Date> = {
         en: (date) => new Date(date),
         ru: (date) => {
-            if (date.includes('T') || date.includes('/')) {
+            if (date.toString().includes('T') || date.toString().includes('/')) {
                 return new Date(date);
             }
 
-            // eslint-disable-next-line radix
-            const dateParts = date.split('.').map((p) => parseInt(p));
+            const dateParts = date
+                .toString()
+                .split('.')
+                // eslint-disable-next-line radix
+                .map((p) => parseInt(p));
             return new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
         },
     };

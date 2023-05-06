@@ -1,16 +1,19 @@
 import NextLink from 'next/link';
 import { nullable, Link } from '@taskany/bricks';
 
-import { Project } from '../../graphql/@generated/genql';
 import { routes } from '../hooks/router';
 
-export const ProjectTitleList = ({ projects = [] }: { projects: Project[] }) => (
+interface ProjectTitleListProps {
+    projects: Array<{ id: string; title: string; description?: string | null }>;
+}
+
+export const ProjectTitleList: React.FC<ProjectTitleListProps> = ({ projects = [] }) => (
     <>
         {projects.map((project, i) =>
             nullable(project, (pr) => (
                 <span key={pr.title}>
                     <NextLink key={pr.id} passHref href={routes.project(pr.id)}>
-                        <Link inline title={pr.description}>
+                        <Link inline title={pr.description ?? undefined}>
                             {pr.title}
                         </Link>
                     </NextLink>

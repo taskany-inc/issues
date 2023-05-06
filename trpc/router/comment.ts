@@ -6,7 +6,7 @@ import { mailServer } from '../../src/utils/mailServer';
 import { protectedProcedure, router } from '../trpcBackend';
 import { commentCreateSchema, commentUpdateSchema } from '../../src/schema/comment';
 
-export const commentRouter = router({
+export const comment = router({
     getGoalComments: protectedProcedure.input(z.string()).query(async ({ input: goalId }) => {
         return prisma.comment.findMany({
             where: {

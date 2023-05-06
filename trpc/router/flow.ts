@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 
-export const flowRouter = router({
+export const flow = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
         return prisma.flow.findMany({
             where: {

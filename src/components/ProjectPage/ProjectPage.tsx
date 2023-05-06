@@ -1,13 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import useSWR, { unstable_serialize } from 'swr';
-import { useQuery } from '@tanstack/react-query';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { Button, nullable } from '@taskany/bricks';
+import { Goal, Project } from '@prisma/client';
 
-import { Goal, Project, ProjectDeepOutput } from '../../../graphql/@generated/genql';
-import { createFetcher, refreshInterval } from '../../utils/createFetcher';
+import { refreshInterval } from '../../utils/createFetcher';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
@@ -32,198 +30,17 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-const goalFields = {
-    id: true,
-    title: true,
-    description: true,
-    priority: true,
-    projectId: true,
-    project: {
-        id: true,
-        title: true,
-        description: true,
-        parent: {
-            id: true,
-            title: true,
-            description: true,
-        },
-    },
-    state: {
-        id: true,
-        title: true,
-        hue: true,
-    },
-    activity: {
-        id: true,
-        user: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-        },
-        ghost: {
-            id: true,
-            email: true,
-        },
-    },
-    owner: {
-        id: true,
-        user: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-        },
-        ghost: {
-            id: true,
-            email: true,
-        },
-    },
-    tags: {
-        id: true,
-        title: true,
-        description: true,
-    },
-    _count: {
-        comments: true,
-    },
-    _isEditable: true,
-    createdAt: true,
-    updatedAt: true,
-} as const;
-
-export const projectPageFetcher = createFetcher(
-    (_, id: string, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
-        project: [
-            {
-                data: {
-                    id,
-                },
-            },
-            {
-                id: true,
-                title: true,
-                description: true,
-                activityId: true,
-                flowId: true,
-                parent: {
-                    id: true,
-                    title: true,
-                    description: true,
-                },
-                children: {
-                    id: true,
-                    title: true,
-                    description: true,
-                    parent: {
-                        id: true,
-                        title: true,
-                        description: true,
-                    },
-                },
-                tags: {
-                    id: true,
-                    title: true,
-                },
-                participants: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                },
-                createdAt: true,
-                activity: {
-                    id: true,
-                    user: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                    ghost: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                _count: {
-                    stargizers: true,
-                    watchers: true,
-                    participants: true,
-                    children: true,
-                },
-                _isStarred: true,
-                _isWatching: true,
-                _isOwner: true,
-            },
-        ],
-        projectDeepInfo: [
-            {
-                data: {
-                    id,
-                    priority,
-                    states,
-                    tags,
-                    estimates,
-                    owner,
-                    projects,
-                    query,
-                },
-            },
-            {
-                goals: {
-                    ...goalFields,
-                },
-                meta: {
-                    owners: {
-                        id: true,
-                        user: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            image: true,
-                        },
-                        ghost: {
-                            id: true,
-                            email: true,
-                        },
-                    },
-                    tags: { id: true, title: true, description: true },
-                    states: {
-                        id: true,
-                        title: true,
-                        hue: true,
-                    },
-                    projects: {
-                        id: true,
-                        title: true,
-                        flowId: true,
-                    },
-                    estimates: {
-                        id: true,
-                        q: true,
-                        y: true,
-                        date: true,
-                    },
-                    priority: true,
-                    count: true,
-                },
-            },
-        ],
-    }),
-);
-
-export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
+export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
-
-    const presetData = trpc.filter.getById.useQuery(nextRouter.query.filter as string);
+    const preset = trpc.filter.getById.useQuery(String(nextRouter.query.filter), {
+        enabled: Boolean(nextRouter.query.filter),
+    });
+    const userFilters = trpc.filter.getUserFilters.useQuery();
 
     const {
         currentPreset,
@@ -240,26 +57,24 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset: presetData?.data,
+        preset: preset?.data,
     });
 
-    const { data, isLoading } = useQuery(
-        ['project-page', nextRouter.query],
-        () => projectPageFetcher(user, id, ...Object.values(queryState)),
+    const project = trpc.project.getById.useQuery(id);
+    const { data: projectDeepInfo, isLoading } = trpc.project.getDeepInfo.useQuery(
         {
-            initialData: fallback as Awaited<ReturnType<typeof projectPageFetcher>>,
+            id,
+            ...queryState,
+        },
+        {
             keepPreviousData: true,
             staleTime: refreshInterval,
         },
     );
-
-    const project = data?.project;
-    const deepInfo: ProjectDeepOutput | undefined = data?.projectDeepInfo;
-    const userFilters = trpc.filter.getUserFilters.useQuery();
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
     const groupsMap =
-        deepInfo?.goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g) => {
+        projectDeepInfo?.goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g) => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const k = g.projectId!;
 
@@ -278,10 +93,10 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
     const groups = Object.values(groupsMap).sort((a) => (a.project?.id === id ? -1 : 1));
 
     useEffect(() => {
-        const isGoalDeletedAlready = preview && !deepInfo?.goals?.some((g) => g.id === preview.id);
+        const isGoalDeletedAlready = preview && !projectDeepInfo?.goals?.some((g) => g.id === preview.id);
 
         if (isGoalDeletedAlready) setPreview(null);
-    }, [deepInfo, preview]);
+    }, [projectDeepInfo, preview]);
 
     const onGoalPrewiewShow = useCallback(
         (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
@@ -301,12 +116,12 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
     useEffect(() => {
-        if (project) {
+        if (project.data) {
             setCurrentProjectCache({
-                id: project.id,
-                title: project.title,
-                description: project.description,
-                flowId: project.flowId,
+                id: project.data.id,
+                title: project.data.title,
+                description: project.data.description ?? undefined,
+                flowId: project.data.flowId,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -353,37 +168,48 @@ export const ProjectPage = ({ user, locale, ssrTime, fallback, params: { id } }:
 
     const pageTitle = tr
         .raw('title', {
-            project: project?.title,
+            project: project.data?.title,
         })
         .join('');
 
-    const defaultTitle = <PageTitle title={project?.title} />;
-    const presetTitle = <PageTitle title={project?.title} subtitle={currentPreset?.title} />;
+    const defaultTitle = <PageTitle title={project.data?.title} />;
+    const presetTitle = <PageTitle title={project.data?.title} subtitle={currentPreset?.title} />;
 
     const onShadowPresetTitleClick = useCallback(() => {
         if (shadowPreset) setPreset(shadowPreset.id);
     }, [setPreset, shadowPreset]);
     const shadowPresetTitle = (
-        <PageTitle title={project?.title} subtitle={shadowPreset?.title} onClick={onShadowPresetTitleClick} />
+        <PageTitle title={project.data?.title} subtitle={shadowPreset?.title} onClick={onShadowPresetTitleClick} />
     );
     // eslint-disable-next-line no-nested-ternary
     const title = currentPreset ? presetTitle : shadowPreset ? shadowPresetTitle : defaultTitle;
-    const description = currentPreset && currentPreset.description ? currentPreset.description : project?.description;
+    const description =
+        currentPreset && currentPreset.description ? currentPreset.description : project.data?.description;
 
-    if (!project) return null;
+    if (!project.data) return null;
 
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
-            <ProjectPageLayout actions project={project} title={title} description={description}>
+            <ProjectPageLayout
+                actions
+                id={project.data.id}
+                title={title}
+                description={description}
+                starred={project.data._isStarred}
+                watching={project.data._isWatching}
+                stargizers={project.data._count.stargizers}
+                owned={project.data._isOwner}
+                parent={project.data.parent}
+            >
                 <FiltersPanel
-                    count={deepInfo?.meta?.count}
-                    filteredCount={deepInfo?.goals?.length ?? 0}
-                    priority={deepInfo?.meta?.priority as Priority[]}
-                    states={deepInfo?.meta?.states}
-                    users={deepInfo?.meta?.owners}
-                    tags={deepInfo?.meta?.tags}
-                    estimates={deepInfo?.meta?.estimates}
-                    projects={deepInfo?.meta?.projects}
+                    count={projectDeepInfo?.meta?.count}
+                    filteredCount={projectDeepInfo?.goals?.length ?? 0}
+                    priority={projectDeepInfo?.meta?.priority as Priority[]}
+                    states={projectDeepInfo?.meta?.states}
+                    users={projectDeepInfo?.meta?.owners}
+                    tags={projectDeepInfo?.meta?.tags}
+                    estimates={projectDeepInfo?.meta?.estimates}
+                    projects={projectDeepInfo?.meta?.projects}
                     presets={userFilters.data}
                     currentPreset={currentPreset}
                     queryState={queryState}

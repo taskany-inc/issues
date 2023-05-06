@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import useSWR from 'swr';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { z } from 'zod';
 import { gapS, gray6, gray10 } from '@taskany/colors';
 import {
     Button,
@@ -24,34 +22,22 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { createFetcher } from '../../utils/createFetcher';
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
 import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
 import { routes, useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
-import { CreateProjectFormType, createProjectSchemaProvider, useProjectResource } from '../../hooks/useProjectResource';
+import { useProjectResource } from '../../hooks/useProjectResource';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
 import { FlowComboBox } from '../FlowComboBox';
 import { trpc } from '../../utils/trpcClient';
+import { ProjectCreate, projectCreateSchema } from '../../schema/project';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 
 import { tr } from './ProjectCreateForm.i18n';
 
 const KeyInput = dynamic(() => import('../KeyInput'));
-
-const projectFetcher = createFetcher((_, id: string) => ({
-    project: [
-        {
-            data: {
-                id,
-            },
-        },
-        {
-            title: true,
-        },
-    ],
-}));
 
 const StyledProjectTitleContainer = styled.div`
     display: flex;
@@ -78,15 +64,12 @@ const StyledProjectKeyInputContainer = styled(InputContainer)`
 
 const ProjectCreateForm: React.FC = () => {
     const router = useRouter();
-    const { locale, user } = usePageContext();
+    const { locale } = usePageContext();
     const { createProject } = useProjectResource('');
     const [focusedInput, setFocusedInput] = useState(false);
     const [hoveredInput, setHoveredInput] = useState(false);
     const [busy, setBusy] = useState(false);
     const [dirtyKey, setDirtyKey] = useState(false);
-
-    const schema = createProjectSchemaProvider();
-    type ProjectFormType = z.infer<typeof schema>;
 
     const {
         register,
@@ -96,8 +79,8 @@ const ProjectCreateForm: React.FC = () => {
         setValue,
         control,
         formState: { errors, isValid, isSubmitted },
-    } = useForm<CreateProjectFormType>({
-        resolver: zodResolver(schema),
+    } = useForm<ProjectCreate>({
+        resolver: zodResolver(projectCreateSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,
@@ -123,9 +106,11 @@ const ProjectCreateForm: React.FC = () => {
 
     const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
     const flowRecomendations = trpc.flow.recommedations.useQuery();
+    const existingProject = trpc.project.getById.useQuery(keyWatcher, {
+        enabled: isKeyEnoughLength,
+    });
 
-    const { data: projectData } = useSWR(isKeyEnoughLength ? [user, keyWatcher] : null, projectFetcher);
-    const isKeyUnique = Boolean(projectData?.project === null || !projectData);
+    const isKeyUnique = Boolean(!existingProject?.data);
 
     useEffect(() => {
         if (flowRecomendations.data) {
@@ -134,12 +119,13 @@ const ProjectCreateForm: React.FC = () => {
     }, [setValue, flowRecomendations]);
 
     const onCreateProject = useCallback(
-        (form: ProjectFormType) => {
+        (form: ProjectCreate) => {
             setBusy(true);
 
             // FIXME: it not looks like the best API
             createProject((id: string) => {
                 router.project(id);
+                dispatchModalEvent(ModalEvent.ProjectCreateModal)();
             })(form);
         },
         [router, createProject],
@@ -213,6 +199,7 @@ const ProjectCreateForm: React.FC = () => {
                                                 disabled={busy}
                                                 available={isKeyUnique && isKeyEnoughLength}
                                                 tooltip={tooltip}
+                                                // FIXME: do it via react-hook-form
                                                 onDirty={onKeyDirty}
                                                 error={errorsResolver('id')}
                                                 {...field}

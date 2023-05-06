@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import useSWR from 'swr';
+import { ChangeEvent, useCallback, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import { useRouter as useNextRouter } from 'next/router';
 import { gapS, gray9, warn0 } from '@taskany/colors';
 import {
     Button,
@@ -20,159 +18,68 @@ import {
     ModalContent,
 } from '@taskany/bricks';
 
-import { createFetcher, refreshInterval } from '../../utils/createFetcher';
-import { Activity, Project } from '../../../graphql/@generated/genql';
-import { declareSsrProps, ExternalPageProps } from '../../utils/declareSsrProps';
+import { Activity } from '../../../graphql/@generated/genql';
+import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { PageSep } from '../PageSep';
 import { useRouter } from '../../hooks/router';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { ProjectPageLayout } from '../ProjectPageLayout/ProjectPageLayout';
 import { Page } from '../Page';
-import { UpdateProjectFormType, updateProjectSchemaProvider, useProjectResource } from '../../hooks/useProjectResource';
+import { useProjectResource } from '../../hooks/useProjectResource';
 import { errorsProvider } from '../../utils/forms';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { UserComboBox } from '../UserComboBox';
+import { trpc } from '../../utils/trpcClient';
+import { ProjectUpdate, projectUpdateSchema } from '../../schema/project';
+import { ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
-const projectFetcher = createFetcher((_, id: string) => ({
-    project: [
-        {
-            data: {
-                id,
-            },
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            flowId: true,
-            flow: {
-                id: true,
-                title: true,
-            },
-            watchers: {
-                id: true,
-            },
-            stargizers: {
-                id: true,
-            },
-            createdAt: true,
-            activityId: true,
-            activity: {
-                user: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                },
-                ghost: {
-                    id: true,
-                    email: true,
-                },
-            },
-            parent: {
-                id: true,
-                title: true,
-            },
-            _isOwner: true,
-        },
-    ],
-}));
-
-export const projectsFetcher = createFetcher((_, query: string) => ({
-    projectCompletion: [
-        {
-            query,
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            flowId: true,
-            flow: {
-                id: true,
-                title: true,
-                states: {
-                    id: true,
-                    title: true,
-                    default: true,
-                },
-            },
-        },
-    ],
-}));
-
-export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps) => {
+export const ProjectSettingsPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
-    const nextRouter = useNextRouter();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
-    const { data } = useSWR(id, () => projectFetcher(user, id), {
-        fallback,
-        refreshInterval,
-    });
+    const project = trpc.project.getById.useQuery(id);
 
-    if (!data) return null;
+    const { updateProject, deleteProject, transferOwnership } = useProjectResource(id);
 
-    const project = data?.project;
-
-    if (!project) return nextRouter.push('/404');
-
-    const { updateProject, deleteProject, transferOwnership } = useProjectResource(project.id);
-    const schema = updateProjectSchemaProvider();
-
-    const [actualFields, setActualFields] = useState<Pick<Project, 'title' | 'description' | 'parent'>>({
-        title: project.title,
-        description: project.description ?? '',
-        parent: project.parent ?? [],
-    });
-
-    const [formChanged, setFormChanged] = useState(false);
     const {
-        watch,
         handleSubmit,
+        reset,
         register,
         control,
-        formState: { errors, isSubmitted },
-    } = useForm<UpdateProjectFormType>({
-        resolver: zodResolver(schema),
+        formState: { errors, isSubmitted, isDirty },
+    } = useForm<ProjectUpdate>({
+        resolver: zodResolver(projectUpdateSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
-        defaultValues: actualFields,
+        defaultValues: {
+            id: project.data?.id,
+            title: project.data?.title,
+            description: project.data?.description,
+            parent: project.data?.parent,
+        },
     });
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
-    const formValues = watch();
 
-    useEffect(() => {
-        if (
-            formValues.title !== actualFields.title ||
-            formValues.description !== actualFields.description ||
-            formValues.parent
-                ?.map((p) => p.id)
-                .sort()
-                .join() !==
-                actualFields.parent
-                    ?.map((p) => p.id)
-                    .sort()
-                    .join()
-        ) {
-            setFormChanged(true);
-        }
-    }, [formValues, actualFields]);
-
-    const onProjectUpdate = useCallback((data: UpdateProjectFormType) => {
-        // TODO: solve types collision
-        setActualFields(data as any);
-        setFormChanged(false);
-    }, []);
+    const onProjectUpdate = useCallback(
+        (data: ProjectUpdateReturnType) => {
+            reset({
+                id: data?.id,
+                title: data?.title,
+                description: data?.description,
+                parent: data?.parent,
+            });
+        },
+        [reset],
+    );
 
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
 
@@ -186,24 +93,26 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
     }, []);
 
     const onProjectDelete = useCallback(() => {
+        if (!project.data) return;
+
         const newRecentProjectsCache = { ...recentProjectsCache };
-        if (recentProjectsCache[project.id]) {
-            delete newRecentProjectsCache[project.id];
+        if (recentProjectsCache[project.data.id]) {
+            delete newRecentProjectsCache[project.data.id];
             setRecentProjectsCache(newRecentProjectsCache);
         }
 
-        if (currentProjectCache?.id === project.id) {
+        if (currentProjectCache?.id === project.data.id) {
             setCurrentProjectCache(null);
         }
 
-        if (lastProjectCache?.id === project.id) {
+        if (lastProjectCache?.id === project.data.id) {
             setLastProjectCache(null);
         }
 
         router.exploreProjects();
     }, [
         router,
-        project.id,
+        project.data,
         recentProjectsCache,
         currentProjectCache,
         lastProjectCache,
@@ -217,21 +126,35 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
         setTransferTo(a);
     }, []);
     const onProjectTransferOwnership = useCallback(() => {
-        router.project(project.id);
-    }, [router, project]);
+        if (!project.data) return;
 
-    const projectParentIds = formValues.parent?.map((p) => p.id) ?? [];
+        router.project(project.data.id);
+    }, [router, project.data]);
+
+    const projectParentIds = project.data?.parent?.map((p) => p.id) ?? [];
     const [parentQuery, setParentQuery] = useState('');
-    const { data: parent } = useSWR(parentQuery, (q) => projectsFetcher(user, q));
+    const suggestions = trpc.project.suggestions.useQuery(parentQuery);
+
     const pageTitle = tr
         .raw('title', {
-            project: project.title,
+            project: project.data?.title,
         })
         .join('');
 
+    if (!project.data) return null;
+
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
-            <ProjectPageLayout project={project} title={project.title}>
+            <ProjectPageLayout
+                id={project.data.id}
+                title={project.data.title}
+                description={project.data.description}
+                starred={project.data._isStarred}
+                watching={project.data._isWatching}
+                stargizers={project.data._count.stargizers}
+                owned={project.data._isOwner}
+                parent={project.data.parent}
+            >
                 <PageSep />
 
                 <SettingsContent>
@@ -239,8 +162,9 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                         <Form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
                             <Fieldset title={tr('General')}>
                                 <FormInput
+                                    {...register('id')}
                                     disabled
-                                    defaultValue={project.id}
+                                    defaultValue={project.data.id}
                                     label={tr('key')}
                                     autoComplete="off"
                                     flat="bottom"
@@ -248,6 +172,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
 
                                 <FormInput
                                     {...register('title')}
+                                    defaultValue={project.data.title}
                                     label={tr('Title')}
                                     autoComplete="off"
                                     flat="bottom"
@@ -256,6 +181,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
 
                                 <FormInput
                                     {...register('description')}
+                                    defaultValue={project.data?.description ?? undefined}
                                     label={tr('Description')}
                                     flat="both"
                                     error={errorsResolver('description')}
@@ -268,9 +194,8 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                                         <FormMultiInput
                                             label={tr('Parent')}
                                             query={parentQuery}
-                                            items={parent?.projectCompletion?.filter(
-                                                (p) => !projectParentIds.includes(p.id),
-                                            )}
+                                            // FIXME: move filter to server
+                                            items={suggestions.data?.filter((p) => !projectParentIds.includes(p.id))}
                                             onInput={(q) => setParentQuery(q)}
                                             {...field}
                                         />
@@ -285,7 +210,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                                         size="m"
                                         view="primary"
                                         type="submit"
-                                        disabled={!formChanged}
+                                        disabled={!isDirty}
                                         text={tr('Save')}
                                     />
                                 </FormAction>
@@ -340,7 +265,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                     <ModalContent>
                         <Text>
                             {tr.raw('To confirm deleting project {project} please type project key below.', {
-                                project: <b key={project.title}>{project.title}</b>,
+                                project: <b key={project.data.title}>{project.data.title}</b>,
                             })}
                         </Text>
 
@@ -349,7 +274,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                         <Form>
                             <FormInput
                                 flat="bottom"
-                                placeholder={project.id}
+                                placeholder={project.data.id}
                                 autoComplete="off"
                                 onChange={onConfirmationInputChange}
                             />
@@ -361,7 +286,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                                     <Button
                                         size="m"
                                         view="warning"
-                                        disabled={deleteConfirmation !== project.id}
+                                        disabled={deleteConfirmation !== project.data.id}
                                         onClick={deleteProject(onProjectDelete)}
                                         text={tr('Yes, delete it')}
                                     />
@@ -379,7 +304,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                     <ModalContent>
                         <Text>
                             {tr.raw('To confirm transfering {project} ownership please select new owner below.', {
-                                project: <b key={project.title}>{project.title}</b>,
+                                project: <b key={project.data.title}>{project.data.title}</b>,
                             })}
                         </Text>
 
@@ -401,7 +326,11 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, fallback, params: {
                                         size="m"
                                         view="warning"
                                         disabled={!transferTo}
-                                        onClick={transferOwnership(onProjectTransferOwnership, transferTo?.id)}
+                                        onClick={
+                                            transferTo
+                                                ? transferOwnership(onProjectTransferOwnership, transferTo.id)
+                                                : undefined
+                                        }
                                         text={tr('Transfer ownership')}
                                     />
                                 </FormAction>

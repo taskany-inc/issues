@@ -154,11 +154,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
         <>
             <StyledFiltersPanel loading={loading}>
                 <StyledFiltersContent>
-                    <Input
-                        placeholder={tr('Search')}
-                        defaultValue={queryState.fulltextFilter}
-                        onChange={onSearchInputChange}
-                    />
+                    <Input placeholder={tr('Search')} defaultValue={queryState.query} onChange={onSearchInputChange} />
 
                     <StyledFiltersMenuWrapper>
                         {nullable(count, () => (
@@ -183,7 +179,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                     <PriorityFilterDropdown
                                         text={tr('Priority')}
                                         priority={pr}
-                                        value={queryState.priorityFilter}
+                                        value={queryState.priority}
                                         onChange={onPriorityChange}
                                     />
                                 ))}
@@ -194,7 +190,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                     <StateFilterDropdown
                                         text={tr('State')}
                                         states={st}
-                                        value={queryState.stateFilter}
+                                        value={queryState.state}
                                         onChange={onStateChange}
                                     />
                                 ))}
@@ -205,7 +201,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                     <UserFilterDropdown
                                         text={tr('Owner')}
                                         activity={u}
-                                        value={queryState.ownerFilter}
+                                        value={queryState.owner}
                                         onChange={onUserChange}
                                     />
                                 ))}
@@ -216,7 +212,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                     <ProjectFilterDropdown
                                         text={tr('Project')}
                                         projects={pr}
-                                        value={queryState.projectFilter}
+                                        value={queryState.project}
                                         onChange={onProjectChange}
                                     />
                                 ))}
@@ -227,7 +223,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                     <TagsFilterDropdown
                                         text={tr('Tags')}
                                         tags={ta}
-                                        value={queryState.tagsFilter}
+                                        value={queryState.tag}
                                         onChange={onTagChange}
                                     />
                                 ))}
@@ -238,13 +234,13 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                     <EstimateFilterDropdown
                                         text={tr('Estimate')}
                                         estimates={e}
-                                        value={queryState.estimateFilter}
+                                        value={queryState.estimate}
                                         onChange={onEstimateChange}
                                     />
                                 ))}
 
                             {onLimitChange &&
-                                nullable(queryState.limitFilter, (lf) => (
+                                nullable(queryState.limit, (lf) => (
                                     <LimitFilterDropdown text={tr('Limit')} value={lf} onChange={onLimitChange} />
                                 ))}
 

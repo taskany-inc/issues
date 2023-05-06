@@ -4,7 +4,7 @@ import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import { toggleReactionSchema } from '../../src/schema/reaction';
 
-export const reactionRouter = router({
+export const reaction = router({
     toggle: protectedProcedure
         .input(toggleReactionSchema)
         .mutation(async ({ ctx, input: { emoji, goalId, commentId } }) => {

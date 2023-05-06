@@ -1,19 +1,15 @@
-import { ProjectSettingsPage, projectsFetcher } from '../../../components/ProjectSettingsPage/ProjectSettingsPage';
+import { ProjectSettingsPage } from '../../../components/ProjectSettingsPage/ProjectSettingsPage';
 import { declareSsrProps } from '../../../utils/declareSsrProps';
 
 export const getServerSideProps = declareSsrProps(
-    async ({ user, params: { id } }) => {
-        const ssrData = await projectsFetcher(user, id);
+    async ({ ssrHelpers, params: { id } }) => {
+        const data = await ssrHelpers.project.getById.fetch(id);
 
-        return ssrData.project
-            ? {
-                  fallback: {
-                      [id]: ssrData,
-                  },
-              }
-            : {
-                  notFound: true,
-              };
+        if (!data) {
+            return {
+                notFound: true,
+            };
+        }
     },
     {
         private: true,

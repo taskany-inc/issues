@@ -4,5 +4,7 @@
     "Title must be longer than 1 symbol": "",
     "Comments's description is required": "",
     "Comments's description must be a string": "",
-    "Comments's description must be longer than 1 symbol": ""
+    "Comments's description must be longer than 1 symbol": "",
+    "Title must be longer than 2 symbols": "",
+    "Title can be 50 symbols maximum": ""
 }

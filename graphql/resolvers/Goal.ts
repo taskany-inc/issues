@@ -1,8 +1,8 @@
 import { arg, nonNull, stringArg } from 'nexus';
 import { ObjectDefinitionBlock } from 'nexus/dist/core';
 
-import { connectionMap } from '../queries/connections';
-import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
+import { connectionMap } from '../../trpc/queries/connections';
+import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../../trpc/queries/goals';
 import {
     Goal,
     GoalUpdateInput,

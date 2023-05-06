@@ -4,7 +4,7 @@ import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import { tagCreateSchema } from '../../src/schema/tag';
 
-export const tagRouter = router({
+export const tag = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
         return prisma.tag.findMany({
             where: {

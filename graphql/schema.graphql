@@ -171,17 +171,11 @@ type GoalsMetaOutput {
 
 type Mutation {
   createGoal(data: GoalCreateInput!): Goal
-  createProject(data: ProjectCreateInput!): Project
-  deleteProject(data: ProjectDelete!): Project
   toggleGoalArchive(data: GoalArchiveInput!): Activity
   toggleGoalDependency(data: GoalDependencyToggleInput!): Goal
   toggleGoalStargizer(data: SubscriptionToggleInput!): Activity
   toggleGoalWatcher(data: SubscriptionToggleInput!): Activity
-  toggleProjectStargizer(data: SubscriptionToggleInput!): Activity
-  toggleProjectWatcher(data: SubscriptionToggleInput!): Activity
-  transferProjectOwnership(data: TransferOwnershipInput!): Project
   updateGoal(data: GoalUpdateInput!): Goal
-  updateProject(data: ProjectUpdateInput!): Project
 }
 
 type Project {
@@ -256,11 +250,6 @@ type Query {
   findGoal(query: String!): [Goal]
   goal(id: String!): Goal
   goalDependencyKind: [String]
-  project(data: ProjectInput!): Project
-  projectCompletion(query: String!, sortBy: SortOrder): [Project]
-  projectDeepInfo(data: ProjectDeepInput!): ProjectDeepOutput
-  projects: [Project]
-  topProjects: [Project]
   userGoals(data: UserGoalsInput!): UserGoalsOutput
 }
 
