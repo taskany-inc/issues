@@ -12,10 +12,6 @@ type Activity {
   user: User
 }
 
-input ActivityInput {
-  id: ID!
-}
-
 type Comment {
   activity: Activity
   author: Activity
@@ -24,20 +20,6 @@ type Comment {
   id: ID!
   reactions: [Reaction]
   updatedAt: DateTime!
-}
-
-input CommentCreateInput {
-  description: String!
-  goalId: String!
-}
-
-input CommentDeleteInput {
-  id: ID!
-}
-
-input CommentUpdateInput {
-  description: String!
-  id: ID!
 }
 
 """
@@ -145,13 +127,11 @@ input GoalCreateInput {
   estimate: EstimateInput
   key: Boolean
   ownerId: String
-  participants: [ActivityInput!]
   personal: Boolean
   priority: String
   private: Boolean
   projectId: String
   stateId: String
-  tags: [TagInput!]
   title: String!
 }
 
@@ -174,7 +154,6 @@ input GoalUpdateInput {
   private: Boolean
   projectId: String
   stateId: String
-  tags: [TagInput!]
   title: String
 }
 
@@ -191,10 +170,8 @@ type GoalsMetaOutput {
 }
 
 type Mutation {
-  createComment(data: CommentCreateInput!): Comment
   createGoal(data: GoalCreateInput!): Goal
   createProject(data: ProjectCreateInput!): Project
-  deleteComment(data: CommentDeleteInput!): Comment
   deleteProject(data: ProjectDelete!): Project
   toggleGoalArchive(data: GoalArchiveInput!): Activity
   toggleGoalDependency(data: GoalDependencyToggleInput!): Goal
@@ -203,7 +180,6 @@ type Mutation {
   toggleProjectStargizer(data: SubscriptionToggleInput!): Activity
   toggleProjectWatcher(data: SubscriptionToggleInput!): Activity
   transferProjectOwnership(data: TransferOwnershipInput!): Project
-  updateComment(data: CommentUpdateInput!): Comment
   updateGoal(data: GoalUpdateInput!): Goal
   updateProject(data: ProjectUpdateInput!): Project
 }
@@ -279,7 +255,6 @@ input ProjectUpdateInput {
 type Query {
   findGoal(query: String!): [Goal]
   goal(id: String!): Goal
-  goalComment(goalId: String!): [Comment]
   goalDependencyKind: [String]
   project(data: ProjectInput!): Project
   projectCompletion(query: String!, sortBy: SortOrder): [Project]
@@ -335,12 +310,6 @@ type Tag {
   goals: [Goal]
   id: ID!
   projects: [Project]
-  title: String!
-}
-
-input TagInput {
-  description: String
-  id: ID!
   title: String!
 }
 

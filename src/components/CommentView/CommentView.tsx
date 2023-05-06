@@ -15,9 +15,8 @@ import {
     UserPic,
     nullable,
 } from '@taskany/bricks';
-import { Reaction } from '@prisma/client';
+import { Reaction, User } from '@prisma/client';
 
-import { User } from '../../../graphql/@generated/genql';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
 import { Reactions } from '../Reactions';
