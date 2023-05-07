@@ -2,20 +2,20 @@ import React, { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { Text, Link, nullable } from '@taskany/bricks';
-import { Goal, Project } from '@prisma/client';
 
 import { routes } from '../hooks/router';
+import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
 import { GoalListItem } from './GoalListItem/GoalListItem';
 import { PageSep } from './PageSep';
 import { ProjectTitleList } from './ProjectTitleList';
 
 interface GoalGroupProps {
-    goals: Goal[];
+    goals: NonNullable<GoalByIdReturnType>[];
     children: React.ReactNode;
     selectedResolver: (id: string) => boolean;
 
-    onClickProvider: (g: Goal) => MouseEventHandler<HTMLAnchorElement>;
+    onClickProvider: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
 }
 
@@ -29,17 +29,23 @@ const StyledGoalsGroup = styled.div`
     margin: 0 -20px;
 `;
 
-export const GoalsGroupProjectTitle = ({ project }: { project: Project }) => (
+interface GoalsGroupProjectTitleProps {
+    id: string;
+    title: string;
+    parent?: Array<{ id: string; title: string }>;
+}
+
+export const GoalsGroupProjectTitle: React.FC<GoalsGroupProjectTitleProps> = ({ id, title, parent }) => (
     <Text size="l" weight="bolder">
-        {Boolean(project.parent?.length) &&
-            nullable(project.parent, (parent) => (
+        {Boolean(parent?.length) &&
+            nullable(parent, (p) => (
                 <>
-                    <ProjectTitleList projects={parent} />
+                    <ProjectTitleList projects={p} />
                     {' / '}
                 </>
             ))}
-        <NextLink passHref href={routes.project(project.id)}>
-            <Link inline>{project.title}</Link>
+        <NextLink passHref href={routes.project(id)}>
+            <Link inline>{title}</Link>
         </NextLink>
     </Text>
 );
@@ -56,12 +62,12 @@ export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
                     <GoalListItem
                         createdAt={g.createdAt}
                         id={g.id}
-                        state={g.state}
+                        state={g.state!}
                         title={g.title}
-                        issuer={g.activity}
-                        owner={g.owner}
+                        issuer={g.activity!}
+                        owner={g.owner!}
                         tags={g.tags}
-                        priority={g.priority}
+                        priority={g.priority!}
                         comments={g._count?.comments}
                         key={g.id}
                         focused={selectedResolver(g.id)}

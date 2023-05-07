@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
+import { Goal, Project } from '@prisma/client';
 
-import { Goal, GoalsMetaOutput, Project } from '../../../graphql/@generated/genql';
-import { createFetcher, refreshInterval } from '../../utils/createFetcher';
+import { refreshInterval } from '../../utils/createFetcher';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
@@ -20,7 +19,7 @@ import { GoalsGroup, GoalsGroupProjectTitle } from '../GoalsGroup';
 import { PageTitle } from '../PageTitle';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById } from '../../../trpc/inferredTypes';
+import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -29,123 +28,7 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-export const goalsPageFetcher = createFetcher(
-    (_, priority = [], states = [], tags = [], estimates = [], owner = [], projects = [], query = '') => ({
-        userGoals: [
-            {
-                data: {
-                    priority,
-                    states,
-                    tags,
-                    estimates,
-                    owner,
-                    projects,
-                    query,
-                },
-            },
-            {
-                goals: {
-                    id: true,
-                    title: true,
-                    description: true,
-                    projectId: true,
-                    project: {
-                        id: true,
-                        title: true,
-                        flowId: true,
-                        parent: {
-                            id: true,
-                            title: true,
-                            description: true,
-                        },
-                    },
-                    priority: true,
-                    state: {
-                        id: true,
-                        title: true,
-                        hue: true,
-                    },
-                    activity: {
-                        id: true,
-                        user: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            image: true,
-                        },
-                        ghost: {
-                            id: true,
-                            email: true,
-                        },
-                    },
-                    owner: {
-                        id: true,
-                        user: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            image: true,
-                        },
-                        ghost: {
-                            id: true,
-                            email: true,
-                        },
-                    },
-                    tags: {
-                        id: true,
-                        title: true,
-                        description: true,
-                    },
-                    comments: {
-                        id: true,
-                    },
-                    _count: {
-                        comments: true,
-                    },
-                    _isEditable: true,
-                    createdAt: true,
-                    updatedAt: true,
-                },
-                meta: {
-                    owners: {
-                        id: true,
-                        user: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            image: true,
-                        },
-                        ghost: {
-                            id: true,
-                            email: true,
-                        },
-                    },
-                    tags: { id: true, title: true, description: true },
-                    states: {
-                        id: true,
-                        title: true,
-                        hue: true,
-                    },
-                    projects: {
-                        id: true,
-                        title: true,
-                        flowId: true,
-                    },
-                    estimates: {
-                        id: true,
-                        q: true,
-                        y: true,
-                        date: true,
-                    },
-                    priority: true,
-                    count: true,
-                },
-            },
-        ],
-    }),
-);
-
-export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps) => {
+export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
     const router = useRouter();
     const [preview, setPreview] = useState<Goal | null>(null);
     const { toggleFilterStar } = useFilterResource();
@@ -172,34 +55,37 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
         preset: presetData?.data,
     });
 
-    const { data, isLoading } = useQuery(
-        ['goals-page', router.query],
-        () => goalsPageFetcher(user, ...Object.values(queryState)),
-        {
-            initialData: fallback as Awaited<ReturnType<typeof goalsPageFetcher>>,
-            keepPreviousData: true,
-            staleTime: refreshInterval,
-        },
-    );
+    const { data, isLoading } = trpc.goal.getUserGoals.useQuery(queryState, {
+        keepPreviousData: true,
+        staleTime: refreshInterval,
+    });
 
-    const goals = data?.userGoals?.goals;
-    const meta: GoalsMetaOutput | undefined = data?.userGoals?.meta;
+    const goals = data?.goals;
+    const meta = data?.meta;
     const userFilters = trpc.filter.getUserFilters.useQuery();
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
     const groupsMap =
-        goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g: Goal) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const k = g.projectId!;
+        // eslint-disable-next-line no-spaced-func
+        (goals as NonNullable<GoalByIdReturnType>[])?.reduce<{
+            [key: string]: {
+                // eslint-disable-next-line func-call-spacing
+                project?: (Project & { parent?: Project[] }) | null;
+                goals: NonNullable<GoalByIdReturnType>[];
+            };
+        }>((r, g) => {
+            const k = g.projectId;
 
-            if (!r[k]) {
-                r[k] = {
-                    project: g.project,
-                    goals: [],
-                };
+            if (k) {
+                if (!r[k]) {
+                    r[k] = {
+                        project: g.project,
+                        goals: [],
+                    };
+                }
+
+                r[k].goals.push(g);
             }
-
-            r[k].goals.push(g);
             return r;
         }, Object.create(null)) || {};
 
@@ -323,14 +209,18 @@ export const GoalsPage = ({ user, ssrTime, locale, fallback }: ExternalPageProps
                                 onClickProvider={onGoalPrewiewShow}
                                 onTagClick={setTagsFilterOutside}
                             >
-                                <GoalsGroupProjectTitle project={group.project} />
+                                <GoalsGroupProjectTitle
+                                    id={group.project.id}
+                                    title={group.project.title}
+                                    parent={group.project.parent}
+                                />
                             </GoalsGroup>
                         ),
                 )}
             </PageContent>
 
             {nullable(preview, (p) => (
-                <GoalPreview goal={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
+                <GoalPreview preview={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
             ))}
 
             {nullable(queryString, (params) => (

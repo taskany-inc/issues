@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import z from 'zod';
 import styled from 'styled-components';
 import { gapS, gray2 } from '@taskany/colors';
 import {
@@ -15,8 +14,8 @@ import {
     ModalHeader,
     Tag,
 } from '@taskany/bricks';
+import { Activity, Estimate, Project, State, Tag as TagModel } from '@prisma/client';
 
-import { Project, EstimateInput, State, Tag as TagModel, Activity } from '../../../graphql/@generated/genql';
 import { FormEditor } from '../FormEditor/FormEditor';
 import { estimatedMeta } from '../../utils/dateTime';
 import { errorsProvider } from '../../utils/forms';
@@ -28,83 +27,27 @@ import { EstimateComboBox } from '../EstimateComboBox';
 import { TagComboBox } from '../TagComboBox/TagComboBox';
 import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
+import { GoalCommon, goalCommonSchema } from '../../schema/goal';
 
 import { tr } from './GoalForm.i18n';
 
 const tagsLimit = 5;
 
-const schemaProvider = () =>
-    z.object({
-        title: z
-            .string({
-                required_error: tr("Goal's title is required"),
-                invalid_type_error: tr("Goal's title must be a string"),
-            })
-            .min(10, {
-                message: tr("Goal's description must be longer than 10 symbols"),
-            }),
-        description: z
-            .string({
-                required_error: tr("Goal's description is required"),
-                invalid_type_error: tr("Goal's description must be a string"),
-            })
-            .min(10, {
-                message: tr("Goal's description must be longer than 10 symbols"),
-            }),
-        owner: z.object({
-            id: z.string(),
-        }),
-        parent: z.object(
-            {
-                id: z.string(),
-                title: z.string(),
-                flowId: z.string(),
-            },
-            {
-                invalid_type_error: tr("Goal's project or team are required"),
-                required_error: tr("Goal's project or team are required"),
-            },
-        ),
-        state: z.object({
-            id: z.string(),
-            hue: z.number(),
-            title: z.string(),
-        }),
-        priority: z.string().nullable().optional(),
-        estimate: z
-            .object({
-                date: z.string(),
-                q: z.string(),
-                y: z.string(),
-            })
-            .optional(),
-        tags: z
-            .array(
-                z.object({
-                    id: z.string(),
-                    title: z.string(),
-                }),
-            )
-            .optional(),
-    });
-
-export type GoalFormType = z.infer<ReturnType<typeof schemaProvider>>;
-
 interface GoalFormProps {
     actionBtnText: string;
     formTitle: string;
-    owner?: Partial<Activity>;
+    owner?: Activity;
     title?: string;
     description?: string;
-    parent?: Partial<Project>;
-    tags?: Array<TagModel | undefined>;
-    state?: Partial<State>;
+    parent?: Project;
+    tags?: TagModel[];
+    state?: State;
     priority?: Priority | string;
-    estimate?: EstimateInput;
+    estimate?: Estimate;
     busy?: boolean;
     children?: React.ReactNode;
 
-    onSumbit: (fields: GoalFormType) => void;
+    onSumbit: (fields: GoalCommon) => void;
 }
 
 const StyledTagsContainer = styled.div<{ focused?: boolean }>`
@@ -133,7 +76,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     children,
     onSumbit,
 }) => {
-    const schema = schemaProvider();
     const { locale } = usePageContext();
     const [descriptionFocused, setDescriptionFocused] = useState(false);
 
@@ -153,8 +95,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         setFocus,
         setValue,
         formState: { errors, isValid, isSubmitted },
-    } = useForm<GoalFormType>({
-        resolver: zodResolver(schema),
+    } = useForm<GoalCommon>({
+        resolver: zodResolver(goalCommonSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,

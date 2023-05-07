@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
+import { Tag } from '@prisma/client';
 
 import { FilterById } from '../../trpc/inferredTypes';
-import { Tag } from '../../graphql/@generated/genql';
 import { Priority } from '../types/priority';
 
 export interface QueryState {

@@ -1,26 +1,21 @@
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 
-import { Goal, GoalUpdateInput } from '../../../graphql/@generated/genql';
-import { gql } from '../../utils/gql';
+import { trpc } from '../../utils/trpcClient';
+import { GoalUpdate } from '../../schema/goal';
 
 import { tr } from './useGoalUpdate.i18n';
 
-export const useGoalUpdate = (goal: Goal) => {
+export const useGoalUpdate = (id?: string) => {
+    const updateMutation = trpc.goal.update.useMutation();
+
     return useCallback(
-        (data: Partial<GoalUpdateInput>) => {
-            const promise = gql.mutation({
-                updateGoal: [
-                    {
-                        data: {
-                            ...data,
-                            id: goal.id,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+        (data: Omit<GoalUpdate, 'id'>) => {
+            if (!id) return;
+
+            const promise = updateMutation.mutateAsync({
+                ...data,
+                id,
             });
 
             toast.promise(promise, {
@@ -31,6 +26,6 @@ export const useGoalUpdate = (goal: Goal) => {
 
             return promise;
         },
-        [goal],
+        [id, updateMutation],
     );
 };

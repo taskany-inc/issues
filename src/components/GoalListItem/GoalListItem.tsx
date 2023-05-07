@@ -4,12 +4,13 @@ import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
 import { gray4, textColor, gray10, gapM, gapS } from '@taskany/colors';
 import { GitForkIcon, MessageIcon, Text, Tag as TagItem, nullable, UserPic } from '@taskany/bricks';
+import type { State, Tag } from '@prisma/client';
 
 import { routes } from '../../hooks/router';
-import type { Scalars, State, Tag, Activity } from '../../../graphql/@generated/genql';
 import { Priority, priorityColorsMap } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './GoalListItem.i18n';
 
@@ -18,11 +19,11 @@ const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 interface GoalListItemProps {
     id: string;
     title: string;
-    issuer?: Activity;
+    issuer?: ActivityByIdReturnType;
     tags?: Array<Tag | undefined>;
     state?: State;
-    createdAt: Scalars['DateTime'];
-    owner?: Activity;
+    createdAt: Date;
+    owner?: ActivityByIdReturnType;
     comments?: number;
     hasForks?: boolean;
     isNotViewed?: boolean;
@@ -161,7 +162,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                                 <StyledTag
                                     key={t.id}
                                     title={t.title}
-                                    description={t.description}
+                                    description={t.description ?? undefined}
                                     onClick={onTagClick?.(t)}
                                 />
                             )),

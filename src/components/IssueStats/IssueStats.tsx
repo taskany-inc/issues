@@ -11,7 +11,7 @@ import { tr } from './IssueStats.i18n';
 const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 
 interface IssueStatsProps {
-    updatedAt: string;
+    updatedAt: Date;
     comments: number;
     mode?: 'compact' | 'default';
     onCommentsClick?: () => void;

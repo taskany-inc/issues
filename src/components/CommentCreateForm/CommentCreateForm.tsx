@@ -1,13 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { UserPic } from '@taskany/bricks';
 
 import { usePageContext } from '../../hooks/usePageContext';
-import { CreateFormType, useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
+import { useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
+import { CommentCreate, commentCreateSchema } from '../../schema/comment';
 
 import { tr } from './CommentCreateForm.i18n';
 
@@ -21,19 +21,17 @@ interface CommentCreateFormProps {
 
 const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus, onCancel, goalId }) => {
     const { user } = usePageContext();
-    const { createSchema, create } = useCommentResource();
+    const { create } = useCommentResource();
     const [focus, setFocus] = useState<boolean | undefined>();
     const [busy, setBusy] = useState(false);
-
-    type CommentFormType = z.infer<typeof createSchema>;
 
     const {
         control,
         handleSubmit,
         reset,
         formState: { isValid },
-    } = useForm<CreateFormType>({
-        resolver: zodResolver(createSchema),
+    } = useForm<CommentCreate>({
+        resolver: zodResolver(commentCreateSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
@@ -44,7 +42,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
     });
 
     const createComment = useCallback(
-        (form: CommentFormType) => {
+        (form: CommentCreate) => {
             setBusy(true);
 
             // FIXME: maybe async/await would be better API

@@ -3,15 +3,15 @@ import styled from 'styled-components';
 import { gapL, gapM } from '@taskany/colors';
 import { ComboBox, FormInput, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
 
-import { Activity, Goal } from '../../../graphql/@generated/genql';
 import { trpc } from '../../utils/trpcClient';
 import { IssueParticipantsList } from '../IssueParticipantsList';
 import { UserMenuItem } from '../UserMenuItem';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './IssueParticipantsForm.i18n';
 
 interface IssueParticipantsFormProps {
-    issue: Goal;
+    participants: ActivityByIdReturnType[];
 
     onChange?: (activities: string[]) => void;
 }
@@ -20,12 +20,12 @@ const StyledCompletion = styled.div`
     padding: ${gapL} 0 ${gapM};
 `;
 
-export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ issue, onChange }) => {
+export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ participants, onChange }) => {
     const [query, setQuery] = useState('');
     const [completionVisible, setCompletionVisible] = useState(false);
-    const activities = useMemo(() => new Set<string>(issue.participants?.map((p) => p!.id)), [issue]);
+    const activities = useMemo(() => new Set<string>(participants.map((p) => p.id)), [participants]);
 
-    const alreadyParticipants = issue.participants?.map((p) => p!.id);
+    const alreadyParticipants = participants.map((p) => p.id);
     const suggestions = trpc.user.suggestions.useQuery({ query, filter: alreadyParticipants });
 
     const onParticipantDelete = useCallback(
@@ -38,7 +38,7 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ is
     );
 
     const onParticipantAdd = useCallback(
-        (activity: Activity) => {
+        (activity: ActivityByIdReturnType) => {
             activities.add(activity.id);
 
             setQuery('');
@@ -57,7 +57,7 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ is
             <ModalContent>
                 <IssueParticipantsList
                     title={tr('Participants')}
-                    participants={issue.participants}
+                    participants={participants}
                     onDelete={onParticipantDelete}
                 />
 

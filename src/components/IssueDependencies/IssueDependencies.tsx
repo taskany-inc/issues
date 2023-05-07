@@ -4,9 +4,9 @@ import dynamic from 'next/dynamic';
 import { gapS, gray8 } from '@taskany/colors';
 import { Text, Link, nullable } from '@taskany/bricks';
 
-import { Goal } from '../../../graphql/@generated/genql';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { IssueDependenciesList } from '../IssueDependenciesList/IssueDependenciesList';
+import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './IssueDependencies.i18n';
 
@@ -14,7 +14,7 @@ const IssueDependenciesForm = dynamic(() => import('../IssueDependenciesForm/Iss
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 interface IssueDependenciesProps {
-    issue: Goal;
+    issue: GoalByIdReturnType;
 
     onChange?: React.ComponentProps<typeof IssueDependenciesForm>['onChange'];
 }
@@ -24,7 +24,7 @@ const StyledActionNotice = styled.div`
 `;
 
 const IssueDependencies: React.FC<IssueDependenciesProps> = ({ issue, onChange }) => {
-    const issueHasDeps = issue.dependsOn?.length || issue.blocks?.length || issue.relatedTo?.length;
+    const issueHasDeps = issue?.dependsOn?.length || issue?.blocks?.length || issue?.relatedTo?.length;
 
     const onDependenciesEdit = useCallback(() => {
         if (onChange) {

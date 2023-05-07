@@ -3,10 +3,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import useSWR from 'swr';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
-import { useRouter as useNextRouter } from 'next/router';
 import { danger0, gapM, gapS } from '@taskany/colors';
 import {
     Button,
@@ -24,12 +22,9 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { GoalDependencyToggleInput, Project, Activity, Comment } from '../../../graphql/@generated/genql';
-import { gql } from '../../utils/gql';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { formatEstimate } from '../../utils/dateTime';
 import { editGoalKeys } from '../../utils/hotkeys';
-import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { Page, PageContent, PageActions } from '../Page';
 import { PageSep } from '../PageSep';
@@ -54,6 +49,9 @@ import { StarButton } from '../StarButton/StarButton';
 import { useRouter } from '../../hooks/router';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../types/priority';
+import { trpc } from '../../utils/trpcClient';
+import { ToggleGoalDependency } from '../../schema/goal';
+import { refreshInterval } from '../../utils/createFetcher';
 
 import { tr } from './GoalPage.i18n';
 
@@ -118,24 +116,18 @@ const StyledCardActions = styled.div`
     }
 `;
 
-export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: ExternalPageProps<{ id: string }>) => {
+export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
-    const nextRouter = useNextRouter();
 
-    const { data, mutate } = useSWR(id, () => goalFetcher(user, id), {
-        fallback,
-        refreshInterval,
+    const utils = trpc.useContext();
+
+    const { data: goal } = trpc.goal.getById.useQuery(id, {
+        staleTime: refreshInterval,
     });
 
-    if (!data) return null;
-
-    const goal = data.goal;
-
-    if (!goal) return nextRouter.push('/404');
-
-    const project: Project | undefined = goal.project;
-    const issuer: Activity | undefined = goal.activity;
-    const owner: Activity | undefined = goal.owner;
+    const project = goal?.project;
+    const issuer = goal?.activity;
+    const owner = goal?.owner;
 
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     useEffect(() => {
@@ -146,59 +138,54 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
         setCurrentProjectCache(null);
     });
 
-    const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal.id);
-    const [watcher, setWatcher] = useState(goal._isWatching);
+    const { toggleGoalWatching, toggleGoalStar } = useGoalResource(id);
+    const [watcher, setWatcher] = useState(goal?._isWatching);
     const onWatchToggle = useCallback(() => {
         setWatcher(!watcher);
     }, [watcher]);
 
-    const [stargizer, setStargizer] = useState(goal._isStarred);
+    const [stargizer, setStargizer] = useState(goal?._isStarred);
     const onStarToggle = useCallback(() => {
         setStargizer(!stargizer);
     }, [stargizer]);
 
-    const priority = goal.priority as Priority;
+    const priority = goal?.priority as Priority;
     const priorityColor = priorityColorsMap[priority];
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
-    const updateGoal = useGoalUpdate(goal);
-    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
+    const updateGoal = useGoalUpdate(id);
+    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
     const onGoalStateChange = useCallback(
-        async (stateId: string) => {
+        async (id: string) => {
             await updateGoal({
-                stateId,
+                state: { id },
             });
 
-            mutate();
+            utils.goal.getById.invalidate(id);
         },
-        [updateGoal, mutate],
+        [updateGoal, utils.goal.getById],
     );
 
-    const onGoalReactionToggle = useCallback((id: string) => goalReaction(id, mutate), [mutate, goalReaction]);
+    const onGoalReactionToggle = useCallback(
+        (id: string) => goalReaction(id, () => utils.goal.getById.invalidate(id)),
+        [goalReaction, utils.goal.getById],
+    );
 
     const onParticipantsChange = useCallback(
         async (participants: string[]) => {
             await updateGoal({
-                participants,
+                participants: participants.map((id) => ({ id })),
             });
 
-            mutate();
+            utils.goal.getById.invalidate(id);
         },
-        [mutate, updateGoal],
+        [id, updateGoal, utils.goal.getById],
     );
 
+    const toggleDependencyMutation = trpc.goal.toggleDependency.useMutation();
     const onDependenciesChange = useCallback(
-        async (data: GoalDependencyToggleInput) => {
-            const promise = gql.mutation({
-                toggleGoalDependency: [
-                    {
-                        data,
-                    },
-                    {
-                        id: true,
-                    },
-                ],
-            });
+        async (data: ToggleGoalDependency) => {
+            const promise = toggleDependencyMutation.mutateAsync(data);
 
             toast.promise(promise, {
                 error: tr('Something went wrong 😿'),
@@ -208,35 +195,38 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
 
             await promise;
 
-            mutate();
+            utils.goal.getById.invalidate(id);
         },
-        [mutate],
+        [id, toggleDependencyMutation, utils.goal.getById],
     );
 
     const onCommentPublish = useCallback(
-        (id?: string) => {
-            mutate();
-            setHighlightCommentId(id);
+        (commentId?: string) => {
+            utils.goal.getById.invalidate(id);
+            setHighlightCommentId(commentId);
         },
-        [mutate, setHighlightCommentId],
+        [id, setHighlightCommentId, utils.goal.getById],
     );
-    const onCommentReactionToggle = useCallback((id: string) => commentReaction(id, mutate), [mutate, commentReaction]);
+    const onCommentReactionToggle = useCallback(
+        (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(id)),
+        [commentReaction, utils.goal.getById],
+    );
     const onCommentDelete = useCallback(() => {
-        mutate();
-    }, [mutate]);
+        utils.goal.getById.invalidate(id);
+    }, [id, utils.goal.getById]);
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(
-        (id?: string) => {
+        (editedId?: string) => {
             setGoalEditModalVisible(false);
 
-            if (goal.id !== id) {
-                router.goal(id);
+            if (id !== editedId) {
+                router.goal(editedId);
             } else {
-                mutate();
+                utils.goal.getById.invalidate(id);
             }
         },
-        [mutate, goal.id, router],
+        [id, router, utils.goal.getById],
     );
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
@@ -246,19 +236,11 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
         item.onClick?.();
     }, []);
 
+    const toggleArchiveMutation = trpc.goal.toggleArchive.useMutation();
     const onGoalDeleteConfirm = useCallback(async () => {
-        const promise = gql.mutation({
-            toggleGoalArchive: [
-                {
-                    data: {
-                        id: goal.id,
-                        archived: true,
-                    },
-                },
-                {
-                    id: true,
-                },
-            ],
+        const promise = toggleArchiveMutation.mutateAsync({
+            id,
+            archived: true,
         });
 
         toast.promise(promise, {
@@ -270,11 +252,11 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
         await promise;
 
         router.goals();
-    }, [goal, router]);
+    }, [id, router, toggleArchiveMutation]);
 
     const pageTitle = tr
         .raw('title', {
-            goal: goal.title,
+            goal: goal?.title,
         })
         .join('');
 
@@ -283,11 +265,13 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
         commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
 
+    if (!goal) return null;
+
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <IssueHeader>
                 <StyledIssueInfo align="left">
-                    <IssueKey id={goal.id}>
+                    <IssueKey id={id}>
                         {nullable(goal.tags, (tags) => (
                             <IssueTags tags={tags} />
                         ))}
@@ -414,7 +398,7 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
 
                     <ActivityFeed ref={commentsRef}>
                         {goal.comments?.map((comment) =>
-                            nullable(comment, (c: Comment) => (
+                            nullable(comment, (c) => (
                                 <CommentView
                                     key={c.id}
                                     id={c.id}
@@ -435,7 +419,10 @@ export const GoalPage = ({ user, locale, ssrTime, fallback, params: { id } }: Ex
                 </div>
 
                 <div>
-                    <IssueParticipants issue={goal} onChange={goal._isEditable ? onParticipantsChange : undefined} />
+                    <IssueParticipants
+                        participants={goal.participants}
+                        onChange={goal._isEditable ? onParticipantsChange : undefined}
+                    />
                     <IssueDependencies issue={goal} onChange={goal._isEditable ? onDependenciesChange : undefined} />
                 </div>
             </IssueContent>

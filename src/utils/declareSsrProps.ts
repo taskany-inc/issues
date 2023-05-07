@@ -21,10 +21,6 @@ interface SSRProps<P = { [key: string]: string }> {
 }
 
 export interface ExternalPageProps<P = { [key: string]: string }> extends SSRProps<P> {
-    fallback: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: any;
-    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }

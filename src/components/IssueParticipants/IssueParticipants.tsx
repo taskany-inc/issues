@@ -2,22 +2,22 @@ import React, { useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { nullable } from '@taskany/bricks';
 
-import { Goal } from '../../../graphql/@generated/genql';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { IssueParticipantsForm } from '../IssueParticipantsForm/IssueParticipantsForm';
 import { IssueParticipantsList } from '../IssueParticipantsList';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './IssueParticipants.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 interface IssueParticipantsProps {
-    issue: Goal;
+    participants: ActivityByIdReturnType[];
 
     onChange?: React.ComponentProps<typeof IssueParticipantsForm>['onChange'];
 }
 
-const IssueParticipants: React.FC<IssueParticipantsProps> = ({ issue, onChange }) => {
+const IssueParticipants: React.FC<IssueParticipantsProps> = ({ participants, onChange }) => {
     const onParticipantsEdit = useCallback(() => {
         if (onChange) {
             dispatchModalEvent(ModalEvent.IssueParticipantsModal)();
@@ -28,13 +28,13 @@ const IssueParticipants: React.FC<IssueParticipantsProps> = ({ issue, onChange }
         <>
             <IssueParticipantsList
                 title={tr('Participants')}
-                participants={issue.participants}
+                participants={participants}
                 onEdit={onChange ? onParticipantsEdit : undefined}
             />
 
             {nullable(onChange, () => (
                 <ModalOnEvent event={ModalEvent.IssueParticipantsModal}>
-                    <IssueParticipantsForm issue={issue} onChange={onChange} />
+                    <IssueParticipantsForm participants={participants} onChange={onChange} />
                 </ModalOnEvent>
             ))}
         </>

@@ -14,7 +14,7 @@ interface IssueListItemProps {
         state?: {
             title: string;
             hue: number;
-        };
+        } | null;
     };
 }
 

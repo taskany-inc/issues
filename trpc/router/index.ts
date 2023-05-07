@@ -7,6 +7,7 @@ import { reaction } from './reaction';
 import { tag } from './tag';
 import { comment } from './comment';
 import { project } from './project';
+import { goal } from './goal';
 
 export const trpcRouter = router({
     filter,
@@ -16,6 +17,7 @@ export const trpcRouter = router({
     tag,
     comment,
     project,
+    goal,
 });
 
 export type TrpcRouter = typeof trpcRouter;

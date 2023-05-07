@@ -1,27 +1,21 @@
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 
-import { gql } from '../../utils/gql';
+import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './useGoalResource.i18n';
 
 type Callback<A = []> = (...args: A[]) => void;
 
 export const useGoalResource = (id: string) => {
+    const toggleWatcherMutation = trpc.goal.toggleWatcher.useMutation();
+    const toggleStargizerMutation = trpc.goal.toggleStargizer.useMutation();
+
     const toggleGoalWatching = useCallback(
         (cb: Callback, watcher?: boolean) => async () => {
-            const promise = gql.mutation({
-                toggleGoalWatcher: [
-                    {
-                        data: {
-                            id,
-                            direction: !watcher,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+            const promise = toggleWatcherMutation.mutateAsync({
+                id,
+                direction: !watcher,
             });
 
             toast.promise(promise, {
@@ -34,23 +28,14 @@ export const useGoalResource = (id: string) => {
 
             await promise;
         },
-        [id],
+        [id, toggleWatcherMutation],
     );
 
     const toggleGoalStar = useCallback(
         (cb: Callback, stargizer?: boolean) => async () => {
-            const promise = gql.mutation({
-                toggleGoalStargizer: [
-                    {
-                        data: {
-                            id,
-                            direction: !stargizer,
-                        },
-                    },
-                    {
-                        id: true,
-                    },
-                ],
+            const promise = toggleStargizerMutation.mutateAsync({
+                id,
+                direction: !stargizer,
             });
 
             toast.promise(promise, {
@@ -63,7 +48,7 @@ export const useGoalResource = (id: string) => {
 
             await promise;
         },
-        [id],
+        [id, toggleStargizerMutation],
     );
 
     return {
