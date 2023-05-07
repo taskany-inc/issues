@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { Button, nullable } from '@taskany/bricks';
 import { Goal, Project } from '@prisma/client';
 
-import { refreshInterval } from '../../utils/createFetcher';
+import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';

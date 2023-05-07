@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
 import { Goal, Project } from '@prisma/client';
 
-import { refreshInterval } from '../../utils/createFetcher';
+import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';

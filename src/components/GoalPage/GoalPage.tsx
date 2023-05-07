@@ -51,7 +51,7 @@ import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../types/priority';
 import { trpc } from '../../utils/trpcClient';
 import { ToggleGoalDependency } from '../../schema/goal';
-import { refreshInterval } from '../../utils/createFetcher';
+import { refreshInterval } from '../../utils/config';
 
 import { tr } from './GoalPage.i18n';
 
@@ -156,14 +156,14 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
     const onGoalStateChange = useCallback(
-        async (id: string) => {
+        async (stateId: string) => {
             await updateGoal({
-                state: { id },
+                state: { id: stateId },
             });
 
             utils.goal.getById.invalidate(id);
         },
-        [updateGoal, utils.goal.getById],
+        [id, updateGoal, utils.goal.getById],
     );
 
     const onGoalReactionToggle = useCallback(
