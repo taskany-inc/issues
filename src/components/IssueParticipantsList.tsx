@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import { gapS } from '@taskany/colors';
 import { CleanButton, UserPic, nullable } from '@taskany/bricks';
 
-import { Activity } from '../../graphql/@generated/genql';
+import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 
 import { IssueMeta } from './IssueMeta';
 
 interface IssueParticipantsListProps {
     title: string;
-    participants?: Array<Activity | undefined>;
+    participants?: ActivityByIdReturnType[];
 
     onEdit?: () => void;
     onDelete?: (id: string) => void;

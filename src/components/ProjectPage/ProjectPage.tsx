@@ -74,20 +74,23 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
     const groupsMap =
-        projectDeepInfo?.goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>((r, g) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const k = g.projectId!;
+        projectDeepInfo?.goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>(
+            (r, g: Goal & { project?: Project }) => {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const k = g.projectId!;
 
-            if (!r[k]) {
-                r[k] = {
-                    project: g.project,
-                    goals: [],
-                };
-            }
+                if (!r[k]) {
+                    r[k] = {
+                        project: g.project,
+                        goals: [],
+                    };
+                }
 
-            r[k].goals.push(g);
-            return r;
-        }, Object.create(null)) || {};
+                r[k].goals.push(g);
+                return r;
+            },
+            Object.create(null),
+        ) || {};
 
     // sort groups to make root project first
     const groups = Object.values(groupsMap).sort((a) => (a.project?.id === id ? -1 : 1));
@@ -247,7 +250,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                 </PageContent>
 
                 {nullable(preview, (p) => (
-                    <GoalPreview goal={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
+                    <GoalPreview preview={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
                 ))}
 
                 {nullable(queryString, (params) => (

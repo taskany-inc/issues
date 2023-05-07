@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState } from 'react';
-import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
@@ -23,9 +22,7 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { gql } from '../../utils/gql';
-import { Goal } from '../../../graphql/@generated/genql';
-import { goalFetcher, refreshInterval } from '../../utils/entityFetcher';
+import { refreshInterval } from '../../utils/createFetcher';
 import { formatEstimate } from '../../utils/dateTime';
 import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
@@ -49,6 +46,7 @@ import { Reactions } from '../Reactions';
 import ReactionsDropdown from '../ReactionsDropdown';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { getPriorityText } from '../PriorityText/PriorityText';
+import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -58,7 +56,12 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
 
 interface GoalPreviewProps {
-    goal: Goal;
+    preview: {
+        id: string;
+        title: string;
+        description?: string | null;
+        updatedAt: Date;
+    };
 
     onClose?: () => void;
     onDelete?: () => void;
@@ -97,56 +100,58 @@ const StyledCard = styled(Card)`
     min-height: 60px;
 `;
 
-const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, onDelete }) => {
+const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
     const { user, locale } = usePageContext();
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
 
-    const { data, mutate } = useSWR(`goal-${partialGoal.id}`, () => goalFetcher(user, partialGoal.id), {
-        refreshInterval,
-    });
-    const refresh = useCallback(() => mutate(), [mutate]);
+    const archiveMutation = trpc.goal.toggleArchive.useMutation();
+    const utils = trpc.useContext();
 
-    const goal: Goal = data?.goal ?? partialGoal;
+    const { data: goal } = trpc.goal.getById.useQuery(preview.id, {
+        staleTime: refreshInterval,
+    });
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(() => {
         setGoalEditModalVisible(false);
 
-        refresh();
-    }, [refresh]);
+        utils.goal.getById.invalidate(preview.id);
+    }, [utils.goal.getById, preview.id]);
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
     }, []);
 
-    const updateGoal = useGoalUpdate(goal);
-    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal.reactions);
+    const updateGoal = useGoalUpdate(preview.id);
+    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
-    const priorityColor = priorityColorsMap[goal.priority as Priority];
-    const issueEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
+    const priorityColor = priorityColorsMap[goal?.priority as Priority];
 
     const onGoalStateChange = useCallback(
-        async (stateId: string) => {
+        async (id: string) => {
             await updateGoal({
-                stateId,
+                state: { id },
             });
 
-            refresh();
+            utils.goal.getById.invalidate(preview.id);
         },
-        [updateGoal, refresh],
+        [preview, updateGoal, utils.goal.getById],
     );
 
     const onCommentPublish = useCallback(
         (id?: string) => {
-            refresh();
+            utils.goal.getById.invalidate(preview.id);
             setHighlightCommentId(id);
         },
-        [refresh, setHighlightCommentId],
+        [preview, utils.goal.getById, setHighlightCommentId],
     );
 
-    const onGoalReactionToggle = useCallback((id: string) => goalReaction(id, refresh), [refresh, goalReaction]);
+    const onGoalReactionToggle = useCallback(
+        (id: string) => goalReaction(id, () => utils.goal.getById.invalidate(preview.id)),
+        [preview, goalReaction, utils.goal.getById],
+    );
     const onCommentReactionToggle = useCallback(
-        (id: string) => commentReaction(id, refresh),
-        [refresh, commentReaction],
+        (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(preview.id)),
+        [preview, commentReaction, utils.goal.getById],
     );
 
     const onPreviewClose = useCallback(() => {
@@ -160,18 +165,9 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
 
     const onGoalDeleteConfirm = useCallback(async () => {
         onDelete?.();
-        const promise = gql.mutation({
-            toggleGoalArchive: [
-                {
-                    data: {
-                        id: goal.id,
-                        archived: true,
-                    },
-                },
-                {
-                    id: true,
-                },
-            ],
+        const promise = archiveMutation.mutateAsync({
+            id: preview.id,
+            archived: true,
         });
 
         toast.promise(promise, {
@@ -182,8 +178,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
 
         await promise;
 
-        refresh();
-    }, [goal, refresh, onDelete]);
+        utils.goal.getById.invalidate(preview.id);
+    }, [preview, onDelete, archiveMutation, utils.goal.getById]);
 
     const commentsRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -202,44 +198,44 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
         <>
             <ModalPreview visible onClose={onPreviewClose}>
                 <StyledModalHeader ref={headerRef}>
-                    {nullable(goal.id, (id) => (
+                    {nullable(preview.id, (id) => (
                         <IssueKey size="s" id={id}>
-                            {nullable(goal.tags, (tags) => (
+                            {nullable(goal?.tags, (tags) => (
                                 <IssueTags tags={tags} size="s" />
                             ))}
                         </IssueKey>
                     ))}
 
-                    {Boolean(goal.project?.parent?.length) &&
-                        nullable(goal.project?.parent, (parent) => (
+                    {Boolean(goal?.project?.parent?.length) &&
+                        nullable(goal?.project?.parent, (parent) => (
                             <>
                                 <IssueParent as="span" mode="compact" parent={parent} size="m" />
                                 <Dot />
                             </>
                         ))}
 
-                    {nullable(goal.project, (project) => (
+                    {nullable(goal?.project, (project) => (
                         <IssueParent as="span" mode="compact" parent={project} size="m" />
                     ))}
 
                     <IssueStats
                         mode="compact"
-                        comments={goal._count?.comments ?? 0}
+                        comments={goal?._count?.comments ?? 0}
                         onCommentsClick={onCommentsClick}
-                        updatedAt={goal.updatedAt}
+                        updatedAt={(goal || preview).updatedAt}
                     />
 
-                    {nullable(goal.title, (title) => (
-                        <IssueTitle title={title} href={routes.goal(goal.id)} size="xl" />
+                    {nullable((goal || preview).title, (title) => (
+                        <IssueTitle title={title} href={routes.goal(preview.id)} size="xl" />
                     ))}
 
                     <StyledImportantActions>
                         <StyledPublicActions>
-                            {nullable(goal.state, (s) => (
-                                <StateSwitch state={s} flowId={goal.project?.flowId} onClick={onGoalStateChange} />
+                            {nullable(goal?.state, (s) => (
+                                <StateSwitch state={s} flowId={goal?.project?.flowId} onClick={onGoalStateChange} />
                             ))}
 
-                            {nullable(goal.priority, (ip) => (
+                            {nullable(goal?.priority, (ip) => (
                                 <Button
                                     ghost
                                     text={getPriorityText(ip as Priority)}
@@ -249,28 +245,28 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
 
                             <Button
                                 ghost
-                                text={goal.owner?.user?.name || goal.owner?.user?.email || goal.owner?.ghost?.email}
+                                text={goal?.owner?.user?.name || goal?.owner?.user?.email || goal?.owner?.ghost?.email}
                                 iconLeft={
                                     <UserPic
-                                        src={goal.owner?.user?.image}
-                                        email={goal.owner?.user?.email || goal.owner?.ghost?.email}
+                                        src={goal?.owner?.user?.image}
+                                        email={goal?.owner?.user?.email || goal?.owner?.ghost?.email}
                                         size={16}
                                     />
                                 }
                             />
 
-                            {nullable(issueEstimate, (ie) => (
+                            {nullable(goal?._lastEstimate, (ie) => (
                                 <Button ghost text={formatEstimate(ie, locale)} />
                             ))}
 
-                            <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(goal.id)}>
+                            <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(preview.id)}>
                                 {nullable(!reactionsProps.limited, () => (
-                                    <ReactionsDropdown onClick={onGoalReactionToggle(goal.id)} />
+                                    <ReactionsDropdown onClick={onGoalReactionToggle(preview.id)} />
                                 ))}
                             </Reactions>
                         </StyledPublicActions>
 
-                        {nullable(goal._isEditable, () => (
+                        {nullable(goal?._isEditable, () => (
                             <Dropdown
                                 onChange={onEditMenuChange}
                                 items={[
@@ -313,17 +309,20 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                 <StyledModalContent ref={contentRef}>
                     <StyledCard>
                         <CardInfo>
-                            <Link inline>{goal.activity?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
+                            <Link inline>{goal?.activity?.user?.name}</Link> —{' '}
+                            {nullable(goal?.createdAt, (date) => (
+                                <RelativeTime date={date} />
+                            ))}
                         </CardInfo>
 
                         <CardComment>
-                            <Md>{goal.description}</Md>
+                            <Md>{(goal || preview).description ?? ''}</Md>
                         </CardComment>
                     </StyledCard>
 
-                    {nullable(data, () => (
+                    {nullable(goal?.comments, (comments) => (
                         <ActivityFeed ref={commentsRef}>
-                            {goal.comments?.map((comment) =>
+                            {comments.map((comment) =>
                                 nullable(comment, (c) => (
                                     <CommentView
                                         key={c.id}
@@ -339,26 +338,28 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ goal: partialGoal, onClose, o
                                 )),
                             )}
 
-                            <CommentCreateForm goalId={goal.id} onSubmit={onCommentPublish} />
+                            <CommentCreateForm goalId={preview.id} onSubmit={onCommentPublish} />
                         </ActivityFeed>
                     ))}
                 </StyledModalContent>
             </ModalPreview>
 
-            {nullable(goal._isEditable, () => (
-                <ModalOnEvent
-                    event={ModalEvent.GoalEditModal}
-                    hotkeys={editGoalKeys}
-                    visible={goalEditModalVisible}
-                    onShow={onGoalEditModalShow}
-                >
-                    <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
-                </ModalOnEvent>
-            ))}
+            {nullable(goal, (g) =>
+                nullable(g._isEditable, () => (
+                    <>
+                        <ModalOnEvent
+                            event={ModalEvent.GoalEditModal}
+                            hotkeys={editGoalKeys}
+                            visible={goalEditModalVisible}
+                            onShow={onGoalEditModalShow}
+                        >
+                            <GoalEditForm goal={g} onSubmit={onGoalEdit} />
+                        </ModalOnEvent>
 
-            {nullable(goal._isEditable, () => (
-                <GoalDeleteModal id={goal.id} onConfirm={onGoalDeleteConfirm} />
-            ))}
+                        <GoalDeleteModal id={g.id} onConfirm={onGoalDeleteConfirm} />
+                    </>
+                )),
+            )}
         </>
     );
 };

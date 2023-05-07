@@ -32,10 +32,10 @@ const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
 interface CommentViewProps {
     id: string;
     description: string;
-    createdAt: string;
-    updatedAt?: string;
+    createdAt: Date;
+    updatedAt?: Date;
     reactions?: Reaction[];
-    author?: User;
+    author?: User | null;
     isNew?: boolean;
     isEditable?: boolean;
 

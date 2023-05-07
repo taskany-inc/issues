@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import styled from 'styled-components';
-import useSWR from 'swr';
 import { gapL, gapM } from '@taskany/colors';
 import {
     Button,
@@ -15,18 +14,18 @@ import {
     FormTitle,
 } from '@taskany/bricks';
 
-import { Dependency, enumDependency, Goal, GoalDependencyToggleInput } from '../../../graphql/@generated/genql';
-import { createFetcher } from '../../utils/createFetcher';
-import { usePageContext } from '../../hooks/usePageContext';
 import { IssueDependenciesList } from '../IssueDependenciesList/IssueDependenciesList';
 import { GoalMenuItem } from '../GoalMenuItem';
+import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { trpc } from '../../utils/trpcClient';
+import { dependencyKind, ToggleGoalDependency } from '../../schema/goal';
 
-import { I18nKey, tr } from './IssueDependenciesForm.i18n';
+import { tr } from './IssueDependenciesForm.i18n';
 
 interface IssueDependenciesFormProps {
-    issue: Goal;
+    issue: GoalByIdReturnType;
 
-    onChange?: (input: GoalDependencyToggleInput) => void;
+    onChange?: (input: ToggleGoalDependency) => void;
 }
 
 const StyledMenuItem = styled(MenuItem)`
@@ -49,108 +48,36 @@ const StyledDropdownContainer = styled.div`
     align-items: center;
 `;
 
-const depsKindfetcher = createFetcher(() => ({
-    goalDependencyKind: true,
-}));
-
-const goalsFetcher = createFetcher((_, query: string) => ({
-    findGoal: [
-        {
-            query,
-        },
-        {
-            id: true,
-            title: true,
-            description: true,
-            activityId: true,
-            ownerId: true,
-            state: {
-                id: true,
-                title: true,
-                hue: true,
-            },
-            estimate: {
-                date: true,
-                q: true,
-                y: true,
-            },
-            createdAt: true,
-            updatedAt: true,
-            project: {
-                id: true,
-                title: true,
-                description: true,
-                flow: {
-                    id: true,
-                },
-            },
-            tags: {
-                id: true,
-                title: true,
-                description: true,
-            },
-            watchers: {
-                id: true,
-            },
-            stargizers: {
-                id: true,
-            },
-            comments: {
-                id: true,
-            },
-            participants: {
-                id: true,
-                user: {
-                    email: true,
-                    name: true,
-                    image: true,
-                },
-                ghost: {
-                    email: true,
-                },
-            },
-        },
-    ],
-}));
-
-const map: Record<Dependency, I18nKey> = {
-    blocks: 'blocks',
-    dependsOn: 'dependsOn',
-    relatedTo: 'relatedTo',
-};
-
 const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
-    const { user } = usePageContext();
-
-    const [kind, setKind] = useState<Dependency>();
-    const [target, setTarget] = useState<Goal>();
+    const [kind, setKind] = useState<dependencyKind>();
+    const [target, setTarget] = useState<GoalByIdReturnType>();
     const [query, setQuery] = useState('');
     const [completionVisible, setCompletionVisible] = useState(false);
 
-    const { data: goalsData } = useSWR(query, (q) => goalsFetcher(user, q));
-    const { data: depsKindData } = useSWR('depsKind', () => depsKindfetcher(user));
+    const { data: goalsData } = trpc.goal.suggestions.useQuery(query);
 
     const onDependencyDelete = useCallback(
-        (id: string, dependency: keyof typeof enumDependency) => {
-            onChange &&
+        (id: string, kind: dependencyKind) => {
+            issue &&
+                onChange &&
                 onChange({
                     id: issue.id,
                     target: id,
                     direction: false,
-                    dependency,
+                    kind,
                 });
         },
         [onChange, issue],
     );
 
-    const onDependencyAdd = useCallback((g: Goal) => {
+    const onDependencyAdd = useCallback((g: NonNullable<GoalByIdReturnType>) => {
         setCompletionVisible(false);
         setTarget(g);
         setQuery(g.id);
     }, []);
 
     const onKindChange = useCallback(
-        (kind: Dependency) => {
+        (kind: dependencyKind) => {
             if (!target) {
                 return;
             }
@@ -161,22 +88,21 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
     );
 
     const onSubmit = useCallback(() => {
-        if (!target && !kind) {
-            return;
-        }
-
         setQuery('');
         setTarget(undefined);
         setKind(undefined);
 
-        onChange &&
+        target &&
+            kind &&
+            issue &&
+            onChange &&
             onChange({
                 id: issue.id,
-                target: target?.id,
+                target: target.id,
                 direction: true,
-                dependency: kind,
+                kind,
             });
-    }, [target, kind, onChange, issue.id]);
+    }, [target, kind, onChange, issue]);
 
     const disabled = !target;
 
@@ -196,7 +122,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                         placement="top-start"
                         offset={[-4, 38]}
                         visible={completionVisible}
-                        items={goalsData?.findGoal}
+                        items={goalsData}
                         onChange={onDependencyAdd}
                         renderInput={(props) => (
                             <FormInput
@@ -222,7 +148,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
 
                     <StyledDropdownContainer>
                         <Dropdown
-                            items={depsKindData?.goalDependencyKind}
+                            items={Object.values(dependencyKind)}
                             onChange={onKindChange}
                             renderTrigger={(props) => (
                                 <Button
@@ -237,7 +163,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                                             <ArrowDownSmallIcon size="s" noWrap />
                                         )
                                     }
-                                    text={kind ? tr(map[kind]) : undefined}
+                                    text={kind ? tr(kind) : undefined}
                                     ref={props.ref}
                                     onClick={props.onClick}
                                 />
@@ -250,7 +176,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                                     onClick={props.onClick}
                                     view="primary"
                                 >
-                                    {map[props.item as Dependency]}
+                                    {tr(props.item)}
                                 </StyledMenuItem>
                             )}
                         />

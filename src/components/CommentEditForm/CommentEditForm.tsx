@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
-import { UpdateFormType, useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
-import { Comment } from '../../../graphql/@generated/genql';
+import { useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
 import { CommentForm } from '../CommentForm/CommentForm';
+import { CommentUpdate, commentUpdateSchema } from '../../schema/comment';
 
 import { tr } from './CommentEditForm.i18n';
 
@@ -15,23 +14,21 @@ interface CommentEditFormProps {
     setFocus?: boolean;
 
     onChanged: (comment: { id: string; description: string }) => void;
-    onUpdate: (comment?: Partial<Comment>) => void;
+    onUpdate: (comment?: { id: string; description: string }) => void;
     onCancel: () => void;
 }
 
 const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onChanged, onUpdate, onCancel }) => {
-    const { updateSchema, update } = useCommentResource();
+    const { update } = useCommentResource();
     const [busy, setBusy] = useState(false);
-
-    type CommentFormType = z.infer<typeof updateSchema>;
 
     const {
         control,
         handleSubmit,
         watch,
         formState: { errors, isValid },
-    } = useForm<UpdateFormType>({
-        resolver: zodResolver(updateSchema),
+    } = useForm<CommentUpdate>({
+        resolver: zodResolver(commentUpdateSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
@@ -48,7 +45,7 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onCh
     }, [id, description, isUpdateAllowed, onChanged]);
 
     const onCommentUpdate = useCallback(
-        (form: CommentFormType) => {
+        (form: CommentUpdate) => {
             setBusy(true);
 
             update((comment) => {

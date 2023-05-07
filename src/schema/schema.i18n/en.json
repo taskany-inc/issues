@@ -6,5 +6,11 @@
     "Comments's description must be a string": "",
     "Comments's description must be longer than 1 symbol": "",
     "Title must be longer than 2 symbols": "",
-    "Title can be 50 symbols maximum": ""
+    "Title can be 50 symbols maximum": "",
+    "Goal's title is required": "",
+    "Goal's title must be a string": "",
+    "Goal's description must be longer than 10 symbols": "",
+    "Goal's description is required": "",
+    "Goal's description must be a string": "",
+    "Goal's project or team are required": ""
 }

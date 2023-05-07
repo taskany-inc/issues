@@ -4,15 +4,15 @@ import styled from 'styled-components';
 import { gapS, gray6, gray10 } from '@taskany/colors';
 import { BulbOnIcon, Link, QuestionIcon } from '@taskany/bricks';
 
-import { gql } from '../../utils/gql';
-import { Activity } from '../../../graphql/@generated/genql';
 import { routes, useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
-import { GoalForm, GoalFormType } from '../GoalForm/GoalForm';
+import { GoalForm } from '../GoalForm/GoalForm';
+import { trpc } from '../../utils/trpcClient';
+import { GoalCommon } from '../../schema/goal';
 
 import { tr } from './GoalCreateForm.i18n';
 
@@ -32,28 +32,11 @@ const GoalCreateForm: React.FC = () => {
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
     const [busy, setBusy] = useState(false);
 
-    const createGoal = async (form: GoalFormType) => {
+    const createMutation = trpc.goal.create.useMutation();
+    const createGoal = async (form: GoalCommon) => {
         setBusy(true);
 
-        const promise = gql.mutation({
-            createGoal: [
-                {
-                    data: {
-                        title: form.title,
-                        description: form.description,
-                        ownerId: form.owner.id,
-                        projectId: form.parent.id,
-                        stateId: form.state.id,
-                        priority: form.priority,
-                        tags: form.tags,
-                        estimate: form.estimate,
-                    },
-                },
-                {
-                    id: true,
-                },
-            ],
-        });
+        const promise = createMutation.mutateAsync(form);
 
         toast.promise(promise, {
             error: tr('Something went wrong 😿'),
@@ -63,7 +46,7 @@ const GoalCreateForm: React.FC = () => {
 
         const res = await promise;
 
-        if (res?.createGoal?.id) {
+        if (res?.id) {
             const newRecentProjectsCache = { ...recentProjectsCache };
             if (newRecentProjectsCache[form.parent.id]) {
                 newRecentProjectsCache[form.parent.id].rate += 1;
@@ -77,7 +60,7 @@ const GoalCreateForm: React.FC = () => {
             setRecentProjectsCache(newRecentProjectsCache);
             setLastProjectCache(form.parent);
 
-            router.goal(res.createGoal.id);
+            router.goal(res.id);
             dispatchModalEvent(ModalEvent.GoalCreateModal)();
         }
     };
@@ -86,7 +69,7 @@ const GoalCreateForm: React.FC = () => {
         <GoalForm
             busy={busy}
             formTitle={tr('New goal')}
-            owner={{ id: user?.activityId, user } as Partial<Activity>}
+            owner={{ id: user!.activityId, user: user! }}
             parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}
