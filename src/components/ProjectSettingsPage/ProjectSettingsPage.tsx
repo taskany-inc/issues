@@ -18,7 +18,6 @@ import {
     ModalContent,
 } from '@taskany/bricks';
 
-import { Activity } from '../../../graphql/@generated/genql';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { PageSep } from '../PageSep';
 import { useRouter } from '../../hooks/router';
@@ -32,7 +31,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { UserComboBox } from '../UserComboBox';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectUpdate, projectUpdateSchema } from '../../schema/project';
-import { ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType, ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -121,8 +120,8 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, params: { id } }: E
         setLastProjectCache,
     ]);
 
-    const [transferTo, setTransferTo] = useState<Activity | undefined>();
-    const onTransferToChange = useCallback((a: Activity) => {
+    const [transferTo, setTransferTo] = useState<NonNullable<ActivityByIdReturnType> | undefined>();
+    const onTransferToChange = useCallback((a: NonNullable<ActivityByIdReturnType>) => {
         setTransferTo(a);
     }, []);
     const onProjectTransferOwnership = useCallback(() => {

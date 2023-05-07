@@ -1,14 +1,18 @@
 import React, { useCallback } from 'react';
 import { Dropdown, MenuItem } from '@taskany/bricks';
 
-import { Tag as TagModel } from '../../graphql/@generated/genql';
-
 import { FiltersMenuItem } from './FiltersMenuItem';
+
+interface TagObject {
+    id: string;
+    title: string;
+    description?: string | null;
+}
 
 interface TagsFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
     value?: Array<string>;
-    tags?: Array<TagModel>;
+    tags?: Array<TagObject>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
     onChange?: (selected: string[]) => void;
@@ -19,7 +23,7 @@ export const TagsFilterDropdown: React.FC<TagsFilterDropdownProps> = React.forwa
     TagsFilterDropdownProps
 >(({ text, tags, value, disabled, onChange }, ref) => {
     const onTagClick = useCallback(
-        (t: TagModel) => {
+        (t: TagObject) => {
             const selected = new Set(value);
             selected.has(t.id) ? selected.delete(t.id) : selected.add(t.id);
             const newSelected = new Set(selected);

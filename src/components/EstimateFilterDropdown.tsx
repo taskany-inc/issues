@@ -1,27 +1,29 @@
 import React, { useCallback } from 'react';
 import { Dropdown, MenuItem } from '@taskany/bricks';
 
-import { Estimate } from '../../graphql/@generated/genql';
-
 import { FiltersMenuItem } from './FiltersMenuItem';
 
 interface EstimateFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
     value?: string[];
-    estimates: Estimate[];
+    estimates: {
+        date: string;
+        q: string;
+        y: string;
+    }[];
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
     onChange?: (selected: string[]) => void;
 }
 
-const estimateToString = (estimate: Estimate) => `${estimate.q}/${estimate.y}`;
+const estimateToString = (estimate: { date: string; q: string; y: string }) => `${estimate.q}/${estimate.y}`;
 
 export const EstimateFilterDropdown: React.FC<EstimateFilterDropdownProps> = React.forwardRef<
     HTMLDivElement,
     EstimateFilterDropdownProps
 >(({ text, estimates, value, disabled, onChange }, ref) => {
     const onEstimateClick = useCallback(
-        (e: Estimate) => {
+        (e: { date: string; q: string; y: string }) => {
             const selected = new Set(value);
             selected.has(estimateToString(e))
                 ? selected.delete(estimateToString(e))

@@ -3,20 +3,20 @@ import styled from 'styled-components';
 import { Button, ComboBox, UserPic, Input } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
-import { Activity } from '../../graphql/@generated/genql';
+import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 
 import { UserMenuItem } from './UserMenuItem';
 
 interface UserComboBoxProps {
     text: React.ComponentProps<typeof Button>['text'];
     query?: string;
-    value?: Partial<Activity>;
+    value?: Partial<NonNullable<ActivityByIdReturnType>>;
     disabled?: boolean;
     placeholder?: string;
     filter?: string[];
     error?: React.ComponentProps<typeof ComboBox>['error'];
 
-    onChange?: (activity: Activity) => void;
+    onChange?: (activity: NonNullable<ActivityByIdReturnType>) => void;
 }
 
 const StyledInput = styled(Input)`

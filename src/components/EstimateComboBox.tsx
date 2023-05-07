@@ -4,7 +4,6 @@ import InputMask from 'react-input-mask';
 import { danger8, danger9, gray6, textColor } from '@taskany/colors';
 import { Button, Input, ComboBox, CalendarTickIcon } from '@taskany/bricks';
 
-import { EstimateInput } from '../../graphql/@generated/genql';
 import {
     createLocaleDate,
     quarterFromDate,
@@ -33,7 +32,7 @@ interface EstimateComboBoxProps {
     placeholder?: string;
     error?: React.ComponentProps<typeof ComboBox>['error'];
 
-    onChange?: (estimate?: EstimateInput) => void;
+    onChange?: (estimate?: { date: string; q: string; y: string }) => void;
 }
 
 const StyledInput = styled(Input)`

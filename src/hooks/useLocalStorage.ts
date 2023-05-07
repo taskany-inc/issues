@@ -2,8 +2,11 @@ import { useCallback, useState } from 'react';
 
 import { safelyParseJson } from '../utils/safelyParseJson';
 
-export type LastOrCurrentProject = { id: string; title: string } | null;
-export type RecentProjectsCache = Record<string, { rate: number; cache: { id: string; title: string } }>;
+export type LastOrCurrentProject = { id: string; title: string; flowId: string; description?: string | null } | null;
+export type RecentProjectsCache = Record<
+    string,
+    { rate: number; cache: { id: string; title: string; flowId: string; description?: string | null } }
+>;
 type SetValue<TValue> = (value: TValue | ((previousValue: TValue) => TValue)) => void;
 interface StorageKey {
     lastProjectCache: LastOrCurrentProject;

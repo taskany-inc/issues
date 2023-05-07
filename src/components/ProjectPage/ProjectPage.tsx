@@ -21,7 +21,7 @@ import { Priority } from '../../types/priority';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById } from '../../../trpc/inferredTypes';
+import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -74,23 +74,27 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
     const groupsMap =
-        projectDeepInfo?.goals?.reduce<{ [key: string]: { project?: Project; goals: Goal[] } }>(
-            (r, g: Goal & { project?: Project }) => {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const k = g.projectId!;
+        // eslint-disable-next-line no-spaced-func
+        (projectDeepInfo?.goals as NonNullable<GoalByIdReturnType>[])?.reduce<{
+            [key: string]: {
+                // eslint-disable-next-line func-call-spacing
+                project?: (Project & { parent?: Project[] }) | null;
+                goals: NonNullable<GoalByIdReturnType>[];
+            };
+        }>((r, g) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const k = g.projectId!;
 
-                if (!r[k]) {
-                    r[k] = {
-                        project: g.project,
-                        goals: [],
-                    };
-                }
+            if (!r[k]) {
+                r[k] = {
+                    project: g.project,
+                    goals: [],
+                };
+            }
 
-                r[k].goals.push(g);
-                return r;
-            },
-            Object.create(null),
-        ) || {};
+            r[k].goals.push(g);
+            return r;
+        }, Object.create(null)) || {};
 
     // sort groups to make root project first
     const groups = Object.values(groupsMap).sort((a) => (a.project?.id === id ? -1 : 1));
@@ -243,7 +247,11 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                                     onClickProvider={onGoalPrewiewShow}
                                     onTagClick={setTagsFilterOutside}
                                 >
-                                    <GoalsGroupProjectTitle project={group.project} />
+                                    <GoalsGroupProjectTitle
+                                        id={group.project.id}
+                                        title={group.project.title}
+                                        parent={group.project.parent}
+                                    />
                                 </GoalsGroup>
                             ),
                     )}

@@ -13,6 +13,7 @@ import { Keyboard } from '../Keyboard';
 import { GoalForm } from '../GoalForm/GoalForm';
 import { trpc } from '../../utils/trpcClient';
 import { GoalCommon } from '../../schema/goal';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './GoalCreateForm.i18n';
 
@@ -69,7 +70,7 @@ const GoalCreateForm: React.FC = () => {
         <GoalForm
             busy={busy}
             formTitle={tr('New goal')}
-            owner={{ id: user!.activityId, user: user! }}
+            owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
             parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}

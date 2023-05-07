@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Dropdown } from '@taskany/bricks';
 
-import { Activity } from '../../graphql/@generated/genql';
+import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { UserMenuItem } from './UserMenuItem';
@@ -9,7 +9,7 @@ import { UserMenuItem } from './UserMenuItem';
 interface UserFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
     value?: Array<string>;
-    activity?: Array<Activity>;
+    activity?: Array<NonNullable<ActivityByIdReturnType>>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
     onChange?: (selected: string[]) => void;
@@ -18,7 +18,7 @@ interface UserFilterDropdownProps {
 export const UserFilterDropdown = React.forwardRef<HTMLDivElement, UserFilterDropdownProps>(
     ({ text, activity, value, disabled, onChange }, ref) => {
         const onUserClick = useCallback(
-            (a: Activity) => {
+            (a: NonNullable<ActivityByIdReturnType>) => {
                 const selected = new Set(value);
                 selected.has(a.id) ? selected.delete(a.id) : selected.add(a.id);
                 const newSelected = new Set(selected);
