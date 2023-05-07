@@ -40,7 +40,6 @@
     "cyrillic-to-translit-js": "3.2.1",
     "gray-matter": "4.0.3",
     "md5": "2.3.0",
-    "micro": "9.4.1",
     "multer": "1.4.5-lts.1",
     "next": "12.2.5",
     "next-auth": "4.20.1",
@@ -60,10 +59,8 @@
     "remark-gfm": "3.0.1",
     "styled-components": "5.3.6",
     "superjson": "1.12.3",
-    "teenyicons": "0.4.1",
     "throttle-debounce": "5.0.0",
     "tinykeys": "1.4.0",
-    "unified": "10.1.2",
     "zod": "3.20.2"
   },
   "devDependencies": {
@@ -89,7 +86,6 @@
     "@welldone-software/why-did-you-render": "7.0.1",
     "babel-eslint": "10.1.0",
     "babel-loader": "9.1.2",
-    "change-case": "4.1.2",
     "concurrently": "7.6.0",
     "conventional-changelog": "3.1.25",
     "conventional-changelog-conventionalcommits": "5.0.0",
