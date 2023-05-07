@@ -23,6 +23,7 @@ export const trpc = createTRPCNext<TrpcRouter>({
                     headers: async () => {
                         if (ctx?.req) {
                             // https://trpc.io/docs/nextjs/ssr#q-why-do-i-need-to-delete-the-connection-header-when-using-ssr-on-node-18
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             const { connection, ...headers } = ctx.req.headers;
 
                             return {
