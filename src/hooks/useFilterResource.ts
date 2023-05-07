@@ -1,5 +1,6 @@
 import { notifyPromise } from '../utils/notifyPromise';
-import { CreateFilter, ToggleStargizer } from '../schema/filter';
+import { CreateFilter } from '../schema/filter';
+import { ToggleSubscription } from '../schema/common';
 import { trpc } from '../utils/trpcClient';
 
 export const useFilterResource = () => {
@@ -22,7 +23,7 @@ export const useFilterResource = () => {
             },
         );
 
-    const toggleFilterStar = (data: ToggleStargizer) =>
+    const toggleFilterStar = (data: ToggleSubscription) =>
         notifyPromise(
             toggleMutation.mutateAsync(data, {
                 onSuccess: () => {
