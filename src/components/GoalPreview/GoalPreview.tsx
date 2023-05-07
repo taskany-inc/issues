@@ -22,7 +22,7 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { refreshInterval } from '../../utils/createFetcher';
+import { refreshInterval } from '../../utils/config';
 import { formatEstimate } from '../../utils/dateTime';
 import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
