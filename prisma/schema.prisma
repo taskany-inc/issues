@@ -6,10 +6,6 @@ generator client {
   binaryTargets = ["native", "linux-musl", "debian-openssl-1.1.x"]
 }
 
-generator nexusPrisma {
-  provider = "nexus-prisma"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -24,14 +20,6 @@ enum FilterMode {
     Global
     Project
     User
-}
-
-enum Priority {
-  Highest
-  High
-  Medium
-  Low
-  Lowest
 }
 
 model Account {
