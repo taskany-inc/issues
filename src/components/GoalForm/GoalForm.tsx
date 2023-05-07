@@ -14,7 +14,7 @@ import {
     ModalHeader,
     Tag,
 } from '@taskany/bricks';
-import { Activity, Estimate, Project, State, Tag as TagModel } from '@prisma/client';
+import { Estimate, State, Tag as TagModel } from '@prisma/client';
 
 import { FormEditor } from '../FormEditor/FormEditor';
 import { estimatedMeta } from '../../utils/dateTime';
@@ -28,6 +28,7 @@ import { TagComboBox } from '../TagComboBox/TagComboBox';
 import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
 import { GoalCommon, goalCommonSchema } from '../../schema/goal';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './GoalForm.i18n';
 
@@ -36,10 +37,10 @@ const tagsLimit = 5;
 interface GoalFormProps {
     actionBtnText: string;
     formTitle: string;
-    owner?: Activity;
+    owner?: ActivityByIdReturnType;
     title?: string;
     description?: string;
-    parent?: Project;
+    parent?: { id: string; title: string; flowId: string; description?: string | null };
     tags?: TagModel[];
     state?: State;
     priority?: Priority | string;

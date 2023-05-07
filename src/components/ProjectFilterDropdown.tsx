@@ -1,13 +1,14 @@
 import React, { useCallback } from 'react';
 import { Dropdown, MenuItem } from '@taskany/bricks';
 
-import { Project } from '../../graphql/@generated/genql';
-
 import { FiltersMenuItem } from './FiltersMenuItem';
 
 interface ProjectFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
-    projects: Project[];
+    projects: Array<{
+        id: string;
+        title: string;
+    }>;
     value?: string[];
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
@@ -19,7 +20,7 @@ export const ProjectFilterDropdown: React.FC<ProjectFilterDropdownProps> = React
     ProjectFilterDropdownProps
 >(({ text, projects, value, disabled, onChange }, ref) => {
     const onProjectClick = useCallback(
-        (p: Project) => {
+        (p: { id: string; title: string }) => {
             const selected = new Set(value);
             selected.has(p.id) ? selected.delete(p.id) : selected.add(p.id);
             const newSelected = new Set(selected);

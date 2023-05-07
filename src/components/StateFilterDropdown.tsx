@@ -1,14 +1,12 @@
 import React, { useCallback } from 'react';
 import { Dropdown } from '@taskany/bricks';
 
-import { State } from '../../graphql/@generated/genql';
-
 import { FiltersMenuItem } from './FiltersMenuItem';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 
 interface StateFilterDropdownProps {
     text: React.ComponentProps<typeof Dropdown>['text'];
-    states?: State[];
+    states?: Array<{ id: string; title: string; hue: number }>;
     value?: Array<string>;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
 
@@ -18,7 +16,7 @@ interface StateFilterDropdownProps {
 export const StateFilterDropdown = React.forwardRef<HTMLDivElement, StateFilterDropdownProps>(
     ({ text, states, value, disabled, onChange }, ref) => {
         const onStateClick = useCallback(
-            (s: State) => {
+            (s: { id: string; title: string; hue: number }) => {
                 const selected = new Set(value);
                 selected.has(s.id) ? selected.delete(s.id) : selected.add(s.id);
                 const newSelected = new Set(selected);

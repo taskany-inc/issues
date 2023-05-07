@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { Button, ComboBox, Input, Tag, TagIcon } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
-import { Tag as TagModel } from '../../../graphql/@generated/genql';
 
 import { tr } from './TagComboBox.i18n';
 
@@ -60,7 +59,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
         }, [inputState, onChange, tags, createMutation]);
 
         const onTagClick = useCallback(
-            async (tag: TagModel) => {
+            async (tag: TagObject) => {
                 if (!suggestions.data?.length) {
                     await createTag();
                     return;
