@@ -2,9 +2,9 @@ import z from 'zod';
 import { TRPCError } from '@trpc/server';
 
 import { prisma } from '../../src/utils/prisma';
-import { mailServer } from '../../src/utils/mailServer';
 import { protectedProcedure, router } from '../trpcBackend';
 import { commentCreateSchema, commentUpdateSchema } from '../../src/schema/comment';
+import { createEmailJob } from '../../src/utils/worker/create';
 
 export const comment = router({
     getGoalComments: protectedProcedure.input(z.string()).query(async ({ input: goalId }) => {
@@ -57,12 +57,10 @@ export const comment = router({
             }
 
             if (toEmails.length) {
-                await mailServer.sendMail({
-                    from: `"Taskany Issues" <${process.env.MAIL_USER}>`,
-                    to: toEmails.map((p) => p.user?.email).join(' ,'),
-                    subject: 'Hello ✔',
-                    text: `new comment for ${process.env.NEXTAUTH_URL}/goals/${input.goalId}#comment-${newComment.id}`,
-                    html: `<a href="${process.env.NEXTAUTH_URL}/goals/${input.goalId}#comment-${newComment.id}">new comment</a> for <a href="${process.env.NEXTAUTH_URL}/goals/${input.goalId}">${input.goalId}</a>`,
+                await createEmailJob('newComment', {
+                    to: toEmails.map((p) => p.user?.email),
+                    commentId: newComment.id,
+                    goalId: input.goalId,
                 });
             }
 
