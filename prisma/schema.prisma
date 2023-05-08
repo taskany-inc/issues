@@ -17,9 +17,9 @@ enum Role {
 }
 
 enum FilterMode {
-    Global
-    Project
-    User
+  Global
+  Project
+  User
 }
 
 model Account {
@@ -101,7 +101,7 @@ model Activity {
   ghost              Ghost?     @relation(fields: [ghostId], references: [id])
   ghostId            String?    @unique
   user               User?
-  filters             Filter[]
+  filters            Filter[]
   comments           Comment[]
   reactions          Reaction[]
   projects           Project[]
@@ -112,7 +112,7 @@ model Activity {
   goalStargizers     Goal[]     @relation("goalStargizers")
   projectWatchers    Project[]  @relation("projectWatchers")
   projectStargizers  Project[]  @relation("projectStargizers")
-  filterStargizers    Filter[]   @relation("filterStargizers")
+  filterStargizers   Filter[]   @relation("filterStargizers")
   goalOwner          Goal[]     @relation("goalOwner")
   goalIssuer         Goal[]     @relation("goalIssuer")
   settings           Settings   @relation(fields: [settingsId], references: [id])
@@ -291,6 +291,21 @@ model Tag {
   project     Project[]
   activity    Activity  @relation(fields: [activityId], references: [id])
   activityId  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Job {
+  id       String  @id @default(cuid())
+  state    String
+  priority Int     @default(0)
+  kind     String
+  data     Json
+  delay    Int?
+  retry    Int?
+  cron     String?
+  error     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
