@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.1.0](https://github.com/taskany-inc/issues/compare/v1.0.0...v1.1.0) (2023-05-08)
+
+
+### Features
+
+* **Goal:** goal project parents owners can edit goal ([b7319af](https://github.com/taskany-inc/issues/commit/b7319af3b161b72f90de4b66837545f2cae260e5))
+* **trpc:** filter router ([7f49408](https://github.com/taskany-inc/issues/commit/7f49408b38c28fcb8dd8b18958175584a41aa2b6))
+
+
+### Bug Fixes
+
+* do not show empty values in applied filters ([eff70c8](https://github.com/taskany-inc/issues/commit/eff70c8380e613d30305b1b02c79fbbe0d726d23))
+* **GoalsPage:** check query params ([7d7a3bf](https://github.com/taskany-inc/issues/commit/7d7a3bf2e3dcc248e0a43ad4b0a9032e92bdd4aa))
+* **GoalsPage:** hook call without condition ([303dfde](https://github.com/taskany-inc/issues/commit/303dfdeb75423d2b1880dd6e6959daa5f3ca7a74))
+* **GoalsPage:** restore gql ssr data ([39e4a4f](https://github.com/taskany-inc/issues/commit/39e4a4fecc334c145f699c9ac3df448a2375b2d7))
+* **ProjectPage:** restore gql ssr data ([340cc21](https://github.com/taskany-inc/issues/commit/340cc21e29dc68544122458aa0f2907413c2e970))
+* **trpc:** add transformer to ssr helper ([e25ce14](https://github.com/taskany-inc/issues/commit/e25ce14320ca24c500c785189721e63eab08054a))
+* vulnerabilities audit ([fd282d1](https://github.com/taskany-inc/issues/commit/fd282d1fdce960d59c0be8fca7ac006af5cd86fe))
+
 ## 1.0.0 (2023-04-27)
 
 
