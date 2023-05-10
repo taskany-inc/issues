@@ -115,5 +115,11 @@
     "ts-node": "10.9.1",
     "typescript": "5.0.3",
     "webpack": "5.76.0"
+  },
+  "nextBundleAnalysis": {
+    "budget": null,
+    "budgetPercentIncreaseRed": 10,
+    "minimumChangeThreshold": 0,
+    "showDetails": true
   }
 }
