@@ -8,6 +8,7 @@ import { tag } from './tag';
 import { comment } from './comment';
 import { project } from './project';
 import { goal } from './goal';
+import { tools } from './tools';
 
 export const trpcRouter = router({
     filter,
@@ -18,6 +19,7 @@ export const trpcRouter = router({
     comment,
     project,
     goal,
+    tools,
 });
 
 export type TrpcRouter = typeof trpcRouter;
