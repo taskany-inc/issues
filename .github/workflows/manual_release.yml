@@ -1,17 +1,14 @@
 name: Manual Release
 
-on:
-  issues: 
-    types: [opened]
+on: workflow_dispatch
 
 jobs:
-  if_merged:
-    if: github.event.issue.title == 'Manual release'
+  manual_release:
     name: Manual Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with: 
+        with:
           fetch-depth: 0
 
       - uses: actions/setup-node@v3
@@ -25,12 +22,12 @@ jobs:
           key: npm-deps-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             npm-deps-${{ hashFiles('package-lock.json') }}
-            
+
       - name: Setup packages
         run: npm ci
 
       - name: Changelog
-        run: | 
+        run: |
           git config --global user.email "sheep@taskany.org"
           git config --global user.name "Taskany Sheep"
           node scripts/release.js
@@ -39,9 +36,9 @@ jobs:
           git add .
           git commit -n -m "chore: release $(cat version)"
           git push --no-verify origin releases/$(cat version)
-          
+
       - name: Pull Request
         env:
           GH_TOKEN: ${{ github.token }}
-        run: | 
+        run: |
           gh pr create --title "Release $(cat version)" -F .release_bot/body
