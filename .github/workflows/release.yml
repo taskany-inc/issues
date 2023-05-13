@@ -5,42 +5,6 @@ on:
     - cron: '0 7 * * 1'
 
 jobs:
-  build:
+  manual_release:
     name: Scheduled Release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with: 
-          fetch-depth: 0
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18.12.0
-
-      - name: Cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: npm-deps-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            npm-deps-${{ hashFiles('package-lock.json') }}
-            
-      - name: Setup packages
-        run: npm ci
-
-      - name: Changelog
-        run: | 
-          git config --global user.email "sheep@taskany.org"
-          git config --global user.name "Taskany Sheep"
-          node scripts/release.js
-          npm version $(cat version) --git-tag-version false
-          git checkout -b releases/$(cat version)
-          git add .
-          git commit -n -m "chore: release $(cat version)"
-          git push --no-verify origin releases/$(cat version)
-          
-      - name: Pull Request
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: | 
-          gh pr create --title "Release $(cat version)" -F .release_bot/body
+    uses: taskany-inc/release/.github/workflows/manual_release.yml@main
