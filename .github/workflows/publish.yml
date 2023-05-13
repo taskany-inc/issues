@@ -4,8 +4,8 @@ on:
   pull_request_target:
     types:
       - closed
-    branches:
-      - 'releases/**'
+    paths:
+      - '.release_notes/**'
 
 jobs:
   if_merged:
