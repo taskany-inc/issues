@@ -12,6 +12,7 @@
     "generate:types": "node ./scripts/types.js",
     "watch:types": "nodemon --exec \"npm run generate:types\" --watch \"src/pages/help/**/*.md\"",
     "generate": "concurrently \"npm run generate:types\"",
+    "db:init": "npx prisma migrate dev --preview-feature && npx prisma db seed",
     "db:run": "docker-compose -f docker-compose.dev.yml up -d",
     "db:down": "docker-compose down",
     "test": "jest",
