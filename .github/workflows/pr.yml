@@ -8,22 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      PR_NAME: pr-${{ github.event.number }}
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18.12.0
-
-      - name: Cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: npm-deps-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            npm-deps-${{ hashFiles('package-lock.json') }}
+      - uses: taskany-inc/release/.github/workflows/checkout.yml@main
         
       - name: Setup packages
         run: npm ci
