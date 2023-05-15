@@ -5,6 +5,5 @@ on:
     - cron: '0 7 * * 1'
 
 jobs:
-  manual_release:
-    name: Scheduled Release
+  scheduled_release:
     uses: taskany-inc/release/.github/workflows/release_pr.yml@main
