@@ -10,7 +10,8 @@ jobs:
     name: PR
     runs-on: ubuntu-latest
     steps:
-      - uses: taskany-inc/release/.github/workflows/checkout.yml@main
+      - name: Checkout
+        uses: taskany-inc/release/.github/workflows/checkout.yml@main
         
       - name: Setup packages
         run: npm ci
