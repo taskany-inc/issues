@@ -1,4 +1,4 @@
-name: Release
+name: Scheduled Release
 
 on:
   schedule:
@@ -7,4 +7,4 @@ on:
 jobs:
   manual_release:
     name: Scheduled Release
-    uses: taskany-inc/release/.github/workflows/manual_release.yml@main
+    uses: taskany-inc/release/.github/workflows/release_pr.yml@main
