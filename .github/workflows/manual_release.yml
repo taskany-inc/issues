@@ -4,5 +4,4 @@ on: workflow_dispatch
 
 jobs:
   manual_release:
-    name: Manual Release
     uses: taskany-inc/release/.github/workflows/release_pr.yml@main
