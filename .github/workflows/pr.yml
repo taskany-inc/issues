@@ -6,19 +6,24 @@ on:
       - main
 
 jobs:
-  checkout:
-    uses: taskany-inc/release/.github/workflows/checkout.yml@main
   build:
     runs-on: ubuntu-latest
-    steps:        
+    steps:    
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ variables.NODE_VERSION }}
+      - uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: npm-deps-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-deps-${{ hashFiles('package-lock.json') }}
       - name: Setup packages
         run: npm ci
-        
       - name: Lint
         run: npm run lint
-      
       - name: Unit
         run: npm run test
-        
       - name: Build
         run: npm run build
