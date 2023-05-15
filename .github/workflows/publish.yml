@@ -10,8 +10,5 @@ on:
 jobs:
   if_merged:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps: 
-      - uses: taskany-inc/release/.github/workflows/checkout.yml@main
-      - uses: taskany-inc/release/.github/workflows/gh_release.yml@main
+    uses: taskany-inc/release/.github/workflows/gh_release.yml@main
           
