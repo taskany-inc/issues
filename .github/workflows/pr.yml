@@ -6,13 +6,11 @@ on:
       - main
 
 jobs:
+  checkout:
+    uses: taskany-inc/release/.github/workflows/checkout.yml@main
   build:
-    name: Pull Request Build
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: taskany-inc/release/.github/workflows/checkout.yml@main
-        
+    steps:        
       - name: Setup packages
         run: npm ci
         
