@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: PR
     runs-on: ubuntu-latest
     steps:
       - uses: taskany-inc/release/.github/workflows/checkout.yml@main
