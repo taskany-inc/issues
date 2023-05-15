@@ -53,7 +53,7 @@
     "react-dom": "18.2.0",
     "react-dropzone": "14.2.3",
     "react-hook-form": "7.43.9",
-    "react-hot-toast": "2.4.0",
+    "react-hot-toast": "2.4.1",
     "react-input-mask": "2.0.4",
     "react-remark": "2.1.0",
     "remark-emoji": "3.1.1",
