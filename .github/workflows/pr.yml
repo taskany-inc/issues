@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: PR
+    name: Build Pull Request
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
