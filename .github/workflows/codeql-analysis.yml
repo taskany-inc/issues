@@ -2,8 +2,10 @@ name: CodeQL
 
 on:
   push:
-    branches: 
+    branches:
       - main
+    paths:
+      - '**.{json,js,jsx,ts,tsx}'
 
 jobs:
   analyze:
@@ -17,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: 
+        language:
           - javascript
 
     steps:
@@ -28,7 +30,7 @@ jobs:
       uses: github/codeql-action/init@v1
       with:
         languages: ${{ matrix.language }}
-        
+
     - name: Autobuild
       uses: github/codeql-action/autobuild@v1
 

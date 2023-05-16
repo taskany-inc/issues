@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - '**.{json,js,jsx,ts,tsx}'
 
 defaults:
   run:
