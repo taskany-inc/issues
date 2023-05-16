@@ -1,13 +1,18 @@
+/* eslint-disable global-require */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { withSentryConfig } = require('@sentry/nextjs');
 const withPlugins = require('next-compose-plugins');
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-    enabled: process.env.ANALYZE === 'true',
-});
 const path = require('path');
 
-const nextPlugins = [withBundleAnalyzer];
+const nextPlugins =
+    process.env.NODE_ENV === 'development'
+        ? [
+              require('@next/bundle-analyzer')({
+                  enabled: process.env.ANALYZE === 'true',
+              }),
+          ]
+        : [];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
