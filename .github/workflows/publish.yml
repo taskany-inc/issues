@@ -28,10 +28,17 @@ jobs:
           echo "version<<EOF" >> $GITHUB_OUTPUT
           echo "$(cat version)" >> $GITHUB_OUTPUT
           echo EOF >> $GITHUB_OUTPUT
-      - name: Build and Push
+      - name: Build and Push — Default
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           tags: taskany/issues:latest,taskany/issues:${{ steps.version.outputs.version }}
+      - name: Build and Push — Enterprise
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile.enterprise
+          push: true
+          tags: taskany/issues-enterprise:latest,taskany/issues-enterprise:${{ steps.version.outputs.version }}
 
