@@ -51,8 +51,8 @@ cp .env.example .env
 Add your settings to `.env` file. Then prepate database:
 
 ```sh
-npm run db:init
-npm run db:run
+npm run dev:db:run
+npm run dev:db:init
 npm run dev
 ```
 
@@ -84,11 +84,13 @@ On the other hand, sometimes the best way to start a conversation _is_ to send a
 
 In general, the contribution workflow looks like this:
 
--   Open a new issue in the [Issue tracker](https://github.com/taskany-inc/issues/issues).
--   Fork the repo.
--   Create a new branch based off the `master` branch. Branch name must follow pattern `issues/{id}`.
--   Make sure all tests pass and there are no linting errors.
--   Submit a pull request, referencing any issues it addresses.
+-   Open a new issue in the [Issue tracker](https://github.com/taskany-inc/issues/issues);
+-   Fork the repo;
+-   Create a new branch based off the `master` branch. Branch name must follow pattern `issues/{id}`;
+-   Make sure all checks pass w/o errors;
+-   Make sure PR title equal with issue title w/o issue id;
+-   Follow instructions in PR template;
+-   Submit a pull request and wait to review.
 
 Please try to keep your pull request focused in scope and avoid including unrelated commits.
 
