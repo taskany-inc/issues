@@ -123,6 +123,10 @@ services:
             retries: 3
 ```
 
+## Contributing
+
+Please follow [code of conduct](https://github.com/taskany-inc/issues/blob/main/CODE_OF_CONDUCT.md) first. Than use instructions in [contributing guide](https://github.com/taskany-inc/issues/blob/main/CONTRIBUTING.md) to create your first PR.
+
 ## License
 
 [MIT](https://github.com/taskany-inc/issues/blob/main/LICENSE)
