@@ -17,9 +17,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Version
+        id: version
+        run: |
+          echo "version<<EOF" >> $GITHUB_OUTPUT
+          echo "$(cat version)" >> $GITHUB_OUTPUT
+          echo EOF >> $GITHUB_OUTPUT
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: taskany/issues:latest
+          tags: taskany/issues:latest,taskany/issues:${{ steps.version.outputs.version }}
