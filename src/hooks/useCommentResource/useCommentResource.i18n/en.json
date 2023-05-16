@@ -1,16 +1,9 @@
 {
-    "Comments's description is required": "Comments's description is required",
-    "Comments's description must be a string": "Comments's description must be a string",
-    "Comments's description must be longer than 1 symbol": "Comments's description must be longer than 1 symbol",
     "Something went wrong 😿": "Something went wrong 😿",
     "We are publishing your comment": "We are publishing your comment",
     "Voila! Comment is here 🎉": "Voila! Comment is here 🎉",
     "We are updating your comment": "We are updating your comment",
     "Comment updated": "Comment updated",
-    "Leave a comment": "Leave a comment...",
-    "Styling with markdown is supported": "Styling with markdown is supported",
-    "Comment": "Save",
-    "Cancel": "Cancel",
     "We are deleting your comment": "We are deleting your comment",
     "Comment removed": "Comment removed"
 }

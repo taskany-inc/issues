@@ -36,14 +36,6 @@ export const PageHeader: FC = () => {
             href: routes.goals(),
             title: tr('Goals'),
         },
-        // {
-        //     href: '',
-        //     title: t('Issues'),
-        // },
-        // {
-        //     href: '',
-        //     title: t('Boards'),
-        // },
         {
             href: routes.exploreTopProjects(),
             title: tr('Explore'),

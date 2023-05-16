@@ -80,13 +80,19 @@ export const IssueDependenciesListItem: React.FC<IssueDependenciesListItemProps>
 };
 
 export const IssueDependenciesList: React.FC<IssueDependenciesListProps> = ({ issue, onDelete, onEdit }) => {
+    const dependKeys = {
+        [dependencyKind.blocks]: tr('blocks'),
+        [dependencyKind.dependsOn]: tr('dependsOn'),
+        [dependencyKind.relatedTo]: tr('relatedTo'),
+    };
+
     return (
         <>
             {Object.values(dependencyKind).map((kind) => (
                 <IssueDependenciesListItem
                     key={kind}
                     kind={kind}
-                    title={tr(dependencyKind[kind])}
+                    title={dependKeys[kind]}
                     dependencies={issue?.[kind] as GoalByIdReturnType[]}
                     onEdit={onEdit}
                     onDelete={onDelete}
