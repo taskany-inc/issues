@@ -15,12 +15,6 @@ interface RelativeTimeProps {
     date: Date;
     kind?: RelativeTimeKind;
 }
-const map: Record<RelativeTimeKind, I18nKey> = {
-    created: 'created',
-    updated: 'updated',
-    Created: 'Created',
-    Updated: 'Updated',
-};
 
 const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
     const { locale, ssrTime } = usePageContext();
@@ -32,6 +26,13 @@ const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
         setTime(Date.now());
     }, [mounted]);
 
+    const map: Record<RelativeTimeKind, string> = {
+        created: tr('created'),
+        updated: tr('updated'),
+        Created: tr('Created'),
+        Updated: tr('Updated'),
+    };
+
     useEffect(() => {
         const interval = setInterval(() => {
             setTime(Date.now());
@@ -42,7 +43,7 @@ const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
 
     return (
         <>
-            {kind ? `${tr(map[kind])} ` : ''}
+            {kind ? map[kind] : ''}
             <Light title={createLocaleDate(localeDate, { locale })}>{dateAgo(localeDate, time, { locale })}</Light>
         </>
     );

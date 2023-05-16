@@ -1,7 +1,4 @@
 {
-    "User name is required": "User name is required",
-    "User name must be a string": "User name must be a string",
-    "User name must be longer than 3 symbols": "User name must be longer than 3 symbol",
     "Something went wrong 😿": "Something went wrong 😿",
     "We are updating user settings": "We are updating user settings",
     "Voila! Successfully updated 🎉": "Voila! Successfully updated 🎉",

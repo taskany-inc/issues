@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { gapL, gapM } from '@taskany/colors';
 import {
@@ -55,6 +55,15 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
     const [completionVisible, setCompletionVisible] = useState(false);
 
     const { data: goalsData } = trpc.goal.suggestions.useQuery(query);
+
+    const dependKeys = useMemo(
+        () => ({
+            [dependencyKind.blocks]: tr('blocks'),
+            [dependencyKind.dependsOn]: tr('dependsOn'),
+            [dependencyKind.relatedTo]: tr('relatedTo'),
+        }),
+        [],
+    );
 
     const onDependencyDelete = useCallback(
         (id: string, kind: dependencyKind) => {
@@ -163,7 +172,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                                             <ArrowDownSmallIcon size="s" noWrap />
                                         )
                                     }
-                                    text={kind ? tr(kind) : undefined}
+                                    text={kind ? dependKeys[kind] : undefined}
                                     ref={props.ref}
                                     onClick={props.onClick}
                                 />
@@ -176,7 +185,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                                     onClick={props.onClick}
                                     view="primary"
                                 >
-                                    {tr(props.item)}
+                                    {dependKeys[props.item as dependencyKind]}
                                 </StyledMenuItem>
                             )}
                         />

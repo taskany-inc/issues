@@ -3,9 +3,6 @@
     "dependsOn": "Depends on",
     "blocks": "Blocks",
     "relatedTo": "Related",
-    "Does issue have dependencies": "Does issue have dependencies",
     "Add one": "Add one",
-    "Add dependency": "Add dependency",
-    "Kind": "Kind",
-    "Add": "Add"
+    "Add dependency": "Add dependency"
 }
