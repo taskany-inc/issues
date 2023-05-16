@@ -2,81 +2,127 @@
 
 <img width="640" alt="Taskany" src="https://user-images.githubusercontent.com/982072/186257262-6f79ee44-f949-48b9-a12e-23fd659a7f6f.png">
 
-## Development
+## Docker
 
-__Prepare env, first!__
+Docker is the recommended way to run **Taskany Issues** – updated Docker images based on Alpine Linux are available on a weekly release cadence and are tested by the maintaining team.
 
-> npm run db:run
+### Configuration
 
-It ups Postgres, [Maildev](http://maildev.github.io/maildev) and [localstack](https://github.com/localstack/localstack).
+Using this [sample file](https://github.com/taskany-inc/issues/blob/main/.env.example) as a reference create a `.env` file to contain the environment variables for your installation.
+
+### Docker Compose
+
+It is recommended to use Docker Compose to manage the various docker containers, if your Postgres is running in the cloud then you may skip this step and run the single **Taskany Issues** docker container directly.
+
+1. [Install Docker Compose](https://docs.docker.com/compose/install/).
+2. Create a `docker-compose.yml` file, an example configuration with all dependencies dockerized and environment variables kept in `.env` is as follows.
+
+```yml
+version: '3'
+services:
+    db:
+        image: postgres:11.6
+        container_name: postgres
+        env_file: ./.env
+        ports:
+            - 5432:5432
+        volumes:
+            - ./postgres/data:/var/lib/postgresql/data
+    taskany_issues:
+        image: taskany/issues:latest
+        env_file: ./.env
+        depends_on:
+            - db
+        ports:
+            - 3000:3000
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/auth/signin']
+            interval: 3s
+            timeout: 10s
+            retries: 3
+```
+
+It is recommended to pin the version of the image rather than relying on the latest tag so that you can remain in control of upgrades, eg image: `taskany/issues:1.0.0`.
+
+### Running
+
+Make sure you are in the same directory as `docker-compose.yml` and start **Taskany Issues**:
+
+> docker-compose up -d
+
+### Database
+
+Migrate the database to add needed tables, indexes, etc:
+
+> docker-compose run --rm taskany_issues npm run db:migrate
 
 ### Seed
 
-This command adds default admin user and default flows with states.
+If you want to test **Taskany Issues** with some promo data:
 
-> ADMIN_EMAIL="" ADMIN_PASSWORD="" prisma db seed
+> docker-compose run --rm taskany_issues npm run db:seed
 
-And you are ready!
+## Enterprise
 
-> npm run dev
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see [Taskany](taskany.org).
-
-## Environment configuration
-
-Any of variables below can be added via `.env` file, Docker env in `Dockerfile` or CLI args for container.
-
-### DB
+If you are installing the enterprise edition the image name should be `taskany/issues-enterprise`. Firstly you need to create custom `Dockerfile` based on enterprise image:
 
 ```
-DATABASE_URL=
+FROM taskany/issues-enterprise as build
+
+WORKDIR /app
+COPY .taskany.config.json .
+RUN npm ci
+RUN npm run build
+
+FROM node:18-alpine AS runner
+
+WORKDIR /app
+COPY --from=build --chown=nextjs:nodejs /app/package.json /app/package-lock.json ./
+COPY --from=build --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=build --chown=nextjs:nodejs /app/public ./public
+COPY --from=build --chown=nextjs:nodejs /app/version ./public/version.txt
+COPY --from=build --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=build --chown=nextjs:nodejs /app/next.config.js ./
+
+RUN npm i --omit=dev --ignore-scripts
+RUN npx prisma generate
+
+EXPOSE 3000
+
+CMD npm start
 ```
 
-### S3
+Then use this `Dockerfile` with Docker Compose is as follows:
 
-If no env variable provided Taskany uses fs storage for uploads.
-
-```
-S3_ENDPOINT=
-S3_REGION=
-S3_ACCESS_KEY=
-S3_SECRET=
-S3_BUCKET=
-S3_PATH_STYLE=
-S3_TLS=
-```
-
-### E-Mails
-
-Taskany uses [Nodemailer](https://nodemailer.com) as provider.
-
-```
-MAIL_HOST=
-MAIL_PORT=
-MAIL_USER=
-MAIL_PASS=
-```
-
-### Auth
-
-Taskany uses [NextAuth.js](https://next-auth.js.org/). Check [docs](https://next-auth.js.org/providers/) for providers.
-
-```
-NEXTAUTH_URL=
-NEXT_PUBLIC_NEXTAUTH_URL=
-NEXTAUTH_SECRET=
-
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
-
-KEYCLOAK_ID=
-KEYCLOAK_SECRET=
-KEYCLOAK_ISSUER=
+```yml
+version: '3'
+services:
+    db:
+        image: postgres:11.6
+        container_name: postgres
+        env_file: ./.env
+        ports:
+            - 5432:5432
+        volumes:
+            - ./postgres/data:/var/lib/postgresql/data
+    taskany_issues:
+        container_name: issues
+        env_file: ./.env
+        stdin_open: true
+        build:
+            context: .
+            dockerfile: Dockerfile
+        depends_on:
+            - db
+        ports:
+            - 3000:3000
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/auth/signin']
+            interval: 3s
+            timeout: 10s
+            retries: 3
 ```
 
 ## License
 
 [MIT](https://github.com/taskany-inc/issues/blob/main/LICENSE)
-
-
-
