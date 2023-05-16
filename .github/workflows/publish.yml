@@ -8,7 +8,30 @@ on:
       - .release_notes/**
 
 jobs:
-  if_merged:
+  gh_release:
     if: github.event.pull_request.merged == true
     uses: taskany-inc/release/.github/workflows/gh_release.yml@main
-          
+  docker:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Version
+        id: version
+        run: |
+          echo "version<<EOF" >> $GITHUB_OUTPUT
+          echo "$(cat version)" >> $GITHUB_OUTPUT
+          echo EOF >> $GITHUB_OUTPUT
+      - name: Build and Push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: taskany/issues:latest,taskany/issues:${{ steps.version.outputs.version }}
+
