@@ -44,6 +44,13 @@ const nextConfig = {
             };
         }
 
+        if (!dev && !isServer && !process.env.INCLUDE_SCRIPTS_TO_MAIN_BUNDLE) {
+            config.externals = {
+                react: 'React',
+                'react-dom': 'ReactDOM',
+            };
+        }
+
         return config;
     },
     async redirects() {
