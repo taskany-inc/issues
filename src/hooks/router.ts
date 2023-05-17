@@ -1,6 +1,6 @@
 import { useRouter as NextRouter } from 'next/router';
 
-import { AvailableHelpPages } from '../types/@generated/help';
+import { AvailableHelpPages } from '../types/help';
 import { TLocale } from '../utils/getLang';
 
 export const routes = {

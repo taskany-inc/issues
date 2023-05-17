@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { Page } from '../Page';
 import { routes } from '../../hooks/router';
-import { AvailableHelpPages } from '../../types/@generated/help';
+import { AvailableHelpPages } from '../../types/help';
 import { setSSRLocale, TLocale } from '../../utils/getLang';
 
 const Md = dynamic(() => import('../Md'));
