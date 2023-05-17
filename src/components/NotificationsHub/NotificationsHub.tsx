@@ -3,36 +3,48 @@ import toast from 'react-hot-toast';
 
 import type { NotificationsEventPromiseData } from '../../utils/dispatchNotification';
 
-import { tr } from './NotificationsHub.i18n';
-
 declare global {
     interface WindowEventMap {
-        notifyPromise: CustomEvent;
+        notifyPromise: CustomEvent<NotificationsEventPromiseData>;
+        notifyError: CustomEvent<string>;
+        notifySuccess: CustomEvent<string>;
     }
 }
 
 const NotificationsHub: React.FC = () => {
-    const promiseListener = async (e: CustomEvent<NotificationsEventPromiseData>) => {
-        const id = toast.loading(tr(e.detail.events.onPending));
+    const promiseListener = async (e: WindowEventMap['notifyPromise']) => {
+        const id = toast.loading(e.detail.events.onPending);
 
         await e.detail.promise
             .then((data) => {
                 toast.dismiss(id);
-                toast.success(tr(e.detail.events.onSuccess));
+                toast.success(e.detail.events.onSuccess);
                 return [data, null];
             })
             .catch((error) => {
                 toast.dismiss(id);
-                toast.error(tr(e.detail.events.onError));
+                toast.error(e.detail.events.onError);
                 return [null, error];
             });
     };
 
+    const notifyErrorHandler = (ev: WindowEventMap['notifyError']) => {
+        toast.error(ev.detail);
+    };
+
+    const notifySuccessHandler = (ev: WindowEventMap['notifySuccess']) => {
+        toast.success(ev.detail);
+    };
+
     useEffect(() => {
         window.addEventListener('notifyPromise', promiseListener);
+        window.addEventListener('notifyError', notifyErrorHandler);
+        window.addEventListener('notifySuccess', notifySuccessHandler);
 
         return () => {
             window.removeEventListener('notifyPromise', promiseListener);
+            window.removeEventListener('notifyError', notifyErrorHandler);
+            window.removeEventListener('notifySuccess', notifySuccessHandler);
         };
     }, []);
 

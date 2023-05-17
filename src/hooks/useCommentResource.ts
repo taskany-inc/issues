@@ -1,10 +1,8 @@
-import toast from 'react-hot-toast';
 import { Comment } from '@prisma/client';
 
-import { trpc } from '../../utils/trpcClient';
-import { CommentCreate, CommentUpdate } from '../../schema/comment';
-
-import { tr } from './useCommentResource.i18n';
+import { trpc } from '../utils/trpcClient';
+import { CommentCreate, CommentUpdate } from '../schema/comment';
+import { notifyPromise } from '../utils/notifyPromise';
 
 export const useCommentResource = () => {
     const createMutation = trpc.comment.create.useMutation();
@@ -19,13 +17,7 @@ export const useCommentResource = () => {
                 description,
             });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are publishing your comment'),
-                success: tr('Voila! Comment is here 🎉'),
-            });
-
-            const data = await promise;
+            const [data] = await notifyPromise(promise, 'commentCreate');
 
             data && cb(data);
         };
@@ -38,13 +30,7 @@ export const useCommentResource = () => {
                 description,
             });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are updating your comment'),
-                success: tr('Comment updated'),
-            });
-
-            const data = await promise;
+            const [data] = await notifyPromise(promise, 'commentUpdate');
 
             data && cb(data);
         };
@@ -54,11 +40,7 @@ export const useCommentResource = () => {
         async ({ id }: { id: string }) => {
             const promise = deleteMutation.mutateAsync(id);
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are deleting your comment'),
-                success: tr('Comment removed'),
-            });
+            notifyPromise(promise, 'commentDelete');
 
             const data = await promise;
 

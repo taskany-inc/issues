@@ -1,12 +1,10 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
-import toast from 'react-hot-toast';
 import { Button, ComboBox, Input, Tag, TagIcon } from '@taskany/bricks';
 
-import { trpc } from '../../utils/trpcClient';
-
-import { tr } from './TagComboBox.i18n';
+import { trpc } from '../utils/trpcClient';
+import { notifyPromise } from '../utils/notifyPromise';
 
 interface TagObject {
     id: string;
@@ -41,13 +39,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
         const createTag = useCallback(async () => {
             const promise = createMutation.mutateAsync({ title: inputState });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are creating new tag'),
-                success: tr('Voila! Tag is here 🎉'),
-            });
-
-            const res = await promise;
+            const [res] = await notifyPromise(promise, 'tagCreate');
 
             if (res) {
                 const newTags = [...tags, res];

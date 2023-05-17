@@ -24,7 +24,7 @@ import { Priority } from '../../types/priority';
 import { UserComboBox } from '../UserComboBox';
 import { GoalParentComboBox } from '../GoalParentComboBox';
 import { EstimateComboBox } from '../EstimateComboBox';
-import { TagComboBox } from '../TagComboBox/TagComboBox';
+import { TagComboBox } from '../TagComboBox';
 import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
 import { GoalCommon, goalCommonSchema } from '../../schema/goal';

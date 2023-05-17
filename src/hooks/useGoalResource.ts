@@ -1,9 +1,7 @@
 import { useCallback } from 'react';
-import toast from 'react-hot-toast';
 
-import { trpc } from '../../utils/trpcClient';
-
-import { tr } from './useGoalResource.i18n';
+import { trpc } from '../utils/trpcClient';
+import { notifyPromise } from '../utils/notifyPromise';
 
 type Callback<A = []> = (...args: A[]) => void;
 
@@ -18,11 +16,7 @@ export const useGoalResource = (id: string) => {
                 direction: !watcher,
             });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are calling owner'),
-                success: !watcher ? tr('Voila! You are watcher now 🎉') : tr('So sad! Goal will miss you'),
-            });
+            notifyPromise(promise, !watcher ? 'goalsWatch' : 'goalsUnwatch');
 
             cb();
 
@@ -38,11 +32,7 @@ export const useGoalResource = (id: string) => {
                 direction: !stargizer,
             });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are calling owner'),
-                success: !stargizer ? tr('Voila! You are stargizer now 🎉') : tr('So sad! Goal will miss you'),
-            });
+            notifyPromise(promise, !stargizer ? 'goalsStar' : 'goalsUnstar');
 
             cb();
 

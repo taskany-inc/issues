@@ -1,10 +1,8 @@
 import { useCallback } from 'react';
-import toast from 'react-hot-toast';
 
-import { trpc } from '../../utils/trpcClient';
-import { GoalUpdate } from '../../schema/goal';
-
-import { tr } from './useGoalUpdate.i18n';
+import { trpc } from '../utils/trpcClient';
+import { GoalUpdate } from '../schema/goal';
+import { notifyPromise } from '../utils/notifyPromise';
 
 export const useGoalUpdate = (id?: string) => {
     const updateMutation = trpc.goal.update.useMutation();
@@ -18,11 +16,7 @@ export const useGoalUpdate = (id?: string) => {
                 id,
             });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are updating the goal'),
-                success: tr('Voila! Goal is up to date 🎉'),
-            });
+            notifyPromise(promise, 'goalsUpdate');
 
             return promise;
         },

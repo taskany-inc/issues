@@ -2,7 +2,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import toast from 'react-hot-toast';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { gray10 } from '@taskany/colors';
@@ -29,6 +28,8 @@ import { Keyboard } from '../Keyboard';
 import { CommonHeader } from '../CommonHeader';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { UpdateUser, updateUserSchema } from '../../schema/user';
+import { notifyPromise } from '../../utils/notifyPromise';
+import { dispatchErrorNotification, dispatchSuccessNotification } from '../../utils/dispatchNotification';
 
 import { tr } from './UserSettingsPage.i18n';
 
@@ -61,13 +62,7 @@ export const UserSettingsPage = ({ user, locale, ssrTime }: ExternalPageProps) =
     const updateUser = async (data: UpdateUser) => {
         const promise = updateMutation.mutateAsync(data);
 
-        toast.promise(promise, {
-            error: tr('Something went wrong 😿'),
-            loading: tr('We are updating user settings'),
-            success: tr('Voila! Successfully updated 🎉'),
-        });
-
-        const res = await promise;
+        const [res] = await notifyPromise(promise, 'userSettingsUpdate');
 
         if (res) setActualUserFields(res);
     };
@@ -91,15 +86,9 @@ export const UserSettingsPage = ({ user, locale, ssrTime }: ExternalPageProps) =
                 },
             );
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are updating user settings'),
-                success: tr('Voila! Successfully updated 🎉'),
-            });
+            const [res] = await notifyPromise(promise, 'userSettingsUpdate');
 
-            const res = await promise;
-
-            if (res.theme) {
+            if (res && res.theme) {
                 setAppearanceTheme(res.theme);
             }
         },
@@ -113,10 +102,9 @@ export const UserSettingsPage = ({ user, locale, ssrTime }: ExternalPageProps) =
     const clearLocalCache = useCallback(() => {
         try {
             window.localStorage.clear();
-            toast.success(tr('Local cache cleared successfully'));
-            // eslint-disable-next-line no-empty
+            dispatchSuccessNotification('clearLSCache');
         } catch (e) {
-            toast.error(tr('Something went wrong 😿'));
+            dispatchErrorNotification('error');
         }
     }, []);
 

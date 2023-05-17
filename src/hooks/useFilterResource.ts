@@ -16,11 +16,7 @@ export const useFilterResource = () => {
                     utils.filter.getUserFilters.invalidate();
                 },
             }),
-            {
-                onPending: 'We are saving your filter...',
-                onSuccess: 'Voila! Saved successfully 🎉! Use and share it with teammates 😉',
-                onError: 'Something went wrong 😿',
-            },
+            'filterCreate',
         );
 
     const toggleFilterStar = (data: ToggleSubscription) =>
@@ -30,11 +26,7 @@ export const useFilterResource = () => {
                     utils.filter.getUserFilters.invalidate();
                 },
             }),
-            {
-                onPending: 'We are calling owner...',
-                onSuccess: data.direction ? 'Voila! You are stargizer now 🎉' : 'So sad! We will miss you',
-                onError: 'Something went wrong 😿',
-            },
+            data.direction ? 'filterStar' : 'filterUnstar',
         );
 
     const deleteFilter = (id: string) =>
@@ -44,11 +36,7 @@ export const useFilterResource = () => {
                     utils.filter.getUserFilters.invalidate();
                 },
             }),
-            {
-                onPending: 'We are deleting your filter...',
-                onSuccess: 'Deleted successfully 🎉!',
-                onError: 'Something went wrong 😿',
-            },
+            'filterDelete',
         );
 
     return {

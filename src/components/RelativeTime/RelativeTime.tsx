@@ -6,7 +6,6 @@ import { usePageContext } from '../../hooks/usePageContext';
 import { Light } from '../Light';
 
 import { tr } from './RelativeTime.i18n';
-import type { I18nKey } from './RelativeTime.i18n';
 
 type RelativeTimeKindCommon = 'created' | 'updated';
 type RelativeTimeKind = RelativeTimeKindCommon | Capitalize<RelativeTimeKindCommon>;
@@ -43,7 +42,7 @@ const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
 
     return (
         <>
-            {kind ? map[kind] : ''}
+            {kind ? `${map[kind]} ` : ''}
             <Light title={createLocaleDate(localeDate, { locale })}>{dateAgo(localeDate, time, { locale })}</Light>
         </>
     );
