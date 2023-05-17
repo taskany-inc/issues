@@ -4,7 +4,6 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import toast from 'react-hot-toast';
 import { danger0, gapM, gapS } from '@taskany/colors';
 import {
     Button,
@@ -52,6 +51,7 @@ import { Priority, priorityColorsMap } from '../../types/priority';
 import { trpc } from '../../utils/trpcClient';
 import { ToggleGoalDependency } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
+import { notifyPromise } from '../../utils/notifyPromise';
 
 import { tr } from './GoalPage.i18n';
 
@@ -187,13 +187,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
         async (data: ToggleGoalDependency) => {
             const promise = toggleDependencyMutation.mutateAsync(data);
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are updating the goal'),
-                success: tr('Voila! Goal is up to date 🎉'),
-            });
-
-            await promise;
+            await notifyPromise(promise, 'goalsUpdate');
 
             utils.goal.getById.invalidate(id);
         },
@@ -243,11 +237,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
             archived: true,
         });
 
-        toast.promise(promise, {
-            error: tr('Something went wrong 😿'),
-            loading: tr('We are deleting the goal'),
-            success: tr('Deleted successfully 🎉'),
-        });
+        notifyPromise(promise, 'goalsDelete');
 
         await promise;
 

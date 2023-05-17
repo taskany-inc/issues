@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import styled from 'styled-components';
 import { gapS, gray6, gray10 } from '@taskany/colors';
 import { BulbOnIcon, Link, QuestionIcon } from '@taskany/bricks';
@@ -14,6 +13,7 @@ import { GoalForm } from '../GoalForm/GoalForm';
 import { trpc } from '../../utils/trpcClient';
 import { GoalCommon } from '../../schema/goal';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
+import { notifyPromise } from '../../utils/notifyPromise';
 
 import { tr } from './GoalCreateForm.i18n';
 
@@ -37,17 +37,9 @@ const GoalCreateForm: React.FC = () => {
     const createGoal = async (form: GoalCommon) => {
         setBusy(true);
 
-        const promise = createMutation.mutateAsync(form);
+        const [res] = await notifyPromise(createMutation.mutateAsync(form), 'goalsCreate');
 
-        toast.promise(promise, {
-            error: tr('Something went wrong 😿'),
-            loading: tr('We are creating new goal'),
-            success: tr('Voila! Goal is here 🎉'),
-        });
-
-        const res = await promise;
-
-        if (res?.id) {
+        if (res && res.id) {
             const newRecentProjectsCache = { ...recentProjectsCache };
             if (newRecentProjectsCache[form.parent.id]) {
                 newRecentProjectsCache[form.parent.id].rate += 1;

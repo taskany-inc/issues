@@ -18,7 +18,7 @@ import {
 import { Reaction, User } from '@prisma/client';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
-import { useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
+import { useCommentResource } from '../../hooks/useCommentResource';
 import { Reactions } from '../Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
 

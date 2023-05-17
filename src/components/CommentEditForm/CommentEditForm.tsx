@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
+import { useCommentResource } from '../../hooks/useCommentResource';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { CommentUpdate, commentUpdateSchema } from '../../schema/comment';
 

@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useRef } from 'react';
-import toast from 'react-hot-toast';
 import z from 'zod';
 import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
@@ -26,6 +25,7 @@ import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
+import { notifyPromise } from '../../utils/notifyPromise';
 
 import { tr } from './UserInviteForm.i18n';
 
@@ -62,13 +62,7 @@ const UserInviteForm: React.FC = () => {
 
         const promise = inviteMutation.mutateAsync(emails);
 
-        toast.promise(promise, {
-            error: tr('Something went wrong 😿'),
-            loading: tr('We are creating invite'),
-            success: tr('Voila! Users invited 🎉'),
-        });
-
-        await promise;
+        await notifyPromise(promise, 'userInvite');
 
         setEmails([]);
         setInputValue('');

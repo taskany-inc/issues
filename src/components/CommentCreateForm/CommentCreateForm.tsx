@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { UserPic } from '@taskany/bricks';
 
 import { usePageContext } from '../../hooks/usePageContext';
-import { useCommentResource } from '../../hooks/useCommentResource/useCommentResource';
+import { useCommentResource } from '../../hooks/useCommentResource';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { CommentCreate, commentCreateSchema } from '../../schema/comment';

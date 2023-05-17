@@ -1,11 +1,9 @@
 import { useCallback } from 'react';
-import toast from 'react-hot-toast';
 
-import { ProjectCreate, ProjectUpdate } from '../../schema/project';
-import { trpc } from '../../utils/trpcClient';
-import { ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
-
-import { tr } from './useProjectResource.i18n';
+import { ProjectCreate, ProjectUpdate } from '../schema/project';
+import { trpc } from '../utils/trpcClient';
+import { ProjectUpdateReturnType } from '../../trpc/inferredTypes';
+import { notifyPromise } from '../utils/notifyPromise';
 
 type Callback<A = []> = (...args: A[]) => void;
 
@@ -22,11 +20,7 @@ export const useProjectResource = (id: string) => {
         (cb: Callback<string>) => async (form: ProjectCreate) => {
             const promise = createMutation.mutateAsync(form);
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are creating something new'),
-                success: tr("Voila! It's here 🎉"),
-            });
+            notifyPromise(promise, 'projectCreate');
 
             const res = await promise;
 
@@ -39,11 +33,7 @@ export const useProjectResource = (id: string) => {
         (cb?: Callback<ProjectUpdateReturnType>) => async (data: ProjectUpdate) => {
             const promise = updateMutation.mutateAsync(data);
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are updating project settings'),
-                success: tr('Voila! Successfully updated 🎉'),
-            });
+            notifyPromise(promise, 'projectUpdate');
 
             const res = await promise;
 
@@ -71,11 +61,7 @@ export const useProjectResource = (id: string) => {
                 direction: !watcher,
             });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are calling owner'),
-                success: !watcher ? tr('Voila! You are watcher now 🎉') : tr('So sad! Project will miss you'),
-            });
+            notifyPromise(promise, !watcher ? 'projectWatch' : 'projectUnwatch');
 
             cb();
 
@@ -91,11 +77,7 @@ export const useProjectResource = (id: string) => {
                 direction: !stargizer,
             });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are calling owner'),
-                success: !stargizer ? tr('Voila! You are stargizer now 🎉') : tr('So sad! Project will miss you'),
-            });
+            notifyPromise(promise, !stargizer ? 'projectStar' : 'projectUnstar');
 
             cb();
 
@@ -111,11 +93,7 @@ export const useProjectResource = (id: string) => {
                 activityId,
             });
 
-            toast.promise(promise, {
-                error: tr('Something went wrong 😿'),
-                loading: tr('We are calling owner'),
-                success: tr('So sad! Project will miss you'),
-            });
+            notifyPromise(promise, 'projectTransfer');
 
             const res = await promise;
 
