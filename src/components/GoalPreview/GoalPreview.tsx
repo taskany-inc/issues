@@ -121,6 +121,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         setGoalEditModalVisible(true);
     }, []);
 
+    const onGoalEditModalClose = useCallback(() => {
+        setGoalEditModalVisible(false);
+    }, []);
+
     const updateGoal = useGoalUpdate(preview.id);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
@@ -352,6 +356,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                             hotkeys={editGoalKeys}
                             visible={goalEditModalVisible}
                             onShow={onGoalEditModalShow}
+                            onClose={onGoalEditModalClose}
                         >
                             <GoalEditForm goal={g} onSubmit={onGoalEdit} />
                         </ModalOnEvent>
