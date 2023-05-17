@@ -2,17 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { withSentryConfig } = require('@sentry/nextjs');
-const withPlugins = require('next-compose-plugins');
 const path = require('path');
-
-const nextPlugins =
-    process.env.NODE_ENV === 'development'
-        ? [
-              require('@next/bundle-analyzer')({
-                  enabled: process.env.ANALYZE === 'true',
-              }),
-          ]
-        : [];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -67,10 +57,11 @@ const nextConfig = {
     },
 };
 
-const SentryWebpackPluginOptions = {
-    silent: true,
-    hideSourcemaps: true,
-    ignore: ['node_modules'],
-};
-
-module.exports = withPlugins(nextPlugins, withSentryConfig(nextConfig, SentryWebpackPluginOptions));
+module.exports =
+    process.env.NODE_ENV === 'development' && process.env.ANALYZE === 'true'
+        ? require('@next/bundle-analyzer')({})(nextConfig)
+        : withSentryConfig(nextConfig, {
+              silent: true,
+              hideSourcemaps: true,
+              ignore: ['node_modules'],
+          });
