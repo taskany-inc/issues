@@ -16,6 +16,10 @@ export const useProjectResource = (id: string) => {
     const toggleStargizerMutation = trpc.project.toggleStargizer.useMutation();
     const transferOwnershipMutation = trpc.project.transferOwnership.useMutation();
 
+    const invalidate = useCallback(() => {
+        utils.project.getById.invalidate(id);
+    }, [id, utils.project.getById]);
+
     const createProject = useCallback(
         (cb: Callback<string>) => async (form: ProjectCreate) => {
             const promise = createMutation.mutateAsync(form);
@@ -37,11 +41,11 @@ export const useProjectResource = (id: string) => {
 
             const res = await promise;
 
-            utils.project.getById.invalidate(id);
+            invalidate();
 
             res && cb?.(res);
         },
-        [id, updateMutation, utils],
+        [updateMutation, invalidate],
     );
 
     const deleteProject = useCallback(
@@ -55,35 +59,33 @@ export const useProjectResource = (id: string) => {
     );
 
     const toggleProjectWatching = useCallback(
-        (cb: Callback, watcher?: boolean) => async () => {
-            const promise = toggleWatcherMutation.mutateAsync({
-                id,
-                direction: !watcher,
-            });
+        async (watcher?: boolean) => {
+            await notifyPromise(
+                toggleWatcherMutation.mutateAsync({
+                    id,
+                    direction: !watcher,
+                }),
+                !watcher ? 'projectWatch' : 'projectUnwatch',
+            );
 
-            notifyPromise(promise, !watcher ? 'projectWatch' : 'projectUnwatch');
-
-            cb();
-
-            await promise;
+            invalidate();
         },
-        [id, toggleWatcherMutation],
+        [id, toggleWatcherMutation, invalidate],
     );
 
     const toggleProjectStar = useCallback(
-        (cb: Callback, stargizer?: boolean) => async () => {
-            const promise = toggleStargizerMutation.mutateAsync({
-                id,
-                direction: !stargizer,
-            });
+        async (stargizer?: boolean) => {
+            await notifyPromise(
+                toggleStargizerMutation.mutateAsync({
+                    id,
+                    direction: !stargizer,
+                }),
+                !stargizer ? 'projectStar' : 'projectUnstar',
+            );
 
-            notifyPromise(promise, !stargizer ? 'projectStar' : 'projectUnstar');
-
-            cb();
-
-            await promise;
+            invalidate();
         },
-        [id, toggleStargizerMutation],
+        [id, toggleStargizerMutation, invalidate],
     );
 
     const transferOwnership = useCallback(
@@ -109,5 +111,6 @@ export const useProjectResource = (id: string) => {
         toggleProjectWatching,
         toggleProjectStar,
         transferOwnership,
+        invalidate,
     };
 };

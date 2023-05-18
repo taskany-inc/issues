@@ -3,42 +3,43 @@ import { useCallback } from 'react';
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
 
-type Callback<A = []> = (...args: A[]) => void;
-
 export const useGoalResource = (id: string) => {
+    const utils = trpc.useContext();
     const toggleWatcherMutation = trpc.goal.toggleWatcher.useMutation();
     const toggleStargizerMutation = trpc.goal.toggleStargizer.useMutation();
 
+    const invalidate = useCallback(() => {
+        utils.goal.getById.invalidate(id);
+    }, [id, utils.goal.getById]);
+
     const toggleGoalWatching = useCallback(
-        (cb: Callback, watcher?: boolean) => async () => {
-            const promise = toggleWatcherMutation.mutateAsync({
-                id,
-                direction: !watcher,
-            });
+        async (watcher?: boolean) => {
+            await notifyPromise(
+                toggleWatcherMutation.mutateAsync({
+                    id,
+                    direction: !watcher,
+                }),
+                !watcher ? 'goalsWatch' : 'goalsUnwatch',
+            );
 
-            notifyPromise(promise, !watcher ? 'goalsWatch' : 'goalsUnwatch');
-
-            cb();
-
-            await promise;
+            invalidate();
         },
-        [id, toggleWatcherMutation],
+        [id, toggleWatcherMutation, invalidate],
     );
 
     const toggleGoalStar = useCallback(
-        (cb: Callback, stargizer?: boolean) => async () => {
-            const promise = toggleStargizerMutation.mutateAsync({
-                id,
-                direction: !stargizer,
-            });
+        async (stargizer?: boolean) => {
+            await notifyPromise(
+                toggleStargizerMutation.mutateAsync({
+                    id,
+                    direction: !stargizer,
+                }),
+                !stargizer ? 'goalsStar' : 'goalsUnstar',
+            );
 
-            notifyPromise(promise, !stargizer ? 'goalsStar' : 'goalsUnstar');
-
-            cb();
-
-            await promise;
+            invalidate();
         },
-        [id, toggleStargizerMutation],
+        [id, toggleStargizerMutation, invalidate],
     );
 
     return {

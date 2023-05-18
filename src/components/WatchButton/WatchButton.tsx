@@ -6,7 +6,7 @@ import { tr } from './WatchButton.i18n';
 interface WatchButtonProps {
     watcher?: boolean;
 
-    onToggle: () => void;
+    onToggle: (val: WatchButtonProps['watcher']) => void;
 }
 
 interface IconProps {
@@ -20,11 +20,15 @@ const Icon: React.FC<IconProps> = ({ watching }) => {
 };
 
 export const WatchButton: React.FC<WatchButtonProps> = ({ watcher, onToggle }) => {
+    const onClick = () => {
+        onToggle(watcher);
+    };
+
     return (
         <Button
             text={watcher ? tr('Watching') : tr('Watch')}
             iconLeft={<Icon watching={!!watcher} />}
-            onClick={onToggle}
+            onClick={onClick}
         />
     );
 };

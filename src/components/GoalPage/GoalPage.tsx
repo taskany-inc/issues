@@ -139,15 +139,6 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     });
 
     const { toggleGoalWatching, toggleGoalStar } = useGoalResource(id);
-    const [watcher, setWatcher] = useState(goal?._isWatching);
-    const onWatchToggle = useCallback(() => {
-        setWatcher(!watcher);
-    }, [watcher]);
-
-    const [stargizer, setStargizer] = useState(goal?._isStarred);
-    const onStarToggle = useCallback(() => {
-        setStargizer(!stargizer);
-    }, [stargizer]);
 
     const priority = goal?.priority as Priority;
     const priorityColor = priorityColorsMap[priority];
@@ -289,11 +280,11 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
 
                 <StyledIssueInfo align="right">
                     <PageActions>
-                        <WatchButton watcher={watcher} onToggle={toggleGoalWatching(onWatchToggle, watcher)} />
+                        <WatchButton watcher={!!goal._isWatching} onToggle={toggleGoalWatching} />
                         <StarButton
-                            stargizer={stargizer}
+                            stargizer={!!goal._isStarred}
                             count={goal._count?.stargizers}
-                            onToggle={toggleGoalStar(onStarToggle, stargizer)}
+                            onToggle={toggleGoalStar}
                         />
                     </PageActions>
                 </StyledIssueInfo>
