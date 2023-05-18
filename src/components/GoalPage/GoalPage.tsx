@@ -116,6 +116,11 @@ const StyledCardActions = styled.div`
     }
 `;
 
+const StyledMenuItem = styled(MenuItem)`
+    display: flex;
+    justify-content: start;
+`;
+
 export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
 
@@ -321,7 +326,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                                                 <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
                                             )}
                                             renderItem={({ item, cursor, index, onClick }) => (
-                                                <MenuItem
+                                                <StyledMenuItem
                                                     key={item.label}
                                                     ghost
                                                     color={item.color}
@@ -330,7 +335,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                                                     onClick={onClick}
                                                 >
                                                     {item.label}
-                                                </MenuItem>
+                                                </StyledMenuItem>
                                             )}
                                         />
                                     </span>
