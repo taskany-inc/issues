@@ -7,7 +7,7 @@ interface StarButtonProps {
     stargizer?: boolean;
     count?: number;
 
-    onToggle: () => void;
+    onToggle: (val: StarButtonProps['stargizer']) => void;
 }
 
 interface IconProps {
@@ -20,11 +20,17 @@ const Icon: React.FC<IconProps> = ({ filled }) => {
     return <Comp size="s" />;
 };
 
-export const StarButton: React.FC<StarButtonProps> = ({ stargizer, count, onToggle }) => (
-    <Button
-        text={stargizer ? tr('Starred') : tr('Stars')}
-        iconLeft={<Icon filled={!!stargizer} />}
-        iconRight={count !== undefined ? <Badge>{count}</Badge> : undefined}
-        onClick={onToggle}
-    />
-);
+export const StarButton: React.FC<StarButtonProps> = ({ stargizer, count, onToggle }) => {
+    const onClick = () => {
+        onToggle(stargizer);
+    };
+
+    return (
+        <Button
+            text={stargizer ? tr('Starred') : tr('Stars')}
+            iconLeft={<Icon filled={!!stargizer} />}
+            iconRight={count !== undefined ? <Badge>{count}</Badge> : undefined}
+            onClick={onClick}
+        />
+    );
+};

@@ -62,17 +62,6 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
         [tr('Settings'), routes.projectSettings(id), true],
     ];
 
-    // FIXME: invalidate getById instead
-    const [watcher, setWatcher] = useState(watching);
-    const onWatchToggle = useCallback(() => {
-        setWatcher(!watcher);
-    }, [watcher]);
-
-    const [stargizer, setStargizer] = useState(starred);
-    const onStarToggle = useCallback(() => {
-        setStargizer(!stargizer);
-    }, [stargizer]);
-
     return (
         <>
             <ProjectHeader>
@@ -98,12 +87,8 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
                 <PageActions>
                     {nullable(actions, () => (
                         <>
-                            <WatchButton watcher={watcher} onToggle={toggleProjectWatching(onWatchToggle, watcher)} />
-                            <StarButton
-                                stargizer={stargizer}
-                                count={stargizers}
-                                onToggle={toggleProjectStar(onStarToggle, stargizer)}
-                            />
+                            <WatchButton watcher={watching} onToggle={toggleProjectWatching} />
+                            <StarButton stargizer={starred} count={stargizers} onToggle={toggleProjectStar} />
                         </>
                     ))}
                 </PageActions>
