@@ -13,6 +13,7 @@ import {
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
+import { createGoalInDb } from '../../src/utils/createGoalInDb';
 
 export const goal = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
@@ -112,23 +113,37 @@ export const goal = router({
             },
         });
     }),
-    getById: protectedProcedure.input(z.string()).query(async ({ ctx, input: id }) => {
-        const goal = await prisma.goal.findFirst({
-            where: {
-                id,
-                archived: false,
-            },
-            include: {
-                ...goalDeepQuery,
-            },
-        });
+    getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+        // try to recognize shot id like: FRNTND-23
+        const [projectId, scopeIdStr] = input.split('-');
 
-        if (!goal) return null;
+        if (!projectId) return null;
 
-        return {
-            ...goal,
-            ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
-        };
+        const scopeId = parseInt(scopeIdStr, 10);
+
+        if (!scopeId) return null;
+
+        try {
+            const goal = await prisma.goal.findFirst({
+                where: {
+                    projectId,
+                    scopeId,
+                    archived: false,
+                },
+                include: {
+                    ...goalDeepQuery,
+                },
+            });
+
+            if (!goal) return null;
+
+            return {
+                ...goal,
+                ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
+            };
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
     }),
     getUserGoals: protectedProcedure.input(userGoalsSchema).query(async ({ ctx, input }) => {
         const { activityId } = ctx.session.user;
@@ -226,60 +241,13 @@ export const goal = router({
         };
     }),
     create: protectedProcedure.input(goalCommonSchema).mutation(async ({ ctx, input }) => {
-        const promises = [
-            prisma.activity.findUnique({ where: { id: input.owner.id } }),
-            prisma.project.findUnique({ where: { id: input.parent.id } }),
-        ];
-
-        const [owner, parent] = await Promise.all(promises);
-
-        if (!owner?.id) return null;
-        if (!parent?.id) return null;
-
-        const pre = `${parent?.id}-`;
-
-        // FIXME: https://github.com/taskany-inc/issues/issues/627
-        const lastGoal = await prisma.goal.findFirst({
-            where: { id: { contains: pre } },
-            orderBy: { createdAt: 'desc' },
-        });
-        const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
-        const id = `${pre}${numId}`;
+        if (!input.owner.id) return null;
+        if (!input.parent.id) return null;
 
         const { activityId } = ctx.session.user;
 
         try {
-            return prisma.goal.create({
-                data: {
-                    id,
-                    activityId,
-                    ownerId: owner.id,
-                    projectId: parent.id,
-                    title: input.title,
-                    description: input.description || '',
-                    stateId: input.state.id,
-                    priority: input.priority,
-                    tags: input.tags?.length
-                        ? {
-                              connect: input.tags,
-                          }
-                        : undefined,
-                    estimate: input.estimate
-                        ? {
-                              create: {
-                                  ...input.estimate,
-                                  activityId,
-                              },
-                          }
-                        : undefined,
-                    watchers: {
-                        connect: [{ id: activityId }, { id: owner.id }],
-                    },
-                    participants: {
-                        connect: [{ id: activityId }, { id: owner.id }],
-                    },
-                },
-            });
+            return createGoalInDb(activityId, input);
 
             // await mailServer.sendMail({
             //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,

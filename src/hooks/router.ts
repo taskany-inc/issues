@@ -10,7 +10,7 @@ export const routes = {
     projectSettings: (id: string) => `/projects/${id}/settings`,
 
     goals: () => '/goals',
-    goal: (id: string) => `/goals/${id}`,
+    goal: (projectId: string, scopeId: string) => `/goals/${projectId}-${scopeId}`,
 
     signIn: () => '/api/auth/signin',
     userSettings: () => '/users/settings',
@@ -33,7 +33,7 @@ export const useRouter = (): Record<keyof typeof routes, any> => {
         projectSettings: (id: string) => router.push(routes.projectSettings(id)),
 
         goals: () => router.push(routes.goals()),
-        goal: (id: string) => router.push(routes.goal(id)),
+        goal: (projectId: string, scopeId: string) => router.push(routes.goal(projectId, scopeId)),
 
         signIn: () => router.push(routes.signIn()),
         userSettings: () => router.push(routes.userSettings()),

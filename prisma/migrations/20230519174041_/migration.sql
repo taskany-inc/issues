@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Goal" ADD COLUMN     "scopeId" INTEGER NOT NULL DEFAULT 1;
