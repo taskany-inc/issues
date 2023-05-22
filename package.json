@@ -58,7 +58,7 @@
     "react-remark": "2.1.0",
     "remark-emoji": "3.1.1",
     "remark-gfm": "3.0.1",
-    "styled-components": "5.3.6",
+    "styled-components": "5.3.10",
     "superjson": "1.12.3",
     "throttle-debounce": "5.0.0",
     "tinykeys": "1.4.0",
