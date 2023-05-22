@@ -53,7 +53,7 @@ const GoalCreateForm: React.FC = () => {
             setRecentProjectsCache(newRecentProjectsCache);
             setLastProjectCache(form.parent);
 
-            router.goal(res.id);
+            router.goal(`${res.projectId}-${res.scopeId}`);
             dispatchModalEvent(ModalEvent.GoalCreateModal)();
         }
     };

@@ -162,7 +162,8 @@ model Estimate {
 }
 
 model Goal {
-  id           String     @id
+  id           String     @id @default(cuid())
+  scopeId      Int        @default(1)
   title        String
   description  String
   kind         String?
