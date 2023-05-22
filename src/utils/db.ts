@@ -15,7 +15,7 @@ import { prisma } from './prisma';
  * @param input goal FormData
  * @returns new goal id
  */
-export const createGoalInDb = async (activityId: string, input: GoalCommon) => {
+export const createGoal = async (activityId: string, input: GoalCommon) => {
     const id = nanoid();
 
     await prisma.$executeRaw`
@@ -57,6 +57,20 @@ export const createGoalInDb = async (activityId: string, input: GoalCommon) => {
             participants: {
                 connect: [{ id: activityId }, { id: input.owner.id }],
             },
+        },
+    });
+};
+
+export const changeGoalProject = async (id: string, newProjectId: string) => {
+    await prisma.$executeRaw`
+        UPDATE "Goal"
+        SET "projectId" = ${newProjectId}, "scopeId" = (SELECT max("scopeId") + 1 FROM "Goal" WHERE "projectId" = ${newProjectId})
+        WHERE "id" = ${id};
+    `;
+
+    return prisma.goal.findUnique({
+        where: {
+            id,
         },
     });
 };

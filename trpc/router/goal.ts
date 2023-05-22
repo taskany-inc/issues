@@ -5,6 +5,7 @@ import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
 import {
+    goalChangeProjectSchema,
     goalCommonSchema,
     goalUpdateSchema,
     toogleGoalArchiveSchema,
@@ -13,7 +14,7 @@ import {
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
-import { createGoalInDb } from '../../src/utils/createGoalInDb';
+import { createGoal, changeGoalProject } from '../../src/utils/db';
 
 export const goal = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
@@ -247,7 +248,7 @@ export const goal = router({
         const { activityId } = ctx.session.user;
 
         try {
-            return createGoalInDb(activityId, input);
+            return createGoal(activityId, input);
 
             // await mailServer.sendMail({
             //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
@@ -259,6 +260,9 @@ export const goal = router({
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
+    }),
+    changeProject: protectedProcedure.input(goalChangeProjectSchema).mutation(async ({ input }) => {
+        return changeGoalProject(input.id, input.projectId);
     }),
     update: protectedProcedure.input(goalUpdateSchema).mutation(async ({ ctx, input }) => {
         const actualGoal = await prisma.goal.findUnique({
@@ -282,28 +286,9 @@ export const goal = router({
         }
 
         try {
-            if (input.parent?.id && actualGoal.projectId !== input.parent.id) {
-                const project = await prisma.project.findUnique({
-                    where: { id: input.parent.id },
-                });
-
-                if (!project) return null;
-
-                // FIXME: https://github.com/taskany-inc/issues/issues/627
-                const pre = `${project.id}-`;
-                const lastGoal = await prisma.goal.findFirst({
-                    where: { id: { contains: pre } },
-                    orderBy: { createdAt: 'desc' },
-                });
-                const numId = lastGoal ? Number(lastGoal?.id?.replace(pre, '')) + 1 : 1;
-
-                input.id = `${pre}${numId}`;
-            }
-
             return prisma.goal.update({
                 where: { id: actualGoal.id },
                 data: {
-                    id: input.id,
                     ownerId: input.owner?.id,
                     projectId: input.parent?.id,
                     title: input.title,
