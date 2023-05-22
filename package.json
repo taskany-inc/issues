@@ -62,7 +62,7 @@
     "superjson": "1.12.3",
     "throttle-debounce": "5.0.0",
     "tinykeys": "1.4.0",
-    "zod": "3.20.2"
+    "zod": "3.21.4"
   },
   "devDependencies": {
     "@babel/core": "7.21.8",
