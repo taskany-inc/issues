@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.1.0](https://github.com/taskany-inc/issues/compare/v1.0.0...v1.1.0) (2023-05-22)
+
+
+### Features
+
+* add background queue ([b658eef](https://github.com/taskany-inc/issues/commit/b658eefde49fd1e076c292ac7271ceb52829bd1a))
+* bricks component filterPanel ([cda5426](https://github.com/taskany-inc/issues/commit/cda54267b92452780a2fef60b471b7c28127f069))
+* **Goal:** goal project parents owners can edit goal ([b7319af](https://github.com/taskany-inc/issues/commit/b7319af3b161b72f90de4b66837545f2cae260e5))
+* react and react-dom are externals by default ([36a8552](https://github.com/taskany-inc/issues/commit/36a855278d3d0579927fae0645307724b88020ed))
+* **trpc:** filter router ([7f49408](https://github.com/taskany-inc/issues/commit/7f49408b38c28fcb8dd8b18958175584a41aa2b6))
+
+
+### Bug Fixes
+
+* do not show empty values in applied filters ([eff70c8](https://github.com/taskany-inc/issues/commit/eff70c8380e613d30305b1b02c79fbbe0d726d23))
+* **GoalPage:** wrap content in dropdown items ([9597243](https://github.com/taskany-inc/issues/commit/95972432780b7460af92bb94cb8e1cce1efafef2))
+* **GoalPreview:** automatically open early opened GoalEditForm modal ([a522646](https://github.com/taskany-inc/issues/commit/a52264644ac63911253914e86c691a8e403954bb))
+* **GoalsPage:** check query params ([7d7a3bf](https://github.com/taskany-inc/issues/commit/7d7a3bf2e3dcc248e0a43ad4b0a9032e92bdd4aa))
+* **GoalsPage:** hook call without condition ([303dfde](https://github.com/taskany-inc/issues/commit/303dfdeb75423d2b1880dd6e6959daa5f3ca7a74))
+* **GoalsPage:** restore gql ssr data ([39e4a4f](https://github.com/taskany-inc/issues/commit/39e4a4fecc334c145f699c9ac3df448a2375b2d7))
+* **i18n:** unused translations keys ([cdbf82d](https://github.com/taskany-inc/issues/commit/cdbf82d9a0a5d970867b11707c157d38134b821f))
+* invalidate goal and project cache after clicks by watch or star buttons ([bd1a611](https://github.com/taskany-inc/issues/commit/bd1a611ef1e5cfb36837069b085dbbf23f05bfc1))
+* move prod modules to prod section ([25e58c1](https://github.com/taskany-inc/issues/commit/25e58c10fa91d284fad9108e786e68e536f6c51b))
+* **next:** adapt config to work with prod modules only ([3db0934](https://github.com/taskany-inc/issues/commit/3db0934633d843774d70d5771d5601e165be0fa0))
+* **NotificationsHub:** migrate all request ([f761ef3](https://github.com/taskany-inc/issues/commit/f761ef3656a7d865f6188d16f4866328a2d5beeb))
+* **ProjectPage:** restore gql ssr data ([340cc21](https://github.com/taskany-inc/issues/commit/340cc21e29dc68544122458aa0f2907413c2e970))
+* run publish if new release notes ([83ce8bf](https://github.com/taskany-inc/issues/commit/83ce8bfe0c354216b948a6845573868b3f1bec87))
+* **sentry:** correct Sentry plugin usage ([5cdcc52](https://github.com/taskany-inc/issues/commit/5cdcc52cb6747889ef393da2836ec936462ea657))
+* **Sentry:** up to date configs ([3d2ec7a](https://github.com/taskany-inc/issues/commit/3d2ec7a65f394c63e064ae7c8c12f6e8d7a0e5a0))
+* **trpc:** add transformer to ssr helper ([e25ce14](https://github.com/taskany-inc/issues/commit/e25ce14320ca24c500c785189721e63eab08054a))
+* vulnerabilities audit ([fd282d1](https://github.com/taskany-inc/issues/commit/fd282d1fdce960d59c0be8fca7ac006af5cd86fe))
+
 ## 1.0.0 (2023-04-27)
 
 
