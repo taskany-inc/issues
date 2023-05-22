@@ -8,6 +8,7 @@ const path = require('path');
 const nextConfig = {
     reactStrictMode: process.env.STRICT_MODE,
     swcMinify: true,
+    output: 'standalone',
     i18n: {
         locales: ['en', 'ru'],
         defaultLocale: 'en',
