@@ -165,3 +165,10 @@ export const goalUpdateSchema = z.object({
 });
 
 export type GoalUpdate = z.infer<typeof goalUpdateSchema>;
+
+export const goalChangeProjectSchema = z.object({
+    id: z.string(),
+    projectId: z.string(),
+});
+
+export type GoalChangeProject = z.infer<typeof goalChangeProjectSchema>;
