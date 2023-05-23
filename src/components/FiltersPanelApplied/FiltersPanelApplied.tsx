@@ -82,7 +82,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }
 
     Object.entries(appliedMap).forEach(([k, v]) => {
-        if (v.length) infoString += `${k}: ${v.join(' ,')}. `;
+        if (v.length) infoString += `${k}: ${v.join(', ')}. `;
     });
 
     return (
