@@ -96,14 +96,6 @@ export const FiltersPanel: FC<{
                 </FiltersCounterContainer>
                 <FiltersMenuContainer>
                     {Boolean(priorities.length) && (
-                        <PriorityFilter
-                            text={tr('Priority')}
-                            value={queryState.priority}
-                            priorities={priorities}
-                            onChange={onPriorityChange}
-                        />
-                    )}
-                    {Boolean(priorities.length) && (
                         <StateFilter
                             text={tr('State')}
                             value={queryState.state}
@@ -111,8 +103,13 @@ export const FiltersPanel: FC<{
                             onChange={onStateChange}
                         />
                     )}
-                    {Boolean(users.length) && (
-                        <UserFilter text={tr('Owner')} value={queryState.owner} users={users} onChange={onUserChange} />
+                    {Boolean(priorities.length) && (
+                        <PriorityFilter
+                            text={tr('Priority')}
+                            value={queryState.priority}
+                            priorities={priorities}
+                            onChange={onPriorityChange}
+                        />
                     )}
                     {Boolean(projects.length) && (
                         <ProjectFilter
@@ -122,8 +119,8 @@ export const FiltersPanel: FC<{
                             onChange={onProjectChange}
                         />
                     )}
-                    {Boolean(tags.length) && (
-                        <TagFilter text={tr('Tags')} value={queryState.tag} tags={tags} onChange={onTagChange} />
+                    {Boolean(users.length) && (
+                        <UserFilter text={tr('Owner')} value={queryState.owner} users={users} onChange={onUserChange} />
                     )}
                     {Boolean(estimates.length) && (
                         <EstimateFilter
@@ -132,6 +129,9 @@ export const FiltersPanel: FC<{
                             estimates={estimates}
                             onChange={onEstimateChange}
                         />
+                    )}
+                    {Boolean(tags.length) && (
+                        <TagFilter text={tr('Tags')} value={queryState.tag} tags={tags} onChange={onTagChange} />
                     )}
                     {Boolean(presets.length) && (
                         <PresetDropdown
