@@ -39,7 +39,7 @@ const GoalCreateForm: React.FC = () => {
 
         const [res] = await notifyPromise(createMutation.mutateAsync(form), 'goalsCreate');
 
-        if (res && res.id) {
+        if (res && res._shortId) {
             const newRecentProjectsCache = { ...recentProjectsCache };
             if (newRecentProjectsCache[form.parent.id]) {
                 newRecentProjectsCache[form.parent.id].rate += 1;
@@ -53,7 +53,7 @@ const GoalCreateForm: React.FC = () => {
             setRecentProjectsCache(newRecentProjectsCache);
             setLastProjectCache(form.parent);
 
-            router.goal(`${res.projectId}-${res.scopeId}`);
+            router.goal(res._shortId);
             dispatchModalEvent(ModalEvent.GoalCreateModal)();
         }
     };

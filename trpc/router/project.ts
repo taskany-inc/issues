@@ -9,7 +9,7 @@ import {
     projectTransferOwnershipSchema,
     projectUpdateSchema,
 } from '../../src/schema/project';
-import { calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
+import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 
@@ -124,7 +124,7 @@ export const project = router({
             _isOwner: project.activityId === ctx.session.user.activityId,
         };
     }),
-    getDeepInfo: protectedProcedure.input(projectDeepInfoSchema).query(async ({ input }) => {
+    getDeepInfo: protectedProcedure.input(projectDeepInfoSchema).query(async ({ ctx, input }) => {
         const [allProjectGoals, filtredProjectGoals] = await Promise.all([
             prisma.goal.findMany({
                 ...goalsFilter(
@@ -186,7 +186,10 @@ export const project = router({
         ]);
 
         return {
-            goals: filtredProjectGoals,
+            goals: filtredProjectGoals.map((g) => ({
+                ...g,
+                ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+            })),
             meta: calcGoalsMeta(allProjectGoals),
         };
     }),

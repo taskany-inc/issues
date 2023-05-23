@@ -18,6 +18,7 @@ const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 
 interface GoalListItemProps {
     id: string;
+    shortId: string;
     title: string;
     issuer?: ActivityByIdReturnType;
     tags?: Array<Tag | undefined>;
@@ -126,7 +127,7 @@ const StyledMessageIcon = styled(MessageIcon)`
 
 export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
     ({
-        id,
+        shortId,
         owner,
         issuer,
         createdAt,
@@ -141,7 +142,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         onClick,
         onTagClick,
     }) => (
-        <NextLink href={routes.goal(id)} passHref>
+        <NextLink href={routes.goal(shortId)} passHref>
             <StyledGoal focused={focused} onClick={onClick}>
                 <StyledNotViewed>{isNotViewed && <StyledNotViewedDot />}</StyledNotViewed>
                 <StyledState>
@@ -170,7 +171,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                     </StyledTags>
 
                     <StyledSubTitle size="s">
-                        #{id} <RelativeTime date={createdAt} kind="created" />
+                        #{shortId} <RelativeTime date={createdAt} kind="created" />
                         {` ${tr('by')} ${issuer?.user?.name}`}
                     </StyledSubTitle>
                 </StyledName>

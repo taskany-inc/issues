@@ -3,7 +3,7 @@ import React, { MouseEventHandler, useCallback, useEffect, useState } from 'reac
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
-import { Goal, Project } from '@prisma/client';
+import { Project } from '@prisma/client';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -29,7 +29,7 @@ const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteF
 
 export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
     const router = useRouter();
-    const [preview, setPreview] = useState<Goal | null>(null);
+    const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
@@ -97,7 +97,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
     }, [goals, preview]);
 
     const onGoalPrewiewShow = useCallback(
-        (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
+        (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey) return;
 

@@ -10,7 +10,7 @@ import { tr } from './GoalEditForm.i18n';
 interface GoalEditFormProps {
     goal: NonNullable<GoalByIdReturnType>;
 
-    onSubmit: (id?: string) => void;
+    onSubmit: (goal?: GoalByIdReturnType) => void;
 }
 
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
@@ -22,7 +22,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
 
         await update(form);
 
-        onSubmit(goal.id);
+        onSubmit(goal);
     };
 
     // FIXME: nullable values are conflicting with undefined

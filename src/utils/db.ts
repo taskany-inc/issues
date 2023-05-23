@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 
 import { GoalCommon } from '../schema/goal';
+import { addCalclulatedGoalsFields } from '../../trpc/queries/goals';
 
 import { prisma } from './prisma';
 
@@ -33,7 +34,7 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
         FROM "Goal" WHERE "projectId" = ${input.parent.id};
     `;
 
-    return prisma.goal.update({
+    const goal = await prisma.goal.update({
         where: {
             id,
         },
@@ -59,6 +60,11 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
             },
         },
     });
+
+    return {
+        ...goal,
+        ...addCalclulatedGoalsFields(goal, activityId),
+    };
 };
 
 export const changeGoalProject = async (id: string, newProjectId: string) => {
