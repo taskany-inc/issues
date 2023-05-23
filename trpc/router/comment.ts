@@ -50,6 +50,12 @@ export const comment = router({
                 },
             });
 
+            // force goal update
+            await prisma.goal.update({
+                where: { id: input.goalId },
+                data: { id: input.goalId },
+            });
+
             let toEmails = goal.participants;
 
             if (commentAuthor.user?.email === goal.activity?.user?.email) {
