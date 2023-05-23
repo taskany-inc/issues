@@ -8,6 +8,7 @@ const path = require('path');
 const nextConfig = {
     reactStrictMode: process.env.STRICT_MODE,
     swcMinify: true,
+    output: 'standalone',
     i18n: {
         locales: ['en', 'ru'],
         defaultLocale: 'en',
@@ -46,8 +47,8 @@ const nextConfig = {
 
         if (!dev && !isServer && !process.env.INCLUDE_SCRIPTS_TO_MAIN_BUNDLE) {
             config.externals = {
-                react: 'React',
-                'react-dom': 'ReactDOM',
+                React: 'react',
+                ReactDOM: 'react-dom',
             };
         }
 
