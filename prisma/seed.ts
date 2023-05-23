@@ -211,7 +211,7 @@ seed('Default projects', async () => {
                 ].map(([title, description, activityId]: string[], index) =>
                     prisma.goal.create({
                         data: {
-                            id: `${project.id}-${index}`,
+                            scopeId: index + 1,
                             title,
                             description,
                             projectId: project.id,
