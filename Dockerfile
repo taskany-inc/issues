@@ -1,21 +1,22 @@
-FROM node:18-alpine as build
+FROM node:18.12.0-alpine as build
 
 WORKDIR /app
 COPY . .
 RUN npm ci
 RUN npm run build
 
-FROM node:18-alpine AS runner
+FROM node:18.12.0-alpine AS runner
 
 WORKDIR /app
-COPY --from=build --chown=nextjs:nodejs /app/package.json /app/package-lock.json ./
-COPY --from=build --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=build --chown=nextjs:nodejs /app/public ./public
-COPY --from=build --chown=nextjs:nodejs /app/version ./public/version.txt
-COPY --from=build --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=build --chown=nextjs:nodejs /app/next.config.js ./
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/public ./public
+COPY --from=build /app/version ./public/version.txt
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/next.config.js ./
+COPY --from=build /app/.next/standalone ./
 
-RUN npm i --omit=dev --ignore-scripts
+RUN npm ci --only=production --ignore-scripts && npm cache clean --force
 RUN npx prisma generate
 
 EXPOSE 3000
