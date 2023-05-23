@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.2.0](https://github.com/taskany-inc/issues/compare/v1.1.0...v1.2.0) (2023-05-23)
+
+
+### Features
+
+* **Goal:** change project with scope id ([eb81fdd](https://github.com/taskany-inc/issues/commit/eb81fdd7f1477e5a442160d276c0c0ef2bf67088))
+* **Goal:** create id in project scope ([2825ded](https://github.com/taskany-inc/issues/commit/2825ded06c301a2b5f2d2c6632e4982c4c21c13c))
+
+
+### Bug Fixes
+
+* **FiltersPanelApplied:** incorrect space position ([57c5658](https://github.com/taskany-inc/issues/commit/57c5658d1e8cceedc7aa66899b2b3347210b0c8d))
+
 ## [1.1.0](https://github.com/taskany-inc/issues/compare/v1.0.0...v1.1.0) (2023-05-22)
 
 
