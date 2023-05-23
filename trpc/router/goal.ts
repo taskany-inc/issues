@@ -288,6 +288,8 @@ export const goal = router({
             tagsToDisconnect = actualGoal.tags?.filter((t) => !input.tags?.some((tag) => tag.id === t.id)) || [];
         }
 
+        console.log(input.tags);
+
         try {
             return prisma.goal.update({
                 where: { id: actualGoal.id },
@@ -309,13 +311,13 @@ export const goal = router({
                         : undefined,
                     tags: input.tags?.length
                         ? {
-                              connect: input.tags,
+                              connect: input.tags.map((t) => ({ id: t.id })),
                               disconnect: tagsToDisconnect,
                           }
                         : undefined,
                     participants: input.participants?.length
                         ? {
-                              connect: input.participants,
+                              connect: input.participants.map((p) => ({ id: p.id })),
                               disconnect: participantsToDisconnect,
                           }
                         : undefined,
