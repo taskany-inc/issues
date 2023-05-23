@@ -24,6 +24,7 @@ interface GoalListItemProps {
     tags?: Array<Tag | undefined>;
     state?: State;
     createdAt: Date;
+    updatedAt: Date;
     owner?: ActivityByIdReturnType;
     comments?: number;
     hasForks?: boolean;
@@ -130,7 +131,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         shortId,
         owner,
         issuer,
-        createdAt,
+        updatedAt,
         tags,
         title,
         comments,
@@ -171,7 +172,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                     </StyledTags>
 
                     <StyledSubTitle size="s">
-                        #{shortId} <RelativeTime date={createdAt} kind="created" />
+                        #{shortId} <RelativeTime date={updatedAt} kind="updated" />
                         {` ${tr('by')} ${issuer?.user?.name}`}
                     </StyledSubTitle>
                 </StyledName>

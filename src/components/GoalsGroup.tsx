@@ -61,6 +61,7 @@ export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
                 {goals.map((g) => (
                     <GoalListItem
                         createdAt={g.createdAt}
+                        updatedAt={g.updatedAt}
                         id={g.id}
                         shortId={g._shortId}
                         state={g.state!}

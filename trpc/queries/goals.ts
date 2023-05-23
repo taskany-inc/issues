@@ -113,7 +113,7 @@ export const goalsFilter = (
             ...extra,
         },
         orderBy: {
-            createdAt: 'asc',
+            updatedAt: 'desc',
         },
     };
 };
