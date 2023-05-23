@@ -57,6 +57,7 @@ const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
 
 interface GoalPreviewProps {
     preview: {
+        _shortId: string;
         id: string;
         title: string;
         description?: string | null;
@@ -107,7 +108,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     const archiveMutation = trpc.goal.toggleArchive.useMutation();
     const utils = trpc.useContext();
 
-    const { data: goal } = trpc.goal.getById.useQuery(preview.id, {
+    const { data: goal } = trpc.goal.getById.useQuery(preview._shortId, {
         staleTime: refreshInterval,
     });
 
@@ -115,8 +116,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     const onGoalEdit = useCallback(() => {
         setGoalEditModalVisible(false);
 
-        utils.goal.getById.invalidate(preview.id);
-    }, [utils.goal.getById, preview.id]);
+        utils.goal.getById.invalidate(preview._shortId);
+    }, [utils.goal.getById, preview._shortId]);
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
     }, []);
@@ -136,26 +137,26 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                 state: { id },
             });
 
-            utils.goal.getById.invalidate(preview.id);
+            utils.goal.getById.invalidate(preview._shortId);
         },
-        [preview, updateGoal, utils.goal.getById],
+        [preview._shortId, updateGoal, utils.goal.getById],
     );
 
     const onCommentPublish = useCallback(
         (id?: string) => {
-            utils.goal.getById.invalidate(preview.id);
+            utils.goal.getById.invalidate(preview._shortId);
             setHighlightCommentId(id);
         },
-        [preview, utils.goal.getById, setHighlightCommentId],
+        [preview._shortId, utils.goal.getById, setHighlightCommentId],
     );
 
     const onGoalReactionToggle = useCallback(
-        (id: string) => goalReaction(id, () => utils.goal.getById.invalidate(preview.id)),
-        [preview, goalReaction, utils.goal.getById],
+        (id: string) => goalReaction(id, () => utils.goal.getById.invalidate(preview._shortId)),
+        [preview._shortId, goalReaction, utils.goal.getById],
     );
     const onCommentReactionToggle = useCallback(
-        (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(preview.id)),
-        [preview, commentReaction, utils.goal.getById],
+        (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(preview._shortId)),
+        [preview._shortId, commentReaction, utils.goal.getById],
     );
 
     const onPreviewClose = useCallback(() => {
@@ -176,7 +177,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
 
         await notifyPromise(promise, 'goalsDelete');
 
-        utils.goal.getById.invalidate(preview.id);
+        utils.goal.getById.invalidate(preview._shortId);
     }, [preview, onDelete, archiveMutation, utils.goal.getById]);
 
     const commentsRef = useRef<HTMLDivElement>(null);
@@ -196,8 +197,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         <>
             <ModalPreview visible onClose={onPreviewClose}>
                 <StyledModalHeader ref={headerRef}>
-                    {nullable(preview.id, (id) => (
-                        <IssueKey size="s" id={id}>
+                    {nullable(preview.id, () => (
+                        <IssueKey size="s" id={preview._shortId}>
                             {nullable(goal?.tags, (tags) => (
                                 <IssueTags tags={tags} size="s" />
                             ))}
@@ -224,7 +225,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                     />
 
                     {nullable((goal || preview).title, (title) => (
-                        <IssueTitle title={title} href={routes.goal(preview.id)} size="xl" />
+                        <IssueTitle title={title} href={routes.goal(preview._shortId)} size="xl" />
                     ))}
 
                     <StyledImportantActions>

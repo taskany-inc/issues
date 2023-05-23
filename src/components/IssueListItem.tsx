@@ -10,6 +10,7 @@ import { StateDot } from './StateDot';
 interface IssueListItemProps {
     issue: {
         id: string;
+        _shortId: string;
         title: string;
         state?: {
             title: string;
@@ -40,7 +41,7 @@ const StyledDotWrapper = styled.div`
 
 export const IssueListItem: React.FC<IssueListItemProps> = ({ issue }) => {
     return (
-        <NextLink passHref href={routes.goal(issue.id)}>
+        <NextLink passHref href={routes.goal(issue._shortId)}>
             <StyledLink inline>
                 <StyledIssueListItem>
                     <StyledDotWrapper>

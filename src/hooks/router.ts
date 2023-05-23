@@ -10,7 +10,7 @@ export const routes = {
     projectSettings: (id: string) => `/projects/${id}/settings`,
 
     goals: () => '/goals',
-    goal: (projectId: string, scopeId: string) => `/goals/${projectId}-${scopeId}`,
+    goal: (shortId: string) => `/goals/${shortId}`,
 
     signIn: () => '/api/auth/signin',
     userSettings: () => '/users/settings',
@@ -23,7 +23,7 @@ export const routes = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useRouter = (): Record<keyof typeof routes, any> => {
+export const useRouter = () => {
     const router = NextRouter();
 
     return {
@@ -33,7 +33,7 @@ export const useRouter = (): Record<keyof typeof routes, any> => {
         projectSettings: (id: string) => router.push(routes.projectSettings(id)),
 
         goals: () => router.push(routes.goals()),
-        goal: (projectId: string, scopeId: string) => router.push(routes.goal(projectId, scopeId)),
+        goal: (shortId: string) => router.push(routes.goal(shortId)),
 
         signIn: () => router.push(routes.signIn()),
         userSettings: () => router.push(routes.userSettings()),

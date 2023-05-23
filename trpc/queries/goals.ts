@@ -221,6 +221,7 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     const _isStarred = goal.stargizers?.some((stargizer: any) => stargizer?.id === activityId);
     const _isIssuer = goal.activityId === activityId;
     const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
+    const _shortId = `${goal.projectId}-${goal.scopeId}`;
 
     let parentOwner = false;
     function checkParent(project?: any) {
@@ -246,6 +247,7 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
         _isIssuer,
         _isEditable,
         _lastEstimate,
+        _shortId,
     };
 };
 

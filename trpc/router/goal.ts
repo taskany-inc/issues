@@ -237,7 +237,10 @@ export const goal = router({
         ]);
 
         return {
-            goals: filtredUserGoals,
+            goals: filtredUserGoals.map((g) => ({
+                ...g,
+                ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+            })),
             meta: calcGoalsMeta(allUserGoals),
         };
     }),

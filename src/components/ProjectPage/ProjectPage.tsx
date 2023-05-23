@@ -3,7 +3,7 @@ import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { Button, nullable } from '@taskany/bricks';
-import { Goal, Project } from '@prisma/client';
+import { Project } from '@prisma/client';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -31,7 +31,7 @@ const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteF
 
 export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
-    const [preview, setPreview] = useState<Goal | null>(null);
+    const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     const { toggleFilterStar } = useFilterResource();
 
@@ -105,7 +105,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
     }, [projectDeepInfo, preview]);
 
     const onGoalPrewiewShow = useCallback(
-        (goal: Goal): MouseEventHandler<HTMLAnchorElement> =>
+        (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey) return;
 

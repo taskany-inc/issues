@@ -67,7 +67,13 @@ export const IssueDependenciesListItem: React.FC<IssueDependenciesListItemProps>
                                     {nullable(onDelete, () => (
                                         <StyledCleanButton onClick={onDependencyDelete(dep.id)} />
                                     ))}
-                                    <IssueListItem issue={dep} />
+                                    <IssueListItem
+                                        issue={{
+                                            ...dep,
+                                            // FIXME: no calculated info on includes
+                                            _shortId: `${dep.projectId}-${dep.scopeId}`,
+                                        }}
+                                    />
                                 </StyledDependency>
                                 <br />
                             </React.Fragment>
