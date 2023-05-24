@@ -1,12 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
-import { JobDataMap, JobKind, jobKind, jobState } from '../src/utils/worker/create';
-import * as resolve from '../src/utils/worker/resolve';
+import { JobDataMap, JobKind, jobKind, jobState } from './create';
+import * as resolve from './resolve';
 
 const prisma = new PrismaClient();
 const queueInterval = process.env.WORKER_JOBS_INTERVAL ? parseInt(process.env.WORKER_JOBS_INTERVAL, 10) : 3000;
 const retryLimit = process.env.WORKER_JOBS_RETRY ? parseInt(process.env.WORKER_JOBS_RETRY, 10) : 3;
 const defaultJobDelay = process.env.WORKER_JOBS_DELAY ? parseInt(process.env.WORKER_JOBS_DELAY, 10) : 1000;
+
+// eslint-disable-next-line no-console
+console.log('Worker started successfully');
 
 (() =>
     setInterval(async () => {
