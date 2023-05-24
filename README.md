@@ -91,7 +91,7 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD ["concurrently", "node background/worker/index.js", "node server.js"]
+CMD ["node_modules/.bin/concurrently", "node background/worker/index.js", "node server.js"]
 ```
 
 Then use this `Dockerfile` with Docker Compose is as follows:
