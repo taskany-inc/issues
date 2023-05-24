@@ -300,6 +300,20 @@ seed('Default projects', async () => {
                     },
                 });
             }
+
+            const [goal] = allGoals;
+
+            // eslint-disable-next-line no-await-in-loop
+            await prisma.goalHistory.create({
+                data: {
+                    goalId: goal.id,
+                    subject: 'state',
+                    action: 'change',
+                    previousValue: 'InProgress',
+                    nextValue: 'Critical',
+                    activityId: sample(allUsers).activityId,
+                },
+            });
         }
     }
 });
