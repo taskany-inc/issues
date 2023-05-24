@@ -1,15 +1,11 @@
-export const goalsFilter = (
-    data: {
-        query?: string;
-        priority?: string[];
-        state?: string[];
-        tag?: string[];
-        estimate?: string[];
-        owner?: string[];
-        project?: string[];
-    },
-    extra: any = {},
-): any => {
+import { QueryWithFilters } from '../../src/schema/common';
+
+const defaultOrderBy = {
+    updatedAt: 'desc',
+};
+
+// TODO: make it much more type-safety
+export const goalsFilter = (data: QueryWithFilters, extra: any = {}): any => {
     const priorityFilter = data.priority?.length ? { priority: { in: data.priority } } : {};
 
     const statesFilter = data.state?.length
@@ -71,6 +67,66 @@ export const goalsFilter = (
           }
         : {};
 
+    let orderBy: any = [];
+
+    if (data.sort?.updatedAt) {
+        orderBy = [{ updatedAt: data.sort.updatedAt }];
+    }
+
+    if (data.sort?.createdAt) {
+        orderBy.push({
+            createdAt: data.sort.createdAt,
+        });
+    }
+
+    if (data.sort?.title) {
+        orderBy.push({
+            title: data.sort.title,
+        });
+    }
+
+    if (data.sort?.priority) {
+        orderBy.push({
+            priority: data.sort.priority,
+        });
+    }
+
+    if (data.sort?.state) {
+        orderBy.push({
+            state: {
+                title: data.sort.state,
+            },
+        });
+    }
+
+    if (data.sort?.project) {
+        orderBy.push({
+            project: {
+                title: data.sort.project,
+            },
+        });
+    }
+
+    if (data.sort?.activity) {
+        orderBy.push({
+            activity: {
+                user: {
+                    name: data.sort.activity,
+                },
+            },
+        });
+    }
+
+    if (data.sort?.owner) {
+        orderBy.push({
+            owner: {
+                user: {
+                    name: data.sort.owner,
+                },
+            },
+        });
+    }
+
     return {
         where: {
             archived: false,
@@ -112,9 +168,7 @@ export const goalsFilter = (
             ...projectFilter,
             ...extra,
         },
-        orderBy: {
-            updatedAt: 'desc',
-        },
+        orderBy: orderBy.length ? orderBy : defaultOrderBy,
     };
 };
 

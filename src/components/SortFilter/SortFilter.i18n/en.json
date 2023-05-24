@@ -1,0 +1,10 @@
+{
+    "title": "Title",
+    "state": "State",
+    "priority": "Priority",
+    "project": "Project",
+    "activity": "Issuer",
+    "owner": "Owner",
+    "updatedAt": "Updated",
+    "createdAt": "Created"
+}

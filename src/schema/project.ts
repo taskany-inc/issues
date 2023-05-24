@@ -1,16 +1,10 @@
 import { z } from 'zod';
 
 import { tr } from './schema.i18n';
+import { queryWithFiltersSchema } from './common';
 
-export const projectDeepInfoSchema = z.object({
+export const projectDeepInfoSchema = queryWithFiltersSchema.extend({
     id: z.string(),
-    priority: z.array(z.string()).optional(),
-    state: z.array(z.string()).optional(),
-    tag: z.array(z.string()).optional(),
-    estimate: z.array(z.string()).optional(),
-    owner: z.array(z.string()).optional(),
-    project: z.array(z.string()).optional(),
-    query: z.string().optional(),
 });
 
 export type ProjectDeepInfo = z.infer<typeof projectDeepInfoSchema>;

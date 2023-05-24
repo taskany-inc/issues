@@ -216,6 +216,7 @@ export const goal = router({
                         estimate: [],
                         owner: [],
                         project: [],
+                        sort: {},
                         query: '',
                     },
                     {
