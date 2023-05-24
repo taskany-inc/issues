@@ -266,6 +266,16 @@ export const goalDeepQuery = {
             comments: true,
         },
     },
+    history: {
+        include: {
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+        },
+    },
 } as const;
 
 export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {

@@ -97,27 +97,28 @@ model Ghost {
 }
 
 model Activity {
-  id                 String     @id @default(cuid())
-  ghost              Ghost?     @relation(fields: [ghostId], references: [id])
-  ghostId            String?    @unique
+  id                 String       @id @default(cuid())
+  ghost              Ghost?       @relation(fields: [ghostId], references: [id])
+  ghostId            String?      @unique
   user               User?
   filters            Filter[]
   comments           Comment[]
   reactions          Reaction[]
   projects           Project[]
   estimates          Estimate[]
-  projectParticipant Project[]  @relation("projectParticipants")
-  goalParticipant    Goal[]     @relation("goalParticipants")
-  goalWatchers       Goal[]     @relation("goalWatchers")
-  goalStargizers     Goal[]     @relation("goalStargizers")
-  projectWatchers    Project[]  @relation("projectWatchers")
-  projectStargizers  Project[]  @relation("projectStargizers")
-  filterStargizers   Filter[]   @relation("filterStargizers")
-  goalOwner          Goal[]     @relation("goalOwner")
-  goalIssuer         Goal[]     @relation("goalIssuer")
-  settings           Settings   @relation(fields: [settingsId], references: [id])
-  settingsId         String     @unique
+  projectParticipant Project[]    @relation("projectParticipants")
+  goalParticipant    Goal[]       @relation("goalParticipants")
+  goalWatchers       Goal[]       @relation("goalWatchers")
+  goalStargizers     Goal[]       @relation("goalStargizers")
+  projectWatchers    Project[]    @relation("projectWatchers")
+  projectStargizers  Project[]    @relation("projectStargizers")
+  filterStargizers   Filter[]     @relation("filterStargizers")
+  goalOwner          Goal[]       @relation("goalOwner")
+  goalIssuer         Goal[]       @relation("goalIssuer")
+  settings           Settings     @relation(fields: [settingsId], references: [id])
+  settingsId         String       @unique
   tags               Tag[]
+  goalActions        GoalHistory[] @relation("goalActions")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -170,28 +171,29 @@ model Goal {
   key          Boolean?
   personal     Boolean?
   private      Boolean?
-  archived     Boolean?   @default(false)
+  archived     Boolean?      @default(false)
   priority     String?
   estimate     Estimate[]
-  project      Project?   @relation("projectGoals", fields: [projectId], references: [id])
+  project      Project?      @relation("projectGoals", fields: [projectId], references: [id])
   projectId    String?
   teamId       String?
-  state        State?     @relation("goalState", fields: [stateId], references: [id])
+  state        State?        @relation("goalState", fields: [stateId], references: [id])
   stateId      String?
-  activity     Activity?  @relation("goalIssuer", fields: [activityId], references: [id])
+  activity     Activity?     @relation("goalIssuer", fields: [activityId], references: [id])
   activityId   String?
-  owner        Activity?  @relation("goalOwner", fields: [ownerId], references: [id])
+  owner        Activity?     @relation("goalOwner", fields: [ownerId], references: [id])
   ownerId      String?
-  participants Activity[] @relation("goalParticipants")
-  watchers     Activity[] @relation("goalWatchers")
-  stargizers   Activity[] @relation("goalStargizers")
+  participants Activity[]    @relation("goalParticipants")
+  watchers     Activity[]    @relation("goalWatchers")
+  stargizers   Activity[]    @relation("goalStargizers")
   comments     Comment[]
   reactions    Reaction[]
   tags         Tag[]
-  dependsOn    Goal[]     @relation("dependsOn")
-  blocks       Goal[]     @relation("dependsOn")
-  relatedTo    Goal[]     @relation("connected")
-  connected    Goal[]     @relation("connected")
+  dependsOn    Goal[]        @relation("dependsOn")
+  blocks       Goal[]        @relation("dependsOn")
+  relatedTo    Goal[]        @relation("connected")
+  connected    Goal[]        @relation("connected")
+  history      GoalHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -306,8 +308,25 @@ model Job {
   delay    Int?
   retry    Int?
   cron     String?
-  error     String?
+  error    String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model GoalHistory {
+  id            String   @id @default(cuid())
+  goal          Goal     @relation(fields: [goalId], references: [id])
+  goalId        String
+  subject       String
+  action        String
+  previousValue String?
+  nextValue     String?
+  activity      Activity @relation("goalActions", fields: [activityId], references: [id])
+  activityId    String
+
+  createdAt DateTime @default(now())
+
+  @@index([id])
+  @@index([goalId])
 }
