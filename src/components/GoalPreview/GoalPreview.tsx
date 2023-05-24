@@ -356,7 +356,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                             <GoalEditForm goal={g} onSubmit={onGoalEdit} />
                         </ModalOnEvent>
 
-                        <GoalDeleteModal id={g.id} onConfirm={onGoalDeleteConfirm} />
+                        <GoalDeleteModal shortId={g._shortId} onConfirm={onGoalDeleteConfirm} />
                     </>
                 )),
             )}

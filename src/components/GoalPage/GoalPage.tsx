@@ -426,7 +426,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
             ))}
 
             {nullable(goal._isEditable, () => (
-                <GoalDeleteModal id={goal.id} onConfirm={onGoalDeleteConfirm} />
+                <GoalDeleteModal shortId={goal._shortId} onConfirm={onGoalDeleteConfirm} />
             ))}
         </Page>
     );
