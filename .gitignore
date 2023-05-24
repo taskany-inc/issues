@@ -54,3 +54,4 @@ next.config.original.js
 # dev tools
 unsafe-prod-db-update.ts
 .release_bot
+background

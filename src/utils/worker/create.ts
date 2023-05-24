@@ -1,5 +1,6 @@
-import { EmailTemplatesPropsMap } from '../mail/templates';
 import { prisma } from '../prisma';
+
+import { EmailTemplatesPropsMap } from './mail/templates';
 
 export enum jobState {
     scheduled = 'scheduled',
