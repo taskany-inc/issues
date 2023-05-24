@@ -35,7 +35,7 @@ const nextConfig = {
         if (dev && !isServer) {
             const originalEntry = config.entry;
             config.entry = async () => {
-                const wdrPath = path.resolve(__dirname, './scripts/wdyr.ts');
+                const wdrPath = path.resolve(__dirname, './src/utils/wdyr.ts');
                 const entries = await originalEntry();
 
                 if (entries['main.js'] && !entries['main.js'].includes(wdrPath)) {
