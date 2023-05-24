@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app';
-import '../../scripts/wdyr';
+import '../utils/wdyr';
 import { PageLoadProgress } from '@taskany/bricks';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
