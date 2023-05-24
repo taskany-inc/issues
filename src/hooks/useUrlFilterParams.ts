@@ -5,7 +5,9 @@ import { Tag } from '@prisma/client';
 
 import { FilterById } from '../../trpc/inferredTypes';
 import { Priority } from '../types/priority';
+import { SortDirection, SortableProps } from '../components/SortFilter/SortFilter';
 
+// TODO: replace it with QueryWithFilters from schema/common
 export interface QueryState {
     priority: Priority[];
     state: string[];
@@ -14,10 +16,25 @@ export interface QueryState {
     owner: string[];
     project: string[];
     query: string;
+    sort: Record<SortableProps, NonNullable<SortDirection>> | Record<string, never>;
     limit?: number;
 }
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
+
+const parseSortQueryParam = (param = '') =>
+    param.split(',').reduce((acc, curr) => {
+        if (curr) {
+            const [id, direction] = curr.split(':');
+            acc[id as SortableProps] = direction as NonNullable<SortDirection>;
+        }
+        return acc;
+    }, {} as Record<SortableProps, NonNullable<SortDirection>>);
+
+const stringifySortQueryParam = (param: QueryState['sort']) =>
+    Object.entries(param)
+        .map(([id, direction]) => `${id}:${direction}`)
+        .join(',');
 
 export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     priority: parseQueryParam(query.priority?.toString()) as Priority[],
@@ -27,6 +44,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     owner: parseQueryParam(query.owner?.toString()),
     project: parseQueryParam(query.project?.toString()),
     query: parseQueryParam(query.query?.toString()).toString(),
+    sort: parseSortQueryParam(query.sort?.toString()),
     limit: query.limit ? Number(query.limit) : undefined,
 });
 
@@ -44,7 +62,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     }
 
     const pushNewState = useCallback(
-        ({ priority, state, tag, estimate, owner, project, query, limit }: QueryState) => {
+        ({ priority, state, tag, estimate, owner, project, query, sort, limit }: QueryState) => {
             const newurl = router.asPath.split('?')[0];
             const urlParams = new URLSearchParams();
 
@@ -63,6 +81,10 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             owner.length > 0 ? urlParams.set('owner', Array.from(owner).toString()) : urlParams.delete('owner');
 
             project.length > 0 ? urlParams.set('project', Array.from(project).toString()) : urlParams.delete('project');
+
+            Object.keys(sort).length > 0
+                ? urlParams.set('sort', stringifySortQueryParam(sort))
+                : urlParams.delete('sort');
 
             query.length > 0 ? urlParams.set('query', query.toString()) : urlParams.delete('query');
 
@@ -94,6 +116,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             tag: [],
             estimate: [],
             query: '',
+            sort: {},
         });
     }, [pushNewState]);
 
@@ -137,6 +160,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setEstimateFilter: pushStateProvider('estimate'),
             setOwnerFilter: pushStateProvider('owner'),
             setProjectFilter: pushStateProvider('project'),
+            setSortFilter: pushStateProvider('sort'),
             setFulltextFilter: pushStateProvider('query'),
             setLimitFilter: pushStateProvider('limit'),
         }),

@@ -52,6 +52,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
         setEstimateFilter,
         setOwnerFilter,
         setProjectFilter,
+        setSortFilter,
         setFulltextFilter,
         resetQueryState,
         setPreset,
@@ -230,6 +231,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                     onPriorityChange={setPriorityFilter}
                     onPresetChange={setPreset}
                     onFilterStar={onFilterStar}
+                    onSortChange={setSortFilter}
                 >
                     {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
                 </FiltersPanel>

@@ -1,16 +1,9 @@
 import { z } from 'zod';
 
 import { tr } from './schema.i18n';
+import { queryWithFiltersSchema } from './common';
 
-export const userGoalsSchema = z.object({
-    priority: z.array(z.string()).optional(),
-    state: z.array(z.string()).optional(),
-    tag: z.array(z.string()).optional(),
-    estimate: z.array(z.string()).optional(),
-    owner: z.array(z.string()).optional(),
-    project: z.array(z.string()).optional(),
-    query: z.string().optional(),
-});
+export const userGoalsSchema = queryWithFiltersSchema;
 
 export type UserGoals = z.infer<typeof userGoalsSchema>;
 

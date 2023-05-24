@@ -47,6 +47,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
         setEstimateFilter,
         setOwnerFilter,
         setProjectFilter,
+        setSortFilter,
         setFulltextFilter,
         resetQueryState,
         setPreset,
@@ -192,6 +193,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
                 onPriorityChange={setPriorityFilter}
                 onPresetChange={setPreset}
                 onFilterStar={onFilterStar}
+                onSortChange={setSortFilter}
             >
                 {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
             </FiltersPanel>
