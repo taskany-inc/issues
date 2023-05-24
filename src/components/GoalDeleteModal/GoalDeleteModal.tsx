@@ -20,13 +20,13 @@ import { tr } from './GoalDeleteModal.i18n';
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 interface GoalDeleteModalProps {
-    id: string;
+    shortId: string;
 
     onConfirm: () => void;
     onCancel?: () => void;
 }
 
-export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ id, onConfirm, onCancel }) => {
+export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onConfirm, onCancel }) => {
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
 
     const onConfirmationInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -48,14 +48,20 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ id, onConfirm,
             <ModalContent>
                 <Text>
                     {tr.raw('To confirm deleting goal please type goal key below', {
-                        goal: <b key={id}>{id}</b>,
+                        goal: <b key={shortId}>{shortId}</b>,
                     })}
                 </Text>
 
                 <br />
 
                 <Form>
-                    <FormInput flat="bottom" placeholder={id} autoComplete="off" onChange={onConfirmationInputChange} />
+                    <FormInput
+                        flat="bottom"
+                        placeholder={shortId}
+                        autoComplete="off"
+                        autoFocus
+                        onChange={onConfirmationInputChange}
+                    />
 
                     <FormActions flat="top">
                         <FormAction left />
@@ -64,7 +70,7 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ id, onConfirm,
                             <Button
                                 size="m"
                                 view="danger"
-                                disabled={deleteConfirmation !== id}
+                                disabled={deleteConfirmation !== shortId}
                                 onClick={onConfirm}
                                 text={tr('Yes, delete it')}
                             />
