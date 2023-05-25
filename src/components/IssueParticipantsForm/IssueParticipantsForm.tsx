@@ -44,7 +44,7 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ pa
         (id: string) => {
             activities.delete(id);
 
-            onChange?.(Array.from(activities).map(([_, p]) => p));
+            onChange?.(Array.from(activities.values()));
         },
         [activities, onChange],
     );
@@ -58,7 +58,7 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ pa
 
             setQuery('');
 
-            onChange?.(Array.from(activities).map(([_, p]) => p));
+            onChange?.(Array.from(activities.values()));
         },
         [activities, onChange],
     );

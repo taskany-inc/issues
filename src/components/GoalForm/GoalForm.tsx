@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Schema, z } from 'zod';
 import styled from 'styled-components';
 import { gapS, gray2 } from '@taskany/colors';
 import {
@@ -27,7 +28,6 @@ import { EstimateComboBox } from '../EstimateComboBox';
 import { TagComboBox } from '../TagComboBox';
 import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
-import { GoalCommon, goalCommonSchema } from '../../schema/goal';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './GoalForm.i18n';
@@ -47,8 +47,10 @@ interface GoalFormProps {
     estimate?: Estimate;
     busy?: boolean;
     children?: React.ReactNode;
+    validityScheme: Schema;
+    id?: string;
 
-    onSumbit: (fields: GoalCommon) => void;
+    onSumbit: (fields: z.infer<GoalFormProps['validityScheme']>) => void;
 }
 
 const StyledTagsContainer = styled.div<{ focused?: boolean }>`
@@ -65,6 +67,7 @@ const StyledTagsContainer = styled.div<{ focused?: boolean }>`
 export const GoalForm: React.FC<GoalFormProps> = ({
     formTitle,
     actionBtnText,
+    id,
     title,
     description,
     owner,
@@ -74,6 +77,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     priority,
     estimate,
     busy,
+    validityScheme,
     children,
     onSumbit,
 }) => {
@@ -96,8 +100,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         setFocus,
         setValue,
         formState: { errors, isValid, isSubmitted },
-    } = useForm<GoalCommon>({
-        resolver: zodResolver(goalCommonSchema),
+    } = useForm<z.infer<typeof validityScheme>>({
+        resolver: zodResolver(validityScheme),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,
@@ -110,11 +114,12 @@ export const GoalForm: React.FC<GoalFormProps> = ({
             priority,
             estimate,
             tags,
+            id,
         },
     });
 
     const parentWatcher = watch('parent');
-    const tagsWatcher = watch('tags');
+    const tagsWatcher: TagModel[] = watch('tags');
     const errorsResolver = errorsProvider(errors, isSubmitted);
 
     useEffect(() => {

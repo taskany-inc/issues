@@ -37,7 +37,6 @@ import { IssueParent } from '../IssueParent';
 import { IssueTags } from '../IssueTags';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { useHighlightedComment } from '../../hooks/useHighlightedComment';
-import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { ActivityFeed } from '../ActivityFeed';

@@ -11,7 +11,7 @@ import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
 import { GoalForm } from '../GoalForm/GoalForm';
 import { trpc } from '../../utils/trpcClient';
-import { GoalCommon } from '../../schema/goal';
+import { GoalCommon, goalCommonSchema } from '../../schema/goal';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { notifyPromise } from '../../utils/notifyPromise';
 
@@ -61,6 +61,7 @@ const GoalCreateForm: React.FC = () => {
     return (
         <GoalForm
             busy={busy}
+            validityScheme={goalCommonSchema}
             formTitle={tr('New goal')}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
             parent={currentProjectCache || lastProjectCache || undefined}

@@ -24,7 +24,6 @@ import {
 import { refreshInterval } from '../../utils/config';
 import { formatEstimate } from '../../utils/dateTime';
 import { useHighlightedComment } from '../../hooks/useHighlightedComment';
-import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
