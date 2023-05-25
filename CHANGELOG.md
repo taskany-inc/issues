@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.3.0](https://github.com/taskany-inc/issues/compare/v1.2.0...v1.3.0) (2023-05-25)
+
+
+### Features
+
+* **FiltersPanel:** support sort filter ([6e0dd45](https://github.com/taskany-inc/issues/commit/6e0dd453da093dd4295dac51a4b01535d3bbceb6))
+* **Goal:** sort by updatedAt by default ([fbfd6a6](https://github.com/taskany-inc/issues/commit/fbfd6a6e43339cb7158ba9e50355a7b3837cd51b))
+
+
+### Bug Fixes
+
+* **Goal:** use shortId to confirm deleting ([f58a01a](https://github.com/taskany-inc/issues/commit/f58a01a0c6194c30db0b85b7e0c4d989f005cfc6))
+* **IssueDependenciesForm:** scopedId in input field ([6bfb74e](https://github.com/taskany-inc/issues/commit/6bfb74e44f28c36d856ca692b46922df4fe68142))
+
 ## [1.2.0](https://github.com/taskany-inc/issues/compare/v1.1.0...v1.2.0) (2023-05-23)
 
 
