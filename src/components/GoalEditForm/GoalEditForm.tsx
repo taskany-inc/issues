@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { GoalForm } from '../GoalForm/GoalForm';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
-import { GoalCommon } from '../../schema/goal';
+import { GoalUpdate, goalUpdateSchema } from '../../schema/goal';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -17,7 +17,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const [busy, setBusy] = useState(false);
     const update = useGoalUpdate(goal.id);
 
-    const updateGoal = async (form: GoalCommon) => {
+    const updateGoal = async (form: GoalUpdate) => {
         setBusy(true);
 
         await update(form);
@@ -28,6 +28,8 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     // FIXME: nullable values are conflicting with undefined
     return (
         <GoalForm
+            validityScheme={goalUpdateSchema}
+            id={goal.id}
             busy={busy}
             formTitle={tr('Edit the goal')}
             title={goal.title}

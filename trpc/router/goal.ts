@@ -1,5 +1,6 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
+import { Tag } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -10,6 +11,7 @@ import {
     goalParticipantsSchema,
     goalStateChangeSchema,
     goalUpdateSchema,
+    GoalUpdate,
     toogleGoalArchiveSchema,
     toogleGoalDependencySchema,
     userGoalsSchema,
@@ -290,22 +292,93 @@ export const goal = router({
     update: protectedProcedure.input(goalUpdateSchema).mutation(async ({ ctx, input }) => {
         const actualGoal = await prisma.goal.findUnique({
             where: { id: input.id },
-            include: { participants: true, project: true, tags: true },
+            include: {
+                participants: true,
+                project: true,
+                tags: true,
+                owner: {
+                    include: {
+                        user: true,
+                    },
+                },
+            },
         });
 
         if (!actualGoal) return null;
 
-        // FIXME: move out to separated mutations
-        let participantsToDisconnect: Array<{ id: string }> = [];
-        let tagsToDisconnect: Array<{ id: string }> = [];
+        const tagsToDisconnect: Array<Tag> =
+            actualGoal.tags.filter((t) => !input.tags.some((tag) => tag.id === t.id)) || [];
+        const tagsToConnect: GoalUpdate['tags'] =
+            input.tags.filter((t) => !actualGoal.tags.some((tag) => tag.id === t.id)) || [];
 
-        if (input.participants?.length) {
-            participantsToDisconnect =
-                actualGoal.participants?.filter((p) => !input.participants?.some((pa) => pa.id === p.id)) || [];
+        const history = [];
+
+        if (actualGoal.title !== input.title) {
+            history.push({
+                subject: 'title',
+                action: 'change',
+                previousValue: actualGoal.title,
+                nextValue: input.title,
+            });
         }
 
-        if (input.tags?.length) {
-            tagsToDisconnect = actualGoal.tags?.filter((t) => !input.tags?.some((tag) => tag.id === t.id)) || [];
+        if (actualGoal.description !== input.description) {
+            history.push({
+                subject: 'description',
+                action: 'change',
+                previousValue: actualGoal.description,
+                nextValue: input.description,
+            });
+        }
+
+        if (tagsToDisconnect.length) {
+            history.push({
+                subject: 'tags',
+                action: 'remove',
+                nextValue: tagsToDisconnect.map(({ title }) => title).join(', '),
+            });
+        }
+
+        if (tagsToConnect.length) {
+            history.push({
+                subject: 'tags',
+                action: 'add',
+                nextValue: tagsToConnect.map(({ title }) => title).join(', '),
+            });
+        }
+
+        if (actualGoal.priority !== input.priority) {
+            history.push({
+                subject: 'priority',
+                action: 'change',
+                previousValue: actualGoal.priority,
+                nextValue: input.priority,
+            });
+        }
+
+        // TODO: after FIXME statement below
+        // if (actualGoal.estimate)
+
+        if (actualGoal.ownerId !== input.owner.id) {
+            history.push({
+                subject: 'owner',
+                action: 'change',
+                previousValue:
+                    actualGoal.owner?.user?.nickname ??
+                    actualGoal.owner?.user?.name ??
+                    actualGoal.owner?.user?.email ??
+                    '',
+                nextValue: input.owner?.user?.nickname ?? input.owner?.user?.name ?? input.owner?.user?.email ?? '',
+            });
+        }
+
+        if (actualGoal.projectId !== input.parent.id) {
+            history.push({
+                subject: 'project',
+                action: 'change',
+                previuosValue: actualGoal.project?.id,
+                nextValue: input.parent.id,
+            });
         }
 
         try {
@@ -327,18 +400,15 @@ export const goal = router({
                               },
                           }
                         : undefined,
-                    tags: input.tags?.length
-                        ? {
-                              connect: input.tags.map((t) => ({ id: t.id })),
-                              disconnect: tagsToDisconnect,
-                          }
-                        : undefined,
-                    participants: input.participants?.length
-                        ? {
-                              connect: input.participants.map((p) => ({ id: p.id })),
-                              disconnect: participantsToDisconnect,
-                          }
-                        : undefined,
+                    tags: {
+                        connect: tagsToConnect.map(({ id }) => ({ id })),
+                        disconnect: tagsToDisconnect.map(({ id }) => ({ id })),
+                    },
+                    history: {
+                        createMany: {
+                            data: history.map((record) => ({ ...record, activityId: ctx.session.user.activityId })),
+                        },
+                    },
                 },
             });
 

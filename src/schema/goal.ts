@@ -99,62 +99,47 @@ export const goalUpdateSchema = z.object({
         })
         .min(10, {
             message: tr("Goal's description must be longer than 10 symbols"),
-        })
-        .optional(),
-    description: z
-        .string({
-            required_error: tr("Goal's description is required"),
-            invalid_type_error: tr("Goal's description must be a string"),
-        })
-        .optional(),
-    owner: z
-        .object({
+        }),
+    description: z.string({
+        required_error: tr("Goal's description is required"),
+        invalid_type_error: tr("Goal's description must be a string"),
+    }),
+    owner: z.object({
+        id: z.string(),
+        user: z.object({
+            nickname: z.string().nullable(),
+            name: z.string().nullable(),
+            email: z.string(),
+        }),
+    }),
+    parent: z.object(
+        {
             id: z.string(),
-        })
-        .optional(),
-    parent: z
-        .object(
-            {
-                id: z.string(),
-                title: z.string(),
-                flowId: z.string(),
-            },
-            {
-                invalid_type_error: tr("Goal's project or team are required"),
-                required_error: tr("Goal's project or team are required"),
-            },
-        )
-        .optional(),
-    state: z
-        .object({
+            title: z.string(),
+            flowId: z.string(),
+        },
+        {
+            invalid_type_error: tr("Goal's project or team are required"),
+            required_error: tr("Goal's project or team are required"),
+        },
+    ),
+    state: z.object({
+        id: z.string(),
+        hue: z.number().optional(),
+        title: z.string().optional(),
+    }),
+    priority: z.string().nullable(),
+    estimate: z.object({
+        date: z.string(),
+        q: z.string(),
+        y: z.string(),
+    }),
+    tags: z.array(
+        z.object({
             id: z.string(),
-            hue: z.number().optional(),
-            title: z.string().optional(),
-        })
-        .optional(),
-    priority: z.string().nullable().optional(),
-    estimate: z
-        .object({
-            date: z.string(),
-            q: z.string(),
-            y: z.string(),
-        })
-        .optional(),
-    tags: z
-        .array(
-            z.object({
-                id: z.string(),
-                title: z.string(),
-            }),
-        )
-        .optional(),
-    participants: z
-        .array(
-            z.object({
-                id: z.string(),
-            }),
-        )
-        .optional(),
+            title: z.string(),
+        }),
+    ),
 });
 
 export type GoalUpdate = z.infer<typeof goalUpdateSchema>;
