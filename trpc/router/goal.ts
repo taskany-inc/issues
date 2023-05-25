@@ -289,8 +289,6 @@ export const goal = router({
             tagsToDisconnect = actualGoal.tags?.filter((t) => !input.tags?.some((tag) => tag.id === t.id)) || [];
         }
 
-        console.log(input.tags);
-
         try {
             return prisma.goal.update({
                 where: { id: actualGoal.id },
