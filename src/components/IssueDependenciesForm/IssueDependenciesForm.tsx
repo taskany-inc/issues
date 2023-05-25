@@ -51,10 +51,10 @@ const StyledDropdownContainer = styled.div`
 const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, onChange }) => {
     const [kind, setKind] = useState<dependencyKind>();
     const [target, setTarget] = useState<GoalByIdReturnType>();
-    const [query, setQuery] = useState('');
+    const [query, setQuery] = useState<string[]>([]);
     const [completionVisible, setCompletionVisible] = useState(false);
 
-    const { data: goalsData } = trpc.goal.suggestions.useQuery(query);
+    const { data: goalsData } = trpc.goal.suggestions.useQuery(query.join('-'));
 
     const dependKeys = useMemo(
         () => ({
@@ -82,7 +82,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
     const onDependencyAdd = useCallback((g: NonNullable<GoalByIdReturnType>) => {
         setCompletionVisible(false);
         setTarget(g);
-        setQuery(g.id);
+        setQuery([g.projectId!, String(g.scopeId)]);
     }, []);
 
     const onKindChange = useCallback(
@@ -97,7 +97,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
     );
 
     const onSubmit = useCallback(() => {
-        setQuery('');
+        setQuery(['']);
         setTarget(undefined);
         setKind(undefined);
 
@@ -126,8 +126,8 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
 
                 <StyledCompletion>
                     <ComboBox
-                        text={query}
-                        value={query}
+                        text={query.join('-')}
+                        value={query.join('-')}
                         placement="top-start"
                         offset={[-4, 38]}
                         visible={completionVisible}
@@ -138,7 +138,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
                                 autoFocus
                                 placeholder={tr('Add dependency')}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                    setQuery(e.currentTarget.value);
+                                    setQuery([e.currentTarget.value]);
                                     setCompletionVisible(true);
                                 }}
                                 {...props}
