@@ -7,6 +7,8 @@ import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } 
 import {
     goalChangeProjectSchema,
     goalCommonSchema,
+    goalParticipantsSchema,
+    goalStateChangeSchema,
     goalUpdateSchema,
     toogleGoalArchiveSchema,
     toogleGoalDependencySchema,
@@ -383,7 +385,7 @@ export const goal = router({
     }),
     toggleDependency: protectedProcedure
         .input(toogleGoalDependencySchema)
-        .mutation(({ input: { id, target, direction, kind } }) => {
+        .mutation(({ input: { id, target, direction, kind }, ctx }) => {
             const connection = { id: target };
 
             try {
@@ -392,6 +394,15 @@ export const goal = router({
                     data: {
                         id, // this is hack to force updatedAt field
                         [kind]: { [connectionMap[String(direction)]]: connection },
+                        history: {
+                            create: {
+                                activityId: ctx.session.user.activityId,
+                                subject: 'dependencies',
+                                action: direction ? 'add' : 'remove',
+                                // FIXME: scoped id of deps goal
+                                nextValue: target,
+                            },
+                        },
                     },
                 });
 
@@ -406,12 +417,20 @@ export const goal = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
         }),
-    toggleArchive: protectedProcedure.input(toogleGoalArchiveSchema).mutation(({ input: { id, archived } }) => {
+    toggleArchive: protectedProcedure.input(toogleGoalArchiveSchema).mutation(({ input: { id, archived }, ctx }) => {
         try {
             return prisma.goal.update({
                 where: { id },
                 data: {
                     archived,
+                    history: {
+                        create: {
+                            subject: 'state',
+                            action: 'archive',
+                            activityId: ctx.session.user.activityId,
+                            nextValue: archived ? 'move to archive' : 'move from archive',
+                        },
+                    },
                 },
             });
 
@@ -422,6 +441,109 @@ export const goal = router({
             //     text: `new post '${title}'`,
             //     html: `new post <b>${title}</b>`,
             // });
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+
+    toggleParticipants: protectedProcedure.input(goalParticipantsSchema).mutation(async ({ input, ctx }) => {
+        const [projectId, scopeIdStr] = input.id.split('-');
+
+        if (!projectId) return null;
+
+        const scopeId = parseInt(scopeIdStr, 10);
+
+        if (!scopeId) return null;
+
+        const actualGoal = await prisma.goal.findFirst({
+            where: { projectId, scopeId },
+            include: {
+                participants: {
+                    include: {
+                        user: true,
+                    },
+                },
+            },
+        });
+
+        if (!actualGoal) {
+            return null;
+        }
+
+        const participantsToDisconnect = actualGoal.participants
+            .filter((p) => !input.participants?.some((pa) => pa.id === p.id))
+            .map(({ id }) => ({ id }));
+
+        const hash = new Set(
+            actualGoal.participants.map(({ id }) => id).concat(input.participants.map(({ id }) => id)),
+        );
+
+        const simpliestList = actualGoal.participants.reduce<typeof input.participants>((acc, { id, user }) => {
+            if (user) {
+                acc.push({
+                    id,
+                    name: user.nickname ?? user.name ?? user.email,
+                });
+            }
+
+            return acc;
+        }, []);
+
+        const shortList = participantsToDisconnect.length ? input.participants : simpliestList;
+        const longList = participantsToDisconnect.length ? simpliestList : input.participants;
+        const action = participantsToDisconnect.length ? 'remove' : 'add';
+
+        for (const { id } of shortList) {
+            hash.delete(id);
+        }
+
+        const [diffId] = Array.from(hash);
+
+        try {
+            return prisma.goal.update({
+                where: {
+                    id: actualGoal.id,
+                },
+                data: {
+                    id: actualGoal.id,
+                    participants: {
+                        connect: input.participants.map(({ id }) => ({ id })),
+                        disconnect: participantsToDisconnect,
+                    },
+                    history: {
+                        create: {
+                            subject: 'participants',
+                            action,
+                            nextValue: longList.find(({ id }) => id === diffId)!.name,
+                            activityId: ctx.session.user.activityId,
+                        },
+                    },
+                },
+            });
+        } catch (error: any) {
+            throw new TRPCError({ message: String(error.message), code: 'INTERNAL_SERVER_ERROR', cause: error });
+        }
+    }),
+    switchState: protectedProcedure.input(goalStateChangeSchema).mutation(async ({ input, ctx }) => {
+        try {
+            return await prisma.goal.update({
+                where: {
+                    id: input.id,
+                },
+                data: {
+                    id: input.id,
+                    stateId: input.state.id,
+                    history: {
+                        create: {
+                            subject: 'state',
+                            action: 'change',
+                            previousValue: input.prevState.title,
+                            nextValue: input.state.title,
+                            activityId: ctx.session.user.activityId,
+                        },
+                    },
+                },
+            });
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }

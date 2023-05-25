@@ -165,3 +165,29 @@ export const goalChangeProjectSchema = z.object({
 });
 
 export type GoalChangeProject = z.infer<typeof goalChangeProjectSchema>;
+
+export const goalParticipantsSchema = z.object({
+    id: z.string(),
+    participants: z.array(
+        z.object({
+            id: z.string(),
+            name: z.string(),
+        }),
+    ),
+});
+
+export type GoalParticipantsSchema = z.infer<typeof goalParticipantsSchema>;
+
+export const goalStateChangeSchema = z.object({
+    id: z.string(),
+    state: z.object({
+        id: z.string(),
+        title: z.string(),
+    }),
+    prevState: z.object({
+        id: z.string(),
+        title: z.string(),
+    }),
+});
+
+export type GoalStateChangeSchema = z.infer<typeof goalStateChangeSchema>;
