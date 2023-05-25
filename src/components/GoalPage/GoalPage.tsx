@@ -49,7 +49,7 @@ import { useRouter } from '../../hooks/router';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { Priority, priorityColorsMap } from '../../types/priority';
 import { trpc } from '../../utils/trpcClient';
-import { ToggleGoalDependency } from '../../schema/goal';
+import { GoalParticipantsSchema, GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -149,18 +149,21 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const priority = goal?.priority as Priority;
     const priorityColor = priorityColorsMap[priority];
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
-    const updateGoal = useGoalUpdate(id);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
+    const stateMutation = trpc.goal.switchState.useMutation();
     const onGoalStateChange = useCallback(
-        async (stateId: string) => {
-            await updateGoal({
-                state: { id: stateId },
-            });
-
-            utils.goal.getById.invalidate(id);
+        async (nextState: GoalStateChangeSchema['state']) => {
+            if (goal) {
+                await stateMutation.mutateAsync({
+                    state: nextState,
+                    prevState: goal.state!,
+                    id: goal.id,
+                });
+                utils.goal.getById.invalidate(id);
+            }
         },
-        [id, updateGoal, utils.goal.getById],
+        [goal, id, stateMutation, utils.goal.getById],
     );
 
     const onGoalReactionToggle = useCallback(
@@ -168,15 +171,13 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
         [goalReaction, utils.goal.getById],
     );
 
+    const participantsMutation = trpc.goal.toggleParticipants.useMutation();
     const onParticipantsChange = useCallback(
-        async (participants: string[]) => {
-            await updateGoal({
-                participants: participants.map((id) => ({ id })),
-            });
-
+        async (participants: GoalParticipantsSchema['participants']) => {
+            await participantsMutation.mutateAsync({ participants, id });
             utils.goal.getById.invalidate(id);
         },
-        [id, updateGoal, utils.goal.getById],
+        [participantsMutation, utils.goal.getById, id],
     );
 
     const toggleDependencyMutation = trpc.goal.toggleDependency.useMutation();

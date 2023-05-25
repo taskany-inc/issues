@@ -47,6 +47,7 @@ import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
+import { GoalStateChangeSchema } from '../../schema/goal';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -126,20 +127,24 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         setGoalEditModalVisible(false);
     }, []);
 
-    const updateGoal = useGoalUpdate(preview.id);
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
     const priorityColor = priorityColorsMap[goal?.priority as Priority];
 
+    const stateChangeMutations = trpc.goal.switchState.useMutation();
     const onGoalStateChange = useCallback(
-        async (id: string) => {
-            await updateGoal({
-                state: { id },
-            });
+        async (nextState: GoalStateChangeSchema['state']) => {
+            if (goal) {
+                await stateChangeMutations.mutateAsync({
+                    id: goal.id,
+                    state: nextState,
+                    prevState: goal.state!,
+                });
+            }
 
             utils.goal.getById.invalidate(preview._shortId);
         },
-        [preview._shortId, updateGoal, utils.goal.getById],
+        [goal, preview._shortId, stateChangeMutations, utils.goal.getById],
     );
 
     const onCommentPublish = useCallback(

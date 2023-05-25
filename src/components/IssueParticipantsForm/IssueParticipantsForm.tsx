@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { gapL, gapM } from '@taskany/colors';
 import { ComboBox, FormInput, FormTitle, ModalContent, ModalHeader, UserMenuItem } from '@taskany/bricks';
 
+import { GoalParticipantsSchema } from '../../schema/goal';
 import { trpc } from '../../utils/trpcClient';
 import { IssueParticipantsList } from '../IssueParticipantsList';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
@@ -12,7 +13,7 @@ import { tr } from './IssueParticipantsForm.i18n';
 interface IssueParticipantsFormProps {
     participants: ActivityByIdReturnType[];
 
-    onChange?: (activities: string[]) => void;
+    onChange?: (participants: GoalParticipantsSchema['participants']) => void;
 }
 
 const StyledCompletion = styled.div`
@@ -22,7 +23,19 @@ const StyledCompletion = styled.div`
 export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ participants, onChange }) => {
     const [query, setQuery] = useState('');
     const [completionVisible, setCompletionVisible] = useState(false);
-    const activities = useMemo(() => new Set<string>(participants.map((p) => p.id)), [participants]);
+    const activities = useMemo(
+        () =>
+            new Map<string, GoalParticipantsSchema['participants'][number]>(
+                participants.map((p) => [
+                    p.id,
+                    {
+                        id: p.id,
+                        name: p.user?.nickname ?? p.user?.name ?? p.user?.email ?? '',
+                    },
+                ]),
+            ),
+        [participants],
+    );
 
     const alreadyParticipants = participants.map((p) => p.id);
     const suggestions = trpc.user.suggestions.useQuery({ query, filter: alreadyParticipants });
@@ -31,18 +44,21 @@ export const IssueParticipantsForm: React.FC<IssueParticipantsFormProps> = ({ pa
         (id: string) => {
             activities.delete(id);
 
-            onChange?.(Array.from(activities));
+            onChange?.(Array.from(activities).map(([_, p]) => p));
         },
         [activities, onChange],
     );
 
     const onParticipantAdd = useCallback(
         (activity: ActivityByIdReturnType) => {
-            activities.add(activity.id);
+            activities.set(activity.id, {
+                id: activity.id,
+                name: activity.user?.nickname ?? activity.user?.name ?? activity.user?.email ?? '',
+            });
 
             setQuery('');
 
-            onChange?.(Array.from(activities));
+            onChange?.(Array.from(activities).map(([_, p]) => p));
         },
         [activities, onChange],
     );

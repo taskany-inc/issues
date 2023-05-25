@@ -20,7 +20,7 @@ interface StateSwitchProps {
     state: StateObject;
     flowId?: string;
 
-    onClick?: (id: string) => void;
+    onClick?: (val: StateObject) => void;
 }
 
 const StyledStates = styled.div`
@@ -48,7 +48,7 @@ const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => 
     const onItemClick = useCallback(
         (s: StateObject) => () => {
             setPopupVisibility(false);
-            onClick && onClick(s.id);
+            onClick && onClick(s);
         },
         [onClick],
     );
