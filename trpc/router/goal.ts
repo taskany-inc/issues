@@ -18,16 +18,33 @@ import { createGoal, changeGoalProject } from '../../src/utils/db';
 
 export const goal = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
+        const splittedInput = input.split('-');
+        let selectParams = {};
+
+        if (splittedInput.length === 2 && Number.isNaN(+splittedInput[1])) {
+            selectParams = {
+                AND: [
+                    {
+                        projectId: {
+                            contains: splittedInput[0],
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        scopeId: {
+                            contains: splittedInput[1],
+                            mode: 'insensitive',
+                        },
+                    },
+                ],
+            };
+        }
+
         return prisma.goal.findMany({
             take: 10,
             where: {
                 OR: [
-                    {
-                        id: {
-                            contains: input,
-                            mode: 'insensitive',
-                        },
-                    },
+                    selectParams,
                     {
                         title: {
                             contains: input,
