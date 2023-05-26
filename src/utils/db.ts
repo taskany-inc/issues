@@ -117,17 +117,13 @@ export const getGoalHistory = async (history: GoalHistory[]) => {
                             in: previousValue?.concat(nextValue),
                         },
                     },
-                    include: !['owner', 'participant'].includes(record.subject)
-                        ? {
-                              activity: {
-                                  include: {
-                                      user: true,
-                                  },
-                              },
-                          }
-                        : {
-                              user: true,
-                          },
+                    include: {
+                        activity: {
+                            include: {
+                                user: true,
+                            },
+                        },
+                    },
                 };
 
                 switch (record.subject) {
@@ -139,7 +135,12 @@ export const getGoalHistory = async (history: GoalHistory[]) => {
                         return prisma.tag.findMany(query);
                     case 'owner':
                     case 'participant':
-                        return prisma.activity.findMany(query);
+                        return prisma.activity.findMany({
+                            where: query.where,
+                            include: {
+                                user: true,
+                            },
+                        });
                     case 'state':
                         return prisma.state.findMany({ where: query.where });
                     default:

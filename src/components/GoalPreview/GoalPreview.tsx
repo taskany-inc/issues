@@ -137,7 +137,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                 await stateChangeMutations.mutateAsync({
                     id: goal.id,
                     state: nextState,
-                    prevState: goal.state!,
                 });
             }
 
