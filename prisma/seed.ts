@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import assert from 'assert';
 import { faker } from '@faker-js/faker';
-import { Role, User, Tag } from '@prisma/client';
+import { Role, User, Tag, Goal } from '@prisma/client';
 
 import { prisma } from '../src/utils/prisma';
 import { keyPredictor } from '../src/utils/keyPredictor';
@@ -195,7 +195,7 @@ seed('Default projects', async () => {
     for (const project of allProjects) {
         if (project) {
             // eslint-disable-next-line no-await-in-loop
-            const allGoals = await Promise.all(
+            const allGoals: Goal[] = await Promise.all(
                 [
                     [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
                     [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
@@ -297,23 +297,41 @@ seed('Default projects', async () => {
                                 id: sample(allGoals.filter((item) => item.id !== goal.id))?.id,
                             },
                         },
+                        history: {
+                            createMany: {
+                                data: [
+                                    [faker.lorem.sentence(2), goal.title, sample(allUsers).activityId, 'title'],
+                                    [
+                                        faker.lorem.sentence(5),
+                                        goal.description,
+                                        sample(allUsers).activityId,
+                                        'description',
+                                    ],
+                                    [sample(allUsers).activityId, goal.activityId, goal.activityId, 'participant'],
+                                    [null, sample(allGoals).id, sample(allUsers).activityId, 'dependencies'],
+                                    [sample(allGoals).id, null, sample(allUsers).activityId, 'dependencies'],
+                                ].map(([previousValue, nextValue, activityId, subject]) => {
+                                    let action = 'add';
+
+                                    if (previousValue && nextValue) {
+                                        action = 'change';
+                                    } else if (!nextValue) {
+                                        action = 'remove';
+                                    }
+
+                                    return {
+                                        subject,
+                                        previousValue,
+                                        nextValue,
+                                        action,
+                                        activityId,
+                                    };
+                                }),
+                            },
+                        },
                     },
                 });
             }
-
-            const [goal] = allGoals;
-
-            // eslint-disable-next-line no-await-in-loop
-            await prisma.goalHistory.create({
-                data: {
-                    goalId: goal.id,
-                    subject: 'state',
-                    action: 'change',
-                    previousValue: 'InProgress',
-                    nextValue: 'Critical',
-                    activityId: sample(allUsers).activityId,
-                },
-            });
         }
     }
 });
