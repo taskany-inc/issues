@@ -169,10 +169,6 @@ export const goalStateChangeSchema = z.object({
         id: z.string(),
         title: z.string(),
     }),
-    prevState: z.object({
-        id: z.string(),
-        title: z.string(),
-    }),
 });
 
 export type GoalStateChangeSchema = z.infer<typeof goalStateChangeSchema>;

@@ -156,7 +156,6 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
             if (goal) {
                 await stateMutation.mutateAsync({
                     state: nextState,
-                    prevState: goal.state!,
                     id: goal.id,
                 });
                 utils.goal.getById.invalidate(id);

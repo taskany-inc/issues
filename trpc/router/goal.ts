@@ -468,7 +468,6 @@ export const goal = router({
                                 activityId: ctx.session.user.activityId,
                                 subject: 'dependencies',
                                 action: direction ? 'add' : 'remove',
-                                // FIXME: scoped id of deps goal
                                 nextValue: target,
                             },
                         },
@@ -593,6 +592,16 @@ export const goal = router({
         }
     }),
     switchState: protectedProcedure.input(goalStateChangeSchema).mutation(async ({ input, ctx }) => {
+        const actualGoal = await prisma.goal.findFirst({
+            where: {
+                id: input.id,
+            },
+        });
+
+        if (!actualGoal) {
+            return null;
+        }
+
         try {
             return await prisma.goal.update({
                 where: {
@@ -605,7 +614,7 @@ export const goal = router({
                         create: {
                             subject: 'state',
                             action: 'change',
-                            previousValue: input.prevState.id,
+                            previousValue: actualGoal.stateId,
                             nextValue: input.state.id,
                             activityId: ctx.session.user.activityId,
                         },

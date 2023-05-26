@@ -283,7 +283,6 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     const _isIssuer = goal.activityId === activityId;
     const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
-    const { history = [] } = goal;
 
     let parentOwner = false;
     function checkParent(project?: any) {
@@ -310,7 +309,6 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
         _isEditable,
         _lastEstimate,
         _shortId,
-        history,
     };
 };
 
