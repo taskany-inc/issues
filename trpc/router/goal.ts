@@ -1,6 +1,6 @@
-import z from 'zod';
+import z, { record } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { Tag } from '@prisma/client';
+import { PrismaClient, Tag } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -18,7 +18,7 @@ import {
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
-import { createGoal, changeGoalProject } from '../../src/utils/db';
+import { createGoal, changeGoalProject, getGoalHistory } from '../../src/utils/db';
 
 export const goal = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
@@ -159,9 +159,12 @@ export const goal = router({
 
             if (!goal) return null;
 
+            const history = await getGoalHistory(goal.history);
+
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
+                history,
             };
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -335,7 +338,7 @@ export const goal = router({
             history.push({
                 subject: 'tags',
                 action: 'remove',
-                nextValue: tagsToDisconnect.map(({ title }) => title).join(', '),
+                nextValue: tagsToDisconnect.map(({ id }) => id).join(', '),
             });
         }
 
@@ -343,7 +346,7 @@ export const goal = router({
             history.push({
                 subject: 'tags',
                 action: 'add',
-                nextValue: tagsToConnect.map(({ title }) => title).join(', '),
+                nextValue: tagsToConnect.map(({ id }) => id).join(', '),
             });
         }
 
@@ -363,12 +366,8 @@ export const goal = router({
             history.push({
                 subject: 'owner',
                 action: 'change',
-                previousValue:
-                    actualGoal.owner?.user?.nickname ??
-                    actualGoal.owner?.user?.name ??
-                    actualGoal.owner?.user?.email ??
-                    '',
-                nextValue: input.owner?.user?.nickname ?? input.owner?.user?.name ?? input.owner?.user?.email ?? '',
+                previousValue: actualGoal.ownerId,
+                nextValue: input.owner.id,
             });
         }
 
@@ -560,7 +559,6 @@ export const goal = router({
         }, []);
 
         const shortList = participantsToDisconnect.length ? input.participants : simpliestList;
-        const longList = participantsToDisconnect.length ? simpliestList : input.participants;
         const action = participantsToDisconnect.length ? 'remove' : 'add';
 
         for (const { id } of shortList) {
@@ -584,7 +582,7 @@ export const goal = router({
                         create: {
                             subject: 'participants',
                             action,
-                            nextValue: longList.find(({ id }) => id === diffId)!.name,
+                            nextValue: diffId,
                             activityId: ctx.session.user.activityId,
                         },
                     },
@@ -607,8 +605,8 @@ export const goal = router({
                         create: {
                             subject: 'state',
                             action: 'change',
-                            previousValue: input.prevState.title,
-                            nextValue: input.state.title,
+                            previousValue: input.prevState.id,
+                            nextValue: input.state.id,
                             activityId: ctx.session.user.activityId,
                         },
                     },

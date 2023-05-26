@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { GoalHistory, PrismaClient } from '@prisma/client';
 
 import { GoalCommon } from '../schema/goal';
 import { addCalclulatedGoalsFields } from '../../trpc/queries/goals';
@@ -79,4 +80,99 @@ export const changeGoalProject = async (id: string, newProjectId: string) => {
             id,
         },
     });
+};
+
+const subjectToTableNameMap: Record<string, keyof PrismaClient> = {
+    dependencies: 'goal',
+    project: 'project',
+    tags: 'tag',
+    owner: 'activity',
+    participant: 'activity',
+    state: 'state',
+};
+
+export const getGoalHistory = async (history: GoalHistory[]) => {
+    const needRequestForRecordIndicies = history.reduce<number[]>((acc, { subject }, index) => {
+        if (subjectToTableNameMap[subject]) {
+            acc.push(index);
+        }
+
+        return acc;
+    }, []);
+
+    const historyWithMeta: any[] = Array.from(history);
+
+    if (needRequestForRecordIndicies.length) {
+        const results = await prisma.$transaction(
+            needRequestForRecordIndicies.map((recordIndex) => {
+                const record = history[recordIndex];
+                const [previousValue = [], nextValue = []] = [
+                    record.previousValue?.split(', '),
+                    record.nextValue?.split(', '),
+                ];
+
+                const query = {
+                    where: {
+                        id: {
+                            in: previousValue?.concat(nextValue),
+                        },
+                    },
+                    include: !['owner', 'participant'].includes(record.subject)
+                        ? {
+                              activity: {
+                                  include: {
+                                      user: true,
+                                  },
+                              },
+                          }
+                        : {
+                              user: true,
+                          },
+                };
+
+                switch (record.subject) {
+                    case 'project':
+                        return prisma.project.findMany(query);
+                    case 'dependencies':
+                        return prisma.goal.findMany(query);
+                    case 'tags':
+                        return prisma.tag.findMany(query);
+                    case 'owner':
+                    case 'participant':
+                        return prisma.activity.findMany(query);
+                    case 'state':
+                        return prisma.state.findMany({ where: query.where });
+                    default:
+                        throw new Error('query for history record is undefined');
+                }
+            }),
+        );
+
+        const metaResults: Record<string, unknown>[] = [];
+
+        for (const records of results) {
+            const meta: Record<string, (typeof records)[number]> = {};
+
+            for (const record of records) {
+                meta[record.id] = record;
+            }
+
+            metaResults.push(meta);
+        }
+
+        let transactionResultIndex = 0;
+
+        historyWithMeta.forEach((record, index) => {
+            if (needRequestForRecordIndicies.includes(index) && metaResults[transactionResultIndex]) {
+                historyWithMeta[index] = {
+                    ...record,
+                    meta: metaResults[transactionResultIndex],
+                };
+
+                transactionResultIndex += 1;
+            }
+        });
+    }
+
+    return historyWithMeta;
 };
