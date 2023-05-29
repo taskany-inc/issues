@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { danger0 } from '@taskany/colors';
 import {
@@ -28,6 +28,20 @@ interface GoalDeleteModalProps {
 
 export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onConfirm, onCancel }) => {
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
+    // FIXME: try to find better way to solve this issue with autoFocus
+    const ref = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const globalListener = () => {
+            setTimeout(() => ref.current && ref.current.focus(), 0);
+        };
+
+        window.addEventListener(ModalEvent.GoalDeleteModal, globalListener);
+
+        return () => {
+            window.removeEventListener(ModalEvent.GoalDeleteModal, globalListener);
+        };
+    });
 
     const onConfirmationInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setDeleteConfirmation(e.currentTarget.value);
@@ -56,6 +70,7 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
 
                 <Form>
                     <FormInput
+                        ref={ref}
                         flat="bottom"
                         placeholder={shortId}
                         autoComplete="off"
