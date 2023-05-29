@@ -1,6 +1,6 @@
-import z, { record } from 'zod';
+import z from 'zod';
 import { TRPCError } from '@trpc/server';
-import { PrismaClient, Tag } from '@prisma/client';
+import { Tag } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
