@@ -1,7 +1,7 @@
 import { FiltersDropdown } from '@taskany/bricks';
 import { FC, useMemo } from 'react';
 
-const estimateToString = (estimate: Estimate) => `${estimate.q}/${estimate.y}`;
+import { estimateToString } from '../utils/estimateToString';
 
 type Estimate = {
     date: string;

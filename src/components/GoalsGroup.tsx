@@ -6,7 +6,7 @@ import { Text, Link, nullable } from '@taskany/bricks';
 import { routes } from '../hooks/router';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
-import { GoalListItem } from './GoalListItem/GoalListItem';
+import { GoalListItem, GoalsList } from './GoalListItem/GoalListItem';
 import { PageSep } from './PageSep';
 import { ProjectTitleList } from './ProjectTitleList';
 
@@ -18,11 +18,6 @@ interface GoalGroupProps {
     onClickProvider: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
 }
-
-const StyledGoalsList = styled.div`
-    padding: 0;
-    margin: 0 -20px;
-`;
 
 const StyledGoalsGroup = styled.div`
     padding: 0 20px 40px 20px;
@@ -57,13 +52,14 @@ export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
 
             <PageSep />
 
-            <StyledGoalsList>
+            <GoalsList>
                 {goals.map((g) => (
                     <GoalListItem
                         createdAt={g.createdAt}
                         updatedAt={g.updatedAt}
                         id={g.id}
                         shortId={g._shortId}
+                        projectId={g.projectId}
                         state={g.state!}
                         title={g.title}
                         issuer={g.activity!}
@@ -71,13 +67,15 @@ export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
                         tags={g.tags}
                         priority={g.priority!}
                         comments={g._count?.comments}
+                        estimate={g.estimate?.length ? g.estimate[g.estimate.length - 1] : undefined}
+                        participants={g.participants}
                         key={g.id}
                         focused={selectedResolver(g.id)}
                         onClick={onClickProvider(g)}
                         onTagClick={onTagClick}
                     />
                 ))}
-            </StyledGoalsList>
+            </GoalsList>
         </StyledGoalsGroup>
     ),
 );

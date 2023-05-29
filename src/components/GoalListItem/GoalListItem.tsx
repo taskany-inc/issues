@@ -1,50 +1,73 @@
-import React, { MouseEventHandler } from 'react';
+import React, { MouseEventHandler, useMemo } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
-import { gray4, textColor, gray10, gapM, gapS } from '@taskany/colors';
-import { GitForkIcon, MessageIcon, Text, Tag as TagItem, nullable, UserPic } from '@taskany/bricks';
-import type { State, Tag } from '@prisma/client';
+import { gray4, textColor, gapS, gapXs, radiusM, gray9, gapSm } from '@taskany/colors';
+import { MessageIcon, Text, Tag as TagItem, nullable } from '@taskany/bricks';
+import type { Estimate, State, Tag } from '@prisma/client';
 
 import { routes } from '../../hooks/router';
-import { Priority, priorityColorsMap } from '../../types/priority';
+import { Priority } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-
-import { tr } from './GoalListItem.i18n';
+import { estimateToString } from '../../utils/estimateToString';
+import { UserGroup } from '../UserGroup';
 
 const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 
 interface GoalListItemProps {
     id: string;
     shortId: string;
+    projectId: string | null;
     title: string;
+    owner?: ActivityByIdReturnType;
     issuer?: ActivityByIdReturnType;
+    participants?: ActivityByIdReturnType[];
     tags?: Array<Tag | undefined>;
     state?: State;
     createdAt: Date;
     updatedAt: Date;
-    owner?: ActivityByIdReturnType;
+    estimate?: Estimate;
     comments?: number;
-    hasForks?: boolean;
     isNotViewed?: boolean;
     focused?: boolean;
     priority?: string;
-
+    className?: string;
     onClick?: MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: (tag: Tag) => MouseEventHandler<HTMLDivElement>;
 }
 
-const StyledGoal = styled.a<{ focused?: boolean }>`
-    display: grid;
-    grid-template-columns: 15px 30px 600px repeat(4, 40px);
+export const GoalsList = styled.div`
+    display: table;
+`;
+
+const GoalCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
+    font-size: 0;
+    display: table-cell;
+    transition: background-color 150ms ease-in;
+    text-align: ${({ align = 'left' }) => align};
+    vertical-align: middle;
+
+    &:last-child {
+        width: 1%;
+        white-space: nowrap;
+        padding: ${gapXs} ${gapSm} ${gapXs} 0;
+        border-radius: 0 ${radiusM} ${radiusM} 0;
+    }
+
+    &:first-child {
+        padding: ${gapXs} 0 ${gapXs} ${gapSm};
+        border-radius: ${radiusM} 0 0 ${radiusM};
+    }
+`;
+
+const Goal = styled.a<{ focused?: boolean }>`
+    display: table-row;
     align-items: center;
 
     color: ${textColor};
     text-decoration: none;
-
-    transition: background-color 150ms ease-in;
 
     &:hover {
         background-color: ${gray4};
@@ -57,111 +80,155 @@ const StyledGoal = styled.a<{ focused?: boolean }>`
     ${({ focused }) =>
         focused &&
         `
-            background-color: ${gray4};
+            ${GoalCell} {
+                background-color: ${gray4};
+            }
         `}
 
-    padding: ${gapM} 20px;
-    margin: 0 -20px;
+    border-radius: ${radiusM};
 `;
 
-const StyledState = styled.div`
-    align-self: start;
+const GoalTitleItem = styled(GoalCell)`
+    overflow: hidden;
+    width: 30%;
+    min-width: 410px;
+`;
+
+const GoalContentItem = styled(GoalCell)`
     justify-self: center;
-
-    padding-top: 5px;
+    align-self: center;
+    padding: ${gapXs} ${gapS};
 `;
 
-const StyledNotViewed = styled.div`
-    align-self: start;
+const GoalTitleContainer = styled.div`
+    display: flex;
+`;
+
+const NotViewedDot = styled.div`
+    align-self: center;
     justify-self: center;
-`;
-
-const StyledNotViewedDot = styled.div`
     width: 5px;
     height: 5px;
+
+    margin-right: ${gapXs};
 
     background-color: ${textColor};
 
     border-radius: 100%;
 `;
 
-const StyledName = styled.div`
-    width: 800px;
-    max-width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-`;
-
-const StyledTitle = styled(Text)`
+const GoalTitle = styled(Text)`
     margin-right: ${gapS};
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 `;
 
-const StyledAddon = styled.div`
-    justify-self: center;
-    align-self: center;
-    vertical-align: middle;
+const GoalTag = styled(TagItem)`
+    margin: calc(${gapXs} / 2) 0;
+    margin-right: ${gapXs};
+
+    & + & {
+        margin-left: 0;
+    }
+    &:last-child {
+        margin-right: 0;
+    }
 `;
 
-const StyledCommentsCount = styled(Text)`
+const GoalStateDot = styled(StateDot)`
+    margin: 0 auto;
+`;
+
+const CommentsCountContainer = styled.div`
+    white-space: nowrap;
+`;
+
+const CommentsCount = styled(Text)`
     display: inline-block;
-    margin-left: ${gapS};
-    vertical-align: top;
-`;
-
-const StyledSubTitle = styled(Text)`
-    color: ${gray10};
-    width: 100%;
-    padding-top: ${gapS};
-`;
-
-const StyledTags = styled.div`
-    padding-top: 1px;
-`;
-
-const StyledTag = styled(TagItem)`
-    margin-right: ${gapS};
-`;
-
-const StyledMessageIcon = styled(MessageIcon)`
+    margin-left: ${gapXs};
     vertical-align: middle;
 `;
+
+const CommentsCountIcon = styled(MessageIcon)`
+    display: inline-block;
+    vertical-align: middle;
+`;
+
+const GoalTextItem = styled(Text).attrs({
+    size: 's',
+    weight: 'bold',
+    color: gray9,
+})``;
+
+const RelatedTextItem = styled(GoalTextItem).attrs({
+    weight: 'regular',
+})``;
 
 export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
     ({
         shortId,
+        projectId,
         owner,
         issuer,
+        participants,
         updatedAt,
         tags,
         title,
         comments,
-        hasForks,
         isNotViewed,
         state,
         focused,
+        estimate,
         priority,
         onClick,
+        className,
         onTagClick,
-    }) => (
-        <NextLink href={routes.goal(shortId)} passHref>
-            <StyledGoal focused={focused} onClick={onClick}>
-                <StyledNotViewed>{isNotViewed && <StyledNotViewedDot />}</StyledNotViewed>
-                <StyledState>
-                    {nullable(state, (s) => (
-                        <StateDot size="m" hue={s.hue} />
-                    ))}
-                </StyledState>
+    }) => {
+        const issuers = useMemo(() => {
+            if (issuer && owner && owner.id === issuer.id) {
+                return [owner];
+            }
 
-                <StyledName>
-                    <StyledTitle size="m" weight="bold">
-                        {' '}
-                        {title}
-                    </StyledTitle>
+            return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
+        }, [issuer, owner]);
 
-                    <StyledTags>
+        return (
+            <NextLink href={routes.goal(shortId)} passHref>
+                <Goal focused={focused} onClick={onClick} className={className}>
+                    <GoalTitleItem>
+                        <GoalTitleContainer>
+                            {isNotViewed && <NotViewedDot />}
+                            <GoalTitle size="m" weight="bold">
+                                {title}
+                            </GoalTitle>
+                        </GoalTitleContainer>
+                    </GoalTitleItem>
+                    <GoalContentItem>
+                        {nullable(state, (s) => (
+                            <GoalStateDot size="m" hue={s.hue} />
+                        ))}
+                    </GoalContentItem>
+                    <GoalContentItem>
+                        <GoalTextItem>{getPriorityText(priority as Priority)}</GoalTextItem>
+                    </GoalContentItem>
+
+                    <GoalContentItem>
+                        <GoalTextItem>{projectId}</GoalTextItem>
+                    </GoalContentItem>
+
+                    <GoalContentItem align="center">
+                        <UserGroup users={issuers} />
+                    </GoalContentItem>
+
+                    <GoalContentItem>
+                        <GoalTextItem>{nullable(estimate, (e) => estimateToString(e))}</GoalTextItem>
+                    </GoalContentItem>
+
+                    <GoalContentItem>
                         {tags?.map((tag) =>
                             nullable(tag, (t) => (
-                                <StyledTag
+                                <GoalTag
                                     key={t.id}
                                     title={t.title}
                                     description={t.description ?? undefined}
@@ -169,41 +236,31 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                                 />
                             )),
                         )}
-                    </StyledTags>
+                    </GoalContentItem>
 
-                    <StyledSubTitle size="s">
-                        #{shortId} <RelativeTime date={updatedAt} kind="updated" />
-                        {` ${tr('by')} ${issuer?.user?.name}`}
-                    </StyledSubTitle>
-                </StyledName>
+                    <GoalContentItem>
+                        {nullable(participants, (p) => (
+                            <UserGroup users={p} />
+                        ))}
+                    </GoalContentItem>
 
-                <StyledAddon>
-                    {nullable(priority, (p) => (
-                        <StateDot
-                            size="s"
-                            hue={priorityColorsMap[p as Priority]}
-                            title={getPriorityText(p as Priority)}
-                        />
-                    ))}
-                </StyledAddon>
-
-                <StyledAddon>
-                    <UserPic src={owner?.user?.image} email={owner?.user?.email || owner?.ghost?.email} size={24} />
-                </StyledAddon>
-
-                <StyledAddon>{hasForks && <GitForkIcon size="s" />}</StyledAddon>
-
-                <StyledAddon>
-                    {comments !== 0 && (
-                        <>
-                            <StyledMessageIcon size="s" />
-                            <StyledCommentsCount size="xs" weight="bold">
-                                {comments}
-                            </StyledCommentsCount>
-                        </>
-                    )}
-                </StyledAddon>
-            </StyledGoal>
-        </NextLink>
-    ),
+                    <GoalContentItem>
+                        {comments !== 0 && (
+                            <CommentsCountContainer>
+                                <CommentsCountIcon size="s" />
+                                <CommentsCount size="xs" weight="bold">
+                                    {comments}
+                                </CommentsCount>
+                            </CommentsCountContainer>
+                        )}
+                    </GoalContentItem>
+                    <GoalContentItem>
+                        <RelatedTextItem>
+                            <RelativeTime date={updatedAt} />
+                        </RelatedTextItem>
+                    </GoalContentItem>
+                </Goal>
+            </NextLink>
+        );
+    },
 );
