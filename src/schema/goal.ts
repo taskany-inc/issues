@@ -129,11 +129,13 @@ export const goalUpdateSchema = z.object({
         title: z.string().optional(),
     }),
     priority: z.string().nullable(),
-    estimate: z.object({
-        date: z.string(),
-        q: z.string(),
-        y: z.string(),
-    }),
+    estimate: z
+        .object({
+            date: z.string(),
+            q: z.string(),
+            y: z.string(),
+        })
+        .optional(),
     tags: z.array(
         z.object({
             id: z.string(),
