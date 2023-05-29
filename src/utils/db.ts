@@ -100,7 +100,7 @@ export const getGoalHistory = async (history: GoalHistory[]) => {
         return acc;
     }, []);
 
-    const historyWithMeta: any[] = Array.from(history);
+    const historyWithMeta: (GoalHistory & { meta?: Record<string, unknown> })[] = Array.from(history);
 
     if (needRequestForRecordIndicies.length) {
         const results = await prisma.$transaction(
@@ -149,7 +149,7 @@ export const getGoalHistory = async (history: GoalHistory[]) => {
             }),
         );
 
-        const metaResults: Record<string, unknown>[] = [];
+        const metaResults: Record<string, (typeof results)[number][number]>[] = [];
 
         for (const records of results) {
             const meta: Record<string, (typeof records)[number]> = {};
