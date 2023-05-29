@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.3.1](https://github.com/taskany-inc/issues/compare/v1.3.0...v1.3.1) (2023-05-29)
+
+
+### Bug Fixes
+
+* **worker:** incorrect path to runner ([8137345](https://github.com/taskany-inc/issues/commit/8137345cbf9cdb11920d92887b7cade2d28e76e3))
+
 ## [1.3.0](https://github.com/taskany-inc/issues/compare/v1.2.0...v1.3.0) (2023-05-25)
 
 
