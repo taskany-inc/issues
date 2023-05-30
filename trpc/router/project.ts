@@ -242,8 +242,8 @@ export const project = router({
                 data: {
                     ...data,
                     parent: {
-                        connect: parentsToConnect || [],
-                        disconnect: parentsToDisconnect,
+                        connect: parentsToConnect?.map((p) => ({ id: p.id })) || [],
+                        disconnect: parentsToDisconnect?.map((p) => ({ id: p.id })),
                     },
                 },
                 include: {
