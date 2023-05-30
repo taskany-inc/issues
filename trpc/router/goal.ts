@@ -1,6 +1,6 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
-import { Tag } from '@prisma/client';
+import { GoalHistory, Tag } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -314,7 +314,7 @@ export const goal = router({
         const tagsToConnect: GoalUpdate['tags'] =
             input.tags.filter((t) => !actualGoal.tags.some((tag) => tag.id === t.id)) || [];
 
-        const history = [];
+        const history: Omit<GoalHistory, 'id' | 'activityId' | 'goalId' | 'createdAt'>[] = [];
 
         if (actualGoal.title !== input.title) {
             history.push({
@@ -338,6 +338,7 @@ export const goal = router({
             history.push({
                 subject: 'tags',
                 action: 'remove',
+                previousValue: actualGoal.tags?.map(({ id }) => id).join(', '),
                 nextValue: tagsToDisconnect.map(({ id }) => id).join(', '),
             });
         }
@@ -346,6 +347,7 @@ export const goal = router({
             history.push({
                 subject: 'tags',
                 action: 'add',
+                previousValue: actualGoal.tags?.map(({ id }) => id).join(', '),
                 nextValue: tagsToConnect.map(({ id }) => id).join(', '),
             });
         }
@@ -375,7 +377,7 @@ export const goal = router({
             history.push({
                 subject: 'project',
                 action: 'change',
-                previuosValue: actualGoal.project?.id,
+                previousValue: actualGoal.projectId,
                 nextValue: input.parent.id,
             });
         }
