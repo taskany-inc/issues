@@ -15,7 +15,7 @@ import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../GoalsGroup';
-import { GoalsListContainer } from '../GoalListItem/GoalListItem';
+import { GoalsListContainer } from '../GoalListItem';
 import { PageTitle } from '../PageTitle';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';

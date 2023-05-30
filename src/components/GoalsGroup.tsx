@@ -7,7 +7,7 @@ import { gapM, gapS } from '@taskany/colors';
 import { routes } from '../hooks/router';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
-import { GoalListItem } from './GoalListItem/GoalListItem';
+import { GoalListItem } from './GoalListItem';
 import { PageSep } from './PageSep';
 import { ProjectTitleList } from './ProjectTitleList';
 

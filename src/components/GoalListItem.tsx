@@ -6,15 +6,16 @@ import { gray4, textColor, gapS, gapXs, radiusM, gray9, gapSm } from '@taskany/c
 import { MessageIcon, Text, Tag as TagItem, nullable } from '@taskany/bricks';
 import type { Estimate, State as StateType, Tag } from '@prisma/client';
 
-import { routes } from '../../hooks/router';
-import { Priority } from '../../types/priority';
-import { getPriorityText } from '../PriorityText/PriorityText';
-import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-import { estimateToString } from '../../utils/estimateToString';
-import { UserGroup } from '../UserGroup';
-import { State } from '../State';
+import { routes } from '../hooks/router';
+import { Priority } from '../types/priority';
+import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
+import { estimateToString } from '../utils/estimateToString';
 
-const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
+import { getPriorityText } from './PriorityText/PriorityText';
+import { UserGroup } from './UserGroup';
+import { State } from './State';
+
+const RelativeTime = dynamic(() => import('./RelativeTime/RelativeTime'));
 
 interface GoalListItemProps {
     id: string;
