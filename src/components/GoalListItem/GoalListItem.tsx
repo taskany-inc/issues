@@ -95,6 +95,7 @@ const GoalTitleItem = styled(GoalCell)`
     overflow: hidden;
     width: 30%;
     min-width: 410px;
+    white-space: normal;
 `;
 
 const GoalContentItem = styled(GoalCell)`
@@ -122,7 +123,6 @@ const NotViewedDot = styled.div`
 
 const GoalTitle = styled(Text)`
     margin-right: ${gapS};
-    white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
 `;
