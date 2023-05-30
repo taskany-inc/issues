@@ -3,14 +3,14 @@ import { useCallback } from 'react';
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
 
-export const useGoalResource = (id: string) => {
+export const useGoalResource = (id?: string, shortId?: string) => {
     const utils = trpc.useContext();
     const toggleWatcherMutation = trpc.goal.toggleWatcher.useMutation();
     const toggleStargizerMutation = trpc.goal.toggleStargizer.useMutation();
 
     const invalidate = useCallback(() => {
-        utils.goal.getById.invalidate(id);
-    }, [id, utils.goal.getById]);
+        utils.goal.getById.invalidate(shortId);
+    }, [utils.goal.getById, shortId]);
 
     const toggleGoalWatching = useCallback(
         async (watcher?: boolean) => {
