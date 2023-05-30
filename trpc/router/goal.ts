@@ -243,6 +243,7 @@ export const goal = router({
                         sort: {},
                         query: '',
                     },
+                    ctx.session.user.activityId,
                     {
                         ...userDashboardGoals,
                     },
@@ -252,7 +253,7 @@ export const goal = router({
                 },
             }),
             prisma.goal.findMany({
-                ...goalsFilter(input, {
+                ...goalsFilter(input, ctx.session.user.activityId, {
                     ...userDashboardGoals,
                 }),
                 include: {

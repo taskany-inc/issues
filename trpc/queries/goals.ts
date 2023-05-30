@@ -7,7 +7,7 @@ const defaultOrderBy = {
 };
 
 // TODO: make it much more type-safety
-export const goalsFilter = (data: QueryWithFilters, extra: any = {}): any => {
+export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: any = {}): any => {
     const priorityFilter = data.priority?.length ? { priority: { in: data.priority } } : {};
 
     const statesFilter = data.state?.length
@@ -129,6 +129,26 @@ export const goalsFilter = (data: QueryWithFilters, extra: any = {}): any => {
         });
     }
 
+    const starredFilter = data.starred
+        ? {
+              stargizers: {
+                  some: {
+                      id: activityId,
+                  },
+              },
+          }
+        : {};
+
+    const watchingFilter = data.watching
+        ? {
+              watchers: {
+                  some: {
+                      id: activityId,
+                  },
+              },
+          }
+        : {};
+
     return {
         where: {
             archived: false,
@@ -162,6 +182,8 @@ export const goalsFilter = (data: QueryWithFilters, extra: any = {}): any => {
                     },
                 },
             ],
+            ...starredFilter,
+            ...watchingFilter,
             ...priorityFilter,
             ...statesFilter,
             ...tagsFilter,
