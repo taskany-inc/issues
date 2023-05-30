@@ -2,6 +2,7 @@ import React, { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { Text, Link, nullable } from '@taskany/bricks';
+import { gapM, gapS } from '@taskany/colors';
 
 import { routes } from '../hooks/router';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
@@ -20,11 +21,16 @@ interface GoalGroupProps {
 }
 
 const GoalsGroupContainer = styled.div`
-    padding-top: 40px;
+    display: block;
+    padding-top: ${gapM};
 
     &:first-child {
         padding-top: 0;
     }
+`;
+
+const GolasGroupSep = styled(PageSep)`
+    margin: ${gapS} 0px;
 `;
 
 interface GoalsGroupProjectTitleProps {
@@ -51,9 +57,10 @@ export const GoalsGroupProjectTitle: React.FC<GoalsGroupProjectTitleProps> = ({ 
 export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
     ({ goals, children, selectedResolver, onClickProvider, onTagClick }) => (
         <>
-            <GoalsGroupContainer>{children}</GoalsGroupContainer>
-
-            <PageSep />
+            <GoalsGroupContainer>
+                {children}
+                <GolasGroupSep />
+            </GoalsGroupContainer>
 
             {goals.map((g) => (
                 <GoalListItem
