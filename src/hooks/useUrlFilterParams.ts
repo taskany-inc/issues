@@ -16,6 +16,8 @@ export interface QueryState {
     owner: string[];
     project: string[];
     query: string;
+    starred: boolean;
+    watching: boolean;
     sort: Record<SortableProps, NonNullable<SortDirection>> | Record<string, never>;
     limit?: number;
 }
@@ -44,6 +46,8 @@ export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     owner: parseQueryParam(query.owner?.toString()),
     project: parseQueryParam(query.project?.toString()),
     query: parseQueryParam(query.query?.toString()).toString(),
+    starred: Boolean(parseInt(parseQueryParam(query.starred?.toString()).toString(), 10)),
+    watching: Boolean(parseInt(parseQueryParam(query.watching?.toString()).toString(), 10)),
     sort: parseSortQueryParam(query.sort?.toString()),
     limit: query.limit ? Number(query.limit) : undefined,
 });
@@ -62,7 +66,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     }
 
     const pushNewState = useCallback(
-        ({ priority, state, tag, estimate, owner, project, query, sort, limit }: QueryState) => {
+        ({ priority, state, tag, estimate, owner, project, query, starred, watching, sort, limit }: QueryState) => {
             const newurl = router.asPath.split('?')[0];
             const urlParams = new URLSearchParams();
 
@@ -87,6 +91,10 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
                 : urlParams.delete('sort');
 
             query.length > 0 ? urlParams.set('query', query.toString()) : urlParams.delete('query');
+
+            starred ? urlParams.set('starred', '1') : urlParams.delete('starred');
+
+            watching ? urlParams.set('watching', '1') : urlParams.delete('watching');
 
             limit ? urlParams.set('limit', limit.toString()) : urlParams.delete('limit');
 
@@ -115,6 +123,8 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             project: [],
             tag: [],
             estimate: [],
+            starred: false,
+            watching: false,
             query: '',
             sort: {},
         });
@@ -160,6 +170,8 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setEstimateFilter: pushStateProvider('estimate'),
             setOwnerFilter: pushStateProvider('owner'),
             setProjectFilter: pushStateProvider('project'),
+            setStarredFilter: pushStateProvider('starred'),
+            setWatchingFilter: pushStateProvider('watching'),
             setSortFilter: pushStateProvider('sort'),
             setFulltextFilter: pushStateProvider('query'),
             setLimitFilter: pushStateProvider('limit'),

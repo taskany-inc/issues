@@ -53,6 +53,8 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
         setEstimateFilter,
         setOwnerFilter,
         setProjectFilter,
+        setStarredFilter,
+        setWatchingFilter,
         setSortFilter,
         setFulltextFilter,
         resetQueryState,
@@ -230,6 +232,8 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                     onTagChange={setTagsFilter}
                     onEstimateChange={setEstimateFilter}
                     onPriorityChange={setPriorityFilter}
+                    onStarredChange={setStarredFilter}
+                    onWatchingChange={setWatchingFilter}
                     onPresetChange={setPreset}
                     onFilterStar={onFilterStar}
                     onSortChange={setSortFilter}

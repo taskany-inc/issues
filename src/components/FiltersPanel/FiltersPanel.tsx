@@ -26,6 +26,8 @@ import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied'
 import { Priority } from '../../types/priority';
 import { FilterById } from '../../../trpc/inferredTypes';
 import { SortFilter } from '../SortFilter/SortFilter';
+import { StarredFilter } from '../StarredFilter/StarredFilter';
+import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 
 import { tr } from './FiltersPanel.i18n';
 
@@ -54,6 +56,8 @@ export const FiltersPanel: FC<{
     onTagChange: React.ComponentProps<typeof TagFilter>['onChange'];
     onEstimateChange: React.ComponentProps<typeof EstimateFilter>['onChange'];
     onPresetChange: React.ComponentProps<typeof PresetDropdown>['onChange'];
+    onStarredChange: React.ComponentProps<typeof StarredFilter>['onChange'];
+    onWatchingChange: React.ComponentProps<typeof WatchingFilter>['onChange'];
     onSortChange: React.ComponentProps<typeof SortFilter>['onChange'];
     onLimitChange?: React.ComponentProps<typeof LimitDropdown>['onChange'];
     onFilterStar?: () => void;
@@ -83,6 +87,8 @@ export const FiltersPanel: FC<{
     onLimitChange,
     onFilterStar,
     onSortChange,
+    onStarredChange,
+    onWatchingChange,
 }) => (
     <>
         <FiltersPanelContainer loading={loading}>
@@ -136,6 +142,9 @@ export const FiltersPanel: FC<{
                     {Boolean(tags.length) && (
                         <TagFilter text={tr('Tags')} value={queryState.tag} tags={tags} onChange={onTagChange} />
                     )}
+
+                    <StarredFilter value={queryState.starred} onChange={onStarredChange} />
+                    <WatchingFilter value={queryState.watching} onChange={onWatchingChange} />
 
                     <SortFilter text={tr('Sort')} value={queryState.sort} onChange={onSortChange} />
 

@@ -48,6 +48,8 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
         setEstimateFilter,
         setOwnerFilter,
         setProjectFilter,
+        setStarredFilter,
+        setWatchingFilter,
         setSortFilter,
         setFulltextFilter,
         resetQueryState,
@@ -192,6 +194,8 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
                 onTagChange={setTagsFilter}
                 onEstimateChange={setEstimateFilter}
                 onPriorityChange={setPriorityFilter}
+                onStarredChange={setStarredFilter}
+                onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}
                 onFilterStar={onFilterStar}
                 onSortChange={setSortFilter}
