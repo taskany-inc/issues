@@ -6,7 +6,7 @@ import { Text, Link, nullable } from '@taskany/bricks';
 import { routes } from '../hooks/router';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
-import { GoalListItem, GoalsList } from './GoalListItem/GoalListItem';
+import { GoalListItem } from './GoalListItem/GoalListItem';
 import { PageSep } from './PageSep';
 import { ProjectTitleList } from './ProjectTitleList';
 
@@ -19,9 +19,12 @@ interface GoalGroupProps {
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
 }
 
-const StyledGoalsGroup = styled.div`
-    padding: 0 20px 40px 20px;
-    margin: 0 -20px;
+const GoalsGroupContainer = styled.div`
+    padding-top: 40px;
+
+    &:first-child {
+        padding-top: 0;
+    }
 `;
 
 interface GoalsGroupProjectTitleProps {
@@ -47,35 +50,33 @@ export const GoalsGroupProjectTitle: React.FC<GoalsGroupProjectTitleProps> = ({ 
 
 export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
     ({ goals, children, selectedResolver, onClickProvider, onTagClick }) => (
-        <StyledGoalsGroup>
-            {children}
+        <>
+            <GoalsGroupContainer>{children}</GoalsGroupContainer>
 
             <PageSep />
 
-            <GoalsList>
-                {goals.map((g) => (
-                    <GoalListItem
-                        createdAt={g.createdAt}
-                        updatedAt={g.updatedAt}
-                        id={g.id}
-                        shortId={g._shortId}
-                        projectId={g.projectId}
-                        state={g.state!}
-                        title={g.title}
-                        issuer={g.activity!}
-                        owner={g.owner!}
-                        tags={g.tags}
-                        priority={g.priority!}
-                        comments={g._count?.comments}
-                        estimate={g.estimate?.length ? g.estimate[g.estimate.length - 1] : undefined}
-                        participants={g.participants}
-                        key={g.id}
-                        focused={selectedResolver(g.id)}
-                        onClick={onClickProvider(g)}
-                        onTagClick={onTagClick}
-                    />
-                ))}
-            </GoalsList>
-        </StyledGoalsGroup>
+            {goals.map((g) => (
+                <GoalListItem
+                    createdAt={g.createdAt}
+                    updatedAt={g.updatedAt}
+                    id={g.id}
+                    shortId={g._shortId}
+                    projectId={g.projectId}
+                    state={g.state!}
+                    title={g.title}
+                    issuer={g.activity!}
+                    owner={g.owner!}
+                    tags={g.tags}
+                    priority={g.priority!}
+                    comments={g._count?.comments}
+                    estimate={g.estimate?.length ? g.estimate[g.estimate.length - 1] : undefined}
+                    participants={g.participants}
+                    key={g.id}
+                    focused={selectedResolver(g.id)}
+                    onClick={onClickProvider(g)}
+                    onTagClick={onTagClick}
+                />
+            ))}
+        </>
     ),
 );

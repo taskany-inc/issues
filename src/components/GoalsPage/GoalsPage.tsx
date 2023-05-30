@@ -15,6 +15,7 @@ import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { GoalsGroup, GoalsGroupProjectTitle } from '../GoalsGroup';
+import { GoalsListContainer } from '../GoalListItem/GoalListItem';
 import { PageTitle } from '../PageTitle';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
@@ -199,25 +200,27 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
             </FiltersPanel>
 
             <PageContent>
-                {groups?.map(
-                    (group) =>
-                        Boolean(group.goals.length) &&
-                        group.project && (
-                            <GoalsGroup
-                                key={group.project.id}
-                                goals={group.goals}
-                                selectedResolver={selectedGoalResolver}
-                                onClickProvider={onGoalPrewiewShow}
-                                onTagClick={setTagsFilterOutside}
-                            >
-                                <GoalsGroupProjectTitle
-                                    id={group.project.id}
-                                    title={group.project.title}
-                                    parent={group.project.parent}
-                                />
-                            </GoalsGroup>
-                        ),
-                )}
+                <GoalsListContainer>
+                    {groups?.map(
+                        (group) =>
+                            Boolean(group.goals.length) &&
+                            group.project && (
+                                <GoalsGroup
+                                    key={group.project.id}
+                                    goals={group.goals}
+                                    selectedResolver={selectedGoalResolver}
+                                    onClickProvider={onGoalPrewiewShow}
+                                    onTagClick={setTagsFilterOutside}
+                                >
+                                    <GoalsGroupProjectTitle
+                                        id={group.project.id}
+                                        title={group.project.title}
+                                        parent={group.project.parent}
+                                    />
+                                </GoalsGroup>
+                            ),
+                    )}
+                </GoalsListContainer>
             </PageContent>
 
             {nullable(preview, (p) => (

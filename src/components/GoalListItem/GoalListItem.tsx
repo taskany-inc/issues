@@ -38,8 +38,11 @@ interface GoalListItemProps {
     onTagClick?: (tag: Tag) => MouseEventHandler<HTMLDivElement>;
 }
 
-export const GoalsList = styled.div`
+export const GoalsListContainer = styled.div`
     display: table;
+    width: 100%;
+    margin: 0 -20px;
+    padding: 0 20px;
 `;
 
 const GoalCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`

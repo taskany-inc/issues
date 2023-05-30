@@ -21,6 +21,7 @@ import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { GoalsListContainer } from '../GoalListItem/GoalListItem';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -237,25 +238,27 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                 </FiltersPanel>
 
                 <PageContent>
-                    {groups?.map(
-                        (group) =>
-                            Boolean(group.goals.length) &&
-                            group.project && (
-                                <GoalsGroup
-                                    key={group.project.id}
-                                    goals={group.goals}
-                                    selectedResolver={selectedGoalResolver}
-                                    onClickProvider={onGoalPrewiewShow}
-                                    onTagClick={setTagsFilterOutside}
-                                >
-                                    <GoalsGroupProjectTitle
-                                        id={group.project.id}
-                                        title={group.project.title}
-                                        parent={group.project.parent}
-                                    />
-                                </GoalsGroup>
-                            ),
-                    )}
+                    <GoalsListContainer>
+                        {groups?.map(
+                            (group) =>
+                                Boolean(group.goals.length) &&
+                                group.project && (
+                                    <GoalsGroup
+                                        key={group.project.id}
+                                        goals={group.goals}
+                                        selectedResolver={selectedGoalResolver}
+                                        onClickProvider={onGoalPrewiewShow}
+                                        onTagClick={setTagsFilterOutside}
+                                    >
+                                        <GoalsGroupProjectTitle
+                                            id={group.project.id}
+                                            title={group.project.title}
+                                            parent={group.project.parent}
+                                        />
+                                    </GoalsGroup>
+                                ),
+                        )}
+                    </GoalsListContainer>
                 </PageContent>
 
                 {nullable(preview, (p) => (
