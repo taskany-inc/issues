@@ -4,15 +4,15 @@ import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
 import { gray4, textColor, gapS, gapXs, radiusM, gray9, gapSm } from '@taskany/colors';
 import { MessageIcon, Text, Tag as TagItem, nullable } from '@taskany/bricks';
-import type { Estimate, State, Tag } from '@prisma/client';
+import type { Estimate, State as StateType, Tag } from '@prisma/client';
 
 import { routes } from '../../hooks/router';
 import { Priority } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { StateDot } from '../StateDot';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { estimateToString } from '../../utils/estimateToString';
 import { UserGroup } from '../UserGroup';
+import { State } from '../State';
 
 const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 
@@ -25,7 +25,7 @@ interface GoalListItemProps {
     issuer?: ActivityByIdReturnType;
     participants?: ActivityByIdReturnType[];
     tags?: Array<Tag | undefined>;
-    state?: State;
+    state?: StateType;
     createdAt: Date;
     updatedAt: Date;
     estimate?: Estimate;
@@ -139,10 +139,6 @@ const GoalTag = styled(TagItem)`
     }
 `;
 
-const GoalStateDot = styled(StateDot)`
-    margin: 0 auto;
-`;
-
 const CommentsCountContainer = styled.div`
     white-space: nowrap;
 `;
@@ -209,7 +205,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                     </GoalTitleItem>
                     <GoalContentItem>
                         {nullable(state, (s) => (
-                            <GoalStateDot size="m" hue={s.hue} />
+                            <State size="s" title={s?.title} hue={s?.hue} />
                         ))}
                     </GoalContentItem>
                     <GoalContentItem>
