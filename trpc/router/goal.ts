@@ -380,14 +380,21 @@ export const goal = router({
                 previousValue: actualGoal.projectId,
                 nextValue: input.parent.id,
             });
+
+            // FIXME: remove this monkey patch after adding button to changeProject separately
+            const movedGoal = await changeGoalProject(actualGoal.id, input.parent.id);
+            if (movedGoal) {
+                actualGoal.id = movedGoal.id;
+                actualGoal.projectId = movedGoal.projectId;
+                actualGoal.scopeId = movedGoal.scopeId;
+            }
         }
 
         try {
-            return prisma.goal.update({
+            const goal = await prisma.goal.update({
                 where: { id: actualGoal.id },
                 data: {
                     ownerId: input.owner?.id,
-                    projectId: input.parent?.id,
                     title: input.title,
                     description: input.description,
                     stateId: input.state?.id,
@@ -411,7 +418,15 @@ export const goal = router({
                         },
                     },
                 },
+                include: {
+                    ...goalDeepQuery,
+                },
             });
+
+            return {
+                ...goal,
+                ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
+            };
 
             // await mailServer.sendMail({
             //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,

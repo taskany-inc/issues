@@ -20,9 +20,9 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const updateGoal = async (form: GoalUpdate) => {
         setBusy(true);
 
-        await update(form);
+        const updatedGoal = await update(form);
 
-        onSubmit(goal);
+        onSubmit(updatedGoal);
     };
 
     // FIXME: nullable values are conflicting with undefined
