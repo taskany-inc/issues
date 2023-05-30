@@ -143,7 +143,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
         setCurrentProjectCache(null);
     });
 
-    const { toggleGoalWatching, toggleGoalStar } = useGoalResource(id);
+    const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal?.id, goal?._shortId);
 
     const priority = goal?.priority as Priority;
     const priorityColor = priorityColorsMap[priority];

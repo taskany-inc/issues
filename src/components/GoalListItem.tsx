@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
 import { gray4, textColor, gapS, gapXs, radiusM, gray9, gapSm } from '@taskany/colors';
-import { MessageIcon, Text, Tag as TagItem, nullable } from '@taskany/bricks';
+import { MessageIcon, Text, Tag as TagItem, nullable, StarFilledIcon, EyeIcon } from '@taskany/bricks';
 import type { Estimate, State as StateType, Tag } from '@prisma/client';
 
 import { routes } from '../hooks/router';
@@ -34,6 +34,8 @@ interface GoalListItemProps {
     isNotViewed?: boolean;
     focused?: boolean;
     priority?: string;
+    starred?: boolean;
+    watching?: boolean;
     className?: string;
     onClick?: MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: (tag: Tag) => MouseEventHandler<HTMLDivElement>;
@@ -181,6 +183,8 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         focused,
         estimate,
         priority,
+        starred,
+        watching,
         onClick,
         className,
         onTagClick,
@@ -254,10 +258,23 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                             </CommentsCountContainer>
                         )}
                     </GoalContentItem>
+
                     <GoalContentItem>
                         <RelatedTextItem>
                             <RelativeTime date={updatedAt} />
                         </RelatedTextItem>
+                    </GoalContentItem>
+
+                    <GoalContentItem>
+                        {nullable(starred, () => (
+                            <StarFilledIcon size="s" />
+                        ))}
+                    </GoalContentItem>
+
+                    <GoalContentItem>
+                        {nullable(watching, () => (
+                            <EyeIcon size="s" />
+                        ))}
                     </GoalContentItem>
                 </Goal>
             </NextLink>
