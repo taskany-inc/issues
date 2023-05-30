@@ -55,12 +55,12 @@ const GoalCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
     &:last-child {
         width: 1%;
         white-space: nowrap;
-        padding: ${gapXs} ${gapSm} ${gapXs} 0;
+        padding: ${gapS} ${gapSm} ${gapS} 0;
         border-radius: 0 ${radiusM} ${radiusM} 0;
     }
 
     &:first-child {
-        padding: ${gapXs} 0 ${gapXs} ${gapSm};
+        padding: ${gapS} 0 ${gapS} ${gapSm};
         border-radius: ${radiusM} 0 0 ${radiusM};
     }
 `;
@@ -101,7 +101,7 @@ const GoalTitleItem = styled(GoalCell)`
 const GoalContentItem = styled(GoalCell)`
     justify-self: center;
     align-self: center;
-    padding: ${gapXs} ${gapS};
+    padding: ${gapS} ${gapS};
 `;
 
 const GoalTitleContainer = styled.div`
