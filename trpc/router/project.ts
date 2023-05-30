@@ -137,6 +137,7 @@ export const project = router({
                         project: [],
                         query: '',
                     },
+                    ctx.session.user.activityId,
                     {
                         AND: {
                             OR: [
@@ -161,7 +162,7 @@ export const project = router({
                 },
             }),
             prisma.goal.findMany({
-                ...goalsFilter(input, {
+                ...goalsFilter(input, ctx.session.user.activityId, {
                     AND: {
                         OR: [
                             {

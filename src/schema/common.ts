@@ -29,6 +29,8 @@ export const queryWithFiltersSchema = z.object({
     project: z.array(z.string()).optional(),
     sort: sortablePropertiesSchema,
     query: z.string().optional(),
+    starred: z.boolean().optional(),
+    watching: z.boolean().optional(),
 });
 
 export type QueryWithFilters = z.infer<typeof queryWithFiltersSchema>;
