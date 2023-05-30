@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.5.1](https://github.com/taskany-inc/issues/compare/v1.5.0...v1.5.1) (2023-05-30)
+
+
+### Bug Fixes
+
+* **GoalListItem:** bigger paddings for row ([4f3349c](https://github.com/taskany-inc/issues/commit/4f3349c4cde217228352c9953c35c738c0befe37))
+
 ## [1.5.0](https://github.com/taskany-inc/issues/compare/v1.4.0...v1.5.0) (2023-05-30)
 
 
