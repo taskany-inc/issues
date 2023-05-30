@@ -21,7 +21,7 @@ import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { GoalsListContainer } from '../GoalListItem/GoalListItem';
+import { GoalsListContainer } from '../GoalListItem';
 
 import { tr } from './ProjectPage.i18n';
 
