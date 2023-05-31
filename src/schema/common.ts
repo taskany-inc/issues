@@ -27,6 +27,7 @@ export const queryWithFiltersSchema = z.object({
     estimate: z.array(z.string()).optional(),
     issuer: z.array(z.string()).optional(),
     owner: z.array(z.string()).optional(),
+    participant: z.array(z.string()).optional(),
     project: z.array(z.string()).optional(),
     sort: sortablePropertiesSchema,
     query: z.string().optional(),

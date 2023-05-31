@@ -15,6 +15,7 @@ export interface QueryState {
     estimate: string[];
     issuer: string[];
     owner: string[];
+    participant: string[];
     project: string[];
     query: string;
     starred: boolean;
@@ -46,6 +47,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     estimate: parseQueryParam(query.estimate?.toString()),
     issuer: parseQueryParam(query.issuer?.toString()),
     owner: parseQueryParam(query.owner?.toString()),
+    participant: parseQueryParam(query.participant?.toString()),
     project: parseQueryParam(query.project?.toString()),
     query: parseQueryParam(query.query?.toString()).toString(),
     starred: Boolean(parseInt(parseQueryParam(query.starred?.toString()).toString(), 10)),
@@ -75,6 +77,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             estimate,
             issuer,
             owner,
+            participant,
             project,
             query,
             starred,
@@ -98,7 +101,12 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
                 : urlParams.delete('estimate');
 
             owner.length > 0 ? urlParams.set('owner', Array.from(owner).toString()) : urlParams.delete('owner');
+
             issuer.length > 0 ? urlParams.set('issuer', Array.from(issuer).toString()) : urlParams.delete('issuer');
+
+            participant.length > 0
+                ? urlParams.set('participant', Array.from(participant).toString())
+                : urlParams.delete('participant');
 
             project.length > 0 ? urlParams.set('project', Array.from(project).toString()) : urlParams.delete('project');
 
@@ -137,6 +145,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             state: [],
             issuer: [],
             owner: [],
+            participant: [],
             project: [],
             tag: [],
             estimate: [],
@@ -187,6 +196,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setEstimateFilter: pushStateProvider('estimate'),
             setIssuerFilter: pushStateProvider('issuer'),
             setOwnerFilter: pushStateProvider('owner'),
+            setParticipantFilter: pushStateProvider('participant'),
             setProjectFilter: pushStateProvider('project'),
             setStarredFilter: pushStateProvider('starred'),
             setWatchingFilter: pushStateProvider('watching'),
