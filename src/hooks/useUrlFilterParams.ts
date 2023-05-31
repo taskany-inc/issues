@@ -180,9 +180,11 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         (filter: string | undefined | null) => {
             router.push({
                 pathname: router.asPath.split('?')[0],
-                query: {
-                    filter,
-                },
+                query: filter
+                    ? {
+                          filter,
+                      }
+                    : {},
             });
         },
         [router],
