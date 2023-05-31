@@ -83,7 +83,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
         if (v.length) infoString += `${k}: ${v.join(', ')}. `;
     });
 
-    if (queryState.sort) {
+    if (Object.keys(queryState.sort).length) {
         infoString += `${tr('Sorted')}: `;
         const items = Object.entries(queryState.sort);
 
