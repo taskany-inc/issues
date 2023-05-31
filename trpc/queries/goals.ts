@@ -67,6 +67,18 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
           }
         : {};
 
+    const participantFilter = data.participant?.length
+        ? {
+              participants: {
+                  some: {
+                      id: {
+                          in: data.participant,
+                      },
+                  },
+              },
+          }
+        : {};
+
     const projectFilter = data.project?.length
         ? {
               project: {
@@ -198,6 +210,7 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
             ...estimateFilter,
             ...issuerFilter,
             ...ownerFilter,
+            ...participantFilter,
             ...projectFilter,
             ...extra,
         },

@@ -48,6 +48,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
         setEstimateFilter,
         setIssuerFilter,
         setOwnerFilter,
+        setParticipantFilter,
         setProjectFilter,
         setStarredFilter,
         setWatchingFilter,
@@ -182,6 +183,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
                 queryString={queryString}
                 issuers={meta?.issuers}
                 owners={meta?.owners}
+                participants={meta?.participants}
                 priorities={meta?.priority}
                 projects={meta?.projects}
                 preset={currentPreset}
@@ -192,6 +194,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
                 onSearchChange={setFulltextFilter}
                 onIssuerChange={setIssuerFilter}
                 onOwnerChange={setOwnerFilter}
+                onParticipantChange={setParticipantFilter}
                 onProjectChange={setProjectFilter}
                 onStateChange={setStateFilter}
                 onTagChange={setTagsFilter}

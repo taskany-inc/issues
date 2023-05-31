@@ -53,6 +53,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
         setEstimateFilter,
         setIssuerFilter,
         setOwnerFilter,
+        setParticipantFilter,
         setProjectFilter,
         setStarredFilter,
         setWatchingFilter,
@@ -220,6 +221,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                     queryString={queryString}
                     issuers={projectDeepInfo?.meta?.issuers}
                     owners={projectDeepInfo?.meta?.owners}
+                    participants={projectDeepInfo?.meta?.participants}
                     priorities={projectDeepInfo?.meta?.priority}
                     projects={projectDeepInfo?.meta?.projects}
                     preset={currentPreset}
@@ -230,6 +232,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                     onSearchChange={setFulltextFilter}
                     onIssuerChange={setIssuerFilter}
                     onOwnerChange={setOwnerFilter}
+                    onParticipantChange={setParticipantFilter}
                     onProjectChange={setProjectFilter}
                     onStateChange={setStateFilter}
                     onTagChange={setTagsFilter}

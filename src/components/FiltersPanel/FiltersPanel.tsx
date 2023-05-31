@@ -48,12 +48,14 @@ export const FiltersPanel: FC<{
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
     issuers?: React.ComponentProps<typeof UserFilter>['users'];
     owners?: React.ComponentProps<typeof UserFilter>['users'];
+    participants?: React.ComponentProps<typeof UserFilter>['users'];
 
     onSearchChange: (search: string) => void;
     onPriorityChange: React.ComponentProps<typeof PriorityFilter>['onChange'];
     onStateChange: React.ComponentProps<typeof StateFilter>['onChange'];
     onIssuerChange: React.ComponentProps<typeof UserFilter>['onChange'];
     onOwnerChange: React.ComponentProps<typeof UserFilter>['onChange'];
+    onParticipantChange: React.ComponentProps<typeof UserFilter>['onChange'];
     onProjectChange: React.ComponentProps<typeof ProjectFilter>['onChange'];
     onTagChange: React.ComponentProps<typeof TagFilter>['onChange'];
     onEstimateChange: React.ComponentProps<typeof EstimateFilter>['onChange'];
@@ -77,12 +79,14 @@ export const FiltersPanel: FC<{
     presets = [],
     owners = [],
     issuers = [],
+    participants = [],
     priorities = [],
     states = [],
     onPriorityChange,
     onStateChange,
     onIssuerChange,
     onOwnerChange,
+    onParticipantChange,
     onSearchChange,
     onProjectChange,
     onEstimateChange,
@@ -116,6 +120,7 @@ export const FiltersPanel: FC<{
                             onChange={onStateChange}
                         />
                     )}
+
                     {Boolean(priorities.length) && (
                         <PriorityFilter
                             text={tr('Priority')}
@@ -124,6 +129,7 @@ export const FiltersPanel: FC<{
                             onChange={onPriorityChange}
                         />
                     )}
+
                     {Boolean(projects.length) && (
                         <ProjectFilter
                             text={tr('Project')}
@@ -132,6 +138,7 @@ export const FiltersPanel: FC<{
                             onChange={onProjectChange}
                         />
                     )}
+
                     {Boolean(issuers.length) && (
                         <UserFilter
                             text={tr('Issuer')}
@@ -140,6 +147,7 @@ export const FiltersPanel: FC<{
                             onChange={onIssuerChange}
                         />
                     )}
+
                     {Boolean(owners.length) && (
                         <UserFilter
                             text={tr('Owner')}
@@ -148,6 +156,7 @@ export const FiltersPanel: FC<{
                             onChange={onOwnerChange}
                         />
                     )}
+
                     {Boolean(estimates.length) && (
                         <EstimateFilter
                             text={tr('Estimate')}
@@ -156,11 +165,22 @@ export const FiltersPanel: FC<{
                             onChange={onEstimateChange}
                         />
                     )}
+
                     {Boolean(tags.length) && (
                         <TagFilter text={tr('Tags')} value={queryState.tag} tags={tags} onChange={onTagChange} />
                     )}
 
+                    {Boolean(participants.length) && (
+                        <UserFilter
+                            text={tr('Participant')}
+                            value={queryState.participant}
+                            users={participants}
+                            onChange={onParticipantChange}
+                        />
+                    )}
+
                     <StarredFilter value={queryState.starred} onChange={onStarredChange} />
+
                     <WatchingFilter value={queryState.watching} onChange={onWatchingChange} />
 
                     <SortFilter text={tr('Sort')} value={queryState.sort} onChange={onSortChange} />
@@ -173,15 +193,18 @@ export const FiltersPanel: FC<{
                             onChange={onPresetChange}
                         />
                     )}
+
                     {onLimitChange &&
                         nullable(queryState.limit, (lf) => (
                             <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={onLimitChange} />
                         ))}
+
                     {((Boolean(queryString) && !preset) || (preset && !preset._isOwner && !preset._isStarred)) && (
                         <FiltersAction onClick={onFilterStar}>
                             <StarIcon size="s" noWrap />
                         </FiltersAction>
                     )}
+
                     {preset && (preset._isOwner || preset._isStarred) && (
                         <FiltersAction onClick={onFilterStar}>
                             <StarFilledIcon size="s" noWrap />
@@ -197,6 +220,7 @@ export const FiltersPanel: FC<{
             states={states}
             issuers={issuers}
             owners={owners}
+            participants={participants}
             projects={projects}
             tags={tags}
             estimates={estimates}
