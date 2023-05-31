@@ -19,7 +19,7 @@ import { TagFilter } from '../TagFilter';
 import { EstimateFilter } from '../EstimateFilter';
 import { PresetDropdown } from '../PresetDropdown';
 import { LimitDropdown } from '../LimitDropdown';
-import { UserFilter } from '../UserFilter';
+import { UserFilter } from '../UserFilter/UserFilter';
 import { PriorityFilter } from '../PriorityFilter';
 import { StateFilter } from '../StateFilter';
 import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
