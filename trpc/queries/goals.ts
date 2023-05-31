@@ -1,3 +1,5 @@
+import { Estimate, EstimateToGoal, Goal, Prisma } from '@prisma/client';
+
 import { QueryWithFilters } from '../../src/schema/common';
 
 const defaultOrderBy = {
@@ -8,7 +10,7 @@ const defaultOrderBy = {
 export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: any = {}): any => {
     const priorityFilter = data.priority?.length ? { priority: { in: data.priority } } : {};
 
-    const statesFilter = data.state?.length
+    const statesFilter: Prisma.GoalFindManyArgs['where'] = data.state?.length
         ? {
               state: {
                   id: {
@@ -18,7 +20,7 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
           }
         : {};
 
-    const tagsFilter = data.tag?.length
+    const tagsFilter: Prisma.GoalFindManyArgs['where'] = data.tag?.length
         ? {
               tags: {
                   some: {
@@ -30,24 +32,26 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
           }
         : {};
 
-    const estimateFilter = data.estimate?.length
+    const estimateFilter: Prisma.GoalFindManyArgs['where'] = data.estimate?.length
         ? {
               estimate: {
                   some: {
-                      OR: data.estimate.map((e) => {
-                          const [q, y] = e.split('/');
+                      estimate: {
+                          OR: data.estimate.map((e) => {
+                              const [q, y] = e.split('/');
 
-                          return {
-                              q,
-                              y,
-                          };
-                      }),
+                              return {
+                                  q,
+                                  y,
+                              };
+                          }),
+                      },
                   },
               },
           }
         : {};
 
-    const issuerFilter = data.issuer?.length
+    const issuerFilter: Prisma.GoalFindManyArgs['where'] = data.issuer?.length
         ? {
               activity: {
                   id: {
@@ -57,7 +61,7 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
           }
         : {};
 
-    const ownerFilter = data.owner?.length
+    const ownerFilter: Prisma.GoalFindManyArgs['where'] = data.owner?.length
         ? {
               owner: {
                   id: {
@@ -67,7 +71,7 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
           }
         : {};
 
-    const participantFilter = data.participant?.length
+    const participantFilter: Prisma.GoalFindManyArgs['where'] = data.participant?.length
         ? {
               participants: {
                   some: {
@@ -79,7 +83,7 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
           }
         : {};
 
-    const projectFilter = data.project?.length
+    const projectFilter: Prisma.GoalFindManyArgs['where'] = data.project?.length
         ? {
               project: {
                   id: {
@@ -149,7 +153,7 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
         });
     }
 
-    const starredFilter = data.starred
+    const starredFilter: Prisma.GoalFindManyArgs['where'] = data.starred
         ? {
               stargizers: {
                   some: {
@@ -159,7 +163,7 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
           }
         : {};
 
-    const watchingFilter = data.watching
+    const watchingFilter: Prisma.GoalFindManyArgs['where'] = data.watching
         ? {
               watchers: {
                   some: {
@@ -325,7 +329,7 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     const _isWatching = goal.watchers?.some((watcher: any) => watcher?.id === activityId);
     const _isStarred = goal.stargizers?.some((stargizer: any) => stargizer?.id === activityId);
     const _isIssuer = goal.activityId === activityId;
-    const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined;
+    const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1].estimate : undefined;
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
 
     let parentOwner = false;
@@ -384,8 +388,8 @@ export const calcGoalsMeta = (goals: any[]) => {
         goal.activity && uniqIssuers.set(goal.activity.id, goal.activity);
 
         goal.estimate &&
-            goal.estimate.forEach((e: any) => {
-                uniqEstimates.set(`${e?.q}/${e?.y}`, e);
+            goal.estimate.forEach(({ estimate }: EstimateToGoal & { estimate: Estimate }) => {
+                uniqEstimates.set(`${estimate?.q}/${estimate?.y}`, estimate);
             });
     });
 
@@ -400,4 +404,24 @@ export const calcGoalsMeta = (goals: any[]) => {
         estimates: Array.from(uniqEstimates.values()),
         count: goals.length,
     };
+};
+
+export const getEstimateListFormJoin = <
+    T extends Goal & { estimate?: Array<EstimateToGoal & { estimate?: Estimate }> },
+>(
+    goal: T,
+): Estimate[] | null => {
+    const { estimate } = goal;
+
+    if (estimate == null || !estimate.length) {
+        return null;
+    }
+
+    return estimate.reduce<Estimate[]>((acc, value) => {
+        if (value.estimate != null) {
+            acc.push(value.estimate);
+        }
+
+        return acc;
+    }, []);
 };
