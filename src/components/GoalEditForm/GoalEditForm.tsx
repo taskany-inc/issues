@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FormAction, Button } from '@taskany/bricks';
 
 import { GoalForm } from '../GoalForm/GoalForm';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -41,7 +42,11 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             tags={goal.tags}
             estimate={goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined}
             onSumbit={updateGoal}
-            actionBtnText={tr('Submit')}
+            renderActionButton={({ busy, isValid }) => (
+                <FormAction right inline>
+                    <Button view="primary" disabled={busy} outline={!isValid} type="submit" text={tr('Submit')} />
+                </FormAction>
+            )}
         />
     );
 };
