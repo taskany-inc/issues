@@ -1,10 +1,45 @@
 import { nanoid } from 'nanoid';
 import { GoalHistory, PrismaClient } from '@prisma/client';
 
-import { GoalCommon } from '../schema/goal';
+import { GoalCommon, GoalUpdate } from '../schema/goal';
 import { addCalclulatedGoalsFields } from '../../trpc/queries/goals';
 
 import { prisma } from './prisma';
+
+export const findOrCreateEstimate = async (
+    estimate: GoalCommon['estimate'] | GoalUpdate['estimate'],
+    activityId: string,
+    goalId: string,
+) => {
+    if (!estimate) {
+        return null;
+    }
+
+    let currentEstimate = { ...estimate };
+
+    if (estimate.id == null) {
+        const { id: _, ...whereParams } = currentEstimate;
+        const realEstimate = await prisma.estimate.findFirst({
+            where: whereParams,
+        });
+
+        if (realEstimate) {
+            currentEstimate.id = realEstimate.id;
+        } else {
+            currentEstimate = await prisma.estimate.create({
+                data: {
+                    date: estimate.date,
+                    y: estimate.y,
+                    q: estimate.q,
+                    activityId,
+                    goalId,
+                },
+            });
+        }
+    }
+
+    return currentEstimate;
+};
 
 /**
  * Type-safe wrapper in raw SQL query.
@@ -35,6 +70,8 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
         FROM "Goal" WHERE "projectId" = ${input.parent.id};
     `;
 
+    const correctEstimate = await findOrCreateEstimate(input.estimate, activityId, id);
+
     const goal = await prisma.goal.update({
         where: {
             id,
@@ -45,11 +82,14 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
                       connect: input.tags,
                   }
                 : undefined,
-            estimate: input.estimate
+            estimate: correctEstimate?.id
                 ? {
                       create: {
-                          ...input.estimate,
-                          activityId,
+                          estimate: {
+                              connect: {
+                                  id: correctEstimate.id,
+                              },
+                          },
                       },
                   }
                 : undefined,
@@ -89,9 +129,10 @@ const subjectToTableNameMap: Record<string, keyof PrismaClient> = {
     owner: 'activity',
     participant: 'activity',
     state: 'state',
+    estimate: 'estimate',
 };
 
-export const getGoalHistory = async (history: GoalHistory[]) => {
+export const getGoalHistory = async (history: GoalHistory[], goalId: string) => {
     const needRequestForRecordIndicies = history.reduce<number[]>((acc, { subject }, index) => {
         if (subjectToTableNameMap[subject]) {
             acc.push(index);
@@ -143,6 +184,19 @@ export const getGoalHistory = async (history: GoalHistory[]) => {
                         });
                     case 'state':
                         return prisma.state.findMany({ where: query.where });
+                    case 'estimate':
+                        return prisma.estimate.findMany({
+                            where: {
+                                id: {
+                                    in: query.where.id.in.map((v) => Number(v)),
+                                },
+                                goal: {
+                                    some: {
+                                        goalId,
+                                    },
+                                },
+                            },
+                        });
                     default:
                         throw new Error('query for history record is undefined');
                 }

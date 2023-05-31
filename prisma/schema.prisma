@@ -97,26 +97,26 @@ model Ghost {
 }
 
 model Activity {
-  id                 String       @id @default(cuid())
-  ghost              Ghost?       @relation(fields: [ghostId], references: [id])
-  ghostId            String?      @unique
+  id                 String        @id @default(cuid())
+  ghost              Ghost?        @relation(fields: [ghostId], references: [id])
+  ghostId            String?       @unique
   user               User?
   filters            Filter[]
   comments           Comment[]
   reactions          Reaction[]
   projects           Project[]
   estimates          Estimate[]
-  projectParticipant Project[]    @relation("projectParticipants")
-  goalParticipant    Goal[]       @relation("goalParticipants")
-  goalWatchers       Goal[]       @relation("goalWatchers")
-  goalStargizers     Goal[]       @relation("goalStargizers")
-  projectWatchers    Project[]    @relation("projectWatchers")
-  projectStargizers  Project[]    @relation("projectStargizers")
-  filterStargizers   Filter[]     @relation("filterStargizers")
-  goalOwner          Goal[]       @relation("goalOwner")
-  goalIssuer         Goal[]       @relation("goalIssuer")
-  settings           Settings     @relation(fields: [settingsId], references: [id])
-  settingsId         String       @unique
+  projectParticipant Project[]     @relation("projectParticipants")
+  goalParticipant    Goal[]        @relation("goalParticipants")
+  goalWatchers       Goal[]        @relation("goalWatchers")
+  goalStargizers     Goal[]        @relation("goalStargizers")
+  projectWatchers    Project[]     @relation("projectWatchers")
+  projectStargizers  Project[]     @relation("projectStargizers")
+  filterStargizers   Filter[]      @relation("filterStargizers")
+  goalOwner          Goal[]        @relation("goalOwner")
+  goalIssuer         Goal[]        @relation("goalIssuer")
+  settings           Settings      @relation(fields: [settingsId], references: [id])
+  settingsId         String        @unique
   tags               Tag[]
   goalActions        GoalHistory[] @relation("goalActions")
 
@@ -151,7 +151,7 @@ model Estimate {
   q          String
   y          String
   date       String
-  goal       Goal     @relation(fields: [goalId], references: [id])
+  goal       EstimateToGoal[]
   goalId     String
   activity   Activity @relation(fields: [activityId], references: [id])
   activityId String
@@ -159,12 +159,24 @@ model Estimate {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  @@index([date])
+}
+
+model EstimateToGoal {
+  id         Int @default(autoincrement()) @id
+  goal       Goal @relation(fields: [goalId], references: [id])
+  goalId     String
+  estimate   Estimate @relation(fields: [estimateId], references: [id])
+  estimateId Int
+  createadAt DateTime @default(now())
+
   @@index([goalId])
+  @@index([estimateId])
 }
 
 model Goal {
-  id           String     @id @default(cuid())
-  scopeId      Int        @default(1)
+  id           String        @id @default(cuid())
+  scopeId      Int           @default(1)
   title        String
   description  String
   kind         String?
@@ -173,7 +185,7 @@ model Goal {
   private      Boolean?
   archived     Boolean?      @default(false)
   priority     String?
-  estimate     Estimate[]
+  estimate     EstimateToGoal[]
   project      Project?      @relation("projectGoals", fields: [projectId], references: [id])
   projectId    String?
   teamId       String?

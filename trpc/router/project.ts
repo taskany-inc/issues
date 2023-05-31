@@ -9,7 +9,13 @@ import {
     projectTransferOwnershipSchema,
     projectUpdateSchema,
 } from '../../src/schema/project';
-import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
+import {
+    addCalclulatedGoalsFields,
+    calcGoalsMeta,
+    getEstimateListFormJoin,
+    goalDeepQuery,
+    goalsFilter,
+} from '../queries/goals';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 
@@ -159,6 +165,14 @@ export const project = router({
                 ),
                 include: {
                     ...goalDeepQuery,
+                    estimate: {
+                        include: {
+                            estimate: true,
+                        },
+                        orderBy: {
+                            createadAt: 'asc',
+                        },
+                    },
                 },
             }),
             prisma.goal.findMany({
@@ -182,6 +196,14 @@ export const project = router({
                 }),
                 include: {
                     ...goalDeepQuery,
+                    estimate: {
+                        include: {
+                            estimate: true,
+                        },
+                        orderBy: {
+                            createadAt: 'asc',
+                        },
+                    },
                 },
             }),
         ]);
@@ -190,6 +212,7 @@ export const project = router({
             goals: filtredProjectGoals.map((g) => ({
                 ...g,
                 ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+                estimate: getEstimateListFormJoin(g),
             })),
             meta: calcGoalsMeta(allProjectGoals),
         };

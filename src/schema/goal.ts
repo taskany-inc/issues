@@ -69,6 +69,7 @@ export const goalCommonSchema = z.object({
             date: z.string(),
             q: z.string(),
             y: z.string(),
+            id: z.number().nullish(),
         })
         .optional(),
     tags: z
@@ -134,6 +135,7 @@ export const goalUpdateSchema = z.object({
             date: z.string(),
             q: z.string(),
             y: z.string(),
+            id: z.number().nullish(),
         })
         .optional(),
     tags: z.array(

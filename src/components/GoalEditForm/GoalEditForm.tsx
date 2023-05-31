@@ -40,7 +40,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             state={goal.state!}
             priority={goal.priority!}
             tags={goal.tags}
-            estimate={goal.estimate?.length ? goal.estimate[goal.estimate.length - 1] : undefined}
+            estimate={goal._lastEstimate ?? undefined}
             onSumbit={updateGoal}
             renderActionButton={({ busy, isValid }) => (
                 <FormAction right inline>

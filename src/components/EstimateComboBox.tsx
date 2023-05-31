@@ -22,6 +22,7 @@ interface EstimateComboBoxProps {
         date: string;
         q: string;
         y: string;
+        id: number;
     };
     defaultValuePlaceholder: {
         date: string;
@@ -114,23 +115,19 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
         const onQButtonClick = useCallback(
             (nextQ: string) => () => {
                 setSelectedQ(nextQ);
-
-                let newDate = createLocaleDate(endOfQuarter(nextQ), { locale });
-                // this is trick to avoid no zero before month in the EN locale, ex: 2/10/1990
-                if (newDate.length === 9) {
-                    newDate = `0${newDate}`;
-                }
-
-                setInputState(newDate);
                 setChanged(true);
             },
-            [locale],
+            [],
         );
 
         const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
             setChanged(true);
             setInputState(e.target.value);
         }, []);
+
+        useEffect(() => {
+            setInputState(createLocaleDate(endOfQuarter(selectedQ), { locale }));
+        }, [selectedQ, locale]);
 
         useEffect(() => {
             if (isValidDate(inputState)) {

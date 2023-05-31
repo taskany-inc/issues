@@ -4,7 +4,13 @@ import { GoalHistory, Tag } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
+import {
+    addCalclulatedGoalsFields,
+    calcGoalsMeta,
+    goalDeepQuery,
+    goalsFilter,
+    getEstimateListFormJoin,
+} from '../queries/goals';
 import {
     goalChangeProjectSchema,
     goalCommonSchema,
@@ -18,7 +24,7 @@ import {
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
-import { createGoal, changeGoalProject, getGoalHistory } from '../../src/utils/db';
+import { createGoal, changeGoalProject, getGoalHistory, findOrCreateEstimate } from '../../src/utils/db';
 
 export const goal = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
@@ -154,16 +160,32 @@ export const goal = router({
                 },
                 include: {
                     ...goalDeepQuery,
+                    estimate: {
+                        include: {
+                            estimate: true,
+                        },
+                        where: {
+                            goal: {
+                                projectId,
+                                scopeId,
+                                archived: false,
+                            },
+                        },
+                        orderBy: {
+                            createadAt: 'asc',
+                        },
+                    },
                 },
             });
 
             if (!goal) return null;
 
-            const history = await getGoalHistory(goal.history);
+            const history = await getGoalHistory(goal.history || [], goal.id);
 
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
+                estimate: getEstimateListFormJoin(goal),
                 history,
             };
         } catch (error: any) {
@@ -250,6 +272,14 @@ export const goal = router({
                 ),
                 include: {
                     ...goalDeepQuery,
+                    estimate: {
+                        include: {
+                            estimate: true,
+                        },
+                        orderBy: {
+                            createadAt: 'asc',
+                        },
+                    },
                 },
             }),
             prisma.goal.findMany({
@@ -258,6 +288,14 @@ export const goal = router({
                 }),
                 include: {
                     ...goalDeepQuery,
+                    estimate: {
+                        include: {
+                            estimate: true,
+                        },
+                        orderBy: {
+                            createadAt: 'asc',
+                        },
+                    },
                 },
             }),
         ]);
@@ -266,6 +304,7 @@ export const goal = router({
             goals: filtredUserGoals.map((g) => ({
                 ...g,
                 ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+                estimate: getEstimateListFormJoin(g),
             })),
             meta: calcGoalsMeta(allUserGoals),
         };
@@ -300,6 +339,7 @@ export const goal = router({
                 participants: true,
                 project: true,
                 tags: true,
+                estimate: true,
                 owner: {
                     include: {
                         user: true,
@@ -362,9 +402,6 @@ export const goal = router({
             });
         }
 
-        // TODO: after FIXME statement below
-        // if (actualGoal.estimate)
-
         if (actualGoal.ownerId !== input.owner.id) {
             history.push({
                 subject: 'owner',
@@ -391,6 +428,19 @@ export const goal = router({
             }
         }
 
+        const correctEstimate = await findOrCreateEstimate(input.estimate, ctx.session.user.activityId, actualGoal.id);
+
+        if (correctEstimate) {
+            history.push({
+                subject: 'estimate',
+                action: 'change',
+                previousValue: actualGoal.estimate.length
+                    ? String(actualGoal.estimate[actualGoal.estimate.length - 1].estimateId)
+                    : '',
+                nextValue: String(correctEstimate.id),
+            });
+        }
+
         try {
             const goal = await prisma.goal.update({
                 where: { id: actualGoal.id },
@@ -400,12 +450,14 @@ export const goal = router({
                     description: input.description,
                     stateId: input.state?.id,
                     priority: input.priority,
-                    // FIXME: looks like we are creating new every update
-                    estimate: input.estimate
+                    estimate: correctEstimate?.id
                         ? {
                               create: {
-                                  ...input.estimate,
-                                  activityId: ctx.session.user.activityId,
+                                  estimate: {
+                                      connect: {
+                                          id: correctEstimate.id,
+                                      },
+                                  },
                               },
                           }
                         : undefined,
@@ -427,6 +479,7 @@ export const goal = router({
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
+                estimate: getEstimateListFormJoin(goal),
             };
 
             // await mailServer.sendMail({

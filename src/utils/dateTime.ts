@@ -11,11 +11,21 @@ export enum quarters {
     'Q4' = 'Q4',
 }
 
-export const createLocaleDate = (date: Date, { locale }: LocaleArg) => new Intl.DateTimeFormat(locale).format(date);
+export const createLocaleDate = (date: Date, { locale }: LocaleArg) =>
+    new Intl.DateTimeFormat(locale, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    }).format(date);
 
 export const yearFromDate = (date: Date) => date.getFullYear();
 
-export const currentLocaleDate = ({ locale }: LocaleArg) => new Intl.DateTimeFormat(locale).format(new Date());
+export const currentLocaleDate = ({ locale }: LocaleArg) =>
+    new Intl.DateTimeFormat(locale, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    }).format(new Date());
 
 export const endOfQuarter = (q: string) => {
     const qToM = {
@@ -25,7 +35,7 @@ export const endOfQuarter = (q: string) => {
         [quarters.Q4]: 11,
     };
 
-    const abstractDate = new Date().setMonth(qToM[q as quarters]);
+    const abstractDate = new Date().setMonth(qToM[q as quarters], 0);
 
     const qEndDate = (date: number) => {
         const d = new Date(date);
