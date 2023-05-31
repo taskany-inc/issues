@@ -42,44 +42,48 @@ interface GoalListItemProps {
 }
 
 export const GoalsListContainer = styled.div`
-    display: table;
+    display: grid;
+    grid-template-columns: minmax(410px, 30%) repeat(10, max-content) 1fr;
+
     width: 100%;
     margin: 0 -20px;
     padding: 0 20px;
 `;
 
 const GoalCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
     font-size: 0;
-    display: table-cell;
+
     transition: background-color 150ms ease-in;
     text-align: ${({ align = 'left' }) => align};
-    vertical-align: middle;
+    box-sizing: border-box;
 
     &:last-child {
-        width: 1%;
         white-space: nowrap;
-        padding: ${gapS} ${gapSm} ${gapS} 0;
+        padding: ${gapS} ${gapSm} ${gapS} ${gapS};
         border-radius: 0 ${radiusM} ${radiusM} 0;
     }
 
     &:first-child {
-        padding: ${gapS} 0 ${gapS} ${gapSm};
+        padding: ${gapS} ${gapS} ${gapS} ${gapSm};
         border-radius: ${radiusM} 0 0 ${radiusM};
     }
 `;
 
 const Goal = styled.a<{ focused?: boolean }>`
-    display: table-row;
-    align-items: center;
+    display: contents;
 
     color: ${textColor};
     text-decoration: none;
 
-    &:hover {
+    &:hover ${GoalCell} {
         background-color: ${gray4};
     }
 
-    &:visited {
+    &:visited ${GoalCell} {
         color: ${textColor};
     }
 
@@ -91,13 +95,11 @@ const Goal = styled.a<{ focused?: boolean }>`
             }
         `}
 
-    border-radius: ${radiusM};
+    box-sizing: border-box;
 `;
 
 const GoalTitleItem = styled(GoalCell)`
     overflow: hidden;
-    width: 30%;
-    min-width: 410px;
     white-space: normal;
 `;
 
