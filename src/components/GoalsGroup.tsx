@@ -21,8 +21,8 @@ interface GoalGroupProps {
 }
 
 const GoalsGroupContainer = styled.div`
-    display: block;
     padding-top: ${gapM};
+    grid-column: 1/-1;
 
     &:first-child {
         padding-top: 0;
