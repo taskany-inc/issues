@@ -1,6 +1,7 @@
 {
     "Priority": "Priority",
     "State": "State",
+    "Issuer": "Issuer",
     "Owner": "Owner",
     "Project": "Project",
     "Tag": "Tag",

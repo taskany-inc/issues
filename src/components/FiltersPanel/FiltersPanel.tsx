@@ -46,11 +46,13 @@ export const FiltersPanel: FC<{
     tags?: React.ComponentProps<typeof TagFilter>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
+    issuers?: React.ComponentProps<typeof UserFilter>['users'];
     owners?: React.ComponentProps<typeof UserFilter>['users'];
 
     onSearchChange: (search: string) => void;
     onPriorityChange: React.ComponentProps<typeof PriorityFilter>['onChange'];
     onStateChange: React.ComponentProps<typeof StateFilter>['onChange'];
+    onIssuerChange: React.ComponentProps<typeof UserFilter>['onChange'];
     onOwnerChange: React.ComponentProps<typeof UserFilter>['onChange'];
     onProjectChange: React.ComponentProps<typeof ProjectFilter>['onChange'];
     onTagChange: React.ComponentProps<typeof TagFilter>['onChange'];
@@ -74,10 +76,12 @@ export const FiltersPanel: FC<{
     estimates = [],
     presets = [],
     owners = [],
+    issuers = [],
     priorities = [],
     states = [],
     onPriorityChange,
     onStateChange,
+    onIssuerChange,
     onOwnerChange,
     onSearchChange,
     onProjectChange,
@@ -126,6 +130,14 @@ export const FiltersPanel: FC<{
                             value={queryState.project}
                             projects={projects}
                             onChange={onProjectChange}
+                        />
+                    )}
+                    {Boolean(issuers.length) && (
+                        <UserFilter
+                            text={tr('Issuer')}
+                            value={queryState.issuer}
+                            users={issuers}
+                            onChange={onIssuerChange}
                         />
                     )}
                     {Boolean(owners.length) && (
@@ -183,6 +195,7 @@ export const FiltersPanel: FC<{
             queryState={queryState}
             priority={priorities as Priority[]}
             states={states}
+            issuers={issuers}
             owners={owners}
             projects={projects}
             tags={tags}

@@ -13,6 +13,7 @@ export interface QueryState {
     state: string[];
     tag: string[];
     estimate: string[];
+    issuer: string[];
     owner: string[];
     project: string[];
     query: string;
@@ -43,6 +44,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     state: parseQueryParam(query.state?.toString()),
     tag: parseQueryParam(query.tag?.toString()),
     estimate: parseQueryParam(query.estimate?.toString()),
+    issuer: parseQueryParam(query.issuer?.toString()),
     owner: parseQueryParam(query.owner?.toString()),
     project: parseQueryParam(query.project?.toString()),
     query: parseQueryParam(query.query?.toString()).toString(),
@@ -66,7 +68,20 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     }
 
     const pushNewState = useCallback(
-        ({ priority, state, tag, estimate, owner, project, query, starred, watching, sort, limit }: QueryState) => {
+        ({
+            priority,
+            state,
+            tag,
+            estimate,
+            issuer,
+            owner,
+            project,
+            query,
+            starred,
+            watching,
+            sort,
+            limit,
+        }: QueryState) => {
             const newurl = router.asPath.split('?')[0];
             const urlParams = new URLSearchParams();
 
@@ -83,6 +98,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
                 : urlParams.delete('estimate');
 
             owner.length > 0 ? urlParams.set('owner', Array.from(owner).toString()) : urlParams.delete('owner');
+            issuer.length > 0 ? urlParams.set('issuer', Array.from(issuer).toString()) : urlParams.delete('issuer');
 
             project.length > 0 ? urlParams.set('project', Array.from(project).toString()) : urlParams.delete('project');
 
@@ -119,6 +135,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         pushNewState({
             priority: [],
             state: [],
+            issuer: [],
             owner: [],
             project: [],
             tag: [],
@@ -168,6 +185,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setStateFilter: pushStateProvider('state'),
             setTagsFilter: pushStateProvider('tag'),
             setEstimateFilter: pushStateProvider('estimate'),
+            setIssuerFilter: pushStateProvider('issuer'),
             setOwnerFilter: pushStateProvider('owner'),
             setProjectFilter: pushStateProvider('project'),
             setStarredFilter: pushStateProvider('starred'),

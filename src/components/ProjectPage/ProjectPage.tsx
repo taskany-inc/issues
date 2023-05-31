@@ -51,6 +51,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
         setTagsFilter,
         setTagsFilterOutside,
         setEstimateFilter,
+        setIssuerFilter,
         setOwnerFilter,
         setProjectFilter,
         setStarredFilter,
@@ -217,6 +218,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                     counter={projectDeepInfo?.goals?.length}
                     queryState={queryState}
                     queryString={queryString}
+                    issuers={projectDeepInfo?.meta?.issuers}
                     owners={projectDeepInfo?.meta?.owners}
                     priorities={projectDeepInfo?.meta?.priority}
                     projects={projectDeepInfo?.meta?.projects}
@@ -226,6 +228,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                     states={projectDeepInfo?.meta?.states}
                     estimates={projectDeepInfo?.meta?.estimates}
                     onSearchChange={setFulltextFilter}
+                    onIssuerChange={setIssuerFilter}
                     onOwnerChange={setOwnerFilter}
                     onProjectChange={setProjectFilter}
                     onStateChange={setStateFilter}

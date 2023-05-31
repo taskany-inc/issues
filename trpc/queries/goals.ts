@@ -1,5 +1,3 @@
-import { Activity, Goal, GoalHistory, Project } from '@prisma/client';
-
 import { QueryWithFilters } from '../../src/schema/common';
 
 const defaultOrderBy = {
@@ -44,6 +42,16 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
                               y,
                           };
                       }),
+                  },
+              },
+          }
+        : {};
+
+    const issuerFilter = data.issuer?.length
+        ? {
+              activity: {
+                  id: {
+                      in: data.issuer,
                   },
               },
           }
@@ -188,6 +196,7 @@ export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: a
             ...statesFilter,
             ...tagsFilter,
             ...estimateFilter,
+            ...issuerFilter,
             ...ownerFilter,
             ...projectFilter,
             ...extra,
