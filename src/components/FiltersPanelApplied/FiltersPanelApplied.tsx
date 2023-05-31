@@ -18,7 +18,7 @@ interface FiltersPanelAppliedProps {
     queryState: QueryState;
     priority?: React.ComponentProps<typeof PriorityFilter>['priorities'];
     states?: React.ComponentProps<typeof StateFilter>['states'];
-    users?: React.ComponentProps<typeof UserFilter>['users'];
+    owners?: React.ComponentProps<typeof UserFilter>['users'];
     projects?: React.ComponentProps<typeof ProjectFilter>['projects'];
     tags?: React.ComponentProps<typeof TagFilter>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
@@ -37,7 +37,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     queryState,
     priority,
     states,
-    users,
+    owners,
     projects,
     tags,
     estimates,
@@ -47,11 +47,11 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     const { statesMap, ownersMap, projectsMap, tagsMap } = useMemo(() => {
         return {
             statesMap: arrToMap(states || []),
-            ownersMap: arrToMap(users || []),
+            ownersMap: arrToMap(owners || []),
             projectsMap: arrToMap(projects || []),
             tagsMap: arrToMap(tags || []),
         };
-    }, [states, users, projects, tags]);
+    }, [states, owners, projects, tags]);
 
     const appliedMap: Record<string, string[]> = {};
 
@@ -63,7 +63,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
         appliedMap[tr('State')] = queryState.state.map((s) => statesMap[s].title).filter(Boolean);
     }
 
-    if (queryState.owner.length && users?.length) {
+    if (queryState.owner.length && owners?.length) {
         appliedMap[tr('Owner')] = queryState.owner.map((u) => ownersMap[u].user?.name).filter(Boolean) as string[];
     }
 
