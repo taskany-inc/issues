@@ -6,7 +6,7 @@ import { QueryState } from '../../hooks/useUrlFilterParams';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { PriorityFilter } from '../PriorityFilter';
 import { StateFilter } from '../StateFilter';
-import { UserFilter } from '../UserFilter';
+import { UserFilter } from '../UserFilter/UserFilter';
 import { ProjectFilter } from '../ProjectFilter';
 import { TagFilter } from '../TagFilter';
 import { EstimateFilter } from '../EstimateFilter';
