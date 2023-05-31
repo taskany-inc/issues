@@ -4,6 +4,8 @@ import { gray8 } from '@taskany/colors';
 
 import { tr } from './SortFilter.i18n';
 
+export const sortFilterTr = tr;
+
 export type SortDirection = 'asc' | 'desc' | null;
 export type SortableProps =
     | 'title'
