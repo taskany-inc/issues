@@ -4,17 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
 import styled from 'styled-components';
 import { gapS, gray2 } from '@taskany/colors';
-import {
-    Button,
-    Form,
-    FormInput,
-    FormActions,
-    FormAction,
-    FormTitle,
-    ModalContent,
-    ModalHeader,
-    Tag,
-} from '@taskany/bricks';
+import { Form, FormInput, FormActions, FormAction, FormTitle, ModalContent, ModalHeader, Tag } from '@taskany/bricks';
 import { Estimate, State, Tag as TagModel } from '@prisma/client';
 
 import { FormEditor } from '../FormEditor/FormEditor';
@@ -33,9 +23,7 @@ import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { tr } from './GoalForm.i18n';
 
 const tagsLimit = 5;
-
 interface GoalFormProps {
-    actionBtnText: string;
     formTitle: string;
     owner?: ActivityByIdReturnType;
     title?: string;
@@ -51,6 +39,7 @@ interface GoalFormProps {
     id?: string;
 
     onSumbit: (fields: z.infer<GoalFormProps['validityScheme']>) => void;
+    renderActionButton: (props: { busy: boolean; isValid: boolean }) => React.ReactNode;
 }
 
 const StyledTagsContainer = styled.div<{ focused?: boolean }>`
@@ -66,7 +55,6 @@ const StyledTagsContainer = styled.div<{ focused?: boolean }>`
 
 export const GoalForm: React.FC<GoalFormProps> = ({
     formTitle,
-    actionBtnText,
     id,
     title,
     description,
@@ -80,6 +68,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     validityScheme,
     children,
     onSumbit,
+    renderActionButton,
 }) => {
     const { locale } = usePageContext();
     const [descriptionFocused, setDescriptionFocused] = useState(false);
@@ -258,15 +247,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 )}
                             />
                         </FormAction>
-                        <FormAction right inline>
-                            <Button
-                                view="primary"
-                                disabled={busy}
-                                outline={!isValid}
-                                type="submit"
-                                text={actionBtnText}
-                            />
-                        </FormAction>
+                        {renderActionButton({ busy: Boolean(busy), isValid: Boolean(isValid) })}
                     </FormActions>
                 </Form>
 
