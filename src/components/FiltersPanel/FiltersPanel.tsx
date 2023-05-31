@@ -46,12 +46,12 @@ export const FiltersPanel: FC<{
     tags?: React.ComponentProps<typeof TagFilter>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
-    users?: React.ComponentProps<typeof UserFilter>['users'];
+    owners?: React.ComponentProps<typeof UserFilter>['users'];
 
     onSearchChange: (search: string) => void;
     onPriorityChange: React.ComponentProps<typeof PriorityFilter>['onChange'];
     onStateChange: React.ComponentProps<typeof StateFilter>['onChange'];
-    onUserChange: React.ComponentProps<typeof UserFilter>['onChange'];
+    onOwnerChange: React.ComponentProps<typeof UserFilter>['onChange'];
     onProjectChange: React.ComponentProps<typeof ProjectFilter>['onChange'];
     onTagChange: React.ComponentProps<typeof TagFilter>['onChange'];
     onEstimateChange: React.ComponentProps<typeof EstimateFilter>['onChange'];
@@ -73,12 +73,12 @@ export const FiltersPanel: FC<{
     tags = [],
     estimates = [],
     presets = [],
-    users = [],
+    owners = [],
     priorities = [],
     states = [],
     onPriorityChange,
     onStateChange,
-    onUserChange,
+    onOwnerChange,
     onSearchChange,
     onProjectChange,
     onEstimateChange,
@@ -128,8 +128,13 @@ export const FiltersPanel: FC<{
                             onChange={onProjectChange}
                         />
                     )}
-                    {Boolean(users.length) && (
-                        <UserFilter text={tr('Owner')} value={queryState.owner} users={users} onChange={onUserChange} />
+                    {Boolean(owners.length) && (
+                        <UserFilter
+                            text={tr('Owner')}
+                            value={queryState.owner}
+                            users={owners}
+                            onChange={onOwnerChange}
+                        />
                     )}
                     {Boolean(estimates.length) && (
                         <EstimateFilter
@@ -178,7 +183,7 @@ export const FiltersPanel: FC<{
             queryState={queryState}
             priority={priorities as Priority[]}
             states={states}
-            users={users}
+            owners={owners}
             projects={projects}
             tags={tags}
             estimates={estimates}

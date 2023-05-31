@@ -179,7 +179,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
                 counter={goals?.length}
                 queryState={queryState}
                 queryString={queryString}
-                users={meta?.owners}
+                owners={meta?.owners}
                 priorities={meta?.priority}
                 projects={meta?.projects}
                 preset={currentPreset}
@@ -188,7 +188,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
                 states={meta?.states}
                 estimates={meta?.estimates}
                 onSearchChange={setFulltextFilter}
-                onUserChange={setOwnerFilter}
+                onOwnerChange={setOwnerFilter}
                 onProjectChange={setProjectFilter}
                 onStateChange={setStateFilter}
                 onTagChange={setTagsFilter}
