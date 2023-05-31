@@ -155,13 +155,26 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
     );
 
     const defaultTitle = <PageTitle title={tr('Dashboard')} />;
-    const presetTitle = <PageTitle title={tr('Dashboard')} subtitle={currentPreset?.title} />;
+    const presetInfo =
+        user.activityId === currentPreset?.activityId
+            ? `${tr('created by')} ${currentPreset?.activity?.user?.name}`
+            : undefined;
+    const presetTitle = <PageTitle title={tr('Dashboard')} subtitle={currentPreset?.title} info={presetInfo} />;
 
     const onShadowPresetTitleClick = useCallback(() => {
         if (shadowPreset) setPreset(shadowPreset.id);
     }, [setPreset, shadowPreset]);
+    const shadowPresetInfo =
+        user.activityId !== shadowPreset?.activityId
+            ? `${tr('created by')} ${shadowPreset?.activity?.user?.name}`
+            : undefined;
     const shadowPresetTitle = (
-        <PageTitle title={tr('Dashboard')} subtitle={shadowPreset?.title} onClick={onShadowPresetTitleClick} />
+        <PageTitle
+            title={tr('Dashboard')}
+            subtitle={shadowPreset?.title}
+            info={shadowPresetInfo}
+            onClick={onShadowPresetTitleClick}
+        />
     );
     // eslint-disable-next-line no-nested-ternary
     const title = currentPreset ? presetTitle : shadowPreset ? shadowPresetTitle : defaultTitle;
