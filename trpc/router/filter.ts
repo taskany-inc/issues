@@ -15,6 +15,12 @@ export const filter = router({
             },
             include: {
                 stargizers: true,
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
             },
         });
 
@@ -43,6 +49,14 @@ export const filter = router({
                         },
                     },
                 ],
+            },
+            include: {
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
             },
         });
     }),
