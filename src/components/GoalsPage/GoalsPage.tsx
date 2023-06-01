@@ -156,7 +156,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
 
     const defaultTitle = <PageTitle title={tr('Dashboard')} />;
     const presetInfo =
-        user.activityId === currentPreset?.activityId
+        user.activityId !== currentPreset?.activityId
             ? `${tr('created by')} ${currentPreset?.activity?.user?.name}`
             : undefined;
     const presetTitle = <PageTitle title={tr('Dashboard')} subtitle={currentPreset?.title} info={presetInfo} />;
