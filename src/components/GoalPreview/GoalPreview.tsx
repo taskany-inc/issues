@@ -104,6 +104,11 @@ const StyledCard = styled(Card)`
 const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
     const { user, locale } = usePageContext();
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
+    const [isRelativeTime, setIsRelativeTime] = useState(true);
+
+    const onChangeTypeDate = () => {
+        setIsRelativeTime(!isRelativeTime);
+    };
 
     const archiveMutation = trpc.goal.toggleArchive.useMutation();
     const utils = trpc.useContext();
@@ -310,10 +315,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                 </StyledModalHeader>
                 <StyledModalContent ref={contentRef}>
                     <StyledCard>
-                        <CardInfo>
+                        <CardInfo onClick={onChangeTypeDate}>
                             <Link inline>{goal?.activity?.user?.name}</Link> —{' '}
                             {nullable(goal?.createdAt, (date) => (
-                                <RelativeTime date={date} />
+                                <RelativeTime isRelativeTime={isRelativeTime} date={date} />
                             ))}
                         </CardInfo>
 
