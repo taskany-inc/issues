@@ -120,6 +120,11 @@ export const CommentView: FC<CommentViewProps> = ({
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);
     const { reactionsProps } = useReactionsResource(reactions);
+    const [isRelativeTime, setIsRelativeTime] = useState(true);
+
+    const onChangeTypeDate = () => {
+        setIsRelativeTime(!isRelativeTime);
+    };
 
     const onEditClick = useCallback(() => {
         setEditMode(true);
@@ -167,11 +172,11 @@ export const CommentView: FC<CommentViewProps> = ({
                 />
             ) : (
                 <StyledCommentCard isNew={isNew} onClick={onDoubleCommentClick}>
-                    <StyledCardInfo>
+                    <StyledCardInfo onClick={onChangeTypeDate}>
                         <div>
                             <Link inline>{author?.name}</Link> —{' '}
                             <Link inline href={`#comment-${id}`}>
-                                <RelativeTime date={createdAt} />
+                                <RelativeTime isRelativeTime={isRelativeTime} date={createdAt} />
                             </Link>
                         </div>
                         <StyledCommentActions>

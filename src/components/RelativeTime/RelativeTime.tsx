@@ -13,9 +13,10 @@ type RelativeTimeKind = RelativeTimeKindCommon | Capitalize<RelativeTimeKindComm
 interface RelativeTimeProps {
     date: Date;
     kind?: RelativeTimeKind;
+    isRelativeTime?: boolean;
 }
 
-const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
+const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true }) => {
     const { locale, ssrTime } = usePageContext();
     const [time, setTime] = useState(ssrTime);
     const mounted = useMounted(0);
@@ -43,7 +44,9 @@ const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date }) => {
     return (
         <>
             {kind ? `${map[kind]} ` : ''}
-            <Light title={createLocaleDate(localeDate, { locale })}>{dateAgo(localeDate, time, { locale })}</Light>
+            <Light title={createLocaleDate(localeDate, { locale })}>
+                {isRelativeTime ? dateAgo(localeDate, time, { locale }) : createLocaleDate(localeDate, { locale })}
+            </Light>
         </>
     );
 };
