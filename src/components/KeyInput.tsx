@@ -65,7 +65,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
 
     const onInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = keyPredictor(e.target.value);
+            const newValue = keyPredictor(e.target.value, { allowVowels: true });
             setInputState(newValue);
 
             onDirty?.();
