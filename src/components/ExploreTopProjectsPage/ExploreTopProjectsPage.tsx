@@ -5,7 +5,7 @@ import { routes } from '../../hooks/router';
 import { Page, PageContent } from '../Page';
 import { PageSep } from '../PageSep';
 import { ExplorePageLayout } from '../ExplorePageLayout/ExplorePageLayout';
-import { ProjectListItem } from '../ProjectListItem';
+import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './ExploreTopProjectsPage.i18n';
@@ -21,19 +21,21 @@ export const ExploreProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps
                 <PageSep />
 
                 <PageContent>
-                    {projects.data.map((project) =>
-                        nullable(project, (p) => (
-                            <ProjectListItem
-                                key={p.id}
-                                href={routes.project(p.id)}
-                                createdAt={p.createdAt}
-                                title={p.title}
-                                description={p.description}
-                                ownerImage={p.activity.user?.image}
-                                onwerEmail={p.activity.user?.email || p.activity.ghost?.email}
-                            />
-                        )),
-                    )}
+                    <ProjectListContainer>
+                        {projects.data.map((project) =>
+                            nullable(project, (p) => (
+                                <ProjectListItem
+                                    key={p.id}
+                                    href={routes.project(p.id)}
+                                    title={p.title}
+                                    owner={p.activity}
+                                    starred={p._isStarred}
+                                    watching={p._isWatching}
+                                    participants={p.participants}
+                                />
+                            )),
+                        )}
+                    </ProjectListContainer>
                 </PageContent>
             </ExplorePageLayout>
         </Page>
