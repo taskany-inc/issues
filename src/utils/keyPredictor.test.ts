@@ -28,4 +28,8 @@ describe('keyPredictor', () => {
     test('removes unicode', () => {
         expect(keyPredictor('😎GBDC😍XDRTML♥')).toBe('GBDCXDRTML');
     });
+
+    test('do not remove vowels', () => {
+        expect(keyPredictor('AEOIUYW', { allowVowels: true })).toBe('AEOIUYW');
+    });
 });
