@@ -1,8 +1,8 @@
-import React, { MouseEventHandler, useMemo } from 'react';
+import React, { FC, MouseEventHandler, useMemo } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
-import { gray4, textColor, gapS, gapXs, radiusM, gray9, gapSm } from '@taskany/colors';
+import { textColor, gapS, gapXs, gray9 } from '@taskany/colors';
 import { MessageIcon, Text, Tag as TagItem, nullable, StarFilledIcon, EyeIcon } from '@taskany/bricks';
 import type { Estimate, State as StateType, Tag } from '@prisma/client';
 
@@ -14,6 +14,7 @@ import { estimateToString } from '../utils/estimateToString';
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
 import { State } from './State';
+import { Table, TableRow, TableCell } from './Table';
 
 const RelativeTime = dynamic(() => import('./RelativeTime/RelativeTime'));
 
@@ -41,69 +42,12 @@ interface GoalListItemProps {
     onTagClick?: (tag: Tag) => MouseEventHandler<HTMLDivElement>;
 }
 
-export const GoalsListContainer = styled.div`
-    display: grid;
-    grid-template-columns: minmax(410px, 30%) repeat(10, max-content) 1fr;
-
-    width: 100%;
-    margin: 0 -20px;
-    padding: 0 20px;
-`;
-
-const GoalCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    font-size: 0;
-
-    transition: background-color 150ms ease-in;
-    text-align: ${({ align = 'left' }) => align};
-    box-sizing: border-box;
-
-    &:last-child {
-        white-space: nowrap;
-        padding: ${gapS} ${gapSm} ${gapS} ${gapS};
-        border-radius: 0 ${radiusM} ${radiusM} 0;
-    }
-
-    &:first-child {
-        padding: ${gapS} ${gapS} ${gapS} ${gapSm};
-        border-radius: ${radiusM} 0 0 ${radiusM};
-    }
-`;
-
-const Goal = styled.a<{ focused?: boolean }>`
-    display: contents;
-
-    color: ${textColor};
-    text-decoration: none;
-
-    &:hover ${GoalCell} {
-        background-color: ${gray4};
-    }
-
-    &:visited ${GoalCell} {
-        color: ${textColor};
-    }
-
-    ${({ focused }) =>
-        focused &&
-        `
-            ${GoalCell} {
-                background-color: ${gray4};
-            }
-        `}
-
-    box-sizing: border-box;
-`;
-
-const GoalTitleItem = styled(GoalCell)`
+const GoalTitleItem = styled(TableCell)`
     overflow: hidden;
     white-space: normal;
 `;
 
-const GoalContentItem = styled(GoalCell)`
+const GoalContentItem = styled(TableCell)`
     justify-self: center;
     align-self: center;
     padding: ${gapS} ${gapS};
@@ -169,6 +113,10 @@ const RelatedTextItem = styled(GoalTextItem).attrs({
     weight: 'regular',
 })``;
 
+export const GoalsListContainer: FC<{ children: React.ReactNode }> = ({ children }) => (
+    <Table columns={12}>{children}</Table>
+);
+
 export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
     ({
         shortId,
@@ -201,7 +149,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
 
         return (
             <NextLink href={routes.goal(shortId)} passHref>
-                <Goal focused={focused} onClick={onClick} className={className}>
+                <TableRow focused={focused} onClick={onClick} className={className}>
                     <GoalTitleItem>
                         <GoalTitleContainer>
                             {isNotViewed && <NotViewedDot />}
@@ -278,7 +226,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                             <EyeIcon size="s" />
                         ))}
                     </GoalContentItem>
-                </Goal>
+                </TableRow>
             </NextLink>
         );
     },

@@ -19,6 +19,28 @@ import {
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 
+type WithId = { id: string };
+
+const addCalculatedProjectFields = <T extends { watchers?: WithId[]; stargizers?: WithId[]; ownerId?: string }>(
+    project: T,
+    activityId: string,
+): T & {
+    _isWatching?: boolean;
+    _isStarred?: boolean;
+    _isOwner: boolean;
+} => {
+    const _isWatching = project.watchers?.some((watcher: any) => watcher.id === activityId);
+    const _isStarred = project.stargizers?.some((stargizer: any) => stargizer.id === activityId);
+    const _isOwner = project.ownerId === activityId;
+
+    return {
+        ...project,
+        _isWatching,
+        _isStarred,
+        _isOwner,
+    };
+};
+
 export const project = router({
     suggestions: protectedProcedure.input(z.string()).query(({ input }) => {
         return prisma.project.findMany({
@@ -42,42 +64,62 @@ export const project = router({
             },
         });
     }),
-    getAll: protectedProcedure.query(() => {
-        return prisma.project.findMany({
-            orderBy: {
-                createdAt: 'asc',
-            },
-            include: {
-                activity: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
+    getAll: protectedProcedure.query(({ ctx }) => {
+        return prisma.project
+            .findMany({
+                orderBy: {
+                    createdAt: 'asc',
                 },
-            },
-        });
+                include: {
+                    activity: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                    participants: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                    stargizers: true,
+                    watchers: true,
+                },
+            })
+            .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
     }),
-    getTop: protectedProcedure.query(async () => {
-        const allProjects = await prisma.project.findMany({
-            orderBy: {
-                createdAt: 'asc',
-            },
-            include: {
-                activity: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
+    getTop: protectedProcedure.query(async ({ ctx }) => {
+        const allProjects = await prisma.project
+            .findMany({
+                orderBy: {
+                    createdAt: 'asc',
                 },
-                children: true,
-                parent: true,
-                _count: {
-                    select: {
-                        parent: true,
+                include: {
+                    activity: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
                     },
+                    participants: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                    children: true,
+                    parent: true,
+                    _count: {
+                        select: {
+                            parent: true,
+                        },
+                    },
+                    stargizers: true,
+                    watchers: true,
                 },
-            },
-        });
+            })
+            .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
 
         // FIX: it is hack!
         return allProjects.filter((p) => p._count.parent === 0);
@@ -122,13 +164,7 @@ export const project = router({
 
         if (!project) return null;
 
-        return {
-            ...project,
-            _isStarred:
-                project.stargizers.filter((stargizer) => stargizer?.id === ctx.session.user.activityId).length > 0,
-            _isWatching: project.watchers.filter((watcher) => watcher?.id === ctx.session.user.activityId).length > 0,
-            _isOwner: project.activityId === ctx.session.user.activityId,
-        };
+        return addCalculatedProjectFields(project, ctx.session.user.activityId);
     }),
     getDeepInfo: protectedProcedure.input(projectDeepInfoSchema).query(async ({ ctx, input }) => {
         const [allProjectGoals, filtredProjectGoals] = await Promise.all([

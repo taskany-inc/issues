@@ -10,6 +10,7 @@ import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { GoalListItem } from './GoalListItem';
 import { PageSep } from './PageSep';
 import { ProjectTitleList } from './ProjectTitleList';
+import { TableFullWidthCell } from './Table';
 
 interface GoalGroupProps {
     goals: NonNullable<GoalByIdReturnType>[];
@@ -20,9 +21,8 @@ interface GoalGroupProps {
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
 }
 
-const GoalsGroupContainer = styled.div`
+const GoalsGroupContainer = styled(TableFullWidthCell)`
     padding-top: ${gapM};
-    grid-column: 1/-1;
 
     &:first-child {
         padding-top: 0;
