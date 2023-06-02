@@ -168,7 +168,8 @@ model EstimateToGoal {
   goalId     String
   estimate   Estimate @relation(fields: [estimateId], references: [id])
   estimateId Int
-  createadAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
 
   @@index([goalId])
   @@index([estimateId])

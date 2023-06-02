@@ -172,7 +172,7 @@ export const goal = router({
                             },
                         },
                         orderBy: {
-                            createadAt: 'asc',
+                            createdAt: 'asc',
                         },
                     },
                 },
@@ -277,7 +277,7 @@ export const goal = router({
                             estimate: true,
                         },
                         orderBy: {
-                            createadAt: 'asc',
+                            createdAt: 'asc',
                         },
                     },
                 },
@@ -293,7 +293,7 @@ export const goal = router({
                             estimate: true,
                         },
                         orderBy: {
-                            createadAt: 'asc',
+                            createdAt: 'asc',
                         },
                     },
                 },
