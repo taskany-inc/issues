@@ -170,7 +170,7 @@ export const project = router({
                             estimate: true,
                         },
                         orderBy: {
-                            createadAt: 'asc',
+                            createdAt: 'asc',
                         },
                     },
                 },
@@ -201,7 +201,7 @@ export const project = router({
                             estimate: true,
                         },
                         orderBy: {
-                            createadAt: 'asc',
+                            createdAt: 'asc',
                         },
                     },
                 },

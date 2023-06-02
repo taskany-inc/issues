@@ -9,7 +9,7 @@ CREATE TABLE "EstimateToGoal" (
     "id" SERIAL NOT NULL,
     "goalId" TEXT NOT NULL,
     "estimateId" INTEGER NOT NULL,
-    "createadAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "EstimateToGoal_pkey" PRIMARY KEY ("id")
 );
@@ -31,4 +31,4 @@ ALTER TABLE "EstimateToGoal" ADD CONSTRAINT "EstimateToGoal_estimateId_fkey" FOR
 
 -- Fill join table
 INSERT INTO "EstimateToGoal" ("goalId", "estimateId", "createdAt")
-SELECT "goalId", "id", "createdAt" from "Estimate"
+SELECT "goalId", "id", "createdAt" FROM "Estimate"
