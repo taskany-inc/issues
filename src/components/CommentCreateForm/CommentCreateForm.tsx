@@ -1,74 +1,87 @@
 import React, { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UserPic } from '@taskany/bricks';
+import { ArrowDownSmallIcon, ArrowUpSmallIcon, Button, Dropdown, UserPic } from '@taskany/bricks';
+import { State } from '@prisma/client';
+import styled from 'styled-components';
 
 import { usePageContext } from '../../hooks/usePageContext';
 import { useCommentResource } from '../../hooks/useCommentResource';
+import { GoalCommentCreate, goalCreateCommentSchema } from '../../schema/goal';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
-import { CommentCreate, commentCreateSchema } from '../../schema/comment';
+import { ColorizedMenuItem } from '../ColorizedMenuItem';
+import { StateDot } from '../StateDot';
 
 import { tr } from './CommentCreateForm.i18n';
 
 interface CommentCreateFormProps {
     goalId: string;
+    states?: State[];
 
     onSubmit?: (id?: string) => void;
     onFocus?: () => void;
     onCancel?: () => void;
 }
 
-const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus, onCancel, goalId }) => {
-    const { user } = usePageContext();
+const StyledStateUpdate = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
+const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, onSubmit, onFocus, onCancel }) => {
+    const { user, themeId } = usePageContext();
     const { create } = useCommentResource();
-    const [focus, setFocus] = useState<boolean | undefined>();
     const [busy, setBusy] = useState(false);
+    const [pushState, setPushState] = useState<State | undefined>();
 
     const {
         control,
         handleSubmit,
         reset,
         formState: { isValid },
-    } = useForm<CommentCreate>({
-        resolver: zodResolver(commentCreateSchema),
+    } = useForm<GoalCommentCreate>({
+        resolver: zodResolver(goalCreateCommentSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
         defaultValues: {
-            goalId,
+            id: goalId,
             description: '',
         },
     });
 
     const createComment = useCallback(
-        (form: CommentCreate) => {
+        (form: GoalCommentCreate) => {
             setBusy(true);
 
             // FIXME: maybe async/await would be better API
             create(({ id }) => {
                 onSubmit?.(id);
                 reset();
-                setFocus(false);
+                setPushState(undefined);
                 setBusy(false);
             })({
                 ...form,
-                goalId,
+                id: goalId,
+                stateId: pushState?.id,
             });
         },
-        [create, goalId, onSubmit, reset],
+        [create, goalId, pushState, onSubmit, reset],
     );
 
-    const onCommentFocus = useCallback(() => {
-        onFocus?.();
-        setFocus(true);
-    }, [onFocus]);
-
     const onCancelCreate = useCallback(() => {
-        onCancel?.();
         reset();
-        setFocus(false);
+        setPushState(undefined);
+        onCancel?.();
     }, [onCancel, reset]);
+
+    const onStateSelect = useCallback(
+        (state: State) => {
+            setPushState(state.id === pushState?.id ? undefined : state);
+        },
+        [pushState],
+    );
 
     return (
         <ActivityFeedItem>
@@ -78,11 +91,67 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ onSubmit, onFocus
                 busy={busy}
                 control={control}
                 isValid={isValid}
-                height={focus ? 120 : 60}
                 onSubmit={handleSubmit(createComment)}
                 onCancel={onCancelCreate}
-                onFocus={onCommentFocus}
-                actionButtonText={tr('Comment')}
+                onFocus={onFocus}
+                actionButton={
+                    states ? (
+                        <StyledStateUpdate>
+                            <Button
+                                view="primary"
+                                hue={pushState ? [pushState.hue, themeId] : undefined}
+                                outline
+                                type="submit"
+                                brick="right"
+                                text={pushState ? tr('Update state') : tr('Comment')}
+                                iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
+                            />
+                            <Dropdown
+                                placement="top-end"
+                                arrow
+                                items={states}
+                                offset={[-5, 20]}
+                                onChange={onStateSelect}
+                                renderTrigger={(props) => (
+                                    <Button
+                                        view="primary"
+                                        hue={pushState ? [pushState.hue, themeId] : undefined}
+                                        outline
+                                        brick="left"
+                                        iconRight={
+                                            props.visible ? (
+                                                <ArrowUpSmallIcon size="s" noWrap />
+                                            ) : (
+                                                <ArrowDownSmallIcon size="s" noWrap />
+                                            )
+                                        }
+                                        ref={props.ref}
+                                        onClick={props.onClick}
+                                    />
+                                )}
+                                renderItem={(props) => (
+                                    <ColorizedMenuItem
+                                        key={props.item.id}
+                                        hue={props.item.hue}
+                                        checked={props.item.id === pushState?.id}
+                                        onClick={props.onClick}
+                                    >
+                                        {props.item.title}
+                                    </ColorizedMenuItem>
+                                )}
+                            />
+                        </StyledStateUpdate>
+                    ) : (
+                        <Button
+                            size="m"
+                            view="primary"
+                            disabled={busy}
+                            outline={!isValid}
+                            type="submit"
+                            text={tr('Comment')}
+                        />
+                    )
+                }
             />
         </ActivityFeedItem>
     );

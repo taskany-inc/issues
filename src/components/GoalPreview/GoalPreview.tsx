@@ -347,7 +347,11 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                                 )),
                             )}
 
-                            <CommentCreateForm goalId={preview.id} onSubmit={onCommentPublish} />
+                            <CommentCreateForm
+                                goalId={preview.id}
+                                states={goal?._isEditable ? goal.project?.flow.states : undefined}
+                                onSubmit={onCommentPublish}
+                            />
                         </ActivityFeed>
                     ))}
                 </StyledModalContent>

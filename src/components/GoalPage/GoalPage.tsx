@@ -388,6 +388,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                                 <CommentView
                                     key={c.id}
                                     id={c.id}
+                                    state={c.state}
                                     author={c.activity?.user}
                                     description={c.description}
                                     createdAt={c.createdAt}
@@ -400,7 +401,11 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                             )),
                         )}
 
-                        <CommentCreateForm goalId={goal.id} onSubmit={onCommentPublish} />
+                        <CommentCreateForm
+                            goalId={goal.id}
+                            states={goal?._isEditable ? goal.project?.flow.states : undefined}
+                            onSubmit={onCommentPublish}
+                        />
                     </ActivityFeed>
                 </div>
 

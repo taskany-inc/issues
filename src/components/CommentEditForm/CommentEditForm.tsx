@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@taskany/bricks';
 
 import { useCommentResource } from '../../hooks/useCommentResource';
 import { CommentForm } from '../CommentForm/CommentForm';
@@ -66,7 +67,7 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onCh
             error={errors.description}
             onSubmit={handleSubmit(onCommentUpdate)}
             onCancel={onCancel}
-            actionButtonText={tr('Save')}
+            actionButton={<Button size="m" view="primary" disabled={busy} outline type="submit" text={tr('Save')} />}
         />
     );
 };

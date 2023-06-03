@@ -1,6 +1,6 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
-import { GoalHistory, Tag } from '@prisma/client';
+import { GoalHistory, Prisma, Tag } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -21,10 +21,12 @@ import {
     toogleGoalArchiveSchema,
     toogleGoalDependencySchema,
     userGoalsSchema,
+    goalCreateCommentSchema,
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { createGoal, changeGoalProject, getGoalHistory, findOrCreateEstimate } from '../../src/utils/db';
+import { createEmailJob } from '../../src/utils/worker/create';
 
 export const goal = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
@@ -195,7 +197,7 @@ export const goal = router({
     getUserGoals: protectedProcedure.input(userGoalsSchema).query(async ({ ctx, input }) => {
         const { activityId } = ctx.session.user;
 
-        const userDashboardGoals = {
+        const userDashboardGoals: Prisma.GoalFindManyArgs['where'] = {
             AND: {
                 OR: [
                     // all projects where the user is a participant
@@ -584,7 +586,6 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-
     toggleParticipants: protectedProcedure.input(goalParticipantsSchema).mutation(async ({ input, ctx }) => {
         const [projectId, scopeIdStr] = input.id.split('-');
 
@@ -692,6 +693,74 @@ export const goal = router({
                     },
                 },
             });
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    createComment: protectedProcedure.input(goalCreateCommentSchema).mutation(async ({ ctx, input }) => {
+        const [commentAuthor, goal] = await Promise.all([
+            prisma.activity.findUnique({
+                where: { id: ctx.session.user.activityId },
+                include: { user: true, ghost: true },
+            }),
+            prisma.goal.findUnique({
+                where: { id: input.id },
+                include: {
+                    participants: { include: { user: true, ghost: true } },
+                    activity: { include: { user: true, ghost: true } },
+                },
+            }),
+        ]);
+
+        if (!commentAuthor) return null;
+        if (!goal) return null;
+
+        try {
+            const [newComment] = await Promise.all([
+                prisma.comment.create({
+                    data: {
+                        description: input.description,
+                        activityId: commentAuthor.id,
+                        goalId: input.id,
+                        stateId: input.stateId,
+                    },
+                }),
+                prisma.goal.update({
+                    where: { id: input.id },
+                    data: {
+                        id: input.id,
+                        stateId: input.stateId,
+                        history:
+                            input.stateId && input.stateId !== goal.stateId
+                                ? {
+                                      create: {
+                                          subject: 'state',
+                                          action: 'change',
+                                          previousValue: goal.stateId,
+                                          nextValue: input.stateId,
+                                          activityId: ctx.session.user.activityId,
+                                      },
+                                  }
+                                : undefined,
+                    },
+                }),
+            ]);
+
+            let toEmails = goal.participants;
+
+            if (commentAuthor.user?.email === goal.activity?.user?.email) {
+                toEmails = toEmails.filter((p) => p.user?.email !== commentAuthor?.user?.email);
+            }
+
+            if (toEmails.length) {
+                await createEmailJob('newComment', {
+                    to: toEmails.map((p) => p.user?.email),
+                    commentId: newComment.id,
+                    goalId: input.id,
+                });
+            }
+
+            return newComment;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }

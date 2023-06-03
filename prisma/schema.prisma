@@ -147,13 +147,13 @@ model Project {
 }
 
 model Estimate {
-  id         Int      @id @default(autoincrement())
+  id         Int              @id @default(autoincrement())
   q          String
   y          String
   date       String
   goal       EstimateToGoal[]
   goalId     String
-  activity   Activity @relation(fields: [activityId], references: [id])
+  activity   Activity         @relation(fields: [activityId], references: [id])
   activityId String
 
   createdAt DateTime @default(now())
@@ -163,8 +163,8 @@ model Estimate {
 }
 
 model EstimateToGoal {
-  id         Int @default(autoincrement()) @id
-  goal       Goal @relation(fields: [goalId], references: [id])
+  id         Int      @id @default(autoincrement())
+  goal       Goal     @relation(fields: [goalId], references: [id])
   goalId     String
   estimate   Estimate @relation(fields: [estimateId], references: [id])
   estimateId Int
@@ -176,36 +176,36 @@ model EstimateToGoal {
 }
 
 model Goal {
-  id           String        @id @default(cuid())
-  scopeId      Int           @default(1)
+  id           String           @id @default(cuid())
+  scopeId      Int              @default(1)
   title        String
   description  String
   kind         String?
   key          Boolean?
   personal     Boolean?
   private      Boolean?
-  archived     Boolean?      @default(false)
+  archived     Boolean?         @default(false)
   priority     String?
   estimate     EstimateToGoal[]
-  project      Project?      @relation("projectGoals", fields: [projectId], references: [id])
+  project      Project?         @relation("projectGoals", fields: [projectId], references: [id])
   projectId    String?
   teamId       String?
-  state        State?        @relation("goalState", fields: [stateId], references: [id])
+  state        State?           @relation("goalState", fields: [stateId], references: [id])
   stateId      String?
-  activity     Activity?     @relation("goalIssuer", fields: [activityId], references: [id])
+  activity     Activity?        @relation("goalIssuer", fields: [activityId], references: [id])
   activityId   String?
-  owner        Activity?     @relation("goalOwner", fields: [ownerId], references: [id])
+  owner        Activity?        @relation("goalOwner", fields: [ownerId], references: [id])
   ownerId      String?
-  participants Activity[]    @relation("goalParticipants")
-  watchers     Activity[]    @relation("goalWatchers")
-  stargizers   Activity[]    @relation("goalStargizers")
+  participants Activity[]       @relation("goalParticipants")
+  watchers     Activity[]       @relation("goalWatchers")
+  stargizers   Activity[]       @relation("goalStargizers")
   comments     Comment[]
   reactions    Reaction[]
   tags         Tag[]
-  dependsOn    Goal[]        @relation("dependsOn")
-  blocks       Goal[]        @relation("dependsOn")
-  relatedTo    Goal[]        @relation("connected")
-  connected    Goal[]        @relation("connected")
+  dependsOn    Goal[]           @relation("dependsOn")
+  blocks       Goal[]           @relation("dependsOn")
+  relatedTo    Goal[]           @relation("connected")
+  connected    Goal[]           @relation("connected")
   history      GoalHistory[]
 
   createdAt DateTime @default(now())
@@ -236,6 +236,8 @@ model Comment {
   activityId  String
   goal        Goal       @relation(fields: [goalId], references: [id])
   goalId      String
+  state       State?     @relation(fields: [stateId], references: [id])
+  stateId     String?
   reactions   Reaction[]
 
   createdAt DateTime @default(now())
@@ -277,12 +279,13 @@ model Flow {
 }
 
 model State {
-  id      String   @id @default(cuid())
-  title   String   @unique
-  flows   Flow[]
-  default Boolean?
-  hue     Int      @default(1)
-  goals   Goal[]   @relation("goalState")
+  id       String    @id @default(cuid())
+  title    String    @unique
+  flows    Flow[]
+  default  Boolean?
+  hue      Int       @default(1)
+  goals    Goal[]    @relation("goalState")
+  comments Comment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
