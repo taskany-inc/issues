@@ -125,16 +125,9 @@ const GoalCreateForm: React.FC = () => {
             parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}
-            renderActionButton={({ busy, isValid }) => (
+            renderActionButton={({ busy }) => (
                 <FormAction right>
-                    <Button
-                        view="primary"
-                        disabled={busy}
-                        outline={!isValid}
-                        type="submit"
-                        brick="right"
-                        text={actionBtnText}
-                    />
+                    <Button view="primary" disabled={busy} outline type="submit" brick="right" text={actionBtnText} />
                     <Dropdown
                         placement="top-end"
                         arrow
