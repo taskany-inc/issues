@@ -31,20 +31,18 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     <Link href={href} passHref>
         <TableRow>
             <TableCell>
-                <Text size="m" weight="bold">
+                <Text size="l" weight="bold">
                     {title}
                 </Text>
             </TableCell>
+
             <TableCell>
                 {nullable(owner, (o) => (
                     <UserGroup users={[o]} />
                 ))}
             </TableCell>
-            <TableCell>
-                {nullable(participants, (p) => (
-                    <UserGroup users={p} />
-                ))}
-            </TableCell>
+
+            <TableCell>{nullable(participants, (p) => (p.length ? <UserGroup users={p} /> : null))}</TableCell>
 
             <TableCell>
                 {nullable(starred, () => (
@@ -59,4 +57,10 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
             </TableCell>
         </TableRow>
     </Link>
+);
+
+export const ProjectItemStandalone: React.FC<ProjectListItemProps> = (props) => (
+    <ProjectListContainer>
+        <ProjectListItem {...props} />
+    </ProjectListContainer>
 );

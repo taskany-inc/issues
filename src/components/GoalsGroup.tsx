@@ -1,15 +1,11 @@
 import React, { MouseEventHandler } from 'react';
 import styled from 'styled-components';
-import NextLink from 'next/link';
-import { Text, Link, nullable } from '@taskany/bricks';
 import { gapM, gapS } from '@taskany/colors';
 
-import { routes } from '../hooks/router';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
 import { GoalListItem } from './GoalListItem';
 import { PageSep } from './PageSep';
-import { ProjectTitleList } from './ProjectTitleList';
 import { TableFullWidthCell } from './Table';
 
 interface GoalGroupProps {
@@ -32,27 +28,6 @@ const GoalsGroupContainer = styled(TableFullWidthCell)`
 const GolasGroupSep = styled(PageSep)`
     margin: ${gapS} 0px;
 `;
-
-interface GoalsGroupProjectTitleProps {
-    id: string;
-    title: string;
-    parent?: Array<{ id: string; title: string }>;
-}
-
-export const GoalsGroupProjectTitle: React.FC<GoalsGroupProjectTitleProps> = ({ id, title, parent }) => (
-    <Text size="l" weight="bolder">
-        {Boolean(parent?.length) &&
-            nullable(parent, (p) => (
-                <>
-                    <ProjectTitleList projects={p} />
-                    {' / '}
-                </>
-            ))}
-        <NextLink passHref href={routes.project(id)}>
-            <Link inline>{title}</Link>
-        </NextLink>
-    </Text>
-);
 
 export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
     ({ goals, children, selectedResolver, onClickProvider, onTagClick }) => (

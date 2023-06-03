@@ -21,7 +21,9 @@ import { connectionMap } from '../queries/connections';
 
 type WithId = { id: string };
 
-const addCalculatedProjectFields = <T extends { watchers?: WithId[]; stargizers?: WithId[]; ownerId?: string }>(
+export const addCalculatedProjectFields = <
+    T extends { watchers?: WithId[]; stargizers?: WithId[]; activityId?: string },
+>(
     project: T,
     activityId: string,
 ): T & {
@@ -31,7 +33,7 @@ const addCalculatedProjectFields = <T extends { watchers?: WithId[]; stargizers?
 } => {
     const _isWatching = project.watchers?.some((watcher: any) => watcher.id === activityId);
     const _isStarred = project.stargizers?.some((stargizer: any) => stargizer.id === activityId);
-    const _isOwner = project.ownerId === activityId;
+    const _isOwner = project.activityId === activityId;
 
     return {
         ...project,
@@ -211,7 +213,7 @@ export const project = router({
                     },
                 },
             }),
-            prisma.goal.findMany({
+            prisma.goal.findMany<{ include: typeof goalDeepQuery }>({
                 ...goalsFilter(input, ctx.session.user.activityId, {
                     AND: {
                         OR: [
@@ -247,6 +249,7 @@ export const project = router({
         return {
             goals: filtredProjectGoals.map((g) => ({
                 ...g,
+                project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : g.project,
                 ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
                 estimate: getEstimateListFormJoin(g),
             })),
