@@ -28,6 +28,8 @@ import { connectionMap } from '../queries/connections';
 import { createGoal, changeGoalProject, getGoalHistory, findOrCreateEstimate } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 
+import { addCalculatedProjectFields } from './project';
+
 export const goal = router({
     suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
         const splittedInput = input.split('-');
@@ -187,6 +189,7 @@ export const goal = router({
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
+                project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
                 estimate: getEstimateListFormJoin(goal),
                 history,
             };
@@ -284,7 +287,9 @@ export const goal = router({
                     },
                 },
             }),
-            prisma.goal.findMany({
+            prisma.goal.findMany<{
+                include: typeof goalDeepQuery;
+            }>({
                 ...goalsFilter(input, ctx.session.user.activityId, {
                     ...userDashboardGoals,
                 }),
@@ -307,6 +312,7 @@ export const goal = router({
                 ...g,
                 ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
                 estimate: getEstimateListFormJoin(g),
+                project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
             })),
             meta: calcGoalsMeta(allUserGoals),
         };
@@ -481,6 +487,7 @@ export const goal = router({
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
+                project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
                 estimate: getEstimateListFormJoin(goal),
             };
 

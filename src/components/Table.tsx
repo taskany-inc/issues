@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { gapS, gapSm, gray4, radiusM, textColor } from '@taskany/colors';
+import React from 'react';
 
 export const Table = styled.div<{ columns: number }>`
     display: grid;
@@ -31,7 +32,7 @@ export const TableCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
     text-align: ${({ align = 'left' }) => align};
     box-sizing: border-box;
 
-    padding: ${gapS} ${gapS};
+    padding: ${({ children }) => (React.Children.count(children) ? gapS : 0)};
 
     &:last-child {
         white-space: nowrap;

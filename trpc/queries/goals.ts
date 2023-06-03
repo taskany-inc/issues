@@ -247,9 +247,37 @@ export const goalDeepQuery = {
     project: {
         include: {
             parent: true,
+            tags: true,
             flow: {
                 include: {
                     states: true,
+                },
+            },
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            participants: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            stargizers: true,
+            watchers: true,
+            children: {
+                include: {
+                    parent: true,
+                },
+            },
+            _count: {
+                select: {
+                    stargizers: true,
+                    watchers: true,
+                    participants: true,
+                    children: true,
                 },
             },
         },

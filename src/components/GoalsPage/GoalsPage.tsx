@@ -3,7 +3,6 @@ import React, { MouseEventHandler, useCallback, useEffect, useState } from 'reac
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
-import { Project } from '@prisma/client';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -11,15 +10,17 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../hooks/useFilterResource';
+import { routes } from '../../hooks/router';
 import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
-import { GoalsGroup, GoalsGroupProjectTitle } from '../GoalsGroup';
+import { GoalsGroup } from '../GoalsGroup';
 import { GoalsListContainer } from '../GoalListItem';
 import { PageTitle } from '../PageTitle';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { ProjectItemStandalone } from '../ProjectListItem';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -74,8 +75,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
         // eslint-disable-next-line no-spaced-func
         (goals as NonNullable<GoalByIdReturnType>[])?.reduce<{
             [key: string]: {
-                // eslint-disable-next-line func-call-spacing
-                project?: (Project & { parent?: Project[] }) | null;
+                project?: ProjectByIdReturnType | null;
                 goals: NonNullable<GoalByIdReturnType>[];
             };
         }>((r, g) => {
@@ -235,10 +235,14 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
                                     onClickProvider={onGoalPrewiewShow}
                                     onTagClick={setTagsFilterOutside}
                                 >
-                                    <GoalsGroupProjectTitle
-                                        id={group.project.id}
+                                    <ProjectItemStandalone
+                                        key={group.project.id}
+                                        href={routes.project(group.project.id)}
                                         title={group.project.title}
-                                        parent={group.project.parent}
+                                        owner={group.project?.activity}
+                                        participants={group.project?.participants}
+                                        starred={group.project?._isStarred}
+                                        watching={group.project?._isWatching}
                                     />
                                 </GoalsGroup>
                             ),
