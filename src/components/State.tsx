@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import colorLayer from 'color-layer';
-import { gapM, gapS, gapXs, gray6, radiusXl } from '@taskany/colors';
+import { gapS, gapXs, gray6, radiusXl } from '@taskany/colors';
 
 import { usePageContext } from '../hooks/usePageContext';
 
@@ -52,7 +52,7 @@ const StyledState = styled.div<{
 
     ${({ size }) =>
         size === 's' &&
-        `   
+        `
             padding: calc(${gapXs}/2) ${gapS};
             font-size: 12px;
         `}

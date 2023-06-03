@@ -6,8 +6,14 @@ const defaultOrderBy = {
     updatedAt: 'desc',
 };
 
-// TODO: make it much more type-safety
-export const goalsFilter = (data: QueryWithFilters, activityId: string, extra: any = {}): any => {
+export const goalsFilter = (
+    data: QueryWithFilters,
+    activityId: string,
+    extra: Prisma.GoalFindManyArgs['where'] = {},
+): {
+    where: Prisma.GoalFindManyArgs['where'];
+    orderBy: Prisma.GoalFindManyArgs['orderBy'];
+} => {
     const priorityFilter = data.priority?.length ? { priority: { in: data.priority } } : {};
 
     const statesFilter: Prisma.GoalFindManyArgs['where'] = data.state?.length
@@ -241,6 +247,11 @@ export const goalDeepQuery = {
     project: {
         include: {
             parent: true,
+            flow: {
+                include: {
+                    states: true,
+                },
+            },
         },
     },
     dependsOn: {
@@ -269,6 +280,7 @@ export const goalDeepQuery = {
                     ghost: true,
                 },
             },
+            state: true,
             reactions: {
                 include: {
                     activity: {

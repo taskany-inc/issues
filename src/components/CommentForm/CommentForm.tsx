@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Controller, Control } from 'react-hook-form';
 import { backgroundColor, gapS, gray4, gray6 } from '@taskany/colors';
@@ -14,9 +14,10 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { FormEditor } from '../FormEditor/FormEditor';
 import { usePageContext } from '../../hooks/usePageContext';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import { routes } from '../../hooks/router';
+import { FormEditor } from '../FormEditor/FormEditor';
 import { Tip } from '../Tip';
 
 import { tr } from './CommentForm.i18n';
@@ -24,12 +25,12 @@ import { tr } from './CommentForm.i18n';
 interface CommentFormProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     control: Control<any>;
+    actionButton: React.ReactNode;
     autoFocus?: boolean;
     height?: number;
     isValid?: boolean;
     error?: React.ComponentProps<typeof FormEditor>['error'];
     busy?: boolean;
-    actionButtonText: string;
 
     onSubmit?: () => void;
     onFocus?: () => void;
@@ -72,18 +73,17 @@ const StyledTip = styled(Tip)`
 
 export const CommentForm: React.FC<CommentFormProps> = ({
     autoFocus,
-    height,
     control,
+    actionButton,
     error,
     busy,
-    isValid,
     onSubmit,
     onFocus,
     onCancel,
-    actionButtonText,
 }) => {
     const { locale } = usePageContext();
     const [commentFocused, setCommentFocused] = useState(false);
+    const ref = useRef(null);
 
     const onCommentFocus = useCallback(() => {
         setCommentFocused(true);
@@ -96,12 +96,18 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     }, [onCancel]);
 
     const onCommentSubmit = useCallback(() => {
-        onSubmit?.();
         setCommentFocused(false);
+        onSubmit?.();
     }, [onSubmit]);
 
+    useClickOutside(ref, () => {
+        if (!Object.values(control._fields).some((v) => v?._f.value !== '')) {
+            onCommentCancel();
+        }
+    });
+
     return (
-        <StyledCommentForm tabIndex={0}>
+        <StyledCommentForm ref={ref} tabIndex={0}>
             <Form onSubmit={onCommentSubmit}>
                 <Controller
                     name="description"
@@ -111,7 +117,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                             {...field}
                             disabled={busy}
                             placeholder={tr('Leave a comment')}
-                            height={height}
+                            height={commentFocused ? 120 : 60}
                             onCancel={onCommentCancel}
                             onFocus={onCommentFocus}
                             autoFocus={autoFocus}
@@ -125,17 +131,10 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         <FormAction left inline />
                         <FormAction right inline>
                             {nullable(!busy, () => (
-                                <Button size="m" text={tr('Cancel')} onClick={onCommentCancel} />
+                                <Button size="m" outline text={tr('Cancel')} onClick={onCommentCancel} />
                             ))}
 
-                            <Button
-                                size="m"
-                                view="primary"
-                                disabled={busy}
-                                outline={!isValid}
-                                type="submit"
-                                text={actionButtonText}
-                            />
+                            {actionButton}
                         </FormAction>
                     </FormActions>
                 ))}

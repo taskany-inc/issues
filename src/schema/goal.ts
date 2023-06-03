@@ -176,3 +176,18 @@ export const goalStateChangeSchema = z.object({
 });
 
 export type GoalStateChangeSchema = z.infer<typeof goalStateChangeSchema>;
+
+export const goalCreateCommentSchema = z.object({
+    id: z.string(),
+    description: z
+        .string({
+            required_error: tr("Comments's description is required"),
+            invalid_type_error: tr("Comments's description must be a string"),
+        })
+        .min(1, {
+            message: tr("Comments's description must be longer than 1 symbol"),
+        }),
+    stateId: z.string().optional(),
+});
+
+export type GoalCommentCreate = z.infer<typeof goalCreateCommentSchema>;

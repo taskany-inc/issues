@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { brandColor, danger0, gapM, gapS, gray4 } from '@taskany/colors';
+import { brandColor, danger0, gapM, gapS, gray4, gray9 } from '@taskany/colors';
 import {
     BinIcon,
     Card,
@@ -12,13 +12,18 @@ import {
     Link,
     MenuItem,
     MoreVerticalIcon,
+    StateDot,
+    Text,
     UserPic,
     nullable,
 } from '@taskany/bricks';
-import { Reaction, User } from '@prisma/client';
+import { Reaction, State, User } from '@prisma/client';
+import colorLayer from 'color-layer';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCommentResource } from '../../hooks/useCommentResource';
+import { usePageContext } from '../../hooks/usePageContext';
+import { createLocaleDate } from '../../utils/dateTime';
 import { Reactions } from '../Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
 
@@ -38,6 +43,7 @@ interface CommentViewProps {
     author?: User | null;
     isNew?: boolean;
     isEditable?: boolean;
+    state?: State | null;
 
     onReactionToggle?: React.ComponentProps<typeof ReactionsDropdown>['onClick'];
     onDelete?: (id: string) => void;
@@ -105,6 +111,17 @@ const StyledReactions = styled.div`
     padding-top: ${gapM};
 `;
 
+const StyledStateDot = styled(StateDot)`
+    margin-right: ${gapS};
+`;
+
+const StyledTimestamp = styled.div`
+    display: flex;
+    align-items: center;
+
+    padding-bottom: ${gapM};
+`;
+
 export const CommentView: FC<CommentViewProps> = ({
     id,
     author,
@@ -113,9 +130,11 @@ export const CommentView: FC<CommentViewProps> = ({
     isNew,
     isEditable,
     reactions,
+    state,
     onDelete,
     onReactionToggle,
 }) => {
+    const { themeId, locale } = usePageContext();
     const { remove } = useCommentResource();
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);
@@ -223,6 +242,15 @@ export const CommentView: FC<CommentViewProps> = ({
                     </StyledCardInfo>
 
                     <CardComment>
+                        {nullable(state, (s) => (
+                            <StyledTimestamp>
+                                <StyledStateDot color={colorLayer(s.hue, 9, s.hue === 1 ? 0 : undefined)[themeId]} />
+                                <Text size="m" weight="bolder" color={gray9}>
+                                    {createLocaleDate(createdAt, { locale })}
+                                </Text>
+                            </StyledTimestamp>
+                        ))}
+
                         <Md>{commentDescription}</Md>
 
                         {nullable(reactions?.length, () => (
