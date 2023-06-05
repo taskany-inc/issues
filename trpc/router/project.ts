@@ -213,7 +213,7 @@ export const project = router({
                     },
                 },
             }),
-            prisma.goal.findMany<{ include: typeof goalDeepQuery }>({
+            prisma.goal.findMany({
                 ...goalsFilter(input, ctx.session.user.activityId, {
                     AND: {
                         OR: [
@@ -249,7 +249,7 @@ export const project = router({
         return {
             goals: filtredProjectGoals.map((g) => ({
                 ...g,
-                project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : g.project,
+                project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
                 ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
                 estimate: getEstimateListFormJoin(g),
             })),
