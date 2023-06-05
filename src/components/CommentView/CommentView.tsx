@@ -122,8 +122,10 @@ export const CommentView: FC<CommentViewProps> = ({
     const { reactionsProps } = useReactionsResource(reactions);
     const [isRelativeTime, setIsRelativeTime] = useState(true);
 
-    const onChangeTypeDate = () => {
-        setIsRelativeTime(!isRelativeTime);
+    const onChangeTypeDate = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | undefined) => {
+        if (e && e.target === e.currentTarget) {
+            setIsRelativeTime(!isRelativeTime);
+        }
     };
 
     const onEditClick = useCallback(() => {

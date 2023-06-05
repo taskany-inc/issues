@@ -106,8 +106,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const [isRelativeTime, setIsRelativeTime] = useState(true);
 
-    const onChangeTypeDate = () => {
-        setIsRelativeTime(!isRelativeTime);
+    const onChangeTypeDate = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | undefined) => {
+        if (e && e.target === e.currentTarget) {
+            setIsRelativeTime(!isRelativeTime);
+        }
     };
 
     const archiveMutation = trpc.goal.toggleArchive.useMutation();
