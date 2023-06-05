@@ -287,9 +287,7 @@ export const goal = router({
                     },
                 },
             }),
-            prisma.goal.findMany<{
-                include: typeof goalDeepQuery;
-            }>({
+            prisma.goal.findMany({
                 ...goalsFilter(input, ctx.session.user.activityId, {
                     ...userDashboardGoals,
                 }),
