@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { gray4, gray8, gray9, radiusM } from '@taskany/colors';
+import { gray4, gray8, gray9, radiusM, radiusS } from '@taskany/colors';
 
 interface KeyboardProps {
     command?: boolean;
@@ -9,12 +9,12 @@ interface KeyboardProps {
     ctrl?: boolean;
     enter?: boolean;
     space?: boolean;
+    size?: 's' | 'm';
     children?: React.ReactNode;
 }
 
-const StyledKeyboard = styled.kbd`
+const StyledKeyboard = styled.kbd<Pick<KeyboardProps, 'size'>>`
     display: inline-block;
-    padding: 2px 5px;
 
     font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
     line-height: 1.1em;
@@ -24,8 +24,6 @@ const StyledKeyboard = styled.kbd`
     cursor: pointer;
 
     background-color: ${gray4};
-
-    border-radius: ${radiusM};
 
     border: 1px solid ${gray8};
 
@@ -48,11 +46,34 @@ const StyledKeyboard = styled.kbd`
     span + span {
         margin-left: 0.3em;
     }
+
+    ${({ size }) =>
+        size === 'm' &&
+        `
+        padding: 2px 5px;
+        border-radius: ${radiusM};
+    `}
+
+    ${({ size }) =>
+        size === 's' &&
+        `
+        padding: 2px 3px;
+        border-radius: ${radiusS};
+    `}
 `;
 
-export const Keyboard: React.FC<KeyboardProps> = ({ command, shift, option, ctrl, enter, space, children }) => {
+export const Keyboard: React.FC<KeyboardProps> = ({
+    command,
+    shift,
+    option,
+    ctrl,
+    enter,
+    space,
+    size = 'm',
+    children,
+}) => {
     return (
-        <StyledKeyboard>
+        <StyledKeyboard size={size}>
             {command && <span>⌘</span>}
             {shift && <span>⇧</span>}
             {option && <span>⌥</span>}
