@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import InputMask from 'react-input-mask';
 import { danger8, danger9, gray6, textColor } from '@taskany/colors';
@@ -11,6 +11,7 @@ import {
     endOfQuarter,
     parseLocaleDate,
     formatEstimate,
+    quarters,
 } from '../utils/dateTime';
 import { usePageContext } from '../hooks/usePageContext';
 import { TLocale } from '../utils/getLang';
@@ -112,6 +113,31 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
         const [changed, setChanged] = useState(false);
         const [buttonText, setButtonText] = useState(text);
 
+        const quarterInfo = useMemo(() => {
+            const quarterInfo: Record<string, { date: string; q: string; y?: string }> = {
+                [defaultValuePlaceholder.q]: defaultValuePlaceholder,
+            };
+
+            const qOrder = Object.keys(quarters);
+            const qLen = qOrder.length;
+            const nextIndex = qOrder.indexOf(defaultValuePlaceholder.q) + 1;
+
+            for (let i = nextIndex; i <= nextIndex + 3; i++) {
+                const relatedIndex = `Q${i <= qLen ? i : i - qLen}`;
+                if (i <= qLen) {
+                    quarterInfo[relatedIndex] = createValue(
+                        createLocaleDate(endOfQuarter(relatedIndex), { locale }),
+                        locale,
+                    );
+                } else {
+                    const temp = parseLocaleDate(createLocaleDate(endOfQuarter(relatedIndex), { locale }), { locale });
+                    temp.setFullYear(temp.getFullYear() + 1);
+                    quarterInfo[relatedIndex] = createValue(temp, locale);
+                }
+            }
+            return quarterInfo;
+        }, [defaultValuePlaceholder, locale]);
+
         const onQButtonClick = useCallback(
             (nextQ: string) => () => {
                 setSelectedQ(nextQ);
@@ -126,8 +152,10 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
         }, []);
 
         useEffect(() => {
-            setInputState(createLocaleDate(endOfQuarter(selectedQ), { locale }));
-        }, [selectedQ, locale]);
+            if (Object.keys(quarterInfo).length) {
+                setInputState(createLocaleDate(parseLocaleDate(quarterInfo[selectedQ].date, { locale }), { locale }));
+            }
+        }, [selectedQ, locale, quarterInfo]);
 
         useEffect(() => {
             if (isValidDate(inputState)) {
@@ -146,9 +174,18 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
 
         useEffect(() => {
             if (value) {
-                setButtonText(formatEstimate(createValue(value.date, locale), locale));
+                setButtonText(
+                    formatEstimate(
+                        {
+                            q: quarterInfo[value.q].q,
+                            y: quarterInfo[value.q].y || value.y,
+                            date: quarterInfo[value.q].date,
+                        },
+                        locale,
+                    ),
+                );
             }
-        }, [value, locale]);
+        }, [value, locale, quarterInfo]);
 
         const onCleanClick = useCallback(() => {
             setButtonText(text);
@@ -167,7 +204,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                 disabled={disabled}
                 error={error}
                 placement="top-start"
-                items={['Q1', 'Q2', 'Q3', 'Q4']}
+                items={Object.keys(quarterInfo)}
                 maxWidth={100}
                 minWidth={100}
                 onChange={onChange}

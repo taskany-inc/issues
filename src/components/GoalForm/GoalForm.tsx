@@ -212,7 +212,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     <EstimateComboBox
                                         placeholder={tr('Date input mask placeholder')}
                                         mask={tr('Date input mask')}
-                                        defaultValuePlaceholder={estimate ?? estimatedMeta({ locale })}
+                                        defaultValuePlaceholder={estimatedMeta({ locale })}
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
                                         {...field}
