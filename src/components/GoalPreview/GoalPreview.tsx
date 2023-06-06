@@ -23,7 +23,6 @@ import {
 
 import { refreshInterval } from '../../utils/config';
 import { formatEstimate } from '../../utils/dateTime';
-import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
@@ -38,8 +37,6 @@ import { StateDot } from '../StateDot';
 import RelativeTime from '../RelativeTime/RelativeTime';
 import Md from '../Md';
 import { IssueStats } from '../IssueStats/IssueStats';
-import { CommentView } from '../CommentView/CommentView';
-import { ActivityFeed } from '../ActivityFeed';
 import { Reactions } from '../Reactions';
 import ReactionsDropdown from '../ReactionsDropdown';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
@@ -47,11 +44,11 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalStateChangeSchema } from '../../schema/goal';
+import { GoalActivity } from '../GoalActivity';
 
 import { tr } from './GoalPreview.i18n';
 
 const StateSwitch = dynamic(() => import('../StateSwitch'));
-const CommentCreateForm = dynamic(() => import('../CommentCreateForm/CommentCreateForm'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
 
@@ -103,7 +100,6 @@ const StyledCard = styled(Card)`
 
 const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
     const { user, locale } = usePageContext();
-    const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const [isRelativeTime, setIsRelativeTime] = useState(true);
 
     const onChangeTypeDate = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | undefined) => {
@@ -152,13 +148,9 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         [goal, preview._shortId, stateChangeMutations, utils.goal.getById],
     );
 
-    const onCommentPublish = useCallback(
-        (id?: string) => {
-            utils.goal.getById.invalidate(preview._shortId);
-            setHighlightCommentId(id);
-        },
-        [preview._shortId, utils.goal.getById, setHighlightCommentId],
-    );
+    const onCommentPublish = useCallback(() => {
+        utils.goal.getById.invalidate(preview._shortId);
+    }, [preview._shortId, utils.goal.getById]);
 
     const onGoalReactionToggle = useCallback(
         (id: string) => goalReaction(id, () => utils.goal.getById.invalidate(preview._shortId)),
@@ -168,6 +160,9 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(preview._shortId)),
         [preview._shortId, commentReaction, utils.goal.getById],
     );
+    const onCommentDelete = useCallback(() => {
+        utils.goal.getById.invalidate(preview._shortId);
+    }, [preview._shortId, utils.goal.getById]);
 
     const onPreviewClose = useCallback(() => {
         setGoalEditModalVisible(false);
@@ -329,30 +324,17 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                         </CardComment>
                     </StyledCard>
 
-                    {nullable(goal?.comments, (comments) => (
-                        <ActivityFeed ref={commentsRef}>
-                            {comments.map((comment) =>
-                                nullable(comment, (c) => (
-                                    <CommentView
-                                        key={c.id}
-                                        id={c.id}
-                                        author={c.activity?.user}
-                                        description={c.description}
-                                        createdAt={c.createdAt}
-                                        isEditable={c.activity?.id === user?.activityId}
-                                        isNew={c.id === highlightCommentId}
-                                        reactions={c.reactions}
-                                        onReactionToggle={onCommentReactionToggle(c.id)}
-                                    />
-                                )),
-                            )}
-
-                            <CommentCreateForm
-                                goalId={preview.id}
-                                states={goal?._isEditable ? goal.project?.flow.states : undefined}
-                                onSubmit={onCommentPublish}
-                            />
-                        </ActivityFeed>
+                    {nullable(goal?.activityFeed, (feed) => (
+                        <GoalActivity
+                            feed={feed}
+                            ref={commentsRef}
+                            onCommentPublish={onCommentPublish}
+                            onCommentReaction={onCommentReactionToggle}
+                            goalId={preview.id}
+                            userId={user?.activityId}
+                            goalStates={goal?._isEditable ? goal.project?.flow.states : undefined}
+                            onCommentDelete={onCommentDelete}
+                        />
                     ))}
                 </StyledModalContent>
             </ModalPreview>

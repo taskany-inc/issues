@@ -358,7 +358,11 @@ export const goalDeepQuery = {
     },
     history: {
         include: {
-            activity: true,
+            activity: {
+                include: {
+                    user: true,
+                },
+            },
         },
     },
 } as const;

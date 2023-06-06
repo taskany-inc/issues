@@ -31,7 +31,6 @@ import { IssueTitle } from '../IssueTitle';
 import { IssueKey } from '../IssueKey';
 import { IssueStats } from '../IssueStats/IssueStats';
 import { Reactions } from '../Reactions';
-import { CommentView } from '../CommentView/CommentView';
 import { StateDot } from '../StateDot';
 import { IssueParent } from '../IssueParent';
 import { IssueTags } from '../IssueTags';
@@ -39,7 +38,6 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
-import { ActivityFeed } from '../ActivityFeed';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { WatchButton } from '../WatchButton/WatchButton';
 import { useGoalResource } from '../../hooks/useGoalResource';
@@ -52,6 +50,7 @@ import { GoalParticipantsSchema, GoalStateChangeSchema, ToggleGoalDependency } f
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { GoalActivity } from '../GoalActivity';
 
 import { tr } from './GoalPage.i18n';
 
@@ -60,7 +59,6 @@ const Md = dynamic(() => import('../Md'));
 const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
-const CommentCreateForm = dynamic(() => import('../CommentCreateForm/CommentCreateForm'));
 const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
 const IssueDependencies = dynamic(() => import('../IssueDependencies/IssueDependencies'));
 const IssueParticipants = dynamic(() => import('../IssueParticipants/IssueParticipants'));
@@ -147,7 +145,6 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
 
     const priority = goal?.priority as Priority;
     const priorityColor = priorityColorsMap[priority];
-    const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
     const stateMutation = trpc.goal.switchState.useMutation();
@@ -190,13 +187,10 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
         [id, toggleDependencyMutation, utils.goal.getById],
     );
 
-    const onCommentPublish = useCallback(
-        (commentId?: string) => {
-            utils.goal.getById.invalidate(id);
-            setHighlightCommentId(commentId);
-        },
-        [id, setHighlightCommentId, utils.goal.getById],
-    );
+    const onCommentPublish = useCallback(() => {
+        utils.goal.getById.invalidate(id);
+    }, [id, utils.goal.getById]);
+
     const onCommentReactionToggle = useCallback(
         (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(id)),
         [commentReaction, utils.goal.getById],
@@ -382,31 +376,18 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                         </CardActions>
                     </Card>
 
-                    <ActivityFeed ref={commentsRef}>
-                        {goal.comments?.map((comment) =>
-                            nullable(comment, (c) => (
-                                <CommentView
-                                    key={c.id}
-                                    id={c.id}
-                                    state={c.state}
-                                    author={c.activity?.user}
-                                    description={c.description}
-                                    createdAt={c.createdAt}
-                                    isEditable={c.activity?.id === user.activityId}
-                                    isNew={c.id === highlightCommentId}
-                                    reactions={c.reactions}
-                                    onReactionToggle={onCommentReactionToggle(c.id)}
-                                    onDelete={onCommentDelete}
-                                />
-                            )),
-                        )}
-
-                        <CommentCreateForm
+                    {nullable(goal?.activityFeed, (feed) => (
+                        <GoalActivity
+                            feed={feed}
+                            ref={commentsRef}
+                            userId={user.activityId}
                             goalId={goal.id}
-                            states={goal?._isEditable ? goal.project?.flow.states : undefined}
-                            onSubmit={onCommentPublish}
+                            onCommentReaction={onCommentReactionToggle}
+                            onCommentPublish={onCommentPublish}
+                            onCommentDelete={onCommentDelete}
+                            goalStates={goal?._isEditable ? goal.project?.flow.states : undefined}
                         />
-                    </ActivityFeed>
+                    ))}
                 </div>
 
                 <div>

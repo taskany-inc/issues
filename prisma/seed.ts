@@ -307,7 +307,7 @@ seed('Default projects', async () => {
                                         sample(allUsers).activityId,
                                         'description',
                                     ],
-                                    [sample(allUsers).activityId, goal.activityId, goal.activityId, 'participant'],
+                                    [sample(allUsers).activityId, null, goal.activityId, 'participants'],
                                     [null, sample(allGoals).id, sample(allUsers).activityId, 'dependencies'],
                                     [sample(allGoals).id, null, sample(allUsers).activityId, 'dependencies'],
                                 ].map(([previousValue, nextValue, activityId, subject]) => {
