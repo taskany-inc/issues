@@ -1,10 +1,12 @@
 import { nanoid } from 'nanoid';
-import { GoalHistory, PrismaClient } from '@prisma/client';
+import { GoalHistory, Comment, Activity, User } from '@prisma/client';
 
 import { GoalCommon, GoalUpdate } from '../schema/goal';
 import { addCalclulatedGoalsFields } from '../../trpc/queries/goals';
+import type { HistoryRecordWithActivity, Subject, Meta, HistoryAction } from '../types/history';
 
 import { prisma } from './prisma';
+import { castToMetaDto, subjectToEnumValue } from './goalHistory';
 
 export const findOrCreateEstimate = async (
     estimate: GoalCommon['estimate'] | GoalUpdate['estimate'],
@@ -122,26 +124,19 @@ export const changeGoalProject = async (id: string, newProjectId: string) => {
     });
 };
 
-const subjectToTableNameMap: Record<string, keyof PrismaClient> = {
-    dependencies: 'goal',
-    project: 'project',
-    tags: 'tag',
-    owner: 'activity',
-    participant: 'activity',
-    state: 'state',
-    estimate: 'estimate',
-};
-
-export const getGoalHistory = async (history: GoalHistory[], goalId: string) => {
+export const getGoalHistory = async <T extends GoalHistory & { activity: Activity & { user: User | null } }>(
+    history: T[],
+    goalId: string,
+) => {
     const needRequestForRecordIndicies = history.reduce<number[]>((acc, { subject }, index) => {
-        if (subjectToTableNameMap[subject]) {
+        if (subjectToEnumValue(subject)) {
             acc.push(index);
         }
 
         return acc;
     }, []);
 
-    const historyWithMeta: (GoalHistory & { meta?: Record<string, unknown> })[] = Array.from(history);
+    const historyWithMeta: HistoryRecordWithActivity[] = Array.from(history);
 
     if (needRequestForRecordIndicies.length) {
         const results = await prisma.$transaction(
@@ -158,52 +153,54 @@ export const getGoalHistory = async (history: GoalHistory[], goalId: string) => 
                             in: previousValue?.concat(nextValue),
                         },
                     },
-                    include: {
-                        activity: {
-                            include: {
-                                user: true,
-                            },
-                        },
-                    },
                 };
 
-                switch (record.subject) {
-                    case 'project':
-                        return prisma.project.findMany(query);
-                    case 'dependencies':
-                        return prisma.goal.findMany(query);
-                    case 'tags':
-                        return prisma.tag.findMany(query);
-                    case 'owner':
-                    case 'participant':
-                        return prisma.activity.findMany({
-                            where: query.where,
-                            include: {
-                                user: true,
-                            },
-                        });
-                    case 'state':
-                        return prisma.state.findMany({ where: query.where });
-                    case 'estimate':
-                        return prisma.estimate.findMany({
-                            where: {
-                                id: {
-                                    in: query.where.id.in.map((v) => Number(v)),
+                if (subjectToEnumValue(record.subject)) {
+                    switch (record.subject) {
+                        case 'dependencies':
+                            return prisma.goal.findMany({
+                                where: query.where,
+                                include: {
+                                    state: true,
                                 },
-                                goal: {
-                                    some: {
-                                        goalId,
+                            });
+                        case 'tags':
+                            return prisma.tag.findMany(query);
+                        case 'owner':
+                        case 'participants':
+                            return prisma.activity.findMany({
+                                where: query.where,
+                                include: {
+                                    user: true,
+                                },
+                            });
+                        case 'state':
+                            return prisma.state.findMany({ where: query.where });
+                        case 'estimate':
+                            return prisma.estimate.findMany({
+                                where: {
+                                    id: {
+                                        in: query.where.id.in.map((v) => Number(v)),
+                                    },
+                                    goal: {
+                                        some: {
+                                            goalId,
+                                        },
                                     },
                                 },
-                            },
-                        });
-                    default:
-                        throw new Error('query for history record is undefined');
+                            });
+                        case 'project':
+                            return prisma.project.findMany({ where: query.where });
+                        default:
+                            throw new Error('query for history record is undefined');
+                    }
                 }
+
+                throw new Error('query for history record is undefined');
             }),
         );
 
-        const metaResults: Record<string, (typeof results)[number][number]>[] = [];
+        const metaResults: Record<string, Meta[keyof Subject]>[] = [];
 
         for (const records of results) {
             const meta: Record<string, (typeof records)[number]> = {};
@@ -217,12 +214,30 @@ export const getGoalHistory = async (history: GoalHistory[], goalId: string) => 
 
         let transactionResultIndex = 0;
 
-        historyWithMeta.forEach((record, index) => {
-            if (needRequestForRecordIndicies.includes(index) && metaResults[transactionResultIndex]) {
-                historyWithMeta[index] = {
-                    ...record,
-                    meta: metaResults[transactionResultIndex],
-                };
+        history.forEach((record, index) => {
+            const currentMeta = metaResults[transactionResultIndex];
+            if (
+                needRequestForRecordIndicies.includes(index) &&
+                subjectToEnumValue(record.subject) &&
+                castToMetaDto(record.subject, currentMeta)
+            ) {
+                const valueCanBeArray = ['dependencies', 'tags'].includes(record.subject);
+
+                if (valueCanBeArray) {
+                    historyWithMeta[index] = {
+                        ...record,
+                        action: record.action as HistoryAction,
+                        previousValue: record.previousValue?.split(', ').map((id) => currentMeta[id]),
+                        nextValue: record.previousValue?.split(', ').map((id) => currentMeta[id]),
+                    };
+                } else {
+                    historyWithMeta[index] = {
+                        ...record,
+                        action: record.action as HistoryAction,
+                        previousValue: record.previousValue ? currentMeta[record.previousValue] : null,
+                        nextValue: record.nextValue ? currentMeta[record.nextValue] : null,
+                    };
+                }
 
                 transactionResultIndex += 1;
             }
@@ -230,4 +245,25 @@ export const getGoalHistory = async (history: GoalHistory[], goalId: string) => 
     }
 
     return historyWithMeta;
+};
+
+export const mixHistoryWithComments = <H extends HistoryRecordWithActivity, C extends Comment>(
+    history: H[],
+    comments: C[],
+): Array<{ type: 'history'; value: H } | { type: 'comment'; value: C }> => {
+    const activity: Array<{ type: 'history'; value: H } | { type: 'comment'; value: C }> = history.map((record) => {
+        return {
+            type: 'history',
+            value: record,
+        };
+    });
+
+    for (const comment of comments) {
+        activity.push({
+            type: 'comment',
+            value: comment,
+        });
+    }
+
+    return activity.sort((a, b) => a.value.createdAt.getTime() - b.value.createdAt.getTime());
 };

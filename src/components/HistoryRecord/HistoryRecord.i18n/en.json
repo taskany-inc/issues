@@ -1,0 +1,19 @@
+{
+    "change": "changed",
+    "edit": "edited",
+    "remove": "removed",
+    "delete": "deleted",
+    "add": "added",
+    "description": "description",
+    "project": "project",
+    "tags": "tags",
+    "owner": "owner",
+    "participant": "participant",
+    "state": "state",
+    "estimate": "estimate",
+    "title": "title",
+    "dependencies": "dependencies",
+    "priority": "priority",
+    "from": "from",
+    "to": "to"
+}

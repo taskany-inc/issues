@@ -25,7 +25,13 @@ import {
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
-import { createGoal, changeGoalProject, getGoalHistory, findOrCreateEstimate } from '../../src/utils/db';
+import {
+    createGoal,
+    changeGoalProject,
+    getGoalHistory,
+    findOrCreateEstimate,
+    mixHistoryWithComments,
+} from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 
 import { addCalculatedProjectFields } from './project';
@@ -191,7 +197,7 @@ export const goal = router({
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
                 project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
                 estimate: getEstimateListFormJoin(goal),
-                history,
+                activityFeed: mixHistoryWithComments(history, goal.comments),
             };
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -487,6 +493,7 @@ export const goal = router({
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
                 project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
                 estimate: getEstimateListFormJoin(goal),
+                activityFeed: [],
             };
 
             // await mailServer.sendMail({

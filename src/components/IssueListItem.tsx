@@ -17,6 +17,8 @@ interface IssueListItemProps {
             hue: number;
         } | null;
     };
+    size?: React.ComponentProps<typeof Text>['size'];
+    className?: string;
 }
 
 const StyledIssueListItem = styled.div`
@@ -25,10 +27,10 @@ const StyledIssueListItem = styled.div`
     align-items: top;
 `;
 
-const StyledIssueListItemTitle = styled(Text)`
+const StyledIssueListItemTitle = styled(Text)<{ size: IssueListItemProps['size'] }>`
     padding-top: 0;
     margin-top: 0;
-    padding-left: ${gapS};
+    padding-left: ${({ size }) => (size === 'xs' ? gapXs : gapS)};
 `;
 
 const StyledLink = styled(Link)`
@@ -39,15 +41,15 @@ const StyledDotWrapper = styled.div`
     padding-top: ${gapXs};
 `;
 
-export const IssueListItem: React.FC<IssueListItemProps> = ({ issue }) => {
+export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, size = 's' }) => {
     return (
         <NextLink passHref href={routes.goal(issue._shortId)}>
             <StyledLink inline>
-                <StyledIssueListItem>
+                <StyledIssueListItem className={className}>
                     <StyledDotWrapper>
-                        <StateDot {...issue.state} />
+                        <StateDot {...issue.state} size={size !== 'xs' ? 'm' : 's'} />
                     </StyledDotWrapper>
-                    <StyledIssueListItemTitle size="s" weight="bold" color="inherit">
+                    <StyledIssueListItemTitle size={size} weight="bold" color="inherit">
                         {issue.title}
                     </StyledIssueListItemTitle>
                 </StyledIssueListItem>
