@@ -1,7 +1,7 @@
 {
-    "New project": "Новый проект",
-    "Create project": "Создать проект",
-    "Title": "Название",
+    "Create": "Создать",
+    "Cancel": "Отмена",
+    "Project title": "Название проекта",
     "Short description": "Короткое описание",
     "Pro tip!": "Держи совет!",
     "Press key to create project": "Нажми {key} чтобы создать проект.",
