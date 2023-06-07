@@ -56,6 +56,7 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                                     id={value.id}
                                     author={value.activity?.user}
                                     description={value.description}
+                                    state={value.state}
                                     createdAt={value.createdAt}
                                     isEditable={value.activity?.id === userId}
                                     isNew={value.id === highlightCommentId}
