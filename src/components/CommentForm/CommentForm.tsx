@@ -12,10 +12,10 @@ import {
     MarkdownIcon,
     QuestionIcon,
     nullable,
+    useClickOutside,
 } from '@taskany/bricks';
 
 import { usePageContext } from '../../hooks/usePageContext';
-import { useClickOutside } from '../../hooks/useClickOutside';
 import { routes } from '../../hooks/router';
 import { FormEditor } from '../FormEditor/FormEditor';
 import { Tip } from '../Tip';
