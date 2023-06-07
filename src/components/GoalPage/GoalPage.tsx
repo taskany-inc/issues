@@ -1,6 +1,4 @@
 /* eslint-disable prefer-destructuring */
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
