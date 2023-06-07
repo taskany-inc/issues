@@ -15,5 +15,6 @@
     "dependencies": "dependencies",
     "priority": "priority",
     "from": "from",
-    "to": "to"
+    "to": "to",
+    "replace": "replaced"
 }

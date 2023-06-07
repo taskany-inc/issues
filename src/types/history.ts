@@ -10,9 +10,9 @@ export const subjectToTableNameMap = {
     estimate: true,
 } as const;
 
-export type Subject = { [K in keyof typeof subjectToTableNameMap]: string };
+export type HistoryRecordSubject = { [K in keyof typeof subjectToTableNameMap]: string };
 
-export interface Meta {
+export interface HistoryRecordMeta {
     dependencies: Goal & { state: State | null };
     project: Project;
     tags: Tag;
@@ -24,7 +24,7 @@ export interface Meta {
 
 export type HistoryAction = 'add' | 'change' | 'remove' | 'delete' | 'edit';
 
-type HistoryValuesBySubject<T extends keyof Subject, V = Meta[T]> = {
+type HistoryValuesBySubject<T extends keyof HistoryRecordSubject, V = HistoryRecordMeta[T]> = {
     subject: T;
     previousValue?: V;
     nextValue?: V;
@@ -37,8 +37,8 @@ type HistoryRecord =
           action: HistoryAction;
           createdAt: Date;
       } & (
-          | HistoryValuesBySubject<'dependencies', Meta['dependencies'][]>
-          | HistoryValuesBySubject<'tags', Meta['tags'][]>
+          | HistoryValuesBySubject<'dependencies', HistoryRecordMeta['dependencies'][]>
+          | HistoryValuesBySubject<'tags', HistoryRecordMeta['tags'][]>
           | HistoryValuesBySubject<'estimate'>
           | HistoryValuesBySubject<'participants'>
           | HistoryValuesBySubject<'project'>

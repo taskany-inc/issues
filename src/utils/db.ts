@@ -3,7 +3,7 @@ import { GoalHistory, Comment, Activity, User } from '@prisma/client';
 
 import { GoalCommon, GoalUpdate } from '../schema/goal';
 import { addCalclulatedGoalsFields } from '../../trpc/queries/goals';
-import type { HistoryRecordWithActivity, Subject, Meta, HistoryAction } from '../types/history';
+import { HistoryRecordWithActivity, HistoryRecordMeta, HistoryRecordSubject, HistoryAction } from '../types/history';
 
 import { prisma } from './prisma';
 import { castToMetaDto, subjectToEnumValue } from './goalHistory';
@@ -200,7 +200,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
             }),
         );
 
-        const metaResults: Record<string, Meta[keyof Subject]>[] = [];
+        const metaResults: Record<string, HistoryRecordMeta[keyof HistoryRecordSubject]>[] = [];
 
         for (const records of results) {
             const meta: Record<string, (typeof records)[number]> = {};
@@ -228,7 +228,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                         ...record,
                         action: record.action as HistoryAction,
                         previousValue: record.previousValue?.split(', ').map((id) => currentMeta[id]),
-                        nextValue: record.previousValue?.split(', ').map((id) => currentMeta[id]),
+                        nextValue: record.nextValue?.split(', ').map((id) => currentMeta[id]),
                     };
                 } else {
                     historyWithMeta[index] = {
