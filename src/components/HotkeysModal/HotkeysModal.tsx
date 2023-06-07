@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { gray8, gapM, gray9, gapS } from '@taskany/colors';
-import { Modal, Text } from '@taskany/bricks';
+import { Modal, ModalContent, Text } from '@taskany/bricks';
 
 import { isEventTargetInputOrTextArea } from '../../utils/hotkeys';
 import { Keyboard } from '../Keyboard';
@@ -68,38 +68,40 @@ const HotkeysModal = () => {
     }, [keyupListener]);
 
     return (
-        <Modal visible={modalVisible}>
-            <StyledTitle size="xl" weight="bolder">
-                {tr('Available hotkeys')}
-            </StyledTitle>
+        <Modal cross={false} visible={modalVisible}>
+            <ModalContent>
+                <StyledTitle size="xl" weight="bolder">
+                    {tr('Available hotkeys')}
+                </StyledTitle>
 
-            <Text size="m" color={gray8}>
-                {tr('Any hotkey available on any page')}
-            </Text>
+                <Text size="m" color={gray8}>
+                    {tr('Any hotkey available on any page')}
+                </Text>
 
-            <StyledHotkeys>
-                <StyledHotkeyRow color={gray9}>
-                    <Keyboard>c</Keyboard>, <Keyboard>p</Keyboard> — {tr('create project')}
-                </StyledHotkeyRow>
-                <StyledHotkeyRow color={gray9}>
-                    <Keyboard>c</Keyboard>, <Keyboard>g</Keyboard> — {tr('create goal')}
-                </StyledHotkeyRow>
-                <StyledHotkeyRow color={gray9}>
-                    <Keyboard>c</Keyboard>, <Keyboard>i</Keyboard> — {tr('create issue')}
-                </StyledHotkeyRow>
-                <StyledHotkeyRow color={gray9}>
-                    <Keyboard>c</Keyboard>, <Keyboard>u</Keyboard> — {tr('invite user')}
-                </StyledHotkeyRow>
-                <StyledHotkeyRow color={gray9}>
-                    <Keyboard>g</Keyboard>, <Keyboard>h</Keyboard> — {tr('home page')}
-                </StyledHotkeyRow>
-                <StyledHotkeyRow color={gray9}>
-                    <Keyboard>g</Keyboard>, <Keyboard>g</Keyboard> — {tr('goals page')}
-                </StyledHotkeyRow>
-                <StyledHotkeyRow color={gray9}>
-                    <Keyboard>h</Keyboard> — {tr('shows this instruction')}
-                </StyledHotkeyRow>
-            </StyledHotkeys>
+                <StyledHotkeys>
+                    <StyledHotkeyRow color={gray9}>
+                        <Keyboard>c</Keyboard>, <Keyboard>p</Keyboard> — {tr('create project')}
+                    </StyledHotkeyRow>
+                    <StyledHotkeyRow color={gray9}>
+                        <Keyboard>c</Keyboard>, <Keyboard>g</Keyboard> — {tr('create goal')}
+                    </StyledHotkeyRow>
+                    <StyledHotkeyRow color={gray9}>
+                        <Keyboard>c</Keyboard>, <Keyboard>i</Keyboard> — {tr('create issue')}
+                    </StyledHotkeyRow>
+                    <StyledHotkeyRow color={gray9}>
+                        <Keyboard>c</Keyboard>, <Keyboard>u</Keyboard> — {tr('invite user')}
+                    </StyledHotkeyRow>
+                    <StyledHotkeyRow color={gray9}>
+                        <Keyboard>g</Keyboard>, <Keyboard>h</Keyboard> — {tr('home page')}
+                    </StyledHotkeyRow>
+                    <StyledHotkeyRow color={gray9}>
+                        <Keyboard>g</Keyboard>, <Keyboard>g</Keyboard> — {tr('goals page')}
+                    </StyledHotkeyRow>
+                    <StyledHotkeyRow color={gray9}>
+                        <Keyboard>h</Keyboard> — {tr('shows this instruction')}
+                    </StyledHotkeyRow>
+                </StyledHotkeys>
+            </ModalContent>
         </Modal>
     );
 };
