@@ -1,7 +1,7 @@
 {
-    "New project": "New project",
-    "Create project": "Create project",
-    "Title": "Title",
+    "Create": "Create",
+    "Cancel": "Cancel",
+    "Project title": "Project title",
     "Short description": "Short description",
     "Pro tip!": "Pro tip!",
     "Press key to create project": "Press {key} to create project.",

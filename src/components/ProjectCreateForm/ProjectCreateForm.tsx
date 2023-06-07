@@ -62,6 +62,11 @@ const StyledProjectKeyInputContainer = styled(InputContainer)`
     padding-right: ${gapS};
 `;
 
+const StyledHelpIcon = styled(QuestionIcon)`
+    display: flex;
+    align-items: center;
+`;
+
 const ProjectCreateForm: React.FC = () => {
     const router = useRouter();
     const { locale } = usePageContext();
@@ -164,16 +169,12 @@ const ProjectCreateForm: React.FC = () => {
 
     return (
         <>
-            <ModalHeader>
-                <FormTitle>{tr('New project')}</FormTitle>
-            </ModalHeader>
-
             <ModalContent>
                 <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined}>
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
-                            placeholder={tr('Title')}
+                            placeholder={tr('Project title')}
                             flat="bottom"
                             brick="right"
                             disabled={busy}
@@ -213,9 +214,10 @@ const ProjectCreateForm: React.FC = () => {
 
                     <FormTextarea
                         {...register('description')}
+                        flat="both"
+                        minHeight={100}
                         disabled={busy}
                         placeholder={tr('Short description')}
-                        flat="both"
                         error={errorsResolver('description')}
                     />
 
@@ -234,30 +236,36 @@ const ProjectCreateForm: React.FC = () => {
                                     />
                                 )}
                             />
+
+                            <Link href={routes.help(locale, 'projects')}>
+                                <StyledHelpIcon size="s" color={gray6} />
+                            </Link>
+                        </FormAction>
+                    </FormActions>
+                    <FormActions flat="top">
+                        <FormAction left>
+                            <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                                {tr.raw('Press key to create project', {
+                                    key: <Keyboard command enter />,
+                                })}
+                            </Tip>
                         </FormAction>
                         <FormAction right inline>
+                            <Button
+                                outline
+                                text={tr('Cancel')}
+                                onClick={dispatchModalEvent(ModalEvent.ProjectCreateModal)}
+                            />
                             <Button
                                 view="primary"
                                 disabled={busy}
                                 outline={!isValid || !isKeyUnique || !isKeyEnoughLength}
                                 type="submit"
-                                text={tr('Create project')}
+                                text={tr('Create')}
                             />
                         </FormAction>
                     </FormActions>
                 </Form>
-
-                <StyledFormBottom>
-                    <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
-                        {tr.raw('Press key to create project', {
-                            key: <Keyboard command enter />,
-                        })}
-                    </Tip>
-
-                    <Link href={routes.help(locale, 'projects')}>
-                        <QuestionIcon size="s" color={gray6} />
-                    </Link>
-                </StyledFormBottom>
             </ModalContent>
         </>
     );
