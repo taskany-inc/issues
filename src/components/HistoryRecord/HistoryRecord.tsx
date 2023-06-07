@@ -1,3 +1,4 @@
+import { createContext, useContext, useState, SetStateAction, useMemo } from 'react';
 import { User, Tag as TagData, Estimate, State as StateData, Activity, Project } from '@prisma/client';
 import styled, { css } from 'styled-components';
 import { UserPic, Text, Tag, nullable, DoubleCaretRightCircleIcon } from '@taskany/bricks';
@@ -9,11 +10,12 @@ import RelativeTime from '../RelativeTime/RelativeTime';
 import { Priority } from '../../types/priority';
 import { PriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
-import { HistoryAction, Subject } from '../../types/history';
+import { HistoryAction, HistoryRecordSubject } from '../../types/history';
+import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 
 import { tr } from './HistoryRecord.i18n';
 
-type WholeSubject = 'title' | 'description' | 'priority' | keyof Subject;
+type WholeSubject = 'title' | 'description' | 'priority' | keyof HistoryRecordSubject;
 
 interface HistoryRecordProps {
     id: string;
@@ -21,7 +23,6 @@ interface HistoryRecordProps {
     subject: WholeSubject;
     action: HistoryAction;
     children?: React.ReactNode;
-    meta?: Record<string, unknown>;
     createdAt: Date;
 }
 
@@ -96,17 +97,29 @@ const StyledIcon = styled(DoubleCaretRightCircleIcon)`
     transform: translateY(-3px);
 `;
 
-export const HistorySimplifyRecord: React.FC<HistoryChangeProps<React.ReactNode>> = ({ from, to }) => (
+interface HistoryRecordContext {
+    setActionText: (value: SetStateAction<HistoryAction>) => void;
+}
+
+const RecordCtx = createContext<HistoryRecordContext>({
+    setActionText: () => {},
+});
+
+export const HistorySimplifyRecord: React.FC<{ withPretext?: boolean } & HistoryChangeProps<React.ReactNode>> = ({
+    from,
+    to,
+    withPretext = true,
+}) => (
     <>
         {nullable(from, (val) => (
             <>
-                <Text size="xs">{tr('from')}</Text>
+                {withPretext && <Text size="xs">{tr('from')}</Text>}
                 {val}
             </>
         ))}
         {nullable(to, (val) => (
             <>
-                <Text size="xs">{tr('to')}</Text>
+                {withPretext && <Text size="xs">{tr('to')}</Text>}
                 {val}
             </>
         ))}
@@ -114,44 +127,49 @@ export const HistorySimplifyRecord: React.FC<HistoryChangeProps<React.ReactNode>
 );
 
 export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, action, createdAt, children }) => {
-    const mapActions: Record<HistoryAction, string> = {
-        change: tr('change'),
-        edit: tr('edit'),
-        remove: tr('remove'),
-        delete: tr('delete'),
-        add: tr('add'),
-    };
+    const translates = useMemo<Record<HistoryAction | WholeSubject, string>>(() => {
+        return {
+            change: tr('change'),
+            edit: tr('edit'),
+            remove: tr('remove'),
+            delete: tr('delete'),
+            add: tr('add'),
+            replace: tr('replace'),
+            description: tr('description'),
+            project: tr('project'),
+            tags: tr('tags'),
+            owner: tr('owner'),
+            participants: tr('participant'),
+            state: tr('state'),
+            estimate: tr('estimate'),
+            title: tr('title'),
+            dependencies: tr('dependencies'),
+            priority: tr('priority'),
+        };
+    }, []);
 
-    const mapSubjects: Record<WholeSubject, string> = {
-        description: tr('description'),
-        project: tr('project'),
-        tags: tr('tags'),
-        owner: tr('owner'),
-        participants: tr('participant'),
-        state: tr('state'),
-        estimate: tr('estimate'),
-        title: tr('title'),
-        dependencies: tr('dependencies'),
-        priority: tr('priority'),
-    };
+    const [actionText, setActionText] = useState(action);
+
     return (
         <StyledActivityFeedItem>
-            <StyledIcon size="m" color={gray7} />
-            <StyledHistoryRecordWrapper>
-                <UserPic size={18} src={author?.image} email={author?.email} />
-                <StyledTextWrapper>
-                    <Text size="xs" weight="bold">
-                        {author?.nickname ?? author?.name ?? author?.email}
-                    </Text>
-                    <Text size="xs">
-                        {mapActions[action]} {mapSubjects[subject]}
-                    </Text>
-                    {children}
-                    <Text size="xs">
-                        <RelativeTime date={createdAt} />
-                    </Text>
-                </StyledTextWrapper>
-            </StyledHistoryRecordWrapper>
+            <RecordCtx.Provider value={{ setActionText }}>
+                <StyledIcon size="m" color={gray7} />
+                <StyledHistoryRecordWrapper>
+                    <UserPic size={18} src={author?.image} email={author?.email} />
+                    <StyledTextWrapper>
+                        <Text size="xs" weight="bold">
+                            {author?.nickname ?? author?.name ?? author?.email}
+                        </Text>
+                        <Text size="xs">
+                            {translates[actionText]} {translates[subject]}
+                        </Text>
+                        {children}
+                        <Text size="xs">
+                            <RelativeTime date={createdAt} />
+                        </Text>
+                    </StyledTextWrapper>
+                </StyledHistoryRecordWrapper>
+            </RecordCtx.Provider>
         </StyledActivityFeedItem>
     );
 };
@@ -179,12 +197,32 @@ const HistoryTags: React.FC<{ tags: { title: string; id: string }[] }> = ({ tags
     );
 };
 
-export const HistoryRecordTags: React.FC<HistoryChangeProps<TagData[]>> = ({ from, to }) => (
-    <HistorySimplifyRecord
-        from={from ? <HistoryTags tags={from} /> : null}
-        to={to ? <HistoryTags tags={to} /> : null}
-    />
-);
+export const HistoryRecordTags: React.FC<HistoryChangeProps<TagData[]>> = ({ from, to }) => {
+    const recordCtx = useContext(RecordCtx);
+
+    const added = calculateDiffBetweenArrays(to, from);
+    const removed = calculateDiffBetweenArrays(from, to);
+
+    recordCtx.setActionText(() => {
+        if (added.length && !removed.length) {
+            return 'add';
+        }
+
+        if (!added.length && removed.length) {
+            return 'remove';
+        }
+
+        return 'change';
+    });
+
+    return (
+        <HistorySimplifyRecord
+            withPretext={added.length > 0 && removed.length > 0}
+            from={removed.length ? <HistoryTags tags={removed} /> : null}
+            to={added.length ? <HistoryTags tags={added} /> : null}
+        />
+    );
+};
 
 export const HistoryRecordEstimate: React.FC<HistoryChangeProps<Estimate>> = ({ from, to }) => (
     <HistorySimplifyRecord
@@ -260,6 +298,7 @@ export const HistoryRecordParticipant: React.FC<HistoryChangeProps<Activity & { 
     to,
 }) => (
     <HistorySimplifyRecord
+        withPretext={!from || !to}
         from={
             from ? (
                 <HistoryParticipant

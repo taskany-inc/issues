@@ -17,7 +17,6 @@ import {
     goalParticipantsSchema,
     goalStateChangeSchema,
     goalUpdateSchema,
-    GoalUpdate,
     toogleGoalArchiveSchema,
     toogleGoalDependencySchema,
     userGoalsSchema,
@@ -33,6 +32,7 @@ import {
     mixHistoryWithComments,
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
+import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
 
 import { addCalculatedProjectFields } from './project';
 
@@ -362,10 +362,8 @@ export const goal = router({
 
         if (!actualGoal) return null;
 
-        const tagsToDisconnect: Array<Tag> =
-            actualGoal.tags.filter((t) => !input.tags.some((tag) => tag.id === t.id)) || [];
-        const tagsToConnect: GoalUpdate['tags'] =
-            input.tags.filter((t) => !actualGoal.tags.some((tag) => tag.id === t.id)) || [];
+        const tagsToDisconnect = calculateDiffBetweenArrays(actualGoal.tags, input.tags);
+        const tagsToConnect = calculateDiffBetweenArrays(input.tags, actualGoal.tags);
 
         const history: Omit<GoalHistory, 'id' | 'activityId' | 'goalId' | 'createdAt'>[] = [];
 
@@ -387,21 +385,15 @@ export const goal = router({
             });
         }
 
-        if (tagsToDisconnect.length) {
-            history.push({
-                subject: 'tags',
-                action: 'remove',
-                previousValue: actualGoal.tags?.map(({ id }) => id).join(', '),
-                nextValue: tagsToDisconnect.map(({ id }) => id).join(', '),
-            });
-        }
+        if (tagsToConnect.length || tagsToDisconnect.length) {
+            const prevIds = actualGoal.tags.map(({ id }) => id).join(', ');
+            const nextIds = input.tags.map(({ id }) => id).join(', ');
 
-        if (tagsToConnect.length) {
             history.push({
                 subject: 'tags',
-                action: 'add',
-                previousValue: actualGoal.tags?.map(({ id }) => id).join(', '),
-                nextValue: tagsToConnect.map(({ id }) => id).join(', '),
+                action: 'change',
+                previousValue: prevIds.length ? prevIds : null,
+                nextValue: nextIds.length ? nextIds : null,
             });
         }
 

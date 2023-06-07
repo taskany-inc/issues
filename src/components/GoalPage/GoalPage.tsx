@@ -35,7 +35,6 @@ import { StateDot } from '../StateDot';
 import { IssueParent } from '../IssueParent';
 import { IssueTags } from '../IssueTags';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { useHighlightedComment } from '../../hooks/useHighlightedComment';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
