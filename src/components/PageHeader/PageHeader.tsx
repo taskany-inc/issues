@@ -1,30 +1,24 @@
 import { FC, useCallback } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import {
-    Header,
-    HeaderContent,
-    HeaderLogo,
-    HeaderMenu,
-    HeaderNav,
-    HeaderNavLink,
-    SearchIcon,
-    UserMenu,
-} from '@taskany/bricks';
-import { gray7 } from '@taskany/colors';
+import { Header, HeaderContent, HeaderLogo, HeaderMenu, HeaderNav, HeaderNavLink, UserMenu } from '@taskany/bricks';
+import { gapM } from '@taskany/colors';
 
 import { usePageContext } from '../../hooks/usePageContext';
 import { routes, useRouter } from '../../hooks/router';
 import { PageHeaderActionButton } from '../PageHeaderActionButton/PageHeaderActionButton';
 import { PageHeaderLogo } from '../PageHeaderLogo';
+import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
 
 import { tr } from './PageHeader.i18n';
 
 const HeaderSearch = styled.div`
-    position: relative;
-    display: inline-block;
-    margin-left: 30px;
-    top: 3px;
+    margin-left: ${gapM};
+`;
+
+const StyledHeaderNav = styled(HeaderNav)`
+    display: flex;
+    align-items: center;
 `;
 
 export const PageHeader: FC = () => {
@@ -42,13 +36,7 @@ export const PageHeader: FC = () => {
         },
     ];
 
-    const onUserMenuClick = useCallback(() => {
-        if (user) {
-            userSettings();
-        } else {
-            signIn();
-        }
-    }, [user, userSettings, signIn]);
+    const onUserMenuClick = useCallback(() => (user ? userSettings() : signIn()), [user, userSettings, signIn]);
 
     return (
         <Header
@@ -59,24 +47,20 @@ export const PageHeader: FC = () => {
             }
             menu={
                 <HeaderMenu>
-                    <UserMenu
-                        onClick={onUserMenuClick}
-                        avatar={user?.image || undefined} // TODO: понять суть бытия
-                        email={user?.email || undefined}
-                    />
+                    <UserMenu onClick={onUserMenuClick} avatar={user?.image} email={user?.email} />
                 </HeaderMenu>
             }
             nav={
-                <HeaderNav>
-                    {links.map(({ href, title }, i) => (
-                        <NextLink href={href} passHref key={i}>
+                <StyledHeaderNav>
+                    {links.map(({ href, title }) => (
+                        <NextLink href={href} passHref key={href}>
                             <HeaderNavLink>{title}</HeaderNavLink>
                         </NextLink>
                     ))}
                     <HeaderSearch>
-                        <SearchIcon size="s" color={gray7} />
+                        <GlobalSearch />
                     </HeaderSearch>
-                </HeaderNav>
+                </StyledHeaderNav>
             }
         >
             <HeaderContent>

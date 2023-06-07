@@ -1,19 +1,20 @@
 import styled from 'styled-components';
-import { gapS, gapSm, gray4, radiusM, textColor } from '@taskany/colors';
+import { gapS, gapSm, gray4, gray9, radiusM, textColor } from '@taskany/colors';
 import React from 'react';
+import { Text } from '@taskany/bricks';
 
-export const Table = styled.div<{ columns: number }>`
+export const Table = styled.div<{ columns: number; minmax?: number }>`
     display: grid;
-    grid-template-columns: ${({ columns }) => {
+    grid-template-columns: ${({ columns, minmax = 410 }) => {
         if (columns < 2) {
             return '1fr';
         }
 
         if (columns === 2) {
-            return 'minmax(410px, 30%) repeat(10, max-content) 1fr';
+            return `minmax(${minmax}px, 30%) repeat(10, max-content) 1fr`;
         }
 
-        return `minmax(410px, 30%) repeat(${columns - 2}, max-content) 1fr`;
+        return `minmax(${minmax}px, 30%) repeat(${columns - 2}, max-content) 1fr`;
     }};
 
     width: 100%;
@@ -74,3 +75,30 @@ export const TableRow = styled.a<{ focused?: boolean }>`
 export const TableFullWidthCell = styled.div`
     grid-column: 1/-1;
 `;
+
+export const TitleItem = styled(TableCell)`
+    overflow: hidden;
+    white-space: normal;
+`;
+
+export const ContentItem = styled(TableCell)`
+    justify-self: center;
+    align-self: center;
+    padding: ${gapS} ${gapS};
+`;
+
+export const TitleContainer = styled.div`
+    display: flex;
+`;
+
+export const Title = styled(Text)`
+    margin-right: ${gapS};
+    text-overflow: ellipsis;
+    overflow: hidden;
+`;
+
+export const TextItem = styled(Text).attrs({
+    size: 's',
+    weight: 'bold',
+    color: gray9,
+})``;
