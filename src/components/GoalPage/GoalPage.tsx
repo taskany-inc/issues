@@ -29,7 +29,6 @@ import { IssueTitle } from '../IssueTitle';
 import { IssueKey } from '../IssueKey';
 import { IssueStats } from '../IssueStats/IssueStats';
 import { Reactions } from '../Reactions';
-import { StateDot } from '../StateDot';
 import { IssueParent } from '../IssueParent';
 import { IssueTags } from '../IssueTags';
 import { getPriorityText } from '../PriorityText/PriorityText';
@@ -141,7 +140,6 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal?.id, goal?._shortId);
 
     const priority = goal?.priority as Priority;
-    const priorityColor = priorityColorsMap[priority];
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
     const stateMutation = trpc.goal.switchState.useMutation();
@@ -341,11 +339,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                         <CardActions>
                             <IssueBaseActions>
                                 {nullable(priority, (ip) => (
-                                    <Button
-                                        ghost
-                                        text={getPriorityText(ip)}
-                                        iconLeft={<StateDot hue={priorityColor} />}
-                                    />
+                                    <Button ghost text={getPriorityText(ip)} />
                                 ))}
 
                                 <Button
