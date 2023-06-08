@@ -3,9 +3,8 @@ import { Button, Dropdown } from '@taskany/bricks';
 
 import { Priority, priorityColorsMap } from '../types/priority';
 
-import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
-import { PriorityText } from './PriorityText/PriorityText';
+import { PriorityText, getPriorityText } from './PriorityText/PriorityText';
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -34,7 +33,7 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                         ref={props.ref}
                         onClick={props.onClick}
                         disabled={props.disabled}
-                        iconLeft={<StateDot hue={priorityColorsMap[props.value as Priority]} />}
+                        text={getPriorityText(props.value)}
                     />
                 )}
                 renderItem={(props) => (
