@@ -38,16 +38,16 @@ const StyledState = styled.div<{
     border: 3px solid var(--stroke);
     background-color: var(--bkg);
 
-    &:hover {
-        color: var(--strokeHover);
-        border-color: var(--strokeHover);
-        background-color: var(--bkgHover);
-    }
-
     ${({ onClick }) =>
         onClick &&
         `
             cursor: pointer;
+
+            &:hover {
+                color: var(--strokeHover);
+                border-color: var(--strokeHover);
+                background-color: var(--bkgHover);
+            }
         `}
 
     ${({ size }) =>
@@ -55,6 +55,8 @@ const StyledState = styled.div<{
         `
             padding: calc(${gapXs}/2) ${gapS};
             font-size: 12px;
+            border: 2px solid var(--stroke);
+            font-weight: 500;
         `}
 `;
 
