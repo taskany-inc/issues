@@ -1,20 +1,9 @@
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { gapS, gray6, gray9, gray10 } from '@taskany/colors';
-import {
-    BulbOnIcon,
-    Link,
-    QuestionIcon,
-    Button,
-    Dropdown,
-    ArrowUpSmallIcon,
-    ArrowDownSmallIcon,
-    MenuItem,
-    Text,
-    FormAction,
-} from '@taskany/bricks';
+import { gray9, gray10 } from '@taskany/colors';
+import { BulbOnIcon, Button, Dropdown, ArrowUpSmallIcon, ArrowDownSmallIcon, MenuItem, Text } from '@taskany/bricks';
 
-import { routes, useRouter } from '../../hooks/router';
+import { useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
@@ -28,14 +17,6 @@ import { notifyPromise } from '../../utils/notifyPromise';
 
 import { tr } from './GoalCreateForm.i18n';
 
-const StyledFormBottom = styled.div`
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-
-    padding: ${gapS} ${gapS} 0 ${gapS};
-`;
-
 const StyledMenuItem = styled(MenuItem)`
     display: flex;
     flex-direction: column;
@@ -46,9 +27,14 @@ const StyledMenuItem = styled(MenuItem)`
     padding: 0;
 `;
 
+const StyledButtonWithDropdown = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
 const GoalCreateForm: React.FC = () => {
     const router = useRouter();
-    const { locale, user } = usePageContext();
+    const { user } = usePageContext();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
@@ -120,63 +106,68 @@ const GoalCreateForm: React.FC = () => {
         <GoalForm
             busy={busy}
             validityScheme={goalCommonSchema}
-            formTitle={tr('New goal')}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
             parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}
-            renderActionButton={({ busy }) => (
-                <FormAction right>
-                    <Button view="primary" disabled={busy} outline type="submit" brick="right" text={actionBtnText} />
-                    <Dropdown
-                        placement="top-end"
-                        arrow
-                        items={createOptions}
-                        offset={[-5, 20]}
-                        onChange={onCreateTypeChange}
-                        renderTrigger={(props) => (
-                            <Button
-                                disabled={false}
-                                view="primary"
-                                outline
-                                brick="left"
-                                iconRight={
-                                    props.visible ? (
-                                        <ArrowUpSmallIcon size="s" noWrap />
-                                    ) : (
-                                        <ArrowDownSmallIcon size="s" noWrap />
-                                    )
-                                }
-                                ref={props.ref}
-                                onClick={props.onClick}
-                            />
-                        )}
-                        renderItem={(props) => (
-                            <StyledMenuItem view="primary" key={props.item.id} ghost onClick={props.onClick}>
-                                <Text>{props.item.title}</Text>
-                                {props.item.clue && (
-                                    <Text size="xs" color={gray9}>
-                                        {props.item.clue}
-                                    </Text>
-                                )}
-                            </StyledMenuItem>
-                        )}
-                    />
-                </FormAction>
-            )}
-        >
-            <StyledFormBottom>
+            help="goals"
+            actionButton={
+                <>
+                    <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)} />
+                    <StyledButtonWithDropdown>
+                        <Button
+                            view="primary"
+                            disabled={busy}
+                            outline
+                            type="submit"
+                            brick="right"
+                            text={actionBtnText}
+                        />
+                        <Dropdown
+                            placement="top-end"
+                            arrow
+                            items={createOptions}
+                            offset={[-5, 20]}
+                            onChange={onCreateTypeChange}
+                            renderTrigger={(props) => (
+                                <Button
+                                    disabled={false}
+                                    view="primary"
+                                    outline
+                                    brick="left"
+                                    iconRight={
+                                        props.visible ? (
+                                            <ArrowUpSmallIcon size="s" noWrap />
+                                        ) : (
+                                            <ArrowDownSmallIcon size="s" noWrap />
+                                        )
+                                    }
+                                    ref={props.ref}
+                                    onClick={props.onClick}
+                                />
+                            )}
+                            renderItem={(props) => (
+                                <StyledMenuItem view="primary" key={props.item.id} ghost onClick={props.onClick}>
+                                    <Text>{props.item.title}</Text>
+                                    {props.item.clue && (
+                                        <Text size="xs" color={gray9}>
+                                            {props.item.clue}
+                                        </Text>
+                                    )}
+                                </StyledMenuItem>
+                            )}
+                        />
+                    </StyledButtonWithDropdown>
+                </>
+            }
+            tip={
                 <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
                     {tr.raw('Press key to create the goal', {
                         key: <Keyboard key={'cmd/enter'} command enter />,
                     })}
                 </Tip>
-
-                <Link href={routes.help(locale, 'goals')}>
-                    <QuestionIcon size="s" color={gray6} />
-                </Link>
-            </StyledFormBottom>
-        </GoalForm>
+            }
+        />
     );
 };
 

@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { FormAction, Button } from '@taskany/bricks';
+import { BulbOnIcon, Button } from '@taskany/bricks';
+import { gray10 } from '@taskany/colors';
 
 import { GoalForm } from '../GoalForm/GoalForm';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 import { GoalUpdate, goalUpdateSchema } from '../../schema/goal';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { Tip } from '../Tip';
+import { Keyboard } from '../Keyboard';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -32,7 +36,6 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             validityScheme={goalUpdateSchema}
             id={goal.id}
             busy={busy}
-            formTitle={tr('Edit the goal')}
             title={goal.title}
             description={goal.description}
             owner={goal.owner!}
@@ -42,11 +45,20 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             tags={goal.tags}
             estimate={goal._lastEstimate ?? undefined}
             onSumbit={updateGoal}
-            renderActionButton={({ busy, isValid }) => (
-                <FormAction right inline>
-                    <Button view="primary" disabled={busy} outline={!isValid} type="submit" text={tr('Submit')} />
-                </FormAction>
-            )}
+            help="goals"
+            actionButton={
+                <>
+                    <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
+                    <Button view="primary" disabled={busy} outline type="submit" text={tr('Submit')} />
+                </>
+            }
+            tip={
+                <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                    {tr.raw('Press key to update goal', {
+                        key: <Keyboard key={'cmd/enter'} command enter />,
+                    })}
+                </Tip>
+            }
         />
     );
 };

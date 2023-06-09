@@ -8,7 +8,8 @@ export const FormEditor = React.forwardRef<HTMLDivElement, React.ComponentProps<
         <FormEditorBricks
             ref={ref}
             messages={{
-                attachments: tr('Attach files by dragging & dropping, selecting or pasting them.'),
+                attachmentsButton: tr('Attach files'),
+                attachmentsDescription: tr("drag'n'drop or pasting also supported"),
                 attachmentsUploading: tr('Uploading...'),
             }}
             {...props}
