@@ -142,14 +142,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, o
                             />
                         </StyledStateUpdate>
                     ) : (
-                        <Button
-                            size="m"
-                            view="primary"
-                            disabled={busy}
-                            outline={!isValid}
-                            type="submit"
-                            text={tr('Comment')}
-                        />
+                        <Button size="m" view="primary" disabled={busy} outline type="submit" text={tr('Comment')} />
                     )
                 }
             />
