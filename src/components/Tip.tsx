@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { gapM, gapS, gapXs, gray7, gray8 } from '@taskany/colors';
+import { gapS, gapXs, gray7, gray8 } from '@taskany/colors';
 import { Text, nullable } from '@taskany/bricks';
 
 interface TipProps {
@@ -10,7 +10,7 @@ interface TipProps {
 }
 
 const StyledTip = styled(Text)`
-    padding: ${gapM} ${gapXs} 0;
+    padding: 0 ${gapXs} 0;
 `;
 
 const StyledTipIcon = styled.span`

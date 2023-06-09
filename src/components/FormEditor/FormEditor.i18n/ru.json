@@ -1,4 +1,5 @@
 {
-    "Attach files by dragging & dropping, selecting or pasting them.": "Прикрепляйте файлы перетаскиванием или вставкой.",
+    "Attach files": "Загрузить файл",
+    "drag'n'drop or pasting also supported": "— перетаскивание и вставка из буфера тоже работает",
     "Uploading...": "Загрузка..."
 }

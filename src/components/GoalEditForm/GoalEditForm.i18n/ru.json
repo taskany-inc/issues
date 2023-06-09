@@ -1,4 +1,6 @@
 {
     "Submit": "Сохранить",
-    "Edit the goal": "Редактирование цели"
+    "Cancel": "Отмена",
+    "Pro tip!": "Держи совет!",
+    "Press key to update goal": "Нажми {key}, чтобы обновить цель."
 }

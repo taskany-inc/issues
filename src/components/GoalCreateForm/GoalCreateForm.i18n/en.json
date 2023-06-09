@@ -1,5 +1,4 @@
 {
-    "New goal": "New goal",
     "Pro tip!": "Pro tip!",
     "Press key to create the goal": "Press {key} to create the goal.",
     "Create & Go": "Create & Go",
@@ -7,5 +6,6 @@
     "Create": "Create",
     "Create and go to the goal page": "Create and go to the goal page",
     "Create and open new form for the next goal": "Create and open new form for the next goal",
-    "Create goal and close form": "Create goal and close form"
+    "Create goal and close form": "Create goal and close form",
+    "Cancel": "Cancel"
 }

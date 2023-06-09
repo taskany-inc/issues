@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { gapS, gray6, gray10 } from '@taskany/colors';
+import { gapS, gray10, gray9 } from '@taskany/colors';
 import {
     Button,
     Text,
@@ -14,10 +14,8 @@ import {
     FormAction,
     FormTextarea,
     FormInput,
-    FormTitle,
     BulbOnIcon,
     QuestionIcon,
-    ModalHeader,
     ModalContent,
     nullable,
 } from '@taskany/bricks';
@@ -46,14 +44,6 @@ const StyledProjectTitleContainer = styled.div`
 
 const StyledProjectKeyContainer = styled.div`
     position: relative;
-`;
-
-const StyledFormBottom = styled.div`
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-
-    padding: ${gapS} ${gapS} 0 ${gapS};
 `;
 
 const StyledProjectKeyInputContainer = styled(InputContainer)`
@@ -238,7 +228,7 @@ const ProjectCreateForm: React.FC = () => {
                             />
 
                             <Link href={routes.help(locale, 'projects')}>
-                                <StyledHelpIcon size="s" color={gray6} />
+                                <StyledHelpIcon size="s" color={gray9} />
                             </Link>
                         </FormAction>
                     </FormActions>
