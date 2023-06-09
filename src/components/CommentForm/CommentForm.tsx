@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Controller, Control } from 'react-hook-form';
-import { backgroundColor, gapS, gray4, gray6 } from '@taskany/colors';
+import { backgroundColor, gapM, gray4, gray9 } from '@taskany/colors';
 import {
     Button,
     Link,
@@ -9,7 +9,6 @@ import {
     FormCard,
     FormAction,
     FormActions,
-    MarkdownIcon,
     QuestionIcon,
     nullable,
     useClickOutside,
@@ -18,7 +17,6 @@ import {
 import { usePageContext } from '../../hooks/usePageContext';
 import { routes } from '../../hooks/router';
 import { FormEditor } from '../FormEditor/FormEditor';
-import { Tip } from '../Tip';
 
 import { tr } from './CommentForm.i18n';
 
@@ -42,7 +40,7 @@ const StyledFormBottom = styled.div`
     align-items: center;
     justify-content: space-between;
 
-    padding: ${gapS} ${gapS} 0 ${gapS};
+    padding-top: ${gapM};
 `;
 
 const StyledCommentForm = styled(FormCard)`
@@ -65,10 +63,6 @@ const StyledCommentForm = styled(FormCard)`
         top: 10px;
         left: -8px;
     }
-`;
-
-const StyledTip = styled(Tip)`
-    padding: 0;
 `;
 
 export const CommentForm: React.FC<CommentFormProps> = ({
@@ -117,7 +111,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                             {...field}
                             disabled={busy}
                             placeholder={tr('Leave a comment')}
-                            height={commentFocused ? 120 : 60}
+                            height={commentFocused ? 120 : 40}
                             onCancel={onCommentCancel}
                             onFocus={onCommentFocus}
                             autoFocus={autoFocus}
@@ -127,8 +121,16 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                 />
 
                 {nullable(commentFocused, () => (
-                    <FormActions focused={commentFocused}>
-                        <FormAction left inline />
+                    <FormActions>
+                        <FormAction left inline>
+                            {nullable(commentFocused, () => (
+                                <StyledFormBottom>
+                                    <Link href={routes.help(locale, 'comments')}>
+                                        <QuestionIcon size="s" color={gray9} />
+                                    </Link>
+                                </StyledFormBottom>
+                            ))}
+                        </FormAction>
                         <FormAction right inline>
                             {nullable(!busy, () => (
                                 <Button size="m" outline text={tr('Cancel')} onClick={onCommentCancel} />
@@ -139,15 +141,6 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                     </FormActions>
                 ))}
             </Form>
-
-            {nullable(commentFocused, () => (
-                <StyledFormBottom>
-                    <StyledTip icon={<MarkdownIcon size="s" color={gray6} />}>{tr('Markdown supported')}</StyledTip>
-                    <Link href={routes.help(locale, 'comments')}>
-                        <QuestionIcon size="s" color={gray6} />
-                    </Link>
-                </StyledFormBottom>
-            ))}
         </StyledCommentForm>
     );
 };
