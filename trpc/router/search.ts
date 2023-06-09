@@ -8,6 +8,7 @@ export const search = router({
     global: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
         const [goals, projects] = await Promise.all([
             prisma.goal.findMany({
+                take: 5,
                 where: {
                     OR: [
                         {
@@ -29,6 +30,7 @@ export const search = router({
                 },
             }),
             prisma.project.findMany({
+                take: 5,
                 where: {
                     OR: [
                         {
