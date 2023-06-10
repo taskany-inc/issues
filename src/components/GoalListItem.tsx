@@ -112,8 +112,14 @@ const RelatedTextItem = styled(GoalTextItem).attrs({
     weight: 'regular',
 })``;
 
-export const GoalsListContainer: FC<{ children: React.ReactNode }> = ({ children }) => (
-    <Table columns={12}>{children}</Table>
+export const GoalsListContainer: FC<{ children: React.ReactNode; offset?: number; className?: string }> = ({
+    children,
+    offset = 0,
+    className,
+}) => (
+    <Table columns={12} offset={offset} className={className}>
+        {children}
+    </Table>
 );
 
 export const GoalListItem: React.FC<GoalListItemProps> = React.memo(

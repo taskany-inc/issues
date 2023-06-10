@@ -3,18 +3,18 @@ import { gapS, gapSm, gray4, gray9, radiusM, textColor } from '@taskany/colors';
 import React from 'react';
 import { Text } from '@taskany/bricks';
 
-export const Table = styled.div<{ columns: number; minmax?: number }>`
+export const Table = styled.div<{ columns: number; minmax?: number, offset?: number }>`
     display: grid;
-    grid-template-columns: ${({ columns, minmax = 410 }) => {
+    grid-template-columns: ${({ columns, minmax = 410, offset = 0 }) => {
         if (columns < 2) {
             return '1fr';
         }
 
         if (columns === 2) {
-            return `minmax(${minmax}px, 30%) repeat(10, max-content) 1fr`;
+            return `minmax(${minmax - offset}px, 30%) repeat(10, max-content) 1fr`;
         }
 
-        return `minmax(${minmax}px, 30%) repeat(${columns - 2}, max-content) 1fr`;
+        return `minmax(${minmax - offset}px, 30%) repeat(${columns - 2}, max-content) 1fr`;
     }};
 
     width: 100%;
@@ -28,7 +28,6 @@ export const TableCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
     display: flex;
     align-items: center;
     font-size: 0;
-
     transition: background-color 150ms ease-in;
     text-align: ${({ align = 'left' }) => align};
     box-sizing: border-box;
@@ -49,6 +48,7 @@ export const TableCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
 
 export const TableRow = styled.a<{ focused?: boolean }>`
     display: contents;
+    cursor: pointer;
 
     color: ${textColor};
     text-decoration: none;
