@@ -21,8 +21,7 @@ import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
-import { GoalsListContainer } from '../GoalListItem';
-import { ProjectItemStandalone } from '../ProjectListItem';
+import { ProjectListItemCollapsible } from '../ProjectListItem';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -79,14 +78,17 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
     );
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
-    const groupsMap =
+    const projectMap =
         // eslint-disable-next-line no-spaced-func
         (projectDeepInfo?.goals as NonNullable<GoalByIdReturnType>[])?.reduce<{
             [key: string]: {
-                project?: ProjectByIdReturnType | null;
+                project: NonNullable<ProjectByIdReturnType>;
                 goals: NonNullable<GoalByIdReturnType>[];
             };
         }>((r, g) => {
+            if (!g.project) {
+                return r;
+            }
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const k = g.projectId!;
 
@@ -100,9 +102,6 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
             r[k].goals.push(g);
             return r;
         }, Object.create(null)) || {};
-
-    // sort groups to make root project first
-    const groups = Object.values(groupsMap).sort((a) => (a.project?.id === id ? -1 : 1));
 
     useEffect(() => {
         const isGoalDeletedAlready = preview && !projectDeepInfo?.goals?.some((g) => g.id === preview.id);
@@ -213,6 +212,23 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
 
     if (!project.data) return null;
 
+    const fetchGoals = useCallback((id: string) => Promise.resolve(projectMap[id].goals), [projectMap]);
+    const fetchProjects = useCallback(
+        (projectId: string): Promise<NonNullable<ProjectByIdReturnType>[] | null> => {
+            if (projectId !== project.data?.id) {
+                return Promise.resolve(null);
+            }
+            return Promise.resolve(
+                project.data?.children
+                    .map(({ id }) => {
+                        return projectMap[id]?.project;
+                    })
+                    .filter((i) => i) || [],
+            );
+        },
+        [projectMap, project],
+    );
+
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <ProjectPageLayout
@@ -261,31 +277,21 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                 </FiltersPanel>
 
                 <PageContent>
-                    <GoalsListContainer>
-                        {groups?.map(
-                            (group) =>
-                                Boolean(group.goals.length) &&
-                                group.project && (
-                                    <GoalsGroup
-                                        key={group.project.id}
-                                        goals={group.goals}
-                                        selectedResolver={selectedGoalResolver}
-                                        onClickProvider={onGoalPrewiewShow}
-                                        onTagClick={setTagsFilterOutside}
-                                    >
-                                        <ProjectItemStandalone
-                                            key={group.project.id}
-                                            href={routes.project(group.project.id)}
-                                            title={group.project.title}
-                                            owner={group.project?.activity}
-                                            participants={group.project?.participants}
-                                            starred={group.project?._isStarred}
-                                            watching={group.project?._isWatching}
-                                        />
-                                    </GoalsGroup>
-                                ),
-                        )}
-                    </GoalsListContainer>
+                    <ProjectListItemCollapsible
+                        key={project.data.id}
+                        id={project.data.id}
+                        href={routes.project(project.data.id)}
+                        title={project.data.title}
+                        owner={project.data?.activity}
+                        participants={project.data?.participants}
+                        starred={project.data?._isStarred}
+                        watching={project.data?._isWatching}
+                        fetchProjects={fetchProjects}
+                        fetchGoals={fetchGoals}
+                        onTagClick={setTagsFilterOutside}
+                        onClickProvider={onGoalPrewiewShow}
+                        selectedResolver={selectedGoalResolver}
+                    />
                 </PageContent>
 
                 {nullable(preview, (p) => (
