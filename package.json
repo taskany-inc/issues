@@ -84,7 +84,7 @@
     "@types/react-input-mask": "3.0.2",
     "@types/styled-components": "5.1.26",
     "@types/throttle-debounce": "5.0.0",
-    "@typescript-eslint/eslint-plugin": "5.59.2",
+    "@typescript-eslint/eslint-plugin": "5.59.9",
     "@typescript-eslint/parser": "5.56.0",
     "@welldone-software/why-did-you-render": "7.0.1",
     "babel-eslint": "10.1.0",
