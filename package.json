@@ -63,7 +63,7 @@
     "styled-components": "5.3.11",
     "superjson": "1.12.3",
     "throttle-debounce": "5.0.0",
-    "tinykeys": "1.4.0",
+    "tinykeys": "2.0.0",
     "zod": "3.21.4"
   },
   "devDependencies": {
