@@ -105,7 +105,6 @@ const CommentsCountIcon = styled(MessageIcon)`
 
 const GoalTextItem = styled(Text).attrs({
     size: 's',
-    weight: 'bold',
     color: gray9,
 })``;
 
