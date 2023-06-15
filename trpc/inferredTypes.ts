@@ -8,6 +8,7 @@ export type FilterById = RouterOutputs['filter']['getById'];
 export type ProjectByIdReturnType = RouterOutputs['project']['getById'];
 export type ProjectUpdateReturnType = RouterOutputs['project']['update'];
 export type GoalByIdReturnType = RouterOutputs['goal']['getById'];
+export type GoalBatchReturnType = RouterOutputs['goal']['getBatch'];
 export type ActivityByIdReturnType = RouterOutputs['user']['suggestions'][number];
 export type GoalEstimate = NonNullable<GoalByIdReturnType>['_lastEstimate'];
 export type GoalAchiveCriteria = NonNullable<GoalByIdReturnType>['goalAchiveCriteria'][number];
