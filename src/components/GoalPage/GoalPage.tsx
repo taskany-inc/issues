@@ -384,6 +384,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                             onAddCriteria={onAddHandler}
                             onToggleCriteria={onToggleHandler}
                             onRemoveCriteria={onRemoveHandler}
+                            canEdit={goal._isEditable}
                             renderForm={(props) =>
                                 nullable(goal?._isEditable, () => (
                                     <CreateCriteriaForm

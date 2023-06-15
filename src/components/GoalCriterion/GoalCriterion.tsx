@@ -1,5 +1,5 @@
 import { useCallback, useMemo, memo } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Text, CircleIcon, TickCirclecon, MessageTickIcon, GoalIcon, nullable } from '@taskany/bricks';
 import { State } from '@prisma/client';
 import { backgroundColor, brandColor, gray10, gray6, gray7, gray9 } from '@taskany/colors';
@@ -56,21 +56,33 @@ const StyledTickIcon = styled(TickCirclecon)`
     display: inline-flex;
 `;
 
-const StyledCheckboxWrapper = styled.div`
+const StyledCheckboxWrapper = styled.div<{ canEdit: boolean }>`
     display: flex;
     align-items: center;
-    cursor: pointer;
+
+    ${({ canEdit }) =>
+        !canEdit &&
+        css`
+            pointer-events: none;
+        `}
+
+    ${({ canEdit }) =>
+        canEdit &&
+        css`
+            cursor: pointer;
+        `}
 `;
 
 interface GoalCreteriaCheckBoxProps {
     checked: boolean;
+    canEdit: boolean;
     onClick: () => void;
 }
 
-const GoalCreteriaCheckBox: React.FC<GoalCreteriaCheckBoxProps> = ({ checked, onClick }) => {
+const GoalCreteriaCheckBox: React.FC<GoalCreteriaCheckBoxProps> = ({ checked, canEdit, onClick }) => {
     const Icon = !checked ? StyledCircleIcon : StyledTickIcon;
     return (
-        <StyledCheckboxWrapper onClick={onClick}>
+        <StyledCheckboxWrapper onClick={onClick} canEdit={canEdit}>
             <Icon size="s" />
         </StyledCheckboxWrapper>
     );
@@ -105,11 +117,12 @@ interface GoalCriteriaProps {
     owner?: ActivityByIdReturnType | null;
     estimate?: GoalEstimate | null;
     state?: State | null;
+    canEdit: boolean;
     onCheck?: (val: boolean) => void;
 }
 
 const GoalCriteria: React.FC<GoalCriteriaProps> = memo(
-    ({ isDone, title, weight, estimate, owner, issuer, projectId, state, onCheck }) => {
+    ({ isDone, title, weight, estimate, owner, issuer, projectId, state, onCheck, canEdit }) => {
         const onToggle = useCallback(() => {
             onCheck?.(!isDone);
         }, [onCheck, isDone]);
@@ -126,7 +139,7 @@ const GoalCriteria: React.FC<GoalCriteriaProps> = memo(
             <StyledTableRow>
                 <ContentItem>
                     {projectId == null ? (
-                        <GoalCreteriaCheckBox onClick={onToggle} checked={isDone} />
+                        <GoalCreteriaCheckBox onClick={onToggle} checked={isDone} canEdit={canEdit} />
                     ) : (
                         <GoalIcon size="s" />
                     )}
@@ -169,6 +182,7 @@ const GoalCriteria: React.FC<GoalCriteriaProps> = memo(
 interface GoalCriterionProps {
     goalId?: string;
     criterion?: GoalAchiveCriteria[];
+    canEdit: boolean;
     onAddCriteria: (val: AddCriteriaScheme) => void;
     onToggleCriteria: (val: UpdateCriteriaScheme) => void;
     onRemoveCriteria: (val: RemoveCriteriaScheme) => void;
@@ -181,6 +195,7 @@ interface GoalCriterionProps {
 export const GoalCriterion: React.FC<GoalCriterionProps> = ({
     goalId,
     criterion = [],
+    canEdit,
     onAddCriteria,
     onToggleCriteria,
     // onRemoveCriteria,
@@ -223,6 +238,7 @@ export const GoalCriterion: React.FC<GoalCriterionProps> = ({
                             issuer={item.goalAsCriteria?.activity}
                             state={item.goalAsCriteria?.state}
                             onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
+                            canEdit={canEdit}
                         />
                     ))}
                 </StyledTable>
