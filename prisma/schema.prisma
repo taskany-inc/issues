@@ -97,28 +97,29 @@ model Ghost {
 }
 
 model Activity {
-  id                 String        @id @default(cuid())
-  ghost              Ghost?        @relation(fields: [ghostId], references: [id])
-  ghostId            String?       @unique
+  id                 String               @id @default(cuid())
+  ghost              Ghost?               @relation(fields: [ghostId], references: [id])
+  ghostId            String?              @unique
   user               User?
   filters            Filter[]
   comments           Comment[]
   reactions          Reaction[]
   projects           Project[]
   estimates          Estimate[]
-  projectParticipant Project[]     @relation("projectParticipants")
-  goalParticipant    Goal[]        @relation("goalParticipants")
-  goalWatchers       Goal[]        @relation("goalWatchers")
-  goalStargizers     Goal[]        @relation("goalStargizers")
-  projectWatchers    Project[]     @relation("projectWatchers")
-  projectStargizers  Project[]     @relation("projectStargizers")
-  filterStargizers   Filter[]      @relation("filterStargizers")
-  goalOwner          Goal[]        @relation("goalOwner")
-  goalIssuer         Goal[]        @relation("goalIssuer")
-  settings           Settings      @relation(fields: [settingsId], references: [id])
-  settingsId         String        @unique
+  projectParticipant Project[]            @relation("projectParticipants")
+  goalParticipant    Goal[]               @relation("goalParticipants")
+  goalWatchers       Goal[]               @relation("goalWatchers")
+  goalStargizers     Goal[]               @relation("goalStargizers")
+  projectWatchers    Project[]            @relation("projectWatchers")
+  projectStargizers  Project[]            @relation("projectStargizers")
+  filterStargizers   Filter[]             @relation("filterStargizers")
+  goalOwner          Goal[]               @relation("goalOwner")
+  goalIssuer         Goal[]               @relation("goalIssuer")
+  settings           Settings             @relation(fields: [settingsId], references: [id])
+  settingsId         String               @unique
   tags               Tag[]
-  goalActions        GoalHistory[] @relation("goalActions")
+  goalActions        GoalHistory[]        @relation("goalActions")
+  criterion          GoalAchiveCriteria[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -176,37 +177,39 @@ model EstimateToGoal {
 }
 
 model Goal {
-  id           String           @id @default(cuid())
-  scopeId      Int              @default(1)
-  title        String
-  description  String
-  kind         String?
-  key          Boolean?
-  personal     Boolean?
-  private      Boolean?
-  archived     Boolean?         @default(false)
-  priority     String?
-  estimate     EstimateToGoal[]
-  project      Project?         @relation("projectGoals", fields: [projectId], references: [id])
-  projectId    String?
-  teamId       String?
-  state        State?           @relation("goalState", fields: [stateId], references: [id])
-  stateId      String?
-  activity     Activity?        @relation("goalIssuer", fields: [activityId], references: [id])
-  activityId   String?
-  owner        Activity?        @relation("goalOwner", fields: [ownerId], references: [id])
-  ownerId      String?
-  participants Activity[]       @relation("goalParticipants")
-  watchers     Activity[]       @relation("goalWatchers")
-  stargizers   Activity[]       @relation("goalStargizers")
-  comments     Comment[]
-  reactions    Reaction[]
-  tags         Tag[]
-  dependsOn    Goal[]           @relation("dependsOn")
-  blocks       Goal[]           @relation("dependsOn")
-  relatedTo    Goal[]           @relation("connected")
-  connected    Goal[]           @relation("connected")
-  history      GoalHistory[]
+  id                 String               @id @default(cuid())
+  scopeId            Int                  @default(1)
+  title              String
+  description        String
+  kind               String?
+  key                Boolean?
+  personal           Boolean?
+  private            Boolean?
+  archived           Boolean?             @default(false)
+  priority           String?
+  estimate           EstimateToGoal[]
+  project            Project?             @relation("projectGoals", fields: [projectId], references: [id])
+  projectId          String?
+  teamId             String?
+  state              State?               @relation("goalState", fields: [stateId], references: [id])
+  stateId            String?
+  activity           Activity?            @relation("goalIssuer", fields: [activityId], references: [id])
+  activityId         String?
+  owner              Activity?            @relation("goalOwner", fields: [ownerId], references: [id])
+  ownerId            String?
+  participants       Activity[]           @relation("goalParticipants")
+  watchers           Activity[]           @relation("goalWatchers")
+  stargizers         Activity[]           @relation("goalStargizers")
+  comments           Comment[]
+  reactions          Reaction[]
+  tags               Tag[]
+  dependsOn          Goal[]               @relation("dependsOn")
+  blocks             Goal[]               @relation("dependsOn")
+  relatedTo          Goal[]               @relation("connected")
+  connected          Goal[]               @relation("connected")
+  history            GoalHistory[]
+  goalAchiveCriteria GoalAchiveCriteria[] @relation("GoalCriterion")
+  goalAsCriteria     GoalAchiveCriteria?  @relation("GoalAsCriteria")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -345,4 +348,23 @@ model GoalHistory {
 
   @@index([id])
   @@index([goalId])
+}
+
+model GoalAchiveCriteria {
+  id               String   @id @default(cuid())
+  linkedGoal       Goal     @relation("GoalCriterion", fields: [linkedGoalId], references: [id])
+  linkedGoalId     String
+  goalAsCriteria   Goal?    @relation("GoalAsCriteria", fields: [goalIdAsCriteria], references: [id])
+  goalIdAsCriteria String?  @unique
+  title            String
+  weight           Int
+  isDone           Boolean  @default(false)
+  activity         Activity @relation(fields: [activityId], references: [id])
+  activityId       String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([title])
+  @@index([linkedGoalId])
 }
