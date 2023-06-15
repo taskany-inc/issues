@@ -338,6 +338,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                         <GoalCriterion
                             goalId={goal?.id}
                             criterion={goal?.goalAchiveCriteria}
+                            canEdit={goal?._isEditable || false}
                             onAddCriteria={onAddHandler}
                             onToggleCriteria={onToggleHandler}
                             onRemoveCriteria={onRemoveHandler}
