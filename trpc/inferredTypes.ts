@@ -11,3 +11,4 @@ export type GoalByIdReturnType = RouterOutputs['goal']['getById'];
 export type ActivityByIdReturnType = RouterOutputs['user']['suggestions'][number];
 export type GoalEstimate = NonNullable<GoalByIdReturnType>['_lastEstimate'];
 export type GoalAchiveCriteria = NonNullable<GoalByIdReturnType>['goalAchiveCriteria'][number];
+export type GoalUpdateReturnType = RouterOutputs['goal']['update'];

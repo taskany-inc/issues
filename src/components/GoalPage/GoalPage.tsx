@@ -45,7 +45,7 @@ import { trpc } from '../../utils/trpcClient';
 import { GoalParticipantsSchema, GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { GoalUpdateReturnType } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
 import { CreateCriteriaForm } from '../CreateCriteriaForm/CreateCreteriaForm';
 import { GoalCriterion } from '../GoalCriterion/GoalCriterion';
@@ -203,7 +203,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(
-        (editedGoal?: GoalByIdReturnType) => {
+        (editedGoal?: GoalUpdateReturnType) => {
             setGoalEditModalVisible(false);
 
             if (editedGoal && id !== editedGoal._shortId) {

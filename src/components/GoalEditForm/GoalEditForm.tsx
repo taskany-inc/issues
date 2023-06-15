@@ -3,7 +3,7 @@ import { BulbOnIcon, Button } from '@taskany/bricks';
 import { gray10 } from '@taskany/colors';
 
 import { GoalForm } from '../GoalForm/GoalForm';
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { GoalUpdateReturnType, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 import { GoalUpdate, goalUpdateSchema } from '../../schema/goal';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
@@ -15,7 +15,7 @@ import { tr } from './GoalEditForm.i18n';
 interface GoalEditFormProps {
     goal: NonNullable<GoalByIdReturnType>;
 
-    onSubmit: (goal?: GoalByIdReturnType) => void;
+    onSubmit: (goal?: GoalUpdateReturnType) => void;
 }
 
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
