@@ -47,6 +47,9 @@ import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
+import { CreateCriteriaForm } from '../CreateCriteriaForm/CreateCreteriaForm';
+import { GoalCriterion } from '../GoalCriterion/GoalCriterion';
+import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 
 import { tr } from './GoalPage.i18n';
 
@@ -142,6 +145,10 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const priority = goal?.priority as Priority;
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
+    const invalidateFn = useCallback(() => {
+        return utils.goal.getById.invalidate(id);
+    }, [id, utils.goal.getById]);
+
     const stateMutation = trpc.goal.switchState.useMutation();
     const onGoalStateChange = useCallback(
         async (nextState: GoalStateChangeSchema['state']) => {
@@ -150,10 +157,10 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                     state: nextState,
                     id: goal.id,
                 });
-                utils.goal.getById.invalidate(id);
+                invalidateFn();
             }
         },
-        [goal, id, stateMutation, utils.goal.getById],
+        [goal, invalidateFn, stateMutation],
     );
 
     const onGoalReactionToggle = useCallback(
@@ -165,9 +172,9 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const onParticipantsChange = useCallback(
         async (participants: GoalParticipantsSchema['participants']) => {
             await participantsMutation.mutateAsync({ participants, id });
-            utils.goal.getById.invalidate(id);
+            invalidateFn();
         },
-        [participantsMutation, utils.goal.getById, id],
+        [participantsMutation, id, invalidateFn],
     );
 
     const toggleDependencyMutation = trpc.goal.toggleDependency.useMutation();
@@ -177,22 +184,22 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
 
             await notifyPromise(promise, 'goalsUpdate');
 
-            utils.goal.getById.invalidate(id);
+            invalidateFn();
         },
-        [id, toggleDependencyMutation, utils.goal.getById],
+        [invalidateFn, toggleDependencyMutation],
     );
 
     const onCommentPublish = useCallback(() => {
-        utils.goal.getById.invalidate(id);
-    }, [id, utils.goal.getById]);
+        invalidateFn();
+    }, [invalidateFn]);
 
     const onCommentReactionToggle = useCallback(
         (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(id)),
         [commentReaction, utils.goal.getById],
     );
     const onCommentDelete = useCallback(() => {
-        utils.goal.getById.invalidate(id);
-    }, [id, utils.goal.getById]);
+        invalidateFn();
+    }, [invalidateFn]);
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(
@@ -202,10 +209,10 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
             if (editedGoal && id !== editedGoal._shortId) {
                 router.goal(editedGoal._shortId);
             } else {
-                utils.goal.getById.invalidate(id);
+                invalidateFn();
             }
         },
-        [id, router, utils.goal.getById],
+        [id, invalidateFn, router],
     );
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
@@ -239,6 +246,9 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const onCommentsClick = useCallback(() => {
         commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
+
+    const { onAddHandler, onRemoveHandler, onToggleHandler, goals, updateSuggestionQuery } =
+        useCriteriaResource(invalidateFn);
 
     if (!goal) return null;
 
@@ -366,6 +376,27 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                             </IssueBaseActions>
                         </CardActions>
                     </Card>
+
+                    {nullable(goal?.goalAchiveCriteria.length || goal?._isEditable, () => (
+                        <GoalCriterion
+                            goalId={goal.id}
+                            criterion={goal?.goalAchiveCriteria}
+                            onAddCriteria={onAddHandler}
+                            onToggleCriteria={onToggleHandler}
+                            onRemoveCriteria={onRemoveHandler}
+                            renderForm={(props) =>
+                                nullable(goal?._isEditable, () => (
+                                    <CreateCriteriaForm
+                                        onSubmit={props.onAddCriteria}
+                                        onSearch={updateSuggestionQuery}
+                                        items={goals.data || []}
+                                        goalId={goal.id}
+                                        sumOfWeights={props.sumOfWeights}
+                                    />
+                                ))
+                            }
+                        />
+                    ))}
 
                     {nullable(goal?.activityFeed, (feed) => (
                         <GoalActivity
