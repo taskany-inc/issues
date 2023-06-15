@@ -33,6 +33,7 @@ import {
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
+import { criteriaSchema, removeCriteria, updateCriteriaState } from '../../src/schema/criteria';
 
 import { addCalculatedProjectFields } from './project';
 
@@ -170,6 +171,31 @@ export const goal = router({
                 },
                 include: {
                     ...goalDeepQuery,
+                    goalAchiveCriteria: {
+                        include: {
+                            goalAsCriteria: {
+                                include: {
+                                    estimate: { include: { estimate: true } },
+                                    activity: {
+                                        include: {
+                                            user: true,
+                                            ghost: true,
+                                        },
+                                    },
+                                    owner: {
+                                        include: {
+                                            user: true,
+                                            ghost: true,
+                                        },
+                                    },
+                                    state: true,
+                                },
+                            },
+                        },
+                        orderBy: {
+                            createdAt: 'asc',
+                        },
+                    },
                     estimate: {
                         include: {
                             estimate: true,
@@ -351,7 +377,9 @@ export const goal = router({
                 participants: true,
                 project: true,
                 tags: true,
-                estimate: true,
+                estimate: {
+                    include: { estimate: true },
+                },
                 owner: {
                     include: {
                         user: true,
@@ -765,6 +793,113 @@ export const goal = router({
             }
 
             return newComment;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    addCriteria: protectedProcedure.input(criteriaSchema).mutation(async ({ input, ctx }) => {
+        const actualGoal = await prisma.goal.findUnique({
+            where: { id: input.linkedGoalId },
+        });
+
+        if (!actualGoal) {
+            return null;
+        }
+
+        try {
+            const [criteria] = await Promise.all([
+                prisma.goalAchiveCriteria.create({
+                    data: {
+                        title: input.title,
+                        weight: Number(input.weight),
+                        activity: {
+                            connect: {
+                                id: ctx.session.user.activityId,
+                            },
+                        },
+                        linkedGoal: {
+                            connect: {
+                                id: input.linkedGoalId,
+                            },
+                        },
+                        goalAsCriteria:
+                            input.goalAsGriteria != null
+                                ? {
+                                      connect: {
+                                          id: input.goalAsGriteria,
+                                      },
+                                  }
+                                : undefined,
+                    },
+                }),
+                // TODO: implements create new history record
+                // prisma.goalHistory.create({
+                //     data: {
+                //         previousValue: null,
+                //         nextValue: input.goalAsGriteria || input.title,
+                //         action: 'add',
+                //         subject: 'criteria',
+                //         goal: {
+                //             connect: {
+                //                 id: input.linkedGoalId,
+                //             },
+                //         },
+                //         activity: {
+                //             connect: {
+                //                 id: ctx.session.user.activityId,
+                //             },
+                //         },
+                //     },
+                // }),
+            ]);
+
+            return criteria;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+
+    updateCriteriaState: protectedProcedure.input(updateCriteriaState).mutation(async ({ ctx, input }) => {
+        const currentCriteria = await prisma.goalAchiveCriteria.findUnique({
+            where: { id: input.id },
+        });
+
+        try {
+            if (!currentCriteria) {
+                throw Error('No current criteria');
+            }
+
+            await Promise.all([
+                prisma.goalAchiveCriteria.update({
+                    where: { id: input.id },
+                    data: { isDone: input.isDone },
+                }),
+                // TODO: implements create new history record
+                // prisma.goalHistory.create({
+                //     data: {
+                //         previousValue: input.isDone ? 'undone' : 'done',
+                //         nextValue: input.isDone ? 'done' : 'undone',
+                //         subject: 'criteria',
+                //         action: 'change',
+                //         goal: {
+                //             connect: { id: currentCriteria.linkedGoalId },
+                //         },
+                //         activity: {
+                //             connect: { id: ctx.session.user.activityId },
+                //         },
+                //     },
+                // }),
+            ]);
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+
+    removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input }) => {
+        try {
+            await prisma.goalAchiveCriteria.delete({
+                where: { id: input },
+            });
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
