@@ -25,12 +25,13 @@ const UserImage = styled(UserPic)`
 export const UserGroup: FC<{
     users: NonNullable<ActivityByIdReturnType>[];
     className?: string;
-}> = ({ users, className }) => {
+    size?: number;
+}> = ({ users, className, size = 24 }) => {
     return (
         <UserGroupContainer className={className}>
             {users.map(({ user, ghost }, i) => (
                 <UserContainer key={i}>
-                    <UserImage src={user?.image} email={user?.email || ghost?.email} size={24} />
+                    <UserImage src={user?.image} email={user?.email || ghost?.email} size={size} />
                 </UserContainer>
             ))}
         </UserGroupContainer>
