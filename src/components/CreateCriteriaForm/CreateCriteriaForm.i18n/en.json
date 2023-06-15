@@ -1,0 +1,9 @@
+{
+    "Weight is required": "",
+    "Weight must be integer": "",
+    "Weight": "",
+    "Criteria or Goal": "",
+    "Add achivement criteria": "",
+    "Weight must be in range": "Weight must be between 1 and {upTo}",
+    "Add": ""
+}

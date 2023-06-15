@@ -1,0 +1,9 @@
+{
+    "Weight is required": "Вес обязателен",
+    "Weight must be integer": "Вес должен быть числом",
+    "Weight": "Вес критерия",
+    "Criteria or Goal": "Критерий или цель",
+    "Add achivement criteria": "Добавить критерий",
+    "Weight must be in range": "Вес критерия должен быть от 1 до {upTo}",
+    "Add": "Добавить"
+}
