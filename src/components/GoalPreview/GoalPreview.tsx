@@ -26,6 +26,7 @@ import { formatEstimate } from '../../utils/dateTime';
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
+import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { Priority, priorityColorsMap } from '../../types/priority';
@@ -45,6 +46,8 @@ import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalStateChangeSchema } from '../../schema/goal';
 import { GoalActivity } from '../GoalActivity';
+import { GoalCriterion } from '../GoalCriterion/GoalCriterion';
+import { CreateCriteriaForm } from '../CreateCriteriaForm/CreateCreteriaForm';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -111,6 +114,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     const archiveMutation = trpc.goal.toggleArchive.useMutation();
     const utils = trpc.useContext();
 
+    const invalidateFn = useCallback(() => {
+        return utils.goal.getById.invalidate(preview._shortId);
+    }, [utils.goal.getById, preview._shortId]);
+
     const { data: goal } = trpc.goal.getById.useQuery(preview._shortId, {
         staleTime: refreshInterval,
     });
@@ -119,8 +126,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     const onGoalEdit = useCallback(() => {
         setGoalEditModalVisible(false);
 
-        utils.goal.getById.invalidate(preview._shortId);
-    }, [utils.goal.getById, preview._shortId]);
+        invalidateFn();
+    }, [invalidateFn]);
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
     }, []);
@@ -143,14 +150,14 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                 });
             }
 
-            utils.goal.getById.invalidate(preview._shortId);
+            invalidateFn();
         },
-        [goal, preview._shortId, stateChangeMutations, utils.goal.getById],
+        [goal, invalidateFn, stateChangeMutations],
     );
 
     const onCommentPublish = useCallback(() => {
-        utils.goal.getById.invalidate(preview._shortId);
-    }, [preview._shortId, utils.goal.getById]);
+        invalidateFn();
+    }, [invalidateFn]);
 
     const onGoalReactionToggle = useCallback(
         (id: string) => goalReaction(id, () => utils.goal.getById.invalidate(preview._shortId)),
@@ -161,8 +168,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         [preview._shortId, commentReaction, utils.goal.getById],
     );
     const onCommentDelete = useCallback(() => {
-        utils.goal.getById.invalidate(preview._shortId);
-    }, [preview._shortId, utils.goal.getById]);
+        invalidateFn();
+    }, [invalidateFn]);
 
     const onPreviewClose = useCallback(() => {
         setGoalEditModalVisible(false);
@@ -182,8 +189,11 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
 
         await notifyPromise(promise, 'goalsDelete');
 
-        utils.goal.getById.invalidate(preview._shortId);
-    }, [preview, onDelete, archiveMutation, utils.goal.getById]);
+        invalidateFn();
+    }, [onDelete, archiveMutation, preview.id, invalidateFn]);
+
+    const { onAddHandler, onRemoveHandler, onToggleHandler, goals, updateSuggestionQuery } =
+        useCriteriaResource(invalidateFn);
 
     const commentsRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -323,6 +333,27 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                             <Md>{(goal || preview).description ?? ''}</Md>
                         </CardComment>
                     </StyledCard>
+
+                    {nullable(goal?.goalAchiveCriteria.length || goal?._isEditable, () => (
+                        <GoalCriterion
+                            goalId={goal?.id}
+                            criterion={goal?.goalAchiveCriteria}
+                            onAddCriteria={onAddHandler}
+                            onToggleCriteria={onToggleHandler}
+                            onRemoveCriteria={onRemoveHandler}
+                            renderForm={(props) =>
+                                nullable(goal?._isEditable, () => (
+                                    <CreateCriteriaForm
+                                        onSubmit={props.onAddCriteria}
+                                        onSearch={updateSuggestionQuery}
+                                        items={goals.data || []}
+                                        goalId={goal?.id || preview.id}
+                                        sumOfWeights={props.sumOfWeights}
+                                    />
+                                ))
+                            }
+                        />
+                    ))}
 
                     {nullable(goal?.activityFeed, (feed) => (
                         <GoalActivity
