@@ -1,7 +1,7 @@
 {
-    "title": "Taskany — Цели — Рабочий стол",
-    "Dashboard": "Рабочий стол",
-    "This is your personal goals bundle": "Здесь будут все созданные вами, назначенные на вас, а также цели и проекты, за которыми вы следите.",
+    "title": "Taskany — Goals",
+    "Goals": "Цели",
+    "These are goals across all projects": "Здесь собраны все цели со всех проектов.",
     "Reset": "Сбросить",
     "created by": "автор"
 }

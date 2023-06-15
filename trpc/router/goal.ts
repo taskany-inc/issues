@@ -22,7 +22,7 @@ import {
     userGoalsSchema,
     goalCreateCommentSchema,
 } from '../../src/schema/goal';
-import { ToggleSubscriptionSchema, suggestionsQueryScheme } from '../../src/schema/common';
+import { ToggleSubscriptionSchema, suggestionsQueryScheme, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import {
     createGoal,
@@ -85,73 +85,64 @@ export const goal = router({
                 },
             },
             include: {
-                owner: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
-                activity: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
-                tags: true,
-                state: true,
-                project: {
-                    include: {
-                        flow: true,
-                    },
-                },
-                reactions: {
-                    include: {
-                        activity: {
-                            include: {
-                                user: true,
-                                ghost: true,
-                            },
-                        },
-                    },
-                },
-                estimate: true,
-                watchers: true,
-                stargizers: true,
-                dependsOn: {
-                    include: {
-                        state: true,
-                    },
-                },
-                relatedTo: {
-                    include: {
-                        state: true,
-                    },
-                },
-                blocks: {
-                    include: {
-                        state: true,
-                    },
-                },
-                comments: {
-                    include: {
-                        activity: {
-                            include: {
-                                user: true,
-                                ghost: true,
-                            },
-                        },
-                        reactions: true,
-                    },
-                },
-                participants: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
+                ...goalDeepQuery,
             },
         });
     }),
+    getBatch: protectedProcedure
+        .input(
+            z.object({
+                query: queryWithFiltersSchema.optional(),
+                limit: z.number(),
+                cursor: z.string().nullish(),
+                skip: z.number().optional(),
+            }),
+        )
+        .query(async ({ ctx, input: { query, limit, skip, cursor } }) => {
+            const [items, count] = await Promise.all([
+                prisma.goal.findMany({
+                    take: limit + 1,
+                    skip,
+                    cursor: cursor ? { id: cursor } : undefined,
+                    ...(query ? goalsFilter(query, ctx.session.user.activityId) : {}),
+                    orderBy: {
+                        id: 'asc',
+                    },
+                    include: {
+                        ...goalDeepQuery,
+                    },
+                }),
+                prisma.goal.count(),
+            ]);
+
+            let nextCursor: typeof cursor | undefined;
+
+            if (items.length > limit) {
+                const nextItem = items.pop(); // return the last item from the array
+                nextCursor = nextItem?.id;
+            }
+
+            return {
+                items: items.map((g) => ({
+                    ...g,
+                    ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+                    estimate: getEstimateListFormJoin(g),
+                    project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
+                })),
+                nextCursor,
+                meta: {
+                    count,
+                    tags: [],
+                    owners: [],
+                    participants: [],
+                    issuers: [],
+                    priority: [],
+                    states: [],
+                    projects: [],
+                    estimates: [],
+                },
+            };
+        }),
     getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
         // try to recognize shot id like: FRNTND-23
         const [projectId, scopeIdStr] = input.split('-');
