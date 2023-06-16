@@ -389,7 +389,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                                     <CriteriaForm
                                         onSubmit={props.onAddCriteria}
                                         goalId={goal.id}
-                                        sumOfWeights={props.sumOfWeights}
+                                        validityData={props.dataForValidateCriteria}
                                     />
                                 ))
                             }

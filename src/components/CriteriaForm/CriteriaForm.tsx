@@ -15,6 +15,7 @@ import { trpc } from '../../utils/trpcClient';
 import { tr } from './CriteriaForm.i18n';
 
 const maxPossibleWeigth = 100;
+const minPossibleWeight = 1;
 
 const StyledPlainButton = styled(Button)`
     background-color: unset;
@@ -129,7 +130,7 @@ const WeightField: React.FC<WeightFieldProps> = ({ registerProps, errorsResolver
 
             if (Number.isNaN(parsedValue)) {
                 message = tr('Weight must be integer');
-            } else if (parsedValue <= 0 || maxValue + parsedValue > maxPossibleWeigth) {
+            } else if (parsedValue <= minPossibleWeight || maxValue + parsedValue > maxPossibleWeigth) {
                 message = tr
                     .raw('Weight must be in range', {
                         upTo: `${maxPossibleWeigth - maxValue}`,
@@ -161,13 +162,15 @@ const WeightField: React.FC<WeightFieldProps> = ({ registerProps, errorsResolver
 interface CriteriaTitleFieldProps {
     name: 'title';
     value?: string;
+    titles: string[];
     errorsResolver: (field: CriteriaTitleFieldProps['name']) => { message?: string } | undefined;
     onSelect: <T extends Goal>(goal: T) => void;
     onChange: ReactEventHandler<HTMLInputElement>;
+    setError: UseFormSetError<AddCriteriaScheme>;
 }
 
 export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>(
-    ({ name, value = '', errorsResolver, onSelect, onChange }, ref) => {
+    ({ name, value = '', errorsResolver, onSelect, onChange, titles = [], setError }, ref) => {
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [[text, type], setQuery] = useState<[string, 'plain' | 'search']>([value, 'plain']);
 
@@ -217,6 +220,19 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
             [onSelect, type],
         );
 
+        const onlyUniqueTitleHandler = useCallback<React.FocusEventHandler<HTMLInputElement>>(
+            (event) => {
+                const { value } = event.target;
+
+                if (titles.some((t) => t === value)) {
+                    setError('title', {
+                        message: tr('Title must be unique'),
+                    });
+                }
+            },
+            [titles, setError],
+        );
+
         return (
             <ComboBox
                 ref={ref}
@@ -236,6 +252,7 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
                             handleInputChange(...args);
                             onChange(...args);
                         }}
+                        onBlur={onlyUniqueTitleHandler}
                         {...props}
                     />
                 )}
@@ -253,10 +270,13 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
 interface CriteriaFormProps {
     onSubmit: (values: AddCriteriaScheme) => void;
     goalId: string;
-    sumOfWeights: number;
+    validityData: {
+        sum: number;
+        title: string[];
+    };
 }
 
-export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, sumOfWeights = 0 }) => {
+export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, validityData }) => {
     const [formVisible, toggle] = useReducer((state) => !state, false);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -328,14 +348,16 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, su
                                 <CriteriaTitleField
                                     {...field}
                                     errorsResolver={errorResolver}
+                                    setError={setError}
                                     onSelect={handleSelectGoal}
+                                    titles={validityData.title}
                                 />
                             )}
                         />
                         <WeightField
                             registerProps={register('weight')}
                             errorsResolver={errorResolver}
-                            maxValue={sumOfWeights}
+                            maxValue={validityData.sum}
                             setError={setError}
                         />
                         <StyledSubmitButton brick="left" view="primary" text={tr('Add')} size="m" type="submit" />

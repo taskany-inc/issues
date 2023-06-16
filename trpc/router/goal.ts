@@ -808,7 +808,7 @@ export const goal = router({
 
         try {
             const [criteria] = await Promise.all([
-                prisma.goalAchiveCriteria.create({
+                prisma.goalAchieveCriteria.create({
                     data: {
                         title: input.title,
                         weight: Number(input.weight),
@@ -855,7 +855,7 @@ export const goal = router({
     }),
 
     updateCriteriaState: protectedProcedure.input(updateCriteriaState).mutation(async ({ ctx, input }) => {
-        const currentCriteria = await prisma.goalAchiveCriteria.findUnique({
+        const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
             where: { id: input.id },
         });
 
@@ -865,7 +865,7 @@ export const goal = router({
             }
 
             await Promise.all([
-                prisma.goalAchiveCriteria.update({
+                prisma.goalAchieveCriteria.update({
                     where: { id: input.id },
                     data: { isDone: input.isDone },
                 }),
@@ -892,7 +892,7 @@ export const goal = router({
 
     removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input }) => {
         try {
-            await prisma.goalAchiveCriteria.delete({
+            await prisma.goalAchieveCriteria.delete({
                 where: { id: input.id },
             });
         } catch (error: any) {

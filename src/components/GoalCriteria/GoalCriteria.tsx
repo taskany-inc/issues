@@ -333,7 +333,13 @@ interface GoalCriteriaProps {
     onAddCriteria: (val: AddCriteriaScheme) => void;
     onToggleCriteria: (val: UpdateCriteriaScheme) => void;
     onRemoveCriteria: (val: RemoveCriteriaScheme) => void;
-    renderForm: (props: { onAddCriteria: GoalCriteriaProps['onAddCriteria']; sumOfWeights: number }) => React.ReactNode;
+    renderForm: (props: {
+        onAddCriteria: GoalCriteriaProps['onAddCriteria'];
+        dataForValidateCriteria: {
+            sum: number;
+            title: string[];
+        };
+    }) => React.ReactNode;
 }
 
 export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
@@ -353,8 +359,19 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
         },
         [onAddCriteria, goalId],
     );
-    const sumOfWeights = useMemo(() => {
-        return criteriaList.reduce((acc, { weight }) => acc + weight, 0);
+
+    const dataForValidateCriteria = useMemo(() => {
+        return criteriaList.reduce(
+            (acc, { weight, title }) => {
+                acc.sum += weight;
+                acc.title.push(title);
+                return acc;
+            },
+            {
+                sum: 0,
+                title: [] as string[],
+            },
+        );
     }, [criteriaList]);
 
     return (
@@ -385,7 +402,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                         />
                     ))}
                 </StyledTable>
-                {renderForm({ onAddCriteria: onAddHandler, sumOfWeights })}
+                {renderForm({ onAddCriteria: onAddHandler, dataForValidateCriteria })}
             </Wrapper>
         </StyledActivityFeedItem>
     );

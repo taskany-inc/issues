@@ -5,5 +5,6 @@
     "Criteria or Goal": "Критерий или цель",
     "Add achievement criteria": "Добавить критерий",
     "Weight must be in range": "Вес критерия должен быть от 1 до {upTo}",
-    "Add": "Добавить"
+    "Add": "Добавить",
+    "Title must be unique": "Критерий должен быть уникальным"
 }
