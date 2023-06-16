@@ -12,13 +12,17 @@ export const criteriaSchema = z.object({
         }),
     weight: z
         .string({
-            required_error: tr('Criteria Weight is required'),
+            required_error: tr('Criteria weight is required'),
         })
         .min(1, {
-            message: tr('Criteria Weight must be longer than 1 symbol'),
+            message: tr('Criteria weight must be longer than 1 symbol'),
         }),
-    linkedGoalId: z.string(),
-    goalAsGriteria: z.string().optional(),
+    goalId: z.string(),
+    goalAsGriteria: z
+        .object({
+            id: z.string(),
+        })
+        .nullish(),
 });
 
 export const updateCriteriaState = z.object({
@@ -26,7 +30,9 @@ export const updateCriteriaState = z.object({
     isDone: z.boolean(),
 });
 
-export const removeCriteria = z.string();
+export const removeCriteria = z.object({
+    id: z.string(),
+});
 
 export type AddCriteriaScheme = z.infer<typeof criteriaSchema>;
 export type UpdateCriteriaScheme = z.infer<typeof updateCriteriaState>;

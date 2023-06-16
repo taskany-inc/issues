@@ -54,7 +54,7 @@ const IssueDependenciesForm: React.FC<IssueDependenciesFormProps> = ({ issue, on
     const [query, setQuery] = useState<string[]>([]);
     const [completionVisible, setCompletionVisible] = useState(false);
 
-    const { data: goalsData } = trpc.goal.suggestions.useQuery(query.join('-'));
+    const { data: goalsData } = trpc.goal.suggestions.useQuery({ input: query.join('-'), limit: 10 });
 
     const dependKeys = useMemo(
         () => ({

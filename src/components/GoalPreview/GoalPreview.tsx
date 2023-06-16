@@ -46,8 +46,8 @@ import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalStateChangeSchema } from '../../schema/goal';
 import { GoalActivity } from '../GoalActivity';
-import { GoalCriterion } from '../GoalCriterion/GoalCriterion';
-import { CreateCriteriaForm } from '../CreateCriteriaForm/CreateCreteriaForm';
+import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
+import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -192,8 +192,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         invalidateFn();
     }, [onDelete, archiveMutation, preview.id, invalidateFn]);
 
-    const { onAddHandler, onRemoveHandler, onToggleHandler, goals, updateSuggestionQuery } =
-        useCriteriaResource(invalidateFn);
+    const { onAddHandler, onRemoveHandler, onToggleHandler } = useCriteriaResource(invalidateFn);
 
     const commentsRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -335,19 +334,17 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                     </StyledCard>
 
                     {nullable(goal?.goalAchiveCriteria.length || goal?._isEditable, () => (
-                        <GoalCriterion
+                        <GoalCriteria
                             goalId={goal?.id}
-                            criterion={goal?.goalAchiveCriteria}
+                            criteriaList={goal?.goalAchiveCriteria}
                             canEdit={goal?._isEditable || false}
                             onAddCriteria={onAddHandler}
                             onToggleCriteria={onToggleHandler}
                             onRemoveCriteria={onRemoveHandler}
                             renderForm={(props) =>
                                 nullable(goal?._isEditable, () => (
-                                    <CreateCriteriaForm
+                                    <CriteriaForm
                                         onSubmit={props.onAddCriteria}
-                                        onSearch={updateSuggestionQuery}
-                                        items={goals.data || []}
                                         goalId={goal?.id || preview.id}
                                         sumOfWeights={props.sumOfWeights}
                                     />
