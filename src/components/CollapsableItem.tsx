@@ -1,6 +1,7 @@
 import { FC, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
 import { gray7, radiusM } from '@taskany/colors';
+import { nullable } from '@taskany/bricks';
 
 export const collapseOffset = 20;
 
@@ -34,11 +35,11 @@ const Dot = styled.div`
 
 const ParentDot = styled(Dot)``;
 
-const CollapseHeader = styled.div`
+const CollapsableHeader = styled.div`
     border-radius: ${radiusM};
 `;
 
-export const TableRowCollapseContent = styled.div`
+export const CollapsableItem = styled.div`
     position: relative;
 
     &:before {
@@ -48,12 +49,29 @@ export const TableRowCollapseContent = styled.div`
     }
 `;
 
-const TableRowCollapseContainer = styled.div<{ collapsed: boolean; deep: number; showLine: boolean }>`
+const CollapsableContainer = styled.div<{ collapsed: boolean; deep: number; showLine: boolean }>`
     position: relative;
 
     border-radius: ${radiusM};
 
-    ${({ collapsed, deep, showLine }) =>
+    > ${CollapsableItem}:before {
+        display: none;
+    }
+
+    &:last-child:before {
+        display: none;
+    }
+
+    &:last-child > ${CollapsableHeader}:after {
+        content: '';
+        ${line}
+
+        bottom: 50%;
+
+        ${({ deep }) => deep === 0 && 'display: none;'}
+    }
+
+    ${({ collapsed, deep }) =>
         !collapsed &&
         css`
             padding-left: ${collapseOffset}px;
@@ -66,7 +84,7 @@ const TableRowCollapseContainer = styled.div<{ collapsed: boolean; deep: number;
                 margin-left: -${collapseOffset}px;
             }
 
-            & > & > ${CollapseHeader}, & > ${CollapseHeader} {
+            & > & > ${CollapsableHeader}, & > ${CollapsableHeader} {
                 padding-left: ${collapseOffset}px;
                 margin-left: -${collapseOffset}px;
                 position: relative;
@@ -80,7 +98,7 @@ const TableRowCollapseContainer = styled.div<{ collapsed: boolean; deep: number;
 
             /** add parent dot if not first lvl */
 
-            & > ${CollapseHeader} > ${ParentDot} {
+            & > ${CollapsableHeader} > ${ParentDot} {
                 ${deep > 0 &&
                 css`
                     display: block;
@@ -91,18 +109,14 @@ const TableRowCollapseContainer = styled.div<{ collapsed: boolean; deep: number;
             /** first item vertical line */
 
             & > &:before,
-            & > ${CollapseHeader}:before {
+            & > ${CollapsableHeader}:before {
                 content: '';
                 ${line}
             }
 
-            & > ${TableRowCollapseContent}:before, & > ${CollapseHeader}:before {
-                ${!showLine && 'display: none;'}
-            }
+            /** first item vertical line */
 
-            /** middle item vertical line */
-
-            & > ${CollapseHeader}:before {
+            & > ${CollapsableHeader}:before {
                 top: 50%;
             }
 
@@ -116,37 +130,36 @@ const TableRowCollapseContainer = styled.div<{ collapsed: boolean; deep: number;
                 margin-left: -${collapseOffset}px;
             }
 
-            &:last-of-type:before {
-                display: none;
+            &:last-child > ${CollapsableHeader}:after {
+                margin-left: -${collapseOffset}px;
             }
 
-            &:last-of-type > ${CollapseHeader}:after {
-                content: '';
-                ${line}
-                margin-left: -${collapseOffset}px;
-                bottom: 50%;
-
-                ${deep === 0 && 'display: none;'}
+            > ${CollapsableItem}:before {
+                display: block;
             }
         `}
 `;
 
-export const TableRowCollapse: FC<{
+export const Collapsable: FC<{
     children?: ReactNode;
     onClick?: () => void;
     header: ReactNode;
+    content: ReactNode;
     deep?: number;
     collapsed: boolean;
     showLine?: boolean;
-}> = ({ onClick, children, header, collapsed, deep = 0, showLine = true }) => {
+}> = ({ onClick, children, header, collapsed, deep = 0, showLine = true, content }) => {
     return (
-        <TableRowCollapseContainer collapsed={collapsed} deep={deep} showLine={showLine}>
-            <CollapseHeader onClick={onClick}>
+        <CollapsableContainer collapsed={collapsed} deep={deep} showLine={showLine}>
+            <CollapsableHeader onClick={onClick}>
                 <ParentDot />
                 <Dot />
                 {header}
-            </CollapseHeader>
-            {!collapsed ? children : null}
-        </TableRowCollapseContainer>
+            </CollapsableHeader>
+            {nullable(children, (ch) => (
+                <CollapsableItem>{ch}</CollapsableItem>
+            ))}
+            {!collapsed ? content : null}
+        </CollapsableContainer>
     );
 };

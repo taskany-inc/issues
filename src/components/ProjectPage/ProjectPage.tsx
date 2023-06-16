@@ -15,7 +15,6 @@ import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { routes } from '../../hooks/router';
 import { ProjectPageLayout } from '../ProjectPageLayout/ProjectPageLayout';
 import { Page, PageContent } from '../Page';
-import { GoalsGroup } from '../GoalsGroup';
 import { PageTitle } from '../PageTitle';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
@@ -212,12 +211,11 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
 
     if (!project.data) return null;
 
-    const fetchGoals = useCallback((id: string) => Promise.resolve(projectMap[id].goals), [projectMap]);
     const fetchProjects = useCallback(
         (projectId: string): Promise<NonNullable<ProjectByIdReturnType>[] | null> => {
-            if (projectId !== project.data?.id) {
-                return Promise.resolve(null);
-            }
+            // if (projectId !== project.data?.id) {
+            //     return Promise.resolve(null);
+            // }
             return Promise.resolve(
                 project.data?.children
                     .map(({ id }) => {
@@ -287,10 +285,10 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                         starred={project.data?._isStarred}
                         watching={project.data?._isWatching}
                         fetchProjects={fetchProjects}
-                        fetchGoals={fetchGoals}
                         onTagClick={setTagsFilterOutside}
                         onClickProvider={onGoalPrewiewShow}
                         selectedResolver={selectedGoalResolver}
+                        queryState={queryState}
                     />
                 </PageContent>
 

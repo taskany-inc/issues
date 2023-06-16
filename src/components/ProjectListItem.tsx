@@ -1,24 +1,23 @@
-import React, { FC, MouseEventHandler, ReactNode, useCallback, useState } from 'react';
+import React, { FC, MouseEvent, MouseEventHandler, ReactNode, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
-import { gray6, radiusM } from '@taskany/colors';
+import { Badge, Button, EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
+import { gapS, gray3, gray4, gray6, radiusM } from '@taskany/colors';
 
 import { ActivityByIdReturnType, GoalByIdReturnType, ProjectByIdReturnType } from '../../trpc/inferredTypes';
 import { routes } from '../hooks/router';
+import { trpc } from '../utils/trpcClient';
+import { refreshInterval } from '../utils/config';
+import { QueryState } from '../hooks/useUrlFilterParams';
 
 import { Table, TableCell, TableRow } from './Table';
 import { UserGroup } from './UserGroup';
 import { GoalListItem, GoalsListContainer } from './GoalListItem';
-import { TableRowCollapse, TableRowCollapseContent, collapseOffset } from './CollapsableItem';
+import { Collapsable, CollapsableItem, collapseOffset } from './CollapsableItem';
 
-const ProjectTableRowCollapseContent = styled(TableRowCollapseContent)`
-    // background: ${gray6};
-    // border-radius: ${radiusM};
-
-    // ${TableRow}:hover ${TableCell} {
-    //     background: ${gray6};
-    // }
+const ShowGoalsButton = styled(Button)`
+    margin-left: ${gapS};
+    cursor: pointer;
 `;
 
 export const ProjectListContainer: FC<{ children: ReactNode; offset?: number }> = ({ children, offset = 0 }) => (
@@ -37,16 +36,17 @@ interface ProjectListItemBaseProps {
 
 interface ProjectListItemProps extends ProjectListItemBaseProps {
     href?: string;
+    children?: ReactNode;
 }
 
 interface ProjectListItemCollapsibleProps extends ProjectListItemBaseProps {
     id: string;
     href: string;
-    fetchGoals: (id: string) => Promise<NonNullable<GoalByIdReturnType>[] | null>;
     fetchProjects: (id: string) => Promise<NonNullable<ProjectByIdReturnType>[] | null>;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
     onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
     selectedResolver?: (id: string) => boolean;
+    queryState?: QueryState;
     deep?: number;
 }
 
@@ -57,6 +57,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     participants,
     starred,
     watching,
+    children,
 }) => {
     const row = (
         <TableRow>
@@ -64,6 +65,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
                 <Text size="l" weight="bold">
                     {title}
                 </Text>
+                {children}
             </TableCell>
 
             <TableCell>
@@ -104,39 +106,62 @@ export const ProjectListItemCollapsible: React.FC<ProjectListItemCollapsibleProp
     watching,
     owner,
     participants,
-    fetchGoals,
     fetchProjects,
     onTagClick,
     onClickProvider,
     selectedResolver,
+    queryState,
     deep = 0,
 }) => {
     const [collapsed, setIsCollapsed] = useState(true);
-    const [goals, setGoals] = useState<undefined | null | NonNullable<GoalByIdReturnType>[]>(undefined);
+    const [collapsedGoals, setIsCollapsedGoals] = useState(true);
     const [projects, setProjects] = useState<undefined | null | NonNullable<ProjectByIdReturnType>[]>(undefined);
+
+    const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
+        {
+            id,
+            ...queryState,
+        },
+        {
+            keepPreviousData: true,
+            staleTime: refreshInterval,
+        },
+    );
+
+    const goals = useMemo(
+        () => (projectDeepInfo ? projectDeepInfo.goals.filter((g) => g.projectId === id) : null),
+        [projectDeepInfo, id],
+    );
 
     const offset = collapseOffset * (collapsed ? deep - 1 : deep);
 
     const onClick = useCallback(() => {
-        if (typeof goals === 'undefined' || typeof projects === 'undefined') {
-            Promise.all([fetchGoals(id), fetchProjects(id)]).then(([goals, projects]) => {
-                setGoals(goals);
+        if (typeof projects === 'undefined') {
+            fetchProjects(id).then((projects) => {
                 setProjects(projects);
 
-                if (projects?.length || goals?.length) {
+                if (projects?.length) {
                     setIsCollapsed(false);
                 }
             });
-        } else if (projects?.length || goals?.length) {
+        } else if (projects?.length) {
             setIsCollapsed((value) => !value);
         }
-    }, [fetchGoals, goals, projects]);
+    }, [fetchProjects, projects]);
+
+    const onHeaderButtonClick = useCallback(
+        (e: MouseEvent) => {
+            e.stopPropagation();
+
+            setIsCollapsedGoals((value) => !value);
+        },
+        [projects, collapsedGoals, onClick, collapsed],
+    );
 
     return (
-        <TableRowCollapse
+        <Collapsable
             collapsed={collapsed}
-            onClick={onClick}
-            showLine={Boolean(projects?.length)}
+            onClick={projects !== null ? onClick : undefined}
             header={
                 <ProjectListContainer offset={offset}>
                     <ProjectListItem
@@ -145,13 +170,40 @@ export const ProjectListItemCollapsible: React.FC<ProjectListItemCollapsibleProp
                         participants={participants}
                         starred={starred}
                         watching={watching}
-                    />
+                    >
+                        <ShowGoalsButton
+                            onClick={onHeaderButtonClick}
+                            disabled={!goals?.length}
+                            text={'Goals'}
+                            iconRight={<Badge size="s">{goals?.length ?? 0}</Badge>}
+                        />
+                    </ProjectListItem>
                 </ProjectListContainer>
             }
+            content={nullable(projects, (projects) =>
+                projects.map((p, i) => (
+                    <ProjectListItemCollapsible
+                        id={p.id}
+                        key={`${p.id}_${i}`}
+                        href={routes.project(p.id)}
+                        title={p.title}
+                        owner={p?.activity}
+                        participants={p?.participants}
+                        starred={p?._isStarred}
+                        watching={p?._isWatching}
+                        deep={deep + 1}
+                        fetchProjects={fetchProjects}
+                        onTagClick={onTagClick}
+                        onClickProvider={onClickProvider}
+                        selectedResolver={selectedResolver}
+                        queryState={queryState}
+                    />
+                )),
+            )}
             deep={deep}
         >
-            {nullable(goals, (goals) => (
-                <ProjectTableRowCollapseContent>
+            {!collapsedGoals &&
+                nullable(goals, (goals) => (
                     <GoalsListContainer offset={offset}>
                         {goals.map((g) => (
                             <GoalListItem
@@ -178,30 +230,8 @@ export const ProjectListItemCollapsible: React.FC<ProjectListItemCollapsibleProp
                             />
                         ))}
                     </GoalsListContainer>
-                </ProjectTableRowCollapseContent>
-            ))}
-
-            {nullable(projects, (projects) =>
-                projects.map((p, i) => (
-                    <ProjectListItemCollapsible
-                        id={p.id}
-                        key={`${p.id}_${i}`}
-                        href={routes.project(p.id)}
-                        title={p.title}
-                        owner={p?.activity}
-                        participants={p?.participants}
-                        starred={p?._isStarred}
-                        watching={p?._isWatching}
-                        deep={deep + 1}
-                        fetchGoals={fetchGoals}
-                        fetchProjects={fetchProjects}
-                        onTagClick={onTagClick}
-                        onClickProvider={onClickProvider}
-                        selectedResolver={selectedResolver}
-                    />
-                )),
-            )}
-        </TableRowCollapse>
+                ))}
+        </Collapsable>
     );
 };
 
