@@ -5,5 +5,6 @@
     "Criteria or Goal": "",
     "Add achievement criteria": "",
     "Weight must be in range": "Weight must be between 1 and {upTo}",
-    "Add": ""
+    "Add": "",
+    "Title must be unique": ""
 }

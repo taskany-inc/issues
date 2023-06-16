@@ -346,7 +346,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                                     <CriteriaForm
                                         onSubmit={props.onAddCriteria}
                                         goalId={goal?.id || preview.id}
-                                        sumOfWeights={props.sumOfWeights}
+                                        validityData={props.dataForValidateCriteria}
                                     />
                                 ))
                             }
