@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Estimate" ALTER COLUMN "q" DROP NOT NULL,
+ALTER COLUMN "date" DROP NOT NULL;
