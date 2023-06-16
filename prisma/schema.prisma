@@ -148,9 +148,9 @@ model Project {
 
 model Estimate {
   id         Int              @id @default(autoincrement())
-  q          String
+  q          String?
   y          String
-  date       String
+  date       String?
   goal       EstimateToGoal[]
   goalId     String
   activity   Activity         @relation(fields: [activityId], references: [id])

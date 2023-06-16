@@ -66,8 +66,8 @@ export const goalCommonSchema = z.object({
     priority: z.string().nullable().optional(),
     estimate: z
         .object({
-            date: z.string(),
-            q: z.string(),
+            date: z.string().optional().nullable(),
+            q: z.string().optional().nullable(),
             y: z.string(),
             id: z.number().nullish(),
         })
@@ -132,8 +132,8 @@ export const goalUpdateSchema = z.object({
     priority: z.string().nullable(),
     estimate: z
         .object({
-            date: z.string(),
-            q: z.string(),
+            date: z.string().optional().nullable(),
+            q: z.string().optional().nullable(),
             y: z.string(),
             id: z.number().nullish(),
         })

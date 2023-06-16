@@ -130,6 +130,9 @@ const createValue = (date: string | Date, locale: TLocale) => {
 };
 
 export const formatEstimate = (estimate: ReturnType<typeof createValue>, locale: TLocale) => {
+    if (!estimate.q && !estimate.date) {
+        return estimate.y;
+    }
     const { date, q, y } = createValue(estimate.date, locale);
 
     return date === createLocaleDate(endOfQuarter(q), { locale }) ? `${q}/${y}` : date;
