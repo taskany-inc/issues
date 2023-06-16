@@ -352,8 +352,8 @@ model GoalHistory {
 
 model GoalAchiveCriteria {
   id               String   @id @default(cuid())
-  linkedGoal       Goal     @relation("GoalCriterion", fields: [linkedGoalId], references: [id])
-  linkedGoalId     String
+  goal             Goal     @relation("GoalCriterion", fields: [goalId], references: [id])
+  goalId           String
   goalAsCriteria   Goal?    @relation("GoalAsCriteria", fields: [goalIdAsCriteria], references: [id])
   goalIdAsCriteria String?  @unique
   title            String
@@ -366,5 +366,5 @@ model GoalAchiveCriteria {
   updatedAt DateTime @default(now()) @updatedAt
 
   @@index([title])
-  @@index([linkedGoalId])
+  @@index([goalId])
 }

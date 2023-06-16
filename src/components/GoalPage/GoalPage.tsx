@@ -47,8 +47,8 @@ import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalUpdateReturnType } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
-import { CreateCriteriaForm } from '../CreateCriteriaForm/CreateCreteriaForm';
-import { GoalCriterion } from '../GoalCriterion/GoalCriterion';
+import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
+import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
 import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 
 import { tr } from './GoalPage.i18n';
@@ -247,8 +247,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
         commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
 
-    const { onAddHandler, onRemoveHandler, onToggleHandler, goals, updateSuggestionQuery } =
-        useCriteriaResource(invalidateFn);
+    const { onAddHandler, onRemoveHandler, onToggleHandler } = useCriteriaResource(invalidateFn);
 
     if (!goal) return null;
 
@@ -378,19 +377,17 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                     </Card>
 
                     {nullable(goal?.goalAchiveCriteria.length || goal?._isEditable, () => (
-                        <GoalCriterion
+                        <GoalCriteria
                             goalId={goal.id}
-                            criterion={goal?.goalAchiveCriteria}
+                            criteriaList={goal?.goalAchiveCriteria}
                             onAddCriteria={onAddHandler}
                             onToggleCriteria={onToggleHandler}
                             onRemoveCriteria={onRemoveHandler}
                             canEdit={goal._isEditable}
                             renderForm={(props) =>
                                 nullable(goal?._isEditable, () => (
-                                    <CreateCriteriaForm
+                                    <CriteriaForm
                                         onSubmit={props.onAddCriteria}
-                                        onSearch={updateSuggestionQuery}
-                                        items={goals.data || []}
                                         goalId={goal.id}
                                         sumOfWeights={props.sumOfWeights}
                                     />

@@ -1,6 +1,6 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
-import { GoalHistory, Prisma, Tag } from '@prisma/client';
+import { GoalHistory, Prisma } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -22,7 +22,7 @@ import {
     userGoalsSchema,
     goalCreateCommentSchema,
 } from '../../src/schema/goal';
-import { ToggleSubscriptionSchema } from '../../src/schema/common';
+import { ToggleSubscriptionSchema, suggestionsQueryScheme } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import {
     createGoal,
@@ -38,8 +38,8 @@ import { criteriaSchema, removeCriteria, updateCriteriaState } from '../../src/s
 import { addCalculatedProjectFields } from './project';
 
 export const goal = router({
-    suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
-        const splittedInput = input.split('-');
+    suggestions: protectedProcedure.input(suggestionsQueryScheme).query(async ({ input }) => {
+        const splittedInput = input.input.split('-');
         let selectParams = {};
 
         if (splittedInput.length === 2 && Number.isNaN(+splittedInput[1])) {
@@ -62,13 +62,13 @@ export const goal = router({
         }
 
         return prisma.goal.findMany({
-            take: 10,
+            take: input.limit || 5,
             where: {
                 OR: [
                     selectParams,
                     {
                         title: {
-                            contains: input,
+                            contains: input.input,
                             mode: 'insensitive',
                         },
                     },
@@ -799,7 +799,7 @@ export const goal = router({
     }),
     addCriteria: protectedProcedure.input(criteriaSchema).mutation(async ({ input, ctx }) => {
         const actualGoal = await prisma.goal.findUnique({
-            where: { id: input.linkedGoalId },
+            where: { id: input.goalId },
         });
 
         if (!actualGoal) {
@@ -817,19 +817,14 @@ export const goal = router({
                                 id: ctx.session.user.activityId,
                             },
                         },
-                        linkedGoal: {
-                            connect: {
-                                id: input.linkedGoalId,
-                            },
+                        goal: {
+                            connect: { id: input.goalId },
                         },
-                        goalAsCriteria:
-                            input.goalAsGriteria != null
-                                ? {
-                                      connect: {
-                                          id: input.goalAsGriteria,
-                                      },
-                                  }
-                                : undefined,
+                        goalAsCriteria: input.goalAsGriteria?.id
+                            ? {
+                                  connect: { id: input.goalAsGriteria.id },
+                              }
+                            : undefined,
                     },
                 }),
                 // TODO: implements create new history record
@@ -898,7 +893,7 @@ export const goal = router({
     removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input }) => {
         try {
             await prisma.goalAchiveCriteria.delete({
-                where: { id: input },
+                where: { id: input.id },
             });
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
