@@ -24,9 +24,7 @@ export const useHotkeys = () => {
 
 export const useHotkey = (key: string, cb: () => void) => {
     useEffect(() => {
-        const unsubscribe = tinykeys(window, {
-            [key]: () => cb(),
-        });
+        const unsubscribe = tinykeys(window, createHotkeys([[key], () => cb()]));
         return () => {
             unsubscribe();
         };
