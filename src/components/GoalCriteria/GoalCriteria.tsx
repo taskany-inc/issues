@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import {
     Text,
     CircleIcon,
-    TickCirclecon,
+    TickCircleIcon,
     MessageTickIcon,
     GoalIcon,
     nullable,
@@ -63,7 +63,7 @@ const StyledCircleIcon = styled(CircleIcon)`
     }
 `;
 
-const StyledTickIcon = styled(TickCirclecon)`
+const StyledTickIcon = styled(TickCircleIcon)`
     background-color: ${brandColor};
     color: ${backgroundColor};
     border-radius: 50%;
