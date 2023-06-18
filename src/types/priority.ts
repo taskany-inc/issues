@@ -1,8 +1,8 @@
-export const priorityColorsMap = {
-    Highest: 360,
-    High: 30,
-    Medium: 1,
-    Low: 274,
+export const priorityVariants = {
+    Highest: true,
+    High: true,
+    Medium: true,
+    Low: true,
 };
 
-export type Priority = keyof typeof priorityColorsMap;
+export type Priority = keyof typeof priorityVariants;

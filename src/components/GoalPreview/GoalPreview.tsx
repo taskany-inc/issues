@@ -29,12 +29,11 @@ import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { editGoalKeys } from '../../utils/hotkeys';
-import { Priority, priorityColorsMap } from '../../types/priority';
+import { Priority } from '../../types/priority';
 import { IssueKey } from '../IssueKey';
 import { IssueTitle } from '../IssueTitle';
 import { IssueParent } from '../IssueParent';
 import { IssueTags } from '../IssueTags';
-import { StateDot } from '../StateDot';
 import RelativeTime from '../RelativeTime/RelativeTime';
 import Md from '../Md';
 import { IssueStats } from '../IssueStats/IssueStats';
@@ -137,8 +136,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     }, []);
 
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
-
-    const priorityColor = priorityColorsMap[goal?.priority as Priority];
 
     const stateChangeMutations = trpc.goal.switchState.useMutation();
     const onGoalStateChange = useCallback(
@@ -249,11 +246,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                             ))}
 
                             {nullable(goal?.priority, (ip) => (
-                                <Button
-                                    ghost
-                                    text={getPriorityText(ip as Priority)}
-                                    iconLeft={<StateDot hue={priorityColor} />}
-                                />
+                                <Button ghost text={getPriorityText(ip as Priority)} />
                             ))}
 
                             <Button
