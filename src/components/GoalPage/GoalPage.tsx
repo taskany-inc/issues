@@ -40,7 +40,7 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { StarButton } from '../StarButton/StarButton';
 import { useRouter } from '../../hooks/router';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
-import { Priority, priorityColorsMap } from '../../types/priority';
+import { Priority } from '../../types/priority';
 import { trpc } from '../../utils/trpcClient';
 import { GoalParticipantsSchema, GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
