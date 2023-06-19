@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import { danger0, gapM, gapS } from '@taskany/colors';
+import { danger0, gapM, gapS, gray7 } from '@taskany/colors';
 import {
     Dot,
     Button,
@@ -19,6 +19,7 @@ import {
     ModalPreview,
     UserPic,
     nullable,
+    Text,
 } from '@taskany/bricks';
 
 import { refreshInterval } from '../../utils/config';
@@ -204,6 +205,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
             });
     }, []);
 
+    const { description } = goal || preview;
+
     return (
         <>
             <ModalPreview visible onClose={onPreviewClose}>
@@ -322,7 +325,13 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                         </CardInfo>
 
                         <CardComment>
-                            <Md>{(goal || preview).description ?? ''}</Md>
+                            {description ? (
+                                <Md>{description}</Md>
+                            ) : (
+                                <Text size="s" color={gray7} weight="thin">
+                                    {tr('Description is not provided')}
+                                </Text>
+                            )}
                         </CardComment>
                     </StyledCard>
 
