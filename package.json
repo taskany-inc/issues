@@ -1,6 +1,6 @@
 {
   "name": "@taskany/issues",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run worker\" \"next dev\"",
