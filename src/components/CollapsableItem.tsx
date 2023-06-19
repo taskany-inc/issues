@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { gray7, radiusM } from '@taskany/colors';
 import { nullable } from '@taskany/bricks';
@@ -28,18 +28,18 @@ const line = css`
     z-index: 1;
 `;
 
-const Dot = styled.div`
+const StyledDot = styled.div`
     display: none;
     ${dot}
 `;
 
-const ParentDot = styled(Dot)``;
+const StyledParentDot = styled(StyledDot)``;
 
-const CollapsableHeader = styled.div`
+const StyledCollapsableHeader = styled.div`
     border-radius: ${radiusM};
 `;
 
-export const CollapsableItem = styled.div`
+const StyledCollapsableItem = styled.div`
     position: relative;
 
     &:before {
@@ -49,12 +49,12 @@ export const CollapsableItem = styled.div`
     }
 `;
 
-const CollapsableContainer = styled.div<{ collapsed: boolean; deep: number; showLine: boolean }>`
+const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number; showLine: boolean }>`
     position: relative;
 
     border-radius: ${radiusM};
 
-    > ${CollapsableItem}:before {
+    > ${StyledCollapsableItem}:before {
         display: none;
     }
 
@@ -62,7 +62,7 @@ const CollapsableContainer = styled.div<{ collapsed: boolean; deep: number; show
         display: none;
     }
 
-    &:last-child > ${CollapsableHeader}:after {
+    &:last-child > ${StyledCollapsableHeader}:after {
         content: '';
         ${line}
 
@@ -84,21 +84,21 @@ const CollapsableContainer = styled.div<{ collapsed: boolean; deep: number; show
                 margin-left: -${collapseOffset}px;
             }
 
-            & > & > ${CollapsableHeader}, & > ${CollapsableHeader} {
+            & > & > ${StyledCollapsableHeader}, & > ${StyledCollapsableHeader} {
                 padding-left: ${collapseOffset}px;
                 margin-left: -${collapseOffset}px;
                 position: relative;
 
                 /** display dot */
 
-                > ${Dot} {
+                > ${StyledDot} {
                     display: block;
                 }
             }
 
             /** add parent dot if not first lvl */
 
-            & > ${CollapsableHeader} > ${ParentDot} {
+            & > ${StyledCollapsableHeader} > ${StyledParentDot} {
                 ${deep > 0 &&
                 css`
                     display: block;
@@ -109,14 +109,14 @@ const CollapsableContainer = styled.div<{ collapsed: boolean; deep: number; show
             /** first item vertical line */
 
             & > &:before,
-            & > ${CollapsableHeader}:before {
+            & > ${StyledCollapsableHeader}:before {
                 content: '';
                 ${line}
             }
 
             /** first item vertical line */
 
-            & > ${CollapsableHeader}:before {
+            & > ${StyledCollapsableHeader}:before {
                 top: 50%;
             }
 
@@ -130,11 +130,11 @@ const CollapsableContainer = styled.div<{ collapsed: boolean; deep: number; show
                 margin-left: -${collapseOffset}px;
             }
 
-            &:last-child > ${CollapsableHeader}:after {
+            &:last-child > ${StyledCollapsableHeader}:after {
                 margin-left: -${collapseOffset}px;
             }
 
-            > ${CollapsableItem}:before {
+            > ${StyledCollapsableItem}:before {
                 display: block;
             }
         `}
@@ -150,16 +150,16 @@ export const Collapsable: FC<{
     showLine?: boolean;
 }> = ({ onClick, children, header, collapsed, deep = 0, showLine = true, content }) => {
     return (
-        <CollapsableContainer collapsed={collapsed} deep={deep} showLine={showLine}>
-            <CollapsableHeader onClick={onClick}>
-                <ParentDot />
-                <Dot />
+        <StyledCollapsableContainer collapsed={collapsed} deep={deep} showLine={showLine}>
+            <StyledCollapsableHeader onClick={onClick}>
+                <StyledParentDot />
+                <StyledDot />
                 {header}
-            </CollapsableHeader>
+            </StyledCollapsableHeader>
             {nullable(children, (ch) => (
-                <CollapsableItem>{ch}</CollapsableItem>
+                <StyledCollapsableItem>{ch}</StyledCollapsableItem>
             ))}
             {!collapsed ? content : null}
-        </CollapsableContainer>
+        </StyledCollapsableContainer>
     );
 };
