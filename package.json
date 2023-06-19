@@ -70,7 +70,7 @@
     "@babel/core": "7.21.8",
     "@commitlint/cli": "17.6.1",
     "@commitlint/config-conventional": "17.6.1",
-    "@faker-js/faker": "7.6.0",
+    "@faker-js/faker": "8.0.2",
     "@next/bundle-analyzer": "13.2.1",
     "@svgr/webpack": "7.0.0",
     "@types/cors": "2.8.13",
