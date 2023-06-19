@@ -1,21 +1,18 @@
-import React, { FC, MouseEvent, MouseEventHandler, ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { Children, FC, MouseEvent, MouseEventHandler, ReactNode, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { Badge, Button, EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
-import { gapS, gray3, gray4, gray6, radiusM } from '@taskany/colors';
+import { gapS } from '@taskany/colors';
 
-import { ActivityByIdReturnType, GoalByIdReturnType, ProjectByIdReturnType } from '../../trpc/inferredTypes';
-import { routes } from '../hooks/router';
-import { trpc } from '../utils/trpcClient';
-import { refreshInterval } from '../utils/config';
-import { QueryState } from '../hooks/useUrlFilterParams';
+import { ActivityByIdReturnType, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { Table, TableCell, TableRow } from '../Table';
+import { UserGroup } from '../UserGroup';
+import { GoalListItem, GoalsListContainer } from '../GoalListItem';
+import { Collapsable, collapseOffset } from '../CollapsableItem';
 
-import { Table, TableCell, TableRow } from './Table';
-import { UserGroup } from './UserGroup';
-import { GoalListItem, GoalsListContainer } from './GoalListItem';
-import { Collapsable, CollapsableItem, collapseOffset } from './CollapsableItem';
+import { tr } from './ProjectListItem.i18n';
 
-const ShowGoalsButton = styled(Button)`
+const StyledGoalsButton = styled(Button)`
     margin-left: ${gapS};
     cursor: pointer;
 `;
@@ -26,7 +23,9 @@ export const ProjectListContainer: FC<{ children: ReactNode; offset?: number }> 
     </Table>
 );
 
-interface ProjectListItemBaseProps {
+interface ProjectListItemProps {
+    href?: string;
+    children?: ReactNode;
     title: string;
     owner?: ActivityByIdReturnType;
     participants?: ActivityByIdReturnType[];
@@ -34,30 +33,25 @@ interface ProjectListItemBaseProps {
     watching?: boolean;
 }
 
-interface ProjectListItemProps extends ProjectListItemBaseProps {
-    href?: string;
-    children?: ReactNode;
-}
-
-interface ProjectListItemCollapsibleProps extends ProjectListItemBaseProps {
-    id: string;
+interface ProjectListItemCollapsableProps {
     href: string;
-    fetchProjects: (id: string) => Promise<NonNullable<ProjectByIdReturnType>[] | null>;
+    project: NonNullable<ProjectByIdReturnType>;
+    goals?: NonNullable<GoalByIdReturnType>[];
+    children?: (id: string[], deep?: number) => ReactNode;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
     onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
     selectedResolver?: (id: string) => boolean;
-    queryState?: QueryState;
     deep?: number;
 }
 
 export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     href,
+    children,
     title,
     owner,
     participants,
     starred,
     watching,
-    children,
 }) => {
     const row = (
         <TableRow>
@@ -99,113 +93,66 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     );
 };
 
-export const ProjectListItemCollapsible: React.FC<ProjectListItemCollapsibleProps> = ({
-    id,
-    title,
-    starred,
-    watching,
-    owner,
-    participants,
-    fetchProjects,
+export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
+    project,
     onTagClick,
     onClickProvider,
     selectedResolver,
-    queryState,
+    children,
+    goals,
     deep = 0,
 }) => {
     const [collapsed, setIsCollapsed] = useState(true);
     const [collapsedGoals, setIsCollapsedGoals] = useState(true);
-    const [projects, setProjects] = useState<undefined | null | NonNullable<ProjectByIdReturnType>[]>(undefined);
-
-    const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
-        {
-            id,
-            ...queryState,
-        },
-        {
-            keepPreviousData: true,
-            staleTime: refreshInterval,
-        },
-    );
-
-    const goals = useMemo(
-        () => (projectDeepInfo ? projectDeepInfo.goals.filter((g) => g.projectId === id) : null),
-        [projectDeepInfo, id],
-    );
 
     const offset = collapseOffset * (collapsed ? deep - 1 : deep);
 
-    const onClick = useCallback(() => {
-        if (typeof projects === 'undefined') {
-            fetchProjects(id).then((projects) => {
-                setProjects(projects);
+    const childs = useMemo(() => project.children.map(({ id }) => id), [project]);
+    const content = collapsed ? null : children?.(childs, deep + 1);
 
-                if (projects?.length) {
-                    setIsCollapsed(false);
-                }
-            });
-        } else if (projects?.length) {
+    const onClickEnabled = children && childs.length;
+
+    const onClick = useCallback(() => {
+        if (onClickEnabled) {
             setIsCollapsed((value) => !value);
         }
-    }, [fetchProjects, projects]);
+    }, [onClickEnabled]);
 
-    const onHeaderButtonClick = useCallback(
-        (e: MouseEvent) => {
-            e.stopPropagation();
+    const onHeaderButtonClick = useCallback((e: MouseEvent) => {
+        e.stopPropagation();
 
-            setIsCollapsedGoals((value) => !value);
-        },
-        [projects, collapsedGoals, onClick, collapsed],
-    );
+        setIsCollapsedGoals((value) => !value);
+    }, []);
 
     return (
         <Collapsable
             collapsed={collapsed}
-            onClick={projects !== null ? onClick : undefined}
+            onClick={onClick}
             header={
                 <ProjectListContainer offset={offset}>
                     <ProjectListItem
-                        title={title}
-                        owner={owner}
-                        participants={participants}
-                        starred={starred}
-                        watching={watching}
+                        title={project.title}
+                        owner={project.activity}
+                        participants={project.participants}
+                        starred={project._isStarred}
+                        watching={project._isWatching}
                     >
-                        <ShowGoalsButton
+                        <StyledGoalsButton
                             onClick={onHeaderButtonClick}
                             disabled={!goals?.length}
-                            text={'Goals'}
+                            text={tr('Goals')}
                             iconRight={<Badge size="s">{goals?.length ?? 0}</Badge>}
                         />
                     </ProjectListItem>
                 </ProjectListContainer>
             }
-            content={nullable(projects, (projects) =>
-                projects.map((p, i) => (
-                    <ProjectListItemCollapsible
-                        id={p.id}
-                        key={`${p.id}_${i}`}
-                        href={routes.project(p.id)}
-                        title={p.title}
-                        owner={p?.activity}
-                        participants={p?.participants}
-                        starred={p?._isStarred}
-                        watching={p?._isWatching}
-                        deep={deep + 1}
-                        fetchProjects={fetchProjects}
-                        onTagClick={onTagClick}
-                        onClickProvider={onClickProvider}
-                        selectedResolver={selectedResolver}
-                        queryState={queryState}
-                    />
-                )),
-            )}
+            content={content}
             deep={deep}
         >
-            {!collapsedGoals &&
-                nullable(goals, (goals) => (
-                    <GoalsListContainer offset={offset}>
-                        {goals.map((g) => (
+            {!collapsedGoals && (
+                <GoalsListContainer offset={offset}>
+                    {nullable(goals, (goals) =>
+                        goals.map((g) => (
                             <GoalListItem
                                 createdAt={g.createdAt}
                                 updatedAt={g.updatedAt}
@@ -228,9 +175,10 @@ export const ProjectListItemCollapsible: React.FC<ProjectListItemCollapsibleProp
                                 onClick={onClickProvider?.(g)}
                                 onTagClick={onTagClick}
                             />
-                        ))}
-                    </GoalsListContainer>
-                ))}
+                        )),
+                    )}
+                </GoalsListContainer>
+            )}
         </Collapsable>
     );
 };

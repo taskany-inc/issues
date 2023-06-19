@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
 
-import { Nullish } from '../../types/void';
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
@@ -19,6 +18,7 @@ import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { GoalListItem, GoalsListContainer } from '../GoalListItem';
 import { PageTitle } from '../PageTitle';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
+import { Nullish } from '../../types/void';
 
 import { tr } from './GoalsPage.i18n';
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useState, useMemo, FC, ComponentProps } from 'react';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { Button, nullable } from '@taskany/bricks';
@@ -8,7 +8,7 @@ import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import { QueryState, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useFilterResource } from '../../hooks/useFilterResource';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
@@ -19,8 +19,8 @@ import { PageTitle } from '../PageTitle';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
-import { ProjectListItemCollapsible } from '../ProjectListItem';
+import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { ProjectListItemCollapsable } from '../ProjectListItem/ProjectListItem';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -28,6 +28,38 @@ const GoalPreview = dynamic(() => import('../GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
+
+const PageProjectListItem: FC<
+    Omit<ComponentProps<typeof ProjectListItemCollapsable>, 'children' | 'goals' | 'project'> & {
+        id: string;
+        queryState: QueryState;
+    }
+> = ({ queryState, id, ...props }) => {
+    const project = trpc.project.getById.useQuery(id);
+
+    const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
+        {
+            id,
+            ...queryState,
+        },
+        {
+            keepPreviousData: true,
+            staleTime: refreshInterval,
+        },
+    );
+
+    const goals = useMemo(() => projectDeepInfo?.goals.filter((g) => g.projectId === id), [projectDeepInfo, id]);
+
+    if (!project.data) return null;
+
+    return (
+        <ProjectListItemCollapsable goals={goals} project={project.data} {...props}>
+            {(ids, deep) =>
+                ids.map((id) => <PageProjectListItem {...props} key={id} id={id} queryState={queryState} deep={deep} />)
+            }
+        </ProjectListItemCollapsable>
+    );
+};
 
 export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
@@ -76,31 +108,6 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
         },
     );
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
-
-    const projectMap =
-        // eslint-disable-next-line no-spaced-func
-        (projectDeepInfo?.goals as NonNullable<GoalByIdReturnType>[])?.reduce<{
-            [key: string]: {
-                project: NonNullable<ProjectByIdReturnType>;
-                goals: NonNullable<GoalByIdReturnType>[];
-            };
-        }>((r, g) => {
-            if (!g.project) {
-                return r;
-            }
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const k = g.projectId!;
-
-            if (!r[k]) {
-                r[k] = {
-                    project: g.project,
-                    goals: [],
-                };
-            }
-
-            r[k].goals.push(g);
-            return r;
-        }, Object.create(null)) || {};
 
     useEffect(() => {
         const isGoalDeletedAlready = preview && !projectDeepInfo?.goals?.some((g) => g.id === preview.id);
@@ -211,22 +218,6 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
 
     if (!project.data) return null;
 
-    const fetchProjects = useCallback(
-        (projectId: string): Promise<NonNullable<ProjectByIdReturnType>[] | null> => {
-            // if (projectId !== project.data?.id) {
-            //     return Promise.resolve(null);
-            // }
-            return Promise.resolve(
-                project.data?.children
-                    .map(({ id }) => {
-                        return projectMap[id]?.project;
-                    })
-                    .filter((i) => i) || [],
-            );
-        },
-        [projectMap, project],
-    );
-
     return (
         <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
             <ProjectPageLayout
@@ -275,16 +266,10 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                 </FiltersPanel>
 
                 <PageContent>
-                    <ProjectListItemCollapsible
+                    <PageProjectListItem
                         key={project.data.id}
-                        id={project.data.id}
                         href={routes.project(project.data.id)}
-                        title={project.data.title}
-                        owner={project.data?.activity}
-                        participants={project.data?.participants}
-                        starred={project.data?._isStarred}
-                        watching={project.data?._isWatching}
-                        fetchProjects={fetchProjects}
+                        id={project.data.id}
                         onTagClick={setTagsFilterOutside}
                         onClickProvider={onGoalPrewiewShow}
                         selectedResolver={selectedGoalResolver}
