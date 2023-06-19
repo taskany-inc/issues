@@ -36,3 +36,10 @@ export const queryWithFiltersSchema = z.object({
 });
 
 export type QueryWithFilters = z.infer<typeof queryWithFiltersSchema>;
+
+export const suggestionsQueryScheme = z.object({
+    limit: z.number().optional(),
+    input: z.string(),
+});
+
+export type SuggestionsQueryScheme = z.infer<typeof suggestionsQueryScheme>;

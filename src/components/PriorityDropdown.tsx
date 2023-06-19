@@ -1,11 +1,9 @@
-import React from 'react';
-import { Button, Dropdown } from '@taskany/bricks';
+import React, { useMemo } from 'react';
+import { Button, Dropdown, MenuItem } from '@taskany/bricks';
 
-import { Priority, priorityColorsMap } from '../types/priority';
+import { Priority, priorityVariants } from '../types/priority';
 
-import { StateDot } from './StateDot';
-import { ColorizedMenuItem } from './ColorizedMenuItem';
-import { PriorityText } from './PriorityText/PriorityText';
+import { PriorityText, getPriorityText } from './PriorityText/PriorityText';
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -18,7 +16,7 @@ interface PriorityDropdownProps {
 
 export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
     ({ text, value, disabled, error, onChange }, ref) => {
-        const priorityVariants = Object.keys(priorityColorsMap) as Priority[];
+        const items = useMemo(() => Object.keys(priorityVariants).map((p) => getPriorityText(p as Priority)), []);
 
         return (
             <Dropdown
@@ -27,25 +25,15 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                 text={value || text}
                 value={value}
                 onChange={onChange}
-                items={priorityVariants}
+                items={items}
                 disabled={disabled}
                 renderTrigger={(props) => (
-                    <Button
-                        ref={props.ref}
-                        onClick={props.onClick}
-                        disabled={props.disabled}
-                        iconLeft={<StateDot hue={priorityColorsMap[props.value as Priority]} />}
-                    />
+                    <Button ref={props.ref} onClick={props.onClick} disabled={props.disabled} text={props.value} />
                 )}
                 renderItem={(props) => (
-                    <ColorizedMenuItem
-                        key={props.item}
-                        hue={priorityColorsMap[props.item as Priority]}
-                        focused={props.cursor === props.index}
-                        onClick={props.onClick}
-                    >
+                    <MenuItem ghost key={props.item.id} focused={props.cursor === props.index} onClick={props.onClick}>
                         <PriorityText value={props.item} />
-                    </ColorizedMenuItem>
+                    </MenuItem>
                 )}
             />
         );

@@ -1,0 +1,10 @@
+{
+    "Weight is required": "",
+    "Weight must be integer": "",
+    "Weight": "No more than {upTo}",
+    "Criteria or Goal": "",
+    "Add achievement criteria": "",
+    "Weight must be in range": "Weight must be between 1 and {upTo}",
+    "Add": "",
+    "Title must be unique": ""
+}

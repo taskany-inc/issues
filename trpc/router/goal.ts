@@ -1,6 +1,6 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
-import { GoalHistory, Prisma, Tag } from '@prisma/client';
+import { GoalHistory, Prisma } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -22,7 +22,7 @@ import {
     userGoalsSchema,
     goalCreateCommentSchema,
 } from '../../src/schema/goal';
-import { ToggleSubscriptionSchema } from '../../src/schema/common';
+import { ToggleSubscriptionSchema, suggestionsQueryScheme, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import {
     createGoal,
@@ -33,12 +33,13 @@ import {
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
+import { criteriaSchema, removeCriteria, updateCriteriaState } from '../../src/schema/criteria';
 
 import { addCalculatedProjectFields } from './project';
 
 export const goal = router({
-    suggestions: protectedProcedure.input(z.string()).query(async ({ input }) => {
-        const splittedInput = input.split('-');
+    suggestions: protectedProcedure.input(suggestionsQueryScheme).query(async ({ input }) => {
+        const splittedInput = input.input.split('-');
         let selectParams = {};
 
         if (splittedInput.length === 2 && Number.isNaN(+splittedInput[1])) {
@@ -61,13 +62,13 @@ export const goal = router({
         }
 
         return prisma.goal.findMany({
-            take: 10,
+            take: input.limit || 5,
             where: {
                 OR: [
                     selectParams,
                     {
                         title: {
-                            contains: input,
+                            contains: input.input,
                             mode: 'insensitive',
                         },
                     },
@@ -84,73 +85,64 @@ export const goal = router({
                 },
             },
             include: {
-                owner: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
-                activity: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
-                tags: true,
-                state: true,
-                project: {
-                    include: {
-                        flow: true,
-                    },
-                },
-                reactions: {
-                    include: {
-                        activity: {
-                            include: {
-                                user: true,
-                                ghost: true,
-                            },
-                        },
-                    },
-                },
-                estimate: true,
-                watchers: true,
-                stargizers: true,
-                dependsOn: {
-                    include: {
-                        state: true,
-                    },
-                },
-                relatedTo: {
-                    include: {
-                        state: true,
-                    },
-                },
-                blocks: {
-                    include: {
-                        state: true,
-                    },
-                },
-                comments: {
-                    include: {
-                        activity: {
-                            include: {
-                                user: true,
-                                ghost: true,
-                            },
-                        },
-                        reactions: true,
-                    },
-                },
-                participants: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
+                ...goalDeepQuery,
             },
         });
     }),
+    getBatch: protectedProcedure
+        .input(
+            z.object({
+                query: queryWithFiltersSchema.optional(),
+                limit: z.number(),
+                cursor: z.string().nullish(),
+                skip: z.number().optional(),
+            }),
+        )
+        .query(async ({ ctx, input: { query, limit, skip, cursor } }) => {
+            const [items, count] = await Promise.all([
+                prisma.goal.findMany({
+                    take: limit + 1,
+                    skip,
+                    cursor: cursor ? { id: cursor } : undefined,
+                    ...(query ? goalsFilter(query, ctx.session.user.activityId) : {}),
+                    orderBy: {
+                        id: 'asc',
+                    },
+                    include: {
+                        ...goalDeepQuery,
+                    },
+                }),
+                prisma.goal.count(),
+            ]);
+
+            let nextCursor: typeof cursor | undefined;
+
+            if (items.length > limit) {
+                const nextItem = items.pop(); // return the last item from the array
+                nextCursor = nextItem?.id;
+            }
+
+            return {
+                items: items.map((g) => ({
+                    ...g,
+                    ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+                    estimate: getEstimateListFormJoin(g),
+                    project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
+                })),
+                nextCursor,
+                meta: {
+                    count,
+                    tags: [],
+                    owners: [],
+                    participants: [],
+                    issuers: [],
+                    priority: [],
+                    states: [],
+                    projects: [],
+                    estimates: [],
+                },
+            };
+        }),
     getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
         // try to recognize shot id like: FRNTND-23
         const [projectId, scopeIdStr] = input.split('-');
@@ -170,6 +162,31 @@ export const goal = router({
                 },
                 include: {
                     ...goalDeepQuery,
+                    goalAchiveCriteria: {
+                        include: {
+                            goalAsCriteria: {
+                                include: {
+                                    estimate: { include: { estimate: true } },
+                                    activity: {
+                                        include: {
+                                            user: true,
+                                            ghost: true,
+                                        },
+                                    },
+                                    owner: {
+                                        include: {
+                                            user: true,
+                                            ghost: true,
+                                        },
+                                    },
+                                    state: true,
+                                },
+                            },
+                        },
+                        orderBy: {
+                            createdAt: 'asc',
+                        },
+                    },
                     estimate: {
                         include: {
                             estimate: true,
@@ -351,7 +368,9 @@ export const goal = router({
                 participants: true,
                 project: true,
                 tags: true,
-                estimate: true,
+                estimate: {
+                    include: { estimate: true },
+                },
                 owner: {
                     include: {
                         user: true,
@@ -765,6 +784,108 @@ export const goal = router({
             }
 
             return newComment;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    addCriteria: protectedProcedure.input(criteriaSchema).mutation(async ({ input, ctx }) => {
+        const actualGoal = await prisma.goal.findUnique({
+            where: { id: input.goalId },
+        });
+
+        if (!actualGoal) {
+            return null;
+        }
+
+        try {
+            const [criteria] = await Promise.all([
+                prisma.goalAchieveCriteria.create({
+                    data: {
+                        title: input.title,
+                        weight: Number(input.weight),
+                        activity: {
+                            connect: {
+                                id: ctx.session.user.activityId,
+                            },
+                        },
+                        goal: {
+                            connect: { id: input.goalId },
+                        },
+                        goalAsCriteria: input.goalAsGriteria?.id
+                            ? {
+                                  connect: { id: input.goalAsGriteria.id },
+                              }
+                            : undefined,
+                    },
+                }),
+                // TODO: implements create new history record
+                // prisma.goalHistory.create({
+                //     data: {
+                //         previousValue: null,
+                //         nextValue: input.goalAsGriteria || input.title,
+                //         action: 'add',
+                //         subject: 'criteria',
+                //         goal: {
+                //             connect: {
+                //                 id: input.linkedGoalId,
+                //             },
+                //         },
+                //         activity: {
+                //             connect: {
+                //                 id: ctx.session.user.activityId,
+                //             },
+                //         },
+                //     },
+                // }),
+            ]);
+
+            return criteria;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+
+    updateCriteriaState: protectedProcedure.input(updateCriteriaState).mutation(async ({ ctx, input }) => {
+        const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
+            where: { id: input.id },
+        });
+
+        try {
+            if (!currentCriteria) {
+                throw Error('No current criteria');
+            }
+
+            await Promise.all([
+                prisma.goalAchieveCriteria.update({
+                    where: { id: input.id },
+                    data: { isDone: input.isDone },
+                }),
+                // TODO: implements create new history record
+                // prisma.goalHistory.create({
+                //     data: {
+                //         previousValue: input.isDone ? 'undone' : 'done',
+                //         nextValue: input.isDone ? 'done' : 'undone',
+                //         subject: 'criteria',
+                //         action: 'change',
+                //         goal: {
+                //             connect: { id: currentCriteria.linkedGoalId },
+                //         },
+                //         activity: {
+                //             connect: { id: ctx.session.user.activityId },
+                //         },
+                //     },
+                // }),
+            ]);
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+
+    removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input }) => {
+        try {
+            await prisma.goalAchieveCriteria.delete({
+                where: { id: input.id },
+            });
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }

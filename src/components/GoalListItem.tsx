@@ -23,18 +23,18 @@ interface GoalListItemProps {
     shortId: string;
     projectId: string | null;
     title: string;
-    owner?: ActivityByIdReturnType;
-    issuer?: ActivityByIdReturnType;
+    owner?: ActivityByIdReturnType | null;
+    issuer?: ActivityByIdReturnType | null;
     participants?: ActivityByIdReturnType[];
     tags?: Array<Tag | undefined>;
-    state?: StateType;
+    state?: StateType | null;
     createdAt: Date;
     updatedAt: Date;
-    estimate?: Estimate;
+    estimate?: Estimate | null;
     comments?: number;
     isNotViewed?: boolean;
     focused?: boolean;
-    priority?: string;
+    priority?: string | null;
     starred?: boolean;
     watching?: boolean;
     className?: string;
@@ -105,7 +105,6 @@ const CommentsCountIcon = styled(MessageIcon)`
 
 const GoalTextItem = styled(Text).attrs({
     size: 's',
-    weight: 'bold',
     color: gray9,
 })``;
 

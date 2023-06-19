@@ -12,5 +12,7 @@
     "Goal's description must be longer than 10 symbols": "",
     "Goal's description is required": "",
     "Goal's description must be a string": "",
-    "Goal's project or team are required": ""
+    "Goal's project or team are required": "",
+    "Criteria weight is required": "",
+    "Criteria weight must be longer than 1 symbol": ""
 }

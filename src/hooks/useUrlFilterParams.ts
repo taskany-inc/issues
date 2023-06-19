@@ -9,7 +9,7 @@ import { SortDirection, SortableProps } from '../components/SortFilter/SortFilte
 
 // TODO: replace it with QueryWithFilters from schema/common
 export interface QueryState {
-    priority: Priority[];
+    priority: string[];
     state: string[];
     tag: string[];
     estimate: string[];

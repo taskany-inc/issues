@@ -4,8 +4,6 @@ import { MarkedListItem } from '@taskany/bricks';
 
 import { usePageContext } from '../hooks/usePageContext';
 
-import { StateDot } from './StateDot';
-
 export const ColorizedMenuItem: FC<{
     hue: number;
     children?: React.ReactNode;
@@ -17,7 +15,7 @@ export const ColorizedMenuItem: FC<{
     const hoverColor = useMemo(() => colorLayer(hue, 5, hue === 1 ? 0 : undefined)[themeId], [hue, themeId]);
 
     return (
-        <MarkedListItem hoverColor={hoverColor} mark={<StateDot hue={hue} />} {...props}>
+        <MarkedListItem hoverColor={hoverColor} {...props}>
             {children}
         </MarkedListItem>
     );

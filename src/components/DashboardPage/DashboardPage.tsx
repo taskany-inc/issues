@@ -1,35 +1,35 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
 
-import { Nullish } from '../../types/void';
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
-import { trpc } from '../../utils/trpcClient';
-import { FilterById, GoalByIdReturnType, GoalBatchReturnType } from '../../../trpc/inferredTypes';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../hooks/useFilterResource';
+import { routes } from '../../hooks/router';
 import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
-import { GoalListItem, GoalsListContainer } from '../GoalListItem';
+import { GoalsGroup } from '../GoalsGroup';
+import { GoalsListContainer } from '../GoalListItem';
 import { PageTitle } from '../PageTitle';
-import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
+import { Nullish } from '../../types/void';
+import { trpc } from '../../utils/trpcClient';
+import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { ProjectItemStandalone } from '../ProjectListItem';
 
-import { tr } from './GoalsPage.i18n';
+import { tr } from './DashboardPage.i18n';
 
 const GoalPreview = dynamic(() => import('../GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-const pageSize = 20;
-
-export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
+export const DashboardPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
     const router = useRouter();
     const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const { toggleFilterStar } = useFilterResource();
@@ -61,38 +61,46 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
         preset: presetData?.data,
     });
 
-    const [, setPage] = useState(0);
-    const { data, fetchNextPage, isLoading } = trpc.goal.getBatch.useInfiniteQuery(
-        {
-            limit: pageSize,
-            query: queryState,
-        },
-        {
-            getNextPageParam: (p) => p.nextCursor,
-            keepPreviousData: true,
-            staleTime: refreshInterval,
-        },
-    );
+    const { data, isLoading } = trpc.goal.getUserGoals.useQuery(queryState, {
+        keepPreviousData: true,
+        staleTime: refreshInterval,
+    });
 
-    const onFetchNextPage = useCallback(() => {
-        fetchNextPage();
-        setPage((prev) => prev++);
-    }, [fetchNextPage]);
-
-    const pages = data?.pages;
-    const goalsOnScreen = useMemo(
-        () => pages?.reduce<GoalBatchReturnType['items']>((flatArr, curr) => [...flatArr, ...curr.items], []),
-        [pages],
-    );
-    const meta = data?.pages?.[0].meta;
+    const goals = data?.goals;
+    const meta = data?.meta;
     const userFilters = trpc.filter.getUserFilters.useQuery();
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
+    const groupsMap =
+        // eslint-disable-next-line no-spaced-func
+        (goals as NonNullable<GoalByIdReturnType>[])?.reduce<{
+            [key: string]: {
+                project?: ProjectByIdReturnType | null;
+                goals: NonNullable<GoalByIdReturnType>[];
+            };
+        }>((r, g) => {
+            const k = g.projectId;
+
+            if (k) {
+                if (!r[k]) {
+                    r[k] = {
+                        project: g.project,
+                        goals: [],
+                    };
+                }
+
+                r[k].goals.push(g);
+            }
+            return r;
+        }, Object.create(null)) || {};
+
+    const groups = Object.values(groupsMap);
+
     useEffect(() => {
-        const isGoalDeletedAlready = preview && !goalsOnScreen?.some((g) => g.id === preview.id);
+        const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
 
         if (isGoalDeletedAlready) setPreview(null);
-    }, [goalsOnScreen, preview]);
+    }, [goals, preview]);
 
     const onGoalPrewiewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
@@ -146,12 +154,12 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
         [router],
     );
 
-    const defaultTitle = <PageTitle title={tr('Goals')} />;
+    const defaultTitle = <PageTitle title={tr('Dashboard')} />;
     const presetInfo =
         user.activityId !== currentPreset?.activityId
             ? `${tr('created by')} ${currentPreset?.activity?.user?.name}`
             : undefined;
-    const presetTitle = <PageTitle title={tr('Goals')} subtitle={currentPreset?.title} info={presetInfo} />;
+    const presetTitle = <PageTitle title={tr('Dashboard')} subtitle={currentPreset?.title} info={presetInfo} />;
 
     const onShadowPresetTitleClick = useCallback(() => {
         if (shadowPreset) setPreset(shadowPreset.id);
@@ -162,7 +170,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
             : undefined;
     const shadowPresetTitle = (
         <PageTitle
-            title={tr('Goals')}
+            title={tr('Dashboard')}
             subtitle={shadowPreset?.title}
             info={shadowPresetInfo}
             onClick={onShadowPresetTitleClick}
@@ -174,7 +182,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
     const description =
         currentPreset && currentPreset.description
             ? currentPreset.description
-            : tr('These are goals across all projects');
+            : tr('This is your personal goals bundle');
 
     return (
         <Page user={user} ssrTime={ssrTime} locale={locale} title={tr('title')}>
@@ -183,7 +191,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
             <FiltersPanel
                 loading={isLoading}
                 total={meta?.count}
-                counter={goalsOnScreen?.length}
+                counter={goals?.length}
                 queryState={queryState}
                 queryString={queryString}
                 issuers={meta?.issuers}
@@ -211,40 +219,35 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
                 onFilterStar={onFilterStar}
                 onSortChange={setSortFilter}
             >
-                {nullable(queryString, () => (
-                    <Button text={tr('Reset')} onClick={resetQueryState} />
-                ))}
+                {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
             </FiltersPanel>
 
             <PageContent>
                 <GoalsListContainer>
-                    {goalsOnScreen?.map((g) => (
-                        <GoalListItem
-                            createdAt={g.createdAt}
-                            updatedAt={g.updatedAt}
-                            id={g.id}
-                            shortId={g._shortId}
-                            projectId={g.projectId}
-                            state={g.state}
-                            title={g.title}
-                            issuer={g.activity}
-                            owner={g.owner}
-                            tags={g.tags}
-                            priority={g.priority}
-                            comments={g._count?.comments}
-                            estimate={g.estimate?.length ? g.estimate[g.estimate.length - 1] : undefined}
-                            participants={g.participants}
-                            starred={g._isStarred}
-                            watching={g._isWatching}
-                            key={g.id}
-                            focused={selectedGoalResolver(g.id)}
-                            onClick={onGoalPrewiewShow(g as GoalByIdReturnType)}
-                            onTagClick={setTagsFilterOutside}
-                        />
-                    ))}
+                    {groups?.map(
+                        (group) =>
+                            Boolean(group.goals.length) &&
+                            group.project && (
+                                <GoalsGroup
+                                    key={group.project.id}
+                                    goals={group.goals}
+                                    selectedResolver={selectedGoalResolver}
+                                    onClickProvider={onGoalPrewiewShow}
+                                    onTagClick={setTagsFilterOutside}
+                                >
+                                    <ProjectItemStandalone
+                                        key={group.project.id}
+                                        href={routes.project(group.project.id)}
+                                        title={group.project.title}
+                                        owner={group.project?.activity}
+                                        participants={group.project?.participants}
+                                        starred={group.project?._isStarred}
+                                        watching={group.project?._isWatching}
+                                    />
+                                </GoalsGroup>
+                            ),
+                    )}
                 </GoalsListContainer>
-
-                <LoadMoreButton onClick={onFetchNextPage} />
             </PageContent>
 
             {nullable(preview, (p) => (

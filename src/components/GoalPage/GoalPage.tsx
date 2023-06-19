@@ -29,7 +29,6 @@ import { IssueTitle } from '../IssueTitle';
 import { IssueKey } from '../IssueKey';
 import { IssueStats } from '../IssueStats/IssueStats';
 import { Reactions } from '../Reactions';
-import { StateDot } from '../StateDot';
 import { IssueParent } from '../IssueParent';
 import { IssueTags } from '../IssueTags';
 import { getPriorityText } from '../PriorityText/PriorityText';
@@ -41,13 +40,16 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { StarButton } from '../StarButton/StarButton';
 import { useRouter } from '../../hooks/router';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
-import { Priority, priorityColorsMap } from '../../types/priority';
+import { Priority } from '../../types/priority';
 import { trpc } from '../../utils/trpcClient';
 import { GoalParticipantsSchema, GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { GoalUpdateReturnType } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
+import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
+import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
+import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 
 import { tr } from './GoalPage.i18n';
 
@@ -141,8 +143,11 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal?.id, goal?._shortId);
 
     const priority = goal?.priority as Priority;
-    const priorityColor = priorityColorsMap[priority];
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
+
+    const invalidateFn = useCallback(() => {
+        return utils.goal.getById.invalidate(id);
+    }, [id, utils.goal.getById]);
 
     const stateMutation = trpc.goal.switchState.useMutation();
     const onGoalStateChange = useCallback(
@@ -152,10 +157,10 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                     state: nextState,
                     id: goal.id,
                 });
-                utils.goal.getById.invalidate(id);
+                invalidateFn();
             }
         },
-        [goal, id, stateMutation, utils.goal.getById],
+        [goal, invalidateFn, stateMutation],
     );
 
     const onGoalReactionToggle = useCallback(
@@ -167,9 +172,9 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const onParticipantsChange = useCallback(
         async (participants: GoalParticipantsSchema['participants']) => {
             await participantsMutation.mutateAsync({ participants, id });
-            utils.goal.getById.invalidate(id);
+            invalidateFn();
         },
-        [participantsMutation, utils.goal.getById, id],
+        [participantsMutation, id, invalidateFn],
     );
 
     const toggleDependencyMutation = trpc.goal.toggleDependency.useMutation();
@@ -179,35 +184,35 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
 
             await notifyPromise(promise, 'goalsUpdate');
 
-            utils.goal.getById.invalidate(id);
+            invalidateFn();
         },
-        [id, toggleDependencyMutation, utils.goal.getById],
+        [invalidateFn, toggleDependencyMutation],
     );
 
     const onCommentPublish = useCallback(() => {
-        utils.goal.getById.invalidate(id);
-    }, [id, utils.goal.getById]);
+        invalidateFn();
+    }, [invalidateFn]);
 
     const onCommentReactionToggle = useCallback(
         (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(id)),
         [commentReaction, utils.goal.getById],
     );
     const onCommentDelete = useCallback(() => {
-        utils.goal.getById.invalidate(id);
-    }, [id, utils.goal.getById]);
+        invalidateFn();
+    }, [invalidateFn]);
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(
-        (editedGoal?: GoalByIdReturnType) => {
+        (editedGoal?: GoalUpdateReturnType) => {
             setGoalEditModalVisible(false);
 
             if (editedGoal && id !== editedGoal._shortId) {
                 router.goal(editedGoal._shortId);
             } else {
-                utils.goal.getById.invalidate(id);
+                invalidateFn();
             }
         },
-        [id, router, utils.goal.getById],
+        [id, invalidateFn, router],
     );
     const onGoalEditModalShow = useCallback(() => {
         setGoalEditModalVisible(true);
@@ -241,6 +246,8 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     const onCommentsClick = useCallback(() => {
         commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
+
+    const { onAddHandler, onRemoveHandler, onToggleHandler } = useCriteriaResource(invalidateFn);
 
     if (!goal) return null;
 
@@ -341,11 +348,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                         <CardActions>
                             <IssueBaseActions>
                                 {nullable(priority, (ip) => (
-                                    <Button
-                                        ghost
-                                        text={getPriorityText(ip)}
-                                        iconLeft={<StateDot hue={priorityColor} />}
-                                    />
+                                    <Button ghost text={getPriorityText(ip)} />
                                 ))}
 
                                 <Button
@@ -372,6 +375,26 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                             </IssueBaseActions>
                         </CardActions>
                     </Card>
+
+                    {nullable(goal?.goalAchiveCriteria.length || goal?._isEditable, () => (
+                        <GoalCriteria
+                            goalId={goal.id}
+                            criteriaList={goal?.goalAchiveCriteria}
+                            onAddCriteria={onAddHandler}
+                            onToggleCriteria={onToggleHandler}
+                            onRemoveCriteria={onRemoveHandler}
+                            canEdit={goal._isEditable}
+                            renderForm={(props) =>
+                                nullable(goal?._isEditable, () => (
+                                    <CriteriaForm
+                                        onSubmit={props.onAddCriteria}
+                                        goalId={goal.id}
+                                        validityData={props.dataForValidateCriteria}
+                                    />
+                                ))
+                            }
+                        />
+                    ))}
 
                     {nullable(goal?.activityFeed, (feed) => (
                         <GoalActivity
