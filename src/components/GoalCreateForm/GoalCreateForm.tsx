@@ -38,9 +38,9 @@ const GoalCreateForm: React.FC = () => {
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
+    const [goalCreateFormActionCache, setGoalCreateFormActionCache] = useLocalStorage('goalCreateFormAction');
     const [busy, setBusy] = useState(false);
-    const [actionBtnText, setActionBtnText] = useState<string>(tr('Create & Go'));
-    const [createGoalType, setСreateGoalType] = useState<number>(1);
+    const [createGoalType, setСreateGoalType] = useState<number>(goalCreateFormActionCache || 3);
 
     const createOptions = [
         {
@@ -54,7 +54,7 @@ const GoalCreateForm: React.FC = () => {
             value: 2,
         },
         {
-            title: tr('Create'),
+            title: tr('Create only'),
             clue: tr('Create goal and close form'),
             value: 3,
         },
@@ -63,7 +63,6 @@ const GoalCreateForm: React.FC = () => {
     type CreateOptions = typeof createOptions;
     const onCreateTypeChange = useCallback((item: CreateOptions[number]) => {
         setСreateGoalType(item.value);
-        setActionBtnText(item.title);
     }, []);
     const createMutation = trpc.goal.create.useMutation();
     const createGoal = async (form: GoalCommon) => {
@@ -83,6 +82,7 @@ const GoalCreateForm: React.FC = () => {
             }
             setRecentProjectsCache(newRecentProjectsCache);
             setLastProjectCache(form.parent);
+            setGoalCreateFormActionCache(createGoalType);
 
             if (createGoalType === 1) {
                 router.goal(res._shortId);
@@ -121,7 +121,7 @@ const GoalCreateForm: React.FC = () => {
                             outline
                             type="submit"
                             brick="right"
-                            text={actionBtnText}
+                            text={createOptions[createGoalType - 1].title}
                         />
                         <Dropdown
                             placement="top-end"
