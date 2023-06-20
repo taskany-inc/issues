@@ -14,9 +14,10 @@ interface RelativeTimeProps {
     date: Date;
     kind?: RelativeTimeKind;
     isRelativeTime?: boolean;
+    hover?: boolean;
 }
 
-const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true }) => {
+const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true, hover = false }) => {
     const { locale, ssrTime } = usePageContext();
     const [time, setTime] = useState(ssrTime);
     const mounted = useMounted(0);
@@ -41,12 +42,16 @@ const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime 
         return () => clearInterval(interval);
     }, []);
 
+    const timeValue = isRelativeTime ? dateAgo(localeDate, time, { locale }) : createLocaleDate(localeDate, { locale });
+
     return (
         <>
             {kind ? `${map[kind]} ` : ''}
-            <Light title={createLocaleDate(localeDate, { locale })}>
-                {isRelativeTime ? dateAgo(localeDate, time, { locale }) : createLocaleDate(localeDate, { locale })}
-            </Light>
+            {hover ? (
+                <Light title={createLocaleDate(localeDate, { locale })}>{timeValue}</Light>
+            ) : (
+                <span>{timeValue}</span>
+            )}
         </>
     );
 };

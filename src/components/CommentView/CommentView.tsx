@@ -197,7 +197,7 @@ export const CommentView: FC<CommentViewProps> = ({
                         <div>
                             <Link inline>{author?.name}</Link> —{' '}
                             <Link inline href={`#comment-${id}`}>
-                                <RelativeTime isRelativeTime={isRelativeTime} date={createdAt} />
+                                <RelativeTime isRelativeTime={isRelativeTime} date={createdAt} hover />
                             </Link>
                         </div>
                         <StyledCommentActions>
