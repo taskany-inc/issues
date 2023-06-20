@@ -1,4 +1,4 @@
-import { Estimate, EstimateToGoal, Goal, Prisma } from '@prisma/client';
+import { Estimate, EstimateToGoal, Goal, Prisma, GoalAchieveCriteria, StateType } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
 
@@ -375,6 +375,14 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     const _isIssuer = goal.activityId === activityId;
     const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1].estimate : undefined;
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
+    const _hasAchievementCriteria = goal.goalAchiveCriteria?.length;
+    const _achivedCriteriaWeight = goal.goalAchiveCriteria?.reduce((sum: number, curr: any) => {
+        if (curr.isDone || (curr.goalAsCriteria && curr.goalAsCriteria.state?.type === StateType.Completed)) {
+            return sum + curr.weight;
+        }
+
+        return sum;
+    }, 0);
 
     let parentOwner = false;
     function checkParent(project?: any) {
@@ -401,6 +409,8 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
         _isEditable,
         _lastEstimate,
         _shortId,
+        _hasAchievementCriteria,
+        _achivedCriteriaWeight,
     };
 };
 
