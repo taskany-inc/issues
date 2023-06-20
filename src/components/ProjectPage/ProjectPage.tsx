@@ -36,7 +36,6 @@ const PageProjectListItem: FC<
     }
 > = ({ queryState, id, ...props }) => {
     const project = trpc.project.getById.useQuery(id);
-
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
             id,
@@ -48,12 +47,33 @@ const PageProjectListItem: FC<
         },
     );
 
+    const [fetchChildEnabled, setFetchChildEnabled] = useState(false);
+
+    const childrenQueries = trpc.useQueries((t) =>
+        (project.data?.children.map(({ id }) => id) || []).map((id) =>
+            t.project.getById(id, { enabled: fetchChildEnabled, refetchOnWindowFocus: false }),
+        ),
+    );
+
+    const loading = useMemo(() => childrenQueries.some(({ isLoading }) => isLoading), [childrenQueries]);
+
+    console.log('QQQ QUERIES', id, childrenQueries);
     const goals = useMemo(() => projectDeepInfo?.goals.filter((g) => g.projectId === id), [projectDeepInfo, id]);
+
+    const onCollapsedChange = useCallback((value: boolean) => {
+        setFetchChildEnabled(!value);
+    }, []);
 
     if (!project.data) return null;
 
     return (
-        <ProjectListItemCollapsable goals={goals} project={project.data} {...props}>
+        <ProjectListItemCollapsable
+            goals={goals}
+            project={project.data}
+            onCollapsedChange={onCollapsedChange}
+            loading={loading}
+            {...props}
+        >
             {(ids, deep) =>
                 ids.map((id) => <PageProjectListItem {...props} key={id} id={id} queryState={queryState} deep={deep} />)
             }

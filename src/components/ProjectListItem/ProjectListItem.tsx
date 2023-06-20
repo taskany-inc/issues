@@ -1,4 +1,14 @@
-import React, { Children, FC, MouseEvent, MouseEventHandler, ReactNode, useCallback, useMemo, useState } from 'react';
+import React, {
+    Children,
+    FC,
+    MouseEvent,
+    MouseEventHandler,
+    ReactNode,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { Badge, Button, EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
@@ -38,6 +48,8 @@ interface ProjectListItemCollapsableProps {
     project: NonNullable<ProjectByIdReturnType>;
     goals?: NonNullable<GoalByIdReturnType>[];
     children?: (id: string[], deep?: number) => ReactNode;
+    onCollapsedChange?: (value: boolean) => void;
+    loading?: boolean;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
     onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
     selectedResolver?: (id: string) => boolean;
@@ -98,7 +110,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     onTagClick,
     onClickProvider,
     selectedResolver,
+    onCollapsedChange,
     children,
+    loading = false,
     goals,
     deep = 0,
 }) => {
@@ -118,6 +132,10 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         }
     }, [onClickEnabled]);
 
+    useEffect(() => {
+        onCollapsedChange?.(collapsed);
+    }, [collapsed, onCollapsedChange]);
+
     const onHeaderButtonClick = useCallback((e: MouseEvent) => {
         e.stopPropagation();
 
@@ -126,7 +144,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
 
     return (
         <Collapsable
-            collapsed={collapsed}
+            collapsed={collapsed || loading}
             onClick={onClick}
             header={
                 <ProjectListContainer offset={offset}>
