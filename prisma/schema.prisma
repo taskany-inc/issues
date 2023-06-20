@@ -22,6 +22,14 @@ enum FilterMode {
   User
 }
 
+enum StateType {
+  NotStarted
+  InProgress
+  Completed
+  Failed
+  Canceled
+}
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -282,12 +290,13 @@ model Flow {
 }
 
 model State {
-  id       String    @id @default(cuid())
-  title    String    @unique
+  id       String     @id @default(cuid())
+  title    String     @unique
+  type     StateType?
   flows    Flow[]
   default  Boolean?
-  hue      Int       @default(1)
-  goals    Goal[]    @relation("goalState")
+  hue      Int        @default(1)
+  goals    Goal[]     @relation("goalState")
   comments Comment[]
 
   createdAt DateTime @default(now())
