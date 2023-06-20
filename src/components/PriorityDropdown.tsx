@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Button, Dropdown, MenuItem } from '@taskany/bricks';
 
 import { Priority, priorityVariants } from '../types/priority';
@@ -16,8 +16,6 @@ interface PriorityDropdownProps {
 
 export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
     ({ text, value, disabled, error, onChange }, ref) => {
-        const items = useMemo(() => Object.keys(priorityVariants).map((p) => getPriorityText(p as Priority)), []);
-
         return (
             <Dropdown
                 ref={ref}
@@ -25,13 +23,18 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                 text={value || text}
                 value={value}
                 onChange={onChange}
-                items={items}
+                items={Object.keys(priorityVariants)}
                 disabled={disabled}
                 renderTrigger={(props) => (
-                    <Button ref={props.ref} onClick={props.onClick} disabled={props.disabled} text={props.value} />
+                    <Button
+                        ref={props.ref}
+                        onClick={props.onClick}
+                        disabled={props.disabled}
+                        text={getPriorityText(props.value)}
+                    />
                 )}
                 renderItem={(props) => (
-                    <MenuItem ghost key={props.item.id} focused={props.cursor === props.index} onClick={props.onClick}>
+                    <MenuItem ghost key={props.item} focused={props.cursor === props.index} onClick={props.onClick}>
                         <PriorityText value={props.item} />
                     </MenuItem>
                 )}
