@@ -19,8 +19,9 @@ import { PageTitle } from '../PageTitle';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { ProjectListItemCollapsable } from '../ProjectListItem/ProjectListItem';
+import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
+import { GoalListItem } from '../GoalListItem';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -30,18 +31,18 @@ const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateF
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
 const PageProjectListItem: FC<
-    Omit<ComponentProps<typeof ProjectListItemCollapsable>, 'children' | 'goals' | 'project'> & {
-        id: string;
+    Omit<ComponentProps<typeof ProjectListItemCollapsable>, 'children' | 'goals'> & {
         queryState: QueryState;
+        onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
+        onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
+        selectedResolver?: (id: string) => boolean;
     }
-> = ({ queryState, id, ...props }) => {
-    const project = trpc.project.getById.useQuery(id);
-
+> = ({ queryState, project, onClickProvider, onTagClick, selectedResolver, deep = 0, ...props }) => {
     const [fetchGoalsEnabled, setFetchGoalsEnabled] = useState(false);
 
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
-            id,
+            id: project.id,
             ...queryState,
         },
         {
@@ -54,13 +55,27 @@ const PageProjectListItem: FC<
     const [fetchChildEnabled, setFetchChildEnabled] = useState(false);
 
     const childrenQueries = trpc.useQueries((t) =>
-        (project.data?.children.map(({ id }) => id) || []).map((id) =>
+        (project?.children.map(({ id }) => id) || []).map((id) =>
             t.project.getById(id, { enabled: fetchChildEnabled, refetchOnWindowFocus: false }),
         ),
     );
 
-    const loading = useMemo(() => childrenQueries.some(({ isLoading }) => isLoading), [childrenQueries]);
-    const goals = useMemo(() => projectDeepInfo?.goals.filter((g) => g.projectId === id), [projectDeepInfo, id]);
+    const loading = useMemo(() => childrenQueries.some(({ status }) => status === 'loading'), [childrenQueries]);
+    const childrenProjects = useMemo(
+        () =>
+            childrenQueries.reduce((acum, { data }) => {
+                if (data) {
+                    acum.push(data);
+                }
+                return acum;
+            }, [] as NonNullable<ProjectByIdReturnType>[]),
+        [childrenQueries],
+    );
+
+    const goals = useMemo(
+        () => projectDeepInfo?.goals.filter((g) => g.projectId === project.id),
+        [projectDeepInfo, project],
+    );
 
     const onCollapsedChange = useCallback((value: boolean) => {
         setFetchChildEnabled(!value);
@@ -70,20 +85,42 @@ const PageProjectListItem: FC<
         setFetchGoalsEnabled(!value);
     }, []);
 
-    if (!project.data) return null;
-
     return (
         <ProjectListItemCollapsable
-            goals={goals}
-            project={project.data}
+            goals={goals?.map((g) => (
+                <GoalListItem
+                    createdAt={g.createdAt}
+                    updatedAt={g.updatedAt}
+                    id={g.id}
+                    shortId={g._shortId}
+                    projectId={g.projectId}
+                    state={g.state!}
+                    title={g.title}
+                    issuer={g.activity!}
+                    owner={g.owner!}
+                    tags={g.tags}
+                    priority={g.priority!}
+                    comments={g._count?.comments}
+                    estimate={g._lastEstimate}
+                    participants={g.participants}
+                    starred={g._isStarred}
+                    watching={g._isWatching}
+                    key={g.id}
+                    focused={selectedResolver?.(g.id)}
+                    onClick={onClickProvider?.(g as NonNullable<GoalByIdReturnType>)}
+                    onTagClick={onTagClick}
+                />
+            ))}
+            project={project}
             onCollapsedChange={onCollapsedChange}
             onGoalsCollapsedChange={onGoalsCollapsedChange}
             loading={loading}
             {...props}
+            deep={deep}
         >
-            {(ids, deep) =>
-                ids.map((id) => <PageProjectListItem {...props} key={id} id={id} queryState={queryState} deep={deep} />)
-            }
+            {childrenProjects.map((p) => (
+                <PageProjectListItem {...props} key={p.id} project={p} queryState={queryState} deep={deep + 1} />
+            ))}
         </ProjectListItemCollapsable>
     );
 };
@@ -296,7 +333,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                     <PageProjectListItem
                         key={project.data.id}
                         href={routes.project(project.data.id)}
-                        id={project.data.id}
+                        project={project.data}
                         onTagClick={setTagsFilterOutside}
                         onClickProvider={onGoalPrewiewShow}
                         selectedResolver={selectedGoalResolver}

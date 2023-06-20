@@ -282,6 +282,31 @@ export const goalDeepQuery = {
             },
         },
     },
+    goalAchiveCriteria: {
+        include: {
+            goalAsCriteria: {
+                include: {
+                    estimate: { include: { estimate: true } },
+                    activity: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                    owner: {
+                        include: {
+                            user: true,
+                            ghost: true,
+                        },
+                    },
+                    state: true,
+                },
+            },
+        },
+        orderBy: {
+            createdAt: 'asc',
+        },
+    },
     dependsOn: {
         include: {
             state: true,

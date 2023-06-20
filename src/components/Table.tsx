@@ -3,7 +3,7 @@ import { gapS, gapSm, gray4, gray9, radiusM, textColor } from '@taskany/colors';
 import React from 'react';
 import { Text } from '@taskany/bricks';
 
-export const Table = styled.div<{ columns: number; minmax?: number, offset?: number }>`
+export const Table = styled.div<{ columns: number; minmax?: number; offset?: number }>`
     display: grid;
     grid-template-columns: ${({ columns, minmax = 410, offset = 0 }) => {
         if (columns < 2) {
@@ -11,10 +11,10 @@ export const Table = styled.div<{ columns: number; minmax?: number, offset?: num
         }
 
         if (columns === 2) {
-            return `minmax(${minmax - offset}px, 30%) repeat(10, max-content) 1fr`;
+            return `${minmax - offset}px repeat(10, max-content) 1fr`;
         }
 
-        return `minmax(${minmax - offset}px, 30%) repeat(${columns - 2}, max-content) 1fr`;
+        return `${minmax - offset}px repeat(${columns - 2}, max-content) 1fr`;
     }};
 
     width: 100%;

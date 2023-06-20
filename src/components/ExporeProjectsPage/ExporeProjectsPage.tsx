@@ -5,7 +5,7 @@ import { routes } from '../../hooks/router';
 import { Page, PageContent } from '../Page';
 import { PageSep } from '../PageSep';
 import { ExplorePageLayout } from '../ExplorePageLayout/ExplorePageLayout';
-import { ProjectListItem, ProjectListContainer } from '../ProjectListItem/ProjectListItem';
+import { ProjectListItem, ProjectListContainer } from '../ProjectListItem';
 import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './ExporeProjectsPage.i18n';
