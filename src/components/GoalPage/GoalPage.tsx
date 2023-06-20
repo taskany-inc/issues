@@ -2,7 +2,7 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import { danger0, gapM, gapS } from '@taskany/colors';
+import { danger0, gapM, gapS, gray7 } from '@taskany/colors';
 import {
     Button,
     Card,
@@ -17,6 +17,7 @@ import {
     MenuItem,
     UserPic,
     nullable,
+    Text,
 } from '@taskany/bricks';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -275,6 +276,9 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                     ))}
 
                     <IssueStats
+                        estimate={goal._lastEstimate}
+                        priority={goal.priority}
+                        achivedCriteriaWeight={goal._hasAchievementCriteria ? goal._achivedCriteriaWeight : undefined}
                         comments={goal._count?.comments ?? 0}
                         onCommentsClick={onCommentsClick}
                         updatedAt={goal.updatedAt}
@@ -342,15 +346,18 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                         </StyledCardInfo>
 
                         <CardContent>
+                            {goal.description ? (
+                                <Md>{goal.description}</Md>
+                            ) : (
+                                <Text size="s" color={gray7} weight="thin">
+                                    {tr('No description provided')}
+                                </Text>
+                            )}
                             <Md>{goal.description}</Md>
                         </CardContent>
 
                         <CardActions>
                             <IssueBaseActions>
-                                {nullable(priority, (ip) => (
-                                    <Button ghost text={getPriorityText(ip)} />
-                                ))}
-
                                 <Button
                                     ghost
                                     text={owner?.user?.name || owner?.user?.email || owner?.ghost?.email}
@@ -362,10 +369,6 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                                         />
                                     }
                                 />
-
-                                {nullable(goal._lastEstimate, (ie) => (
-                                    <Button ghost text={formatEstimate(ie, locale)} />
-                                ))}
 
                                 <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(goal.id)}>
                                     {nullable(!reactionsProps.limited, () => (
