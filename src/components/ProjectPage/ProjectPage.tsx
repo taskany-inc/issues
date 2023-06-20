@@ -36,12 +36,16 @@ const PageProjectListItem: FC<
     }
 > = ({ queryState, id, ...props }) => {
     const project = trpc.project.getById.useQuery(id);
+
+    const [fetchGoalsEnabled, setFetchGoalsEnabled] = useState(false);
+
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
             id,
             ...queryState,
         },
         {
+            enabled: fetchGoalsEnabled,
             keepPreviousData: true,
             staleTime: refreshInterval,
         },
@@ -56,12 +60,14 @@ const PageProjectListItem: FC<
     );
 
     const loading = useMemo(() => childrenQueries.some(({ isLoading }) => isLoading), [childrenQueries]);
-
-    console.log('QQQ QUERIES', id, childrenQueries);
     const goals = useMemo(() => projectDeepInfo?.goals.filter((g) => g.projectId === id), [projectDeepInfo, id]);
 
     const onCollapsedChange = useCallback((value: boolean) => {
         setFetchChildEnabled(!value);
+    }, []);
+
+    const onGoalsCollapsedChange = useCallback((value: boolean) => {
+        setFetchGoalsEnabled(!value);
     }, []);
 
     if (!project.data) return null;
@@ -71,6 +77,7 @@ const PageProjectListItem: FC<
             goals={goals}
             project={project.data}
             onCollapsedChange={onCollapsedChange}
+            onGoalsCollapsedChange={onGoalsCollapsedChange}
             loading={loading}
             {...props}
         >

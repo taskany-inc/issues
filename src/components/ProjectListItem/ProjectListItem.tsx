@@ -49,6 +49,7 @@ interface ProjectListItemCollapsableProps {
     goals?: NonNullable<GoalByIdReturnType>[];
     children?: (id: string[], deep?: number) => ReactNode;
     onCollapsedChange?: (value: boolean) => void;
+    onGoalsCollapsedChange?: (value: boolean) => void;
     loading?: boolean;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
     onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
@@ -111,6 +112,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     onClickProvider,
     selectedResolver,
     onCollapsedChange,
+    onGoalsCollapsedChange,
     children,
     loading = false,
     goals,
@@ -136,6 +138,10 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         onCollapsedChange?.(collapsed);
     }, [collapsed, onCollapsedChange]);
 
+    useEffect(() => {
+        onGoalsCollapsedChange?.(collapsedGoals);
+    }, [collapsedGoals, onGoalsCollapsedChange]);
+
     const onHeaderButtonClick = useCallback((e: MouseEvent) => {
         e.stopPropagation();
 
@@ -155,12 +161,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                         starred={project._isStarred}
                         watching={project._isWatching}
                     >
-                        <StyledGoalsButton
-                            onClick={onHeaderButtonClick}
-                            disabled={!goals?.length}
-                            text={tr('Goals')}
-                            iconRight={<Badge size="s">{goals?.length ?? 0}</Badge>}
-                        />
+                        <StyledGoalsButton onClick={onHeaderButtonClick} text={tr('Goals')} />
                     </ProjectListItem>
                 </ProjectListContainer>
             }
