@@ -37,8 +37,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
 }) => {
     const [collapsed, setIsCollapsed] = useState(true);
     const [collapsedGoals, setIsCollapsedGoals] = useState(true);
+    const contentHidden = collapsed || loading;
 
-    const offset = collapseOffset * (collapsed ? deep - 1 : deep);
+    const offset = collapseOffset * (contentHidden ? deep - 1 : deep);
     const childs = useMemo(() => project.children.map(({ id }) => id), [project]);
 
     const onClickEnabled = childs.length;
@@ -65,7 +66,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
 
     return (
         <Collapsable
-            collapsed={collapsed || loading}
+            collapsed={contentHidden}
             onClick={onClick}
             header={
                 <ProjectListContainer offset={offset}>
