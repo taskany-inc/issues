@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.10.0](https://github.com/taskany-inc/issues/compare/v1.9.0...v1.10.0) (2023-06-20)
+
+
+### Features
+
+* **GoalCreateForm:** goal button improvements ([e550f89](https://github.com/taskany-inc/issues/commit/e550f89393a97089426d80c24f8e47abccdca959))
+
+
+### Bug Fixes
+
+* **goal:** use max operator for new goal scopeId ([69975d1](https://github.com/taskany-inc/issues/commit/69975d1387b37b27933324d7a2634086c7b0cbdc))
+* **PriorityDropdown:** use value not text ([c73e738](https://github.com/taskany-inc/issues/commit/c73e7383261f873318d3023ab8078b2d678cbfdd))
+
 ## [1.9.0](https://github.com/taskany-inc/issues/compare/v1.8.0...v1.9.0) (2023-06-19)
 
 
