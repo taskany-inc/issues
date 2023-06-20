@@ -31,6 +31,10 @@ const StyledDotSep = styled.span`
     vertical-align: middle;
 `;
 
+const StyledCircleProgressBar = styled(CircleProgressBar)`
+    vertical-align: middle;
+`;
+
 const DotSep: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <StyledDotSep>
         <Dot /> {children}
@@ -58,9 +62,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
             ))}
             {achivedCriteriaWeight !== undefined && (
                 <DotSep>
-                    <StyledDotSep>
-                        <CircleProgressBar value={achivedCriteriaWeight} />
-                    </StyledDotSep>
+                    <StyledCircleProgressBar value={achivedCriteriaWeight} />
                 </DotSep>
             )}
             <DotSep>
