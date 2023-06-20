@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import assert from 'assert';
 import { faker } from '@faker-js/faker';
-import { Role, User, Tag, Goal } from '@prisma/client';
+import { Role, User, Tag, Goal, StateType } from '@prisma/client';
 
 import { prisma } from '../src/utils/prisma';
 import { keyPredictor } from '../src/utils/keyPredictor';
@@ -142,17 +142,18 @@ const flow = prisma.flow.create({
         states: {
             create: (
                 [
-                    ['Draft', 1],
-                    ['InProgress', 194],
-                    ['Blocked', 30],
-                    ['Finished', 158],
-                    ['Failed', 360],
-                    ['Canceled', 274],
-                    ['AtRisk', 14],
-                ] as [string, number][]
-            ).map(([title, hue]) => ({
+                    ['Draft', 1, StateType.NotStarted],
+                    ['InProgress', 194, StateType.InProgress],
+                    ['Blocked', 30, StateType.InProgress],
+                    ['Finished', 158, StateType.Completed],
+                    ['Failed', 360, StateType.Failed],
+                    ['Canceled', 274, StateType.Canceled],
+                    ['AtRisk', 14, StateType.InProgress],
+                ] as [string, number, StateType][]
+            ).map(([title, hue, type]) => ({
                 title,
                 hue,
+                type,
                 default: title === 'Draft',
             })),
         },
