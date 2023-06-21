@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect, useRef, useState } from 'react';
+import { FC, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
 import { gray7, radiusM } from '@taskany/colors';
 import { nullable } from '@taskany/bricks';

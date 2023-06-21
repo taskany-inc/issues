@@ -54,23 +54,10 @@ const PageProjectListItem: FC<
 
     const [fetchChildEnabled, setFetchChildEnabled] = useState(false);
 
-    const childrenQueries = trpc.useQueries((t) =>
-        (project?.children.map(({ id }) => id) || []).map((id) =>
-            t.project.getById(id, { enabled: fetchChildEnabled, refetchOnWindowFocus: false }),
-        ),
-    );
-
-    const loading = useMemo(() => childrenQueries.some(({ status }) => status === 'loading'), [childrenQueries]);
-    const childrenProjects = useMemo(
-        () =>
-            childrenQueries.reduce((acum, { data }) => {
-                if (data) {
-                    acum.push(data);
-                }
-                return acum;
-            }, [] as NonNullable<ProjectByIdReturnType>[]),
-        [childrenQueries],
-    );
+    const ids = useMemo(() => project?.children.map(({ id }) => id) || [], [project]);
+    const { data: childrenProjects = [], status } = trpc.project.getByIds.useQuery(ids, {
+        enabled: fetchChildEnabled,
+    });
 
     const goals = useMemo(
         () => projectDeepInfo?.goals.filter((g) => g.projectId === project.id),
@@ -114,7 +101,7 @@ const PageProjectListItem: FC<
             project={project}
             onCollapsedChange={onCollapsedChange}
             onGoalsCollapsedChange={onGoalsCollapsedChange}
-            loading={loading}
+            loading={status === 'loading'}
             {...props}
             deep={deep}
         >

@@ -43,6 +43,38 @@ export const addCalculatedProjectFields = <
     };
 };
 
+const projectFullSchema = {
+    stargizers: true,
+    watchers: true,
+    parent: true,
+    tags: true,
+    children: {
+        include: {
+            parent: true,
+        },
+    },
+    participants: {
+        include: {
+            user: true,
+            ghost: true,
+        },
+    },
+    activity: {
+        include: {
+            user: true,
+            ghost: true,
+        },
+    },
+    _count: {
+        select: {
+            stargizers: true,
+            watchers: true,
+            participants: true,
+            children: true,
+        },
+    },
+};
+
 export const project = router({
     suggestions: protectedProcedure.input(z.string()).query(({ input }) => {
         return prisma.project.findMany({
@@ -131,42 +163,24 @@ export const project = router({
             where: {
                 id,
             },
-            include: {
-                stargizers: true,
-                watchers: true,
-                parent: true,
-                tags: true,
-                children: {
-                    include: {
-                        parent: true,
-                    },
-                },
-                participants: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
-                activity: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
-                _count: {
-                    select: {
-                        stargizers: true,
-                        watchers: true,
-                        participants: true,
-                        children: true,
-                    },
-                },
-            },
+            include: projectFullSchema,
         });
 
         if (!project) return null;
 
         return addCalculatedProjectFields(project, ctx.session.user.activityId);
+    }),
+    getByIds: protectedProcedure.input(z.array(z.string())).query(async ({ ctx, input }) => {
+        const projects = await prisma.project.findMany({
+            where: {
+                id: {
+                    in: input,
+                },
+            },
+            include: projectFullSchema,
+        });
+
+        return projects.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId));
     }),
     getDeepInfo: protectedProcedure.input(projectDeepInfoSchema).query(async ({ ctx, input }) => {
         const [allProjectGoals, filtredProjectGoals] = await Promise.all([
