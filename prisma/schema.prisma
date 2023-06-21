@@ -224,6 +224,8 @@ model Goal {
 
   @@index([ownerId])
   @@index([activityId])
+
+  @@unique([projectId, scopeId])
 }
 
 model Filter {
