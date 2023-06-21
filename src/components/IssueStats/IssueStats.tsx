@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { gapXs, gray8 } from '@taskany/colors';
@@ -6,7 +7,9 @@ import { Dot, Text, Link, nullable, CircleProgressBar } from '@taskany/bricks';
 import { pluralize } from '../../utils/pluralize';
 import { formatEstimate } from '../../utils/dateTime';
 import { usePageContext } from '../../hooks/usePageContext';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { getPriorityText } from '../PriorityText/PriorityText';
+import { UserGroup } from '../UserGroup';
 
 import { tr } from './IssueStats.i18n';
 
@@ -15,6 +18,8 @@ const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 interface IssueStatsProps {
     updatedAt: Date;
     comments: number;
+    owner?: ActivityByIdReturnType | null;
+    issuer?: ActivityByIdReturnType | null;
     estimate?: { date: string; q?: string; y: string };
     priority?: string | null;
     achivedCriteriaWeight?: number;
@@ -22,8 +27,12 @@ interface IssueStatsProps {
     onCommentsClick?: () => void;
 }
 
-const StyledIssueInfo = styled(Text)`
-    padding-left: ${gapXs};
+const StyledIssueStats = styled(Text)<Pick<IssueStatsProps, 'mode'>>`
+    ${({ mode }) =>
+        mode === 'default' &&
+        `
+            padding-left: ${gapXs};
+        `}
 `;
 
 const StyledDotSep = styled.span`
@@ -35,6 +44,11 @@ const StyledCircleProgressBar = styled(CircleProgressBar)`
     vertical-align: middle;
 `;
 
+const StyledUserGroupContainer = styled.span`
+    display: inline-block;
+    vertical-align: middle;
+`;
+
 const DotSep: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <StyledDotSep>
         <Dot /> {children}
@@ -42,6 +56,8 @@ const DotSep: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 export const IssueStats: React.FC<IssueStatsProps> = ({
+    issuer,
+    owner,
     estimate,
     priority,
     comments,
@@ -52,8 +68,23 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
 }) => {
     const { locale } = usePageContext();
 
+    const issuers = useMemo(() => {
+        if (issuer && owner && owner.id === issuer.id) {
+            return [owner];
+        }
+
+        return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
+    }, [issuer, owner]);
+
     return (
-        <StyledIssueInfo as="span" size="m" color={gray8}>
+        <StyledIssueStats mode={mode} as="span" size="m" color={gray8}>
+            {nullable(issuers.length, () => (
+                <DotSep>
+                    <StyledUserGroupContainer>
+                        <UserGroup users={issuers} />
+                    </StyledUserGroupContainer>
+                </DotSep>
+            ))}
             {nullable(estimate, (e) => (
                 <DotSep>{formatEstimate(e, locale)}</DotSep>
             ))}
@@ -82,6 +113,6 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
                     </Link>
                 </DotSep>
             ))}
-        </StyledIssueInfo>
+        </StyledIssueStats>
     );
 };

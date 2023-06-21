@@ -17,31 +17,23 @@ import {
     ModalContent,
     ModalHeader,
     ModalPreview,
-    UserPic,
     nullable,
     Text,
 } from '@taskany/bricks';
 
 import { refreshInterval } from '../../utils/config';
-import { formatEstimate } from '../../utils/dateTime';
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { editGoalKeys } from '../../utils/hotkeys';
-import { Priority } from '../../types/priority';
-import { IssueKey } from '../IssueKey';
 import { IssueTitle } from '../IssueTitle';
 import { IssueParent } from '../IssueParent';
-import { IssueTags } from '../IssueTags';
 import RelativeTime from '../RelativeTime/RelativeTime';
 import Md from '../Md';
 import { IssueStats } from '../IssueStats/IssueStats';
-import { Reactions } from '../Reactions';
-import ReactionsDropdown from '../ReactionsDropdown';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
-import { getPriorityText } from '../PriorityText/PriorityText';
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalStateChangeSchema } from '../../schema/goal';
@@ -102,7 +94,7 @@ const StyledCard = styled(Card)`
 `;
 
 const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
-    const { user, locale } = usePageContext();
+    const { user } = usePageContext();
     const [isRelativeTime, setIsRelativeTime] = useState(true);
 
     const onChangeTypeDate = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | undefined) => {
@@ -136,7 +128,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         setGoalEditModalVisible(false);
     }, []);
 
-    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
+    const { commentReaction } = useReactionsResource(goal?.reactions);
 
     const stateChangeMutations = trpc.goal.switchState.useMutation();
     const onGoalStateChange = useCallback(
@@ -157,10 +149,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         invalidateFn();
     }, [invalidateFn]);
 
-    const onGoalReactionToggle = useCallback(
-        (id: string) => goalReaction(id, () => utils.goal.getById.invalidate(preview._shortId)),
-        [preview._shortId, goalReaction, utils.goal.getById],
-    );
     const onCommentReactionToggle = useCallback(
         (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(preview._shortId)),
         [preview._shortId, commentReaction, utils.goal.getById],
@@ -205,20 +193,12 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
             });
     }, []);
 
-    const { description } = goal || preview;
+    const { title, description, updatedAt } = goal || preview;
 
     return (
         <>
             <ModalPreview visible onClose={onPreviewClose}>
                 <StyledModalHeader ref={headerRef}>
-                    {nullable(preview.id, () => (
-                        <IssueKey size="s" id={preview._shortId}>
-                            {nullable(goal?.tags, (tags) => (
-                                <IssueTags tags={tags} size="s" />
-                            ))}
-                        </IssueKey>
-                    ))}
-
                     {Boolean(goal?.project?.parent?.length) &&
                         nullable(goal?.project?.parent, (parent) => (
                             <>
@@ -231,15 +211,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                         <IssueParent as="span" mode="compact" parent={project} size="m" />
                     ))}
 
-                    <IssueStats
-                        mode="compact"
-                        comments={goal?._count?.comments ?? 0}
-                        onCommentsClick={onCommentsClick}
-                        updatedAt={(goal || preview).updatedAt}
-                    />
-
-                    {nullable((goal || preview).title, (title) => (
-                        <IssueTitle title={title} href={routes.goal(preview._shortId)} size="xl" />
+                    {nullable(title, (t) => (
+                        <IssueTitle title={t} href={routes.goal(preview._shortId)} size="xl" />
                     ))}
 
                     <StyledImportantActions>
@@ -248,31 +221,19 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                                 <StateSwitch state={s} flowId={goal?.project?.flowId} onClick={onGoalStateChange} />
                             ))}
 
-                            {nullable(goal?.priority, (ip) => (
-                                <Button ghost text={getPriorityText(ip as Priority)} />
-                            ))}
-
-                            <Button
-                                ghost
-                                text={goal?.owner?.user?.name || goal?.owner?.user?.email || goal?.owner?.ghost?.email}
-                                iconLeft={
-                                    <UserPic
-                                        src={goal?.owner?.user?.image}
-                                        email={goal?.owner?.user?.email || goal?.owner?.ghost?.email}
-                                        size={16}
-                                    />
+                            <IssueStats
+                                mode="compact"
+                                issuer={goal?.activity}
+                                owner={goal?.owner}
+                                estimate={goal?._lastEstimate}
+                                priority={goal?.priority}
+                                achivedCriteriaWeight={
+                                    goal?._hasAchievementCriteria ? goal?._achivedCriteriaWeight : undefined
                                 }
+                                comments={goal?._count?.comments ?? 0}
+                                onCommentsClick={onCommentsClick}
+                                updatedAt={updatedAt}
                             />
-
-                            {nullable(goal?._lastEstimate, (ie) => (
-                                <Button ghost text={formatEstimate(ie, locale)} />
-                            ))}
-
-                            <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(preview.id)}>
-                                {nullable(!reactionsProps.limited, () => (
-                                    <ReactionsDropdown onClick={onGoalReactionToggle(preview.id)} />
-                                ))}
-                            </Reactions>
                         </StyledPublicActions>
 
                         {nullable(goal?._isEditable, () => (
@@ -329,7 +290,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                                 <Md>{description}</Md>
                             ) : (
                                 <Text size="s" color={gray7} weight="thin">
-                                    {tr('Description is not provided')}
+                                    {tr('No description provided')}
                                 </Text>
                             )}
                         </CardComment>

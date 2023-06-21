@@ -21,7 +21,6 @@ import {
 } from '@taskany/bricks';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
-import { formatEstimate } from '../../utils/dateTime';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { Page, PageContent, PageActions } from '../Page';
@@ -32,7 +31,6 @@ import { IssueStats } from '../IssueStats/IssueStats';
 import { Reactions } from '../Reactions';
 import { IssueParent } from '../IssueParent';
 import { IssueTags } from '../IssueTags';
-import { getPriorityText } from '../PriorityText/PriorityText';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
@@ -41,7 +39,6 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { StarButton } from '../StarButton/StarButton';
 import { useRouter } from '../../hooks/router';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
-import { Priority } from '../../types/priority';
 import { trpc } from '../../utils/trpcClient';
 import { GoalParticipantsSchema, GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
@@ -143,7 +140,6 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
 
     const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal?.id, goal?._shortId);
 
-    const priority = goal?.priority as Priority;
     const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
 
     const invalidateFn = useCallback(() => {
