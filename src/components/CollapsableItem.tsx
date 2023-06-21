@@ -6,17 +6,6 @@ import { nullable } from '@taskany/bricks';
 export const collapseOffset = 20;
 
 const dotSize = 8;
-const dot = css`
-    position: absolute;
-    top: 50%;
-    width: ${dotSize}px;
-    height: ${dotSize}px;
-    margin-top: -${dotSize / 2}px;
-    left: ${collapseOffset / 2 - dotSize / 2}px;
-
-    border-radius: 100%;
-    background: ${gray7};
-`;
 
 const line = css`
     position: absolute;
@@ -30,7 +19,15 @@ const line = css`
 
 const StyledDot = styled.div`
     display: none;
-    ${dot}
+    position: absolute;
+    top: 50%;
+    width: ${dotSize}px;
+    height: ${dotSize}px;
+    margin-top: -${dotSize / 2}px;
+    left: ${collapseOffset / 2 - dotSize / 2}px;
+
+    border-radius: 100%;
+    background: ${gray7};
 `;
 
 const StyledParentDot = styled(StyledDot)``;
