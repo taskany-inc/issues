@@ -31,13 +31,13 @@ const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateF
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
 const PageProjectListItem: FC<
-    Omit<ComponentProps<typeof ProjectListItemCollapsable>, 'children' | 'goals'> & {
+    Pick<ComponentProps<typeof ProjectListItemCollapsable>, 'project' | 'deep'> & {
         queryState: QueryState;
         onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
         onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
         selectedResolver?: (id: string) => boolean;
     }
-> = ({ queryState, project, onClickProvider, onTagClick, selectedResolver, deep = 0, ...props }) => {
+> = ({ queryState, project, onClickProvider, onTagClick, selectedResolver, deep = 0 }) => {
     const [fetchGoalsEnabled, setFetchGoalsEnabled] = useState(false);
 
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
@@ -74,6 +74,7 @@ const PageProjectListItem: FC<
 
     return (
         <ProjectListItemCollapsable
+            href={routes.project(project.id)}
             goals={goals?.map((g) => (
                 <GoalListItem
                     createdAt={g.createdAt}
@@ -102,11 +103,10 @@ const PageProjectListItem: FC<
             onCollapsedChange={onCollapsedChange}
             onGoalsCollapsedChange={onGoalsCollapsedChange}
             loading={status === 'loading'}
-            {...props}
             deep={deep}
         >
             {childrenProjects.map((p) => (
-                <PageProjectListItem {...props} key={p.id} project={p} queryState={queryState} deep={deep + 1} />
+                <PageProjectListItem key={p.id} project={p} queryState={queryState} deep={deep + 1} />
             ))}
         </ProjectListItemCollapsable>
     );
@@ -158,6 +158,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
             staleTime: refreshInterval,
         },
     );
+
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
     useEffect(() => {
@@ -319,7 +320,6 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
                 <PageContent>
                     <PageProjectListItem
                         key={project.data.id}
-                        href={routes.project(project.data.id)}
                         project={project.data}
                         onTagClick={setTagsFilterOutside}
                         onClickProvider={onGoalPrewiewShow}
