@@ -452,14 +452,14 @@ export const goal = router({
         }
 
         const correctEstimate = await findOrCreateEstimate(input.estimate, ctx.session.user.activityId, actualGoal.id);
-
-        if (correctEstimate) {
+        const previousEstimate = actualGoal.estimate.length
+            ? String(actualGoal.estimate[actualGoal.estimate.length - 1].estimateId)
+            : '';
+        if (correctEstimate && String(correctEstimate.id) !== previousEstimate) {
             history.push({
                 subject: 'estimate',
                 action: 'change',
-                previousValue: actualGoal.estimate.length
-                    ? String(actualGoal.estimate[actualGoal.estimate.length - 1].estimateId)
-                    : '',
+                previousValue: previousEstimate,
                 nextValue: String(correctEstimate.id),
             });
         }
