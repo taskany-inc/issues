@@ -739,15 +739,9 @@ export const goal = router({
         if (!goal) return null;
 
         try {
-            const [newComment] = await Promise.all([
-                prisma.comment.create({
-                    data: {
-                        description: input.description,
-                        activityId: commentAuthor.id,
-                        goalId: input.id,
-                        stateId: input.stateId,
-                    },
-                }),
+            // We want to see state changes record and comment next in activity feed.
+            const [, newComment] = await prisma.$transaction([
+                // Update goal and push to history first.
                 prisma.goal.update({
                     where: { id: input.id },
                     data: {
@@ -765,6 +759,15 @@ export const goal = router({
                                       },
                                   }
                                 : undefined,
+                    },
+                }),
+                // Create comment next.
+                prisma.comment.create({
+                    data: {
+                        description: input.description,
+                        activityId: commentAuthor.id,
+                        goalId: input.id,
+                        stateId: input.stateId,
                     },
                 }),
             ]);
