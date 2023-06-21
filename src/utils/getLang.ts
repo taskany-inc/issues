@@ -5,7 +5,7 @@ export type TLocale = (typeof languages)[number];
 const defaultLocale: TLocale = languages[0];
 
 const getLangClient = (): TLocale => {
-    const [_, locale] = window.location.pathname.match(new RegExp(`/(${languages.join('|')})/`)) ?? [];
+    const [_, locale] = window.location.pathname.match(/\/(en|ru)\b/) ?? [];
 
     return (locale as TLocale) ?? defaultLocale;
 };
