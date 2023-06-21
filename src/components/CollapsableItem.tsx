@@ -71,18 +71,20 @@ const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number
         ${({ deep }) => deep === 0 && 'display: none;'}
     }
 
+    ${({ deep }) =>
+        deep > 0 &&
+        `
+        margin-left: -${collapseOffset}px;
+        padding-left: ${collapseOffset}px;
+    `}
+
     ${({ collapsed, deep }) =>
         !collapsed &&
         css`
             padding-left: ${collapseOffset}px;
-            margin-left: 0px !important; // TODO: fix me
+            margin-left: 0px;
 
             /** show dot and add paddings for earch item is opened */
-
-            & > & {
-                padding-left: ${collapseOffset}px;
-                margin-left: -${collapseOffset}px;
-            }
 
             & > & > ${StyledCollapsableHeader}, & > ${StyledCollapsableHeader} {
                 padding-left: ${collapseOffset}px;
