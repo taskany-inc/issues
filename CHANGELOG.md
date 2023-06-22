@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.11.0](https://github.com/taskany-inc/issues/compare/v1.10.0...v1.11.0) (2023-06-22)
+
+
+### Features
+
+* **GoalPage:** redesign header, add criteria progress bar ([8f45cd4](https://github.com/taskany-inc/issues/commit/8f45cd4136f288b7c68d8074479485566534f6da))
+* **GoalPreview:** redesign header, add criteria progress bar ([abc07cc](https://github.com/taskany-inc/issues/commit/abc07ccee057281c6f021b46d82d6ad295bd84a5))
+* **ProjectListItemCollapsible:** add goals button ([0630b3f](https://github.com/taskany-inc/issues/commit/0630b3fd99704f135a71d6b118e4c578e2ece28d))
+* **ProjectListItemCollapsible:** codereview changes ([eeb5b06](https://github.com/taskany-inc/issues/commit/eeb5b06c16f58025e4c88a6005650a18fe0e40fd))
+* **ProjectListItemCollapsible:** component composition step 1 ([f29104d](https://github.com/taskany-inc/issues/commit/f29104dec22456ffde8a40f290ebf38aa9103f28))
+* **ProjectListItemCollapsible:** fix css important style ([412f43f](https://github.com/taskany-inc/issues/commit/412f43f4002e0bfd91cc8de1b283082ba450e5bb))
+* **ProjectListItemCollapsible:** fix toggle blinking ([e2f9386](https://github.com/taskany-inc/issues/commit/e2f938647a9c0f878796743ce0ca31ea21d3770f))
+* **ProjectListItemCollapsible:** new components ([c46a735](https://github.com/taskany-inc/issues/commit/c46a735868f4aac2a807504687e5e4014f580ccd))
+* **ProjectListItemCollapsible:** prisma project.getByIds endpoint ([a0634f8](https://github.com/taskany-inc/issues/commit/a0634f891d204a40e95b2524c0165757c3c72484))
+* **ProjectListItemCollapsible:** remove props spread ([7b6eb2b](https://github.com/taskany-inc/issues/commit/7b6eb2b1a529bb097f3ba4ae85f89fec2bbb72ef))
+* **ProjectListItemCollapsible:** support goals loading on click ([b9e0281](https://github.com/taskany-inc/issues/commit/b9e02812865657ff83db172ef3c7cecc134a8825))
+* **ProjectListItemCollapsible:** support project loading status ([7c2dcb3](https://github.com/taskany-inc/issues/commit/7c2dcb37cd019a3be87af951a3e65d0abbe35aae))
+* **RelativeTime:** no hover for unclickable timestamps ([afc0367](https://github.com/taskany-inc/issues/commit/afc03673d77c867d5387926f82c7d965779ce44b))
+* **State:** add basic types ([f720922](https://github.com/taskany-inc/issues/commit/f720922cbc3a2104453f01783d96f6f203c17505))
+
+
+### Bug Fixes
+
+* **GoalHistory:** check prev and next estimate before push ([2dbf15d](https://github.com/taskany-inc/issues/commit/2dbf15dcbd0a16f3ab9e23a431fde2dbb956e5c6))
+* **Goal:** unique constraint for scopeId ([ca34b45](https://github.com/taskany-inc/issues/commit/ca34b4544bfbb764ffbd30b536512dd86118ff87))
+* **i18n:** exact pattern match in getLangClient ([fbca1b0](https://github.com/taskany-inc/issues/commit/fbca1b08ecae89c41ac41790e98f16d78749ab47))
+* **package-lock.json:** fix dependency problem ([aa02327](https://github.com/taskany-inc/issues/commit/aa02327d1064de149cb0c37336bffb671b4dd357))
+* **StateComment:** synchroniosly update goal and create comment next ([99acc58](https://github.com/taskany-inc/issues/commit/99acc5865163b91ecc80e16ef0b3e9cb903359c9))
+
 ## [1.10.0](https://github.com/taskany-inc/issues/compare/v1.9.0...v1.10.0) (2023-06-20)
 
 
