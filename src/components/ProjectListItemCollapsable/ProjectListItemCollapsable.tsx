@@ -1,6 +1,6 @@
 import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { Button } from '@taskany/bricks';
+import { Badge, Button } from '@taskany/bricks';
 import { gapS } from '@taskany/colors';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
@@ -77,7 +77,12 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                         starred={project._isStarred}
                         watching={project._isWatching}
                     >
-                        <StyledGoalsButton onClick={onHeaderButtonClick} text={tr('Goals')} />
+                        <StyledGoalsButton
+                            onClick={onHeaderButtonClick}
+                            text={tr('Goals')}
+                            disabled={!project._count.goals}
+                            iconRight={<Badge size="s">{project._count.goals}</Badge>}
+                        />
                     </ProjectListItem>
                 </ProjectListContainer>
             }

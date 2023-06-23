@@ -26,6 +26,7 @@ export const projectFullSchema = {
             watchers: true,
             participants: true,
             children: true,
+            goals: true,
         },
     },
 };
