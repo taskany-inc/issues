@@ -8,11 +8,8 @@ import { routes } from '../hooks/router';
 import { trpcRouter } from '../../trpc/router';
 import type { TrpcRouter } from '../../trpc/router';
 
-import { setSSRLocale, TLocale } from './getLang';
-
 interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];
-    locale: TLocale;
     req: GetServerSidePropsContext['req'];
     params: P;
     query: Record<string, string | string[] | undefined>;
@@ -26,7 +23,7 @@ export interface ExternalPageProps<P = { [key: string]: string }> extends SSRPro
 }
 
 export function declareSsrProps<T = ExternalPageProps>(
-    cb?: ({ user, locale, req, params, query }: SSRProps) => T,
+    cb?: ({ user, req, params, query }: SSRProps) => T,
     options?: { private: boolean },
 ) {
     return async ({ locale, req, params = {}, query }: GetServerSidePropsContext) => {
@@ -42,10 +39,6 @@ export function declareSsrProps<T = ExternalPageProps>(
             };
         }
 
-        if (locale) {
-            setSSRLocale(locale as TLocale);
-        }
-
         const ssrHelpers = createServerSideHelpers({ router: trpcRouter, ctx: { session }, transformer: superjson });
 
         const ssrTime = Date.now();
@@ -56,7 +49,6 @@ export function declareSsrProps<T = ExternalPageProps>(
                   // look at session check in previous condition
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                   user: session!.user,
-                  locale: locale as TLocale,
                   params: params as Record<string, string>,
                   query,
                   ssrTime,
