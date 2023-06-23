@@ -34,6 +34,10 @@ export const PageHeader: FC = () => {
             href: routes.exploreTopProjects(),
             title: tr('Explore'),
         },
+        {
+            href: routes.projects(),
+            title: tr('Projects'),
+        },
     ];
 
     const onUserMenuClick = useCallback(() => (user ? userSettings() : signIn()), [user, userSettings, signIn]);

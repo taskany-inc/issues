@@ -22,8 +22,9 @@ import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { GoalListItem } from '../GoalListItem';
+import { CommonHeader } from '../CommonHeader';
 
-import { tr } from './ProjectPage.i18n';
+import { tr } from './ProjectsPage.i18n';
 
 const GoalPreview = dynamic(() => import('../GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
@@ -120,11 +121,12 @@ const PageProjectListItem: FC<
     );
 };
 
-export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps) => {
+export const ProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
-    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     const { toggleFilterStar } = useFilterResource();
+
+    const { data: projects = [] } = trpc.project.getAll.useQuery();
 
     const utils = trpc.useContext();
     const preset = trpc.filter.getById.useQuery(String(nextRouter.query.filter), {
@@ -155,15 +157,15 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
         preset: preset?.data,
     });
 
-    const project = trpc.project.getById.useQuery(id);
     const { data: projectDeepInfo, isLoading } = trpc.project.getDeepInfo.useQuery(
         {
-            id,
+            id: projects[0].id,
             ...queryState,
         },
         {
             keepPreviousData: true,
             staleTime: refreshInterval,
+            enabled: !!projects.length,
         },
     );
 
@@ -185,22 +187,6 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
     }, []);
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
-
-    useEffect(() => {
-        if (project.data) {
-            setCurrentProjectCache({
-                id: project.data.id,
-                title: project.data.title,
-                description: project.data.description ?? undefined,
-                flowId: project.data.flowId,
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useWillUnmount(() => {
-        setCurrentProjectCache(null);
-    });
 
     const onFilterStar = useCallback(async () => {
         if (currentPreset) {
@@ -237,115 +223,99 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
         [nextRouter],
     );
 
-    const pageTitle = tr
-        .raw('title', {
-            project: project.data?.title,
-        })
-        .join('');
-
-    const defaultTitle = <PageTitle title={project.data?.title} />;
+    const defaultTitle = <PageTitle title={tr('Projects')} />;
     const presetInfo =
         user.activityId !== currentPreset?.activityId
             ? `${tr('created by')} ${currentPreset?.activity?.user?.name}`
             : undefined;
-    const presetTitle = <PageTitle title={project.data?.title} subtitle={currentPreset?.title} info={presetInfo} />;
+    const presetTitle = <PageTitle title={tr('Projects')} subtitle={currentPreset?.title} info={presetInfo} />;
 
     const onShadowPresetTitleClick = useCallback(() => {
         if (shadowPreset) setPreset(shadowPreset.id);
     }, [setPreset, shadowPreset]);
+
     const shadowPresetInfo =
         user.activityId !== shadowPreset?.activityId
             ? `${tr('created by')} ${shadowPreset?.activity?.user?.name}`
             : undefined;
     const shadowPresetTitle = (
         <PageTitle
-            title={project.data?.title}
+            title={tr('Projects')}
             subtitle={shadowPreset?.title}
             info={shadowPresetInfo}
             onClick={onShadowPresetTitleClick}
         />
     );
+
     // eslint-disable-next-line no-nested-ternary
     const title = currentPreset ? presetTitle : shadowPreset ? shadowPresetTitle : defaultTitle;
-    const description =
-        currentPreset && currentPreset.description ? currentPreset.description : project.data?.description;
-
-    if (!project.data) return null;
+    const description = currentPreset && currentPreset.description ? currentPreset.description : tr('description');
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
-            <ProjectPageLayout
-                actions
-                id={project.data.id}
-                title={title}
-                description={description}
-                starred={project.data._isStarred}
-                watching={project.data._isWatching}
-                stargizers={project.data._count.stargizers}
-                owned={project.data._isOwner}
-                parent={project.data.parent}
+        <Page user={user} locale={locale} ssrTime={ssrTime} title={tr('title')}>
+            <CommonHeader title={title} description={description} />
+            <FiltersPanel
+                loading={isLoading}
+                total={projectDeepInfo?.meta?.count}
+                counter={projectDeepInfo?.goals?.length}
+                queryState={queryState}
+                queryString={queryString}
+                issuers={projectDeepInfo?.meta?.issuers}
+                owners={projectDeepInfo?.meta?.owners}
+                participants={projectDeepInfo?.meta?.participants}
+                priorities={projectDeepInfo?.meta?.priority}
+                projects={projects}
+                preset={currentPreset}
+                presets={userFilters.data}
+                tags={projectDeepInfo?.meta?.tags}
+                states={projectDeepInfo?.meta?.states}
+                estimates={projectDeepInfo?.meta?.estimates}
+                onSearchChange={setFulltextFilter}
+                onIssuerChange={setIssuerFilter}
+                onOwnerChange={setOwnerFilter}
+                onParticipantChange={setParticipantFilter}
+                onProjectChange={setProjectFilter}
+                onStateChange={setStateFilter}
+                onTagChange={setTagsFilter}
+                onEstimateChange={setEstimateFilter}
+                onPriorityChange={setPriorityFilter}
+                onStarredChange={setStarredFilter}
+                onWatchingChange={setWatchingFilter}
+                onPresetChange={setPreset}
+                onFilterStar={onFilterStar}
+                onSortChange={setSortFilter}
             >
-                <FiltersPanel
-                    loading={isLoading}
-                    total={projectDeepInfo?.meta?.count}
-                    counter={projectDeepInfo?.goals?.length}
-                    queryState={queryState}
-                    queryString={queryString}
-                    issuers={projectDeepInfo?.meta?.issuers}
-                    owners={projectDeepInfo?.meta?.owners}
-                    participants={projectDeepInfo?.meta?.participants}
-                    priorities={projectDeepInfo?.meta?.priority}
-                    projects={projectDeepInfo?.meta?.projects}
-                    preset={currentPreset}
-                    presets={userFilters.data}
-                    tags={projectDeepInfo?.meta?.tags}
-                    states={projectDeepInfo?.meta?.states}
-                    estimates={projectDeepInfo?.meta?.estimates}
-                    onSearchChange={setFulltextFilter}
-                    onIssuerChange={setIssuerFilter}
-                    onOwnerChange={setOwnerFilter}
-                    onParticipantChange={setParticipantFilter}
-                    onProjectChange={setProjectFilter}
-                    onStateChange={setStateFilter}
-                    onTagChange={setTagsFilter}
-                    onEstimateChange={setEstimateFilter}
-                    onPriorityChange={setPriorityFilter}
-                    onStarredChange={setStarredFilter}
-                    onWatchingChange={setWatchingFilter}
-                    onPresetChange={setPreset}
-                    onFilterStar={onFilterStar}
-                    onSortChange={setSortFilter}
-                >
-                    {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
-                </FiltersPanel>
+                {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
+            </FiltersPanel>
 
-                <PageContent>
+            <PageContent>
+                {projects.map((project) => (
                     <PageProjectListItem
-                        key={project.data.id}
-                        project={project.data}
+                        key={project.id}
+                        project={project}
                         onTagClick={setTagsFilterOutside}
                         onClickProvider={onGoalPrewiewShow}
                         selectedResolver={selectedGoalResolver}
                         queryState={queryState}
                     />
-                </PageContent>
-
-                {nullable(preview, (p) => (
-                    <GoalPreview preview={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
                 ))}
+            </PageContent>
 
-                {nullable(queryString, (params) => (
-                    <ModalOnEvent event={ModalEvent.FilterCreateModal} hotkeys={createFilterKeys}>
-                        <FilterCreateForm mode="User" params={params} onSubmit={onFilterCreated} />
-                    </ModalOnEvent>
-                ))}
+            {nullable(preview, (p) => (
+                <GoalPreview preview={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
+            ))}
 
-                {nullable(currentPreset, (cP) => (
-                    <ModalOnEvent view="warn" event={ModalEvent.FilterDeleteModal}>
-                        <FilterDeleteForm preset={cP} onSubmit={onFilterDeleted} onCancel={onFilterDeleteCanceled} />
-                    </ModalOnEvent>
-                ))}
-            </ProjectPageLayout>
+            {nullable(queryString, (params) => (
+                <ModalOnEvent event={ModalEvent.FilterCreateModal} hotkeys={createFilterKeys}>
+                    <FilterCreateForm mode="User" params={params} onSubmit={onFilterCreated} />
+                </ModalOnEvent>
+            ))}
+
+            {nullable(currentPreset, (cP) => (
+                <ModalOnEvent view="warn" event={ModalEvent.FilterDeleteModal}>
+                    <FilterDeleteForm preset={cP} onSubmit={onFilterDeleted} onCancel={onFilterDeleteCanceled} />
+                </ModalOnEvent>
+            ))}
         </Page>
     );
 };
