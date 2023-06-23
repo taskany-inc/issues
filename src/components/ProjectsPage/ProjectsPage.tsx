@@ -1,28 +1,22 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { MouseEventHandler, useCallback, useEffect, useState, useMemo, FC, ComponentProps } from 'react';
+import { MouseEventHandler, useCallback, useState } from 'react';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { Button, nullable } from '@taskany/bricks';
 
-import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { QueryState, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../hooks/useFilterResource';
-import { useWillUnmount } from '../../hooks/useWillUnmount';
-import { routes } from '../../hooks/router';
-import { ProjectPageLayout } from '../ProjectPageLayout/ProjectPageLayout';
 import { Page, PageContent } from '../Page';
 import { PageTitle } from '../PageTitle';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
-import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
-import { GoalListItem } from '../GoalListItem';
+import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { CommonHeader } from '../CommonHeader';
+import { ProjectListItemConnected } from '../ProjectListItemConnected';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -30,96 +24,6 @@ const GoalPreview = dynamic(() => import('../GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
-
-const PageProjectListItem: FC<
-    Pick<ComponentProps<typeof ProjectListItemCollapsable>, 'project' | 'deep'> & {
-        queryState: QueryState;
-        onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
-        onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
-        selectedResolver?: (id: string) => boolean;
-    }
-> = ({ queryState, project, onClickProvider, onTagClick, selectedResolver, deep = 0 }) => {
-    const [fetchGoalsEnabled, setFetchGoalsEnabled] = useState(false);
-
-    const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
-        {
-            id: project.id,
-            ...queryState,
-        },
-        {
-            enabled: fetchGoalsEnabled,
-            keepPreviousData: true,
-            staleTime: refreshInterval,
-        },
-    );
-
-    const [fetchChildEnabled, setFetchChildEnabled] = useState(false);
-
-    const ids = useMemo(() => project?.children.map(({ id }) => id) || [], [project]);
-    const { data: childrenProjects = [], status } = trpc.project.getByIds.useQuery(ids, {
-        enabled: fetchChildEnabled,
-    });
-
-    const goals = useMemo(
-        () => projectDeepInfo?.goals.filter((g) => g.projectId === project.id),
-        [projectDeepInfo, project],
-    );
-
-    const onCollapsedChange = useCallback((value: boolean) => {
-        setFetchChildEnabled(!value);
-    }, []);
-
-    const onGoalsCollapsedChange = useCallback((value: boolean) => {
-        setFetchGoalsEnabled(!value);
-    }, []);
-
-    return (
-        <ProjectListItemCollapsable
-            href={routes.project(project.id)}
-            goals={goals?.map((g) => (
-                <GoalListItem
-                    createdAt={g.createdAt}
-                    updatedAt={g.updatedAt}
-                    id={g.id}
-                    shortId={g._shortId}
-                    projectId={g.projectId}
-                    state={g.state!}
-                    title={g.title}
-                    issuer={g.activity!}
-                    owner={g.owner!}
-                    tags={g.tags}
-                    priority={g.priority!}
-                    comments={g._count?.comments}
-                    estimate={g._lastEstimate}
-                    participants={g.participants}
-                    starred={g._isStarred}
-                    watching={g._isWatching}
-                    key={g.id}
-                    focused={selectedResolver?.(g.id)}
-                    onClick={onClickProvider?.(g as NonNullable<GoalByIdReturnType>)}
-                    onTagClick={onTagClick}
-                />
-            ))}
-            project={project}
-            onCollapsedChange={onCollapsedChange}
-            onGoalsCollapsedChange={onGoalsCollapsedChange}
-            loading={status === 'loading'}
-            deep={deep}
-        >
-            {childrenProjects.map((p) => (
-                <PageProjectListItem
-                    key={p.id}
-                    project={p}
-                    queryState={queryState}
-                    deep={deep + 1}
-                    onTagClick={onTagClick}
-                    onClickProvider={onClickProvider}
-                    selectedResolver={selectedResolver}
-                />
-            ))}
-        </ProjectListItemCollapsable>
-    );
-};
 
 export const ProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
@@ -156,18 +60,6 @@ export const ProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
     } = useUrlFilterParams({
         preset: preset?.data,
     });
-
-    const { data: projectDeepInfo, isLoading } = trpc.project.getDeepInfo.useQuery(
-        {
-            id: projects[0].id,
-            ...queryState,
-        },
-        {
-            keepPreviousData: true,
-            staleTime: refreshInterval,
-            enabled: !!projects.length,
-        },
-    );
 
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
@@ -255,21 +147,11 @@ export const ProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
         <Page user={user} locale={locale} ssrTime={ssrTime} title={tr('title')}>
             <CommonHeader title={title} description={description} />
             <FiltersPanel
-                loading={isLoading}
-                total={projectDeepInfo?.meta?.count}
-                counter={projectDeepInfo?.goals?.length}
                 queryState={queryState}
                 queryString={queryString}
-                issuers={projectDeepInfo?.meta?.issuers}
-                owners={projectDeepInfo?.meta?.owners}
-                participants={projectDeepInfo?.meta?.participants}
-                priorities={projectDeepInfo?.meta?.priority}
                 projects={projects}
                 preset={currentPreset}
                 presets={userFilters.data}
-                tags={projectDeepInfo?.meta?.tags}
-                states={projectDeepInfo?.meta?.states}
-                estimates={projectDeepInfo?.meta?.estimates}
                 onSearchChange={setFulltextFilter}
                 onIssuerChange={setIssuerFilter}
                 onOwnerChange={setOwnerFilter}
@@ -290,7 +172,7 @@ export const ProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
 
             <PageContent>
                 {projects.map((project) => (
-                    <PageProjectListItem
+                    <ProjectListItemConnected
                         key={project.id}
                         project={project}
                         onTagClick={setTagsFilterOutside}

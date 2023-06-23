@@ -8,7 +8,7 @@ import { GoalsListContainer } from '../GoalListItem';
 import { Collapsable, collapseOffset } from '../CollapsableItem';
 import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 
-import { tr } from './ProjectListItem.i18n';
+import { tr } from './ProjectListItemCollapsable.i18n';
 
 const StyledGoalsButton = styled(Button)`
     margin-left: ${gapS};
