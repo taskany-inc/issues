@@ -18,7 +18,7 @@ interface RelativeTimeProps {
     hover?: boolean;
 }
 
-const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true, hover = false }) => {
+export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true, hover = false }) => {
     const { ssrTime } = usePageContext();
     const locale = useLocale();
     const [time, setTime] = useState(ssrTime);
@@ -57,5 +57,3 @@ const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime 
         </>
     );
 };
-
-export default RelativeTime;

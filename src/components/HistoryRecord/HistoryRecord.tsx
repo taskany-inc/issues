@@ -6,7 +6,7 @@ import { backgroundColor, gray7 } from '@taskany/colors';
 
 import { ActivityFeedItem } from '../ActivityFeed';
 import { IssueListItem } from '../IssueListItem';
-import RelativeTime from '../RelativeTime/RelativeTime';
+import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Priority } from '../../types/priority';
 import { PriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
