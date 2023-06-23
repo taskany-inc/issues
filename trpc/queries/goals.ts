@@ -279,6 +279,7 @@ export const goalDeepQuery = {
                     participants: true,
                     children: true,
                     goals: true,
+                    parent: true,
                 },
             },
         },

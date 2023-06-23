@@ -73,22 +73,7 @@ export const project = router({
                 orderBy: {
                     createdAt: 'asc',
                 },
-                include: {
-                    activity: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    participants: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    stargizers: true,
-                    watchers: true,
-                },
+                include: { ...projectFullSchema },
             })
             .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
     }),
@@ -98,29 +83,7 @@ export const project = router({
                 orderBy: {
                     createdAt: 'asc',
                 },
-                include: {
-                    activity: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    participants: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
-                    },
-                    children: true,
-                    parent: true,
-                    _count: {
-                        select: {
-                            parent: true,
-                        },
-                    },
-                    stargizers: true,
-                    watchers: true,
-                },
+                include: { ...projectFullSchema },
             })
             .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
 
