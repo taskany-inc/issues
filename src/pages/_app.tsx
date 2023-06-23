@@ -8,8 +8,11 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { usePageLoad } from '../hooks/usePageLoad';
 import { trpc } from '../utils/trpcClient';
+import { TLocale, setSSRLocale } from '../utils/getLang';
 
 const App = ({ Component, pageProps, router }: AppProps) => {
+    setSSRLocale((pageProps.locale ?? router.locale) as TLocale);
+
     const pageLoadRef = usePageLoad(router);
 
     return (
