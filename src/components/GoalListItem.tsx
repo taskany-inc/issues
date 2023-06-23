@@ -1,7 +1,6 @@
 import React, { FC, MouseEventHandler, useMemo } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import dynamic from 'next/dynamic';
 import { textColor, gapS, gapXs, gray9 } from '@taskany/colors';
 import { MessageIcon, Text, Tag as TagItem, nullable, StarFilledIcon, EyeIcon } from '@taskany/bricks';
 import type { Estimate, State as StateType, Tag } from '@prisma/client';
@@ -15,8 +14,7 @@ import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
 import { State } from './State';
 import { Table, TableRow, TableCell } from './Table';
-
-const RelativeTime = dynamic(() => import('./RelativeTime/RelativeTime'));
+import { RelativeTime } from './RelativeTime/RelativeTime';
 
 interface GoalListItemProps {
     id: string;

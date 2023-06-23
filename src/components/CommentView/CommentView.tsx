@@ -27,11 +27,11 @@ import { createLocaleDate } from '../../utils/dateTime';
 import { Reactions } from '../Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { useLocale } from '../../hooks/useLocale';
+import { RelativeTime } from '../RelativeTime/RelativeTime';
 
 import { tr } from './CommentView.i18n';
 
 const Md = dynamic(() => import('../Md'));
-const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 const CommentEditForm = dynamic(() => import('../CommentEditForm/CommentEditForm'));
 const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
 

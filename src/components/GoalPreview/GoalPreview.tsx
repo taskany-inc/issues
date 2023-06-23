@@ -30,8 +30,7 @@ import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { IssueTitle } from '../IssueTitle';
 import { IssueParent } from '../IssueParent';
-import RelativeTime from '../RelativeTime/RelativeTime';
-import Md from '../Md';
+import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { IssueStats } from '../IssueStats/IssueStats';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { trpc } from '../../utils/trpcClient';
@@ -43,6 +42,7 @@ import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 
 import { tr } from './GoalPreview.i18n';
 
+const Md = dynamic(() => import('../Md'));
 const StateSwitch = dynamic(() => import('../StateSwitch'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));

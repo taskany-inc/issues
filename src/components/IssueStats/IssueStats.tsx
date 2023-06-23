@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import dynamic from 'next/dynamic';
 import { gapXs, gray8 } from '@taskany/colors';
 import { Dot, Text, Link, nullable, CircleProgressBar } from '@taskany/bricks';
 
@@ -10,10 +9,9 @@ import { useLocale } from '../../hooks/useLocale';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { UserGroup } from '../UserGroup';
+import { RelativeTime } from '../RelativeTime/RelativeTime';
 
 import { tr } from './IssueStats.i18n';
-
-const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 
 interface IssueStatsProps {
     updatedAt: Date;
