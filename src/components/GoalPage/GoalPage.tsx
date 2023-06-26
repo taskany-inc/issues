@@ -349,7 +349,6 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
                                     {tr('No description provided')}
                                 </Text>
                             )}
-                            <Md>{goal.description}</Md>
                         </CardContent>
 
                         <CardActions>
