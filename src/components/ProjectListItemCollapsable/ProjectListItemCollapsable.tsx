@@ -5,7 +5,7 @@ import { gapS } from '@taskany/colors';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalsListContainer } from '../GoalListItem';
-import { Collapsable, collapseOffset } from '../CollapsableItem';
+import { CollapsableItem, collapseOffset } from '../CollapsableItem';
 import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 
 import { tr } from './ProjectListItemCollapsable.i18n';
@@ -58,7 +58,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     );
 
     return (
-        <Collapsable
+        <CollapsableItem
             collapsed={contentHidden}
             onClick={onClickEnabled ? onClick : undefined}
             header={
@@ -83,6 +83,6 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
             deep={deep}
         >
             {!collapsedGoals && <GoalsListContainer offset={offset}>{goals}</GoalsListContainer>}
-        </Collapsable>
+        </CollapsableItem>
     );
 };
