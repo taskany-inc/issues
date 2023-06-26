@@ -38,7 +38,7 @@
     "@trpc/react-query": "10.23.1",
     "@trpc/server": "10.23.1",
     "color-layer": "1.0.3",
-    "concurrently": "8.0.1",
+    "concurrently": "8.2.0",
     "cors": "2.8.5",
     "cyrillic-to-translit-js": "3.2.1",
     "easy-typed-intl": "1.0.3",
