@@ -33,7 +33,7 @@ import { dispatchErrorNotification, dispatchSuccessNotification } from '../../ut
 
 import { tr } from './UserSettingsPage.i18n';
 
-export const UserSettingsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
+export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const router = useRouter();
     const settings = trpc.user.settings.useQuery();
     const updateMutation = trpc.user.update.useMutation();
@@ -115,7 +115,7 @@ export const UserSettingsPage = ({ user, locale, ssrTime }: ExternalPageProps) =
         .join('');
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
+        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <CommonHeader preTitle={`Id: ${user.id}`} title={tr('Settings')} />
 
             <PageSep />

@@ -1,7 +1,5 @@
 ---
-title: Taskany — Help Center
+title: Taskany — Центр поддержки
 ---
 
-# Welcome to Taskany Help Center
-
-
+# Добро пожаловать в центр поддержки пользователей Taskany!

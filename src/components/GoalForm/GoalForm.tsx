@@ -3,24 +3,13 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
 import styled from 'styled-components';
-import { gray9 } from '@taskany/colors';
-import {
-    Form,
-    FormInput,
-    FormActions,
-    FormAction,
-    ModalContent,
-    Tag,
-    Link,
-    QuestionIcon,
-    nullable,
-} from '@taskany/bricks';
+import { Form, FormInput, FormActions, FormAction, ModalContent, Tag, QuestionIcon, nullable } from '@taskany/bricks';
 import { Estimate, State, Tag as TagModel } from '@prisma/client';
 
 import { FormEditor } from '../FormEditor/FormEditor';
 import { estimatedMeta } from '../../utils/dateTime';
 import { errorsProvider } from '../../utils/forms';
-import { usePageContext } from '../../hooks/usePageContext';
+import { useLocale } from '../../hooks/useLocale';
 import { Priority } from '../../types/priority';
 import { UserComboBox } from '../UserComboBox';
 import { GoalParentComboBox } from '../GoalParentComboBox';
@@ -29,8 +18,8 @@ import { TagComboBox } from '../TagComboBox';
 import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-import { routes } from '../../hooks/router';
 import { AvailableHelpPages } from '../../types/help';
+import { HelpButton } from '../HelpButton/HelpButton';
 
 import { tr } from './GoalForm.i18n';
 
@@ -76,7 +65,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     help,
     onSumbit,
 }) => {
-    const { locale } = usePageContext();
+    const locale = useLocale();
 
     const {
         control,
@@ -232,9 +221,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         />
 
                         {nullable(help, (h) => (
-                            <Link href={routes.help(locale, h)}>
-                                <StyledHelpIcon size="s" color={gray9} />
-                            </Link>
+                            <HelpButton slug={h} />
                         ))}
                     </FormAction>
                 </FormActions>

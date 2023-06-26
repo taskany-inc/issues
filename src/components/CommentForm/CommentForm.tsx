@@ -1,22 +1,12 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Controller, Control } from 'react-hook-form';
-import { backgroundColor, gapM, gray4, gray9 } from '@taskany/colors';
-import {
-    Button,
-    Link,
-    Form,
-    FormCard,
-    FormAction,
-    FormActions,
-    QuestionIcon,
-    nullable,
-    useClickOutside,
-} from '@taskany/bricks';
+import { backgroundColor, gapM, gray4 } from '@taskany/colors';
+import { Button, Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
 
-import { usePageContext } from '../../hooks/usePageContext';
-import { routes } from '../../hooks/router';
+import { useLocale } from '../../hooks/useLocale';
 import { FormEditor } from '../FormEditor/FormEditor';
+import { HelpButton } from '../HelpButton/HelpButton';
 
 import { tr } from './CommentForm.i18n';
 
@@ -75,7 +65,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     onFocus,
     onCancel,
 }) => {
-    const { locale } = usePageContext();
+    const locale = useLocale();
     const [commentFocused, setCommentFocused] = useState(false);
     const ref = useRef(null);
 
@@ -125,9 +115,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         <FormAction left inline>
                             {nullable(commentFocused, () => (
                                 <StyledFormBottom>
-                                    <Link href={routes.help(locale, 'comments')}>
-                                        <QuestionIcon size="s" color={gray9} />
-                                    </Link>
+                                    <HelpButton slug="comments" />
                                 </StyledFormBottom>
                             ))}
                         </FormAction>

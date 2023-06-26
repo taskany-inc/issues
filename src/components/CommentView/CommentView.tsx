@@ -26,6 +26,7 @@ import { usePageContext } from '../../hooks/usePageContext';
 import { createLocaleDate } from '../../utils/dateTime';
 import { Reactions } from '../Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
+import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './CommentView.i18n';
 
@@ -134,7 +135,8 @@ export const CommentView: FC<CommentViewProps> = ({
     onDelete,
     onReactionToggle,
 }) => {
-    const { themeId, locale } = usePageContext();
+    const { themeId } = usePageContext();
+    const locale = useLocale();
     const { remove } = useCommentResource();
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);

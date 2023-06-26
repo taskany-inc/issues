@@ -13,7 +13,7 @@ import {
     formatEstimate,
     quarters,
 } from '../utils/dateTime';
-import { usePageContext } from '../hooks/usePageContext';
+import { useLocale } from '../hooks/useLocale';
 import { TLocale } from '../utils/getLang';
 
 interface EstimateComboBoxProps {
@@ -110,7 +110,7 @@ const createValue = (date: string | Date, locale: TLocale) => {
 
 export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBoxProps>(
     ({ text = '', value, defaultValuePlaceholder, placeholder, mask, disabled, error, onChange }, ref) => {
-        const { locale } = usePageContext();
+        const locale = useLocale();
         const inputVal = parseLocaleDate(value?.date || defaultValuePlaceholder?.date, { locale });
         const [inputState, setInputState] = useState(inputVal ? createLocaleDate(inputVal, { locale }) : '');
         const [selectedQ, setSelectedQ] = useState(value?.q || defaultValuePlaceholder?.q || undefined);

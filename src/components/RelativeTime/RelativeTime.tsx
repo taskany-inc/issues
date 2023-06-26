@@ -4,6 +4,7 @@ import { useMounted } from '@taskany/bricks';
 import { dateAgo, createLocaleDate, parseLocaleDate } from '../../utils/dateTime';
 import { usePageContext } from '../../hooks/usePageContext';
 import { Light } from '../Light';
+import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './RelativeTime.i18n';
 
@@ -18,7 +19,8 @@ interface RelativeTimeProps {
 }
 
 const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true, hover = false }) => {
-    const { locale, ssrTime } = usePageContext();
+    const { ssrTime } = usePageContext();
+    const locale = useLocale();
     const [time, setTime] = useState(ssrTime);
     const mounted = useMounted(0);
     const localeDate = parseLocaleDate(date, { locale });

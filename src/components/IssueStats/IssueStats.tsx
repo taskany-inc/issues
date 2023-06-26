@@ -6,7 +6,7 @@ import { Dot, Text, Link, nullable, CircleProgressBar } from '@taskany/bricks';
 
 import { pluralize } from '../../utils/pluralize';
 import { formatEstimate } from '../../utils/dateTime';
-import { usePageContext } from '../../hooks/usePageContext';
+import { useLocale } from '../../hooks/useLocale';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { UserGroup } from '../UserGroup';
@@ -66,7 +66,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
     mode,
     onCommentsClick,
 }) => {
-    const { locale } = usePageContext();
+    const locale = useLocale();
 
     const issuers = useMemo(() => {
         if (issuer && owner && owner.id === issuer.id) {

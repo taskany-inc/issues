@@ -28,7 +28,7 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps) => {
+export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
@@ -181,7 +181,7 @@ export const ProjectPage = ({ user, locale, ssrTime, params: { id } }: ExternalP
     if (!project.data) return null;
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
+        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <ProjectPageLayout
                 actions
                 id={project.data.id}

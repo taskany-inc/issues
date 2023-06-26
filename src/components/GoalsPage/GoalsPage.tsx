@@ -29,7 +29,7 @@ const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteF
 
 const pageSize = 20;
 
-export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
+export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const router = useRouter();
     const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const { toggleFilterStar } = useFilterResource();
@@ -177,7 +177,7 @@ export const GoalsPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
             : tr('These are goals across all projects');
 
     return (
-        <Page user={user} ssrTime={ssrTime} locale={locale} title={tr('title')}>
+        <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <CommonHeader title={title} description={description} />
 
             <FiltersPanel
