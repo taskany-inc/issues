@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
-import { gray7, radiusM } from '@taskany/colors';
+import { gray4, gray7, radiusM } from '@taskany/colors';
 import { nullable } from '@taskany/bricks';
 
 export const collapseOffset = 20;
@@ -33,7 +33,7 @@ const StyledDot = styled.div`
 const StyledParentDot = styled(StyledDot)``;
 
 const StyledCollapsableHeader = styled.div`
-    border-radius: ${radiusM};
+    padding-bottom: 1px;
 `;
 
 const StyledCollapsableItem = styled.div`
@@ -44,6 +44,16 @@ const StyledCollapsableItem = styled.div`
         ${line}
         margin-left: -${collapseOffset}px;
     }
+`;
+
+const StyledHeaderContent = styled.div<{ highlighted?: boolean }>`
+    border-radius: ${radiusM};
+
+    ${({ highlighted }) =>
+        highlighted &&
+        `
+        background: ${gray4};
+    `}
 `;
 
 const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number; showLine: boolean }>`
@@ -79,7 +89,7 @@ const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number
         !collapsed &&
         css`
             padding-left: ${collapseOffset}px;
-            margin-left: 0px;
+            margin-left: ${deep === 0 ? -collapseOffset : 0}px;
 
             /** show dot and add paddings for earch item is opened */
 
@@ -139,7 +149,7 @@ const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number
         `}
 `;
 
-export const Collapsable: FC<{
+export const CollapsableItem: FC<{
     children?: ReactNode;
     onClick?: () => void;
     header: ReactNode;
@@ -153,7 +163,7 @@ export const Collapsable: FC<{
             <StyledCollapsableHeader onClick={onClick}>
                 <StyledParentDot />
                 <StyledDot />
-                {header}
+                <StyledHeaderContent highlighted={!!onClick && collapsed}>{header}</StyledHeaderContent>
             </StyledCollapsableHeader>
             {nullable(children, (ch) => (
                 <StyledCollapsableItem>{ch}</StyledCollapsableItem>
