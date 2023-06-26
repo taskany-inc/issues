@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.13.0](https://github.com/taskany-inc/issues/compare/v1.12.0...v1.13.0) (2023-06-26)
+
+
+### Features
+
+* **ProjectListItemCollapsable:** change item text ([ab65edc](https://github.com/taskany-inc/issues/commit/ab65edc6e0e91b91d1a720fe63a589b57b46b504))
+
 ## [1.12.0](https://github.com/taskany-inc/issues/compare/v1.11.0...v1.12.0) (2023-06-26)
 
 
