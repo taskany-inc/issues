@@ -16,8 +16,20 @@ export const ProjectListItemConnected: FC<{
     onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
     selectedResolver?: (id: string) => boolean;
     deep?: number;
-}> = ({ queryState, project, onClickProvider, onTagClick, selectedResolver, deep = 0 }) => {
-    const [fetchGoalsEnabled, setFetchGoalsEnabled] = useState(false);
+    collapsed?: boolean;
+    collapsedGoals?: boolean;
+}> = ({
+    queryState,
+    project,
+    onClickProvider,
+    onTagClick,
+    selectedResolver,
+    deep = 0,
+    collapsed: defaultCollapsed = false,
+    collapsedGoals: defaultCollapsedGoals = false,
+}) => {
+    const [collapsed, setIsCollapsed] = useState(defaultCollapsed);
+    const [collapsedGoals, setIsCollapsedGoals] = useState(defaultCollapsedGoals);
 
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
@@ -25,17 +37,15 @@ export const ProjectListItemConnected: FC<{
             ...queryState,
         },
         {
-            enabled: fetchGoalsEnabled,
+            enabled: !collapsedGoals,
             keepPreviousData: true,
             staleTime: refreshInterval,
         },
     );
 
-    const [fetchChildEnabled, setFetchChildEnabled] = useState(false);
-
     const ids = useMemo(() => project?.children.map(({ id }) => id) || [], [project]);
     const { data: childrenProjects = [], status } = trpc.project.getByIds.useQuery(ids, {
-        enabled: fetchChildEnabled,
+        enabled: !collapsed,
     });
 
     const goals = useMemo(
@@ -43,12 +53,12 @@ export const ProjectListItemConnected: FC<{
         [projectDeepInfo, project],
     );
 
-    const onCollapsedChange = useCallback((value: boolean) => {
-        setFetchChildEnabled(!value);
+    const onClick = useCallback(() => {
+        setIsCollapsed((value) => !value);
     }, []);
 
-    const onGoalsCollapsedChange = useCallback((value: boolean) => {
-        setFetchGoalsEnabled(!value);
+    const onGoalsClick = useCallback(() => {
+        setIsCollapsedGoals((value) => !value);
     }, []);
 
     const goalsCounter = goals ? goals.length : project._count.goals;
@@ -81,8 +91,10 @@ export const ProjectListItemConnected: FC<{
                 />
             ))}
             project={project}
-            onCollapsedChange={onCollapsedChange}
-            onGoalsCollapsedChange={onGoalsCollapsedChange}
+            collapsed={collapsed}
+            collapsedGoals={collapsedGoals}
+            onClick={onClick}
+            onGoalsClick={onGoalsClick}
             loading={status === 'loading'}
             goalsCounter={goalsCounter}
             deep={deep}
@@ -96,6 +108,8 @@ export const ProjectListItemConnected: FC<{
                     onTagClick={onTagClick}
                     onClickProvider={onClickProvider}
                     selectedResolver={selectedResolver}
+                    collapsedGoals
+                    collapsed
                 />
             ))}
         </ProjectListItemCollapsable>
