@@ -10,13 +10,13 @@ import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './ExploreTopProjectsPage.i18n';
 
-export const ExploreProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
+export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const projects = trpc.project.getTop.useQuery();
 
     if (!projects.data) return null;
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={tr('title')}>
+        <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <ExplorePageLayout>
                 <PageSep />
 

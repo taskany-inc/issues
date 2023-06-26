@@ -116,7 +116,7 @@ const StyledMenuItem = styled(MenuItem)`
     justify-content: start;
 `;
 
-export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
+export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
 
     const utils = trpc.useContext();
@@ -249,7 +249,7 @@ export const GoalPage = ({ user, locale, ssrTime, params: { id } }: ExternalPage
     if (!goal) return null;
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
+        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <IssueHeader>
                 <StyledIssueInfo align="left">
                     <IssueKey id={id}>

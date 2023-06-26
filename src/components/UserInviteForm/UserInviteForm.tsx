@@ -2,18 +2,16 @@ import React, { useCallback, useState, useRef } from 'react';
 import z from 'zod';
 import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
-import { gapM, gapS, gray6, gray7, gray10 } from '@taskany/colors';
+import { gapM, gapS, gray7, gray10 } from '@taskany/colors';
 import {
     Button,
     Text,
-    Link,
     Form,
     FormInput,
     FormAction,
     FormActions,
     FormTitle,
     BulbOnIcon,
-    QuestionIcon,
     ModalHeader,
     ModalContent,
     Tag,
@@ -21,11 +19,11 @@ import {
 } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
-import { routes } from '../../hooks/router';
-import { usePageContext } from '../../hooks/usePageContext';
+import { useLocale } from '../../hooks/useLocale';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
 import { notifyPromise } from '../../utils/notifyPromise';
+import { HelpButton } from '../HelpButton/HelpButton';
 
 import { tr } from './UserInviteForm.i18n';
 
@@ -47,7 +45,7 @@ const schemaProvider = () =>
     });
 
 const UserInviteForm: React.FC = () => {
-    const { locale } = usePageContext();
+    const locale = useLocale();
     const inputRef = useRef<HTMLInputElement>(null);
     const [emails, setEmails] = useState<string[]>([]);
     const [error, setError] = useState<FieldError>();
@@ -166,9 +164,7 @@ const UserInviteForm: React.FC = () => {
                         })}
                     </Tip>
 
-                    <Link href={routes.help(locale, 'users')}>
-                        <QuestionIcon size="s" color={gray6} />
-                    </Link>
+                    <HelpButton slug="users" />
                 </StyledFormBottom>
             </ModalContent>
         </>

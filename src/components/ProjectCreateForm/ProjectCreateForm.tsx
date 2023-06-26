@@ -3,12 +3,11 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { gapS, gray10, gray9 } from '@taskany/colors';
+import { gapS, gray10 } from '@taskany/colors';
 import {
     Button,
     Text,
     InputContainer,
-    Link,
     Form,
     FormActions,
     FormAction,
@@ -23,8 +22,8 @@ import {
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
 import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
-import { routes, useRouter } from '../../hooks/router';
-import { usePageContext } from '../../hooks/usePageContext';
+import { useRouter } from '../../hooks/router';
+import { useLocale } from '../../hooks/useLocale';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
@@ -32,6 +31,7 @@ import { FlowComboBox } from '../FlowComboBox';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectCreate, projectCreateSchema } from '../../schema/project';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { HelpButton } from '../HelpButton/HelpButton';
 
 import { tr } from './ProjectCreateForm.i18n';
 
@@ -59,7 +59,7 @@ const StyledHelpIcon = styled(QuestionIcon)`
 
 const ProjectCreateForm: React.FC = () => {
     const router = useRouter();
-    const { locale } = usePageContext();
+    const locale = useLocale();
     const { createProject } = useProjectResource('');
     const [focusedInput, setFocusedInput] = useState(false);
     const [hoveredInput, setHoveredInput] = useState(false);
@@ -227,9 +227,7 @@ const ProjectCreateForm: React.FC = () => {
                                 )}
                             />
 
-                            <Link href={routes.help(locale, 'projects')}>
-                                <StyledHelpIcon size="s" color={gray9} />
-                            </Link>
+                            <HelpButton slug="projects" />
                         </FormAction>
                     </FormActions>
                     <FormActions flat="top">

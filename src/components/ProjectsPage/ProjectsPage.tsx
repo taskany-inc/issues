@@ -25,7 +25,7 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-export const ProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
+export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const { toggleFilterStar } = useFilterResource();
@@ -144,7 +144,7 @@ export const ProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
     const description = currentPreset && currentPreset.description ? currentPreset.description : tr('description');
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={tr('title')}>
+        <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <CommonHeader title={title} description={description} />
             <FiltersPanel
                 queryState={queryState}

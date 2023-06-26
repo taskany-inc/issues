@@ -28,7 +28,6 @@ const NotificationsHub = dynamic(() => import('./NotificationsHub/NotificationsH
 interface PageProps {
     user: Session['user'];
     ssrTime: number;
-    locale: ExternalPageProps['locale'];
     title?: string;
     children?: React.ReactNode;
 }
@@ -54,7 +53,7 @@ export const PageActions = styled.div`
 
 const mapThemeOnId = { light: 0, dark: 1 } as const;
 
-export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', locale, children }) => {
+export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children }) => {
     useHotkeys();
 
     const { resolvedTheme } = useTheme();
@@ -63,7 +62,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', l
     ) as PageContext['theme'];
 
     return (
-        <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], locale, ssrTime }}>
+        <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], ssrTime }}>
             <Head>
                 <title>{title}</title>
             </Head>

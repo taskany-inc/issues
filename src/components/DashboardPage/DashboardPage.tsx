@@ -29,7 +29,7 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-export const DashboardPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
+export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
     const router = useRouter();
     const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const { toggleFilterStar } = useFilterResource();
@@ -185,7 +185,7 @@ export const DashboardPage = ({ user, ssrTime, locale }: ExternalPageProps) => {
             : tr('This is your personal goals bundle');
 
     return (
-        <Page user={user} ssrTime={ssrTime} locale={locale} title={tr('title')}>
+        <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <CommonHeader title={title} description={description} />
 
             <FiltersPanel

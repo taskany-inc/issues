@@ -33,20 +33,21 @@ export async function getStaticPaths({ locales }: { locales: TLocale[] }) {
 
     return {
         paths: sourcesNames.map(({ locale, fileName }) => ({
-            params: { locale, slug: safeUrl(fileName.replace(sourcesExt, '')) },
+            params: { slug: safeUrl(fileName.replace(sourcesExt, '')) },
+            locale,
         })),
         fallback: false,
     };
 }
 
-export async function getStaticProps({ params: { locale, slug } }: { params: { locale: TLocale; slug: string } }) {
+export async function getStaticProps({ params: { slug }, locale }: { params: { slug: string }; locale: TLocale }) {
     const filePath = `${sourcesDir(locale || 'en')}/${slug}${sourcesExt}`;
     const orig = fs.readFileSync(filePath, 'utf-8');
     const stat = JSON.parse(JSON.stringify(fs.statSync(filePath)));
     const { data: yml, content: source } = matter(orig);
     const menu = fs.readdirSync(sourcesDir(locale)).map((fileName) => {
         const linkSlug = fileName.replace(sourcesExt, '') as AvailableHelpPages;
-        return { slug: linkSlug, link: routes.help(locale, linkSlug) };
+        return { slug: linkSlug, link: routes.help(linkSlug) };
     });
 
     return {
@@ -55,7 +56,6 @@ export async function getStaticProps({ params: { locale, slug } }: { params: { l
             stat,
             yml,
             menu,
-            locale,
         },
         revalidate: 10,
     };
@@ -63,7 +63,6 @@ export async function getStaticProps({ params: { locale, slug } }: { params: { l
 
 export const HelpPage = ({
     user,
-    locale,
     ssrTime,
     source,
     stat,
@@ -71,7 +70,7 @@ export const HelpPage = ({
     menu,
 }: ExternalPageProps<{ source: string; stat: fs.Stats; yml: YmlProps }>) => {
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={yml.title}>
+        <Page user={user} ssrTime={ssrTime} title={yml.title}>
             Created: {stat.ctime}
             <br />
             Modified: {stat.mtime}

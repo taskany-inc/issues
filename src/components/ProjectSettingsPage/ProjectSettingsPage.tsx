@@ -37,7 +37,7 @@ import { tr } from './ProjectSettingsPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
-export const ProjectSettingsPage = ({ user, locale, ssrTime, params: { id } }: ExternalPageProps) => {
+export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
@@ -143,7 +143,7 @@ export const ProjectSettingsPage = ({ user, locale, ssrTime, params: { id } }: E
     if (!project.data) return null;
 
     return (
-        <Page user={user} locale={locale} ssrTime={ssrTime} title={pageTitle}>
+        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <ProjectPageLayout
                 id={project.data.id}
                 title={project.data.title}

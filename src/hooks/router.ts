@@ -20,7 +20,7 @@ export const routes = {
     exploreTopProjects: () => '/explore/top',
     exploreGoals: () => '/explore/goals',
 
-    help: (locale: TLocale, slug: AvailableHelpPages) => `/help/${locale}/${slug}`,
+    help: (slug: AvailableHelpPages) => `/help/${slug}`,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,6 +43,6 @@ export const useRouter = () => {
         exploreTopProjects: () => router.push(routes.exploreTopProjects()),
         exploreGoals: () => router.push(routes.exploreGoals()),
 
-        help: (locale: TLocale, slug: AvailableHelpPages) => router.push(locale, slug),
+        help: (slug: AvailableHelpPages) => router.push(slug),
     };
 };
