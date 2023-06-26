@@ -67,16 +67,33 @@ export const project = router({
             },
         });
     }),
-    getAll: protectedProcedure.query(({ ctx }) => {
-        return prisma.project
-            .findMany({
-                orderBy: {
-                    createdAt: 'asc',
-                },
-                include: { ...projectFullSchema },
-            })
-            .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
-    }),
+    getAll: protectedProcedure
+        .input(
+            z
+                .object({
+                    firstLevel: z.boolean().optional(),
+                })
+                .optional(),
+        )
+        .query(({ ctx, input: { firstLevel } = {} }) => {
+            return prisma.project
+                .findMany({
+                    orderBy: {
+                        createdAt: 'asc',
+                    },
+                    include: { ...projectFullSchema },
+                    ...(firstLevel
+                        ? {
+                              where: {
+                                  parent: {
+                                      none: {},
+                                  },
+                              },
+                          }
+                        : {}),
+                })
+                .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
+        }),
     getTop: protectedProcedure.query(async ({ ctx }) => {
         const allProjects = await prisma.project
             .findMany({
