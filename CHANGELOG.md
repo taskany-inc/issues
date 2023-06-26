@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.12.0](https://github.com/taskany-inc/issues/compare/v1.11.0...v1.12.0) (2023-06-26)
+
+
+### Features
+
+* **ProjectItemCollapsable:** add goals counter ([7e83c34](https://github.com/taskany-inc/issues/commit/7e83c34592a74b4e9794fdb51290020889b49f71))
+* **ProjectListItemConnected:** create separate component ([d76c9b1](https://github.com/taskany-inc/issues/commit/d76c9b1aca25ce6c2ef1a674c48eac67b35c148e))
+* **ProjectsPage:** add projects page ([cce114c](https://github.com/taskany-inc/issues/commit/cce114cd1475e37178db2c44cf97aef6bf82611e))
+
 ## [1.11.0](https://github.com/taskany-inc/issues/compare/v1.10.0...v1.11.0) (2023-06-22)
 
 
