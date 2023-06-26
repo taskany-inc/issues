@@ -51,6 +51,8 @@ export const ProjectListItemConnected: FC<{
         setFetchGoalsEnabled(!value);
     }, []);
 
+    const goalsCounter = goals ? goals.length : project._count.goals;
+
     return (
         <ProjectListItemCollapsable
             href={routes.project(project.id)}
@@ -82,6 +84,7 @@ export const ProjectListItemConnected: FC<{
             onCollapsedChange={onCollapsedChange}
             onGoalsCollapsedChange={onGoalsCollapsedChange}
             loading={status === 'loading'}
+            goalsCounter={goalsCounter}
             deep={deep}
         >
             {childrenProjects.map((p) => (
