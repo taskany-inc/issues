@@ -179,6 +179,8 @@ export const ProjectsPage = ({ user, locale, ssrTime }: ExternalPageProps) => {
                         onClickProvider={onGoalPrewiewShow}
                         selectedResolver={selectedGoalResolver}
                         queryState={queryState}
+                        collapsedGoals
+                        collapsed
                     />
                 ))}
             </PageContent>

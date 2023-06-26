@@ -20,8 +20,10 @@ interface ProjectListItemCollapsableProps {
     project: NonNullable<ProjectByIdReturnType>;
     goals?: ReactNode;
     children?: ReactNode;
-    onCollapsedChange?: (value: boolean) => void;
-    onGoalsCollapsedChange?: (value: boolean) => void;
+    collapsed: boolean;
+    collapsedGoals: boolean;
+    onClick?: () => void;
+    onGoalsClick?: () => void;
     goalsCounter?: number;
     loading?: boolean;
     deep?: number;
@@ -29,16 +31,16 @@ interface ProjectListItemCollapsableProps {
 
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
     project,
-    onCollapsedChange,
-    onGoalsCollapsedChange,
+    collapsed = true,
+    collapsedGoals = true,
+    onClick,
+    onGoalsClick,
     children,
     goals,
     loading = false,
     goalsCounter,
     deep = 0,
 }) => {
-    const [collapsed, setIsCollapsed] = useState(true);
-    const [collapsedGoals, setIsCollapsedGoals] = useState(true);
     const contentHidden = collapsed || loading;
 
     const offset = collapseOffset * (contentHidden ? deep - 1 : deep);
@@ -46,30 +48,19 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
 
     const onClickEnabled = childs.length;
 
-    useEffect(() => {
-        onCollapsedChange?.(collapsed);
-    }, [collapsed, onCollapsedChange]);
+    const onGoalsButtonClick = useCallback(
+        (e: MouseEvent) => {
+            e.stopPropagation();
 
-    useEffect(() => {
-        onGoalsCollapsedChange?.(collapsedGoals);
-    }, [collapsedGoals, onGoalsCollapsedChange]);
-
-    const onClick = useCallback(() => {
-        if (onClickEnabled) {
-            setIsCollapsed((value) => !value);
-        }
-    }, [onClickEnabled]);
-
-    const onHeaderButtonClick = useCallback((e: MouseEvent) => {
-        e.stopPropagation();
-
-        setIsCollapsedGoals((value) => !value);
-    }, []);
+            onGoalsClick?.();
+        },
+        [onGoalsClick],
+    );
 
     return (
         <Collapsable
             collapsed={contentHidden}
-            onClick={onClick}
+            onClick={onClickEnabled ? onClick : undefined}
             header={
                 <ProjectListContainer offset={offset}>
                     <ProjectListItem
@@ -80,7 +71,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                         watching={project._isWatching}
                     >
                         <StyledGoalsButton
-                            onClick={onHeaderButtonClick}
+                            onClick={onGoalsButtonClick}
                             text={goalsCounter ? tr('Goals') : tr('No goals')}
                             disabled={!goalsCounter}
                             iconRight={goalsCounter ? <Badge size="s">{goalsCounter}</Badge> : null}
