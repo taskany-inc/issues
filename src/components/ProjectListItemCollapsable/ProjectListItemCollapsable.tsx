@@ -22,6 +22,7 @@ interface ProjectListItemCollapsableProps {
     children?: ReactNode;
     onCollapsedChange?: (value: boolean) => void;
     onGoalsCollapsedChange?: (value: boolean) => void;
+    goalsCounter?: number;
     loading?: boolean;
     deep?: number;
 }
@@ -31,8 +32,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     onCollapsedChange,
     onGoalsCollapsedChange,
     children,
-    loading = false,
     goals,
+    loading = false,
+    goalsCounter,
     deep = 0,
 }) => {
     const [collapsed, setIsCollapsed] = useState(true);
@@ -79,9 +81,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                     >
                         <StyledGoalsButton
                             onClick={onHeaderButtonClick}
-                            text={tr('Goals')}
-                            disabled={!project._count.goals}
-                            iconRight={<Badge size="s">{project._count.goals}</Badge>}
+                            text={goalsCounter ? tr('Goals') : tr('No goals')}
+                            disabled={!goalsCounter}
+                            iconRight={goalsCounter ? <Badge size="s">{goalsCounter}</Badge> : null}
                         />
                     </ProjectListItem>
                 </ProjectListContainer>
