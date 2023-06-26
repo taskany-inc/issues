@@ -31,12 +31,12 @@ export const PageHeader: FC = () => {
             title: tr('Goals'),
         },
         {
-            href: routes.exploreTopProjects(),
-            title: tr('Explore'),
-        },
-        {
             href: routes.projects(),
             title: tr('Projects'),
+        },
+        {
+            href: routes.exploreTopProjects(),
+            title: tr('Explore'),
         },
     ];
 
