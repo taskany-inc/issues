@@ -30,10 +30,6 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const { toggleFilterStar } = useFilterResource();
 
-    const { data: projects = [] } = trpc.project.getAll.useQuery({
-        firstLevel: true,
-    });
-
     const utils = trpc.useContext();
     const preset = trpc.filter.getById.useQuery(String(nextRouter.query.filter), {
         enabled: Boolean(nextRouter.query.filter),
@@ -61,6 +57,11 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
         setPreset,
     } = useUrlFilterParams({
         preset: preset?.data,
+    });
+
+    const { data: projects = [] } = trpc.project.getAll.useQuery({
+        firstLevel: true,
+        goalsQuery: queryState,
     });
 
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];

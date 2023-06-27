@@ -101,9 +101,14 @@ const ProjectCreateForm: React.FC = () => {
 
     const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
     const flowRecomendations = trpc.flow.recommedations.useQuery();
-    const existingProject = trpc.project.getById.useQuery(keyWatcher, {
-        enabled: isKeyEnoughLength,
-    });
+    const existingProject = trpc.project.getById.useQuery(
+        {
+            id: keyWatcher,
+        },
+        {
+            enabled: isKeyEnoughLength,
+        },
+    );
 
     const isKeyUnique = Boolean(!existingProject?.data);
 

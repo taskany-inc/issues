@@ -43,7 +43,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
 
-    const project = trpc.project.getById.useQuery(id);
+    const project = trpc.project.getById.useQuery({ id });
 
     const { updateProject, deleteProject, transferOwnership } = useProjectResource(id);
 

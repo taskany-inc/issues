@@ -63,11 +63,15 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
         preset: preset?.data,
     });
 
-    const project = trpc.project.getById.useQuery(id);
+    const project = trpc.project.getById.useQuery({
+        id,
+        goalsQuery: queryState,
+    });
+
     const { data: projectDeepInfo, isLoading } = trpc.project.getDeepInfo.useQuery(
         {
             id,
-            ...queryState,
+            goalsQuery: queryState,
         },
         {
             keepPreviousData: true,

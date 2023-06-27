@@ -17,7 +17,7 @@ export const useProjectResource = (id: string) => {
     const transferOwnershipMutation = trpc.project.transferOwnership.useMutation();
 
     const invalidate = useCallback(() => {
-        utils.project.getById.invalidate(id);
+        utils.project.getById.invalidate({ id });
     }, [id, utils.project.getById]);
 
     const createProject = useCallback(
