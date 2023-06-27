@@ -14,7 +14,6 @@ import {
     FormTextarea,
     FormInput,
     BulbOnIcon,
-    QuestionIcon,
     ModalContent,
     nullable,
 } from '@taskany/bricks';
@@ -23,7 +22,6 @@ import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
 import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
 import { useRouter } from '../../hooks/router';
-import { useLocale } from '../../hooks/useLocale';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
@@ -52,17 +50,9 @@ const StyledProjectKeyInputContainer = styled(InputContainer)`
     padding-right: ${gapS};
 `;
 
-const StyledHelpIcon = styled(QuestionIcon)`
-    display: flex;
-    align-items: center;
-`;
-
 const ProjectCreateForm: React.FC = () => {
     const router = useRouter();
-    const locale = useLocale();
     const { createProject } = useProjectResource('');
-    const [focusedInput, setFocusedInput] = useState(false);
-    const [hoveredInput, setHoveredInput] = useState(false);
     const [busy, setBusy] = useState(false);
     const [dirtyKey, setDirtyKey] = useState(false);
 
@@ -73,7 +63,7 @@ const ProjectCreateForm: React.FC = () => {
         setFocus,
         setValue,
         control,
-        formState: { errors, isValid, isSubmitted },
+        formState: { errors, isSubmitted },
     } = useForm<ProjectCreate>({
         resolver: zodResolver(projectCreateSchema),
         mode: 'onChange',
@@ -140,19 +130,19 @@ const ProjectCreateForm: React.FC = () => {
         ? isKeyUnique
             ? tr.raw('Perfect! Issues and goals will look like', {
                   perfect: (
-                      <Text as="span" size="s" weight="bolder">
+                      <Text key="perfect" as="span" size="s" weight="bolder">
                           {tr('Perfect')}
                       </Text>
                   ),
                   issueKeyOne: (
-                      <Text as="span" size="s" weight="bolder">
+                      <Text key="issue key one" as="span" size="s" weight="bolder">
                           {tr.raw('issue key one', {
                               key: keyWatcher,
                           })}
                       </Text>
                   ),
                   issueKeyTwo: (
-                      <Text as="span" size="s" weight="bolder">
+                      <Text key="issue key two" as="span" size="s" weight="bolder">
                           {tr.raw('issue key two', {
                               key: keyWatcher,
                           })}
@@ -174,10 +164,6 @@ const ProjectCreateForm: React.FC = () => {
                             brick="right"
                             disabled={busy}
                             error={errorsResolver('title')}
-                            onMouseEnter={() => setHoveredInput(true)}
-                            onMouseLeave={() => setHoveredInput(false)}
-                            onFocus={() => setFocusedInput(true)}
-                            onBlur={() => setFocusedInput(false)}
                         />
 
                         {nullable(titleWatcher, () => (
@@ -186,16 +172,11 @@ const ProjectCreateForm: React.FC = () => {
                                     name="id"
                                     control={control}
                                     render={({ field }) => (
-                                        <StyledProjectKeyInputContainer
-                                            brick="left"
-                                            hovered={hoveredInput}
-                                            focused={focusedInput}
-                                        >
+                                        <StyledProjectKeyInputContainer>
                                             <KeyInput
                                                 disabled={busy}
                                                 available={isKeyUnique && isKeyEnoughLength}
                                                 tooltip={tooltip}
-                                                // FIXME: do it via react-hook-form
                                                 onDirty={onKeyDirty}
                                                 error={errorsResolver('id')}
                                                 {...field}
@@ -239,7 +220,7 @@ const ProjectCreateForm: React.FC = () => {
                         <FormAction left>
                             <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
                                 {tr.raw('Press key to create project', {
-                                    key: <Keyboard command enter />,
+                                    key: <Keyboard key="command/enter" command enter />,
                                 })}
                             </Tip>
                         </FormAction>
@@ -249,13 +230,7 @@ const ProjectCreateForm: React.FC = () => {
                                 text={tr('Cancel')}
                                 onClick={dispatchModalEvent(ModalEvent.ProjectCreateModal)}
                             />
-                            <Button
-                                view="primary"
-                                disabled={busy}
-                                outline={!isValid || !isKeyUnique || !isKeyEnoughLength}
-                                type="submit"
-                                text={tr('Create')}
-                            />
+                            <Button view="primary" outline disabled={busy} type="submit" text={tr('Create')} />
                         </FormAction>
                     </FormActions>
                 </Form>
