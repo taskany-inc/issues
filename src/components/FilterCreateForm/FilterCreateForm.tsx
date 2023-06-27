@@ -1,23 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-    Button,
-    Form,
-    FormActions,
-    FormAction,
-    FormTextarea,
-    FormInput,
-    FormTitle,
-    ModalHeader,
-    ModalContent,
-} from '@taskany/bricks';
+import { Button, Form, FormActions, FormAction, FormTextarea, FormInput, ModalContent } from '@taskany/bricks';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFilterSchema, CreateFilter } from '../../schema/filter';
 import { Nullish, Void } from '../../types/void';
 import { FilterById } from '../../../trpc/inferredTypes';
 import { useFilterResource } from '../../hooks/useFilterResource';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 
 import { tr } from './FilterCreateForm.i18n';
 
@@ -35,7 +26,7 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
     const {
         register,
         handleSubmit,
-        formState: { errors, isValid, isSubmitted },
+        formState: { errors, isSubmitted },
     } = useForm<CreateFilter>({
         resolver: zodResolver(createFilterSchema),
         mode: 'onChange',
@@ -68,15 +59,11 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
 
     return (
         <>
-            <ModalHeader>
-                <FormTitle>{tr('New filters preset')}</FormTitle>
-            </ModalHeader>
-
             <ModalContent>
                 <Form disabled={formBusy} onSubmit={handleSubmit(onPending, onError)}>
                     <FormInput
                         {...register('title')}
-                        placeholder={tr('Title')}
+                        placeholder={tr('Preset title')}
                         flat="bottom"
                         brick="right"
                         error={errorsResolver('title')}
@@ -84,7 +71,8 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
 
                     <FormTextarea
                         {...register('description')}
-                        placeholder={tr('Description')}
+                        minHeight={100}
+                        placeholder={tr('Preset description')}
                         flat="both"
                         error={errorsResolver('description')}
                     />
@@ -92,7 +80,12 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
                     <FormActions flat="top">
                         <FormAction left inline />
                         <FormAction right inline>
-                            <Button view="primary" outline={!isValid} type="submit" text={tr('Create filter')} />
+                            <Button
+                                outline
+                                text={tr('Cancel')}
+                                onClick={dispatchModalEvent(ModalEvent.FilterCreateModal)}
+                            />
+                            <Button view="primary" outline type="submit" text={tr('Create preset')} />
                         </FormAction>
                     </FormActions>
                 </Form>

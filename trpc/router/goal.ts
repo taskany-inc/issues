@@ -656,6 +656,8 @@ export const goal = router({
         }
     }),
     createComment: protectedProcedure.input(goalCommentSchema).mutation(async ({ ctx, input }) => {
+        if (!input.goalId) return null;
+
         const [commentAuthor, actualGoal] = await Promise.all([
             prisma.activity.findUnique({
                 where: { id: ctx.session.user.activityId },
@@ -672,7 +674,6 @@ export const goal = router({
 
         if (!commentAuthor) return null;
         if (!actualGoal) return null;
-        if (!input.goalId) return null;
 
         const { _isEditable } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
 
