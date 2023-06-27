@@ -3,7 +3,7 @@ import { gapS, gapXs, gray4, gray9, textColor } from '@taskany/colors';
 import { EditCircleIcon, Text, nullable } from '@taskany/bricks';
 
 interface IssueMetaProps {
-    title: string;
+    title?: string;
     children?: React.ReactNode;
 
     onEdit?: () => void | null;

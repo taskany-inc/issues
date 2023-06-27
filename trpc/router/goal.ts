@@ -14,13 +14,13 @@ import {
 import {
     goalChangeProjectSchema,
     goalCommonSchema,
-    goalParticipantsSchema,
     goalStateChangeSchema,
     goalUpdateSchema,
     toogleGoalArchiveSchema,
     toogleGoalDependencySchema,
     userGoalsSchema,
     goalCreateCommentSchema,
+    toggleParticipantsSchema,
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema, suggestionsQueryScheme, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
@@ -609,83 +609,6 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    toggleParticipants: protectedProcedure.input(goalParticipantsSchema).mutation(async ({ input, ctx }) => {
-        const [projectId, scopeIdStr] = input.id.split('-');
-
-        if (!projectId) return null;
-
-        const scopeId = parseInt(scopeIdStr, 10);
-
-        if (!scopeId) return null;
-
-        const actualGoal = await prisma.goal.findFirst({
-            where: { projectId, scopeId },
-            include: {
-                participants: {
-                    include: {
-                        user: true,
-                    },
-                },
-            },
-        });
-
-        if (!actualGoal) {
-            return null;
-        }
-
-        const participantsToDisconnect = actualGoal.participants
-            .filter((p) => !input.participants?.some((pa) => pa.id === p.id))
-            .map(({ id }) => ({ id }));
-
-        const hash = new Set(
-            actualGoal.participants.map(({ id }) => id).concat(input.participants.map(({ id }) => id)),
-        );
-
-        const simpliestList = actualGoal.participants.reduce<typeof input.participants>((acc, { id, user }) => {
-            if (user) {
-                acc.push({
-                    id,
-                    name: user.nickname ?? user.name ?? user.email,
-                });
-            }
-
-            return acc;
-        }, []);
-
-        const shortList = participantsToDisconnect.length ? input.participants : simpliestList;
-        const action = participantsToDisconnect.length ? 'remove' : 'add';
-
-        for (const { id } of shortList) {
-            hash.delete(id);
-        }
-
-        const [diffId] = Array.from(hash);
-
-        try {
-            return prisma.goal.update({
-                where: {
-                    id: actualGoal.id,
-                },
-                data: {
-                    id: actualGoal.id,
-                    participants: {
-                        connect: input.participants.map(({ id }) => ({ id })),
-                        disconnect: participantsToDisconnect,
-                    },
-                    history: {
-                        create: {
-                            subject: 'participants',
-                            action,
-                            nextValue: diffId,
-                            activityId: ctx.session.user.activityId,
-                        },
-                    },
-                },
-            });
-        } catch (error: any) {
-            throw new TRPCError({ message: String(error.message), code: 'INTERNAL_SERVER_ERROR', cause: error });
-        }
-    }),
     switchState: protectedProcedure.input(goalStateChangeSchema).mutation(async ({ input, ctx }) => {
         const actualGoal = await prisma.goal.findFirst({
             where: {
@@ -847,8 +770,7 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-
-    updateCriteriaState: protectedProcedure.input(updateCriteriaState).mutation(async ({ ctx, input }) => {
+    updateCriteriaState: protectedProcedure.input(updateCriteriaState).mutation(async ({ input }) => {
         const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
             where: { id: input.id },
         });
@@ -883,11 +805,54 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-
     removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input }) => {
         try {
             await prisma.goalAchieveCriteria.delete({
                 where: { id: input.id },
+            });
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    addParticipant: protectedProcedure.input(toggleParticipantsSchema).mutation(async ({ input, ctx }) => {
+        try {
+            return prisma.goal.update({
+                where: { id: input.id },
+                data: {
+                    participants: {
+                        connect: [{ id: input.activityId }],
+                    },
+                    history: {
+                        create: {
+                            subject: 'participants',
+                            action: 'add',
+                            nextValue: input.activityId,
+                            activityId: ctx.session.user.activityId,
+                        },
+                    },
+                },
+            });
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    removeParticipant: protectedProcedure.input(toggleParticipantsSchema).mutation(async ({ input, ctx }) => {
+        try {
+            return prisma.goal.update({
+                where: { id: input.id },
+                data: {
+                    participants: {
+                        disconnect: [{ id: input.activityId }],
+                    },
+                    history: {
+                        create: {
+                            subject: 'participants',
+                            action: 'remove',
+                            nextValue: input.activityId,
+                            activityId: ctx.session.user.activityId,
+                        },
+                    },
+                },
             });
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
