@@ -85,7 +85,10 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
         [pages],
     );
     const meta = data?.pages?.[0].meta;
-    const userFilters = trpc.filter.getUserFilters.useQuery();
+    const userFilters = trpc.filter.getUserFilters.useQuery(undefined, {
+        keepPreviousData: true,
+        staleTime: refreshInterval,
+    });
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
     useEffect(() => {
