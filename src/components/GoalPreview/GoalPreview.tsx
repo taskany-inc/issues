@@ -39,6 +39,7 @@ import { GoalStateChangeSchema } from '../../schema/goal';
 import { GoalActivity } from '../GoalActivity';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
 import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
+import { State } from '../State';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -217,9 +218,13 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
 
                     <StyledImportantActions>
                         <StyledPublicActions>
-                            {nullable(goal?.state, (s) => (
-                                <StateSwitch state={s} flowId={goal?.project?.flowId} onClick={onGoalStateChange} />
-                            ))}
+                            {nullable(goal?.state, (s) =>
+                                goal?._isEditable ? (
+                                    <StateSwitch state={s} flowId={goal?.project?.flowId} onClick={onGoalStateChange} />
+                                ) : (
+                                    <State title={s.title} hue={s.hue} />
+                                ),
+                            )}
 
                             <IssueStats
                                 mode="compact"

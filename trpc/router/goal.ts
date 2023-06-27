@@ -381,6 +381,12 @@ export const goal = router({
 
         if (!actualGoal) return null;
 
+        const { _isEditable } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+
+        if (!_isEditable) {
+            return null;
+        }
+
         const tagsToDisconnect = calculateDiffBetweenArrays(actualGoal.tags, input.tags);
         const tagsToConnect = calculateDiffBetweenArrays(input.tags, actualGoal.tags);
 
@@ -620,6 +626,12 @@ export const goal = router({
             return null;
         }
 
+        const { _isEditable } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+
+        if (!_isEditable) {
+            return null;
+        }
+
         try {
             return await prisma.goal.update({
                 where: {
@@ -644,7 +656,7 @@ export const goal = router({
         }
     }),
     createComment: protectedProcedure.input(goalCreateCommentSchema).mutation(async ({ ctx, input }) => {
-        const [commentAuthor, goal] = await Promise.all([
+        const [commentAuthor, actualGoal] = await Promise.all([
             prisma.activity.findUnique({
                 where: { id: ctx.session.user.activityId },
                 include: { user: true, ghost: true },
@@ -659,7 +671,9 @@ export const goal = router({
         ]);
 
         if (!commentAuthor) return null;
-        if (!goal) return null;
+        if (!actualGoal) return null;
+
+        const { _isEditable } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
 
         try {
             // We want to see state changes record and comment next in activity feed.
@@ -669,14 +683,14 @@ export const goal = router({
                     where: { id: input.id },
                     data: {
                         id: input.id,
-                        stateId: input.stateId,
+                        stateId: _isEditable ? input.stateId : actualGoal.stateId,
                         history:
-                            input.stateId && input.stateId !== goal.stateId
+                            _isEditable && input.stateId && input.stateId !== actualGoal.stateId
                                 ? {
                                       create: {
                                           subject: 'state',
                                           action: 'change',
-                                          previousValue: goal.stateId,
+                                          previousValue: actualGoal.stateId,
                                           nextValue: input.stateId,
                                           activityId: ctx.session.user.activityId,
                                       },
@@ -690,14 +704,14 @@ export const goal = router({
                         description: input.description,
                         activityId: commentAuthor.id,
                         goalId: input.id,
-                        stateId: input.stateId,
+                        stateId: _isEditable ? input.stateId : undefined,
                     },
                 }),
             ]);
 
-            let toEmails = goal.participants;
+            let toEmails = actualGoal.participants;
 
-            if (commentAuthor.user?.email === goal.activity?.user?.email) {
+            if (commentAuthor.user?.email === actualGoal.activity?.user?.email) {
                 toEmails = toEmails.filter((p) => p.user?.email !== commentAuthor?.user?.email);
             }
 
