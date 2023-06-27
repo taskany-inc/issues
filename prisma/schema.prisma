@@ -294,7 +294,7 @@ model Flow {
 model State {
   id       String     @id @default(cuid())
   title    String     @unique
-  type     StateType?
+  type     StateType
   flows    Flow[]
   default  Boolean?
   hue      Int        @default(1)
