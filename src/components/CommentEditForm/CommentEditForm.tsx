@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useCallback } from 'react';
 import { Button } from '@taskany/bricks';
 
 import { useCommentResource } from '../../hooks/useCommentResource';
 import { CommentForm } from '../CommentForm/CommentForm';
-import { CommentUpdate, commentUpdateSchema } from '../../schema/comment';
+import { GoalCommentSchema } from '../../schema/goal';
 
 import { tr } from './CommentEditForm.i18n';
 
@@ -14,44 +12,17 @@ interface CommentEditFormProps {
     description: string;
     setFocus?: boolean;
 
-    onChanged: (comment: { id: string; description: string }) => void;
     onUpdate: (comment?: { id: string; description: string }) => void;
     onCancel: () => void;
 }
 
-const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onChanged, onUpdate, onCancel }) => {
+const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onUpdate, onCancel }) => {
     const { update } = useCommentResource();
-    const [busy, setBusy] = useState(false);
-
-    const {
-        control,
-        handleSubmit,
-        watch,
-        formState: { errors, isValid },
-    } = useForm<CommentUpdate>({
-        resolver: zodResolver(commentUpdateSchema),
-        mode: 'onChange',
-        reValidateMode: 'onChange',
-        shouldFocusError: true,
-        defaultValues: {
-            id,
-            description,
-        },
-    });
-
-    const newDescription = watch('description');
-    const isUpdateAllowed = isValid && newDescription !== description;
-    useEffect(() => {
-        isUpdateAllowed && onChanged?.({ id, description });
-    }, [id, description, isUpdateAllowed, onChanged]);
 
     const onCommentUpdate = useCallback(
-        (form: CommentUpdate) => {
-            setBusy(true);
-
+        (form: GoalCommentSchema) => {
             update((comment) => {
                 onUpdate?.(comment);
-                setBusy(false);
             })(form);
         },
         [update, onUpdate],
@@ -59,15 +30,15 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onCh
 
     return (
         <CommentForm
-            busy={busy}
-            control={control}
+            id={id}
+            description={description}
             autoFocus
             height={120}
-            isValid={isUpdateAllowed && isValid}
-            error={errors.description}
-            onSubmit={handleSubmit(onCommentUpdate)}
+            onSubmit={onCommentUpdate}
             onCancel={onCancel}
-            actionButton={<Button size="m" view="primary" disabled={busy} outline type="submit" text={tr('Save')} />}
+            renderActionButton={({ busy }) => (
+                <Button size="m" view="primary" disabled={busy} outline type="submit" text={tr('Save')} />
+            )}
         />
     );
 };

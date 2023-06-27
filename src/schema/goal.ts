@@ -170,8 +170,9 @@ export const goalStateChangeSchema = z.object({
 
 export type GoalStateChangeSchema = z.infer<typeof goalStateChangeSchema>;
 
-export const goalCreateCommentSchema = z.object({
-    id: z.string(),
+export const goalCommentSchema = z.object({
+    id: z.string().optional(),
+    goalId: z.string().optional(),
     description: z
         .string({
             required_error: tr("Comments's description is required"),
@@ -183,4 +184,4 @@ export const goalCreateCommentSchema = z.object({
     stateId: z.string().optional(),
 });
 
-export type GoalCommentCreate = z.infer<typeof goalCreateCommentSchema>;
+export type GoalCommentSchema = z.infer<typeof goalCommentSchema>;

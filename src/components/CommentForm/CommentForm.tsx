@@ -1,26 +1,27 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Controller, Control } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { backgroundColor, gapM, gray4 } from '@taskany/colors';
 import { Button, Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
 
-import { useLocale } from '../../hooks/useLocale';
+import { GoalCommentSchema, goalCommentSchema } from '../../schema/goal';
 import { FormEditor } from '../FormEditor/FormEditor';
 import { HelpButton } from '../HelpButton/HelpButton';
 
 import { tr } from './CommentForm.i18n';
 
 interface CommentFormProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    control: Control<any>;
-    actionButton: React.ReactNode;
     autoFocus?: boolean;
     height?: number;
-    isValid?: boolean;
     error?: React.ComponentProps<typeof FormEditor>['error'];
-    busy?: boolean;
+    id?: string;
+    goalId?: string;
+    stateId?: string;
+    description?: string;
 
-    onSubmit?: () => void;
+    renderActionButton: (props: { busy?: boolean }) => React.ReactNode;
+    onSubmit?: (form: GoalCommentSchema) => void;
     onFocus?: () => void;
     onCancel?: () => void;
 }
@@ -56,18 +57,33 @@ const StyledCommentForm = styled(FormCard)`
 `;
 
 export const CommentForm: React.FC<CommentFormProps> = ({
+    id,
+    goalId,
+    stateId,
+    description = '',
     autoFocus,
-    control,
-    actionButton,
     error,
-    busy,
+    renderActionButton,
     onSubmit,
     onFocus,
     onCancel,
 }) => {
-    const locale = useLocale();
     const [commentFocused, setCommentFocused] = useState(false);
+    const [busy, setBusy] = useState(false);
     const ref = useRef(null);
+
+    const { control, handleSubmit, reset, register } = useForm<GoalCommentSchema>({
+        resolver: zodResolver(goalCommentSchema),
+        mode: 'onChange',
+        reValidateMode: 'onChange',
+        shouldFocusError: true,
+        defaultValues: {
+            id,
+            goalId,
+            stateId,
+            description,
+        },
+    });
 
     const onCommentFocus = useCallback(() => {
         setCommentFocused(true);
@@ -75,14 +91,21 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     }, [onFocus]);
 
     const onCommentCancel = useCallback(() => {
+        reset();
+        setBusy(false);
         setCommentFocused(false);
         onCancel?.();
-    }, [onCancel]);
+    }, [onCancel, reset]);
 
-    const onCommentSubmit = useCallback(() => {
-        setCommentFocused(false);
-        onSubmit?.();
-    }, [onSubmit]);
+    const onCommentSubmit = useCallback(
+        (form: GoalCommentSchema) => {
+            setBusy(true);
+            setCommentFocused(false);
+            onSubmit?.(form);
+            reset();
+        },
+        [onSubmit, reset],
+    );
 
     useClickOutside(ref, () => {
         if (!Object.values(control._fields).some((v) => v?._f.value !== '')) {
@@ -92,7 +115,19 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
     return (
         <StyledCommentForm ref={ref} tabIndex={0}>
-            <Form onSubmit={onCommentSubmit}>
+            <Form onSubmit={handleSubmit(onCommentSubmit)}>
+                {nullable(id, () => (
+                    <input type="hidden" {...register('id')} />
+                ))}
+
+                {nullable(goalId, () => (
+                    <input type="hidden" {...register('goalId')} />
+                ))}
+
+                {nullable(stateId, () => (
+                    <input type="hidden" {...register('stateId')} />
+                ))}
+
                 <Controller
                     name="description"
                     control={control}
@@ -121,10 +156,10 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         </FormAction>
                         <FormAction right inline>
                             {nullable(!busy, () => (
-                                <Button size="m" outline text={tr('Cancel')} onClick={onCommentCancel} />
+                                <Button outline text={tr('Cancel')} onClick={onCommentCancel} />
                             ))}
 
-                            {actionButton}
+                            {renderActionButton({ busy })}
                         </FormAction>
                     </FormActions>
                 ))}

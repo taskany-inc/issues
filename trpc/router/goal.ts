@@ -19,7 +19,7 @@ import {
     toogleGoalArchiveSchema,
     toogleGoalDependencySchema,
     userGoalsSchema,
-    goalCreateCommentSchema,
+    goalCommentSchema,
     toggleParticipantsSchema,
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema, suggestionsQueryScheme, queryWithFiltersSchema } from '../../src/schema/common';
@@ -655,14 +655,14 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    createComment: protectedProcedure.input(goalCreateCommentSchema).mutation(async ({ ctx, input }) => {
+    createComment: protectedProcedure.input(goalCommentSchema).mutation(async ({ ctx, input }) => {
         const [commentAuthor, actualGoal] = await Promise.all([
             prisma.activity.findUnique({
                 where: { id: ctx.session.user.activityId },
                 include: { user: true, ghost: true },
             }),
             prisma.goal.findUnique({
-                where: { id: input.id },
+                where: { id: input.goalId },
                 include: {
                     participants: { include: { user: true, ghost: true } },
                     activity: { include: { user: true, ghost: true } },
@@ -672,6 +672,7 @@ export const goal = router({
 
         if (!commentAuthor) return null;
         if (!actualGoal) return null;
+        if (!input.goalId) return null;
 
         const { _isEditable } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
 
@@ -680,9 +681,9 @@ export const goal = router({
             const [, newComment] = await prisma.$transaction([
                 // Update goal and push to history first.
                 prisma.goal.update({
-                    where: { id: input.id },
+                    where: { id: input.goalId },
                     data: {
-                        id: input.id,
+                        id: input.goalId,
                         stateId: _isEditable ? input.stateId : actualGoal.stateId,
                         history:
                             _isEditable && input.stateId && input.stateId !== actualGoal.stateId
@@ -703,7 +704,7 @@ export const goal = router({
                     data: {
                         description: input.description,
                         activityId: commentAuthor.id,
-                        goalId: input.id,
+                        goalId: input.goalId,
                         stateId: _isEditable ? input.stateId : undefined,
                     },
                 }),
@@ -719,11 +720,38 @@ export const goal = router({
                 await createEmailJob('newComment', {
                     to: toEmails.map((p) => p.user?.email),
                     commentId: newComment.id,
-                    goalId: input.id,
+                    goalId: input.goalId,
                 });
             }
 
             return newComment;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    updateComment: protectedProcedure.input(goalCommentSchema).mutation(async ({ input: { id, description } }) => {
+        try {
+            const newComment = await prisma.comment.update({
+                where: {
+                    id,
+                },
+                data: {
+                    description,
+                },
+            });
+
+            return newComment;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    deleteComment: protectedProcedure.input(z.string()).mutation(async ({ input: id }) => {
+        try {
+            return prisma.comment.delete({
+                where: {
+                    id,
+                },
+            });
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }

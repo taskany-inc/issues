@@ -1,13 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowDownSmallIcon, ArrowUpSmallIcon, Button, Dropdown, UserPic } from '@taskany/bricks';
 import { State } from '@prisma/client';
 import styled from 'styled-components';
 
 import { usePageContext } from '../../hooks/usePageContext';
 import { useCommentResource } from '../../hooks/useCommentResource';
-import { GoalCommentCreate, goalCreateCommentSchema } from '../../schema/goal';
+import { GoalCommentSchema } from '../../schema/goal';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { ColorizedMenuItem } from '../ColorizedMenuItem';
@@ -32,49 +30,23 @@ const StyledStateUpdate = styled.div`
 const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, onSubmit, onFocus, onCancel }) => {
     const { user, themeId } = usePageContext();
     const { create } = useCommentResource();
-    const [busy, setBusy] = useState(false);
     const [pushState, setPushState] = useState<State | undefined>();
 
-    const {
-        control,
-        handleSubmit,
-        reset,
-        formState: { isValid },
-    } = useForm<GoalCommentCreate>({
-        resolver: zodResolver(goalCreateCommentSchema),
-        mode: 'onChange',
-        reValidateMode: 'onChange',
-        shouldFocusError: true,
-        defaultValues: {
-            id: goalId,
-            description: '',
-        },
-    });
-
     const createComment = useCallback(
-        (form: GoalCommentCreate) => {
-            setBusy(true);
-
+        (form: GoalCommentSchema) => {
             // FIXME: maybe async/await would be better API
             create(({ id }) => {
                 onSubmit?.(id);
-                reset();
                 setPushState(undefined);
-                setBusy(false);
-            })({
-                ...form,
-                id: goalId,
-                stateId: pushState?.id,
-            });
+            })(form);
         },
-        [create, goalId, pushState, onSubmit, reset],
+        [create, onSubmit],
     );
 
     const onCancelCreate = useCallback(() => {
-        reset();
         setPushState(undefined);
         onCancel?.();
-    }, [onCancel, reset]);
+    }, [onCancel]);
 
     const onStateSelect = useCallback(
         (state: State) => {
@@ -88,17 +60,17 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, o
             <UserPic size={32} src={user?.image} email={user?.email} />
 
             <CommentForm
-                busy={busy}
-                control={control}
-                isValid={isValid}
-                onSubmit={handleSubmit(createComment)}
+                goalId={goalId}
+                stateId={pushState?.id}
+                onSubmit={createComment}
                 onCancel={onCancelCreate}
                 onFocus={onFocus}
-                actionButton={
+                renderActionButton={({ busy }) =>
                     states ? (
                         <StyledStateUpdate>
                             <Button
                                 view="primary"
+                                disabled={busy}
                                 hue={pushState ? [pushState.hue, themeId] : undefined}
                                 outline
                                 type="submit"
