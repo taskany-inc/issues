@@ -2,7 +2,7 @@ export enum ModalEvent {
     GoalCreateModal = 'GoalCreateModal',
     GoalEditModal = 'GoalEditModal',
     GoalDeleteModal = 'GoalDeleteModal',
-    IssueParticipantsModal = 'IssueParticipantsModal',
+    // TODO: remove in https://github.com/taskany-inc/issues/issues/1044
     IssueDependenciesModal = 'IssueDependenciesModal',
     ProjectCreateModal = 'ProjectCreateModal',
     ProjectTransferModal = 'ProjectTransferModal',
