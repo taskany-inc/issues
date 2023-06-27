@@ -298,7 +298,7 @@ export const HistoryRecordParticipant: React.FC<HistoryChangeProps<Activity & { 
     to,
 }) => (
     <HistorySimplifyRecord
-        withPretext={!from || !to}
+        withPretext={false}
         from={
             from ? (
                 <HistoryParticipant
