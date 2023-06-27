@@ -2,23 +2,8 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import { danger0, gapM, gapS, gray7 } from '@taskany/colors';
-import {
-    Button,
-    Card,
-    CardInfo,
-    CardContent,
-    CardActions,
-    Dropdown,
-    Link,
-    EditIcon,
-    BinIcon,
-    MoreVerticalIcon,
-    MenuItem,
-    UserPic,
-    nullable,
-    Text,
-} from '@taskany/bricks';
+import { gapM, gray7 } from '@taskany/colors';
+import { Button, Card, CardInfo, CardContent, EditIcon, BinIcon, nullable, Text, PlusIcon } from '@taskany/bricks';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { editGoalKeys } from '../../utils/hotkeys';
@@ -28,9 +13,7 @@ import { PageSep } from '../PageSep';
 import { IssueTitle } from '../IssueTitle';
 import { IssueKey } from '../IssueKey';
 import { IssueStats } from '../IssueStats/IssueStats';
-import { Reactions } from '../Reactions';
 import { IssueParent } from '../IssueParent';
-import { IssueTags } from '../IssueTags';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
@@ -40,25 +23,27 @@ import { StarButton } from '../StarButton/StarButton';
 import { useRouter } from '../../hooks/router';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { trpc } from '../../utils/trpcClient';
-import { GoalParticipantsSchema, GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
+import { GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
-import { GoalUpdateReturnType } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType, GoalUpdateReturnType } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
 import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
 import { useCriteriaResource } from '../../hooks/useCriteriaResource';
+import { RelativeTime } from '../RelativeTime/RelativeTime';
+import { IssueMeta } from '../IssueMeta';
+import { UserBadge } from '../UserBadge';
+import { InlineTrigger } from '../InlineTrigger';
+import { UserComboBox } from '../UserComboBox';
 
 import { tr } from './GoalPage.i18n';
 
 const StateSwitch = dynamic(() => import('../StateSwitch'));
 const Md = dynamic(() => import('../Md'));
-const RelativeTime = dynamic(() => import('../RelativeTime/RelativeTime'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
-const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
 const IssueDependencies = dynamic(() => import('../IssueDependencies/IssueDependencies'));
-const IssueParticipants = dynamic(() => import('../IssueParticipants/IssueParticipants'));
 
 const IssueHeader = styled(PageContent)`
     display: grid;
@@ -69,6 +54,19 @@ const IssueContent = styled(PageContent)`
     display: grid;
     grid-template-columns: 7fr 5fr;
     gap: ${gapM};
+`;
+
+const StyledCard = styled(Card)`
+    min-height: auto; // FIXME: https://github.com/taskany-inc/bricks/issues/211
+`;
+
+const StyledCardContent = styled(CardContent)`
+    padding-bottom: 12px; // FIXME: https://github.com/taskany-inc/bricks/issues/211
+`;
+
+const StyledCardInfo = styled(CardInfo)`
+    display: grid;
+    grid-template-columns: 6fr 6fr;
 `;
 
 const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
@@ -85,35 +83,12 @@ const StyledIssueInfo = styled.div<{ align: 'left' | 'right' }>`
         `}
 `;
 
-const IssueBaseActions = styled.div`
-    display: flex;
-    align-items: center;
-
-    & > * {
-        margin-right: ${gapS};
-    }
+const StyledInlineTrigger = styled(InlineTrigger)`
+    margin-left: 5px; // 24 / 2 - 7 center of UserPic and center of PlusIcon
 `;
 
-const StyledCardInfo = styled(CardInfo)`
-    display: grid;
-    grid-template-columns: 6fr 6fr;
-`;
-
-const StyledCardActions = styled.div`
+const StyledParticipantsInput = styled.div`
     display: flex;
-    align-items: center;
-    justify-self: end;
-
-    margin-right: -10px;
-
-    & > span + span {
-        margin-left: ${gapS};
-    }
-`;
-
-const StyledMenuItem = styled(MenuItem)`
-    display: flex;
-    justify-content: start;
 `;
 
 export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
@@ -125,9 +100,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         staleTime: refreshInterval,
     });
 
-    const project = goal?.project;
-    const issuer = goal?.activity;
-    const owner = goal?.owner;
+    const { project, activity: issuer, owner } = goal || {};
 
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     useEffect(() => {
@@ -140,7 +113,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
     const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal?.id, goal?._shortId);
 
-    const { reactionsProps, goalReaction, commentReaction } = useReactionsResource(goal?.reactions);
+    const { commentReaction } = useReactionsResource(goal?.reactions);
 
     const invalidateFn = useCallback(() => {
         return utils.goal.getById.invalidate(id);
@@ -160,18 +133,26 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         [goal, invalidateFn, stateMutation],
     );
 
-    const onGoalReactionToggle = useCallback(
-        (id: string) => goalReaction(id, () => utils.goal.getById.invalidate(id)),
-        [goalReaction, utils.goal.getById],
+    const addParticipantMutation = trpc.goal.addParticipant.useMutation();
+    const onParticipantAdd = useCallback(
+        async ({ id: activityId }: ActivityByIdReturnType) => {
+            if (goal && activityId) {
+                await addParticipantMutation.mutateAsync({ id: goal.id, activityId });
+                invalidateFn();
+            }
+        },
+        [goal, invalidateFn, addParticipantMutation],
     );
 
-    const participantsMutation = trpc.goal.toggleParticipants.useMutation();
-    const onParticipantsChange = useCallback(
-        async (participants: GoalParticipantsSchema['participants']) => {
-            await participantsMutation.mutateAsync({ participants, id });
-            invalidateFn();
+    const removeParticipantMutation = trpc.goal.removeParticipant.useMutation();
+    const onParticipantRemove = useCallback(
+        (activityId?: string | null) => async () => {
+            if (goal && activityId) {
+                await removeParticipantMutation.mutateAsync({ id: goal.id, activityId });
+                invalidateFn();
+            }
         },
-        [participantsMutation, id, invalidateFn],
+        [goal, invalidateFn, removeParticipantMutation],
     );
 
     const toggleDependencyMutation = trpc.goal.toggleDependency.useMutation();
@@ -215,10 +196,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         setGoalEditModalVisible(true);
     }, []);
 
-    const onEditMenuChange = useCallback((item: { onClick: () => void }) => {
-        item.onClick?.();
-    }, []);
-
     const toggleArchiveMutation = trpc.goal.toggleArchive.useMutation();
     const onGoalDeleteConfirm = useCallback(async () => {
         const promise = toggleArchiveMutation.mutateAsync({
@@ -246,18 +223,14 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
     const { onAddHandler, onRemoveHandler, onToggleHandler } = useCriteriaResource(invalidateFn);
 
-    if (!goal) return null;
+    if (!goal || !owner || !issuer) return null;
+
+    const participantsFilter = goal.participants.map(({ id }) => id).concat([owner.id, issuer.id]);
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <IssueHeader>
                 <StyledIssueInfo align="left">
-                    <IssueKey id={id}>
-                        {nullable(goal.tags, (tags) => (
-                            <IssueTags tags={tags} />
-                        ))}
-                    </IssueKey>
-
                     {Boolean(project?.parent?.length) &&
                         nullable(project?.parent, (parent) => <IssueParent size="m" parent={parent} />)}
 
@@ -267,6 +240,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                     <IssueTitle title={goal.title} />
 
+                    {/* FIXME: must be interactive if goal is editable https://github.com/taskany-inc/issues/issues/1165 */}
                     {nullable(goal.state, (s) => (
                         <StateSwitch state={s} flowId={project?.flowId} onClick={onGoalStateChange} />
                     ))}
@@ -290,6 +264,17 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                             onToggle={toggleGoalStar}
                         />
                     </PageActions>
+
+                    <PageActions>
+                        <IssueKey id={id} />
+                        {nullable(goal._isEditable, () => (
+                            <Button
+                                text={tr('Edit')}
+                                iconLeft={<EditIcon noWrap size="xs" />}
+                                onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
+                            />
+                        ))}
+                    </PageActions>
                 </StyledIssueInfo>
             </IssueHeader>
 
@@ -297,51 +282,14 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
             <IssueContent>
                 <div>
-                    <Card>
+                    <StyledCard>
                         <StyledCardInfo>
                             <div>
-                                <Link inline>{issuer?.user?.name}</Link> — <RelativeTime date={goal.createdAt} />
+                                <RelativeTime kind="Created" date={goal.createdAt} />
                             </div>
-                            <StyledCardActions>
-                                {nullable(goal._isEditable, () => (
-                                    <span>
-                                        <Dropdown
-                                            onChange={onEditMenuChange}
-                                            items={[
-                                                {
-                                                    label: tr('Edit'),
-                                                    icon: <EditIcon size="xxs" />,
-                                                    onClick: dispatchModalEvent(ModalEvent.GoalEditModal),
-                                                },
-                                                {
-                                                    label: tr('Delete'),
-                                                    color: danger0,
-                                                    icon: <BinIcon size="xxs" />,
-                                                    onClick: dispatchModalEvent(ModalEvent.GoalDeleteModal),
-                                                },
-                                            ]}
-                                            renderTrigger={({ ref, onClick }) => (
-                                                <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
-                                            )}
-                                            renderItem={({ item, cursor, index, onClick }) => (
-                                                <StyledMenuItem
-                                                    key={item.label}
-                                                    ghost
-                                                    color={item.color}
-                                                    focused={cursor === index}
-                                                    icon={item.icon}
-                                                    onClick={onClick}
-                                                >
-                                                    {item.label}
-                                                </StyledMenuItem>
-                                            )}
-                                        />
-                                    </span>
-                                ))}
-                            </StyledCardActions>
                         </StyledCardInfo>
 
-                        <CardContent>
+                        <StyledCardContent>
                             {goal.description ? (
                                 <Md>{goal.description}</Md>
                             ) : (
@@ -349,30 +297,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     {tr('No description provided')}
                                 </Text>
                             )}
-                        </CardContent>
-
-                        <CardActions>
-                            <IssueBaseActions>
-                                <Button
-                                    ghost
-                                    text={owner?.user?.name || owner?.user?.email || owner?.ghost?.email}
-                                    iconLeft={
-                                        <UserPic
-                                            src={owner?.user?.image}
-                                            email={owner?.user?.email || owner?.ghost?.email}
-                                            size={16}
-                                        />
-                                    }
-                                />
-
-                                <Reactions reactions={reactionsProps.reactions} onClick={onGoalReactionToggle(goal.id)}>
-                                    {nullable(!reactionsProps.limited, () => (
-                                        <ReactionsDropdown onClick={onGoalReactionToggle(goal.id)} />
-                                    ))}
-                                </Reactions>
-                            </IssueBaseActions>
-                        </CardActions>
-                    </Card>
+                        </StyledCardContent>
+                    </StyledCard>
 
                     {nullable(goal?.goalAchiveCriteria.length || goal?._isEditable, () => (
                         <GoalCriteria
@@ -403,17 +329,63 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                             onCommentReaction={onCommentReactionToggle}
                             onCommentPublish={onCommentPublish}
                             onCommentDelete={onCommentDelete}
-                            goalStates={goal?._isEditable ? goal.project?.flow.states : undefined}
+                            goalStates={goal._isEditable ? goal.project?.flow.states : undefined}
                         />
                     ))}
                 </div>
 
                 <div>
-                    <IssueParticipants
-                        participants={goal.participants}
-                        onChange={goal._isEditable ? onParticipantsChange : undefined}
-                    />
+                    <IssueMeta title={tr('Issuer')}>
+                        <UserBadge user={issuer?.user} />
+                    </IssueMeta>
+
+                    <IssueMeta title={tr('Assignee')}>
+                        <UserBadge user={owner?.user} />
+                    </IssueMeta>
+
+                    <IssueMeta title={tr('Participants')}>
+                        {goal.participants?.map(({ user }) => (
+                            <UserBadge
+                                key={user?.activityId}
+                                user={user}
+                                onCleanButtonClick={
+                                    goal._isEditable ? onParticipantRemove(user?.activityId) : undefined
+                                }
+                            />
+                        ))}
+
+                        {nullable(goal._isEditable, () => (
+                            <StyledParticipantsInput>
+                                <UserComboBox
+                                    placement="bottom-start"
+                                    filter={participantsFilter}
+                                    onChange={onParticipantAdd}
+                                    renderTrigger={(props) => (
+                                        <StyledInlineTrigger
+                                            // FIXME: https://github.com/taskany-inc/bricks/issues/210
+                                            ref={props.ref as any as React.RefObject<HTMLDivElement>}
+                                            icon={<PlusIcon noWrap size="xs" />}
+                                            onClick={props.onClick}
+                                            text={tr('Add participant')}
+                                        />
+                                    )}
+                                />
+                            </StyledParticipantsInput>
+                        ))}
+                    </IssueMeta>
+
                     <IssueDependencies issue={goal} onChange={goal._isEditable ? onDependenciesChange : undefined} />
+
+                    {nullable(goal._isEditable, () => (
+                        <IssueMeta>
+                            <StyledInlineTrigger
+                                icon={<BinIcon noWrap size="xs" />}
+                                text={tr('Archive goal')}
+                                onClick={dispatchModalEvent(ModalEvent.GoalDeleteModal)}
+                            />
+                            {/* TODO: https://github.com/taskany-inc/issues/issues/1166 */}
+                        </IssueMeta>
+                    ))}
                 </div>
             </IssueContent>
 

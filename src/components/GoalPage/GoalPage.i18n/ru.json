@@ -1,6 +1,10 @@
 {
     "title": "Taskany — Цели — {goal}",
     "Edit": "Редактировать",
-    "Delete": "Удалить",
-    "No description provided": "Описание отсутствует"
+    "No description provided": "Описание отсутствует",
+    "Issuer": "Автор",
+    "Assignee": "Ответственный",
+    "Participants": "В главных ролях",
+    "Add participant": "Добавить участника",
+    "Archive goal": "Удалить цель"
 }

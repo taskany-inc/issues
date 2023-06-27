@@ -1,4 +1,4 @@
-import { Estimate, EstimateToGoal, Goal, Prisma, GoalAchieveCriteria, StateType } from '@prisma/client';
+import { Estimate, EstimateToGoal, Goal, Prisma, StateType } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
 

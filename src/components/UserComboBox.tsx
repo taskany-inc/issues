@@ -1,18 +1,21 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components';
-import { Button, ComboBox, UserPic, Input, UserMenuItem } from '@taskany/bricks';
+import { Button, ComboBox, UserPic, Input, UserMenuItem, nullable } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 
 interface UserComboBoxProps {
-    text: React.ComponentProps<typeof Button>['text'];
+    text?: React.ComponentProps<typeof Button>['text'];
     query?: string;
     value?: Partial<NonNullable<ActivityByIdReturnType>>;
     disabled?: boolean;
     placeholder?: string;
     filter?: string[];
     error?: React.ComponentProps<typeof ComboBox>['error'];
+    placement?: React.ComponentProps<typeof ComboBox>['placement'];
+    offset?: React.ComponentProps<typeof ComboBox>['offset'];
+    renderTrigger?: React.ComponentProps<typeof ComboBox>['renderTrigger'];
 
     onChange?: (activity: NonNullable<ActivityByIdReturnType>) => void;
 }
@@ -22,7 +25,22 @@ const StyledInput = styled(Input)`
 `;
 
 export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
-    ({ text, query = '', value, filter, disabled, placeholder, error, onChange }, ref) => {
+    (
+        {
+            text,
+            query = '',
+            value,
+            filter,
+            disabled,
+            placeholder,
+            error,
+            placement = 'top-start',
+            offset,
+            renderTrigger,
+            onChange,
+        },
+        ref,
+    ) => {
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(
             value?.user?.name || value?.user?.email || value?.ghost?.email || query,
@@ -33,6 +51,10 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
             filter: filter || [],
         });
 
+        const onClickOutside = useCallback((cb: () => void) => {
+            cb();
+        }, []);
+
         return (
             <ComboBox
                 ref={ref}
@@ -41,26 +63,26 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                 visible={completionVisible}
                 disabled={disabled}
                 error={error}
-                placement="top-start"
+                placement={placement}
+                offset={offset}
                 items={suggestions.data}
+                onClickOutside={onClickOutside}
                 onChange={onChange}
-                renderTrigger={(props) => (
-                    <Button
-                        ref={props.ref}
-                        text={props.text}
-                        disabled={props.disabled}
-                        onClick={props.onClick}
-                        iconLeft={
-                            value ? (
-                                <UserPic
-                                    src={value?.user?.image}
-                                    email={value?.user?.email || value?.ghost?.email}
-                                    size={16}
-                                />
-                            ) : undefined
-                        }
-                    />
-                )}
+                renderTrigger={(props) =>
+                    renderTrigger ? (
+                        renderTrigger(props)
+                    ) : (
+                        <Button
+                            ref={props.ref}
+                            text={props.text}
+                            disabled={props.disabled}
+                            onClick={props.onClick}
+                            iconLeft={nullable(value, (v) => (
+                                <UserPic src={v.user?.image} email={v.user?.email || v.ghost?.email} size={16} />
+                            ))}
+                        />
+                    )
+                }
                 renderInput={(props) => (
                     <StyledInput
                         autoFocus

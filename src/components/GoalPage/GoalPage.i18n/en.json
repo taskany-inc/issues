@@ -1,6 +1,10 @@
 {
     "title": "Taskany — Goals — {goal}",
     "Edit": "Edit",
-    "Delete": "Delete",
-    "No description provided": "No description provided"
+    "No description provided": "No description provided",
+    "Issuer": "Issuer",
+    "Assignee": "Assignee",
+    "Participants": "Participants",
+    "Add participant": "Add participant",
+    "Archive goal": "Archive goal"
 }

@@ -43,7 +43,7 @@ export const PageContent = styled.div`
 
 export const PageActions = styled.div`
     display: flex;
-    align-items: start;
+    align-items: center;
     justify-content: right;
 
     > * + * {
