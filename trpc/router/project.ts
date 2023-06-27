@@ -1,4 +1,4 @@
-import z from 'zod';
+import z, { boolean } from 'zod';
 import { TRPCError } from '@trpc/server';
 
 import { prisma } from '../../src/utils/prisma';
@@ -16,9 +16,9 @@ import {
     goalDeepQuery,
     goalsFilter,
 } from '../queries/goals';
-import { ToggleSubscriptionSchema } from '../../src/schema/common';
+import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
-import { projectFullSchema } from '../queries/project';
+import { getProjectSchema } from '../queries/project';
 
 type WithId = { id: string };
 
@@ -72,153 +72,189 @@ export const project = router({
             z
                 .object({
                     firstLevel: z.boolean().optional(),
+                    goalsQuery: queryWithFiltersSchema.optional(),
                 })
                 .optional(),
         )
-        .query(({ ctx, input: { firstLevel } = {} }) => {
-            return prisma.project
+        .query(({ ctx, input: { firstLevel, goalsQuery } = {} }) =>
+            prisma.project
                 .findMany({
                     orderBy: {
                         createdAt: 'asc',
                     },
-                    include: { ...projectFullSchema },
-                    ...(firstLevel
-                        ? {
-                              where: {
-                                  parent: {
-                                      none: {},
-                                  },
-                              },
-                          }
-                        : {}),
+                    ...getProjectSchema({
+                        activityId: ctx.session.user.activityId,
+                        goalsQuery,
+                        firstLevel,
+                    }),
+                })
+                .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId))),
+        ),
+    getTop: protectedProcedure
+        .input(
+            z
+                .object({
+                    firstLevel: z.boolean().optional(),
+                    goalsQuery: queryWithFiltersSchema.optional(),
+                })
+                .optional(),
+        )
+        .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
+            const allProjects = await prisma.project
+                .findMany({
+                    orderBy: {
+                        createdAt: 'asc',
+                    },
+                    ...getProjectSchema({
+                        activityId: ctx.session.user.activityId,
+                        goalsQuery,
+                        firstLevel,
+                    }),
                 })
                 .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
+
+            // FIX: it is hack!
+            return allProjects.filter((p) => p._count.parent === 0);
         }),
-    getTop: protectedProcedure.query(async ({ ctx }) => {
-        const allProjects = await prisma.project
-            .findMany({
-                orderBy: {
-                    createdAt: 'asc',
+    getById: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                goalsQuery: queryWithFiltersSchema.optional(),
+            }),
+        )
+        .query(async ({ ctx, input: { id, goalsQuery } }) => {
+            const project = await prisma.project.findUnique({
+                ...getProjectSchema({
+                    activityId: ctx.session.user.activityId,
+                    goalsQuery,
+                }),
+                where: {
+                    id,
                 },
-                include: { ...projectFullSchema },
-            })
-            .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
+            });
 
-        // FIX: it is hack!
-        return allProjects.filter((p) => p._count.parent === 0);
-    }),
-    getById: protectedProcedure.input(z.string()).query(async ({ ctx, input: id }) => {
-        const project = await prisma.project.findUnique({
-            where: {
-                id,
-            },
-            include: projectFullSchema,
-        });
+            if (!project) return null;
 
-        if (!project) return null;
-
-        return addCalculatedProjectFields(project, ctx.session.user.activityId);
-    }),
-    getByIds: protectedProcedure.input(z.array(z.string())).query(async ({ ctx, input }) => {
-        const projects = await prisma.project.findMany({
-            where: {
-                id: {
-                    in: input,
-                },
-            },
-            include: projectFullSchema,
-        });
-
-        return projects.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId));
-    }),
-    getDeepInfo: protectedProcedure.input(projectDeepInfoSchema).query(async ({ ctx, input }) => {
-        const [allProjectGoals, filtredProjectGoals] = await Promise.all([
-            prisma.goal.findMany({
-                ...goalsFilter(
-                    {
-                        priority: [],
-                        state: [],
-                        tag: [],
-                        estimate: [],
-                        owner: [],
-                        project: [],
-                        query: '',
+            return addCalculatedProjectFields(project, ctx.session.user.activityId);
+        }),
+    getByIds: protectedProcedure
+        .input(
+            z.object({
+                ids: z.array(z.string()),
+                goalsQuery: queryWithFiltersSchema.optional(),
+            }),
+        )
+        .query(async ({ ctx, input: { ids, goalsQuery } }) => {
+            const projects = await prisma.project.findMany({
+                where: {
+                    id: {
+                        in: ids,
                     },
-                    ctx.session.user.activityId,
-                    {
+                },
+                ...getProjectSchema({
+                    activityId: ctx.session.user.activityId,
+                    goalsQuery,
+                }),
+            });
+
+            return projects.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId));
+        }),
+    getDeepInfo: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                goalsQuery: queryWithFiltersSchema,
+            }),
+        )
+        .query(async ({ ctx, input: { id, goalsQuery } }) => {
+            const [allProjectGoals, filtredProjectGoals] = await Promise.all([
+                prisma.goal.findMany({
+                    ...goalsFilter(
+                        {
+                            priority: [],
+                            state: [],
+                            tag: [],
+                            estimate: [],
+                            owner: [],
+                            project: [],
+                            query: '',
+                        },
+                        ctx.session.user.activityId,
+                        {
+                            AND: {
+                                OR: [
+                                    {
+                                        projectId: id,
+                                    },
+                                    {
+                                        project: {
+                                            parent: {
+                                                some: {
+                                                    id,
+                                                },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ),
+                    include: {
+                        ...goalDeepQuery,
+                        estimate: {
+                            include: {
+                                estimate: true,
+                            },
+                            orderBy: {
+                                createdAt: 'asc',
+                            },
+                        },
+                    },
+                }),
+                prisma.goal.findMany({
+                    ...goalsFilter(goalsQuery, ctx.session.user.activityId, {
                         AND: {
                             OR: [
                                 {
-                                    projectId: input.id,
+                                    projectId: id,
                                 },
                                 {
                                     project: {
                                         parent: {
                                             some: {
-                                                id: input.id,
+                                                id,
                                             },
                                         },
                                     },
                                 },
                             ],
                         },
-                    },
-                ),
-                include: {
-                    ...goalDeepQuery,
-                    estimate: {
-                        include: {
-                            estimate: true,
-                        },
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                    },
-                },
-            }),
-            prisma.goal.findMany({
-                ...goalsFilter(input, ctx.session.user.activityId, {
-                    AND: {
-                        OR: [
-                            {
-                                projectId: input.id,
+                    }),
+                    include: {
+                        ...goalDeepQuery,
+                        estimate: {
+                            include: {
+                                estimate: true,
                             },
-                            {
-                                project: {
-                                    parent: {
-                                        some: {
-                                            id: input.id,
-                                        },
-                                    },
-                                },
+                            orderBy: {
+                                createdAt: 'asc',
                             },
-                        ],
+                        },
                     },
                 }),
-                include: {
-                    ...goalDeepQuery,
-                    estimate: {
-                        include: {
-                            estimate: true,
-                        },
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                    },
-                },
-            }),
-        ]);
+            ]);
 
-        return {
-            goals: filtredProjectGoals.map((g) => ({
-                ...g,
-                project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
-                ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
-                estimate: getEstimateListFormJoin(g),
-            })),
-            meta: calcGoalsMeta(allProjectGoals),
-        };
-    }),
+            return {
+                goals: filtredProjectGoals.map((g) => ({
+                    ...g,
+                    project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
+                    ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+                    estimate: getEstimateListFormJoin(g),
+                })),
+                meta: calcGoalsMeta(allProjectGoals),
+            };
+        }),
     create: protectedProcedure
         .input(projectCreateSchema)
         .mutation(async ({ ctx, input: { id, title, description, flow } }) => {

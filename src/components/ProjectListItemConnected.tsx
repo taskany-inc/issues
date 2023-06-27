@@ -1,4 +1,4 @@
-import { FC, MouseEventHandler, useState, useMemo, useCallback } from 'react';
+import { FC, MouseEventHandler, useState, useMemo, useCallback, useEffect } from 'react';
 
 import { GoalByIdReturnType, ProjectByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';
@@ -34,7 +34,7 @@ export const ProjectListItemConnected: FC<{
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
             id: project.id,
-            ...queryState,
+            goalsQuery: queryState,
         },
         {
             enabled: !collapsedGoals,
@@ -44,9 +44,12 @@ export const ProjectListItemConnected: FC<{
     );
 
     const ids = useMemo(() => project?.children.map(({ id }) => id) || [], [project]);
-    const { data: childrenProjects = [], status } = trpc.project.getByIds.useQuery(ids, {
-        enabled: !collapsed,
-    });
+    const { data: childrenProjects = [], status } = trpc.project.getByIds.useQuery(
+        { ids, goalsQuery: queryState },
+        {
+            enabled: !collapsed,
+        },
+    );
 
     const goals = useMemo(
         () => projectDeepInfo?.goals.filter((g) => g.projectId === project.id),
@@ -60,8 +63,6 @@ export const ProjectListItemConnected: FC<{
     const onGoalsClick = useCallback(() => {
         setIsCollapsedGoals((value) => !value);
     }, []);
-
-    const goalsCounter = goals ? goals.length : project._count.goals;
 
     return (
         <ProjectListItemCollapsable
@@ -96,7 +97,6 @@ export const ProjectListItemConnected: FC<{
             onClick={onClick}
             onGoalsClick={onGoalsClick}
             loading={status === 'loading'}
-            goalsCounter={goalsCounter}
             deep={deep}
         >
             {childrenProjects.map((p) => (
