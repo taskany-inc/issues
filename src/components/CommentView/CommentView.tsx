@@ -170,7 +170,7 @@ export const CommentView: FC<CommentViewProps> = ({
         [commentDescription],
     );
 
-    const onChanged = useCallback<React.ComponentProps<typeof CommentEditForm>['onChanged']>(({ description }) => {
+    const onChange = useCallback<React.ComponentProps<typeof CommentEditForm>['onChange']>(({ description }) => {
         setCommentDescription(description);
     }, []);
 
@@ -190,7 +190,7 @@ export const CommentView: FC<CommentViewProps> = ({
                     id={id}
                     description={commentDescription}
                     onCancel={onUpdate}
-                    onChanged={onChanged}
+                    onChange={onChange}
                     onUpdate={onUpdate}
                 />
             ) : (

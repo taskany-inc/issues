@@ -13,19 +13,22 @@ interface CommentEditFormProps {
     setFocus?: boolean;
 
     onUpdate: (comment?: { id: string; description: string }) => void;
+    onChange: (comment: { description: string }) => void;
     onCancel: () => void;
 }
 
-const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onUpdate, onCancel }) => {
+const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onUpdate, onChange, onCancel }) => {
     const { update } = useCommentResource();
 
     const onCommentUpdate = useCallback(
         (form: GoalCommentSchema) => {
+            // optimistic update
+            onChange?.({ description: form.description });
             update((comment) => {
                 onUpdate?.(comment);
             })(form);
         },
-        [update, onUpdate],
+        [update, onUpdate, onChange],
     );
 
     return (

@@ -1,6 +1,6 @@
 {
-    "Title": "",
-    "Description": "",
-    "Create filter": "",
-    "New filters preset": ""
+    "Preset title": "Название",
+    "Preset description": "Описание",
+    "Create preset": "Сохранить",
+    "Cancel": "Отменить"
 }
