@@ -36,6 +36,7 @@ import { IssueMeta } from '../IssueMeta';
 import { UserBadge } from '../UserBadge';
 import { InlineTrigger } from '../InlineTrigger';
 import { UserComboBox } from '../UserComboBox';
+import { State } from '../State';
 
 import { tr } from './GoalPage.i18n';
 
@@ -240,10 +241,13 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                     <IssueTitle title={goal.title} />
 
-                    {/* FIXME: must be interactive if goal is editable https://github.com/taskany-inc/issues/issues/1165 */}
-                    {nullable(goal.state, (s) => (
-                        <StateSwitch state={s} flowId={project?.flowId} onClick={onGoalStateChange} />
-                    ))}
+                    {nullable(goal.state, (s) =>
+                        goal._isEditable ? (
+                            <StateSwitch state={s} flowId={project?.flowId} onClick={onGoalStateChange} />
+                        ) : (
+                            <State title={s.title} hue={s.hue} />
+                        ),
+                    )}
 
                     <IssueStats
                         estimate={goal._lastEstimate}
