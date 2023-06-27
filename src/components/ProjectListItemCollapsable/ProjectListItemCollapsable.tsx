@@ -1,7 +1,7 @@
-import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { MouseEvent, ReactNode, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { Badge, Button } from '@taskany/bricks';
-import { gapS } from '@taskany/colors';
+import { Badge, Button, Text } from '@taskany/bricks';
+import { gapM, gray7 } from '@taskany/colors';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalsListContainer } from '../GoalListItem';
@@ -10,9 +10,8 @@ import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 
 import { tr } from './ProjectListItemCollapsable.i18n';
 
-const StyledGoalsButton = styled(Button)`
-    margin-left: ${gapS};
-    cursor: pointer;
+const StyledGoalsButtonContainer = styled.div`
+    margin-left: ${gapM};
 `;
 
 interface ProjectListItemCollapsableProps {
@@ -70,12 +69,18 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                         starred={project._isStarred}
                         watching={project._isWatching}
                     >
-                        <StyledGoalsButton
-                            onClick={onGoalsButtonClick}
-                            text={goalsCounter ? tr('Goals') : tr('No goals')}
-                            disabled={!goalsCounter}
-                            iconRight={goalsCounter ? <Badge size="s">{goalsCounter}</Badge> : null}
-                        />
+                        <StyledGoalsButtonContainer>
+                            {goalsCounter ? (
+                                <Button
+                                    ghost={collapsedGoals}
+                                    onClick={onGoalsButtonClick}
+                                    text={tr('Goals')}
+                                    iconRight={<Badge size="s">{goalsCounter}</Badge>}
+                                />
+                            ) : (
+                                <Text color={gray7}>{tr('No goals')}</Text>
+                            )}
+                        </StyledGoalsButtonContainer>
                     </ProjectListItem>
                 </ProjectListContainer>
             }
