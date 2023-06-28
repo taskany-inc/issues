@@ -56,7 +56,7 @@ const StyledHeaderContent = styled.div<{ highlighted?: boolean }>`
     `}
 `;
 
-const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number; showLine: boolean }>`
+const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number }>`
     position: relative;
 
     border-radius: ${radiusM};
@@ -156,19 +156,16 @@ export const CollapsableItem: FC<{
     content: ReactNode;
     deep?: number;
     collapsed: boolean;
-    showLine?: boolean;
-}> = ({ onClick, children, header, collapsed, deep = 0, showLine = true, content }) => {
-    return (
-        <StyledCollapsableContainer collapsed={collapsed} deep={deep} showLine={showLine}>
-            <StyledCollapsableHeader onClick={onClick}>
-                <StyledParentDot />
-                <StyledDot />
-                <StyledHeaderContent highlighted={!!onClick && collapsed}>{header}</StyledHeaderContent>
-            </StyledCollapsableHeader>
-            {nullable(children, (ch) => (
-                <StyledCollapsableItem>{ch}</StyledCollapsableItem>
-            ))}
-            {!collapsed ? content : null}
-        </StyledCollapsableContainer>
-    );
-};
+}> = ({ onClick, children, header, collapsed, deep = 0, content }) => (
+    <StyledCollapsableContainer collapsed={collapsed} deep={deep}>
+        <StyledCollapsableHeader onClick={onClick}>
+            <StyledParentDot />
+            <StyledDot />
+            <StyledHeaderContent highlighted={!!onClick && collapsed}>{header}</StyledHeaderContent>
+        </StyledCollapsableHeader>
+        {nullable(children, (ch) => (
+            <StyledCollapsableItem>{ch}</StyledCollapsableItem>
+        ))}
+        {!collapsed ? content : null}
+    </StyledCollapsableContainer>
+);
