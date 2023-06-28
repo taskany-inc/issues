@@ -1,61 +1,58 @@
 import React, { useCallback, useMemo, memo } from 'react';
 import styled, { css } from 'styled-components';
-import {
-    Text,
-    CircleIcon,
-    TickCircleIcon,
-    MessageTickIcon,
-    GoalIcon,
-    nullable,
-    CrossIcon,
-    Button,
-} from '@taskany/bricks';
+import { Text, CircleIcon, TickCircleIcon, MessageTickIcon, GoalIcon, nullable, CleanButton } from '@taskany/bricks';
 import { State } from '@prisma/client';
-import { backgroundColor, brandColor, gray10, gray6, gray7, gray9, gray8 } from '@taskany/colors';
+import { backgroundColor, brandColor, gray10, gray6, gray7, gray9, gray8, textColor } from '@taskany/colors';
 import NextLink from 'next/link';
 
 import { AddCriteriaScheme, RemoveCriteriaScheme, UpdateCriteriaScheme } from '../../schema/criteria';
 import { TitleItem, TitleContainer, Title, ContentItem, TextItem, Table } from '../Table';
 import { StateDot } from '../StateDot';
-import { ActivityFeedItem } from '../ActivityFeed';
+import { ActivityFeed, ActivityFeedItem } from '../ActivityFeed';
 import { ActivityByIdReturnType, GoalEstimate, GoalAchiveCriteria } from '../../../trpc/inferredTypes';
 import { estimateToString } from '../../utils/estimateToString';
 import { UserGroup } from '../UserGroup';
 import { routes } from '../../hooks/router';
+import { Circle } from '../Circle';
 
 import { tr } from './GoalCriteria.i18n';
 
-const StyledActivityFeedItem = styled(ActivityFeedItem)`
-    padding-top: 20px;
-    padding-left: 4px;
-    padding-right: 4px;
+const StyledActivityFeed = styled(ActivityFeed)`
+    padding: 0;
+    z-index: 1;
 `;
 
-const Wrapper = styled.div`
+const StyledActivityFeedItem = styled(ActivityFeedItem)`
+    padding-top: 20px;
+
+    &:first-child::before {
+        content: none;
+    }
+
+    &:last-child::after {
+        content: '';
+    }
+`;
+
+const StyledWrapper = styled.div`
     display: flex;
     flex-direction: column;
 `;
 
 const StyledIcon = styled(MessageTickIcon)`
-    width: 24px;
-    height: 24px;
     display: flex;
     background-color: ${gray7};
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    transform: translateY(-3px);
-    border-radius: 50%;
-    padding: 2px;
     box-sizing: border-box;
 
     text-align: center;
+
+    width: 32px;
+    height: 32px;
 `;
 
 const StyledCircleIcon = styled(CircleIcon)`
-    width: 15px;
-    height: 15px;
-    display: inline-flex;
     color: ${gray8};
 
     &:hover {
@@ -64,18 +61,12 @@ const StyledCircleIcon = styled(CircleIcon)`
 `;
 
 const StyledTickIcon = styled(TickCircleIcon)`
-    background-color: ${brandColor};
-    color: ${backgroundColor};
-    border-radius: 50%;
-    width: 15px;
-    height: 15px;
-    display: inline-flex;
+    color: ${brandColor};
+    fill: ${backgroundColor};
 `;
 
-const StyledCheckboxWrapper = styled.div<{ canEdit: boolean }>`
-    display: flex;
-    align-items: center;
-
+const StyledCheckboxWrapper = styled.span<{ canEdit: boolean }>`
+    display: inline-flex;
     ${({ canEdit }) =>
         !canEdit &&
         css`
@@ -104,43 +95,28 @@ const GoalCriteriaCheckBox: React.FC<GoalCriteriaCheckBoxProps> = ({ checked, ca
     );
 };
 
-const StyledActionButton = styled(Button).attrs({
-    ghost: true,
-})`
-    appearance: none;
-    width: 15px;
-    height: 15px;
+const StyledCleanButton = styled(CleanButton)`
     opacity: 0;
-    transition: opacity 0.2s ease;
-    will-change: opacity;
-    padding: 0;
-    display: flex;
-    background-color: transparent;
-    color: ${gray7};
-    cursor: pointer;
-    line-height: 15px;
-    min-height: 15px;
-
-    &:hover:not([disabled]),
-    &:active:not([disabled]) {
-        color: ${gray10};
-        background-color: transparent;
-        border-color: transparent;
-    }
-
-    & + & {
-        margin-left: 5px;
-    }
+    transition: opacity 0.2s ease-in-out;
+    margin-right: 4px;
 `;
 
 const StyledTable = styled(Table)`
     width: 100%;
-    grid-template-columns: 14px minmax(250px, 20%) repeat(5, max-content) 1fr;
+    grid-template-columns: 15px minmax(250px, 20%) repeat(5, max-content) 1fr;
     column-gap: 10px;
-    margin-bottom: 10px;
+    row-gap: 2px;
+    padding: 0;
+    margin: 0 0 10px;
+`;
+
+const StyledActionContentItem = styled(ContentItem)`
+    position: relative;
+    justify-content: flex-end;
 `;
 
 const StyledTableRow = styled.div`
+    position: relative;
     display: contents;
     & > *,
     & > *:first-child,
@@ -148,28 +124,31 @@ const StyledTableRow = styled.div`
         padding: 0;
     }
 
+    & ${StyledCleanButton} {
+        position: relative;
+        top: unset;
+        right: unset;
+    }
+
     &:hover {
         background-color: ${gray8};
     }
 
-    &:hover ${StyledActionButton} {
+    &:hover ${StyledCleanButton} {
+        visibility: visible;
         opacity: 1;
     }
 `;
 
-const StyledHeading = styled(Text)`
-    padding-bottom: 7px;
-    display: block;
+const StyledHeadingWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    height: 35px;
 `;
 
 const StyledGoalAnchor = styled.a`
     text-decoration: none;
     cursor: pointer;
-`;
-
-const StyledActionContentItem = styled(ContentItem)`
-    align-items: center;
-    justify-content: flex-end;
 `;
 
 interface CommonCriteriaProps {
@@ -226,7 +205,7 @@ const CriteriaTitle: React.FC<CriteriaTitleProps> = ({ title, checked, canEdit, 
             </ContentItem>
             <TitleItem>
                 <TitleContainer>
-                    <Title color={gray10} weight="regular">
+                    <Title color={gray10} weight="thin">
                         {title}
                     </Title>
                 </TitleContainer>
@@ -251,7 +230,7 @@ const CriteriaGoalTitle: React.FC<CriteriaGoalTitleProps> = ({ projectId, scopeI
             <TitleItem as="a">
                 <TitleContainer>
                     <NextLink passHref href={routes.goal(`${projectId}-${scopeId}`)}>
-                        <StyledGoalAnchor color={gray10} weight="bolder" as={Title}>
+                        <StyledGoalAnchor color={textColor} weight="bold" as={Title}>
                             {title}
                         </StyledGoalAnchor>
                     </NextLink>
@@ -318,7 +297,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
                     <>
                         {/* TODO: implements edit criteria */}
                         {/* <StyledActionButton iconLeft={<EditIcon size="s" />} /> */}
-                        <StyledActionButton iconLeft={<CrossIcon size="s" />} onClick={onRemove} />
+                        <StyledCleanButton onClick={onRemove} />
                     </>
                 ) : null}
             </StyledActionContentItem>
@@ -375,35 +354,47 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     }, [criteriaList]);
 
     return (
-        <StyledActivityFeedItem>
-            <StyledIcon size="s" color={backgroundColor} />
-            <Wrapper>
-                <StyledHeading color={gray6} weight="bold">
-                    {tr('Achivement Criteria')}
-                </StyledHeading>
-                <StyledTable columns={8}>
-                    {criteriaList.map((item) => (
-                        <GoalCriteriaItem
-                            key={item.id}
-                            title={item.title}
-                            weight={item.weight}
-                            isDone={item.isDone}
-                            projectId={item.goalAsCriteria?.projectId}
-                            scopeId={item.goalAsCriteria?.scopeId}
-                            estimate={
-                                item.goalAsCriteria?.estimate[(item.goalAsCriteria?.estimate.length ?? 0) - 1]?.estimate
-                            }
-                            owner={item.goalAsCriteria?.owner}
-                            issuer={item.goalAsCriteria?.activity}
-                            state={item.goalAsCriteria?.state}
-                            onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
-                            onRemove={() => onRemoveCriteria({ id: item.id })}
-                            canEdit={canEdit}
-                        />
+        <StyledActivityFeed>
+            <StyledActivityFeedItem>
+                <Circle size={32}>
+                    <StyledIcon size="s" color={backgroundColor} />
+                </Circle>
+                <StyledWrapper>
+                    {nullable(criteriaList.length, () => (
+                        <>
+                            <StyledHeadingWrapper>
+                                <Text color={gray6} weight="bold">
+                                    {tr('Achivement criteria')}
+                                </Text>
+                            </StyledHeadingWrapper>
+                            <StyledTable columns={8}>
+                                {criteriaList.map((item) => (
+                                    <GoalCriteriaItem
+                                        key={item.id}
+                                        title={item.title}
+                                        weight={item.weight}
+                                        isDone={item.isDone}
+                                        projectId={item.goalAsCriteria?.projectId}
+                                        scopeId={item.goalAsCriteria?.scopeId}
+                                        estimate={
+                                            item.goalAsCriteria?.estimate[
+                                                (item.goalAsCriteria?.estimate.length ?? 0) - 1
+                                            ]?.estimate
+                                        }
+                                        owner={item.goalAsCriteria?.owner}
+                                        issuer={item.goalAsCriteria?.activity}
+                                        state={item.goalAsCriteria?.state}
+                                        onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
+                                        onRemove={() => onRemoveCriteria({ id: item.id })}
+                                        canEdit={canEdit}
+                                    />
+                                ))}
+                            </StyledTable>
+                        </>
                     ))}
-                </StyledTable>
-                {renderForm({ onAddCriteria: onAddHandler, dataForValidateCriteria })}
-            </Wrapper>
-        </StyledActivityFeedItem>
+                    {renderForm({ onAddCriteria: onAddHandler, dataForValidateCriteria })}
+                </StyledWrapper>
+            </StyledActivityFeedItem>
+        </StyledActivityFeed>
     );
 };

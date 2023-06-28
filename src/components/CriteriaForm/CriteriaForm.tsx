@@ -1,15 +1,25 @@
 import React, { useState, useEffect, useCallback, useReducer, useRef, forwardRef, ReactEventHandler } from 'react';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ComboBox, Button, AddIcon, GoalIcon, nullable, FormInput, useClickOutside } from '@taskany/bricks';
-import { gray7, gray8 } from '@taskany/colors';
-import { Controller, UseFormRegisterReturn, UseFormSetError, useForm } from 'react-hook-form';
+import {
+    ComboBox,
+    Button,
+    GoalIcon,
+    nullable,
+    FormInput,
+    useClickOutside,
+    useKeyboard,
+    KeyCode,
+    PlusIcon,
+} from '@taskany/bricks';
+import { gray1, gray7, gray8, gray9 } from '@taskany/colors';
+import { Controller, UseFormSetError, useForm } from 'react-hook-form';
 import { Goal, State } from '@prisma/client';
 
+import { InlineTrigger } from '../InlineTrigger';
 import { AddCriteriaScheme, criteriaSchema } from '../../schema/criteria';
 import { Table, TableRow, TitleItem, ContentItem, Title, TextItem, TitleContainer } from '../Table';
 import { StateDot } from '../StateDot';
-import { errorsProvider } from '../../utils/forms';
 import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './CriteriaForm.i18n';
@@ -17,28 +27,16 @@ import { tr } from './CriteriaForm.i18n';
 const maxPossibleWeigth = 100;
 const minPossibleWeight = 1;
 
-const StyledPlainButton = styled(Button)`
-    background-color: unset;
-    border: none;
-    padding: 0;
-
+const StyledInlineTrigger = styled(InlineTrigger)`
     color: ${gray8};
-
-    border-radius: 0;
-
-    &:hover:not([disabled]),
-    &:focus:not([disabled]) {
-        background-color: unset;
-    }
-
-    &:active:not([disabled]) {
-        transform: none;
-    }
+    line-height: 28px;
 `;
 
 const StyledTableResults = styled(Table)`
+    position: relative;
     grid-template-columns: 30px 210px 40px minmax(max-content, 120px);
     width: fit-content;
+    z-index: 2;
 `;
 
 const StyledFormInput = styled(FormInput)`
@@ -56,7 +54,6 @@ const StyledFormInput = styled(FormInput)`
 
 const StyledTableRow = styled.div`
     display: grid;
-    padding-left: 14px;
     grid-template-columns:
         minmax(calc(250px + 10px /* gap of sibling table */), 20%)
         repeat(2, max-content);
@@ -114,63 +111,72 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
 };
 
 interface WeightFieldProps {
-    registerProps: UseFormRegisterReturn<'weight'>;
-    errorsResolver: (field: 'weight') => { message?: string } | undefined;
+    name: 'weight';
+    value?: string;
+    onChange: ReactEventHandler<HTMLInputElement>;
+    error?: { message?: string };
     maxValue: number;
     setError: UseFormSetError<AddCriteriaScheme>;
 }
 
-const WeightField: React.FC<WeightFieldProps> = ({ registerProps, errorsResolver, maxValue, setError }) => {
-    const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-        (event) => {
-            const { value } = event.target;
+const WeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
+    ({ error, maxValue, setError, value, onChange, name }, ref) => {
+        const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+            (event) => {
+                onChange(event);
 
-            const parsedValue = parseInt(value, 10);
-            let message: string | undefined;
+                const { value } = event.target;
 
-            if (Number.isNaN(parsedValue)) {
-                message = tr('Weight must be integer');
-            } else if (parsedValue <= minPossibleWeight || maxValue + parsedValue > maxPossibleWeigth) {
-                message = tr
-                    .raw('Weight must be in range', {
-                        upTo: `${maxPossibleWeigth - maxValue}`,
+                const parsedValue = +value;
+                let message: string | undefined;
+
+                if (!Number.isNaN(parsedValue)) {
+                    if (parsedValue < minPossibleWeight || maxValue + parsedValue > maxPossibleWeigth) {
+                        message = tr
+                            .raw('Weight must be in range', {
+                                upTo: `${maxPossibleWeigth - maxValue}`,
+                            })
+                            .join('');
+                    }
+                } else {
+                    message = tr('Weight must be integer');
+                }
+
+                setError('weight', { message });
+            },
+            [setError, maxValue, onChange],
+        );
+
+        return (
+            <StyledFormInput
+                name={name}
+                value={value}
+                error={error?.message != null ? error : undefined}
+                placeholder={tr
+                    .raw('Weight', {
+                        upTo: maxPossibleWeigth - maxValue,
                     })
-                    .join('');
-            }
-
-            setError('weight', { message });
-        },
-        [setError, maxValue],
-    );
-
-    return (
-        <StyledFormInput
-            {...registerProps}
-            error={errorsResolver('weight')}
-            name="weight"
-            placeholder={tr
-                .raw('Weight', {
-                    upTo: maxPossibleWeigth - maxValue,
-                })
-                .join('')}
-            brick="center"
-            onChange={handleChange}
-        />
-    );
-};
+                    .join('')}
+                brick="center"
+                onChange={handleChange}
+                ref={ref}
+            />
+        );
+    },
+);
 
 interface CriteriaTitleFieldProps {
     name: 'title';
     value?: string;
     titles: string[];
-    errorsResolver: (field: CriteriaTitleFieldProps['name']) => { message?: string } | undefined;
+    error?: { message?: string };
     onSelect: <T extends Goal>(goal: T) => void;
     onChange: ReactEventHandler<HTMLInputElement>;
     setError: UseFormSetError<AddCriteriaScheme>;
 }
 
 export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>(
-    ({ name, value = '', errorsResolver, onSelect, onChange, titles = [], setError }, ref) => {
+    ({ name, value = '', error, onSelect, onChange, titles = [], setError }, ref) => {
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [[text, type], setQuery] = useState<[string, 'plain' | 'search']>([value, 'plain']);
 
@@ -195,17 +201,22 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
             }
         }, [value, text]);
 
-        const handleInputChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-            const { value } = event.target;
+        const handleInputChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+            (event) => {
+                const { value } = event.target;
 
-            setQuery(() => {
-                const isSearchInput = value[0] === '#';
+                setQuery(() => {
+                    const isSearchInput = value[0] === '#';
 
-                return [value, isSearchInput ? 'search' : 'plain'];
-            });
+                    return [value, isSearchInput ? 'search' : 'plain'];
+                });
 
-            setCompletionVisibility(true);
-        }, []);
+                onChange(event);
+
+                setCompletionVisibility(true);
+            },
+            [onChange],
+        );
 
         type GoalFromResults = NonNullable<typeof results.data>[number];
 
@@ -242,18 +253,17 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
                 maxWidth={400}
                 onChange={handleSelectGoal}
                 visible={completionVisible}
-                renderInput={(props) => (
+                renderInput={({ value, ref }) => (
                     <StyledFormInput
-                        error={errorsResolver(name)}
+                        autoFocus
+                        error={error?.message != null ? error : undefined}
                         placeholder={tr('Criteria or Goal')}
                         name={name}
                         brick="right"
-                        onChange={(...args) => {
-                            handleInputChange(...args);
-                            onChange(...args);
-                        }}
+                        onChange={handleInputChange}
                         onBlur={onlyUniqueTitleHandler}
-                        {...props}
+                        value={value}
+                        ref={ref}
                     />
                 )}
                 renderItems={(children) => (
@@ -279,20 +289,18 @@ interface CriteriaFormProps {
 export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, validityData }) => {
     const [formVisible, toggle] = useReducer((state) => !state, false);
     const wrapperRef = useRef<HTMLDivElement>(null);
+    const prevVisibleRef = useRef(formVisible);
 
     const {
         handleSubmit,
-        register,
         control,
         reset,
         setValue,
         setError,
-        formState: { errors, isSubmitSuccessful },
+        formState: { isSubmitSuccessful },
     } = useForm<AddCriteriaScheme>({
         resolver: zodResolver(criteriaSchema),
-        mode: 'all',
         reValidateMode: 'onChange',
-        criteriaMode: 'all',
         defaultValues: {
             goalId,
             title: '',
@@ -302,29 +310,31 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
     });
 
     useEffect(() => {
-        if (isSubmitSuccessful) {
+        if (!formVisible && prevVisibleRef.current !== formVisible) {
             reset({
                 title: '',
                 weight: '',
                 goalAsGriteria: null,
+                goalId,
             });
         }
-    }, [isSubmitSuccessful, reset]);
+
+        prevVisibleRef.current = formVisible;
+    }, [formVisible, reset, goalId]);
+
+    useEffect(() => {
+        if (isSubmitSuccessful) {
+            toggle();
+        }
+    }, [isSubmitSuccessful]);
 
     const onClickOutside = useCallback(() => {
         if (formVisible) {
-            reset({
-                title: '',
-                weight: '',
-                goalAsGriteria: null,
-            });
             toggle();
         }
-    }, [reset, formVisible]);
+    }, [formVisible]);
 
     useClickOutside(wrapperRef, onClickOutside);
-
-    const errorResolver = errorsProvider(errors, true);
 
     const handleSelectGoal = useCallback(
         (goal: Goal) => {
@@ -336,31 +346,57 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
         [setValue],
     );
 
+    const [onESC] = useKeyboard(
+        [KeyCode.Escape],
+        (event) => {
+            if (event.target && wrapperRef.current?.contains(event.target as Node) && formVisible) {
+                toggle();
+            }
+        },
+        {
+            capture: true,
+            event: 'keydown',
+        },
+    );
+
     return (
         <div ref={wrapperRef}>
             {formVisible ? (
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)} {...onESC}>
                     <StyledTableRow>
                         <Controller
                             name="title"
                             control={control}
-                            render={({ field }) => (
+                            render={({ field, fieldState }) => (
                                 <CriteriaTitleField
                                     {...field}
-                                    errorsResolver={errorResolver}
+                                    error={fieldState.error}
                                     setError={setError}
                                     onSelect={handleSelectGoal}
                                     titles={validityData.title}
                                 />
                             )}
                         />
-                        <WeightField
-                            registerProps={register('weight')}
-                            errorsResolver={errorResolver}
-                            maxValue={validityData.sum}
-                            setError={setError}
+                        <Controller
+                            name="weight"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <WeightField
+                                    {...field}
+                                    error={fieldState.error}
+                                    maxValue={validityData.sum}
+                                    setError={setError}
+                                />
+                            )}
                         />
-                        <StyledSubmitButton brick="left" view="primary" text={tr('Add')} size="m" type="submit" />
+                        <StyledSubmitButton
+                            brick="left"
+                            view="primary"
+                            text={tr('Add')}
+                            size="m"
+                            type="submit"
+                            outline
+                        />
                     </StyledTableRow>
                     <Controller
                         name="goalId"
@@ -374,11 +410,9 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
                     />
                 </form>
             ) : (
-                <StyledPlainButton
+                <StyledInlineTrigger
                     text={tr('Add achievement criteria')}
-                    iconLeft={<AddIcon size="s" />}
-                    view="default"
-                    outline={false}
+                    icon={<PlusIcon noWrap size="s" />}
                     onClick={toggle}
                 />
             )}

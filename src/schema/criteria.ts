@@ -10,13 +10,7 @@ export const criteriaSchema = z.object({
         .min(1, {
             message: tr('Title must be longer than 1 symbol'),
         }),
-    weight: z
-        .string({
-            required_error: tr('Criteria weight is required'),
-        })
-        .min(1, {
-            message: tr('Criteria weight must be longer than 1 symbol'),
-        }),
+    weight: z.string().optional(),
     goalId: z.string(),
     goalAsGriteria: z
         .object({
