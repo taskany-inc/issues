@@ -68,7 +68,7 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
             ${activityId},
             ${input.state.id},
             ${input.priority},
-            max("scopeId") + 1
+            coalesce(max("scopeId"), 0) + 1
         FROM "Goal" WHERE "projectId" = ${input.parent.id};
     `;
 
@@ -113,7 +113,7 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
 export const changeGoalProject = async (id: string, newProjectId: string) => {
     await prisma.$executeRaw`
         UPDATE "Goal"
-        SET "projectId" = ${newProjectId}, "scopeId" = (SELECT max("scopeId") + 1 FROM "Goal" WHERE "projectId" = ${newProjectId})
+        SET "projectId" = ${newProjectId}, "scopeId" = (SELECT coalesce(max("scopeId"), 0) + 1 FROM "Goal" WHERE "projectId" = ${newProjectId})
         WHERE "id" = ${id};
     `;
 
