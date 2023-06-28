@@ -163,6 +163,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                     type="submit"
                                     disabled={!generalFormChanged}
                                     text={tr('Save')}
+                                    outline
                                 />
                             </FormAction>
                         </FormActions>
