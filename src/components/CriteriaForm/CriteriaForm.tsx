@@ -12,7 +12,7 @@ import {
     KeyCode,
     PlusIcon,
 } from '@taskany/bricks';
-import { gray1, gray7, gray8, gray9 } from '@taskany/colors';
+import { gray7, gray8 } from '@taskany/colors';
 import { Controller, UseFormSetError, useForm } from 'react-hook-form';
 import { Goal, State } from '@prisma/client';
 
@@ -28,6 +28,7 @@ const maxPossibleWeigth = 100;
 const minPossibleWeight = 1;
 
 const StyledInlineTrigger = styled(InlineTrigger)`
+    display: inline-flex;
     color: ${gray8};
     line-height: 28px;
 `;
