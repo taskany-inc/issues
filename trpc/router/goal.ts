@@ -358,8 +358,44 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    changeProject: protectedProcedure.input(goalChangeProjectSchema).mutation(async ({ input }) => {
-        return changeGoalProject(input.id, input.projectId);
+    changeProject: protectedProcedure.input(goalChangeProjectSchema).mutation(async ({ ctx, input }) => {
+        const actualGoal = await prisma.goal.findUnique({
+            where: { id: input.id },
+        });
+
+        if (!actualGoal) return null;
+
+        const { activityId } = ctx.session.user;
+
+        try {
+            await changeGoalProject(input.id, input.projectId);
+            const goal = await prisma.goal.update({
+                where: {
+                    id: input.id,
+                },
+                data: {
+                    history: {
+                        create: {
+                            activityId,
+                            subject: 'project',
+                            action: 'change',
+                            previousValue: actualGoal.projectId,
+                            nextValue: input.projectId,
+                        },
+                    },
+                },
+                include: {
+                    ...goalDeepQuery,
+                },
+            });
+
+            return {
+                ...goal,
+                ...addCalclulatedGoalsFields(goal, activityId),
+            };
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
     }),
     update: protectedProcedure.input(goalUpdateSchema).mutation(async ({ ctx, input }) => {
         const actualGoal = await prisma.goal.findUnique({
@@ -438,23 +474,6 @@ export const goal = router({
                 previousValue: actualGoal.ownerId,
                 nextValue: input.owner.id,
             });
-        }
-
-        if (actualGoal.projectId !== input.parent.id) {
-            history.push({
-                subject: 'project',
-                action: 'change',
-                previousValue: actualGoal.projectId,
-                nextValue: input.parent.id,
-            });
-
-            // FIXME: remove this monkey patch after adding button to changeProject separately
-            const movedGoal = await changeGoalProject(actualGoal.id, input.parent.id);
-            if (movedGoal) {
-                actualGoal.id = movedGoal.id;
-                actualGoal.projectId = movedGoal.projectId;
-                actualGoal.scopeId = movedGoal.scopeId;
-            }
         }
 
         const correctEstimate = await findOrCreateEstimate(input.estimate, ctx.session.user.activityId, actualGoal.id);

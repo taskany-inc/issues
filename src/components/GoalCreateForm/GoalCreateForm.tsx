@@ -110,7 +110,6 @@ const GoalCreateForm: React.FC = () => {
             parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}
-            help="goals"
             actionButton={
                 <>
                     <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)} />
@@ -131,7 +130,7 @@ const GoalCreateForm: React.FC = () => {
                             onChange={onCreateTypeChange}
                             renderTrigger={(props) => (
                                 <Button
-                                    disabled={false}
+                                    disabled={busy}
                                     view="primary"
                                     outline
                                     brick="left"

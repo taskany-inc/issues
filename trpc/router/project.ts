@@ -47,6 +47,7 @@ export const addCalculatedProjectFields = <
 export const project = router({
     suggestions: protectedProcedure.input(z.string()).query(({ input }) => {
         return prisma.project.findMany({
+            take: 5,
             where: {
                 title: {
                     contains: input,

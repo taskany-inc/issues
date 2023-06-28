@@ -3,7 +3,18 @@ import React, { useCallback, useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { gapM, gray7 } from '@taskany/colors';
-import { Button, Card, CardInfo, CardContent, EditIcon, BinIcon, nullable, Text, PlusIcon } from '@taskany/bricks';
+import {
+    Button,
+    Card,
+    CardInfo,
+    CardContent,
+    EditIcon,
+    BinIcon,
+    nullable,
+    Text,
+    PlusIcon,
+    ArrowRightIcon,
+} from '@taskany/bricks';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { editGoalKeys } from '../../utils/hotkeys';
@@ -37,6 +48,7 @@ import { UserBadge } from '../UserBadge';
 import { InlineTrigger } from '../InlineTrigger';
 import { UserComboBox } from '../UserComboBox';
 import { State } from '../State';
+import { GoalParentComboBox } from '../GoalParentComboBox';
 
 import { tr } from './GoalPage.i18n';
 
@@ -88,8 +100,10 @@ const StyledInlineTrigger = styled(InlineTrigger)`
     margin-left: 5px; // 24 / 2 - 7 center of UserPic and center of PlusIcon
 `;
 
-const StyledParticipantsInput = styled.div`
+const StyledInlineInput = styled.div`
     display: flex;
+    align-items: center;
+    height: 28px;
 `;
 
 export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
@@ -210,6 +224,25 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
         router.goals();
     }, [id, router, toggleArchiveMutation]);
+
+    const changeProjectMutation = trpc.goal.changeProject.useMutation();
+    const onGoalTransfer = useCallback(
+        async ({ id: projectId }: { id: string }) => {
+            if (goal) {
+                const promise = changeProjectMutation.mutateAsync({
+                    id: goal?.id,
+                    projectId,
+                });
+
+                await notifyPromise(promise, 'goalsUpdate');
+
+                const transferedGoal = await promise;
+
+                if (transferedGoal) router.goal(transferedGoal._shortId);
+            }
+        },
+        [goal, changeProjectMutation, router],
+    );
 
     const pageTitle = tr
         .raw('title', {
@@ -359,9 +392,10 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         ))}
 
                         {nullable(goal._isEditable, () => (
-                            <StyledParticipantsInput>
+                            <StyledInlineInput>
                                 <UserComboBox
                                     placement="bottom-start"
+                                    placeholder={tr('Type user name or email')}
                                     filter={participantsFilter}
                                     onChange={onParticipantAdd}
                                     renderTrigger={(props) => (
@@ -369,12 +403,12 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                             // FIXME: https://github.com/taskany-inc/bricks/issues/210
                                             ref={props.ref as any as React.RefObject<HTMLDivElement>}
                                             icon={<PlusIcon noWrap size="xs" />}
-                                            onClick={props.onClick}
                                             text={tr('Add participant')}
+                                            onClick={props.onClick}
                                         />
                                     )}
                                 />
-                            </StyledParticipantsInput>
+                            </StyledInlineInput>
                         ))}
                     </IssueMeta>
 
@@ -382,12 +416,30 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                     {nullable(goal._isEditable, () => (
                         <IssueMeta>
-                            <StyledInlineTrigger
-                                icon={<BinIcon noWrap size="xs" />}
-                                text={tr('Archive goal')}
-                                onClick={dispatchModalEvent(ModalEvent.GoalDeleteModal)}
-                            />
-                            {/* TODO: https://github.com/taskany-inc/issues/issues/1166 */}
+                            <StyledInlineInput>
+                                <GoalParentComboBox
+                                    placement="bottom-start"
+                                    placeholder={tr('Type project title')}
+                                    onChange={onGoalTransfer}
+                                    renderTrigger={(props) => (
+                                        <StyledInlineTrigger
+                                            // FIXME: https://github.com/taskany-inc/bricks/issues/210
+                                            ref={props.ref as any as React.RefObject<HTMLDivElement>}
+                                            icon={<ArrowRightIcon noWrap size="xs" />}
+                                            text={tr('Transfer goal')}
+                                            onClick={props.onClick}
+                                        />
+                                    )}
+                                />
+                            </StyledInlineInput>
+
+                            <StyledInlineInput>
+                                <StyledInlineTrigger
+                                    icon={<BinIcon noWrap size="xs" />}
+                                    text={tr('Archive goal')}
+                                    onClick={dispatchModalEvent(ModalEvent.GoalDeleteModal)}
+                                />
+                            </StyledInlineInput>
                         </IssueMeta>
                     ))}
                 </div>
