@@ -211,6 +211,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                         type="submit"
                                         disabled={!isDirty}
                                         text={tr('Save')}
+                                        outline
                                     />
                                 </FormAction>
                             </FormActions>
