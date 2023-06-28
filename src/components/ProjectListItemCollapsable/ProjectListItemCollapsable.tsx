@@ -38,12 +38,12 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     loading = false,
     deep = 0,
 }) => {
-    const contentHidden = collapsed || loading;
-
-    const offset = collapseOffset * (contentHidden ? deep - 1 : deep);
     const childs = useMemo(() => project.children.map(({ id }) => id), [project]);
 
     const onClickEnabled = childs.length;
+    const contentHidden = !childs.length || collapsed || loading;
+
+    const offset = collapseOffset * (contentHidden ? deep - 1 : deep);
 
     const onGoalsButtonClick = useCallback(
         (e: MouseEvent) => {
