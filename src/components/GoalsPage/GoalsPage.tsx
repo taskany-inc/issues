@@ -16,9 +16,9 @@ import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { GoalListItem, GoalsListContainer } from '../GoalListItem';
-import { PageTitle } from '../PageTitle';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { Nullish } from '../../types/void';
+import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -149,30 +149,20 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
         [router],
     );
 
-    const defaultTitle = <PageTitle title={tr('Goals')} />;
-    const presetInfo =
-        user.activityId !== currentPreset?.activityId
-            ? `${tr('created by')} ${currentPreset?.activity?.user?.name}`
-            : undefined;
-    const presetTitle = <PageTitle title={tr('Goals')} subtitle={currentPreset?.title} info={presetInfo} />;
-
-    const onShadowPresetTitleClick = useCallback(() => {
-        if (shadowPreset) setPreset(shadowPreset.id);
-    }, [setPreset, shadowPreset]);
-    const shadowPresetInfo =
-        user.activityId !== shadowPreset?.activityId
-            ? `${tr('created by')} ${shadowPreset?.activity?.user?.name}`
-            : undefined;
-    const shadowPresetTitle = (
-        <PageTitle
+    const title = (
+        <PageTitlePreset
+            activityId={user.activityId}
+            currentPresetActivityId={currentPreset?.activityId}
+            currentPresetActivityUserName={currentPreset?.activity.user?.name}
+            currentPresetTitle={currentPreset?.title}
+            shadowPresetActivityId={shadowPreset?.activityId}
+            shadowPresetActivityUserName={shadowPreset?.activity.user?.name}
+            shadowPresetId={shadowPreset?.id}
+            shadowPresetTitle={shadowPreset?.title}
             title={tr('Goals')}
-            subtitle={shadowPreset?.title}
-            info={shadowPresetInfo}
-            onClick={onShadowPresetTitleClick}
+            setPreset={setPreset}
         />
     );
-    // eslint-disable-next-line no-nested-ternary
-    const title = currentPreset ? presetTitle : shadowPreset ? shadowPresetTitle : defaultTitle;
 
     const description =
         currentPreset && currentPreset.description
