@@ -286,9 +286,11 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
                 </CriteriaTitle>
             )}
             <ContentItem>
-                <Text weight="bold" size="s" color={gray9}>
-                    {weight}
-                </Text>
+                {nullable(weight, () => (
+                    <Text weight="bold" size="s" color={gray9}>
+                        {weight}
+                    </Text>
+                ))}
             </ContentItem>
             <ContentItem>
                 {nullable(state, (s) => (
