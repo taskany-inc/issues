@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { gapM, gray7 } from '@taskany/colors';
@@ -37,7 +37,7 @@ import { trpc } from '../../utils/trpcClient';
 import { GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
-import { ActivityByIdReturnType, GoalUpdateReturnType } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
 import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
@@ -194,22 +194,10 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         invalidateFn();
     }, [invalidateFn]);
 
-    const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
-    const onGoalEdit = useCallback(
-        (editedGoal?: GoalUpdateReturnType) => {
-            setGoalEditModalVisible(false);
-
-            if (editedGoal && id !== editedGoal._shortId) {
-                router.goal(editedGoal._shortId);
-            } else {
-                invalidateFn();
-            }
-        },
-        [id, invalidateFn, router],
-    );
-    const onGoalEditModalShow = useCallback(() => {
-        setGoalEditModalVisible(true);
-    }, []);
+    const onGoalEdit = useCallback(() => {
+        dispatchModalEvent(ModalEvent.GoalEditModal)();
+        invalidateFn();
+    }, [invalidateFn]);
 
     const toggleArchiveMutation = trpc.goal.toggleArchive.useMutation();
     const onGoalDeleteConfirm = useCallback(async () => {
@@ -446,12 +434,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
             </IssueContent>
 
             {nullable(goal._isEditable, () => (
-                <ModalOnEvent
-                    event={ModalEvent.GoalEditModal}
-                    hotkeys={editGoalKeys}
-                    visible={goalEditModalVisible}
-                    onShow={onGoalEditModalShow}
-                >
+                <ModalOnEvent event={ModalEvent.GoalEditModal} hotkeys={editGoalKeys}>
                     <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
                 </ModalOnEvent>
             ))}
