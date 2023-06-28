@@ -181,24 +181,7 @@ export const project = router({
                             query: '',
                         },
                         ctx.session.user.activityId,
-                        {
-                            AND: {
-                                OR: [
-                                    {
-                                        projectId: id,
-                                    },
-                                    {
-                                        project: {
-                                            parent: {
-                                                some: {
-                                                    id,
-                                                },
-                                            },
-                                        },
-                                    },
-                                ],
-                            },
-                        },
+                        { projectId: id },
                     ),
                     include: {
                         ...goalDeepQuery,
@@ -213,24 +196,7 @@ export const project = router({
                     },
                 }),
                 prisma.goal.findMany({
-                    ...goalsFilter(goalsQuery, ctx.session.user.activityId, {
-                        AND: {
-                            OR: [
-                                {
-                                    projectId: id,
-                                },
-                                {
-                                    project: {
-                                        parent: {
-                                            some: {
-                                                id,
-                                            },
-                                        },
-                                    },
-                                },
-                            ],
-                        },
-                    }),
+                    ...goalsFilter(goalsQuery, ctx.session.user.activityId, { projectId: id }),
                     include: {
                         ...goalDeepQuery,
                         estimate: {
