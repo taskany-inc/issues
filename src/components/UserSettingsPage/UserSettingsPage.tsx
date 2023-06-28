@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, ChangeEventHandler } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
@@ -16,7 +16,7 @@ import {
     FormRadioInput,
     BulbOnIcon,
 } from '@taskany/bricks';
-import { useRouter } from 'next/router';
+import styled from 'styled-components';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { shallowEqual } from '../../utils/shallowEqual';
@@ -33,8 +33,13 @@ import { dispatchErrorNotification, dispatchSuccessNotification } from '../../ut
 
 import { tr } from './UserSettingsPage.i18n';
 
+const StyledLabel = styled.label`
+    padding: 8px 8px 8px 16px;
+
+    background-color: transparent;
+`;
+
 export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
-    const router = useRouter();
     const settings = trpc.user.settings.useQuery();
     const updateMutation = trpc.user.update.useMutation();
     const updateSettingsMutation = trpc.user.updateSettings.useMutation();
@@ -81,7 +86,6 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 {
                     onSuccess: () => {
                         utils.user.settings.invalidate();
-                        router.reload();
                     },
                 },
             );
@@ -92,7 +96,34 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 setAppearanceTheme(res.theme);
             }
         },
-        [updateSettingsMutation, utils.user.settings, router],
+        [updateSettingsMutation, utils.user.settings],
+    );
+
+    const [betaUser, setBetaUser] = useState(settings?.data?.beta);
+
+    const onBetaUserChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
+        async (e) => {
+            const beta = e.target.checked;
+            setBetaUser(beta);
+
+            const promise = updateSettingsMutation.mutateAsync(
+                {
+                    beta,
+                },
+                {
+                    onSuccess: () => {
+                        utils.user.settings.invalidate();
+                    },
+                },
+            );
+
+            const [res] = await notifyPromise(promise, 'userSettingsUpdate');
+
+            if (res && res.beta) {
+                setBetaUser(res.beta);
+            }
+        },
+        [updateSettingsMutation, utils.user.settings],
     );
 
     useEffect(() => {
@@ -183,6 +214,15 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                 <FormRadioInput value="dark" label="Dark" />
                                 <FormRadioInput value="light" label="Light" />
                             </FormRadio>
+                        </Fieldset>
+                    </Form>
+                </SettingsCard>
+
+                <SettingsCard>
+                    <Form>
+                        <Fieldset title={tr('You are hero')}>
+                            <StyledLabel htmlFor="beta">{tr('Beta features')}</StyledLabel>
+                            <input id="beta" type="checkbox" checked={betaUser} onChange={onBetaUserChange} />
                         </Fieldset>
                     </Form>
                 </SettingsCard>

@@ -222,10 +222,9 @@ model Goal {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  @@unique([projectId, scopeId])
   @@index([ownerId])
   @@index([activityId])
-
-  @@unique([projectId, scopeId])
 }
 
 model Filter {
@@ -292,13 +291,13 @@ model Flow {
 }
 
 model State {
-  id       String     @id @default(cuid())
-  title    String     @unique
+  id       String    @id @default(cuid())
+  title    String    @unique
   type     StateType
   flows    Flow[]
   default  Boolean?
-  hue      Int        @default(1)
-  goals    Goal[]     @relation("goalState")
+  hue      Int       @default(1)
+  goals    Goal[]    @relation("goalState")
   comments Comment[]
 
   createdAt DateTime @default(now())
@@ -308,6 +307,7 @@ model State {
 model Settings {
   id       String    @id @default(cuid())
   theme    String    @default("system")
+  beta     Boolean   @default(true)
   flow     Flow?     @relation(fields: [flowId], references: [id])
   flowId   String?
   activity Activity?

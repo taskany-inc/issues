@@ -154,6 +154,7 @@ declare module 'next-auth' {
             activityId: string;
             settings?: {
                 theme: 'light' | 'dark' | 'system';
+                beta: boolean;
             };
         };
     }
