@@ -2,8 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
-import styled from 'styled-components';
-import { Form, FormInput, FormActions, FormAction, ModalContent, Tag, QuestionIcon, nullable } from '@taskany/bricks';
+import { Form, FormInput, FormActions, FormAction, ModalContent, Tag, nullable } from '@taskany/bricks';
 import { Estimate, State, Tag as TagModel } from '@prisma/client';
 
 import { FormEditor } from '../FormEditor/FormEditor';
@@ -18,7 +17,6 @@ import { TagComboBox } from '../TagComboBox';
 import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-import { AvailableHelpPages } from '../../types/help';
 import { HelpButton } from '../HelpButton/HelpButton';
 
 import { tr } from './GoalForm.i18n';
@@ -38,15 +36,9 @@ interface GoalFormProps {
     validityScheme: Schema;
     id?: string;
     tip?: React.ReactNode;
-    help?: AvailableHelpPages;
 
     onSumbit: (fields: z.infer<GoalFormProps['validityScheme']>) => void;
 }
-
-const StyledHelpIcon = styled(QuestionIcon)`
-    display: flex;
-    align-items: center;
-`;
 
 export const GoalForm: React.FC<GoalFormProps> = ({
     id,
@@ -62,7 +54,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     validityScheme,
     actionButton,
     tip,
-    help,
     onSumbit,
 }) => {
     const locale = useLocale();
@@ -137,19 +128,21 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
                 <FormActions flat="top">
                     <FormAction left inline>
-                        <Controller
-                            name="parent"
-                            control={control}
-                            render={({ field }) => (
-                                <GoalParentComboBox
-                                    text={tr('Enter project or team title')}
-                                    placeholder={tr('Enter project or team title')}
-                                    error={errorsResolver(field.name)}
-                                    disabled={busy}
-                                    {...field}
-                                />
-                            )}
-                        />
+                        {nullable(!id, () => (
+                            <Controller
+                                name="parent"
+                                control={control}
+                                render={({ field }) => (
+                                    <GoalParentComboBox
+                                        text={tr('Enter project or team title')}
+                                        placeholder={tr('Enter project or team title')}
+                                        error={errorsResolver(field.name)}
+                                        disabled={busy}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        ))}
 
                         <Controller
                             name="priority"
@@ -220,9 +213,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             )}
                         />
 
-                        {nullable(help, (h) => (
-                            <HelpButton slug={h} />
-                        ))}
+                        <HelpButton slug="goals" />
                     </FormAction>
                 </FormActions>
                 <FormActions flat="top">

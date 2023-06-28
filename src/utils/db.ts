@@ -111,17 +111,11 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
 };
 
 export const changeGoalProject = async (id: string, newProjectId: string) => {
-    await prisma.$executeRaw`
+    return prisma.$executeRaw`
         UPDATE "Goal"
         SET "projectId" = ${newProjectId}, "scopeId" = (SELECT coalesce(max("scopeId"), 0) + 1 FROM "Goal" WHERE "projectId" = ${newProjectId})
         WHERE "id" = ${id};
     `;
-
-    return prisma.goal.findUnique({
-        where: {
-            id,
-        },
-    });
 };
 
 export const getGoalHistory = async <T extends GoalHistory & { activity: Activity & { user: User | null } }>(

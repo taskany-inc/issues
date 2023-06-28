@@ -46,10 +46,17 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
             value?.user?.name || value?.user?.email || value?.ghost?.email || query,
         );
 
-        const suggestions = trpc.user.suggestions.useQuery({
-            query: inputState,
-            filter: filter || [],
-        });
+        const suggestions = trpc.user.suggestions.useQuery(
+            {
+                query: inputState,
+                filter: filter || [],
+            },
+            {
+                enabled: inputState.length >= 2,
+                cacheTime: 0,
+                staleTime: 0,
+            },
+        );
 
         const onClickOutside = useCallback((cb: () => void) => {
             cb();

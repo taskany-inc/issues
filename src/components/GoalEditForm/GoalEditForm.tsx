@@ -45,7 +45,6 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             tags={goal.tags}
             estimate={goal._lastEstimate ?? undefined}
             onSumbit={updateGoal}
-            help="goals"
             actionButton={
                 <>
                     <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />

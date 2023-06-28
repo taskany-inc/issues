@@ -6,5 +6,8 @@
     "Assignee": "Ответственный",
     "Participants": "В главных ролях",
     "Add participant": "Добавить участника",
-    "Archive goal": "Удалить цель"
+    "Archive goal": "Удалить цель",
+    "Type user name or email": "Введите имя или email",
+    "Type project title": "Введите название проекта",
+    "Transfer goal": "Перенести цель"
 }
