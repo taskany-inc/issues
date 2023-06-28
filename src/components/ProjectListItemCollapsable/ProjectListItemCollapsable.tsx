@@ -43,7 +43,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     const onClickEnabled = childs.length;
     const contentHidden = !childs.length || collapsed || loading;
 
-    const offset = collapseOffset * (contentHidden ? deep - 1 : deep);
+    const offset = collapseOffset * (deep > 0 && contentHidden ? deep - 1 : deep);
 
     const onGoalsButtonClick = useCallback(
         (e: MouseEvent) => {
