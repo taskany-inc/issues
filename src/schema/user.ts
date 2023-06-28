@@ -13,5 +13,6 @@ export const suggestionsUserSchema = z.object({
 });
 
 export const settingsUserSchema = z.object({
-    theme: z.string(),
+    theme: z.string().optional(),
+    beta: z.boolean().optional(),
 });
