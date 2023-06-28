@@ -51,11 +51,6 @@ export const ProjectListItemConnected: FC<{
         },
     );
 
-    const goals = useMemo(
-        () => projectDeepInfo?.goals.filter((g) => g.projectId === project.id),
-        [projectDeepInfo, project],
-    );
-
     const onClick = useCallback(() => {
         setIsCollapsed((value) => !value);
     }, []);
@@ -67,7 +62,7 @@ export const ProjectListItemConnected: FC<{
     return (
         <ProjectListItemCollapsable
             href={routes.project(project.id)}
-            goals={goals?.map((g) => (
+            goals={projectDeepInfo?.goals.map((g) => (
                 <GoalListItem
                     createdAt={g.createdAt}
                     updatedAt={g.updatedAt}
