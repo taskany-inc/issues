@@ -6,6 +6,8 @@ export const ActivityFeed = styled.div`
     row-gap: ${gapM};
     padding-top: ${gapL};
     padding-bottom: 250px;
+    position: relative;
+    z-index: 0;
 `;
 
 export const ActivityFeedItem = styled.div`
