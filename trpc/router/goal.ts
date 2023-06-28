@@ -16,8 +16,8 @@ import {
     goalCommonSchema,
     goalStateChangeSchema,
     goalUpdateSchema,
-    toogleGoalArchiveSchema,
-    toogleGoalDependencySchema,
+    toggleGoalArchiveSchema,
+    toggleGoalDependencySchema,
     userGoalsSchema,
     goalCommentSchema,
     toggleParticipantsSchema,
@@ -573,40 +573,7 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    toggleDependency: protectedProcedure
-        .input(toogleGoalDependencySchema)
-        .mutation(({ input: { id, target, direction, kind }, ctx }) => {
-            const connection = { id: target };
-
-            try {
-                return prisma.goal.update({
-                    where: { id },
-                    data: {
-                        id, // this is hack to force updatedAt field
-                        [kind]: { [connectionMap[String(direction)]]: connection },
-                        history: {
-                            create: {
-                                activityId: ctx.session.user.activityId,
-                                subject: 'dependencies',
-                                action: direction ? 'add' : 'remove',
-                                nextValue: target,
-                            },
-                        },
-                    },
-                });
-
-                // await mailServer.sendMail({
-                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
-                //     to: 'bar@example.com, baz@example.com',
-                //     subject: 'Hello ✔',
-                //     text: `new post '${title}'`,
-                //     html: `new post <b>${title}</b>`,
-                // });
-            } catch (error: any) {
-                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-            }
-        }),
-    toggleArchive: protectedProcedure.input(toogleGoalArchiveSchema).mutation(({ input: { id, archived }, ctx }) => {
+    toggleArchive: protectedProcedure.input(toggleGoalArchiveSchema).mutation(({ input: { id, archived }, ctx }) => {
         try {
             return prisma.goal.update({
                 where: { id },
@@ -911,6 +878,50 @@ export const goal = router({
                             subject: 'participants',
                             action: 'remove',
                             nextValue: input.activityId,
+                            activityId: ctx.session.user.activityId,
+                        },
+                    },
+                },
+            });
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    addDependency: protectedProcedure.input(toggleGoalDependencySchema).mutation(async ({ input, ctx }) => {
+        try {
+            return prisma.goal.update({
+                where: { id: input.id },
+                data: {
+                    [input.kind]: {
+                        connect: { id: input.relation?.id },
+                    },
+                    history: {
+                        create: {
+                            subject: 'dependencies',
+                            action: 'add',
+                            nextValue: input.relation.id,
+                            activityId: ctx.session.user.activityId,
+                        },
+                    },
+                },
+            });
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    removeDependency: protectedProcedure.input(toggleGoalDependencySchema).mutation(async ({ input, ctx }) => {
+        try {
+            return prisma.goal.update({
+                where: { id: input.id },
+                data: {
+                    [input.kind]: {
+                        disconnect: { id: input.relation?.id },
+                    },
+                    history: {
+                        create: {
+                            subject: 'dependencies',
+                            action: 'remove',
+                            nextValue: input.relation.id,
                             activityId: ctx.session.user.activityId,
                         },
                     },
