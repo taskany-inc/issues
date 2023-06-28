@@ -23,6 +23,7 @@ const UserImage = styled(UserPic)`
 `;
 
 const StyledCounter = styled.div`
+    min-width: 0.75rem;
     padding: 0px 5px;
     margin: 2px 0px;
     border-radius: ${radiusL};
