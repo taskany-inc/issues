@@ -13,21 +13,22 @@ export enum dependencyKind {
     relatedTo = 'relatedTo',
 }
 
-export const toogleGoalDependencySchema = z.object({
-    id: z.string(),
-    target: z.string(),
-    direction: z.boolean(),
+export const toggleGoalDependencySchema = z.object({
+    id: z.string().optional(),
     kind: z.nativeEnum(dependencyKind),
+    relation: z.object({
+        id: z.string(),
+    }),
 });
 
-export type ToggleGoalDependency = z.infer<typeof toogleGoalDependencySchema>;
+export type ToggleGoalDependency2 = z.infer<typeof toggleGoalDependencySchema>;
 
-export const toogleGoalArchiveSchema = z.object({
+export const toggleGoalArchiveSchema = z.object({
     id: z.string(),
     archived: z.boolean(),
 });
 
-export type ToggleGoalArchive = z.infer<typeof toogleGoalDependencySchema>;
+export type ToggleGoalArchive = z.infer<typeof toggleGoalArchiveSchema>;
 
 export const goalCommonSchema = z.object({
     title: z
