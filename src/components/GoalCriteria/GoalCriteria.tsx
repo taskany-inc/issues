@@ -98,31 +98,31 @@ const GoalCriteriaCheckBox: React.FC<GoalCriteriaCheckBoxProps> = ({ checked, ca
 const StyledCleanButton = styled(CleanButton)`
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
-    margin-right: 4px;
+    align-self: baseline;
 `;
+const StyledContentCellWithOffset = styled(ContentItem)``;
 
 const StyledTable = styled(Table)`
     width: 100%;
-    grid-template-columns: 15px minmax(250px, 20%) repeat(5, max-content) 1fr;
+    grid-template-columns: 15px minmax(250px, 20%) repeat(4, max-content) 1fr;
     column-gap: 10px;
     row-gap: 2px;
     padding: 0;
     margin: 0 0 10px;
-`;
 
-const StyledActionContentItem = styled(ContentItem)`
-    position: relative;
-    justify-content: flex-end;
+    & ${ContentItem}, & ${TitleItem} {
+        align-items: baseline;
+        padding: 0;
+    }
+
+    & ${ContentItem}:first-child {
+        padding-top: 2px;
+    }
 `;
 
 const StyledTableRow = styled.div`
     position: relative;
     display: contents;
-    & > *,
-    & > *:first-child,
-    & > *:last-child {
-        padding: 0;
-    }
 
     & ${StyledCleanButton} {
         position: relative;
@@ -138,6 +138,15 @@ const StyledTableRow = styled.div`
         visibility: visible;
         opacity: 1;
     }
+`;
+
+const StyledStateDot = styled(StateDot)`
+    margin-top: 4px;
+`;
+
+const StyledTitleContainer = styled(TitleContainer)`
+    flex: 0 1 auto;
+    max-width: 90%;
 `;
 
 const StyledHeadingWrapper = styled.div`
@@ -195,20 +204,22 @@ interface CriteriaTitleProps {
     checked: boolean;
     canEdit: boolean;
     onClick: () => void;
+    children?: React.ReactNode;
 }
 
-const CriteriaTitle: React.FC<CriteriaTitleProps> = ({ title, checked, canEdit, onClick }) => {
+const CriteriaTitle: React.FC<CriteriaTitleProps> = ({ title, checked, canEdit, onClick, children }) => {
     return (
         <>
-            <ContentItem>
+            <StyledContentCellWithOffset>
                 <GoalCriteriaCheckBox onClick={onClick} checked={checked} canEdit={canEdit} />
-            </ContentItem>
+            </StyledContentCellWithOffset>
             <TitleItem>
-                <TitleContainer>
+                <StyledTitleContainer>
                     <Title color={gray10} weight="thin">
                         {title}
                     </Title>
-                </TitleContainer>
+                </StyledTitleContainer>
+                {children}
             </TitleItem>
         </>
     );
@@ -218,23 +229,24 @@ interface CriteriaGoalTitleProps {
     title: string;
     projectId: string | null;
     scopeId: number | null;
+    children: React.ReactNode;
 }
 
-const CriteriaGoalTitle: React.FC<CriteriaGoalTitleProps> = ({ projectId, scopeId, title }) => {
+const CriteriaGoalTitle: React.FC<CriteriaGoalTitleProps> = ({ projectId, scopeId, title, children }) => {
     return (
         <>
-            <ContentItem>
+            <StyledContentCellWithOffset>
                 <GoalIcon size="s" />
-            </ContentItem>
-
+            </StyledContentCellWithOffset>
             <TitleItem as="a">
-                <TitleContainer>
+                <StyledTitleContainer>
                     <NextLink passHref href={routes.goal(`${projectId}-${scopeId}`)}>
                         <StyledGoalAnchor color={textColor} weight="bold" as={Title}>
                             {title}
                         </StyledGoalAnchor>
                     </NextLink>
-                </TitleContainer>
+                </StyledTitleContainer>
+                {children}
             </TitleItem>
         </>
     );
@@ -265,9 +277,13 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
     return (
         <StyledTableRow>
             {criteriaGuard(props) ? (
-                <CriteriaGoalTitle projectId={props.projectId!} scopeId={props.scopeId!} title={title} />
+                <CriteriaGoalTitle projectId={props.projectId!} scopeId={props.scopeId!} title={title}>
+                    {canEdit ? <StyledCleanButton onClick={onRemove} /> : null}
+                </CriteriaGoalTitle>
             ) : (
-                <CriteriaTitle title={title} checked={props.isDone} onClick={onToggle} canEdit={canEdit} />
+                <CriteriaTitle title={title} checked={props.isDone} onClick={onToggle} canEdit={canEdit}>
+                    {canEdit ? <StyledCleanButton onClick={onRemove} /> : null}
+                </CriteriaTitle>
             )}
             <ContentItem>
                 <Text weight="bold" size="s" color={gray9}>
@@ -276,7 +292,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
             </ContentItem>
             <ContentItem>
                 {nullable(state, (s) => (
-                    <StateDot size="m" title={s?.title} hue={s?.hue} />
+                    <StyledStateDot size="m" title={s?.title} hue={s?.hue} />
                 ))}
             </ContentItem>
             <ContentItem>
@@ -292,15 +308,6 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
             <ContentItem>
                 <TextItem>{nullable(estimate, (e) => estimateToString(e))}</TextItem>
             </ContentItem>
-            <StyledActionContentItem align="right">
-                {canEdit ? (
-                    <>
-                        {/* TODO: implements edit criteria */}
-                        {/* <StyledActionButton iconLeft={<EditIcon size="s" />} /> */}
-                        <StyledCleanButton onClick={onRemove} />
-                    </>
-                ) : null}
-            </StyledActionContentItem>
         </StyledTableRow>
     );
 });
