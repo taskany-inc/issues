@@ -44,13 +44,16 @@ const StyledLink = styled.a`
     color: inherit;
 `;
 
-const StyledProjectListItem = styled(ProjectListItem)`
-    &:hover ${StyledOpenButton} {
-        ${visibleStyles}
-    }
+const StyledNoGoals = styled(Text)`
+    white-space: nowrap;
+    ${hiddenStyles}
+`;
 
-    &:hover ${StyledHeaderButton} {
-        ${visibleStyles}
+const StyledProjectListItem = styled(ProjectListItem)`
+    &:hover {
+        ${StyledOpenButton}, ${StyledHeaderButton}, ${StyledNoGoals} {
+            ${visibleStyles}
+        }
     }
 `;
 
@@ -122,7 +125,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                                     iconRight={<Badge size="s">{project._count.goals}</Badge>}
                                 />
                             ) : (
-                                <Text color={gray7}>{tr('No goals')}</Text>
+                                <StyledNoGoals color={gray7}>{tr('No goals')}</StyledNoGoals>
                             )}
                         </StyledGoalsButtonContainer>
 
