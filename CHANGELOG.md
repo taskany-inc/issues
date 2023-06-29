@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.14.1](https://github.com/taskany-inc/issues/compare/v1.14.0...v1.14.1) (2023-06-29)
+
+
+### Bug Fixes
+
+* **CommentForm:** pass value to hidden inputs ([efb49c7](https://github.com/taskany-inc/issues/commit/efb49c761d0ee3ca2202409bf772d52434b2bec2))
+
 ## [1.14.0](https://github.com/taskany-inc/issues/compare/v1.13.0...v1.14.0) (2023-06-29)
 
 
