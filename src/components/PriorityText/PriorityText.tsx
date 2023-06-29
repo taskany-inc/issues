@@ -1,5 +1,3 @@
-import { FC } from 'react';
-
 import { Priority } from '../../types/priority';
 
 import { tr } from './PriorityText.i18n';
@@ -14,5 +12,3 @@ export const getPriorityText = (priority: string) => {
 
     return map[priority as Priority];
 };
-
-export const PriorityText: FC<{ value: Priority }> = ({ value }) => <>{getPriorityText(value)}</>;
