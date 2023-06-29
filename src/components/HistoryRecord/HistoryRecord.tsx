@@ -8,7 +8,7 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { IssueListItem } from '../IssueListItem';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Priority } from '../../types/priority';
-import { PriorityText } from '../PriorityText/PriorityText';
+import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
 import { HistoryAction, HistoryRecordSubject } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
@@ -256,14 +256,14 @@ export const HistoryRecordPriority: React.FC<HistoryChangeProps<Priority>> = ({ 
         from={
             from ? (
                 <Text size="xs" weight="bold">
-                    <PriorityText value={from} />
+                    {getPriorityText(from)}
                 </Text>
             ) : null
         }
         to={
             to ? (
                 <Text size="xs" weight="bold">
-                    <PriorityText value={to} />
+                    {getPriorityText(to)}
                 </Text>
             ) : null
         }
