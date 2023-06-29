@@ -35,7 +35,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     className,
 }) => {
     const row = (
-        <TableRow className={className}>
+        <TableRow as={href ? 'a' : 'div'} className={className}>
             <TableCell>
                 <Text size="l" weight="bold">
                     {title}

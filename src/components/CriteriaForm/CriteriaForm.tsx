@@ -81,7 +81,7 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
     state,
     focused,
 }): React.ReactElement => {
-    const handleClick = useCallback<React.MouseEventHandler<HTMLAnchorElement>>(
+    const handleClick = useCallback<React.MouseEventHandler<HTMLDivElement>>(
         (event) => {
             event.preventDefault();
             onClick();
@@ -90,7 +90,7 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
     );
 
     return (
-        <TableRow href="#" onClick={handleClick} focused={focused}>
+        <TableRow onClick={handleClick} focused={focused}>
             <ContentItem>
                 <GoalIcon size="s" />
             </ContentItem>
