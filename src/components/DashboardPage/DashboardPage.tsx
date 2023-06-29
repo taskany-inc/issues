@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
 
@@ -19,7 +20,7 @@ import { GoalsListContainer } from '../GoalListItem';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
-import { ProjectItemStandalone } from '../ProjectListItem';
+import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 
 import { tr } from './DashboardPage.i18n';
@@ -225,15 +226,19 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                                     onClickProvider={onGoalPrewiewShow}
                                     onTagClick={setTagsFilterOutside}
                                 >
-                                    <ProjectItemStandalone
-                                        key={group.project.id}
-                                        href={routes.project(group.project.id)}
-                                        title={group.project.title}
-                                        owner={group.project?.activity}
-                                        participants={group.project?.participants}
-                                        starred={group.project?._isStarred}
-                                        watching={group.project?._isWatching}
-                                    />
+                                    <ProjectListContainer>
+                                        <NextLink href={routes.project(group.project.id)} passHref>
+                                            <ProjectListItem
+                                                key={group.project.id}
+                                                as="a"
+                                                title={group.project.title}
+                                                owner={group.project?.activity}
+                                                participants={group.project?.participants}
+                                                starred={group.project?._isStarred}
+                                                watching={group.project?._isWatching}
+                                            />
+                                        </NextLink>
+                                    </ProjectListContainer>
                                 </GoalsGroup>
                             ),
                     )}

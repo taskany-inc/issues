@@ -1,4 +1,5 @@
 import { nullable } from '@taskany/bricks';
+import NextLink from 'next/link';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { routes } from '../../hooks/router';
@@ -24,15 +25,16 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                     <ProjectListContainer>
                         {projects.data.map((project) =>
                             nullable(project, (p) => (
-                                <ProjectListItem
-                                    key={p.id}
-                                    href={routes.project(p.id)}
-                                    title={p.title}
-                                    owner={p.activity}
-                                    starred={p._isStarred}
-                                    watching={p._isWatching}
-                                    participants={p.participants}
-                                />
+                                <NextLink key={p.id} href={routes.project(p.id)} passHref>
+                                    <ProjectListItem
+                                        as="a"
+                                        title={p.title}
+                                        owner={p.activity}
+                                        starred={p._isStarred}
+                                        watching={p._isWatching}
+                                        participants={p.participants}
+                                    />
+                                </NextLink>
                             )),
                         )}
                     </ProjectListContainer>
