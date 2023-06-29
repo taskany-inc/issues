@@ -18,7 +18,9 @@ export const ProjectListItemConnected: FC<{
     deep?: number;
     collapsed?: boolean;
     collapsedGoals?: boolean;
+    hasLink?: boolean;
 }> = ({
+    hasLink = false,
     queryState,
     project,
     onClickProvider,
@@ -61,7 +63,7 @@ export const ProjectListItemConnected: FC<{
 
     return (
         <ProjectListItemCollapsable
-            href={routes.project(project.id)}
+            href={hasLink ? routes.project(project.id) : undefined}
             goals={projectDeepInfo?.goals.map((g) => (
                 <GoalListItem
                     createdAt={g.createdAt}
@@ -97,6 +99,7 @@ export const ProjectListItemConnected: FC<{
             {childrenProjects.map((p) => (
                 <ProjectListItemConnected
                     key={p.id}
+                    hasLink={hasLink}
                     project={p}
                     queryState={queryState}
                     deep={deep + 1}
