@@ -1,4 +1,5 @@
 import React, { MouseEvent, ReactNode, useCallback, useMemo } from 'react';
+import NextLink from 'next/link';
 import styled, { css } from 'styled-components';
 import { Badge, Button, ExternalLinkIcon, Text } from '@taskany/bricks';
 import { gapM, gapS, gray7 } from '@taskany/colors';
@@ -37,6 +38,10 @@ const StyledHeaderButton = styled(Button)<{ visibility?: 'visible' | 'hidden' }>
 const StyledOpenButton = styled(ExternalLinkIcon)`
     margin-left: ${gapS};
     ${hiddenStyles}
+`;
+
+const StyledLink = styled.a`
+    color: inherit;
 `;
 
 const StyledProjectListItem = styled(ProjectListItem)`
@@ -90,16 +95,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         [onGoalsClick],
     );
 
-    const onExternalLinkClick = useCallback(
-        (e: React.MouseEvent) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(href);
-            window.focus();
-        },
-        [href],
-    );
+    const onExternalLinkClick = useCallback((e: MouseEvent) => {
+        e.stopPropagation();
+    }, []);
 
     return (
         <CollapsableItem
@@ -127,7 +125,13 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                                 <Text color={gray7}>{tr('No goals')}</Text>
                             )}
                         </StyledGoalsButtonContainer>
-                        {href && <StyledOpenButton size="s" onClick={onExternalLinkClick} />}
+                        {href && (
+                            <NextLink href={href} passHref>
+                                <StyledLink target="_blank" onClick={onExternalLinkClick}>
+                                    <StyledOpenButton size="s" />
+                                </StyledLink>
+                            </NextLink>
+                        )}
                     </StyledProjectListItem>
                 </ProjectListContainer>
             }

@@ -21,7 +21,7 @@ export const ProjectListItemCompact: React.FC<ProjectListItemCompactProps> = Rea
     ({ id, owner, title, focused, className, onClick }) => {
         return (
             <NextLink href={routes.project(id)} passHref>
-                <TableRow focused={focused} onClick={onClick} className={className}>
+                <TableRow as="a" focused={focused} onClick={onClick} className={className}>
                     <ContentItem>
                         <ProjectIcon size="s" />
                     </ContentItem>

@@ -46,7 +46,7 @@ export const TableCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
     }
 `;
 
-export const TableRow = styled.a<{ focused?: boolean }>`
+export const TableRow = styled.div<{ focused?: boolean }>`
     display: contents;
     cursor: pointer;
 

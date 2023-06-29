@@ -152,7 +152,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
 
         return (
             <NextLink href={routes.goal(shortId)} passHref>
-                <TableRow focused={focused} onClick={onClick} className={className}>
+                <TableRow as="a" focused={focused} className={className} onClick={onClick}>
                     <GoalTitleItem>
                         <GoalTitleContainer>
                             {isNotViewed && <NotViewedDot />}
