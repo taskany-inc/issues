@@ -117,15 +117,15 @@ export const CommentForm: React.FC<CommentFormProps> = ({
         <StyledCommentForm ref={ref} tabIndex={0}>
             <Form onSubmit={handleSubmit(onCommentSubmit)}>
                 {nullable(id, () => (
-                    <input type="hidden" {...register('id')} />
+                    <input type="hidden" value={id} {...register('id')} />
                 ))}
 
                 {nullable(goalId, () => (
-                    <input type="hidden" {...register('goalId')} />
+                    <input type="hidden" value={goalId} {...register('goalId')} />
                 ))}
 
                 {nullable(stateId, () => (
-                    <input type="hidden" {...register('stateId')} />
+                    <input type="hidden" value={stateId} {...register('stateId')} />
                 ))}
 
                 <Controller
