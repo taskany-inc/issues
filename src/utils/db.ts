@@ -81,7 +81,7 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
         data: {
             tags: input.tags?.length
                 ? {
-                      connect: input.tags,
+                      connect: input.tags.map(({ id }) => ({ id })),
                   }
                 : undefined,
             estimate: correctEstimate?.id
