@@ -1,5 +1,4 @@
-import { FC, ReactNode } from 'react';
-import Link from 'next/link';
+import { FC, ReactNode, forwardRef } from 'react';
 import { EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
 
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
@@ -8,6 +7,7 @@ import { Table, TableCell, TableRow } from './Table';
 import { UserGroup } from './UserGroup';
 
 interface ProjectListItemProps {
+    as?: 'a' | 'div';
     href?: string;
     children?: ReactNode;
     title: string;
@@ -24,18 +24,9 @@ export const ProjectListContainer: FC<{ children: ReactNode; offset?: number }> 
     </Table>
 );
 
-export const ProjectListItem: React.FC<ProjectListItemProps> = ({
-    href,
-    children,
-    title,
-    owner,
-    participants,
-    starred,
-    watching,
-    className,
-}) => {
-    const row = (
-        <TableRow as={href ? 'a' : 'div'} className={className}>
+export const ProjectListItem = forwardRef<HTMLDivElement, ProjectListItemProps>(
+    ({ as = 'div', children, title, owner, participants, starred, watching, className, ...props }, ref) => (
+        <TableRow as={as} className={className} ref={ref} {...props}>
             <TableCell>
                 <Text size="l" weight="bold">
                     {title}
@@ -63,19 +54,5 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
                 ))}
             </TableCell>
         </TableRow>
-    );
-
-    return href ? (
-        <Link href={href} passHref>
-            {row}
-        </Link>
-    ) : (
-        row
-    );
-};
-
-export const ProjectItemStandalone: React.FC<ProjectListItemProps> = (props) => (
-    <ProjectListContainer>
-        <ProjectListItem {...props} />
-    </ProjectListContainer>
+    ),
 );

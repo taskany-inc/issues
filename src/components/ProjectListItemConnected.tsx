@@ -1,4 +1,4 @@
-import { FC, MouseEventHandler, useState, useMemo, useCallback, useEffect } from 'react';
+import { FC, MouseEventHandler, useState, useMemo, useCallback } from 'react';
 
 import { GoalByIdReturnType, ProjectByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';

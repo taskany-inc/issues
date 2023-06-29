@@ -1,7 +1,7 @@
 import React, { MouseEvent, ReactNode, useCallback, useMemo } from 'react';
 import NextLink from 'next/link';
 import styled, { css } from 'styled-components';
-import { Badge, Button, ExternalLinkIcon, Text } from '@taskany/bricks';
+import { Badge, Button, ExternalLinkIcon, Text, nullable } from '@taskany/bricks';
 import { gapM, gapS, gray7 } from '@taskany/colors';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
@@ -125,13 +125,14 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                                 <Text color={gray7}>{tr('No goals')}</Text>
                             )}
                         </StyledGoalsButtonContainer>
-                        {href && (
-                            <NextLink href={href} passHref>
+
+                        {nullable(href, (h) => (
+                            <NextLink href={h} passHref>
                                 <StyledLink target="_blank" onClick={onExternalLinkClick}>
                                     <StyledOpenButton size="s" />
                                 </StyledLink>
                             </NextLink>
-                        )}
+                        ))}
                     </StyledProjectListItem>
                 </ProjectListContainer>
             }
