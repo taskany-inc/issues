@@ -15,6 +15,7 @@ interface ProjectListItemProps {
     participants?: ActivityByIdReturnType[];
     starred?: boolean;
     watching?: boolean;
+    className?: string;
 }
 
 export const ProjectListContainer: FC<{ children: ReactNode; offset?: number }> = ({ children, offset = 0 }) => (
@@ -31,9 +32,10 @@ export const ProjectListItem: React.FC<ProjectListItemProps> = ({
     participants,
     starred,
     watching,
+    className,
 }) => {
     const row = (
-        <TableRow>
+        <TableRow className={className}>
             <TableCell>
                 <Text size="l" weight="bold">
                     {title}

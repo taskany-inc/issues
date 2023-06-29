@@ -184,6 +184,7 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                         queryState={queryState}
                         collapsedGoals
                         collapsed
+                        hasLink
                     />
                 ))}
             </PageContent>

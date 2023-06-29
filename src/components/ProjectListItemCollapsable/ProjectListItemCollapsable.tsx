@@ -1,7 +1,7 @@
 import React, { MouseEvent, ReactNode, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
-import { Badge, Button, Text } from '@taskany/bricks';
-import { gapM, gray7 } from '@taskany/colors';
+import styled, { css } from 'styled-components';
+import { Badge, Button, ExternalLinkIcon, Text } from '@taskany/bricks';
+import { gapM, gapS, gray7 } from '@taskany/colors';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalsListContainer } from '../GoalListItem';
@@ -14,8 +14,43 @@ const StyledGoalsButtonContainer = styled.div`
     margin-left: ${gapM};
 `;
 
+const hiddenStyles = css`
+    visibility: hidden;
+    opacity: 0;
+    will-change: opacity;
+    transition: opacity 0.3s ease-in;
+`;
+
+const visibleStyles = css`
+    visibility: visible;
+    opacity: 0.8;
+
+    &:hover {
+        opacity: 1;
+    }
+`;
+
+const StyledHeaderButton = styled(Button)<{ visibility?: 'visible' | 'hidden' }>`
+    ${({ visibility = 'hidden' }) => (visibility === 'visible' ? visibleStyles : hiddenStyles)}
+`;
+
+const StyledOpenButton = styled(ExternalLinkIcon)`
+    margin-left: ${gapS};
+    ${hiddenStyles}
+`;
+
+const StyledProjectListItem = styled(ProjectListItem)`
+    &:hover ${StyledOpenButton} {
+        ${visibleStyles}
+    }
+
+    &:hover ${StyledHeaderButton} {
+        ${visibleStyles}
+    }
+`;
+
 interface ProjectListItemCollapsableProps {
-    href: string;
+    href?: string;
     project: NonNullable<ProjectByIdReturnType>;
     goals?: ReactNode;
     children?: ReactNode;
@@ -37,6 +72,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     goals,
     loading = false,
     deep = 0,
+    href,
 }) => {
     const childs = useMemo(() => project.children.map(({ id }) => id), [project]);
 
@@ -54,13 +90,24 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         [onGoalsClick],
     );
 
+    const onExternalLinkClick = useCallback(
+        (e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(href);
+            window.focus();
+        },
+        [href],
+    );
+
     return (
         <CollapsableItem
             collapsed={contentHidden}
             onClick={onClickEnabled ? onClick : undefined}
             header={
                 <ProjectListContainer offset={offset}>
-                    <ProjectListItem
+                    <StyledProjectListItem
                         title={project.title}
                         owner={project.activity}
                         participants={project.participants}
@@ -69,7 +116,8 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                     >
                         <StyledGoalsButtonContainer>
                             {project._count.goals ? (
-                                <Button
+                                <StyledHeaderButton
+                                    visibility={collapsedGoals ? 'hidden' : 'visible'}
                                     ghost={collapsedGoals}
                                     onClick={onGoalsButtonClick}
                                     text={tr('Goals')}
@@ -79,7 +127,8 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                                 <Text color={gray7}>{tr('No goals')}</Text>
                             )}
                         </StyledGoalsButtonContainer>
-                    </ProjectListItem>
+                        {href && <StyledOpenButton size="s" onClick={onExternalLinkClick} />}
+                    </StyledProjectListItem>
                 </ProjectListContainer>
             }
             content={children}
