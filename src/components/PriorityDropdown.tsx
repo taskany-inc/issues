@@ -3,7 +3,7 @@ import { Button, Dropdown, MenuItem } from '@taskany/bricks';
 
 import { Priority, priorityVariants } from '../types/priority';
 
-import { PriorityText, getPriorityText } from './PriorityText/PriorityText';
+import { getPriorityText } from './PriorityText/PriorityText';
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -35,7 +35,7 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                 )}
                 renderItem={(props) => (
                     <MenuItem ghost key={props.item} focused={props.cursor === props.index} onClick={props.onClick}>
-                        <PriorityText value={props.item} />
+                        {getPriorityText(props.item)}
                     </MenuItem>
                 )}
             />
