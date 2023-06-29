@@ -11,8 +11,8 @@ export const StateDot: React.FC<Omit<StateDotProps & { hue?: number }, 'hoverCol
         const { color, hoverColor } = useMemo(() => {
             const sat = hue === 1 ? 0 : undefined;
             return {
-                color: colorLayer(hue, 9, sat)[themeId],
-                hoverColor: colorLayer(hue, 10, sat)[themeId],
+                color: colorLayer(hue, 10, sat)[themeId],
+                hoverColor: colorLayer(hue, 9, sat)[themeId],
             };
         }, [hue, themeId]);
 
