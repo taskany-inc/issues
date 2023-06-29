@@ -75,7 +75,7 @@ export const State = React.forwardRef<HTMLDivElement, StateProps>(({ title, hue 
             const sat = hue === 1 ? 0 : undefined;
             return {
                 '--bkg': colorLayer(hue, 3, sat)[themeId],
-                '--stroke': colorLayer(hue, 9, sat)[themeId],
+                '--stroke': colorLayer(hue, 10, sat)[themeId],
                 '--bkgHover': colorLayer(hue, 4, sat)[themeId],
                 '--strokeHover': colorLayer(hue, 10, sat)[themeId],
             } as React.CSSProperties;
