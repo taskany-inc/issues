@@ -1,8 +1,8 @@
 import React, { MouseEvent, ReactNode, useCallback, useMemo } from 'react';
 import NextLink from 'next/link';
-import styled, { css } from 'styled-components';
-import { Badge, Button, ExternalLinkIcon, Text, nullable } from '@taskany/bricks';
-import { gapM, gapS, gray7 } from '@taskany/colors';
+import styled from 'styled-components';
+import { Badge, Button, ExternalLinkIcon, Link, Text, nullable } from '@taskany/bricks';
+import { gapS, gray7 } from '@taskany/colors';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalsListContainer } from '../GoalListItem';
@@ -11,48 +11,29 @@ import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 
 import { tr } from './ProjectListItemCollapsable.i18n';
 
-const StyledGoalsButtonContainer = styled.div`
-    margin-left: ${gapM};
-`;
-
-const hiddenStyles = css`
-    visibility: hidden;
-    opacity: 0;
-    will-change: opacity;
-    transition: opacity 0.3s ease-in;
-`;
-
-const visibleStyles = css`
-    visibility: visible;
-    opacity: 0.8;
-
-    &:hover {
-        opacity: 1;
-    }
-`;
-
-const StyledHeaderButton = styled(Button)<{ visibility?: 'visible' | 'hidden' }>`
-    ${({ visibility = 'hidden' }) => (visibility === 'visible' ? visibleStyles : hiddenStyles)}
-`;
-
-const StyledOpenButton = styled(ExternalLinkIcon)`
-    margin-left: ${gapS};
-    ${hiddenStyles}
-`;
-
-const StyledLink = styled.a`
-    color: inherit;
-`;
-
 const StyledNoGoals = styled(Text)`
     white-space: nowrap;
-    ${hiddenStyles}
+`;
+
+const StyledProjectListItemActionsContainer = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
+const StyledProjectListItemAction = styled.div<{ forceVisibility?: boolean }>`
+    visibility: ${({ forceVisibility }) => (forceVisibility ? 'visible' : 'hidden')};
+
+    margin-left: ${gapS};
+
+    &:first-child {
+        margin-left: 0;
+    }
 `;
 
 const StyledProjectListItem = styled(ProjectListItem)`
     &:hover {
-        ${StyledOpenButton}, ${StyledHeaderButton}, ${StyledNoGoals} {
-            ${visibleStyles}
+        ${StyledProjectListItemAction} {
+            visibility: visible;
         }
     }
 `;
@@ -115,27 +96,29 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                         starred={project._isStarred}
                         watching={project._isWatching}
                     >
-                        <StyledGoalsButtonContainer>
-                            {project._count.goals ? (
-                                <StyledHeaderButton
-                                    visibility={collapsedGoals ? 'hidden' : 'visible'}
-                                    ghost={collapsedGoals}
-                                    onClick={onGoalsButtonClick}
-                                    text={tr('Goals')}
-                                    iconRight={<Badge size="s">{project._count.goals}</Badge>}
-                                />
-                            ) : (
-                                <StyledNoGoals color={gray7}>{tr('No goals')}</StyledNoGoals>
-                            )}
-                        </StyledGoalsButtonContainer>
-
-                        {nullable(href, (h) => (
-                            <NextLink href={h} passHref>
-                                <StyledLink target="_blank" onClick={onExternalLinkClick}>
-                                    <StyledOpenButton size="s" />
-                                </StyledLink>
-                            </NextLink>
-                        ))}
+                        <StyledProjectListItemActionsContainer>
+                            <StyledProjectListItemAction forceVisibility={!collapsedGoals}>
+                                {project._count.goals ? (
+                                    <Button
+                                        ghost={collapsedGoals}
+                                        onClick={onGoalsButtonClick}
+                                        text={tr('Goals')}
+                                        iconRight={<Badge size="s">{project._count.goals}</Badge>}
+                                    />
+                                ) : (
+                                    <StyledNoGoals color={gray7}>{tr('No goals')}</StyledNoGoals>
+                                )}
+                            </StyledProjectListItemAction>
+                            <StyledProjectListItemAction>
+                                {nullable(href, (h) => (
+                                    <NextLink href={h} passHref>
+                                        <Link inline target="_blank" onClick={onExternalLinkClick}>
+                                            <ExternalLinkIcon size="s" />
+                                        </Link>
+                                    </NextLink>
+                                ))}
+                            </StyledProjectListItemAction>
+                        </StyledProjectListItemActionsContainer>
                     </StyledProjectListItem>
                 </ProjectListContainer>
             }
