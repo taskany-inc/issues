@@ -1,0 +1,5 @@
+{
+    "blocks": "This goal blocked by",
+    "dependsOn": "This goal depends on",
+    "relatesTo": "This goal relates to"
+}

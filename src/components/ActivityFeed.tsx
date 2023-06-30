@@ -4,7 +4,7 @@ import { gapL, gapM, gray5 } from '@taskany/colors';
 export const ActivityFeed = styled.div`
     display: grid;
     row-gap: ${gapM};
-    padding-top: ${gapL};
+    padding-top: 0;
     padding-bottom: 250px;
     position: relative;
     z-index: 0;
@@ -15,6 +15,10 @@ export const ActivityFeedItem = styled.div`
     grid-template-columns: 35px 1fr;
     column-gap: 15px;
     position: relative;
+
+    :first-child {
+        padding-top: 20px;
+    }
 
     :first-child::before {
         content: '';
@@ -37,6 +41,10 @@ export const ActivityFeedItem = styled.div`
     }
 
     :last-child::after {
+        content: none;
+    }
+
+    &:first-child::before {
         content: none;
     }
 `;
