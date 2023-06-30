@@ -56,12 +56,12 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                     await createTag();
                     return;
                 }
-                const newTags = [...tags, tag];
+                const newTags = [...value, tag];
                 setTags(newTags);
                 onChange?.(newTags);
                 setInputState('');
             },
-            [onChange, tags, suggestions.data, createTag],
+            [onChange, value, suggestions.data, createTag],
         );
 
         const filterIds = value.map((t) => t.id);
