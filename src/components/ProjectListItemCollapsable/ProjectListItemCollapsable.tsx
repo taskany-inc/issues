@@ -2,7 +2,7 @@ import React, { MouseEvent, ReactNode, useCallback, useMemo } from 'react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import { Badge, Button, ExternalLinkIcon, Link, Text, nullable } from '@taskany/bricks';
-import { gapS, gray7 } from '@taskany/colors';
+import { gapS, gray7, gray4, radiusM } from '@taskany/colors';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalsListContainer } from '../GoalListItem';
@@ -38,6 +38,12 @@ const StyledProjectListItem = styled(ProjectListItem)`
     }
 `;
 
+const StyledGoalsListContainer = styled(GoalsListContainer)`
+    background-color: ${gray4};
+    border-radius: ${radiusM};
+    margin: 0px;
+    padding: 0px;
+`;
 interface ProjectListItemCollapsableProps {
     href?: string;
     project: NonNullable<ProjectByIdReturnType>;
@@ -125,7 +131,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
             content={children}
             deep={deep}
         >
-            {!collapsedGoals && <GoalsListContainer offset={offset}>{goals}</GoalsListContainer>}
+            {!collapsedGoals && <StyledGoalsListContainer offset={offset}>{goals}</StyledGoalsListContainer>}
         </CollapsableItem>
     );
 };
