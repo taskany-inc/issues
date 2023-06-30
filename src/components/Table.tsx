@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { gapS, gapSm, gray4, gray9, radiusM, textColor } from '@taskany/colors';
+import { gapS, gapSm, gray4, gray9, radiusM, textColor, gray6 } from '@taskany/colors';
 import React from 'react';
 import { Text } from '@taskany/bricks';
 
@@ -54,7 +54,7 @@ export const TableRow = styled.div<{ focused?: boolean }>`
     text-decoration: none;
 
     &:hover ${TableCell} {
-        background-color: ${gray4};
+        background-color: ${gray6};
     }
 
     &:visited ${TableCell} {
