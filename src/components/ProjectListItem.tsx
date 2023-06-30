@@ -1,5 +1,6 @@
 import { FC, ReactNode, forwardRef } from 'react';
 import { EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
+import styled from 'styled-components';
 
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 
@@ -18,6 +19,10 @@ interface ProjectListItemProps {
     className?: string;
 }
 
+const StyledTitleCell = styled(TableCell)`
+    justify-content: space-between;
+`;
+
 export const ProjectListContainer: FC<{ children: ReactNode; offset?: number }> = ({ children, offset = 0 }) => (
     <Table columns={5} offset={offset}>
         {children}
@@ -27,12 +32,12 @@ export const ProjectListContainer: FC<{ children: ReactNode; offset?: number }> 
 export const ProjectListItem = forwardRef<HTMLDivElement, ProjectListItemProps>(
     ({ as = 'div', children, title, owner, participants, starred, watching, className, ...props }, ref) => (
         <TableRow as={as} className={className} ref={ref} {...props}>
-            <TableCell>
+            <StyledTitleCell>
                 <Text size="l" weight="bold">
                     {title}
                 </Text>
                 {children}
-            </TableCell>
+            </StyledTitleCell>
 
             <TableCell>
                 {nullable(owner, (o) => (
