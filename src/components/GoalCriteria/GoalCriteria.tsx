@@ -8,48 +8,18 @@ import NextLink from 'next/link';
 import { AddCriteriaScheme, RemoveCriteriaScheme, UpdateCriteriaScheme } from '../../schema/criteria';
 import { TitleItem, TitleContainer, Title, ContentItem, TextItem, Table } from '../Table';
 import { StateDot } from '../StateDot';
-import { ActivityFeed, ActivityFeedItem } from '../ActivityFeed';
+import { ActivityFeedItem } from '../ActivityFeed';
 import { ActivityByIdReturnType, GoalEstimate, GoalAchiveCriteria } from '../../../trpc/inferredTypes';
 import { estimateToString } from '../../utils/estimateToString';
 import { UserGroup } from '../UserGroup';
 import { routes } from '../../hooks/router';
-import { Circle } from '../Circle';
+import { Circle, CircledIcon as CircleIconInner } from '../Circle';
 
 import { tr } from './GoalCriteria.i18n';
-
-const StyledActivityFeed = styled(ActivityFeed)`
-    padding: 0;
-    z-index: 1;
-`;
-
-const StyledActivityFeedItem = styled(ActivityFeedItem)`
-    padding-top: 20px;
-
-    &:first-child::before {
-        content: none;
-    }
-
-    &:last-child::after {
-        content: '';
-    }
-`;
 
 const StyledWrapper = styled.div`
     display: flex;
     flex-direction: column;
-`;
-
-const StyledIcon = styled(MessageTickIcon)`
-    display: flex;
-    background-color: ${gray7};
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-
-    text-align: center;
-
-    width: 32px;
-    height: 32px;
 `;
 
 const StyledCircleIcon = styled(CircleIcon)`
@@ -363,47 +333,44 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     }, [criteriaList]);
 
     return (
-        <StyledActivityFeed>
-            <StyledActivityFeedItem>
-                <Circle size={32}>
-                    <StyledIcon size="s" color={backgroundColor} />
-                </Circle>
-                <StyledWrapper>
-                    {nullable(criteriaList.length, () => (
-                        <>
-                            <StyledHeadingWrapper>
-                                <Text color={gray6} weight="bold">
-                                    {tr('Achivement criteria')}
-                                </Text>
-                            </StyledHeadingWrapper>
-                            <StyledTable columns={8}>
-                                {criteriaList.map((item) => (
-                                    <GoalCriteriaItem
-                                        key={item.id}
-                                        title={item.title}
-                                        weight={item.weight}
-                                        isDone={item.isDone}
-                                        projectId={item.goalAsCriteria?.projectId}
-                                        scopeId={item.goalAsCriteria?.scopeId}
-                                        estimate={
-                                            item.goalAsCriteria?.estimate[
-                                                (item.goalAsCriteria?.estimate.length ?? 0) - 1
-                                            ]?.estimate
-                                        }
-                                        owner={item.goalAsCriteria?.owner}
-                                        issuer={item.goalAsCriteria?.activity}
-                                        state={item.goalAsCriteria?.state}
-                                        onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
-                                        onRemove={() => onRemoveCriteria({ id: item.id })}
-                                        canEdit={canEdit}
-                                    />
-                                ))}
-                            </StyledTable>
-                        </>
-                    ))}
-                    {renderForm({ onAddCriteria: onAddHandler, dataForValidateCriteria })}
-                </StyledWrapper>
-            </StyledActivityFeedItem>
-        </StyledActivityFeed>
+        <ActivityFeedItem>
+            <Circle size={32}>
+                <CircleIconInner as={MessageTickIcon} size="s" color={backgroundColor} />
+            </Circle>
+            <StyledWrapper>
+                {nullable(criteriaList.length, () => (
+                    <>
+                        <StyledHeadingWrapper>
+                            <Text color={gray6} weight="bold">
+                                {tr('Achivement criteria')}
+                            </Text>
+                        </StyledHeadingWrapper>
+                        <StyledTable columns={8}>
+                            {criteriaList.map((item) => (
+                                <GoalCriteriaItem
+                                    key={item.id}
+                                    title={item.title}
+                                    weight={item.weight}
+                                    isDone={item.isDone}
+                                    projectId={item.goalAsCriteria?.projectId}
+                                    scopeId={item.goalAsCriteria?.scopeId}
+                                    estimate={
+                                        item.goalAsCriteria?.estimate[(item.goalAsCriteria?.estimate.length ?? 0) - 1]
+                                            ?.estimate
+                                    }
+                                    owner={item.goalAsCriteria?.owner}
+                                    issuer={item.goalAsCriteria?.activity}
+                                    state={item.goalAsCriteria?.state}
+                                    onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
+                                    onRemove={() => onRemoveCriteria({ id: item.id })}
+                                    canEdit={canEdit}
+                                />
+                            ))}
+                        </StyledTable>
+                    </>
+                ))}
+                {renderForm({ onAddCriteria: onAddHandler, dataForValidateCriteria })}
+            </StyledWrapper>
+        </ActivityFeedItem>
     );
 };

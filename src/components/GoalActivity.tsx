@@ -31,6 +31,7 @@ interface GoalActivityProps {
     onCommentDelete: (id?: string) => void;
     goalId: string;
     goalStates?: State[];
+    children: React.ReactNode;
 }
 
 function excludeString<T>(val: T): Exclude<T, string> {
@@ -38,7 +39,7 @@ function excludeString<T>(val: T): Exclude<T, string> {
 }
 
 export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
-    ({ feed, onCommentReaction, onCommentPublish, userId, goalId, goalStates, onCommentDelete }, ref) => {
+    ({ feed, onCommentReaction, onCommentPublish, userId, goalId, goalStates, onCommentDelete, children }, ref) => {
         const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
 
         const onPublish = (id?: string) => {
@@ -48,6 +49,7 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
 
         return (
             <ActivityFeed ref={ref}>
+                {children}
                 {feed.map((item) =>
                     nullable(item, ({ type, value }) => (
                         <React.Fragment key={value.id}>
