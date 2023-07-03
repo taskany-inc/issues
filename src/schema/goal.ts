@@ -21,7 +21,7 @@ export const toggleGoalDependencySchema = z.object({
     }),
 });
 
-export type ToggleGoalDependency2 = z.infer<typeof toggleGoalDependencySchema>;
+export type ToggleGoalDependency = z.infer<typeof toggleGoalDependencySchema>;
 
 export const toggleGoalArchiveSchema = z.object({
     id: z.string(),

@@ -312,16 +312,55 @@ export const goalDeepQuery = {
     dependsOn: {
         include: {
             state: true,
+            estimate: { include: { estimate: true } },
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            owner: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
         },
     },
     relatedTo: {
         include: {
             state: true,
+            estimate: { include: { estimate: true } },
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            owner: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
         },
     },
     blocks: {
         include: {
             state: true,
+            estimate: { include: { estimate: true } },
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            owner: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
         },
     },
     comments: {
