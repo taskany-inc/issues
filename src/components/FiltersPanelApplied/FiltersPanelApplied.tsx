@@ -66,7 +66,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }
 
     if (queryState.state.length && states?.length) {
-        appliedMap[tr('State')] = queryState.state.map((s) => statesMap[s].title).filter(Boolean);
+        appliedMap[tr('State')] = queryState.state.map((s) => statesMap[s]?.title).filter(Boolean);
     }
 
     if (queryState.issuer.length && issuers?.length) {
