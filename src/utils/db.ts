@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
-import { GoalHistory, Comment, Activity, User } from '@prisma/client';
+import { GoalHistory, Comment, Activity, User, Goal } from '@prisma/client';
 
-import { GoalCommon, GoalUpdate } from '../schema/goal';
+import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
 import { addCalclulatedGoalsFields } from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordMeta, HistoryRecordSubject, HistoryAction } from '../types/history';
 
@@ -260,4 +260,10 @@ export const mixHistoryWithComments = <H extends HistoryRecordWithActivity, C ex
     }
 
     return activity.sort((a, b) => a.value.createdAt.getTime() - b.value.createdAt.getTime());
+};
+
+export const makeGoalRelationMap = <T extends Goal>(
+    values: Record<dependencyKind, T[]>,
+): Array<{ kind: dependencyKind; goals: T[] }> => {
+    return (Object.entries(values) as [dependencyKind, T[]][]).map(([kind, goals]) => ({ kind, goals }));
 };

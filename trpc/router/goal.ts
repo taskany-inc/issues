@@ -30,6 +30,7 @@ import {
     getGoalHistory,
     findOrCreateEstimate,
     mixHistoryWithComments,
+    makeGoalRelationMap,
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
@@ -215,6 +216,11 @@ export const goal = router({
                 project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
                 estimate: getEstimateListFormJoin(goal),
                 activityFeed: mixHistoryWithComments(history, goal.comments),
+                relations: makeGoalRelationMap({
+                    dependsOn: goal.dependsOn,
+                    blocks: goal.blocks,
+                    relatedTo: goal.relatedTo,
+                }),
             };
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
