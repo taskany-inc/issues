@@ -40,6 +40,9 @@ import { GoalActivity } from '../GoalActivity';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
 import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { State } from '../State';
+import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
+import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm';
+import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -179,7 +182,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
         invalidateFn();
     }, [onDelete, archiveMutation, preview.id, invalidateFn]);
 
-    const { onAddHandler, onRemoveHandler, onToggleHandler } = useCriteriaResource(invalidateFn);
+    const criteria = useCriteriaResource(invalidateFn);
+    const dependency = useGoalDependencyResource(invalidateFn);
 
     const commentsRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -301,37 +305,60 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                         </CardComment>
                     </StyledCard>
 
-                    {nullable(goal?.goalAchiveCriteria.length || goal?._isEditable, () => (
-                        <GoalCriteria
-                            goalId={goal?.id}
-                            criteriaList={goal?.goalAchiveCriteria}
-                            canEdit={goal?._isEditable || false}
-                            onAddCriteria={onAddHandler}
-                            onToggleCriteria={onToggleHandler}
-                            onRemoveCriteria={onRemoveHandler}
-                            renderForm={(props) =>
-                                nullable(goal?._isEditable, () => (
-                                    <CriteriaForm
-                                        onSubmit={props.onAddCriteria}
-                                        goalId={goal?.id || preview.id}
-                                        validityData={props.dataForValidateCriteria}
-                                    />
-                                ))
-                            }
-                        />
-                    ))}
-
-                    {nullable(goal?.activityFeed, (feed) => (
+                    {nullable(goal, ({ activityFeed, id, goalAchiveCriteria, relations, project, _isEditable }) => (
                         <GoalActivity
-                            feed={feed}
+                            feed={activityFeed}
                             ref={commentsRef}
-                            onCommentPublish={onCommentPublish}
-                            onCommentReaction={onCommentReactionToggle}
-                            goalId={preview.id}
                             userId={user?.activityId}
-                            goalStates={goal?._isEditable ? goal.project?.flow.states : undefined}
+                            goalId={id}
+                            onCommentReaction={onCommentReactionToggle}
+                            onCommentPublish={onCommentPublish}
                             onCommentDelete={onCommentDelete}
-                        />
+                            goalStates={_isEditable ? project?.flow.states : undefined}
+                        >
+                            {nullable(goalAchiveCriteria.length || _isEditable, () => (
+                                <GoalCriteria
+                                    goalId={id}
+                                    criteriaList={goalAchiveCriteria}
+                                    onAddCriteria={criteria.onAddHandler}
+                                    onToggleCriteria={criteria.onToggleHandler}
+                                    onRemoveCriteria={criteria.onRemoveHandler}
+                                    canEdit={_isEditable}
+                                    renderForm={(props) =>
+                                        nullable(_isEditable, () => (
+                                            <CriteriaForm
+                                                onSubmit={props.onAddCriteria}
+                                                goalId={id}
+                                                validityData={props.dataForValidateCriteria}
+                                            />
+                                        ))
+                                    }
+                                />
+                            ))}
+
+                            <>
+                                {relations.map((deps) =>
+                                    nullable(deps.goals.length || _isEditable, () => (
+                                        <GoalDependencyListByKind
+                                            goalId={id}
+                                            key={deps.kind}
+                                            kind={deps.kind}
+                                            items={deps.goals}
+                                            canEdit={_isEditable}
+                                            onRemove={dependency.onRemoveHandler}
+                                        >
+                                            {nullable(_isEditable, () => (
+                                                <GoalDependencyAddForm
+                                                    onSubmit={dependency.onAddHandler}
+                                                    kind={deps.kind}
+                                                    goalId={id}
+                                                />
+                                            ))}
+                                        </GoalDependencyListByKind>
+                                    )),
+                                )}
+                            </>
+                        </GoalActivity>
                     ))}
                 </StyledModalContent>
             </ModalPreview>

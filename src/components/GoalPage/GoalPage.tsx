@@ -42,6 +42,7 @@ import { GoalActivity } from '../GoalActivity';
 import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
 import { useCriteriaResource } from '../../hooks/useCriteriaResource';
+import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { IssueMeta } from '../IssueMeta';
 import { UserBadge } from '../UserBadge';
@@ -49,6 +50,8 @@ import { InlineTrigger } from '../InlineTrigger';
 import { UserComboBox } from '../UserComboBox';
 import { State } from '../State';
 import { GoalParentComboBox } from '../GoalParentComboBox';
+import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
+import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm';
 
 import { tr } from './GoalPage.i18n';
 
@@ -56,7 +59,6 @@ const StateSwitch = dynamic(() => import('../StateSwitch'));
 const Md = dynamic(() => import('../Md'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
-const IssueDependencies = dynamic(() => import('../IssueDependencies/IssueDependencies'));
 
 const IssueHeader = styled(PageContent)`
     display: grid;
@@ -170,18 +172,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         [goal, invalidateFn, removeParticipantMutation],
     );
 
-    const toggleDependencyMutation = trpc.goal.toggleDependency.useMutation();
-    const onDependenciesChange = useCallback(
-        async (data: ToggleGoalDependency) => {
-            const promise = toggleDependencyMutation.mutateAsync(data);
-
-            await notifyPromise(promise, 'goalsUpdate');
-
-            invalidateFn();
-        },
-        [invalidateFn, toggleDependencyMutation],
-    );
-
     const onCommentPublish = useCallback(() => {
         invalidateFn();
     }, [invalidateFn]);
@@ -243,7 +233,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
 
-    const { onAddHandler, onRemoveHandler, onToggleHandler } = useCriteriaResource(invalidateFn);
+    const criteria = useCriteriaResource(invalidateFn);
+    const dependency = useGoalDependencyResource(invalidateFn);
 
     if (!goal || !owner || !issuer) return null;
 
@@ -325,37 +316,60 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         </StyledCardContent>
                     </StyledCard>
 
-                    {nullable(goal?.goalAchiveCriteria.length || goal?._isEditable, () => (
-                        <GoalCriteria
-                            goalId={goal.id}
-                            criteriaList={goal?.goalAchiveCriteria}
-                            onAddCriteria={onAddHandler}
-                            onToggleCriteria={onToggleHandler}
-                            onRemoveCriteria={onRemoveHandler}
-                            canEdit={goal._isEditable}
-                            renderForm={(props) =>
-                                nullable(goal?._isEditable, () => (
-                                    <CriteriaForm
-                                        onSubmit={props.onAddCriteria}
-                                        goalId={goal.id}
-                                        validityData={props.dataForValidateCriteria}
-                                    />
-                                ))
-                            }
-                        />
-                    ))}
-
-                    {nullable(goal?.activityFeed, (feed) => (
+                    {nullable(goal, ({ activityFeed, id, goalAchiveCriteria, relations, _isEditable }) => (
                         <GoalActivity
-                            feed={feed}
+                            feed={activityFeed}
                             ref={commentsRef}
                             userId={user.activityId}
-                            goalId={goal.id}
+                            goalId={id}
                             onCommentReaction={onCommentReactionToggle}
                             onCommentPublish={onCommentPublish}
                             onCommentDelete={onCommentDelete}
-                            goalStates={goal._isEditable ? goal.project?.flow.states : undefined}
-                        />
+                            goalStates={_isEditable ? project?.flow.states : undefined}
+                        >
+                            {nullable(goalAchiveCriteria.length || _isEditable, () => (
+                                <GoalCriteria
+                                    goalId={id}
+                                    criteriaList={goalAchiveCriteria}
+                                    onAddCriteria={criteria.onAddHandler}
+                                    onToggleCriteria={criteria.onToggleHandler}
+                                    onRemoveCriteria={criteria.onRemoveHandler}
+                                    canEdit={_isEditable}
+                                    renderForm={(props) =>
+                                        nullable(_isEditable, () => (
+                                            <CriteriaForm
+                                                onSubmit={props.onAddCriteria}
+                                                goalId={id}
+                                                validityData={props.dataForValidateCriteria}
+                                            />
+                                        ))
+                                    }
+                                />
+                            ))}
+
+                            <>
+                                {relations.map((deps) =>
+                                    nullable(deps.goals.length || _isEditable, () => (
+                                        <GoalDependencyListByKind
+                                            goalId={id}
+                                            key={deps.kind}
+                                            kind={deps.kind}
+                                            items={deps.goals}
+                                            canEdit={_isEditable}
+                                            onRemove={dependency.onRemoveHandler}
+                                        >
+                                            {nullable(_isEditable, () => (
+                                                <GoalDependencyAddForm
+                                                    onSubmit={dependency.onAddHandler}
+                                                    kind={deps.kind}
+                                                    goalId={id}
+                                                />
+                                            ))}
+                                        </GoalDependencyListByKind>
+                                    )),
+                                )}
+                            </>
+                        </GoalActivity>
                     ))}
                 </div>
 
@@ -399,8 +413,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                             </StyledInlineInput>
                         ))}
                     </IssueMeta>
-
-                    <IssueDependencies issue={goal} onChange={goal._isEditable ? onDependenciesChange : undefined} />
 
                     {nullable(goal._isEditable, () => (
                         <IssueMeta>
