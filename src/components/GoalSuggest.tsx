@@ -33,7 +33,7 @@ interface GoalSuggestItemProps {
     state?: StateType;
     estimate?: Estimate;
     focused: boolean;
-    onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+    onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
 const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
