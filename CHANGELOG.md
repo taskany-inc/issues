@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.15.0](https://github.com/taskany-inc/issues/compare/v1.14.2...v1.15.0) (2023-07-03)
+
+
+### Features
+
+* **ProjectListItemCollapsable:** added background for project purposes ([7ff2c7a](https://github.com/taskany-inc/issues/commit/7ff2c7aa0ed213c73d3eb02c1eb75f4b9cd411cb))
+
+
+### Bug Fixes
+
+* **FiltersPanelApplied:** fixed 500 on applied preset ([0a84d99](https://github.com/taskany-inc/issues/commit/0a84d993b1add1d35bd8aeba2aadb90c28877d24))
+* **goal:** map tags id to connect ([7f61562](https://github.com/taskany-inc/issues/commit/7f61562df866a57b783f336bdbf559c66ccfc93c))
+* **ProjectListItem:** align actions right ([ced167d](https://github.com/taskany-inc/issues/commit/ced167d65adb39f70acddcda6d7c035e7d5dacb5))
+* **TagComboBox:** deleted tags are not returned after being deleted ([2e0e6e6](https://github.com/taskany-inc/issues/commit/2e0e6e63125672af87c1aee52b874703fd6832ef))
+
 ## [1.14.2](https://github.com/taskany-inc/issues/compare/v1.14.1...v1.14.2) (2023-06-29)
 
 
