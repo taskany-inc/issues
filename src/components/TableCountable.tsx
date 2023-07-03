@@ -75,7 +75,7 @@ export const TableCountable: FC<{
             setTemplate((old) => {
                 delete old[row.templateId][row.id];
 
-                if (Object.values(old[row.templateId]).length) {
+                if (!Object.values(old[row.templateId]).length) {
                     delete old[row.templateId];
 
                     return {

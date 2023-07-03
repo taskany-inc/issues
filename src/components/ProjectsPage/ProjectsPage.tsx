@@ -17,6 +17,7 @@ import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { CommonHeader } from '../CommonHeader';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
+import { Example } from '../TableCountable';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -174,6 +175,7 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
             </FiltersPanel>
 
             <PageContent>
+                <Example />
                 {projects.map((project) => (
                     <ProjectListItemConnected
                         key={project.id}
