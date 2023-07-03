@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import {
     FiltersAction,
     FiltersCounter,
@@ -25,11 +25,14 @@ import { StateFilter } from '../StateFilter';
 import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
 import { Priority } from '../../types/priority';
 import { FilterById } from '../../../trpc/inferredTypes';
+import { trpc } from '../../utils/trpcClient';
 import { SortFilter } from '../SortFilter/SortFilter';
 import { StarredFilter } from '../StarredFilter/StarredFilter';
 import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 
 import { tr } from './FiltersPanel.i18n';
+
+const take = 5;
 
 export const FiltersPanel: FC<{
     children?: ReactNode;
@@ -46,9 +49,6 @@ export const FiltersPanel: FC<{
     tags?: React.ComponentProps<typeof TagFilter>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
-    issuers?: React.ComponentProps<typeof UserFilter>['users'];
-    owners?: React.ComponentProps<typeof UserFilter>['users'];
-    participants?: React.ComponentProps<typeof UserFilter>['users'];
 
     onSearchChange: (search: string) => void;
     onPriorityChange: React.ComponentProps<typeof PriorityFilter>['onChange'];
@@ -77,9 +77,6 @@ export const FiltersPanel: FC<{
     tags = [],
     estimates = [],
     presets = [],
-    owners = [],
-    issuers = [],
-    participants = [],
     priorities = [],
     states = [],
     onPriorityChange,
@@ -97,133 +94,171 @@ export const FiltersPanel: FC<{
     onSortChange,
     onStarredChange,
     onWatchingChange,
-}) => (
-    <>
-        <FiltersPanelContainer loading={loading}>
-            <FiltersPanelContent>
-                <FiltersSearchContainer>
-                    <SearchFilter
-                        placeholder={tr('Search')}
-                        defaultValue={queryState.query}
-                        onChange={onSearchChange}
-                    />
-                </FiltersSearchContainer>
-                <FiltersCounterContainer>
-                    <FiltersCounter total={total} counter={counter} />
-                </FiltersCounterContainer>
-                <FiltersMenuContainer>
-                    {Boolean(priorities.length) && (
-                        <StateFilter
-                            text={tr('State')}
-                            value={queryState.state}
-                            states={states}
-                            onChange={onStateChange}
-                        />
-                    )}
+}) => {
+    const [ownersQuery, setOwnersQuery] = useState('');
 
-                    {Boolean(priorities.length) && (
-                        <PriorityFilter
-                            text={tr('Priority')}
-                            value={queryState.priority}
-                            priorities={priorities}
-                            onChange={onPriorityChange}
-                        />
-                    )}
+    const { data: owners = [] } = trpc.user.suggestions.useQuery(
+        {
+            query: ownersQuery,
+            include: queryState.owner,
+            take,
+        },
+        {
+            keepPreviousData: true,
+        },
+    );
 
-                    {Boolean(projects.length) && (
-                        <ProjectFilter
-                            text={tr('Project')}
-                            value={queryState.project}
-                            projects={projects}
-                            onChange={onProjectChange}
-                        />
-                    )}
+    const [issuersQuery, setIssuersQuery] = useState('');
 
-                    {Boolean(issuers.length) && (
+    const { data: issuers = [] } = trpc.user.suggestions.useQuery(
+        {
+            query: issuersQuery,
+            include: queryState.issuer,
+            take,
+        },
+        {
+            keepPreviousData: true,
+        },
+    );
+
+    const [participantsQuery, setParticipantsQuery] = useState('');
+
+    const { data: participants = [] } = trpc.user.suggestions.useQuery(
+        {
+            query: participantsQuery,
+            include: queryState.issuer,
+            take,
+        },
+        {
+            keepPreviousData: true,
+        },
+    );
+
+    return (
+        <>
+            <FiltersPanelContainer loading={loading}>
+                <FiltersPanelContent>
+                    <FiltersSearchContainer>
+                        <SearchFilter
+                            placeholder={tr('Search')}
+                            defaultValue={queryState.query}
+                            onChange={onSearchChange}
+                        />
+                    </FiltersSearchContainer>
+                    <FiltersCounterContainer>
+                        <FiltersCounter total={total} counter={counter} />
+                    </FiltersCounterContainer>
+                    <FiltersMenuContainer>
+                        {Boolean(priorities.length) && (
+                            <StateFilter
+                                text={tr('State')}
+                                value={queryState.state}
+                                states={states}
+                                onChange={onStateChange}
+                            />
+                        )}
+
+                        {Boolean(priorities.length) && (
+                            <PriorityFilter
+                                text={tr('Priority')}
+                                value={queryState.priority}
+                                priorities={priorities}
+                                onChange={onPriorityChange}
+                            />
+                        )}
+
+                        {Boolean(projects.length) && (
+                            <ProjectFilter
+                                text={tr('Project')}
+                                value={queryState.project}
+                                projects={projects}
+                                onChange={onProjectChange}
+                            />
+                        )}
+
                         <UserFilter
+                            users={issuers}
                             text={tr('Issuer')}
                             value={queryState.issuer}
-                            users={issuers}
                             onChange={onIssuerChange}
+                            onSearchChange={setIssuersQuery}
                         />
-                    )}
 
-                    {Boolean(owners.length) && (
                         <UserFilter
+                            users={owners}
                             text={tr('Owner')}
                             value={queryState.owner}
-                            users={owners}
                             onChange={onOwnerChange}
+                            onSearchChange={setOwnersQuery}
                         />
-                    )}
 
-                    {Boolean(estimates.length) && (
-                        <EstimateFilter
-                            text={tr('Estimate')}
-                            value={queryState.estimate}
-                            estimates={estimates}
-                            onChange={onEstimateChange}
-                        />
-                    )}
+                        {Boolean(estimates.length) && (
+                            <EstimateFilter
+                                text={tr('Estimate')}
+                                value={queryState.estimate}
+                                estimates={estimates}
+                                onChange={onEstimateChange}
+                            />
+                        )}
 
-                    {Boolean(tags.length) && (
-                        <TagFilter text={tr('Tags')} value={queryState.tag} tags={tags} onChange={onTagChange} />
-                    )}
+                        {Boolean(tags.length) && (
+                            <TagFilter text={tr('Tags')} value={queryState.tag} tags={tags} onChange={onTagChange} />
+                        )}
 
-                    {Boolean(participants.length) && (
                         <UserFilter
+                            users={participants}
                             text={tr('Participant')}
                             value={queryState.participant}
-                            users={participants}
                             onChange={onParticipantChange}
+                            onSearchChange={setParticipantsQuery}
                         />
-                    )}
 
-                    <StarredFilter value={queryState.starred} onChange={onStarredChange} />
+                        <StarredFilter value={queryState.starred} onChange={onStarredChange} />
 
-                    <WatchingFilter value={queryState.watching} onChange={onWatchingChange} />
+                        <WatchingFilter value={queryState.watching} onChange={onWatchingChange} />
 
-                    <SortFilter text={tr('Sort')} value={queryState.sort} onChange={onSortChange} />
+                        <SortFilter text={tr('Sort')} value={queryState.sort} onChange={onSortChange} />
 
-                    {Boolean(presets.length) && (
-                        <PresetDropdown
-                            text={tr('Preset')}
-                            value={preset}
-                            presets={presets}
-                            onChange={onPresetChange}
-                        />
-                    )}
+                        {Boolean(presets.length) && (
+                            <PresetDropdown
+                                text={tr('Preset')}
+                                value={preset}
+                                presets={presets}
+                                onChange={onPresetChange}
+                            />
+                        )}
 
-                    {onLimitChange &&
-                        nullable(queryState.limit, (lf) => (
-                            <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={onLimitChange} />
-                        ))}
+                        {onLimitChange &&
+                            nullable(queryState.limit, (lf) => (
+                                <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={onLimitChange} />
+                            ))}
 
-                    {((Boolean(queryString) && !preset) || (preset && !preset._isOwner && !preset._isStarred)) && (
-                        <FiltersAction onClick={onFilterStar}>
-                            <StarIcon size="s" noWrap />
-                        </FiltersAction>
-                    )}
+                        {((Boolean(queryString) && !preset) || (preset && !preset._isOwner && !preset._isStarred)) && (
+                            <FiltersAction onClick={onFilterStar}>
+                                <StarIcon size="s" noWrap />
+                            </FiltersAction>
+                        )}
 
-                    {preset && (preset._isOwner || preset._isStarred) && (
-                        <FiltersAction onClick={onFilterStar}>
-                            <StarFilledIcon size="s" noWrap />
-                        </FiltersAction>
-                    )}
-                </FiltersMenuContainer>
-                {children}
-            </FiltersPanelContent>
-        </FiltersPanelContainer>
-        <FiltersPanelApplied
-            queryState={queryState}
-            priority={priorities as Priority[]}
-            states={states}
-            issuers={issuers}
-            owners={owners}
-            participants={participants}
-            projects={projects}
-            tags={tags}
-            estimates={estimates}
-        />
-    </>
-);
+                        {preset && (preset._isOwner || preset._isStarred) && (
+                            <FiltersAction onClick={onFilterStar}>
+                                <StarFilledIcon size="s" noWrap />
+                            </FiltersAction>
+                        )}
+                    </FiltersMenuContainer>
+                    {children}
+                </FiltersPanelContent>
+            </FiltersPanelContainer>
+            <FiltersPanelApplied
+                queryState={queryState}
+                priority={priorities as Priority[]}
+                states={states}
+                issuers={issuers}
+                owners={owners}
+                participants={participants}
+                projects={projects}
+                tags={tags}
+                estimates={estimates}
+            />
+        </>
+    );
+};

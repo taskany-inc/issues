@@ -5,52 +5,74 @@ import { protectedProcedure, router } from '../trpcBackend';
 import { settingsUserSchema, suggestionsUserSchema, updateUserSchema } from '../../src/schema/user';
 
 export const user = router({
-    suggestions: protectedProcedure.input(suggestionsUserSchema).query(async ({ input: { query, filter } }) => {
-        return prisma.activity.findMany({
-            take: 5,
-            where: {
-                OR: [
-                    {
-                        ghost: {
-                            email: {
-                                contains: query,
-                                mode: 'insensitive',
-                            },
-                        },
-                    },
-                    {
-                        user: {
-                            OR: [
-                                {
+    suggestions: protectedProcedure
+        .input(suggestionsUserSchema)
+        .query(async ({ input: { query, filter, include, take = 5 } }) => {
+            return Promise.all([
+                prisma.activity.findMany({
+                    take,
+                    where: {
+                        OR: [
+                            {
+                                ghost: {
                                     email: {
                                         contains: query,
                                         mode: 'insensitive',
                                     },
                                 },
-                                {
-                                    name: {
-                                        contains: query,
-                                        mode: 'insensitive',
-                                    },
+                            },
+                            {
+                                user: {
+                                    OR: [
+                                        {
+                                            email: {
+                                                contains: query,
+                                                mode: 'insensitive',
+                                            },
+                                        },
+                                        {
+                                            name: {
+                                                contains: query,
+                                                mode: 'insensitive',
+                                            },
+                                        },
+                                    ],
                                 },
-                            ],
-                        },
+                            },
+                            {
+                                id: {
+                                    in: include,
+                                },
+                            },
+                        ],
+                        ...(filter || include
+                            ? {
+                                  id: {
+                                      notIn: [...(filter || []), ...(include || [])],
+                                  },
+                              }
+                            : {}),
                     },
-                ],
-                ...(filter
-                    ? {
-                          id: {
-                              notIn: filter,
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                }),
+                include
+                    ? prisma.activity.findMany({
+                          where: {
+                              id: {
+                                  in: include,
+                              },
                           },
-                      }
-                    : {}),
-            },
-            include: {
-                user: true,
-                ghost: true,
-            },
-        });
-    }),
+                          include: {
+                              user: true,
+                              ghost: true,
+                          },
+                      })
+                    : Promise.resolve([]),
+            ]).then(([suggest, included]) => [...included, ...suggest]);
+        }),
     invite: protectedProcedure.input(z.array(z.string())).mutation(({ ctx, input }) => {
         try {
             const newGhosts = Promise.all(

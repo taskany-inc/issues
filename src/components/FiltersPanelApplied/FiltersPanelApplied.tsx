@@ -74,7 +74,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }
 
     if (queryState.owner.length && owners?.length) {
-        appliedMap[tr('Owner')] = queryState.owner.map((u) => ownersMap[u].user?.name).filter(Boolean) as string[];
+        appliedMap[tr('Owner')] = queryState.owner.map((u) => ownersMap[u]?.user?.name).filter(Boolean) as string[];
     }
 
     if (queryState.participant.length && participants?.length) {
