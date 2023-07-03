@@ -10,6 +10,8 @@ export type UpdateUser = z.infer<typeof updateUserSchema>;
 export const suggestionsUserSchema = z.object({
     query: z.string(),
     filter: z.array(z.string()).optional(),
+    take: z.number().optional(),
+    include: z.array(z.string()).optional(),
 });
 
 export const settingsUserSchema = z.object({

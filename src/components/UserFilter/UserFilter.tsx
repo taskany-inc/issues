@@ -12,7 +12,8 @@ export const UserFilter: FC<{
     text: string;
     value: string[];
     onChange: React.ComponentProps<typeof FiltersDropdownBase>['onChange'];
-}> = ({ text, users, value, onChange }) => {
+    onSearchChange: React.ComponentProps<typeof FiltersDropdownBase>['onSearchChange'];
+}> = ({ text, value, users, onChange, onSearchChange }) => {
     const { user } = usePageContext();
 
     const items = useMemo(() => {
@@ -41,6 +42,7 @@ export const UserFilter: FC<{
 
     return (
         <FiltersDropdownBase
+            onSearchChange={onSearchChange}
             text={text}
             items={items}
             value={value}
