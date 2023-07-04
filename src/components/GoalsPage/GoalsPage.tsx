@@ -182,8 +182,6 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 priorities={meta?.priority}
                 preset={currentPreset}
                 presets={userFilters.data}
-                tags={meta?.tags}
-                states={meta?.states}
                 estimates={meta?.estimates}
                 onSearchChange={setFulltextFilter}
                 onIssuerChange={setIssuerFilter}
