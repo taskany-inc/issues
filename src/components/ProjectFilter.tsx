@@ -1,4 +1,4 @@
-import { FiltersDropdown } from '@taskany/bricks';
+import { FiltersDropdownBase, MenuItem } from '@taskany/bricks';
 import { FC, useMemo } from 'react';
 
 type Project = {
@@ -11,8 +11,22 @@ export const ProjectFilter: FC<{
     value: string[];
     projects: Project[];
     onChange: (value: string[]) => void;
-}> = ({ text, value, projects, onChange }) => {
+    onSearchChange: React.ComponentProps<typeof FiltersDropdownBase>['onSearchChange'];
+}> = ({ text, value, projects, onChange, onSearchChange }) => {
     const items = useMemo(() => projects.map(({ id, title }) => ({ id, data: title })), [projects]);
 
-    return <FiltersDropdown text={text} value={value} items={items} onChange={onChange} />;
+    return (
+        <FiltersDropdownBase
+            text={text}
+            value={value}
+            items={items}
+            onChange={onChange}
+            onSearchChange={onSearchChange}
+            renderItem={({ item, selected, onClick }) => (
+                <MenuItem ghost key={item.id} selected={selected} onClick={onClick}>
+                    {item.data}
+                </MenuItem>
+            )}
+        />
+    );
 };

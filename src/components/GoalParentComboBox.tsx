@@ -49,11 +49,16 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
             setInputState(value?.title || query);
         }, [value, query]);
 
-        const { data } = trpc.project.suggestions.useQuery(inputState, {
-            enabled: inputState.length >= 2,
-            cacheTime: 0,
-            staleTime: 0,
-        });
+        const { data } = trpc.project.suggestions.useQuery(
+            {
+                query: inputState,
+            },
+            {
+                enabled: inputState.length >= 2,
+                cacheTime: 0,
+                staleTime: 0,
+            },
+        );
 
         const recentProjects = Object.values(recentProjectsCache)
             .sort((a, b) => b.rate - a.rate)

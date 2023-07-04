@@ -4,6 +4,8 @@ import { Filter } from '@prisma/client';
 
 import { FilterById } from '../../trpc/inferredTypes';
 
+const showSearchItemLength = 5;
+
 export const PresetDropdown: FC<{
     text: string;
     value?: FilterById;
@@ -21,6 +23,13 @@ export const PresetDropdown: FC<{
     );
 
     return (
-        <FiltersDropdown text={text} type="single" value={presetValue} items={items} onChange={presetChangeHandler} />
+        <FiltersDropdown
+            search={items.length > showSearchItemLength}
+            text={text}
+            type="single"
+            value={presetValue}
+            items={items}
+            onChange={presetChangeHandler}
+        />
     );
 };

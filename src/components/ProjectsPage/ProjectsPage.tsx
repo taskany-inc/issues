@@ -152,7 +152,6 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
             <FiltersPanel
                 queryState={queryState}
                 queryString={queryString}
-                projects={projects}
                 preset={currentPreset}
                 presets={userFilters.data}
                 onSearchChange={setFulltextFilter}

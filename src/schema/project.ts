@@ -7,6 +7,12 @@ export const projectDeepInfoSchema = queryWithFiltersSchema.extend({
     id: z.string(),
 });
 
+export const projectSuggestionsSchema = z.object({
+    query: z.string(),
+    take: z.number().optional(),
+    include: z.array(z.string()).optional(),
+});
+
 export type ProjectDeepInfo = z.infer<typeof projectDeepInfoSchema>;
 
 export const projectCreateSchema = z.object({

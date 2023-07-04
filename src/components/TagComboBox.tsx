@@ -33,7 +33,9 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
         const [inputState, setInputState] = useState(query);
         const [tags, setTags] = useState(value);
 
-        const suggestions = trpc.tag.suggestions.useQuery(inputState);
+        const suggestions = trpc.tag.suggestions.useQuery({
+            query: inputState,
+        });
         const createMutation = trpc.tag.create.useMutation();
 
         const createTag = useCallback(async () => {

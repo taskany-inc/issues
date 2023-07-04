@@ -186,7 +186,6 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                 queryState={queryState}
                 queryString={queryString}
                 priorities={meta?.priority}
-                projects={meta?.projects}
                 preset={currentPreset}
                 presets={userFilters.data}
                 tags={meta?.tags}
