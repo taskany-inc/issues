@@ -47,8 +47,6 @@ export const FiltersPanel: FC<{
 
     preset?: FilterById;
     priorities?: React.ComponentProps<typeof PriorityFilter>['priorities'];
-    states?: React.ComponentProps<typeof StateFilter>['states'];
-    tags?: React.ComponentProps<typeof TagFilter>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
 
@@ -78,7 +76,6 @@ export const FiltersPanel: FC<{
     estimates = [],
     presets = [],
     priorities = [],
-    states = [],
     onPriorityChange,
     onStateChange,
     onIssuerChange,
@@ -150,6 +147,8 @@ export const FiltersPanel: FC<{
         queryParams,
     );
 
+    const { data: states = [] } = trpc.state.all.useQuery();
+
     return (
         <>
             <FiltersPanelContainer loading={loading}>
@@ -165,14 +164,12 @@ export const FiltersPanel: FC<{
                         <FiltersCounter total={total} counter={counter} />
                     </FiltersCounterContainer>
                     <FiltersMenuContainer>
-                        {Boolean(priorities.length) && (
-                            <StateFilter
-                                text={tr('State')}
-                                value={queryState.state}
-                                states={states}
-                                onChange={onStateChange}
-                            />
-                        )}
+                        <StateFilter
+                            text={tr('State')}
+                            value={queryState.state}
+                            states={states}
+                            onChange={onStateChange}
+                        />
 
                         {Boolean(priorities.length) && (
                             <PriorityFilter
