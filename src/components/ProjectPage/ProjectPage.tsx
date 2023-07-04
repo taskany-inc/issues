@@ -193,7 +193,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
                     counter={projectDeepInfo?.goals?.length}
                     queryState={queryState}
                     queryString={queryString}
-                    priorities={projectDeepInfo?.meta?.priority}
                     preset={currentPreset}
                     presets={userFilters.data}
                     estimates={projectDeepInfo?.meta?.estimates}

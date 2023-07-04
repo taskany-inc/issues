@@ -4,7 +4,6 @@ import { gray7 } from '@taskany/colors';
 
 import { QueryState } from '../../hooks/useUrlFilterParams';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { PriorityFilter } from '../PriorityFilter';
 import { StateFilter } from '../StateFilter';
 import { UserFilter } from '../UserFilter/UserFilter';
 import { ProjectFilter } from '../ProjectFilter';
@@ -16,7 +15,6 @@ import { tr } from './FiltersPanelApplied.i18n';
 
 interface FiltersPanelAppliedProps {
     queryState: QueryState;
-    priority?: React.ComponentProps<typeof PriorityFilter>['priorities'];
     states?: React.ComponentProps<typeof StateFilter>['states'];
     issuers?: React.ComponentProps<typeof UserFilter>['users'];
     owners?: React.ComponentProps<typeof UserFilter>['users'];
@@ -37,7 +35,6 @@ const arrToMap = <T extends Array<{ id: string }>>(arr: T): { [key: string]: T[n
 
 export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     queryState,
-    priority,
     states,
     issuers,
     owners,
@@ -61,7 +58,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
 
     const appliedMap: Record<string, string[]> = {};
 
-    if (queryState.priority.length && priority?.length) {
+    if (queryState.priority.length) {
         appliedMap[tr('Priority')] = queryState.priority.map((p) => getPriorityText(p)).filter(Boolean);
     }
 

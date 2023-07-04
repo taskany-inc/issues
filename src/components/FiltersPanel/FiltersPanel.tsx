@@ -23,7 +23,6 @@ import { UserFilter } from '../UserFilter/UserFilter';
 import { PriorityFilter } from '../PriorityFilter';
 import { StateFilter } from '../StateFilter';
 import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
-import { Priority } from '../../types/priority';
 import { FilterById } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
 import { SortFilter } from '../SortFilter/SortFilter';
@@ -46,7 +45,6 @@ export const FiltersPanel: FC<{
     queryString?: string;
 
     preset?: FilterById;
-    priorities?: React.ComponentProps<typeof PriorityFilter>['priorities'];
     estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
 
@@ -75,7 +73,6 @@ export const FiltersPanel: FC<{
     preset,
     estimates = [],
     presets = [],
-    priorities = [],
     onPriorityChange,
     onStateChange,
     onIssuerChange,
@@ -171,14 +168,7 @@ export const FiltersPanel: FC<{
                             onChange={onStateChange}
                         />
 
-                        {Boolean(priorities.length) && (
-                            <PriorityFilter
-                                text={tr('Priority')}
-                                value={queryState.priority}
-                                priorities={priorities}
-                                onChange={onPriorityChange}
-                            />
-                        )}
+                        <PriorityFilter text={tr('Priority')} value={queryState.priority} onChange={onPriorityChange} />
 
                         <ProjectFilter
                             text={tr('Project')}
@@ -266,7 +256,6 @@ export const FiltersPanel: FC<{
             </FiltersPanelContainer>
             <FiltersPanelApplied
                 queryState={queryState}
-                priority={priorities as Priority[]}
                 states={states}
                 issuers={issuers}
                 owners={owners}

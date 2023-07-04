@@ -179,7 +179,6 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 counter={goalsOnScreen?.length}
                 queryState={queryState}
                 queryString={queryString}
-                priorities={meta?.priority}
                 preset={currentPreset}
                 presets={userFilters.data}
                 estimates={meta?.estimates}
