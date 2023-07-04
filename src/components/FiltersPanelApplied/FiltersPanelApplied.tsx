@@ -70,7 +70,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }
 
     if (queryState.issuer.length && issuers?.length) {
-        appliedMap[tr('Issuer')] = queryState.issuer.map((u) => issuersMap[u].user?.name).filter(Boolean) as string[];
+        appliedMap[tr('Issuer')] = queryState.issuer.map((u) => issuersMap[u]?.user?.name).filter(Boolean) as string[];
     }
 
     if (queryState.owner.length && owners?.length) {
@@ -79,16 +79,16 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
 
     if (queryState.participant.length && participants?.length) {
         appliedMap[tr('Participant')] = queryState.participant
-            .map((u) => participantsMap[u].user?.name)
+            .map((u) => participantsMap[u]?.user?.name)
             .filter(Boolean) as string[];
     }
 
     if (queryState.project.length && projects?.length) {
-        appliedMap[tr('Project')] = queryState.project.map((p) => projectsMap[p].title).filter(Boolean);
+        appliedMap[tr('Project')] = queryState.project.map((p) => projectsMap[p]?.title).filter(Boolean);
     }
 
     if (queryState.tag.length && tags?.length) {
-        appliedMap[tr('Tag')] = queryState.tag.map((t) => tagsMap[t].title).filter(Boolean);
+        appliedMap[tr('Tag')] = queryState.tag.map((t) => tagsMap[t]?.title).filter(Boolean);
     }
 
     if (queryState.estimate.length && estimates?.length) {

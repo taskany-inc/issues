@@ -194,7 +194,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
                     queryState={queryState}
                     queryString={queryString}
                     priorities={projectDeepInfo?.meta?.priority}
-                    projects={projectDeepInfo?.meta?.projects}
                     preset={currentPreset}
                     presets={userFilters.data}
                     tags={projectDeepInfo?.meta?.tags}

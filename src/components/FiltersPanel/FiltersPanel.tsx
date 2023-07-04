@@ -33,6 +33,9 @@ import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 import { tr } from './FiltersPanel.i18n';
 
 const take = 5;
+const queryParams = {
+    keepPreviousData: true,
+};
 
 export const FiltersPanel: FC<{
     children?: ReactNode;
@@ -45,7 +48,6 @@ export const FiltersPanel: FC<{
     preset?: FilterById;
     priorities?: React.ComponentProps<typeof PriorityFilter>['priorities'];
     states?: React.ComponentProps<typeof StateFilter>['states'];
-    projects?: React.ComponentProps<typeof ProjectFilter>['projects'];
     tags?: React.ComponentProps<typeof TagFilter>['tags'];
     estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
@@ -73,8 +75,6 @@ export const FiltersPanel: FC<{
     queryState,
     queryString,
     preset,
-    projects = [],
-    tags = [],
     estimates = [],
     presets = [],
     priorities = [],
@@ -103,9 +103,7 @@ export const FiltersPanel: FC<{
             include: queryState.owner,
             take,
         },
-        {
-            keepPreviousData: true,
-        },
+        queryParams,
     );
 
     const [issuersQuery, setIssuersQuery] = useState('');
@@ -116,9 +114,7 @@ export const FiltersPanel: FC<{
             include: queryState.issuer,
             take,
         },
-        {
-            keepPreviousData: true,
-        },
+        queryParams,
     );
 
     const [participantsQuery, setParticipantsQuery] = useState('');
@@ -129,9 +125,29 @@ export const FiltersPanel: FC<{
             include: queryState.issuer,
             take,
         },
+        queryParams,
+    );
+
+    const [projectsQuery, setProjectsQuery] = useState('');
+
+    const { data: projects = [] } = trpc.project.suggestions.useQuery(
         {
-            keepPreviousData: true,
+            query: projectsQuery,
+            include: queryState.project,
+            take,
         },
+        queryParams,
+    );
+
+    const [tagsQuery, setTagsQuery] = useState('');
+
+    const { data: tags = [] } = trpc.tag.suggestions.useQuery(
+        {
+            query: tagsQuery,
+            include: queryState.tag,
+            take,
+        },
+        queryParams,
     );
 
     return (
@@ -167,14 +183,13 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        {Boolean(projects.length) && (
-                            <ProjectFilter
-                                text={tr('Project')}
-                                value={queryState.project}
-                                projects={projects}
-                                onChange={onProjectChange}
-                            />
-                        )}
+                        <ProjectFilter
+                            text={tr('Project')}
+                            value={queryState.project}
+                            projects={projects}
+                            onChange={onProjectChange}
+                            onSearchChange={setProjectsQuery}
+                        />
 
                         <UserFilter
                             users={issuers}
@@ -201,9 +216,13 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        {Boolean(tags.length) && (
-                            <TagFilter text={tr('Tags')} value={queryState.tag} tags={tags} onChange={onTagChange} />
-                        )}
+                        <TagFilter
+                            text={tr('Tags')}
+                            value={queryState.tag}
+                            tags={tags}
+                            onChange={onTagChange}
+                            onSearchChange={setTagsQuery}
+                        />
 
                         <UserFilter
                             users={participants}

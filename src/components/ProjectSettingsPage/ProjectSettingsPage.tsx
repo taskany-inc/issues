@@ -132,7 +132,9 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
     const projectParentIds = project.data?.parent?.map((p) => p.id) ?? [];
     const [parentQuery, setParentQuery] = useState('');
-    const suggestions = trpc.project.suggestions.useQuery(parentQuery);
+    const suggestions = trpc.project.suggestions.useQuery({
+        query: parentQuery,
+    });
 
     const pageTitle = tr
         .raw('title', {

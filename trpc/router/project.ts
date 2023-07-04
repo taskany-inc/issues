@@ -5,9 +5,9 @@ import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import {
     projectCreateSchema,
-    projectDeepInfoSchema,
     projectTransferOwnershipSchema,
     projectUpdateSchema,
+    projectSuggestionsSchema,
 } from '../../src/schema/project';
 import {
     addCalclulatedGoalsFields,
@@ -45,28 +45,48 @@ export const addCalculatedProjectFields = <
 };
 
 export const project = router({
-    suggestions: protectedProcedure.input(z.string()).query(({ input }) => {
-        return prisma.project.findMany({
-            take: 5,
-            where: {
-                title: {
-                    contains: input,
-                    mode: 'insensitive',
+    suggestions: protectedProcedure.input(projectSuggestionsSchema).query(({ input: { query, take = 5, include } }) => {
+        const projectSchema = {
+            activity: {
+                include: {
+                    user: true,
                 },
             },
-            include: {
-                activity: {
-                    include: {
-                        user: true,
-                    },
-                },
-                flow: {
-                    include: {
-                        states: true,
-                    },
+            flow: {
+                include: {
+                    states: true,
                 },
             },
-        });
+        };
+        return Promise.all([
+            prisma.project.findMany({
+                take,
+                where: {
+                    title: {
+                        contains: query,
+                        mode: 'insensitive',
+                    },
+                    ...(include
+                        ? {
+                              id: {
+                                  notIn: include,
+                              },
+                          }
+                        : {}),
+                },
+                include: projectSchema,
+            }),
+            include
+                ? prisma.project.findMany({
+                      where: {
+                          id: {
+                              in: include,
+                          },
+                      },
+                      include: projectSchema,
+                  })
+                : Promise.resolve([]),
+        ]).then(([suggest, included]) => [...included, ...suggest]);
     }),
     getAll: protectedProcedure
         .input(
