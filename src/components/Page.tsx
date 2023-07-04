@@ -6,10 +6,9 @@ import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
 import { gapS, gray4, radiusM, textColor } from '@taskany/colors';
-import { TextStyle, Footer, nullable } from '@taskany/bricks';
+import { TextStyle, nullable } from '@taskany/bricks';
 
 import { pageContext, PageContext } from '../utils/pageContext';
-import { ExternalPageProps } from '../utils/declareSsrProps';
 import { useHotkeys } from '../hooks/useHotkeys';
 import { ModalEvent } from '../utils/dispatchModal';
 import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../utils/hotkeys';
@@ -17,6 +16,7 @@ import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../utils/hotk
 import { Theme } from './Theme';
 import { GlobalStyle } from './GlobalStyle';
 import { PageHeader } from './PageHeader/PageHeader';
+import { PageFooter } from './PageFooter/PageFooter';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm/ProjectCreateForm'));
@@ -101,7 +101,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
 
             <NotificationsHub />
 
-            <Footer />
+            <PageFooter />
         </pageContext.Provider>
     );
 };
