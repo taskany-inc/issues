@@ -17,6 +17,7 @@ interface ProjectListItemProps {
     starred?: boolean;
     watching?: boolean;
     className?: string;
+    disabled?: boolean;
 }
 
 const StyledTitleCell = styled(TableCell)`

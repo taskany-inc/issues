@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { gapS, gapSm, gray4, gray9, radiusM, textColor, gray6 } from '@taskany/colors';
 import React from 'react';
 import { Text } from '@taskany/bricks';
@@ -46,16 +46,20 @@ export const TableCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
     }
 `;
 
-export const TableRow = styled.div<{ focused?: boolean }>`
+export const TableRow = styled.div<{ focused?: boolean; disabled?: boolean }>`
     display: contents;
-    cursor: pointer;
 
     color: ${textColor};
     text-decoration: none;
 
-    &:hover ${TableCell} {
-        background-color: ${gray6};
-    }
+    ${({ disabled }) =>
+        !disabled &&
+        `
+        &:hover ${TableCell} {
+            background-color: ${gray6}};
+            cursor: pointer;
+        }
+    `}
 
     &:visited ${TableCell} {
         color: ${textColor};
