@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormInput, PlusIcon, Button } from '@taskany/bricks';
 import { gray7 } from '@taskany/colors';
-import { useState, useCallback, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -31,17 +31,18 @@ interface GoalDependencyAddFormProps {
     goalId: string;
     kind: dependencyKind;
     onSubmit: (values: ToggleGoalDependency) => void;
+    isEmpty: boolean;
 }
 
-export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ goalId, kind, onSubmit }) => {
+export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ goalId, kind, isEmpty, onSubmit }) => {
     const [selected, setSelected] = useState<GoalByIdReturnType | null>(null);
     const [query, setQuery] = useState(['']);
     const {
-        control,
+        register,
         handleSubmit,
         setValue,
         reset,
-        formState: { isSubmitSuccessful },
+        formState: { isSubmitSuccessful, errors },
     } = useForm({
         resolver: zodResolver(toggleGoalDependencySchema),
         mode: 'onChange',
@@ -78,14 +79,35 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
         setQuery([goal.projectId!, String(goal.scopeId)]);
     }, []);
 
+    useEffect(() => {
+        if (selected) {
+            if (query[0] !== selected.projectId || query[1] !== String(selected.scopeId)) {
+                resetFormHandler();
+            }
+        }
+    }, [query, selected, resetFormHandler]);
+
+    const translate = useMemo(() => {
+        return {
+            default: tr('Add dependency'),
+            [dependencyKind.blocks]: tr('Add blocking dependency'),
+            [dependencyKind.dependsOn]: tr('Add dependency'),
+            [dependencyKind.relatedTo]: tr('Add related dependency'),
+        };
+    }, []);
+
     return (
         <InlineForm
             renderTrigger={(props) => (
-                <StyledInlineTrigger text={tr('Add dependency')} icon={<PlusIcon noWrap size="s" />} {...props} />
+                <StyledInlineTrigger
+                    text={isEmpty ? translate[kind] : translate.default}
+                    icon={<PlusIcon noWrap size="s" />}
+                    {...props}
+                />
             )}
-            submitted={isSubmitSuccessful}
+            isSubmitted={isSubmitSuccessful}
             onSubmit={handleSubmit(onSubmit)}
-            reset={resetFormHandler}
+            onReset={resetFormHandler}
         >
             <GoalSuggest
                 renderTrigger={() => (
@@ -95,19 +117,16 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
                         value={query.join('-')}
                         onChange={handleInputChange}
                         brick="right"
+                        error={errors.relation?.id}
                     />
                 )}
                 value={query.join('-')}
                 onChange={handleGoalSelect}
             />
-            <Button text={tr('Add')} brick="left" type="submit" view="primary" outline disabled={selected == null} />
-            <Controller
-                name="relation"
-                control={control}
-                render={({ field }) => <input type="hidden" {...field} value={field.value.id} />}
-            />
-            <Controller name="id" control={control} render={({ field }) => <input type="hidden" {...field} />} />
-            <Controller name="kind" control={control} render={({ field }) => <input type="hidden" {...field} />} />
+            <Button text={tr('Add')} brick="left" type="submit" view="primary" outline />
+            <input type="hidden" {...register('relation.id')} />
+            <input type="hidden" {...register('id')} />
+            <input type="hidden" {...register('kind')} />
         </InlineForm>
     );
 };

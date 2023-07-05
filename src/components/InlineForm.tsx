@@ -10,8 +10,8 @@ interface InlineFormProps {
     renderTrigger?: (props: RenderTriggerProps) => React.ReactNode;
     onSubmit: () => void;
     children: React.ReactNode;
-    reset: () => void;
-    submitted?: boolean;
+    onReset: () => void;
+    isSubmitted?: boolean;
     className?: string;
 }
 
@@ -28,8 +28,8 @@ const StyledFormWrapper = styled.div`
 export const InlineForm: React.FC<InlineFormProps> = ({
     renderTrigger,
     onSubmit,
-    reset,
-    submitted,
+    onReset,
+    isSubmitted,
     children,
     className,
 }) => {
@@ -62,17 +62,17 @@ export const InlineForm: React.FC<InlineFormProps> = ({
     });
 
     useEffect(() => {
-        if (submitted) {
+        if (isSubmitted) {
             toggle();
-            reset();
+            onReset();
         }
-    }, [reset, submitted]);
+    }, [onReset, isSubmitted]);
 
     useEffect(() => {
         if (!visible) {
-            reset();
+            onReset();
         }
-    }, [visible, reset]);
+    }, [visible, onReset]);
 
     return (
         <StyledWrapper ref={wrapperRef} className={className}>

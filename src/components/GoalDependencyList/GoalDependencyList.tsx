@@ -122,7 +122,9 @@ const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({ onRemov
                                     </Title>
                                 </NextLink>
                             </StyledTitleContainer>
-                            {canEdit ? <StyledCleanButton onClick={onRemoveHandler} /> : null}
+                            {nullable(canEdit, () => (
+                                <StyledCleanButton onClick={onRemoveHandler} />
+                            ))}
                         </TitleItem>
                     ),
                 },
@@ -184,30 +186,31 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
                 <CircleIconInner as={MessageTextAltIcon} size="s" color={backgroundColor} />
             </Circle>
             <StyledWrapper>
-                <StyledHeadingWrapper>
-                    <Text color={gray6} weight="thin">
-                        {heading[kind]}
-                    </Text>
-                </StyledHeadingWrapper>
                 {nullable(items.length, () => (
-                    <StyledTable columns={6}>
-                        {items.map((item) => (
-                            <GoalDependencyListItem
-                                key={item.id}
-                                canEdit={canEdit}
-                                projectId={item.projectId}
-                                title={item.title}
-                                state={item.state ?? undefined}
-                                issuer={item.activity ?? undefined}
-                                owner={item.owner!}
-                                shortId={`${item.projectId}-${item.scopeId}`}
-                                estimate={item.estimate[item.estimate.length - 1]?.estimate}
-                                onRemove={() => onRemoveHandler(item)}
-                            />
-                        ))}
-                    </StyledTable>
+                    <>
+                        <StyledHeadingWrapper>
+                            <Text color={gray6} weight="thin">
+                                {heading[kind]}
+                            </Text>
+                        </StyledHeadingWrapper>
+                        <StyledTable columns={6}>
+                            {items.map((item) => (
+                                <GoalDependencyListItem
+                                    key={item.id}
+                                    canEdit={canEdit}
+                                    projectId={item.projectId}
+                                    title={item.title}
+                                    state={item.state ?? undefined}
+                                    issuer={item.activity ?? undefined}
+                                    owner={item.owner!}
+                                    shortId={`${item.projectId}-${item.scopeId}`}
+                                    estimate={item.estimate[item.estimate.length - 1]?.estimate}
+                                    onRemove={() => onRemoveHandler(item)}
+                                />
+                            ))}
+                        </StyledTable>
+                    </>
                 ))}
-
                 {children}
             </StyledWrapper>
         </ActivityFeedItem>

@@ -4,7 +4,6 @@ import { gapL, gapM, gray5 } from '@taskany/colors';
 export const ActivityFeed = styled.div`
     display: grid;
     row-gap: ${gapM};
-    padding-top: 0;
     padding-bottom: 250px;
     position: relative;
     z-index: 0;
