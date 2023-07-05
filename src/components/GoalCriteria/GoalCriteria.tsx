@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, memo } from 'react';
 import styled, { css } from 'styled-components';
 import { Text, CircleIcon, TickCircleIcon, MessageTickIcon, GoalIcon, nullable, CleanButton } from '@taskany/bricks';
 import { State } from '@prisma/client';
-import { backgroundColor, brandColor, gray10, gray6, gray7, gray9, gray8, textColor } from '@taskany/colors';
+import { backgroundColor, brandColor, gray10, gray6, gray9, gray8, textColor } from '@taskany/colors';
 import NextLink from 'next/link';
 
 import { AddCriteriaScheme, RemoveCriteriaScheme, UpdateCriteriaScheme } from '../../schema/criteria';
