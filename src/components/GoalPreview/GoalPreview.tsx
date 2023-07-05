@@ -352,6 +352,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                                                     onSubmit={dependency.onAddHandler}
                                                     kind={deps.kind}
                                                     goalId={id}
+                                                    isEmpty={deps.goals.length === 0}
                                                 />
                                             ))}
                                         </GoalDependencyListByKind>

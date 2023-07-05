@@ -363,6 +363,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                                     onSubmit={dependency.onAddHandler}
                                                     kind={deps.kind}
                                                     goalId={id}
+                                                    isEmpty={deps.goals.length === 0}
                                                 />
                                             ))}
                                         </GoalDependencyListByKind>

@@ -1,4 +1,6 @@
 {
-    "Add dependency": "Добавить цель",
-    "Add": "Добавить"
+    "Add dependency": "Добавить зависимость",
+    "Add": "Добавить",
+    "Add blocking dependency": "Добавить блокирующую зависимость",
+    "Add related dependency": "Добавить связанную зависимость"
 }
