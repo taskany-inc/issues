@@ -101,6 +101,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                         participants={project.participants}
                         starred={project._isStarred}
                         watching={project._isWatching}
+                        disabled={!onClickEnabled}
                     >
                         <StyledProjectListItemActionsContainer>
                             <StyledProjectListItemAction forceVisibility={!collapsedGoals}>
