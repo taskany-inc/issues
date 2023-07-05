@@ -1,11 +1,16 @@
 import { GoalsPage } from '../../components/GoalsPage/GoalsPage';
+import { filtersPanelSsrInit } from '../../components/FiltersPanel/FiltersPanel';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 import { parseFilterValues } from '../../hooks/useUrlFilterParams';
 
 const pageSize = 20;
 
 export const getServerSideProps = declareSsrProps(
-    async ({ query, ssrHelpers }) => {
+    async (props) => {
+        filtersPanelSsrInit(props);
+
+        const { query, ssrHelpers } = props;
+
         const preset =
             typeof query.filter === 'string' ? await ssrHelpers.filter.getById.fetch(query.filter) : undefined;
 

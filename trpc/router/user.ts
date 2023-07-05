@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -8,70 +9,75 @@ export const user = router({
     suggestions: protectedProcedure
         .input(suggestionsUserSchema)
         .query(async ({ input: { query, filter, include, take = 5 } }) => {
-            return Promise.all([
-                prisma.activity.findMany({
-                    take,
-                    where: {
-                        OR: [
-                            {
-                                ghost: {
+            const where: Prisma.ActivityWhereInput = {
+                OR: [
+                    {
+                        ghost: {
+                            email: {
+                                contains: query,
+                                mode: 'insensitive',
+                            },
+                        },
+                    },
+                    {
+                        user: {
+                            OR: [
+                                {
                                     email: {
                                         contains: query,
                                         mode: 'insensitive',
                                     },
                                 },
-                            },
-                            {
-                                user: {
-                                    OR: [
-                                        {
-                                            email: {
-                                                contains: query,
-                                                mode: 'insensitive',
-                                            },
-                                        },
-                                        {
-                                            name: {
-                                                contains: query,
-                                                mode: 'insensitive',
-                                            },
-                                        },
-                                    ],
+                                {
+                                    name: {
+                                        contains: query,
+                                        mode: 'insensitive',
+                                    },
                                 },
-                            },
-                            {
-                                id: {
-                                    in: include,
-                                },
-                            },
-                        ],
-                        ...(filter || include
-                            ? {
-                                  id: {
-                                      notIn: [...(filter || []), ...(include || [])],
-                                  },
-                              }
-                            : {}),
+                            ],
+                        },
                     },
-                    include: {
-                        user: true,
-                        ghost: true,
+                    {
+                        id: {
+                            in: include,
+                        },
                     },
+                ],
+            };
+
+            if (filter || include) {
+                where.id = {
+                    notIn: [...(filter || []), ...(include || [])],
+                };
+            }
+
+            const includeInput = {
+                user: true,
+                ghost: true,
+            };
+
+            const requests = [
+                prisma.activity.findMany({
+                    take,
+                    where,
+                    include: includeInput,
                 }),
-                include
-                    ? prisma.activity.findMany({
-                          where: {
-                              id: {
-                                  in: include,
-                              },
-                          },
-                          include: {
-                              user: true,
-                              ghost: true,
-                          },
-                      })
-                    : Promise.resolve([]),
-            ]).then(([suggest, included]) => [...included, ...suggest]);
+            ];
+
+            if (include) {
+                requests.push(
+                    prisma.activity.findMany({
+                        where: {
+                            id: {
+                                in: include,
+                            },
+                        },
+                        include: includeInput,
+                    }),
+                );
+            }
+
+            return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
         }),
     invite: protectedProcedure.input(z.array(z.string())).mutation(({ ctx, input }) => {
         try {

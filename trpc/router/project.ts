@@ -1,4 +1,5 @@
-import z, { boolean } from 'zod';
+import z from 'zod';
+import { Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { prisma } from '../../src/utils/prisma';
@@ -46,7 +47,7 @@ export const addCalculatedProjectFields = <
 
 export const project = router({
     suggestions: protectedProcedure.input(projectSuggestionsSchema).query(({ input: { query, take = 5, include } }) => {
-        const projectSchema = {
+        const includeInput = {
             activity: {
                 include: {
                     user: true,
@@ -58,7 +59,21 @@ export const project = router({
                 },
             },
         };
-        return Promise.all([
+
+        const where: Prisma.ProjectWhereInput = {
+            title: {
+                contains: query,
+                mode: 'insensitive',
+            },
+        };
+
+        if (include) {
+            where.id = {
+                notIn: include,
+            };
+        }
+
+        const requests = [
             prisma.project.findMany({
                 take,
                 where: {
@@ -74,19 +89,24 @@ export const project = router({
                           }
                         : {}),
                 },
-                include: projectSchema,
+                include: includeInput,
             }),
-            include
-                ? prisma.project.findMany({
-                      where: {
-                          id: {
-                              in: include,
-                          },
-                      },
-                      include: projectSchema,
-                  })
-                : Promise.resolve([]),
-        ]).then(([suggest, included]) => [...included, ...suggest]);
+        ];
+
+        if (include) {
+            requests.push(
+                prisma.project.findMany({
+                    where: {
+                        id: {
+                            in: include,
+                        },
+                    },
+                    include: includeInput,
+                }),
+            );
+        }
+
+        return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
     }),
     getAll: protectedProcedure
         .input(

@@ -195,7 +195,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
                     queryString={queryString}
                     preset={currentPreset}
                     presets={userFilters.data}
-                    estimates={projectDeepInfo?.meta?.estimates}
                     onSearchChange={setFulltextFilter}
                     onIssuerChange={setIssuerFilter}
                     onOwnerChange={setOwnerFilter}

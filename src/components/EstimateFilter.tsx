@@ -4,8 +4,8 @@ import { FC, useMemo } from 'react';
 import { estimateToString } from '../utils/estimateToString';
 
 type Estimate = {
-    date: string;
-    q: string;
+    date: string | null;
+    q: string | null;
     y: string;
 };
 

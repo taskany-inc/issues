@@ -181,7 +181,6 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 queryString={queryString}
                 preset={currentPreset}
                 presets={userFilters.data}
-                estimates={meta?.estimates}
                 onSearchChange={setFulltextFilter}
                 onIssuerChange={setIssuerFilter}
                 onOwnerChange={setOwnerFilter}
