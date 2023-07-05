@@ -9,6 +9,7 @@ import { project } from './project';
 import { goal } from './goal';
 import { search } from './search';
 import { state } from './state';
+import { estimates } from './estimates';
 
 export const trpcRouter = router({
     filter,
@@ -20,6 +21,7 @@ export const trpcRouter = router({
     goal,
     search,
     state,
+    estimates,
 });
 
 export type TrpcRouter = typeof trpcRouter;

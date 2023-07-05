@@ -12,7 +12,7 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { QueryState } from '../../hooks/useUrlFilterParams';
+import { QueryState, parseFilterValues } from '../../hooks/useUrlFilterParams';
 import { SearchFilter } from '../SearchFilter';
 import { ProjectFilter } from '../ProjectFilter';
 import { TagFilter } from '../TagFilter';
@@ -25,6 +25,7 @@ import { StateFilter } from '../StateFilter';
 import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
 import { FilterById } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
+import { SSRProps } from '../../utils/declareSsrProps';
 import { SortFilter } from '../SortFilter/SortFilter';
 import { StarredFilter } from '../StarredFilter/StarredFilter';
 import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
@@ -36,6 +37,40 @@ const queryParams = {
     keepPreviousData: true,
 };
 
+export const filtersPanelSsrInit = async ({ query, ssrHelpers }: SSRProps) => {
+    const { owner, participant, issuer, project, tag } = parseFilterValues(query);
+
+    await Promise.all([
+        ssrHelpers.user.suggestions.fetch({
+            take,
+            query: '',
+            include: owner,
+        }),
+        ssrHelpers.user.suggestions.fetch({
+            take,
+            query: '',
+            include: participant,
+        }),
+        ssrHelpers.user.suggestions.fetch({
+            take,
+            query: '',
+            include: issuer,
+        }),
+        ssrHelpers.project.suggestions.fetch({
+            take,
+            query: '',
+            include: project,
+        }),
+        ssrHelpers.tag.suggestions.fetch({
+            take,
+            query: '',
+            include: tag,
+        }),
+        ssrHelpers.state.all.fetch(),
+        ssrHelpers.estimates.all.fetch(),
+    ]);
+};
+
 export const FiltersPanel: FC<{
     children?: ReactNode;
     loading?: boolean;
@@ -45,7 +80,6 @@ export const FiltersPanel: FC<{
     queryString?: string;
 
     preset?: FilterById;
-    estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
 
     onSearchChange: (search: string) => void;
@@ -71,7 +105,6 @@ export const FiltersPanel: FC<{
     queryState,
     queryString,
     preset,
-    estimates = [],
     presets = [],
     onPriorityChange,
     onStateChange,
@@ -116,7 +149,7 @@ export const FiltersPanel: FC<{
     const { data: participants = [] } = trpc.user.suggestions.useQuery(
         {
             query: participantsQuery,
-            include: queryState.issuer,
+            include: queryState.participant,
             take,
         },
         queryParams,
@@ -145,6 +178,7 @@ export const FiltersPanel: FC<{
     );
 
     const { data: states = [] } = trpc.state.all.useQuery();
+    const { data: estimates = [] } = trpc.estimates.all.useQuery();
 
     return (
         <>
@@ -161,38 +195,52 @@ export const FiltersPanel: FC<{
                         <FiltersCounter total={total} counter={counter} />
                     </FiltersCounterContainer>
                     <FiltersMenuContainer>
-                        <StateFilter
-                            text={tr('State')}
-                            value={queryState.state}
-                            states={states}
-                            onChange={onStateChange}
-                        />
+                        {Boolean(states.length) && (
+                            <StateFilter
+                                text={tr('State')}
+                                value={queryState.state}
+                                states={states}
+                                onChange={onStateChange}
+                            />
+                        )}
 
-                        <PriorityFilter text={tr('Priority')} value={queryState.priority} onChange={onPriorityChange} />
+                        {Boolean(states.length) && (
+                            <PriorityFilter
+                                text={tr('Priority')}
+                                value={queryState.priority}
+                                onChange={onPriorityChange}
+                            />
+                        )}
 
-                        <ProjectFilter
-                            text={tr('Project')}
-                            value={queryState.project}
-                            projects={projects}
-                            onChange={onProjectChange}
-                            onSearchChange={setProjectsQuery}
-                        />
+                        {Boolean(projects.length) && (
+                            <ProjectFilter
+                                text={tr('Project')}
+                                value={queryState.project}
+                                projects={projects}
+                                onChange={onProjectChange}
+                                onSearchChange={setProjectsQuery}
+                            />
+                        )}
 
-                        <UserFilter
-                            users={issuers}
-                            text={tr('Issuer')}
-                            value={queryState.issuer}
-                            onChange={onIssuerChange}
-                            onSearchChange={setIssuersQuery}
-                        />
+                        {Boolean(issuers.length) && (
+                            <UserFilter
+                                users={issuers}
+                                text={tr('Issuer')}
+                                value={queryState.issuer}
+                                onChange={onIssuerChange}
+                                onSearchChange={setIssuersQuery}
+                            />
+                        )}
 
-                        <UserFilter
-                            users={owners}
-                            text={tr('Owner')}
-                            value={queryState.owner}
-                            onChange={onOwnerChange}
-                            onSearchChange={setOwnersQuery}
-                        />
+                        {Boolean(owners.length) && (
+                            <UserFilter
+                                users={owners}
+                                text={tr('Owner')}
+                                value={queryState.owner}
+                                onChange={onOwnerChange}
+                                onSearchChange={setOwnersQuery}
+                            />
+                        )}
 
                         {Boolean(estimates.length) && (
                             <EstimateFilter
@@ -203,21 +251,25 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        <TagFilter
-                            text={tr('Tags')}
-                            value={queryState.tag}
-                            tags={tags}
-                            onChange={onTagChange}
-                            onSearchChange={setTagsQuery}
-                        />
+                        {Boolean(tags.length) && (
+                            <TagFilter
+                                text={tr('Tags')}
+                                value={queryState.tag}
+                                tags={tags}
+                                onChange={onTagChange}
+                                onSearchChange={setTagsQuery}
+                            />
+                        )}
 
-                        <UserFilter
-                            users={participants}
-                            text={tr('Participant')}
-                            value={queryState.participant}
-                            onChange={onParticipantChange}
-                            onSearchChange={setParticipantsQuery}
-                        />
+                        {Boolean(participants.length) && (
+                            <UserFilter
+                                users={participants}
+                                text={tr('Participant')}
+                                value={queryState.participant}
+                                onChange={onParticipantChange}
+                                onSearchChange={setParticipantsQuery}
+                            />
+                        )}
 
                         <StarredFilter value={queryState.starred} onChange={onStarredChange} />
 

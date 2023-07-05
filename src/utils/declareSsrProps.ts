@@ -8,7 +8,7 @@ import { routes } from '../hooks/router';
 import { trpcRouter } from '../../trpc/router';
 import type { TrpcRouter } from '../../trpc/router';
 
-interface SSRProps<P = { [key: string]: string }> {
+export interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];
     req: GetServerSidePropsContext['req'];
     params: P;
