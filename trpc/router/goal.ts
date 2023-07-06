@@ -1,6 +1,6 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
-import { GoalHistory, Prisma } from '@prisma/client';
+import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -418,6 +418,7 @@ export const goal = router({
                         user: true,
                     },
                 },
+                goalAsCriteria: true,
             },
         });
 
@@ -524,6 +525,11 @@ export const goal = router({
                             data: history.map((record) => ({ ...record, activityId: ctx.session.user.activityId })),
                         },
                     },
+                    goalAsCriteria: {
+                        update: {
+                            isDone: input.state.type === StateType.Completed,
+                        },
+                    },
                 },
                 include: {
                     ...goalDeepQuery,
@@ -612,6 +618,9 @@ export const goal = router({
             where: {
                 id: input.id,
             },
+            include: {
+                goalAsCriteria: true,
+            },
         });
 
         if (!actualGoal) {
@@ -639,6 +648,11 @@ export const goal = router({
                             previousValue: actualGoal.stateId,
                             nextValue: input.state.id,
                             activityId: ctx.session.user.activityId,
+                        },
+                    },
+                    goalAsCriteria: {
+                        update: {
+                            isDone: input.state.type === StateType.Completed,
                         },
                     },
                 },
@@ -758,12 +772,24 @@ export const goal = router({
             return null;
         }
 
+        let isDoneByConnect = false;
+
+        if (input.goalAsGriteria?.id) {
+            const connectedGoal = await prisma.goal.findUnique({
+                where: { id: input.goalAsGriteria.id },
+                include: { state: true },
+            });
+
+            isDoneByConnect = connectedGoal?.state?.type === StateType.Completed;
+        }
+
         try {
             const [criteria] = await Promise.all([
                 prisma.goalAchieveCriteria.create({
                     data: {
                         title: input.title,
                         weight: Number(input.weight),
+                        isDone: isDoneByConnect,
                         activity: {
                             connect: {
                                 id: ctx.session.user.activityId,

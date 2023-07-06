@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, memo } from 'react';
 import styled, { css } from 'styled-components';
 import { Text, CircleIcon, TickCircleIcon, MessageTickIcon, GoalIcon, nullable, CleanButton } from '@taskany/bricks';
-import { State } from '@prisma/client';
+import { GoalAchieveCriteria, State, StateType } from '@prisma/client';
 import { backgroundColor, brandColor, gray10, gray6, gray9, gray8, textColor } from '@taskany/colors';
 import NextLink from 'next/link';
 
@@ -332,6 +332,32 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
         );
     }, [criteriaList]);
 
+    const sortedCriteriaItems = useMemo(() => {
+        const list = criteriaList.reduce<Record<'done' | 'undone', GoalAchiveCriteria[]>>(
+            (acc, criteria) => {
+                if (criteria.isDone) {
+                    acc.done.push(criteria);
+                } else if (criteria.goalAsCriteria) {
+                    if (criteria.goalAsCriteria.state?.type === StateType.Completed) {
+                        acc.done.push(criteria);
+                    } else {
+                        acc.undone.push(criteria);
+                    }
+                } else {
+                    acc.undone.push(criteria);
+                }
+
+                return acc;
+            },
+            {
+                done: [],
+                undone: [],
+            },
+        );
+
+        return list.done.concat(list.undone);
+    }, [criteriaList]);
+
     return (
         <ActivityFeedItem>
             <Circle size={32}>
@@ -346,7 +372,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                             </Text>
                         </StyledHeadingWrapper>
                         <StyledTable columns={8}>
-                            {criteriaList.map((item) => (
+                            {sortedCriteriaItems.map((item) => (
                                 <GoalCriteriaItem
                                     key={item.id}
                                     title={item.title}
