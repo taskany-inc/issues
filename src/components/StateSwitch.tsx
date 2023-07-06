@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { gapM } from '@taskany/colors';
 import { KeyCode, useKeyPress, useKeyboard } from '@taskany/bricks';
+import { StateType } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
 
@@ -14,6 +15,7 @@ interface StateObject {
     id: string;
     title: string;
     hue: number;
+    type: StateType;
 }
 
 interface StateSwitchProps {

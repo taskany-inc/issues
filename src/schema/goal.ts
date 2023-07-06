@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { StateType } from '@prisma/client';
 
 import { tr } from './schema.i18n';
 import { queryWithFiltersSchema } from './common';
@@ -131,6 +132,13 @@ export const goalUpdateSchema = z.object({
         id: z.string(),
         hue: z.number().optional(),
         title: z.string().optional(),
+        type: z.enum([
+            StateType.Canceled,
+            StateType.Completed,
+            StateType.Failed,
+            StateType.InProgress,
+            StateType.NotStarted,
+        ]),
     }),
     priority: z.string().nullable(),
     estimate: z
@@ -168,6 +176,13 @@ export const goalStateChangeSchema = z.object({
     state: z.object({
         id: z.string(),
         title: z.string(),
+        type: z.enum([
+            StateType.Canceled,
+            StateType.Completed,
+            StateType.Failed,
+            StateType.InProgress,
+            StateType.NotStarted,
+        ]),
     }),
 });
 
