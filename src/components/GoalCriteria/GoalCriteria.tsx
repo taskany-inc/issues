@@ -337,12 +337,6 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             (acc, criteria) => {
                 if (criteria.isDone) {
                     acc.done.push(criteria);
-                } else if (criteria.goalAsCriteria) {
-                    if (criteria.goalAsCriteria.state?.type === StateType.Completed) {
-                        acc.done.push(criteria);
-                    } else {
-                        acc.undone.push(criteria);
-                    }
                 } else {
                     acc.undone.push(criteria);
                 }
