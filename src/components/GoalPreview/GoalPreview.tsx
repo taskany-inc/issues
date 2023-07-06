@@ -96,8 +96,6 @@ const StyledModalContent = styled(ModalContent)`
 
 const StyledCard = styled(Card)`
     min-height: 60px;
-
-    margin-bottom: ${gapS};
 `;
 
 const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
@@ -317,21 +315,6 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                         </CardComment>
                     </StyledCard>
 
-                    {nullable(lastChangedStatusComment, (value) => (
-                        <CommentView
-                            id={value.id}
-                            author={value.activity?.user}
-                            description={value.description}
-                            state={value.state}
-                            createdAt={value.createdAt}
-                            isPinned
-                            onDelete={onCommentDelete}
-                            onReactionToggle={onCommentReactionToggle(value.id)}
-                            reactions={value.reactions}
-                            isEditable={value.activity?.id === user?.activityId}
-                        />
-                    ))}
-
                     {nullable(goal, ({ activityFeed, id, goalAchiveCriteria, relations, project, _isEditable }) => (
                         <GoalActivity
                             feed={activityFeed}
@@ -343,6 +326,20 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                             onCommentDelete={onCommentDelete}
                             goalStates={_isEditable ? project?.flow.states : undefined}
                         >
+                            {nullable(lastChangedStatusComment, (value) => (
+                                <CommentView
+                                    id={value.id}
+                                    author={value.activity?.user}
+                                    description={value.description}
+                                    state={value.state}
+                                    createdAt={value.createdAt}
+                                    isPinned
+                                    onDelete={onCommentDelete}
+                                    onReactionToggle={onCommentReactionToggle(value.id)}
+                                    reactions={value.reactions}
+                                    isEditable={value.activity?.id === user?.activityId}
+                                />
+                            ))}
                             {nullable(goalAchiveCriteria.length || _isEditable, () => (
                                 <GoalCriteria
                                     goalId={id}
@@ -350,6 +347,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                                     onAddCriteria={criteria.onAddHandler}
                                     onToggleCriteria={criteria.onToggleHandler}
                                     onRemoveCriteria={criteria.onRemoveHandler}
+                                    onConvertToGoal={criteria.onConvertCriteria}
                                     canEdit={_isEditable}
                                     renderForm={(props) =>
                                         nullable(_isEditable, () => (

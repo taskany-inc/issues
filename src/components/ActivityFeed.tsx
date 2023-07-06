@@ -6,7 +6,6 @@ export const ActivityFeed = styled.div`
     row-gap: ${gapM};
     padding-bottom: 250px;
     position: relative;
-    z-index: 0;
 `;
 
 export const ActivityFeedItem = styled.div`
@@ -26,7 +25,7 @@ export const ActivityFeedItem = styled.div`
         left: 15px;
         top: 0;
         border-left: 1px solid ${gray5};
-        z-index: -1;
+        z-index: 0;
         transform: translateY(-100%);
     }
 
@@ -36,7 +35,7 @@ export const ActivityFeedItem = styled.div`
         height: calc(100% + ${gapM});
         left: 15px;
         border-left: 1px solid ${gray5};
-        z-index: -1;
+        z-index: 0;
     }
 
     :last-child::after {

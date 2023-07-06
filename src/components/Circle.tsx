@@ -8,6 +8,7 @@ interface CircleProps {
 export const Circle = styled.span<CircleProps>`
     display: flex;
     position: relative;
+    z-index: 1;
 
     ${({ size }) => css`
         width: ${size}px;

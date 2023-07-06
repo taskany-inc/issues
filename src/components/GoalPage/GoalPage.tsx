@@ -34,7 +34,7 @@ import { StarButton } from '../StarButton/StarButton';
 import { useRouter } from '../../hooks/router';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { trpc } from '../../utils/trpcClient';
-import { GoalStateChangeSchema, ToggleGoalDependency } from '../../schema/goal';
+import { GoalStateChangeSchema } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
@@ -334,6 +334,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onAddCriteria={criteria.onAddHandler}
                                     onToggleCriteria={criteria.onToggleHandler}
                                     onRemoveCriteria={criteria.onRemoveHandler}
+                                    onConvertToGoal={criteria.onConvertCriteria}
                                     canEdit={_isEditable}
                                     renderForm={(props) =>
                                         nullable(_isEditable, () => (

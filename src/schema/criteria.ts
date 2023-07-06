@@ -28,6 +28,15 @@ export const removeCriteria = z.object({
     id: z.string(),
 });
 
+export const convertCriteriaToGoalSchema = z.object({
+    id: z.string(),
+    title: z.string(),
+    goalAsCriteria: z.object({
+        id: z.string(),
+    }),
+});
+
 export type AddCriteriaScheme = z.infer<typeof criteriaSchema>;
 export type UpdateCriteriaScheme = z.infer<typeof updateCriteriaState>;
 export type RemoveCriteriaScheme = z.infer<typeof removeCriteria>;
+export type ConvertCriteriaToGoalScheme = z.infer<typeof convertCriteriaToGoalSchema>;

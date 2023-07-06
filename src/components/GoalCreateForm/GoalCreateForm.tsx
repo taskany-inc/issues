@@ -12,7 +12,7 @@ import { Keyboard } from '../Keyboard';
 import { GoalForm } from '../GoalForm/GoalForm';
 import { trpc } from '../../utils/trpcClient';
 import { GoalCommon, goalCommonSchema } from '../../schema/goal';
-import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType, GoalCreateReturnType } from '../../../trpc/inferredTypes';
 import { notifyPromise } from '../../utils/notifyPromise';
 
 import { tr } from './GoalCreateForm.i18n';
@@ -32,7 +32,12 @@ const StyledButtonWithDropdown = styled.div`
     align-items: center;
 `;
 
-const GoalCreateForm: React.FC = () => {
+interface GoalCreateFormProps {
+    title?: string;
+    onGoalCreate?: (val: GoalCreateReturnType) => void;
+}
+
+const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) => {
     const router = useRouter();
     const { user } = usePageContext();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
@@ -99,6 +104,8 @@ const GoalCreateForm: React.FC = () => {
             if (createGoalType === 3) {
                 dispatchModalEvent(ModalEvent.GoalCreateModal)();
             }
+
+            onGoalCreate?.(res);
         }
     };
 
@@ -110,6 +117,7 @@ const GoalCreateForm: React.FC = () => {
             parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"
             onSumbit={createGoal}
+            title={title}
             actionButton={
                 <>
                     <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)} />
