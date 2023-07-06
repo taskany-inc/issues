@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { ComboBox, GoalIcon, nullable } from '@taskany/bricks';
 import { backgroundColor } from '@taskany/colors';
@@ -20,7 +20,7 @@ const StyledTable = styled(Table)`
 `;
 
 interface GoalSuggestProps {
-    renderTrigger: () => React.ReactElement;
+    children: React.ReactElement;
     onChange: (val: any) => void;
     value?: string;
 }
@@ -82,55 +82,53 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
     );
 };
 
-export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
-    ({ renderTrigger, onChange, value = '' }, ref) => {
-        const [visible, setVisible] = useState(false);
-        const [selected, setSelected] = useState<GoalByIdReturnType | null>(null);
+export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(({ onChange, value = '', children }, ref) => {
+    const [visible, setVisible] = useState(false);
+    const [selected, setSelected] = useState<GoalByIdReturnType | null>(null);
 
-        const { data: items = [] } = trpc.goal.suggestions.useQuery(
-            { input: value, limit: 5 },
-            {
-                staleTime: 0,
-                cacheTime: 0,
-            },
-        );
+    const { data: items = [] } = trpc.goal.suggestions.useQuery(
+        { input: value, limit: 5 },
+        {
+            staleTime: 0,
+            cacheTime: 0,
+        },
+    );
 
-        useEffect(() => {
-            if (items.length > 0) {
-                setVisible(true);
-            } else {
-                setVisible(false);
-            }
-        }, [items]);
+    useEffect(() => {
+        if (items.length > 0) {
+            setVisible(true);
+        } else {
+            setVisible(false);
+        }
+    }, [items]);
 
-        useEffect(() => {
-            if (selected) {
-                onChange(selected);
-            }
-        }, [selected, onChange]);
+    useEffect(() => {
+        if (selected) {
+            onChange(selected);
+        }
+    }, [selected, onChange]);
 
-        return (
-            <ComboBox
-                ref={ref}
-                onChange={setSelected}
-                items={items}
-                visible={visible}
-                renderInput={renderTrigger}
-                renderItem={({ item, cursor, index, onClick }) => (
-                    <GoalSuggestItem
-                        key={item.id}
-                        focused={cursor === index}
-                        onClick={onClick}
-                        projectId={item.projectId}
-                        title={item.title}
-                        state={item.state}
-                        issuer={item.activity}
-                        owner={item.owner}
-                        estimate={item._lastEstimate}
-                    />
-                )}
-                renderItems={(children) => <StyledTable columns={6}>{children as React.ReactNode}</StyledTable>}
-            />
-        );
-    },
-);
+    return (
+        <ComboBox
+            ref={ref}
+            onChange={setSelected}
+            items={items}
+            visible={visible}
+            renderInput={() => children}
+            renderItem={({ item, cursor, index, onClick }) => (
+                <GoalSuggestItem
+                    key={item.id}
+                    focused={cursor === index}
+                    onClick={onClick}
+                    projectId={item.projectId}
+                    title={item.title}
+                    state={item.state}
+                    issuer={item.activity}
+                    owner={item.owner}
+                    estimate={item._lastEstimate}
+                />
+            )}
+            renderItems={(children) => <StyledTable columns={6}>{children as React.ReactNode}</StyledTable>}
+        />
+    );
+});

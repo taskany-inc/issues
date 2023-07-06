@@ -36,7 +36,7 @@ interface GoalDependencyAddFormProps {
 
 export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ goalId, kind, isEmpty, onSubmit }) => {
     const [selected, setSelected] = useState<GoalByIdReturnType | null>(null);
-    const [query, setQuery] = useState(['']);
+    const [query, setQuery] = useState('');
     const {
         register,
         handleSubmit,
@@ -55,7 +55,7 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
 
     const resetFormHandler = useCallback(() => {
         setSelected(null);
-        setQuery(['']);
+        setQuery('');
 
         reset({
             relation: { id: '' },
@@ -71,19 +71,17 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
     }, [selected, setValue]);
 
     const handleInputChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-        setQuery([event.target.value]);
+        setQuery(event.target.value);
     }, []);
 
     const handleGoalSelect = useCallback((goal: NonNullable<GoalByIdReturnType>) => {
         setSelected(goal);
-        setQuery([goal.projectId!, String(goal.scopeId)]);
+        setQuery(`${goal.projectId!}-${goal.scopeId}`);
     }, []);
 
     useEffect(() => {
-        if (selected) {
-            if (query[0] !== selected.projectId || query[1] !== String(selected.scopeId)) {
-                resetFormHandler();
-            }
+        if (selected && query !== `${selected.projectId!}-${selected.scopeId}`) {
+            resetFormHandler();
         }
     }, [query, selected, resetFormHandler]);
 
@@ -109,20 +107,16 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
             onSubmit={handleSubmit(onSubmit)}
             onReset={resetFormHandler}
         >
-            <GoalSuggest
-                renderTrigger={() => (
-                    <StyledFormInput
-                        autoFocus
-                        autoComplete="off"
-                        value={query.join('-')}
-                        onChange={handleInputChange}
-                        brick="right"
-                        error={errors.relation?.id}
-                    />
-                )}
-                value={query.join('-')}
-                onChange={handleGoalSelect}
-            />
+            <GoalSuggest value={query} onChange={handleGoalSelect}>
+                <StyledFormInput
+                    autoFocus
+                    autoComplete="off"
+                    value={query}
+                    onChange={handleInputChange}
+                    brick="right"
+                    error={errors.relation?.id}
+                />
+            </GoalSuggest>
             <Button text={tr('Add')} brick="left" type="submit" view="primary" outline />
             <input type="hidden" {...register('relation.id')} />
             <input type="hidden" {...register('id')} />
