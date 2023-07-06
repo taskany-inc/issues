@@ -150,6 +150,7 @@ const WeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
 
         return (
             <StyledFormInput
+                autoComplete="off"
                 name={name}
                 value={value}
                 error={error?.message != null ? error : undefined}
