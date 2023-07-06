@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, createContext } from 'react';
 import tinykeys from 'tinykeys';
 import { Modal } from '@taskany/bricks';
 
-import { ModalEvent } from '../utils/dispatchModal';
+import { ModalEvent, MapModalToComponentProps } from '../utils/dispatchModal';
 import { createHotkeys } from '../utils/hotkeys';
 
 interface ModalOnEventProps {
@@ -11,10 +11,11 @@ interface ModalOnEventProps {
     hotkeys?: string[];
     visible?: boolean;
     view?: React.ComponentProps<typeof Modal>['view'];
-
     onShow?: React.ComponentProps<typeof Modal>['onShow'];
     onClose?: React.ComponentProps<typeof Modal>['onClose'];
 }
+
+export const ModalContext = createContext<{ [K in ModalEvent]?: MapModalToComponentProps[K] }>({});
 
 const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     event,
@@ -26,8 +27,10 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     onClose,
 }) => {
     const [modalVisible, setModalVisibility] = useState(visible);
+    const [modalProps, setModalProps] = useState<MapModalToComponentProps[typeof event] | null>(null);
     const onModalClose = useCallback(() => {
         setModalVisibility(false);
+        setModalProps(null);
         onClose?.();
     }, [setModalVisibility, onClose]);
 
@@ -42,10 +45,10 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     }, [visible]);
 
     useEffect(() => {
-        const globalListener = () => {
+        const globalListener = (ev: CustomEvent<MapModalToComponentProps[typeof event]>) => {
             setModalVisibility(!modalVisible);
+            setModalProps(ev.detail);
         };
-
         window.addEventListener(event, globalListener);
 
         return () => {
@@ -55,7 +58,7 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({
 
     return (
         <Modal cross={false} view={view} visible={modalVisible} onShow={onShow} onClose={onModalClose}>
-            {children}
+            <ModalContext.Provider value={{ [event]: modalProps }}>{children}</ModalContext.Provider>
         </Modal>
     );
 };

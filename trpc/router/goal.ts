@@ -35,7 +35,12 @@ import {
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
-import { criteriaSchema, removeCriteria, updateCriteriaState } from '../../src/schema/criteria';
+import {
+    convertCriteriaToGoalSchema,
+    criteriaSchema,
+    removeCriteria,
+    updateCriteriaState,
+} from '../../src/schema/criteria';
 
 import { addCalculatedProjectFields } from './project';
 
@@ -915,6 +920,29 @@ export const goal = router({
             if (current) {
                 await updateGoalWithCalculatedWeight(current.goalId);
             }
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    convertCriteriaToGoal: protectedProcedure.input(convertCriteriaToGoalSchema).mutation(async ({ input, ctx }) => {
+        try {
+            const actualCriteria = await prisma.goalAchieveCriteria.findUnique({
+                where: { id: input.id },
+            });
+
+            if (!actualCriteria) {
+                return null;
+            }
+
+            await prisma.goalAchieveCriteria.update({
+                where: { id: input.id },
+                data: {
+                    title: input.title,
+                    goalAsCriteria: {
+                        connect: { id: input.goalAsCriteria.id },
+                    },
+                },
+            });
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }

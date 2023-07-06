@@ -1,8 +1,17 @@
-import React, { useCallback, useMemo, memo } from 'react';
+import React, { useCallback, useMemo, memo, useReducer, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { Text, CircleIcon, TickCircleIcon, MessageTickIcon, GoalIcon, nullable, CleanButton } from '@taskany/bricks';
+import { Dropdown, MenuItem, Text, nullable } from '@taskany/bricks';
+import {
+    IconXCircleSolid,
+    IconTargetOutline,
+    IconCircleOutline,
+    IconMessageTickOutline,
+    IconTickCircleOutline,
+    IconMoreVerticalOutline,
+} from '@taskany/icons';
+import Popup from '@taskany/bricks/components/Popup';
 import { State } from '@prisma/client';
-import { backgroundColor, brandColor, gray10, gray6, gray9, gray8, textColor } from '@taskany/colors';
+import { backgroundColor, brandColor, gray10, gray6, gray9, gray8, textColor, gray7, danger0 } from '@taskany/colors';
 import NextLink from 'next/link';
 
 import { AddCriteriaScheme, RemoveCriteriaScheme, UpdateCriteriaScheme } from '../../schema/criteria';
@@ -13,7 +22,7 @@ import { ActivityByIdReturnType, GoalEstimate, GoalAchiveCriteria } from '../../
 import { estimateToString } from '../../utils/estimateToString';
 import { UserGroup } from '../UserGroup';
 import { routes } from '../../hooks/router';
-import { Circle, CircledIcon as CircleIconInner } from '../Circle';
+import { Circle, CircledIcon } from '../Circle';
 
 import { tr } from './GoalCriteria.i18n';
 
@@ -22,7 +31,20 @@ const StyledWrapper = styled.div`
     flex-direction: column;
 `;
 
-const StyledCircleIcon = styled(CircleIcon)`
+const StyledIcon = styled(IconMessageTickOutline)`
+    display: flex;
+    background-color: ${gray7};
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+
+    text-align: center;
+
+    width: 32px;
+    height: 32px;
+`;
+
+const StyledCircleIcon = styled(IconCircleOutline)`
     color: ${gray8};
 
     &:hover {
@@ -30,7 +52,7 @@ const StyledCircleIcon = styled(CircleIcon)`
     }
 `;
 
-const StyledTickIcon = styled(TickCircleIcon)`
+const StyledTickIcon = styled(IconTickCircleOutline)`
     color: ${brandColor};
     fill: ${backgroundColor};
 `;
@@ -65,16 +87,21 @@ const GoalCriteriaCheckBox: React.FC<GoalCriteriaCheckBoxProps> = ({ checked, ca
     );
 };
 
-const StyledCleanButton = styled(CleanButton)`
+const StyledActionWrapper = styled.span`
+    display: inline-flex;
+    align-items: baseline;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
     align-self: baseline;
+    gap: 0.25rem;
+    visibility: hidden;
 `;
+
 const StyledContentCellWithOffset = styled(ContentItem)``;
 
 const StyledTable = styled(Table)`
     width: 100%;
-    grid-template-columns: 15px minmax(250px, 20%) repeat(4, max-content) 1fr;
+    grid-template-columns: 15px minmax(250px, 20%) repeat(5, max-content) 1fr;
     column-gap: 10px;
     row-gap: 2px;
     padding: 0;
@@ -94,17 +121,11 @@ const StyledTableRow = styled.div`
     position: relative;
     display: contents;
 
-    & ${StyledCleanButton} {
-        position: relative;
-        top: unset;
-        right: unset;
-    }
-
     &:hover {
         background-color: ${gray8};
     }
 
-    &:hover ${StyledCleanButton} {
+    &:hover ${StyledActionWrapper} {
         visibility: visible;
         opacity: 1;
     }
@@ -167,6 +188,7 @@ interface GoalCriteriaItemProps {
     owner?: ActivityByIdReturnType | null;
     estimate?: GoalEstimate | null;
     state?: State | null;
+    onConvertToGoal?: () => void;
 }
 
 interface CriteriaTitleProps {
@@ -174,10 +196,9 @@ interface CriteriaTitleProps {
     checked: boolean;
     canEdit: boolean;
     onClick: () => void;
-    children?: React.ReactNode;
 }
 
-const CriteriaTitle: React.FC<CriteriaTitleProps> = ({ title, checked, canEdit, onClick, children }) => {
+const CriteriaTitle: React.FC<CriteriaTitleProps> = ({ title, checked, canEdit, onClick }) => {
     return (
         <>
             <StyledContentCellWithOffset>
@@ -189,7 +210,6 @@ const CriteriaTitle: React.FC<CriteriaTitleProps> = ({ title, checked, canEdit, 
                         {title}
                     </Title>
                 </StyledTitleContainer>
-                {children}
             </TitleItem>
         </>
     );
@@ -199,14 +219,13 @@ interface CriteriaGoalTitleProps {
     title: string;
     projectId: string | null;
     scopeId: number | null;
-    children: React.ReactNode;
 }
 
-const CriteriaGoalTitle: React.FC<CriteriaGoalTitleProps> = ({ projectId, scopeId, title, children }) => {
+const CriteriaGoalTitle: React.FC<CriteriaGoalTitleProps> = ({ projectId, scopeId, title }) => {
     return (
         <>
             <StyledContentCellWithOffset>
-                <GoalIcon size="s" />
+                <IconTargetOutline size="s" />
             </StyledContentCellWithOffset>
             <TitleItem as="a">
                 <StyledTitleContainer>
@@ -216,7 +235,6 @@ const CriteriaGoalTitle: React.FC<CriteriaGoalTitleProps> = ({ projectId, scopeI
                         </StyledGoalAnchor>
                     </NextLink>
                 </StyledTitleContainer>
-                {children}
             </TitleItem>
         </>
     );
@@ -226,8 +244,28 @@ const criteriaGuard = (props: GoalCriteriaItemProps): props is CriteriaAsGoalPro
     return 'projectId' in props && props.projectId != null;
 };
 
+type CriteriaActionItem = {
+    label: string;
+    onClick: () => void;
+    color?: string;
+    icon: React.ReactNode;
+};
+
 const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
-    const { onCheck, canEdit, onRemove, title, isDone, weight, issuer, owner, projectId, state, estimate } = props;
+    const {
+        onCheck,
+        canEdit,
+        onRemove,
+        onConvertToGoal,
+        title,
+        isDone,
+        weight,
+        issuer,
+        owner,
+        projectId,
+        state,
+        estimate,
+    } = props;
     const onToggle = useCallback(() => {
         onCheck?.(!isDone);
     }, [onCheck, isDone]);
@@ -244,16 +282,37 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
         return null;
     }, [issuer, owner, props]);
 
+    const availableActions = useMemo<CriteriaActionItem[] | null>(() => {
+        if (!canEdit) {
+            return null;
+        }
+
+        const actions: CriteriaActionItem[] = [];
+
+        if (!criteriaGuard(props) && onConvertToGoal) {
+            actions.push({
+                label: tr('Create as goal'),
+                icon: <IconTargetOutline size="xxs" />,
+                onClick: onConvertToGoal,
+            });
+        }
+
+        actions.push({
+            label: tr('Delete'),
+            icon: <IconXCircleSolid size="xxs" />,
+            color: danger0,
+            onClick: onRemove,
+        });
+
+        return actions;
+    }, [canEdit, onRemove, props, onConvertToGoal]);
+
     return (
         <StyledTableRow>
             {criteriaGuard(props) ? (
-                <CriteriaGoalTitle projectId={props.projectId!} scopeId={props.scopeId!} title={title}>
-                    {canEdit ? <StyledCleanButton onClick={onRemove} /> : null}
-                </CriteriaGoalTitle>
+                <CriteriaGoalTitle projectId={props.projectId!} scopeId={props.scopeId!} title={title} />
             ) : (
-                <CriteriaTitle title={title} checked={props.isDone} onClick={onToggle} canEdit={canEdit}>
-                    {canEdit ? <StyledCleanButton onClick={onRemove} /> : null}
-                </CriteriaTitle>
+                <CriteriaTitle title={title} checked={props.isDone} onClick={onToggle} canEdit={canEdit} />
             )}
             <ContentItem>
                 {nullable(weight, () => (
@@ -280,6 +339,25 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
             <ContentItem>
                 <TextItem>{nullable(estimate, (e) => estimateToString(e))}</TextItem>
             </ContentItem>
+            <ContentItem>
+                {nullable(availableActions, (actions) => (
+                    <Dropdown
+                        renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
+                        items={actions}
+                        renderItem={(props) => (
+                            <MenuItem
+                                key={props.index}
+                                onClick={props.item.onClick}
+                                icon={props.item.icon}
+                                ghost
+                                color={props.item.color}
+                            >
+                                {props.item.label}
+                            </MenuItem>
+                        )}
+                    />
+                ))}
+            </ContentItem>
         </StyledTableRow>
     );
 });
@@ -291,6 +369,7 @@ interface GoalCriteriaProps {
     onAddCriteria: (val: AddCriteriaScheme) => void;
     onToggleCriteria: (val: UpdateCriteriaScheme) => void;
     onRemoveCriteria: (val: RemoveCriteriaScheme) => void;
+    onConvertToGoal: (val: GoalAchiveCriteria) => void;
     renderForm: (props: {
         onAddCriteria: GoalCriteriaProps['onAddCriteria'];
         dataForValidateCriteria: {
@@ -307,6 +386,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     onAddCriteria,
     onToggleCriteria,
     onRemoveCriteria,
+    onConvertToGoal,
     renderForm,
 }) => {
     const onAddHandler = useCallback(
@@ -355,7 +435,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     return (
         <ActivityFeedItem>
             <Circle size={32}>
-                <CircleIconInner as={MessageTickIcon} size="s" color={backgroundColor} />
+                <CircledIcon as={IconMessageTickOutline} size="s" color={backgroundColor} />
             </Circle>
             <StyledWrapper>
                 {nullable(criteriaList.length, () => (
@@ -383,6 +463,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                     state={item.goalAsCriteria?.state}
                                     onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
                                     onRemove={() => onRemoveCriteria({ id: item.id })}
+                                    onConvertToGoal={() => onConvertToGoal(item)}
                                     canEdit={canEdit}
                                 />
                             ))}

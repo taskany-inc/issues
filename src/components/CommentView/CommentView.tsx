@@ -140,14 +140,15 @@ const renderItemHelper = ({ item, cursor, index }: { item: any; cursor: number; 
     </MenuItem>
 );
 
-const iconRenderCondition = (isPinned: boolean, image?: User['image'], email?: User['email']) =>
-    isPinned ? (
-        <Circle size={32}>
+const iconRenderCondition = (isPinned: boolean, image?: User['image'], email?: User['email']) => (
+    <Circle size={32}>
+        {isPinned ? (
             <CircledIcon as={PinAltIcon} size="s" color={backgroundColor} />
-        </Circle>
-    ) : (
-        <UserPic size={32} src={image} email={email} />
-    );
+        ) : (
+            <UserPic size={32} src={image} email={email} />
+        )}
+    </Circle>
+);
 
 export const CommentView: FC<CommentViewProps> = ({
     id,
