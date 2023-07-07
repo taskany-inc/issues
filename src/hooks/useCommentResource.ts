@@ -11,11 +11,12 @@ export const useCommentResource = () => {
 
     const create =
         (cb: (params: Comment) => void) =>
-        async ({ goalId, stateId, description }: GoalCommentSchema) => {
+        async ({ goalId, stateId, description, stateType }: GoalCommentSchema) => {
             const promise = createMutation.mutateAsync({
                 goalId,
                 stateId,
                 description,
+                stateType,
             });
 
             const [data] = await notifyPromise(promise, 'commentCreate');
