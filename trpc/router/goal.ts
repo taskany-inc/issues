@@ -525,11 +525,13 @@ export const goal = router({
                             data: history.map((record) => ({ ...record, activityId: ctx.session.user.activityId })),
                         },
                     },
-                    goalAsCriteria: {
-                        update: {
-                            isDone: input.state.type === StateType.Completed,
-                        },
-                    },
+                    goalAsCriteria: actualGoal.goalAsCriteria
+                        ? {
+                              update: {
+                                  isDone: input.state.type === StateType.Completed,
+                              },
+                          }
+                        : undefined,
                 },
                 include: {
                     ...goalDeepQuery,
@@ -651,11 +653,13 @@ export const goal = router({
                             activityId: ctx.session.user.activityId,
                         },
                     },
-                    goalAsCriteria: {
-                        update: {
-                            isDone: input.state.type === StateType.Completed,
-                        },
-                    },
+                    goalAsCriteria: actualGoal.goalAsCriteria
+                        ? {
+                              update: {
+                                  isDone: input.state.type === StateType.Completed,
+                              },
+                          }
+                        : undefined,
                 },
             });
         } catch (error: any) {
@@ -676,6 +680,7 @@ export const goal = router({
                     participants: { include: { user: true, ghost: true } },
                     activity: { include: { user: true, ghost: true } },
                     project: true,
+                    goalAsCriteria: true,
                 },
             }),
         ]);
@@ -694,6 +699,13 @@ export const goal = router({
                     data: {
                         id: input.goalId,
                         stateId: _isEditable ? input.stateId : actualGoal.stateId,
+                        goalAsCriteria: actualGoal.goalAsCriteria
+                            ? {
+                                  update: {
+                                      isDone: _isEditable && input.stateType && input.stateType === StateType.Completed,
+                                  },
+                              }
+                            : undefined,
                         history:
                             _isEditable && input.stateId && input.stateId !== actualGoal.stateId
                                 ? {

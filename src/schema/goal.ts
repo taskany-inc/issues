@@ -200,6 +200,9 @@ export const goalCommentSchema = z.object({
             message: tr("Comments's description must be longer than 1 symbol"),
         }),
     stateId: z.string().optional(),
+    stateType: z
+        .enum([StateType.Canceled, StateType.Completed, StateType.Failed, StateType.InProgress, StateType.NotStarted])
+        .optional(),
 });
 
 export type GoalCommentSchema = z.infer<typeof goalCommentSchema>;
