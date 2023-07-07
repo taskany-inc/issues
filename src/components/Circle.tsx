@@ -7,8 +7,7 @@ interface CircleProps {
 
 export const Circle = styled.span<CircleProps>`
     display: flex;
-    border-radius: 50%;
-    overflow: hidden;
+    position: relative;
 
     ${({ size }) => css`
         width: ${size}px;
@@ -24,6 +23,8 @@ export const CircledIcon = styled.span`
 
     text-align: center;
     background-color: ${gray7};
+    border-radius: 50%;
+    overflow: hidden;
 
     width: 100%;
     height: 100%;

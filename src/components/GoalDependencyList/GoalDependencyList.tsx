@@ -13,8 +13,13 @@ import { ContentItem, Table, Title, TitleContainer, TitleItem } from '../Table';
 import { GoalListItemCompactCustomize } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
 import { UserGroup } from '../UserGroup';
+import { BetaBadge } from '../BetaBadge';
 
 import { tr } from './GoalDependencyList.i18n';
+
+const StyledBetaMark = styled(BetaBadge)`
+    right: -10px;
+`;
 
 const StyledWrapper = styled.div``;
 const StyledHeadingWrapper = styled.div`
@@ -184,6 +189,7 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
         <ActivityFeedItem>
             <Circle size={32}>
                 <CircleIconInner as={MessageTextAltIcon} size="s" color={backgroundColor} />
+                <StyledBetaMark />
             </Circle>
             <StyledWrapper>
                 {nullable(items.length, () => (
