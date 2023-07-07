@@ -212,7 +212,7 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        {Boolean(projects.length) && (
+                        {(Boolean(projects.length) || projectsQuery) && (
                             <ProjectFilter
                                 text={tr('Project')}
                                 value={queryState.project}
@@ -222,7 +222,7 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        {Boolean(issuers.length) && (
+                        {(Boolean(issuers.length) || issuersQuery) && (
                             <UserFilter
                                 users={issuers}
                                 text={tr('Issuer')}
@@ -232,7 +232,7 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        {Boolean(owners.length) && (
+                        {(Boolean(owners.length) || ownersQuery) && (
                             <UserFilter
                                 users={owners}
                                 text={tr('Owner')}
@@ -251,7 +251,7 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        {Boolean(tags.length) && (
+                        {(Boolean(tags.length) || tagsQuery) && (
                             <TagFilter
                                 text={tr('Tags')}
                                 value={queryState.tag}
@@ -261,7 +261,7 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        {Boolean(participants.length) && (
+                        {(Boolean(participants.length) || participantsQuery) && (
                             <UserFilter
                                 users={participants}
                                 text={tr('Participant')}
