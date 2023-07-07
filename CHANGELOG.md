@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.16.2](https://github.com/taskany-inc/issues/compare/v1.16.1...v1.16.2) (2023-07-07)
+
+
+### Bug Fixes
+
+* **FiltersPanel:** filters shouldn'' be hidden after empty search ([7b428eb](https://github.com/taskany-inc/issues/commit/7b428eb724af31cd97eaea552534b229d359dd55))
+* **goal.switchState:** add project owner to Editable ([face652](https://github.com/taskany-inc/issues/commit/face6528920f0a92bf763dee0d8ead11eb7e17bc))
+
 ## [1.16.1](https://github.com/taskany-inc/issues/compare/v1.16.0...v1.16.1) (2023-07-07)
 
 
