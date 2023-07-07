@@ -10,4 +10,10 @@ const StyledBetaBadge = styled.span`
     padding-left: ${gapXs};
 `;
 
-export const BetaBadge = () => <StyledBetaBadge>β</StyledBetaBadge>;
+interface BetaBadgeProps {
+    className?: string;
+}
+
+export const BetaBadge: React.FC<BetaBadgeProps> = ({ className }) => (
+    <StyledBetaBadge className={className}>β</StyledBetaBadge>
+);
