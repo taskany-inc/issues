@@ -620,6 +620,7 @@ export const goal = router({
             },
             include: {
                 goalAsCriteria: true,
+                project: true,
             },
         });
 
@@ -674,6 +675,7 @@ export const goal = router({
                 include: {
                     participants: { include: { user: true, ghost: true } },
                     activity: { include: { user: true, ghost: true } },
+                    project: true,
                 },
             }),
         ]);
