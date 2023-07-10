@@ -1,10 +1,13 @@
 {
-    "Weight is required": "Вес обязателен",
     "Weight must be integer": "Вес должен быть числом",
     "Weight": "Не более {upTo}",
     "Criteria or Goal": "Критерий или цель",
     "Add achievement criteria": "Добавить критерий",
     "Weight must be in range": "Вес критерия должен быть от 1 до {upTo}",
     "Add": "Добавить",
-    "Title must be unique": "Критерий должен быть уникальным"
+    "Title must be unique": "Критерий должен быть уникальным",
+    "Press key to add criteria": "Нажмите {key}, чтобы добавить критерий",
+    "Enter goal name": "Введите название цели",
+    "Enter criteria": "Укажите критерий",
+    "Search by goals": "Поиск по целям"
 }

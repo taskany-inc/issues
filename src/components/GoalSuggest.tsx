@@ -1,11 +1,10 @@
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ComboBox, GoalIcon, nullable } from '@taskany/bricks';
-import { backgroundColor } from '@taskany/colors';
 import { Estimate, State as StateType } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
-import { ActivityByIdReturnType, GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { estimateToString } from '../utils/estimateToString';
 
 import { TableRow, ContentItem, TitleItem, TitleContainer, Title, TextItem, Table } from './Table';
@@ -15,14 +14,14 @@ import { UserGroup } from './UserGroup';
 const StyledTable = styled(Table)`
     display: grid;
     grid-template-columns: 35px minmax(250px, 20%) repeat(4, max-content);
-    background-color: ${backgroundColor};
-    width: fit-content;
+    padding: 0;
+    margin: 0;
 `;
 
 interface GoalSuggestProps {
-    children: React.ReactElement;
     onChange: (val: any) => void;
     value?: string;
+    renderInput: React.ComponentProps<typeof ComboBox>['renderInput'];
 }
 
 interface GoalSuggestItemProps {
@@ -33,7 +32,7 @@ interface GoalSuggestItemProps {
     state?: StateType;
     estimate?: Estimate;
     focused: boolean;
-    onClick?: React.MouseEventHandler<HTMLDivElement>;
+    onClick?: () => void;
 }
 
 const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
@@ -46,6 +45,7 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
     focused,
     onClick,
 }) => {
+    const rowRef = useRef<HTMLDivElement>(null);
     const issuers = useMemo(() => {
         if (issuer && owner && owner.id === issuer.id) {
             return [owner];
@@ -55,7 +55,7 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
     }, [issuer, owner]);
 
     return (
-        <TableRow onClick={onClick} focused={focused}>
+        <TableRow onClick={onClick} focused={focused} tabIndex={-1} ref={rowRef}>
             <ContentItem>
                 <GoalIcon size="s" />
             </ContentItem>
@@ -82,53 +82,50 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
     );
 };
 
-export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(({ onChange, value = '', children }, ref) => {
-    const [visible, setVisible] = useState(false);
-    const [selected, setSelected] = useState<GoalByIdReturnType | null>(null);
+export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
+    ({ onChange, value = '', renderInput }, ref) => {
+        const [visible, setVisible] = useState(false);
 
-    const { data: items = [] } = trpc.goal.suggestions.useQuery(
-        { input: value, limit: 5 },
-        {
-            staleTime: 0,
-            cacheTime: 0,
-        },
-    );
+        const { data: items = [] } = trpc.goal.suggestions.useQuery(
+            { input: value, limit: 5 },
+            {
+                staleTime: 0,
+                cacheTime: 0,
+            },
+        );
 
-    useEffect(() => {
-        if (items.length > 0) {
-            setVisible(true);
-        } else {
-            setVisible(false);
-        }
-    }, [items]);
+        useEffect(() => {
+            if (items.length > 0) {
+                setVisible(true);
+            } else {
+                setVisible(false);
+            }
+        }, [items]);
 
-    useEffect(() => {
-        if (selected) {
-            onChange(selected);
-        }
-    }, [selected, onChange]);
-
-    return (
-        <ComboBox
-            ref={ref}
-            onChange={setSelected}
-            items={items}
-            visible={visible}
-            renderInput={() => children}
-            renderItem={({ item, cursor, index, onClick }) => (
-                <GoalSuggestItem
-                    key={item.id}
-                    focused={cursor === index}
-                    onClick={onClick}
-                    projectId={item.projectId}
-                    title={item.title}
-                    state={item.state}
-                    issuer={item.activity}
-                    owner={item.owner}
-                    estimate={item._lastEstimate}
-                />
-            )}
-            renderItems={(children) => <StyledTable columns={6}>{children as React.ReactNode}</StyledTable>}
-        />
-    );
-});
+        return (
+            <ComboBox
+                ref={ref}
+                value={value}
+                onChange={onChange}
+                items={items}
+                visible={visible}
+                renderInput={renderInput}
+                maxWidth={400}
+                renderItem={({ item, cursor, index, onClick }) => (
+                    <GoalSuggestItem
+                        key={item.id}
+                        focused={cursor === index}
+                        onClick={onClick}
+                        projectId={item.projectId}
+                        title={item.title}
+                        state={item.state}
+                        issuer={item.activity}
+                        owner={item.owner}
+                        estimate={item._lastEstimate}
+                    />
+                )}
+                renderItems={(children) => <StyledTable columns={6}>{children as React.ReactNode}</StyledTable>}
+            />
+        );
+    },
+);

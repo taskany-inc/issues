@@ -107,16 +107,20 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
             onSubmit={handleSubmit(onSubmit)}
             onReset={resetFormHandler}
         >
-            <GoalSuggest value={query} onChange={handleGoalSelect}>
-                <StyledFormInput
-                    autoFocus
-                    autoComplete="off"
-                    value={query}
-                    onChange={handleInputChange}
-                    brick="right"
-                    error={errors.relation?.id}
-                />
-            </GoalSuggest>
+            <GoalSuggest
+                value={query}
+                onChange={handleGoalSelect}
+                renderInput={(inputProps) => (
+                    <StyledFormInput
+                        autoFocus
+                        autoComplete="off"
+                        onChange={handleInputChange}
+                        brick="right"
+                        error={errors.relation?.id}
+                        {...inputProps}
+                    />
+                )}
+            />
             <Button text={tr('Add')} brick="left" type="submit" view="primary" outline />
             <input type="hidden" {...register('relation.id')} />
             <input type="hidden" {...register('id')} />
