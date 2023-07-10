@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { danger0, gapM, gapS, gray7 } from '@taskany/colors';
@@ -43,6 +43,7 @@ import { State } from '../State';
 import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
 import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm';
 import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
+import { CommentFixed } from '../CommentFixed';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -95,6 +96,8 @@ const StyledModalContent = styled(ModalContent)`
 
 const StyledCard = styled(Card)`
     min-height: 60px;
+
+    margin-bottom: ${gapS};
 `;
 
 const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
@@ -188,6 +191,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     const commentsRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
+
     const onCommentsClick = useCallback(() => {
         commentsRef.current &&
             contentRef.current &&
@@ -199,6 +203,15 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     }, []);
 
     const { title, description, updatedAt } = goal || preview;
+
+    const lastChangedStatusComment = useMemo(() => {
+        if (!goal || goal.comments.length <= 1) {
+            return null;
+        }
+
+        return goal.comments.findLast((comment) => comment.stateId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [goal?.comments]);
 
     return (
         <>
@@ -304,6 +317,16 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                             )}
                         </CardComment>
                     </StyledCard>
+
+                    {nullable(lastChangedStatusComment, (value) => (
+                        <CommentFixed
+                            id={value.id}
+                            author={value.activity?.user}
+                            description={value.description}
+                            state={value.state}
+                            createdAt={value.createdAt}
+                        />
+                    ))}
 
                     {nullable(goal, ({ activityFeed, id, goalAchiveCriteria, relations, project, _isEditable }) => (
                         <GoalActivity
