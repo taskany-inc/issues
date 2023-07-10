@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.16.3](https://github.com/taskany-inc/issues/compare/v1.16.2...v1.16.3) (2023-07-10)
+
+
+### Bug Fixes
+
+* **Goal:** fix update criteria if goal not as criteria ([3751586](https://github.com/taskany-inc/issues/commit/37515866dfd4ab13527134e496824e0b5a159b7c))
+
 ## [1.16.2](https://github.com/taskany-inc/issues/compare/v1.16.1...v1.16.2) (2023-07-07)
 
 
