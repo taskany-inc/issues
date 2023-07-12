@@ -13,8 +13,16 @@
     "estimate": "estimate",
     "title": "title",
     "dependencies": "dependencies",
+    "criteria": "",
+    "goal as criteria": "goal",
+    "marked criteria": "",
     "priority": "priority",
     "from": "from",
     "to": "to",
-    "replace": "replaced"
+    "replace": "replaced",
+    "as completed": "",
+    "as uncompleted": "",
+    "as criteria": "",
+    "goal complete": "completed goal",
+    "goal in progress": "returns goal to work"
 }

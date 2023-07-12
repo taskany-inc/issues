@@ -188,6 +188,9 @@ export const goal = router({
                         orderBy: {
                             createdAt: 'asc',
                         },
+                        where: {
+                            OR: [{ deleted: false }, { deleted: null }],
+                        },
                     },
                     estimate: {
                         include: {
@@ -629,6 +632,7 @@ export const goal = router({
             include: {
                 goalAsCriteria: true,
                 project: true,
+                state: true,
             },
         });
 
@@ -642,8 +646,8 @@ export const goal = router({
             return null;
         }
 
-        try {
-            const updatedGoal = await prisma.goal.update({
+        const promises: Promise<any>[] = [
+            prisma.goal.update({
                 where: {
                     id: input.id,
                 },
@@ -670,13 +674,35 @@ export const goal = router({
                 include: {
                     goalAsCriteria: true,
                 },
-            });
+            }),
+        ];
+
+        // recording complete state for linked as criteria goal
+        if (actualGoal.goalAsCriteria && actualGoal.state) {
+            const earlyIsCompleted = actualGoal.state.type === StateType.Completed;
+            const nowIsCompleted = input.state.type === StateType.Completed;
+
+            if (earlyIsCompleted !== nowIsCompleted) {
+                promises.push(
+                    prisma.goalHistory.create({
+                        data: {
+                            goalId: actualGoal.goalAsCriteria.goalId,
+                            subject: 'criteria',
+                            action: nowIsCompleted ? 'complete' : 'uncomplete',
+                            nextValue: actualGoal.goalAsCriteria.id,
+                            activityId: ctx.session.user.activityId,
+                        },
+                    }),
+                );
+            }
+        }
+
+        try {
+            const [updatedGoal] = await Promise.all(promises);
 
             if (updatedGoal.goalAsCriteria) {
                 await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
             }
-
-            return updatedGoal;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
@@ -820,56 +846,54 @@ export const goal = router({
         }
 
         try {
-            const [criteria] = await Promise.all([
-                prisma.goalAchieveCriteria.create({
-                    data: {
-                        title: input.title,
-                        weight: Number(input.weight),
-                        isDone: isDoneByConnect,
-                        activity: {
-                            connect: {
-                                id: ctx.session.user.activityId,
-                            },
+            const newCriteria = await prisma.goalAchieveCriteria.create({
+                data: {
+                    title: input.title,
+                    weight: Number(input.weight),
+                    isDone: isDoneByConnect,
+                    activity: {
+                        connect: {
+                            id: ctx.session.user.activityId,
                         },
-                        goal: {
-                            connect: { id: input.goalId },
-                        },
-                        goalAsCriteria: input.goalAsGriteria?.id
-                            ? {
-                                  connect: { id: input.goalAsGriteria.id },
-                              }
-                            : undefined,
                     },
-                }),
-                // TODO: implements create new history record
-                // prisma.goalHistory.create({
-                //     data: {
-                //         previousValue: null,
-                //         nextValue: input.goalAsGriteria || input.title,
-                //         action: 'add',
-                //         subject: 'criteria',
-                //         goal: {
-                //             connect: {
-                //                 id: input.linkedGoalId,
-                //             },
-                //         },
-                //         activity: {
-                //             connect: {
-                //                 id: ctx.session.user.activityId,
-                //             },
-                //         },
-                //     },
-                // }),
-            ]);
+                    goal: {
+                        connect: { id: input.goalId },
+                    },
+                    goalAsCriteria: input.goalAsGriteria?.id
+                        ? {
+                              connect: { id: input.goalAsGriteria.id },
+                          }
+                        : undefined,
+                },
+            });
 
-            await updateGoalWithCalculatedWeight(criteria.goalId);
+            await prisma.goalHistory.create({
+                data: {
+                    previousValue: null,
+                    nextValue: newCriteria.id,
+                    action: 'add',
+                    subject: 'criteria',
+                    goal: {
+                        connect: {
+                            id: input.goalId,
+                        },
+                    },
+                    activity: {
+                        connect: {
+                            id: ctx.session.user.activityId,
+                        },
+                    },
+                },
+            });
 
-            return criteria;
+            await updateGoalWithCalculatedWeight(newCriteria.goalId);
+
+            return newCriteria;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    updateCriteriaState: protectedProcedure.input(updateCriteriaState).mutation(async ({ input }) => {
+    updateCriteriaState: protectedProcedure.input(updateCriteriaState).mutation(async ({ input, ctx }) => {
         const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
             where: { id: input.id },
         });
@@ -884,21 +908,19 @@ export const goal = router({
                     where: { id: input.id },
                     data: { isDone: input.isDone },
                 }),
-                // TODO: implements create new history record
-                // prisma.goalHistory.create({
-                //     data: {
-                //         previousValue: input.isDone ? 'undone' : 'done',
-                //         nextValue: input.isDone ? 'done' : 'undone',
-                //         subject: 'criteria',
-                //         action: 'change',
-                //         goal: {
-                //             connect: { id: currentCriteria.linkedGoalId },
-                //         },
-                //         activity: {
-                //             connect: { id: ctx.session.user.activityId },
-                //         },
-                //     },
-                // }),
+                prisma.goalHistory.create({
+                    data: {
+                        nextValue: currentCriteria.id,
+                        subject: 'criteria',
+                        action: input.isDone ? 'complete' : 'uncomplete',
+                        goal: {
+                            connect: { id: currentCriteria.goalId },
+                        },
+                        activity: {
+                            connect: { id: ctx.session.user.activityId },
+                        },
+                    },
+                }),
             ]);
 
             // update goal criteria weight
@@ -907,17 +929,34 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input }) => {
+    removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input, ctx }) => {
         const current = await prisma.goalAchieveCriteria.findUnique({
             where: { id: input.id },
         });
 
         try {
-            await prisma.goalAchieveCriteria.delete({
-                where: { id: input.id },
-            });
-
             if (current) {
+                await prisma.goalAchieveCriteria.update({
+                    where: { id: input.id },
+                    data: {
+                        deleted: true,
+                    },
+                });
+
+                await prisma.goalHistory.create({
+                    data: {
+                        nextValue: current.id,
+                        subject: 'criteria',
+                        action: 'remove',
+                        activity: {
+                            connect: { id: ctx.session.user.activityId },
+                        },
+                        goal: {
+                            connect: { id: input.goalId },
+                        },
+                    },
+                });
+
                 await updateGoalWithCalculatedWeight(current.goalId);
             }
         } catch (error: any) {

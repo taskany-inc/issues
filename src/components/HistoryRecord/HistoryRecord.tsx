@@ -1,7 +1,17 @@
 import { createContext, useContext, useState, SetStateAction, useMemo } from 'react';
-import { User, Tag as TagData, Estimate, State as StateData, Activity, Project } from '@prisma/client';
+import {
+    User,
+    Tag as TagData,
+    Estimate,
+    State as StateData,
+    Activity,
+    Project,
+    GoalAchieveCriteria,
+    Goal,
+} from '@prisma/client';
 import styled, { css } from 'styled-components';
-import { UserPic, Text, Tag, nullable, DoubleCaretRightCircleIcon, DividerLineIcon, Button } from '@taskany/bricks';
+import { UserPic, Text, Tag, nullable, DividerLineIcon, Button } from '@taskany/bricks';
+import { IconDoubleCaretRightCircleSolid } from '@taskany/icons';
 import { backgroundColor, gray7 } from '@taskany/colors';
 
 import { ActivityFeedItem } from '../ActivityFeed';
@@ -12,10 +22,19 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
 import { HistoryAction, HistoryRecordSubject } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
+import { Circle, CircledIcon } from '../Circle';
 
 import { tr } from './HistoryRecord.i18n';
 
-type WholeSubject = 'title' | 'description' | 'priority' | keyof HistoryRecordSubject;
+type WholeSubject =
+    | 'title'
+    | 'description'
+    | 'priority'
+    | 'goalAsCriteria'
+    | 'criteriaState'
+    | 'goalComplete'
+    | 'goalInProgress'
+    | keyof HistoryRecordSubject;
 
 interface HistoryRecordProps {
     id: string;
@@ -37,6 +56,11 @@ const StyledActivityFeedItem = styled(ActivityFeedItem)`
     justify-content: flex-start;
     padding-left: 4px;
     position: relative;
+
+    & ${Circle} {
+        /* no-magic: this negative margin needs for align icon by center of first line in content */
+        margin-top: -3px;
+    }
 `;
 
 const StyledHistoryRecordWrapper = styled.div`
@@ -50,7 +74,6 @@ const StyledHistoryRecordWrapper = styled.div`
 
 const StyledIssueListItem = styled(IssueListItem)<{ strike?: boolean }>`
     padding: 0;
-    align-items: baseline;
     font-size: 12px;
 
     ${({ strike }) =>
@@ -93,14 +116,8 @@ const StyledTextWrapper = styled.div<{ multiline?: boolean }>`
         `}
 `;
 
-const StyledIcon = styled(DoubleCaretRightCircleIcon)`
-    width: 24px;
-    height: 24px;
-    display: flex;
+const StyledCircledIcon = styled(CircledIcon)`
     background-color: ${backgroundColor};
-    align-items: center;
-    overflow: hidden;
-    transform: translateY(-3px);
 `;
 
 const StyledDescriptionIcon = styled(DividerLineIcon)`
@@ -117,10 +134,12 @@ const StyledFlexReset = styled.div`
 
 interface HistoryRecordContext {
     setActionText: (value: SetStateAction<HistoryAction>) => void;
+    setSubjectText: (value: SetStateAction<WholeSubject>) => void;
 }
 
 const RecordCtx = createContext<HistoryRecordContext>({
     setActionText: () => {},
+    setSubjectText: () => {},
 });
 
 export const HistorySimplifyRecord: React.FC<{ withPretext?: boolean } & HistoryChangeProps<React.ReactNode>> = ({
@@ -196,15 +215,25 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
             title: tr('title'),
             dependencies: tr('dependencies'),
             priority: tr('priority'),
+            criteria: tr('criteria'),
+            goalAsCriteria: tr('goal as criteria'),
+            criteriaState: tr('marked criteria'),
+            goalComplete: tr('goal complete'),
+            goalInProgress: tr('goal in progress'),
+            complete: '',
+            uncomplete: '',
         };
     }, []);
 
     const [actionText, setActionText] = useState(action);
+    const [subjectText, setSubjectText] = useState(subject);
 
     return (
         <StyledActivityFeedItem>
-            <RecordCtx.Provider value={{ setActionText }}>
-                <StyledIcon size="m" color={gray7} />
+            <RecordCtx.Provider value={{ setActionText, setSubjectText }}>
+                <Circle size={24}>
+                    <StyledCircledIcon as={IconDoubleCaretRightCircleSolid} size="m" color={gray7} />
+                </Circle>
                 <StyledHistoryRecordWrapper>
                     <UserPic size={18} src={author?.image} email={author?.email} />
                     <StyledTextWrapper multiline={subject.toString() === 'description'}>
@@ -213,7 +242,7 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
                         </Text>
 
                         <Text size="xs">
-                            {translates[actionText]} {translates[subject]}
+                            {translates[actionText]} {translates[subjectText]}
                         </Text>
 
                         {children}
@@ -404,3 +433,71 @@ export const HistoryRecordParticipant: React.FC<HistoryChangeProps<Activity & { 
         }
     />
 );
+
+export const HistoryRecordCriteria: React.FC<
+    HistoryChangeProps<GoalAchieveCriteria & { goalAsCriteria: Goal & { state: StateData | null } }> & {
+        action: HistoryAction;
+    }
+> = ({ to, action }) => {
+    const recordCtx = useContext(RecordCtx);
+
+    const isChangeAction = ['complete', 'uncomplete'].includes(action);
+
+    recordCtx.setSubjectText((prev) => {
+        if (to?.goalAsCriteria != null) {
+            if (isChangeAction) {
+                if (action === 'complete') {
+                    return 'goalComplete';
+                }
+                return 'goalInProgress';
+            }
+            return 'goalAsCriteria';
+        }
+
+        if (isChangeAction) {
+            return 'criteriaState';
+        }
+
+        return prev;
+    });
+
+    return nullable(to, (t) => {
+        if (t?.goalAsCriteria) {
+            return (
+                <HistorySimplifyRecord
+                    withPretext={false}
+                    to={
+                        <>
+                            <StyledIssueListItem
+                                strike={action === 'remove'}
+                                size="xs"
+                                issue={{
+                                    title: t.goalAsCriteria.title,
+                                    _shortId: `${t.goalAsCriteria.projectId}-${t.goalAsCriteria.scopeId}`,
+                                    id: t.goalAsCriteria.id,
+                                }}
+                            />
+                            <Text size="xs">{tr('as criteria')}</Text>
+                        </>
+                    }
+                />
+            );
+        }
+
+        return (
+            <HistorySimplifyRecord
+                withPretext={false}
+                to={
+                    <>
+                        <Text size="xs" weight="bold">
+                            {t.title}
+                        </Text>
+                        {nullable(isChangeAction, () => (
+                            <Text size="xs">{tr(action === 'complete' ? 'as completed' : 'as uncompleted')}</Text>
+                        ))}
+                    </>
+                }
+            />
+        );
+    });
+};

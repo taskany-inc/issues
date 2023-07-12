@@ -382,6 +382,7 @@ model GoalAchieveCriteria {
   isDone           Boolean  @default(false)
   activity         Activity @relation(fields: [activityId], references: [id])
   activityId       String
+  deleted          Boolean?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

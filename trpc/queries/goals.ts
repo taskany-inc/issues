@@ -459,7 +459,7 @@ export const calcAchievedWeight = (
     );
 
     const remainingtWeight = maxPossibleCriteriaWeight - allWeight;
-    const quantityByWeightlessCriteria = remainingtWeight / anyWithoutWeight;
+    const quantityByWeightlessCriteria = anyWithoutWeight > 0 ? remainingtWeight / anyWithoutWeight : 0;
 
     return Math.min(
         achivedWithWeight + Math.ceil(quantityByWeightlessCriteria * comletedWithoutWeight),
