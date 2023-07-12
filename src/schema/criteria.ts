@@ -26,6 +26,7 @@ export const updateCriteriaState = z.object({
 
 export const removeCriteria = z.object({
     id: z.string(),
+    goalId: z.string(),
 });
 
 export const convertCriteriaToGoalSchema = z.object({

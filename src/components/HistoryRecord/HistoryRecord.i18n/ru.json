@@ -13,8 +13,16 @@
     "estimate": "срок",
     "title": "заголовок",
     "dependencies": "зависимости",
+    "criteria": "критерий",
+    "goal as criteria": "цель",
+    "marked criteria": "отметил(а) критерий",
     "priority": "приоритет",
     "from": "с",
     "to": "на",
-    "replace": "заменил(а)"
+    "replace": "заменил(а)",
+    "as completed": "как выполненный",
+    "as uncompleted": "как не выполненный",
+    "as criteria": "как критерий",
+    "goal complete": "выполнил(а) цель",
+    "goal in progress": "вернул(а) цель в работу"
 }

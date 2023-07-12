@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, memo, useReducer, useRef } from 'react';
+import React, { useCallback, useMemo, memo } from 'react';
 import styled, { css } from 'styled-components';
 import { Dropdown, MenuItem, Text, nullable } from '@taskany/bricks';
 import {
@@ -9,9 +9,8 @@ import {
     IconTickCircleOutline,
     IconMoreVerticalOutline,
 } from '@taskany/icons';
-import Popup from '@taskany/bricks/components/Popup';
 import { State } from '@prisma/client';
-import { backgroundColor, brandColor, gray10, gray6, gray9, gray8, textColor, gray7, danger0 } from '@taskany/colors';
+import { backgroundColor, brandColor, gray10, gray6, gray9, gray8, textColor, danger0 } from '@taskany/colors';
 import NextLink from 'next/link';
 
 import { AddCriteriaScheme, RemoveCriteriaScheme, UpdateCriteriaScheme } from '../../schema/criteria';
@@ -29,19 +28,6 @@ import { tr } from './GoalCriteria.i18n';
 const StyledWrapper = styled.div`
     display: flex;
     flex-direction: column;
-`;
-
-const StyledIcon = styled(IconMessageTickOutline)`
-    display: flex;
-    background-color: ${gray7};
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-
-    text-align: center;
-
-    width: 32px;
-    height: 32px;
 `;
 
 const StyledCircleIcon = styled(IconCircleOutline)`
@@ -368,7 +354,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
 });
 
 interface GoalCriteriaProps {
-    goalId?: string;
+    goalId: string;
     criteriaList?: GoalAchiveCriteria[];
     canEdit: boolean;
     onAddCriteria: (val: AddCriteriaScheme) => void;
@@ -467,7 +453,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                     issuer={item.goalAsCriteria?.activity}
                                     state={item.goalAsCriteria?.state}
                                     onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
-                                    onRemove={() => onRemoveCriteria({ id: item.id })}
+                                    onRemove={() => onRemoveCriteria({ id: item.id, goalId })}
                                     onConvertToGoal={() => onConvertToGoal(item)}
                                     canEdit={canEdit}
                                 />

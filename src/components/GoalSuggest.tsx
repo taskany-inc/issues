@@ -102,11 +102,20 @@ export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
             }
         }, [items]);
 
+        const onSelectItem = useCallback<typeof onChange>(
+            (val) => {
+                if (val) {
+                    onChange(val);
+                }
+            },
+            [onChange],
+        );
+
         return (
             <ComboBox
                 ref={ref}
                 value={value}
-                onChange={onChange}
+                onChange={onSelectItem}
                 items={items}
                 visible={visible}
                 renderInput={renderInput}
