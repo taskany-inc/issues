@@ -6,6 +6,7 @@ import { State } from '@prisma/client';
 import { Priority } from '../types/priority';
 import { useHighlightedComment } from '../hooks/useHighlightedComment';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { HistoryAction } from '../types/history';
 
 import { ActivityFeed } from './ActivityFeed';
 import { CommentView } from './CommentView/CommentView';
@@ -20,6 +21,7 @@ import {
     HistoryRecordParticipant,
     HistoryRecordProject,
     HistoryRecordLongTextChange,
+    HistoryRecordCriteria,
 } from './HistoryRecord/HistoryRecord';
 
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm/CommentCreateForm'));
@@ -129,6 +131,12 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                                         <HistoryRecordProject
                                             from={excludeString(value.previousValue)}
                                             to={excludeString(value.nextValue)}
+                                        />
+                                    )}
+                                    {value.subject === 'criteria' && (
+                                        <HistoryRecordCriteria
+                                            to={excludeString(value.nextValue)}
+                                            action={value.action as HistoryAction}
                                         />
                                     )}
                                 </HistoryRecord>

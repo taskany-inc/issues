@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { z } from 'zod';
 import { GoalHistory, Comment, Activity, User, Goal } from '@prisma/client';
 
 import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
@@ -118,83 +119,112 @@ export const changeGoalProject = async (id: string, newProjectId: string) => {
     `;
 };
 
+const stringIsCiudOrId = (string: string): boolean => {
+    const valueAsNumber = Number(string);
+
+    if (String(valueAsNumber) === string) {
+        return true;
+    }
+
+    return z.string().cuid().safeParse(string).success;
+};
+
+type RequestParamsBySubject = { [K in keyof HistoryRecordSubject]?: { ids: string[]; sourceIdx: number[] } };
+
 export const getGoalHistory = async <T extends GoalHistory & { activity: Activity & { user: User | null } }>(
     history: T[],
     goalId: string,
 ) => {
-    const needRequestForRecordIndicies = history.reduce<number[]>((acc, { subject }, index) => {
-        if (subjectToEnumValue(subject)) {
-            acc.push(index);
-        }
+    const requestParamsBySubjects = history.reduce<RequestParamsBySubject>(
+        (acc, { subject, previousValue, nextValue }, index) => {
+            const allValues = (previousValue ?? '')
+                .split(',')
+                .concat((nextValue ?? '').split(','))
+                .filter(Boolean);
+            const valuesAsIds = allValues.length ? allValues.every((val) => stringIsCiudOrId(val)) : false;
 
-        return acc;
-    }, []);
+            if (subjectToEnumValue(subject) && valuesAsIds) {
+                acc[subject] = {
+                    ids: (acc[subject]?.ids ?? []).concat(...allValues),
+                    sourceIdx: (acc[subject]?.sourceIdx ?? []).concat(index),
+                };
+            }
+
+            return acc;
+        },
+        {},
+    );
 
     const historyWithMeta: HistoryRecordWithActivity[] = Array.from(history);
+    const needRequestForSubject = Object.keys(requestParamsBySubjects) as (keyof typeof requestParamsBySubjects)[];
+    const replacedValueIdx = needRequestForSubject.map((subject) => requestParamsBySubjects[subject]!.sourceIdx).flat();
 
-    if (needRequestForRecordIndicies.length) {
-        const results = await prisma.$transaction(
-            needRequestForRecordIndicies.map((recordIndex) => {
-                const record = history[recordIndex];
-                const [previousValue = [], nextValue = []] = [
-                    record.previousValue?.split(', '),
-                    record.nextValue?.split(', '),
-                ];
+    if (needRequestForSubject.length) {
+        const results = await Promise.all(
+            needRequestForSubject.map((subject) => {
+                const data = requestParamsBySubjects[subject];
 
                 const query = {
                     where: {
                         id: {
-                            in: previousValue?.concat(nextValue),
+                            in: data!.ids,
                         },
                     },
                 };
 
-                if (subjectToEnumValue(record.subject)) {
-                    switch (record.subject) {
-                        case 'dependencies':
-                            return prisma.goal.findMany({
-                                where: query.where,
-                                include: {
-                                    state: true,
+                switch (subject) {
+                    case 'dependencies':
+                        return prisma.goal.findMany({
+                            where: query.where,
+                            include: {
+                                state: true,
+                            },
+                        });
+                    case 'tags':
+                        return prisma.tag.findMany(query);
+                    case 'owner':
+                    case 'participants':
+                        return prisma.activity.findMany({
+                            where: query.where,
+                            include: {
+                                user: true,
+                            },
+                        });
+                    case 'state':
+                        return prisma.state.findMany({ where: query.where });
+                    case 'estimate':
+                        return prisma.estimate.findMany({
+                            where: {
+                                id: {
+                                    in: query.where.id.in.map((v) => Number(v)),
                                 },
-                            });
-                        case 'tags':
-                            return prisma.tag.findMany(query);
-                        case 'owner':
-                        case 'participants':
-                            return prisma.activity.findMany({
-                                where: query.where,
-                                include: {
-                                    user: true,
-                                },
-                            });
-                        case 'state':
-                            return prisma.state.findMany({ where: query.where });
-                        case 'estimate':
-                            return prisma.estimate.findMany({
-                                where: {
-                                    id: {
-                                        in: query.where.id.in.map((v) => Number(v)),
-                                    },
-                                    goal: {
-                                        some: {
-                                            goalId,
-                                        },
+                                goal: {
+                                    some: {
+                                        goalId,
                                     },
                                 },
-                            });
-                        case 'project':
-                            return prisma.project.findMany({ where: query.where });
-                        default:
-                            throw new Error('query for history record is undefined');
-                    }
+                            },
+                        });
+                    case 'project':
+                        return prisma.project.findMany({ where: query.where });
+                    case 'criteria':
+                        return prisma.goalAchieveCriteria.findMany({
+                            where: query.where,
+                            include: {
+                                goalAsCriteria: {
+                                    include: {
+                                        state: true,
+                                    },
+                                },
+                            },
+                        });
+                    default:
+                        throw new Error('query for history record is undefined');
                 }
-
-                throw new Error('query for history record is undefined');
             }),
         );
 
-        const metaResults: Record<string, HistoryRecordMeta[keyof HistoryRecordSubject]>[] = [];
+        const metaResults: Record<string, (typeof results)[number][number]>[] = [];
 
         for (const records of results) {
             const meta: Record<string, (typeof records)[number]> = {};
@@ -206,34 +236,30 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
             metaResults.push(meta);
         }
 
-        let transactionResultIndex = 0;
+        const metaObj = metaResults.reduce((acc, values) => {
+            acc = { ...acc, ...values };
 
-        history.forEach((record, index) => {
-            const currentMeta = metaResults[transactionResultIndex];
-            if (
-                needRequestForRecordIndicies.includes(index) &&
-                subjectToEnumValue(record.subject) &&
-                castToMetaDto(record.subject, currentMeta)
-            ) {
-                const valueCanBeArray = ['dependencies', 'tags'].includes(record.subject);
+            return acc;
+        }, {});
 
-                if (valueCanBeArray) {
-                    historyWithMeta[index] = {
-                        ...record,
-                        action: record.action as HistoryAction,
-                        previousValue: record.previousValue?.split(', ').map((id) => currentMeta[id]),
-                        nextValue: record.nextValue?.split(', ').map((id) => currentMeta[id]),
-                    };
-                } else {
-                    historyWithMeta[index] = {
-                        ...record,
-                        action: record.action as HistoryAction,
-                        previousValue: record.previousValue ? currentMeta[record.previousValue] : null,
-                        nextValue: record.nextValue ? currentMeta[record.nextValue] : null,
-                    };
-                }
+        replacedValueIdx.forEach((sourceIndex) => {
+            const record = history[sourceIndex];
+            const valueCanBeArray = ['dependencies', 'tags'].includes(record.subject);
 
-                transactionResultIndex += 1;
+            if (valueCanBeArray) {
+                historyWithMeta[sourceIndex] = {
+                    ...record,
+                    action: record.action as HistoryAction,
+                    previousValue: record.previousValue?.split(', ').map((id) => metaObj[id]),
+                    nextValue: record.nextValue?.split(', ').map((id) => metaObj[id]),
+                };
+            } else {
+                historyWithMeta[sourceIndex] = {
+                    ...record,
+                    action: record.action as HistoryAction,
+                    previousValue: record.previousValue ? metaObj[record.previousValue] : null,
+                    nextValue: record.nextValue ? metaObj[record.nextValue] : null,
+                };
             }
         });
     }
@@ -270,7 +296,17 @@ export const makeGoalRelationMap = <T extends Goal>(
 
 export const updateGoalWithCalculatedWeight = async (goalId: string) => {
     const criteriaList = await prisma.goalAchieveCriteria.findMany({
-        where: { goalId },
+        where: {
+            goalId,
+            OR: [
+                {
+                    deleted: false,
+                },
+                {
+                    deleted: null,
+                },
+            ],
+        },
         include: {
             goalAsCriteria: {
                 include: {
@@ -280,14 +316,10 @@ export const updateGoalWithCalculatedWeight = async (goalId: string) => {
         },
     });
 
-    if (!criteriaList) {
-        return;
-    }
-
     await prisma.goal.update({
         where: { id: goalId },
         data: {
-            completedCriteriaWeight: calcAchievedWeight(criteriaList),
+            completedCriteriaWeight: criteriaList.length ? calcAchievedWeight(criteriaList) : null,
         },
     });
 };

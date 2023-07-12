@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { gapM, gapS, gapXs } from '@taskany/colors';
-import { Text, Link } from '@taskany/bricks';
+import { Text, Link, nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 
@@ -27,18 +27,18 @@ const StyledIssueListItem = styled.div`
     align-items: top;
 `;
 
-const StyledIssueListItemTitle = styled(Text)<{ size: IssueListItemProps['size'] }>`
+const StyledIssueListItemTitle = styled(Text)`
     padding-top: 0;
     margin-top: 0;
-    padding-left: ${({ size }) => (size === 'xs' ? gapXs : gapS)};
 `;
 
 const StyledLink = styled(Link)`
     display: inline-block;
 `;
 
-const StyledDotWrapper = styled.div`
+const StyledDotWrapper = styled.div<{ size: IssueListItemProps['size'] }>`
     padding-top: ${gapXs};
+    padding-right: ${({ size }) => (size === 'xs' ? gapXs : gapS)};
 `;
 
 export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, size = 's' }) => {
@@ -46,9 +46,11 @@ export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, 
         <NextLink passHref href={routes.goal(issue._shortId)}>
             <StyledLink inline>
                 <StyledIssueListItem className={className}>
-                    <StyledDotWrapper>
-                        <StateDot {...issue.state} size={size !== 'xs' ? 'm' : 's'} />
-                    </StyledDotWrapper>
+                    {nullable(issue.state, (state) => (
+                        <StyledDotWrapper size={size}>
+                            <StateDot {...state} size={size !== 'xs' ? 'm' : 's'} />
+                        </StyledDotWrapper>
+                    ))}
                     <StyledIssueListItemTitle size={size} weight="bold" color="inherit">
                         {issue.title}
                     </StyledIssueListItemTitle>
