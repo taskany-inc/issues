@@ -1,7 +1,7 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { brandColor, danger0, gapM, gapS, gray4, gray9 } from '@taskany/colors';
+import { brandColor, danger0, gapM, gapS, gray4, gray9, backgroundColor } from '@taskany/colors';
 import {
     BinIcon,
     Card,
@@ -16,6 +16,7 @@ import {
     Text,
     UserPic,
     nullable,
+    PinAltIcon,
 } from '@taskany/bricks';
 import { Reaction, State, User } from '@prisma/client';
 import colorLayer from 'color-layer';
@@ -23,11 +24,12 @@ import colorLayer from 'color-layer';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCommentResource } from '../../hooks/useCommentResource';
 import { usePageContext } from '../../hooks/usePageContext';
+import { useLocale } from '../../hooks/useLocale';
 import { createLocaleDate } from '../../utils/dateTime';
 import { Reactions } from '../Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
-import { useLocale } from '../../hooks/useLocale';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
+import { Circle, CircledIcon } from '../Circle';
 
 import { tr } from './CommentView.i18n';
 
@@ -45,6 +47,7 @@ interface CommentViewProps {
     isNew?: boolean;
     isEditable?: boolean;
     state?: State | null;
+    isPinned?: boolean;
 
     onReactionToggle?: React.ComponentProps<typeof ReactionsDropdown>['onClick'];
     onDelete?: (id: string) => void;
@@ -104,24 +107,47 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
 `;
 
 const StyledCardInfo = styled(CardInfo)`
-    display: grid;
-    grid-template-columns: 6fr 6fr;
+    display: flex;
+    justify-content: space-between;
 `;
 
-const StyledReactions = styled.div`
-    padding-top: ${gapM};
-`;
-
-const StyledStateDot = styled(StateDot)`
-    margin-right: ${gapS};
+const StyledCardComment = styled(CardComment)`
+    display: flex;
+    flex-direction: column;
+    gap: ${gapM};
 `;
 
 const StyledTimestamp = styled.div`
     display: flex;
     align-items: center;
-
-    padding-bottom: ${gapM};
+    gap: ${gapS};
 `;
+
+const renderTriggerHelper = ({ ref, onClick }: { ref: React.RefObject<HTMLButtonElement>; onClick: () => void }) => (
+    <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
+);
+
+const renderItemHelper = ({ item, cursor, index }: { item: any; cursor: number; index: number }) => (
+    <MenuItem
+        key={item.label}
+        ghost
+        color={item.color}
+        focused={cursor === index}
+        icon={item.icon}
+        onClick={item.onClick}
+    >
+        {item.label}
+    </MenuItem>
+);
+
+const iconRenderCondition = (isPinned: boolean, image?: User['image'], email?: User['email']) =>
+    isPinned ? (
+        <Circle size={32}>
+            <CircledIcon as={PinAltIcon} size="s" color={backgroundColor} />
+        </Circle>
+    ) : (
+        <UserPic size={32} src={image} email={email} />
+    );
 
 export const CommentView: FC<CommentViewProps> = ({
     id,
@@ -134,6 +160,7 @@ export const CommentView: FC<CommentViewProps> = ({
     state,
     onDelete,
     onReactionToggle,
+    isPinned = false,
 }) => {
     const { themeId } = usePageContext();
     const locale = useLocale();
@@ -181,9 +208,26 @@ export const CommentView: FC<CommentViewProps> = ({
         })({ id });
     }, [id, onDelete, remove]);
 
+    const dropdownItems = useMemo(
+        () => [
+            {
+                label: tr('Edit'),
+                icon: <EditIcon size="xxs" />,
+                onClick: onEditClick,
+            },
+            {
+                label: tr('Delete'),
+                color: danger0,
+                icon: <BinIcon size="xxs" />,
+                onClick: onDeleteClick,
+            },
+        ],
+        [onDeleteClick, onEditClick],
+    );
+
     return (
-        <ActivityFeedItem id={`comment-${id}`}>
-            <UserPic size={32} src={author?.image} email={author?.email} />
+        <ActivityFeedItem id={isPinned ? '' : `comment-${id}`}>
+            {iconRenderCondition(isPinned, author?.image, author?.email)}
 
             {editMode ? (
                 <CommentEditForm
@@ -207,46 +251,19 @@ export const CommentView: FC<CommentViewProps> = ({
                                 <ReactionsDropdown view="icon" onClick={onReactionToggle} />
                             ))}
                             {nullable(isEditable, () => (
-                                <span>
-                                    <Dropdown
-                                        items={[
-                                            {
-                                                label: tr('Edit'),
-                                                icon: <EditIcon size="xxs" />,
-                                                onClick: onEditClick,
-                                            },
-                                            {
-                                                label: tr('Delete'),
-                                                color: danger0,
-                                                icon: <BinIcon size="xxs" />,
-                                                onClick: onDeleteClick,
-                                            },
-                                        ]}
-                                        renderTrigger={({ ref, onClick }) => (
-                                            <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
-                                        )}
-                                        renderItem={({ item, cursor, index }) => (
-                                            <MenuItem
-                                                key={item.label}
-                                                ghost
-                                                color={item.color}
-                                                focused={cursor === index}
-                                                icon={item.icon}
-                                                onClick={item.onClick}
-                                            >
-                                                {item.label}
-                                            </MenuItem>
-                                        )}
-                                    />
-                                </span>
+                                <Dropdown
+                                    items={dropdownItems}
+                                    renderTrigger={renderTriggerHelper}
+                                    renderItem={renderItemHelper}
+                                />
                             ))}
                         </StyledCommentActions>
                     </StyledCardInfo>
 
-                    <CardComment>
+                    <StyledCardComment>
                         {nullable(state, (s) => (
                             <StyledTimestamp>
-                                <StyledStateDot color={colorLayer(s.hue, 9, s.hue === 1 ? 0 : undefined)[themeId]} />
+                                <StateDot color={colorLayer(s.hue, 9, s.hue === 1 ? 0 : undefined)[themeId]} />
                                 <Text size="m" weight="bolder" color={gray9}>
                                     {createLocaleDate(createdAt, { locale })}
                                 </Text>
@@ -256,11 +273,9 @@ export const CommentView: FC<CommentViewProps> = ({
                         <Md>{commentDescription}</Md>
 
                         {nullable(reactions?.length, () => (
-                            <StyledReactions>
-                                <Reactions reactions={reactionsProps.reactions} onClick={onReactionToggle} />
-                            </StyledReactions>
+                            <Reactions reactions={reactionsProps.reactions} onClick={onReactionToggle} />
                         ))}
-                    </CardComment>
+                    </StyledCardComment>
                 </StyledCommentCard>
             )}
         </ActivityFeedItem>

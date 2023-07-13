@@ -43,7 +43,7 @@ import { State } from '../State';
 import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
 import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm';
 import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
-import { CommentFixed } from '../CommentFixed';
+import { CommentView } from '../CommentView/CommentView';
 
 import { tr } from './GoalPreview.i18n';
 
@@ -209,9 +209,10 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
             return null;
         }
 
-        return goal.comments.findLast((comment) => comment.stateId);
+        const foundResult = goal.comments.findLast((comment) => comment.stateId);
+        return foundResult?.stateId === goal.stateId ? foundResult : null;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [goal?.comments]);
+    }, [goal?.comments, goal?.stateId]);
 
     return (
         <>
@@ -319,12 +320,17 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                     </StyledCard>
 
                     {nullable(lastChangedStatusComment, (value) => (
-                        <CommentFixed
+                        <CommentView
                             id={value.id}
                             author={value.activity?.user}
                             description={value.description}
                             state={value.state}
                             createdAt={value.createdAt}
+                            isPinned
+                            onDelete={onCommentDelete}
+                            onReactionToggle={onCommentReactionToggle(value.id)}
+                            reactions={value.reactions}
+                            isEditable={value.activity?.id === user?.activityId}
                         />
                     ))}
 
