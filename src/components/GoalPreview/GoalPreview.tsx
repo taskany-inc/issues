@@ -205,7 +205,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     const { title, description, updatedAt } = goal || preview;
 
     const lastChangedStatusComment = useMemo(() => {
-        if (!goal || goal.comments.length <= 1) {
+        if (!goal || goal.comments?.length <= 1) {
             return null;
         }
 
