@@ -1,4 +1,4 @@
-import { Estimate, EstimateToGoal, Goal, Prisma, StateType } from '@prisma/client';
+import { Estimate, EstimateToGoal, Goal, GoalAchieveCriteria, Prisma, State, StateType } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
 
@@ -433,6 +433,38 @@ export const goalDeepQuery = {
     },
 } as const;
 
+const maxPossibleCriteriaWeight = 100;
+
+const calcAchievedWeight = (list: (GoalAchieveCriteria & { goalAsCriteria: Goal & { state: State } })[]): number => {
+    const { achivedWithWeight, comletedWithoutWeight, anyWithoutWeight, allWeight } = list.reduce(
+        (acc, value) => {
+            acc.allWeight += value.weight;
+
+            if (!value.weight) {
+                acc.anyWithoutWeight += 1;
+            }
+            if (value.isDone || (value.goalAsCriteria && value.goalAsCriteria.state?.type === StateType.Completed)) {
+                acc.achivedWithWeight += value.weight;
+
+                if (!value.weight) {
+                    acc.comletedWithoutWeight += 1;
+                }
+            }
+
+            return acc;
+        },
+        { achivedWithWeight: 0, comletedWithoutWeight: 0, anyWithoutWeight: 0, allWeight: 0 },
+    );
+
+    const remainingtWeight = maxPossibleCriteriaWeight - allWeight;
+    const quantityByWeightlessCriteria = remainingtWeight / anyWithoutWeight;
+
+    return Math.min(
+        achivedWithWeight + Math.ceil(quantityByWeightlessCriteria * comletedWithoutWeight),
+        maxPossibleCriteriaWeight,
+    );
+};
+
 export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     const _isOwner = goal.ownerId === activityId;
     const _isParticipant = goal.participants?.some((participant: any) => participant?.id === activityId);
@@ -442,13 +474,7 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1].estimate : undefined;
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
     const _hasAchievementCriteria = goal.goalAchiveCriteria?.length;
-    const _achivedCriteriaWeight = goal.goalAchiveCriteria?.reduce((sum: number, curr: any) => {
-        if (curr.isDone || (curr.goalAsCriteria && curr.goalAsCriteria.state?.type === StateType.Completed)) {
-            return sum + curr.weight;
-        }
-
-        return sum;
-    }, 0);
+    const _achivedCriteriaWeight = calcAchievedWeight(goal.goalAchiveCriteria ?? []);
 
     let parentOwner = false;
     function checkParent(project?: any) {

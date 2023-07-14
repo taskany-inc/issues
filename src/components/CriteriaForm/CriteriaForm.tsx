@@ -211,7 +211,7 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
             goalId,
             title: '',
             weight: '',
-            goalAsGriteria: null,
+            goalAsGriteria: undefined,
         },
     });
 
@@ -229,7 +229,7 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
         reset({
             title: '',
             weight: '',
-            goalAsGriteria: null,
+            goalAsGriteria: undefined,
             goalId,
         });
     }, [goalId, reset]);

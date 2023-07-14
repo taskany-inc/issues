@@ -16,7 +16,7 @@ export const criteriaSchema = z.object({
         .object({
             id: z.string(),
         })
-        .nullish(),
+        .optional(),
 });
 
 export const updateCriteriaState = z.object({
