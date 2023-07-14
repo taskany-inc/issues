@@ -1,26 +1,18 @@
-import React, { useState, useEffect, useCallback, useReducer, useRef, forwardRef, ReactEventHandler } from 'react';
+import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef } from 'react';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-    ComboBox,
-    Button,
-    GoalIcon,
-    nullable,
-    FormInput,
-    useClickOutside,
-    useKeyboard,
-    KeyCode,
-    PlusIcon,
-} from '@taskany/bricks';
+import { Button, GoalIcon, FormInput, PlusIcon } from '@taskany/bricks';
 import { gray7, gray8 } from '@taskany/colors';
 import { Controller, UseFormSetError, useForm } from 'react-hook-form';
-import { Goal, State } from '@prisma/client';
+import { Goal } from '@prisma/client';
+import Popup from '@taskany/bricks/components/Popup';
 
 import { InlineTrigger } from '../InlineTrigger';
 import { AddCriteriaScheme, criteriaSchema } from '../../schema/criteria';
-import { Table, TableRow, TitleItem, ContentItem, Title, TextItem, TitleContainer } from '../Table';
-import { StateDot } from '../StateDot';
-import { trpc } from '../../utils/trpcClient';
+import { GoalSuggest } from '../GoalSuggest';
+import { InlineForm } from '../InlineForm';
+import { Keyboard } from '../Keyboard';
+import { Tip } from '../Tip';
 
 import { tr } from './CriteriaForm.i18n';
 
@@ -31,13 +23,6 @@ const StyledInlineTrigger = styled(InlineTrigger)`
     display: inline-flex;
     color: ${gray8};
     line-height: 28px;
-`;
-
-const StyledTableResults = styled(Table)`
-    position: relative;
-    grid-template-columns: 30px 210px 40px minmax(max-content, 120px);
-    width: fit-content;
-    z-index: 2;
 `;
 
 const StyledFormInput = styled(FormInput)`
@@ -55,9 +40,7 @@ const StyledFormInput = styled(FormInput)`
 
 const StyledTableRow = styled.div`
     display: grid;
-    grid-template-columns:
-        minmax(calc(250px + 10px /* gap of sibling table */), 20%)
-        repeat(2, max-content);
+    grid-template-columns: 35px minmax(calc(240px), 20%) repeat(2, max-content);
 `;
 
 const StyledSubmitButton = styled(Button)`
@@ -65,51 +48,6 @@ const StyledSubmitButton = styled(Button)`
     align-items: center;
     justify-content: center;
 `;
-
-interface GoalSuggestItemProps {
-    title: string;
-    state?: State | null;
-    projectId: string;
-    focused: boolean;
-    onClick: () => void;
-}
-
-const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
-    onClick,
-    title,
-    projectId,
-    state,
-    focused,
-}): React.ReactElement => {
-    const handleClick = useCallback<React.MouseEventHandler<HTMLDivElement>>(
-        (event) => {
-            event.preventDefault();
-            onClick();
-        },
-        [onClick],
-    );
-
-    return (
-        <TableRow onClick={handleClick} focused={focused}>
-            <ContentItem>
-                <GoalIcon size="s" />
-            </ContentItem>
-            <TitleItem>
-                <TitleContainer>
-                    <Title>{title}</Title>
-                </TitleContainer>
-            </TitleItem>
-            <ContentItem>
-                {nullable(state, (s) => (
-                    <StateDot size="m" title={s.title} hue={s.hue} />
-                ))}
-            </ContentItem>
-            <ContentItem>
-                <TextItem>{projectId}</TextItem>
-            </ContentItem>
-        </TableRow>
-    );
-};
 
 interface WeightFieldProps {
     name: 'weight';
@@ -179,59 +117,9 @@ interface CriteriaTitleFieldProps {
 
 export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>(
     ({ name, value = '', error, onSelect, onChange, titles = [], setError }, ref) => {
-        const [completionVisible, setCompletionVisibility] = useState(false);
-        const [[text, type], setQuery] = useState<[string, 'plain' | 'search']>([value, 'plain']);
-
-        const results = trpc.goal.suggestions.useQuery(
-            {
-                input: text.slice(1),
-                limit: 5,
-            },
-            {
-                enabled: type === 'search' && text.length > 2,
-                staleTime: 0,
-                cacheTime: 0,
-            },
-        );
-
-        useEffect(() => {
-            if (value !== text) {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                setQuery(([_, prevType]) => {
-                    return [value, prevType];
-                });
-            }
-        }, [value, text]);
-
-        const handleInputChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-            (event) => {
-                const { value } = event.target;
-
-                setQuery(() => {
-                    const isSearchInput = value[0] === '#';
-
-                    return [value, isSearchInput ? 'search' : 'plain'];
-                });
-
-                onChange(event);
-
-                setCompletionVisibility(true);
-            },
-            [onChange],
-        );
-
-        type GoalFromResults = NonNullable<typeof results.data>[number];
-
-        const handleSelectGoal = useCallback(
-            (item: GoalFromResults) => {
-                if (type === 'search') {
-                    onSelect(item);
-                    setQuery(['', 'plain']);
-                    setCompletionVisibility(false);
-                }
-            },
-            [onSelect, type],
-        );
+        const [type, setType] = useState<'plain' | 'search'>('plain');
+        const [popupVisible, setPopupVisible] = useState(false);
+        const btnRef = useRef<HTMLButtonElement>(null);
 
         const onlyUniqueTitleHandler = useCallback<React.FocusEventHandler<HTMLInputElement>>(
             (event) => {
@@ -247,34 +135,53 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
         );
 
         return (
-            <ComboBox
-                ref={ref}
-                text={text}
-                value={value || text}
-                items={results.data}
-                maxWidth={400}
-                onChange={handleSelectGoal}
-                visible={completionVisible}
-                renderInput={({ value, ref }) => (
+            <>
+                <Button
+                    type="button"
+                    view={type === 'search' ? 'primary' : 'default'}
+                    brick="right"
+                    outline
+                    iconLeft={<GoalIcon size="xs" noWrap />}
+                    onClick={() => setType((prev) => (prev === 'search' ? 'plain' : 'search'))}
+                    onMouseEnter={() => setPopupVisible(true)}
+                    onMouseLeave={() => setPopupVisible(false)}
+                    ref={btnRef}
+                />
+
+                {type === 'search' ? (
+                    <GoalSuggest
+                        value={value}
+                        onChange={onSelect}
+                        renderInput={(inputProps) => (
+                            <StyledFormInput
+                                autoFocus
+                                brick="center"
+                                name={name}
+                                onChange={onChange}
+                                placeholder={tr('Enter goal name')}
+                                onBlur={onlyUniqueTitleHandler}
+                                error={error}
+                                {...inputProps}
+                            />
+                        )}
+                    />
+                ) : (
                     <StyledFormInput
                         autoFocus
-                        error={error?.message != null ? error : undefined}
-                        placeholder={tr('Criteria or Goal')}
-                        name={name}
-                        brick="right"
-                        onChange={handleInputChange}
-                        onBlur={onlyUniqueTitleHandler}
+                        brick="center"
                         value={value}
-                        ref={ref}
+                        name={name}
+                        onChange={onChange}
+                        onBlur={onlyUniqueTitleHandler}
+                        placeholder={tr('Enter criteria')}
+                        error={error}
                     />
                 )}
-                renderItems={(children) => (
-                    <StyledTableResults columns={3}>{children as React.ReactNode}</StyledTableResults>
-                )}
-                renderItem={({ item, index, cursor, onClick }) => (
-                    <GoalSuggestItem {...item} focused={index === cursor} onClick={() => onClick(item)} key={item.id} />
-                )}
-            />
+
+                <Popup reference={btnRef} visible={popupVisible} placement="top-start">
+                    <Tip>{tr('Search by goals')}</Tip>
+                </Popup>
+            </>
         );
     },
 );
@@ -289,13 +196,10 @@ interface CriteriaFormProps {
 }
 
 export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, validityData }) => {
-    const [formVisible, toggle] = useReducer((state) => !state, false);
-    const wrapperRef = useRef<HTMLDivElement>(null);
-    const prevVisibleRef = useRef(formVisible);
-
     const {
         handleSubmit,
         control,
+        register,
         reset,
         setValue,
         setError,
@@ -311,33 +215,6 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
         },
     });
 
-    useEffect(() => {
-        if (!formVisible && prevVisibleRef.current !== formVisible) {
-            reset({
-                title: '',
-                weight: '',
-                goalAsGriteria: null,
-                goalId,
-            });
-        }
-
-        prevVisibleRef.current = formVisible;
-    }, [formVisible, reset, goalId]);
-
-    useEffect(() => {
-        if (isSubmitSuccessful) {
-            toggle();
-        }
-    }, [isSubmitSuccessful]);
-
-    const onClickOutside = useCallback(() => {
-        if (formVisible) {
-            toggle();
-        }
-    }, [formVisible]);
-
-    useClickOutside(wrapperRef, onClickOutside);
-
     const handleSelectGoal = useCallback(
         (goal: Goal) => {
             if (goal != null) {
@@ -348,76 +225,65 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
         [setValue],
     );
 
-    const [onESC] = useKeyboard(
-        [KeyCode.Escape],
-        (event) => {
-            if (event.target && wrapperRef.current?.contains(event.target as Node) && formVisible) {
-                toggle();
-            }
-        },
-        {
-            capture: true,
-            event: 'keydown',
-        },
-    );
+    const onResetHandler = useCallback(() => {
+        reset({
+            title: '',
+            weight: '',
+            goalAsGriteria: null,
+            goalId,
+        });
+    }, [goalId, reset]);
 
     return (
-        <div ref={wrapperRef}>
-            {formVisible ? (
-                <form onSubmit={handleSubmit(onSubmit)} {...onESC}>
-                    <StyledTableRow>
-                        <Controller
-                            name="title"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <CriteriaTitleField
-                                    {...field}
-                                    error={fieldState.error}
-                                    setError={setError}
-                                    onSelect={handleSelectGoal}
-                                    titles={validityData.title}
-                                />
-                            )}
-                        />
-                        <Controller
-                            name="weight"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <WeightField
-                                    {...field}
-                                    error={fieldState.error}
-                                    maxValue={validityData.sum}
-                                    setError={setError}
-                                />
-                            )}
-                        />
-                        <StyledSubmitButton
-                            brick="left"
-                            view="primary"
-                            text={tr('Add')}
-                            size="m"
-                            type="submit"
-                            outline
-                        />
-                    </StyledTableRow>
-                    <Controller
-                        name="goalId"
-                        control={control}
-                        render={({ field }) => <input type="hidden" {...field} />}
-                    />
-                    <Controller
-                        name="goalAsGriteria"
-                        control={control}
-                        render={({ field }) => <input type="hidden" {...field} value={field.value?.id || ''} />}
-                    />
-                </form>
-            ) : (
+        <InlineForm
+            renderTrigger={({ onClick }) => (
                 <StyledInlineTrigger
                     text={tr('Add achievement criteria')}
                     icon={<PlusIcon noWrap size="s" />}
-                    onClick={toggle}
+                    onClick={onClick}
                 />
             )}
-        </div>
+            onSubmit={handleSubmit(onSubmit)}
+            onReset={onResetHandler}
+            isSubmitted={isSubmitSuccessful}
+            tip={
+                <Tip>
+                    {tr.raw('Press key to add criteria', {
+                        key: <Keyboard key="cmd/enter" size="s" command enter />,
+                    })}
+                </Tip>
+            }
+        >
+            <StyledTableRow>
+                <Controller
+                    name="title"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <CriteriaTitleField
+                            {...field}
+                            error={fieldState.error}
+                            setError={setError}
+                            onSelect={handleSelectGoal}
+                            titles={validityData.title}
+                        />
+                    )}
+                />
+                <Controller
+                    name="weight"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <WeightField
+                            {...field}
+                            error={fieldState.error}
+                            maxValue={validityData.sum}
+                            setError={setError}
+                        />
+                    )}
+                />
+                <StyledSubmitButton brick="left" view="primary" text={tr('Add')} size="m" type="submit" outline />
+            </StyledTableRow>
+            <input type="hidden" {...register('goalId')} />
+            <input type="hidden" {...register('goalAsGriteria.id')} />
+        </InlineForm>
     );
 };

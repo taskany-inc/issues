@@ -41,22 +41,25 @@ import { addCalculatedProjectFields } from './project';
 export const goal = router({
     suggestions: protectedProcedure.input(suggestionsQueryScheme).query(async ({ input }) => {
         const splittedInput = input.input.split('-');
-        let selectParams = {};
+        let selectParams: Prisma.GoalFindManyArgs['where'] = {
+            title: {
+                contains: input.input,
+                mode: 'insensitive',
+            },
+        };
 
-        if (splittedInput.length === 2 && Number.isNaN(+splittedInput[1])) {
+        if (splittedInput.length === 2 && !Number.isNaN(+splittedInput[1])) {
+            const [projectId, scopedId] = splittedInput;
             selectParams = {
                 AND: [
                     {
                         projectId: {
-                            contains: splittedInput[0],
+                            contains: projectId,
                             mode: 'insensitive',
                         },
                     },
                     {
-                        scopeId: {
-                            contains: splittedInput[1],
-                            mode: 'insensitive',
-                        },
+                        scopeId: Number(scopedId),
                     },
                 ],
             };
@@ -65,16 +68,8 @@ export const goal = router({
         return prisma.goal.findMany({
             take: input.limit || 5,
             where: {
-                OR: [
-                    selectParams,
-                    {
-                        title: {
-                            contains: input.input,
-                            mode: 'insensitive',
-                        },
-                    },
-                ],
                 AND: {
+                    ...selectParams,
                     OR: [
                         {
                             archived: false,

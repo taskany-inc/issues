@@ -1,10 +1,13 @@
 {
-    "Weight is required": "",
-    "Weight must be integer": "",
     "Weight": "No more than {upTo}",
     "Criteria or Goal": "",
     "Add achievement criteria": "",
     "Weight must be in range": "Weight must be between 1 and {upTo}",
     "Add": "",
-    "Title must be unique": ""
+    "Title must be unique": "",
+    "Press key to add criteria": "Press {key} to add the criteria",
+    "Enter goal name": "",
+    "Enter criteria": "",
+    "Search by goals": "",
+    "Weight must be integer": ""
 }

@@ -88,7 +88,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                     renderTrigger ? (
                         renderTrigger(props)
                     ) : (
-                        <Button disabled={props.disabled} ref={props.ref} text={props.text} onClick={props.onClick} />
+                        <Button disabled={props.disabled} text={props.text} onClick={props.onClick} />
                     )
                 }
                 renderInput={(props) => (
