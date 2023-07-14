@@ -41,7 +41,6 @@ export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
                 renderTrigger={(props) => (
                     <Button
                         ghost
-                        ref={props.ref}
                         text={props.text}
                         disabled={props.disabled}
                         onClick={props.onClick}

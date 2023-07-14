@@ -403,8 +403,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onChange={onParticipantAdd}
                                     renderTrigger={(props) => (
                                         <StyledInlineTrigger
-                                            // FIXME: https://github.com/taskany-inc/bricks/issues/210
-                                            ref={props.ref as any as React.RefObject<HTMLDivElement>}
                                             icon={<PlusIcon noWrap size="xs" />}
                                             text={tr('Add participant')}
                                             onClick={props.onClick}
@@ -424,8 +422,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onChange={onGoalTransfer}
                                     renderTrigger={(props) => (
                                         <StyledInlineTrigger
-                                            // FIXME: https://github.com/taskany-inc/bricks/issues/210
-                                            ref={props.ref as any as React.RefObject<HTMLDivElement>}
                                             icon={<ArrowRightIcon noWrap size="xs" />}
                                             text={tr('Transfer goal')}
                                             onClick={props.onClick}
