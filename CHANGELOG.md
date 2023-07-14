@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.16.5](https://github.com/taskany-inc/issues/compare/v1.16.4...v1.16.5) (2023-07-14)
+
+
+### Bug Fixes
+
+* **GoalCriteria:** remake title input for form ([69ee5df](https://github.com/taskany-inc/issues/commit/69ee5dfdfa56698049f057a93928c7242816567b))
+* **GoalSuggest:** search query params ([3a959cf](https://github.com/taskany-inc/issues/commit/3a959cf8a61713b5d35586783e738d490d770053))
+
 ## [1.16.4](https://github.com/taskany-inc/issues/compare/v1.16.3...v1.16.4) (2023-07-13)
 
 
