@@ -119,7 +119,7 @@ export const goalsFilter = (
 
     if (data.sort?.priority) {
         orderBy.push({
-            priority: data.sort.priority,
+            priorityId: data.sort.priority,
         });
     }
 

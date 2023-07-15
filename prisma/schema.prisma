@@ -184,6 +184,13 @@ model EstimateToGoal {
   @@index([estimateId])
 }
 
+model Priority {
+  id    Int    @id @default(autoincrement())
+  title String
+  value Int
+  Goal  Goal[]
+}
+
 model Goal {
   id                 String                @id @default(cuid())
   scopeId            Int                   @default(1)
@@ -194,7 +201,9 @@ model Goal {
   personal           Boolean?
   private            Boolean?
   archived           Boolean?              @default(false)
-  priority           String?
+  priority           String
+  priorityExact      Priority              @relation(fields: [priorityId], references: [id])
+  priorityId Int
   estimate           EstimateToGoal[]
   project            Project?              @relation("projectGoals", fields: [projectId], references: [id])
   projectId          String?
@@ -219,8 +228,8 @@ model Goal {
   goalAchiveCriteria GoalAchieveCriteria[] @relation("GoalCriterion")
   goalAsCriteria     GoalAchieveCriteria?  @relation("GoalAsCriteria")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 
   @@unique([projectId, scopeId])
   @@index([ownerId])

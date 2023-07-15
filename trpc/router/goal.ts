@@ -499,7 +499,7 @@ export const goal = router({
                     title: input.title,
                     description: input.description,
                     stateId: input.state?.id,
-                    priority: input.priority,
+                    priority: input.priority ?? '',
                     estimate: correctEstimate?.id
                         ? {
                               create: {
