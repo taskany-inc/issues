@@ -33,9 +33,7 @@ const prioritiesExact = [
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function sample<T>(arr: T[]) {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
+const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
 
 async function seed(title: string, cb: () => void) {
     console.log('SEED:', title, '...');
@@ -48,7 +46,6 @@ assert(adminPassword, "Admin's password isn't provided. Check your environment v
 
 let allUsers: User[];
 let tags: Tag[];
-// let priorityExact: Priority[];
 
 const init = (async () => {
     allUsers = await Promise.all(
@@ -149,13 +146,13 @@ const init = (async () => {
         prisma.tag.create({
             data: {
                 title: 'frontend',
-                activityId: sample(allUsers).activityId ?? '',
+                activityId: sample(allUsers).activityId,
             },
         }),
         prisma.tag.create({
             data: {
                 title: 'backend',
-                activityId: sample(allUsers).activityId ?? '',
+                activityId: sample(allUsers).activityId,
             },
         }),
     ]);
@@ -209,14 +206,14 @@ seed('Default projects', async () => {
             ['Finance department', sample(allUsers).activityId],
             ['Social promotion team', sample(allUsers).activityId],
             ['Cyber security', sample(allUsers).activityId],
-        ].map(([title, activityId]) =>
+        ].map(([title, activityId]: string[]) =>
             prisma.project.create({
                 data: {
-                    id: keyPredictor(title ?? ''),
-                    title: title ?? '',
+                    id: keyPredictor(title),
+                    title,
                     flowId: f.id,
                     description: faker.lorem.sentence(5),
-                    activityId: activityId ?? '',
+                    activityId,
                 },
             }),
         ),
@@ -237,33 +234,32 @@ seed('Default projects', async () => {
                     [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
                     [faker.lorem.words(2), faker.lorem.sentence(5), sample(allUsers).activityId],
                     // eslint-disable-next-line no-loop-func
-                ].map(([title, description, activityId], index) => {
+                ].map(([title, description, activityId]: string[], index) => {
                     const priority = sample(prioritiesExact);
 
                     return prisma.goal.create({
                         data: {
                             scopeId: index + 1,
-                            title: title ?? '',
-                            description: description ?? '',
+                            title,
+                            description,
                             projectId: project.id,
                             activityId,
                             ownerId: activityId,
                             priority: priority.title,
                             priorityId: priority.id,
-                            // priorityExact: priority,
                             participants: {
                                 connect:
                                     Math.random() > 0.5
                                         ? [
                                               {
-                                                  id: sample(allUsers)?.activityId ?? '',
+                                                  id: sample(allUsers)?.activityId as string,
                                               },
                                               {
-                                                  id: sample(allUsers)?.activityId ?? '',
+                                                  id: sample(allUsers)?.activityId as string,
                                               },
                                           ]
                                         : {
-                                              id: sample(allUsers)?.activityId ?? '',
+                                              id: sample(allUsers)?.activityId as string,
                                           },
                             },
                             stateId: sample(f.states)?.id,
@@ -293,9 +289,9 @@ seed('Default projects', async () => {
                                         [faker.lorem.sentence(5), sample(allUsers).activityId],
                                         [faker.lorem.sentence(5), sample(allUsers).activityId],
                                         [faker.lorem.sentence(5), sample(allUsers).activityId],
-                                    ].map(([description, activityId]) => ({
-                                        description: description ?? '',
-                                        activityId: activityId ?? '',
+                                    ].map(([description, activityId]: string[]) => ({
+                                        description,
+                                        activityId,
                                     })),
                                 },
                             },
@@ -333,16 +329,16 @@ seed('Default projects', async () => {
                         history: {
                             createMany: {
                                 data: [
-                                    [faker.lorem.sentence(2), goal.title, sample(allUsers).activityId ?? '', 'title'],
+                                    [faker.lorem.sentence(2), goal.title, sample(allUsers).activityId, 'title'],
                                     [
                                         faker.lorem.sentence(5),
                                         goal.description,
-                                        sample(allUsers).activityId ?? '',
+                                        sample(allUsers).activityId,
                                         'description',
                                     ],
-                                    [sample(allUsers).activityId ?? '', null, goal.activityId ?? '', 'participants'],
-                                    [null, sample(allGoals).id, sample(allUsers).activityId ?? '', 'dependencies'],
-                                    [sample(allGoals).id, null, sample(allUsers).activityId ?? '', 'dependencies'],
+                                    [sample(allUsers).activityId, null, goal.activityId, 'participants'],
+                                    [null, sample(allGoals).id, sample(allUsers).activityId, 'dependencies'],
+                                    [sample(allGoals).id, null, sample(allUsers).activityId, 'dependencies'],
                                 ].map(([previousValue, nextValue, activityId, subject]) => {
                                     let action = 'add';
 
@@ -353,11 +349,11 @@ seed('Default projects', async () => {
                                     }
 
                                     return {
-                                        subject: subject ?? '',
+                                        subject,
                                         previousValue,
                                         nextValue,
                                         action,
-                                        activityId: activityId ?? '',
+                                        activityId,
                                     };
                                 }),
                             },
