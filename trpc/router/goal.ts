@@ -31,6 +31,7 @@ import {
     findOrCreateEstimate,
     mixHistoryWithComments,
     makeGoalRelationMap,
+    updateGoalWithCalculatedWeight,
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
@@ -530,8 +531,13 @@ export const goal = router({
                 },
                 include: {
                     ...goalDeepQuery,
+                    goalAsCriteria: true,
                 },
             });
+
+            if (goal.goalAsCriteria) {
+                await updateGoalWithCalculatedWeight(goal.goalAsCriteria.goalId);
+            }
 
             return {
                 ...goal,
@@ -632,7 +638,7 @@ export const goal = router({
         }
 
         try {
-            return await prisma.goal.update({
+            const updatedGoal = await prisma.goal.update({
                 where: {
                     id: input.id,
                 },
@@ -656,7 +662,16 @@ export const goal = router({
                           }
                         : undefined,
                 },
+                include: {
+                    goalAsCriteria: true,
+                },
             });
+
+            if (updatedGoal.goalAsCriteria) {
+                await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
+            }
+
+            return updatedGoal;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
@@ -687,7 +702,7 @@ export const goal = router({
 
         try {
             // We want to see state changes record and comment next in activity feed.
-            const [, newComment] = await prisma.$transaction([
+            const [updatedGoal, newComment] = await prisma.$transaction([
                 // Update goal and push to history first.
                 prisma.goal.update({
                     where: { id: input.goalId },
@@ -714,6 +729,9 @@ export const goal = router({
                                   }
                                 : undefined,
                     },
+                    include: {
+                        goalAsCriteria: true,
+                    },
                 }),
                 // Create comment next.
                 prisma.comment.create({
@@ -725,6 +743,10 @@ export const goal = router({
                     },
                 }),
             ]);
+
+            if (updatedGoal.goalAsCriteria) {
+                await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
+            }
 
             let toEmails = actualGoal.participants;
 
@@ -835,6 +857,8 @@ export const goal = router({
                 // }),
             ]);
 
+            await updateGoalWithCalculatedWeight(criteria.goalId);
+
             return criteria;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -871,15 +895,26 @@ export const goal = router({
                 //     },
                 // }),
             ]);
+
+            // update goal criteria weight
+            await updateGoalWithCalculatedWeight(currentCriteria.goalId);
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
     removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input }) => {
+        const current = await prisma.goalAchieveCriteria.findUnique({
+            where: { id: input.id },
+        });
+
         try {
             await prisma.goalAchieveCriteria.delete({
                 where: { id: input.id },
             });
+
+            if (current) {
+                await updateGoalWithCalculatedWeight(current.goalId);
+            }
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }

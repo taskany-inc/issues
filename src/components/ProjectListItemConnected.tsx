@@ -82,6 +82,7 @@ export const ProjectListItemConnected: FC<{
                     participants={g.participants}
                     starred={g._isStarred}
                     watching={g._isWatching}
+                    achivedCriteriaWeight={g._achivedCriteriaWeight}
                     key={g.id}
                     focused={selectedResolver?.(g.id)}
                     onClick={onClickProvider?.(g as NonNullable<GoalByIdReturnType>)}

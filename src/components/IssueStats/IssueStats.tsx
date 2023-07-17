@@ -20,7 +20,7 @@ interface IssueStatsProps {
     issuer?: ActivityByIdReturnType | null;
     estimate?: { date: string; q?: string; y: string };
     priority?: string | null;
-    achivedCriteriaWeight?: number;
+    achivedCriteriaWeight?: number | null;
     mode?: 'compact' | 'default';
     onCommentsClick?: () => void;
 }
@@ -89,7 +89,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
             {nullable(priority, (p) => (
                 <DotSep>{getPriorityText(p)}</DotSep>
             ))}
-            {achivedCriteriaWeight !== undefined && (
+            {achivedCriteriaWeight != null && (
                 <DotSep>
                     <StyledCircleProgressBar value={achivedCriteriaWeight} />
                 </DotSep>
