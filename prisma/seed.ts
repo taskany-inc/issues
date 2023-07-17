@@ -8,7 +8,6 @@ import { keyPredictor } from '../src/utils/keyPredictor';
 
 const adminEmail = process.env.ADMIN_EMAIL || 'tony@taskany.org';
 const adminPassword = process.env.ADMIN_PASSWORD || 'taskany';
-// const priorities = ['Highest', 'High', 'Medium', 'Low'];
 const prioritiesExact = [
     {
         id: 4,
