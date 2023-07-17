@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { GoalHistory, Comment, Activity, User, Goal } from '@prisma/client';
 
 import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
-import { addCalclulatedGoalsFields } from '../../trpc/queries/goals';
+import { addCalclulatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordMeta, HistoryRecordSubject, HistoryAction } from '../types/history';
 
 import { prisma } from './prisma';
@@ -266,4 +266,28 @@ export const makeGoalRelationMap = <T extends Goal>(
     values: Record<dependencyKind, T[]>,
 ): Array<{ kind: dependencyKind; goals: T[] }> => {
     return (Object.entries(values) as [dependencyKind, T[]][]).map(([kind, goals]) => ({ kind, goals }));
+};
+
+export const updateGoalWithCalculatedWeight = async (goalId: string) => {
+    const criteriaList = await prisma.goalAchieveCriteria.findMany({
+        where: { goalId },
+        include: {
+            goalAsCriteria: {
+                include: {
+                    state: true,
+                },
+            },
+        },
+    });
+
+    if (!criteriaList) {
+        return;
+    }
+
+    await prisma.goal.update({
+        where: { id: goalId },
+        data: {
+            completedCriteriaWeight: calcAchievedWeight(criteriaList),
+        },
+    });
 };

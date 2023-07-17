@@ -192,41 +192,42 @@ model Priority {
 }
 
 model Goal {
-  id                 String                @id @default(cuid())
-  scopeId            Int                   @default(1)
-  title              String
-  description        String
-  kind               String?
-  key                Boolean?
-  personal           Boolean?
-  private            Boolean?
-  archived           Boolean?              @default(false)
-  priority           String?
-  priorityExact      Priority?             @relation(fields: [priorityId], references: [id])
-  priorityId         Int?
-  estimate           EstimateToGoal[]
-  project            Project?              @relation("projectGoals", fields: [projectId], references: [id])
-  projectId          String?
-  teamId             String?
-  state              State?                @relation("goalState", fields: [stateId], references: [id])
-  stateId            String?
-  activity           Activity?             @relation("goalIssuer", fields: [activityId], references: [id])
-  activityId         String?
-  owner              Activity?             @relation("goalOwner", fields: [ownerId], references: [id])
-  ownerId            String?
-  participants       Activity[]            @relation("goalParticipants")
-  watchers           Activity[]            @relation("goalWatchers")
-  stargizers         Activity[]            @relation("goalStargizers")
-  comments           Comment[]
-  reactions          Reaction[]
-  tags               Tag[]
-  dependsOn          Goal[]                @relation("dependsOn")
-  blocks             Goal[]                @relation("dependsOn")
-  relatedTo          Goal[]                @relation("connected")
-  connected          Goal[]                @relation("connected")
-  history            GoalHistory[]
-  goalAchiveCriteria GoalAchieveCriteria[] @relation("GoalCriterion")
-  goalAsCriteria     GoalAchieveCriteria?  @relation("GoalAsCriteria")
+  id                      String                @id @default(cuid())
+  scopeId                 Int                   @default(1)
+  title                   String
+  description             String
+  kind                    String?
+  key                     Boolean?
+  personal                Boolean?
+  private                 Boolean?
+  archived                Boolean?              @default(false)
+  priority                String?
+  priorityExact           Priority?             @relation(fields: [priorityId], references: [id])
+  priorityId              Int?
+  estimate                EstimateToGoal[]
+  project                 Project?              @relation("projectGoals", fields: [projectId], references: [id])
+  projectId               String?
+  teamId                  String?
+  state                   State?                @relation("goalState", fields: [stateId], references: [id])
+  stateId                 String?
+  activity                Activity?             @relation("goalIssuer", fields: [activityId], references: [id])
+  activityId              String?
+  owner                   Activity?             @relation("goalOwner", fields: [ownerId], references: [id])
+  ownerId                 String?
+  participants            Activity[]            @relation("goalParticipants")
+  watchers                Activity[]            @relation("goalWatchers")
+  stargizers              Activity[]            @relation("goalStargizers")
+  comments                Comment[]
+  reactions               Reaction[]
+  tags                    Tag[]
+  dependsOn               Goal[]                @relation("dependsOn")
+  blocks                  Goal[]                @relation("dependsOn")
+  relatedTo               Goal[]                @relation("connected")
+  connected               Goal[]                @relation("connected")
+  history                 GoalHistory[]
+  goalAchiveCriteria      GoalAchieveCriteria[] @relation("GoalCriterion")
+  goalAsCriteria          GoalAchieveCriteria?  @relation("GoalAsCriteria")
+  completedCriteriaWeight Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

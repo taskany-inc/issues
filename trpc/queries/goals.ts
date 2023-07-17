@@ -435,7 +435,9 @@ export const goalDeepQuery = {
 
 const maxPossibleCriteriaWeight = 100;
 
-const calcAchievedWeight = (list: (GoalAchieveCriteria & { goalAsCriteria: Goal & { state: State } })[]): number => {
+export const calcAchievedWeight = (
+    list: (GoalAchieveCriteria & { goalAsCriteria: (Goal & { state: State | null }) | null })[],
+): number => {
     const { achivedWithWeight, comletedWithoutWeight, anyWithoutWeight, allWeight } = list.reduce(
         (acc, value) => {
             acc.allWeight += value.weight;
@@ -473,8 +475,11 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     const _isIssuer = goal.activityId === activityId;
     const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1].estimate : undefined;
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
-    const _hasAchievementCriteria = goal.goalAchiveCriteria?.length;
-    const _achivedCriteriaWeight = calcAchievedWeight(goal.goalAchiveCriteria ?? []);
+    const _hasAchievementCriteria = !!goal.goalAchiveCriteria?.length;
+    const _achivedCriteriaWeight: number | null =
+        goal.completedCriteriaWeight == null && goal.goalAchieveCriteria
+            ? calcAchievedWeight(goal.goalAchieveCriteria)
+            : goal.completedCriteriaWeight;
 
     let parentOwner = false;
     function checkParent(project?: any) {

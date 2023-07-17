@@ -55,6 +55,7 @@ export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
                     participants={g.participants}
                     starred={g._isStarred}
                     watching={g._isWatching}
+                    achivedCriteriaWeight={g._achivedCriteriaWeight}
                     key={g.id}
                     focused={selectedResolver(g.id)}
                     onClick={onClickProvider(g)}

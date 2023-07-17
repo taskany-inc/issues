@@ -250,9 +250,7 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                                 owner={goal?.owner}
                                 estimate={goal?._lastEstimate}
                                 priority={goal?.priority}
-                                achivedCriteriaWeight={
-                                    goal?._hasAchievementCriteria ? goal?._achivedCriteriaWeight : undefined
-                                }
+                                achivedCriteriaWeight={goal?._achivedCriteriaWeight}
                                 comments={goal?._count?.comments ?? 0}
                                 onCommentsClick={onCommentsClick}
                                 updatedAt={updatedAt}

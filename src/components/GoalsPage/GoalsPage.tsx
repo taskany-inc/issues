@@ -221,6 +221,7 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             participants={g.participants}
                             starred={g._isStarred}
                             watching={g._isWatching}
+                            achivedCriteriaWeight={g._achivedCriteriaWeight}
                             key={g.id}
                             focused={selectedGoalResolver(g.id)}
                             onClick={onGoalPrewiewShow(g as GoalByIdReturnType)}

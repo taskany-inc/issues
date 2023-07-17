@@ -2,7 +2,15 @@ import React, { FC, MouseEventHandler, useMemo } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { textColor, gapS, gapXs, gray9 } from '@taskany/colors';
-import { MessageIcon, Text, Tag as TagItem, nullable, StarFilledIcon, EyeIcon } from '@taskany/bricks';
+import {
+    MessageIcon,
+    Text,
+    Tag as TagItem,
+    nullable,
+    StarFilledIcon,
+    EyeIcon,
+    CircleProgressBar,
+} from '@taskany/bricks';
 import type { Estimate, State as StateType, Tag } from '@prisma/client';
 
 import { routes } from '../hooks/router';
@@ -36,6 +44,7 @@ interface GoalListItemProps {
     starred?: boolean;
     watching?: boolean;
     className?: string;
+    achivedCriteriaWeight?: number | null;
     onClick?: MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: (tag: Tag) => MouseEventHandler<HTMLDivElement>;
 }
@@ -115,7 +124,7 @@ export const GoalsListContainer: FC<{ children: React.ReactNode; offset?: number
     offset = 0,
     className,
 }) => (
-    <Table columns={12} offset={offset} className={className}>
+    <Table columns={13} offset={offset} className={className}>
         {children}
     </Table>
 );
@@ -138,6 +147,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         priority,
         starred,
         watching,
+        achivedCriteriaWeight,
         onClick,
         className,
         onTagClick,
@@ -180,6 +190,10 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
 
                     <GoalContentItem>
                         <GoalTextItem>{nullable(estimate, (e) => estimateToString(e))}</GoalTextItem>
+                    </GoalContentItem>
+
+                    <GoalContentItem>
+                        {achivedCriteriaWeight != null && <CircleProgressBar value={achivedCriteriaWeight} />}
                     </GoalContentItem>
 
                     <GoalContentItem>
