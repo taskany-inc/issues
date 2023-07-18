@@ -228,6 +228,7 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                                                 participants={group.project?.participants}
                                                 starred={group.project?._isStarred}
                                                 watching={group.project?._isWatching}
+                                                averageScore={group.project?.averageScore}
                                             />
                                         </NextLink>
                                     </ProjectListContainer>

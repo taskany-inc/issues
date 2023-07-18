@@ -1,5 +1,5 @@
 import { FC, ReactNode, forwardRef } from 'react';
-import { EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
+import { CircleProgressBar, EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
 import styled from 'styled-components';
 
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
@@ -18,6 +18,7 @@ interface ProjectListItemProps {
     watching?: boolean;
     className?: string;
     disabled?: boolean;
+    averageScore: number | null;
 }
 
 const StyledTitleCell = styled(TableCell)`
@@ -25,13 +26,16 @@ const StyledTitleCell = styled(TableCell)`
 `;
 
 export const ProjectListContainer: FC<{ children: ReactNode; offset?: number }> = ({ children, offset = 0 }) => (
-    <Table columns={5} offset={offset}>
+    <Table columns={6} offset={offset}>
         {children}
     </Table>
 );
 
 export const ProjectListItem = forwardRef<HTMLDivElement, ProjectListItemProps>(
-    ({ as = 'div', children, title, owner, participants, starred, watching, className, ...props }, ref) => (
+    (
+        { as = 'div', children, title, owner, participants, starred, watching, averageScore, className, ...props },
+        ref,
+    ) => (
         <TableRow as={as} className={className} ref={ref} {...props}>
             <StyledTitleCell>
                 <Text size="l" weight="bold">
@@ -47,6 +51,7 @@ export const ProjectListItem = forwardRef<HTMLDivElement, ProjectListItemProps>(
             </TableCell>
 
             <TableCell>{nullable(participants, (p) => (p.length ? <UserGroup users={p} /> : null))}</TableCell>
+            <TableCell>{averageScore != null ? <CircleProgressBar value={averageScore} size="m" /> : null}</TableCell>
 
             <TableCell>
                 {nullable(starred, () => (

@@ -150,6 +150,7 @@ model Project {
   tags         Tag[]
   watchers     Activity[] @relation("projectWatchers")
   stargizers   Activity[] @relation("projectStargizers")
+  averageScore Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
