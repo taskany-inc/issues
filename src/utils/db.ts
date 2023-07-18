@@ -1,13 +1,14 @@
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { GoalHistory, Comment, Activity, User, Goal } from '@prisma/client';
+import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
 import { addCalclulatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
-import { HistoryRecordWithActivity, HistoryRecordMeta, HistoryRecordSubject, HistoryAction } from '../types/history';
+import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
 
 import { prisma } from './prisma';
-import { castToMetaDto, subjectToEnumValue } from './goalHistory';
+import { subjectToEnumValue } from './goalHistory';
 
 export const findOrCreateEstimate = async (
     estimate: GoalCommon['estimate'] | GoalUpdate['estimate'],
@@ -316,10 +317,31 @@ export const updateGoalWithCalculatedWeight = async (goalId: string) => {
         },
     });
 
-    await prisma.goal.update({
-        where: { id: goalId },
-        data: {
-            completedCriteriaWeight: criteriaList.length ? calcAchievedWeight(criteriaList) : null,
-        },
-    });
+    try {
+        await prisma.$transaction(async (ctx) => {
+            // update goal score by criteria list
+            const updatedGoal = await ctx.goal.update({
+                where: { id: goalId },
+                data: {
+                    completedCriteriaWeight: criteriaList.length ? calcAchievedWeight(criteriaList) : null,
+                },
+            });
+
+            if (!updatedGoal) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+            }
+
+            // update project score after goal score update
+            if (updatedGoal.projectId) {
+                await ctx.$executeRaw`
+                    UPDATE "Project"
+                    SET "averageScore" = (SELECT AVG("completedCriteriaWeight") FROM "Goal"
+                        WHERE "projectId" = ${updatedGoal.projectId})
+                    WHERE "id" = ${updatedGoal.projectId};
+                `;
+            }
+        });
+    } catch (error: any) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', cause: error, message: error?.message });
+    }
 };
