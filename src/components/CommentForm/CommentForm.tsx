@@ -108,7 +108,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     );
 
     useClickOutside(ref, () => {
-        if (!Object.values(control._fields).some((v) => v?._f.value !== '')) {
+        if (!Object.values(control._fields).some((v) => v?._f.value)) {
             onCommentCancel();
         }
     });
