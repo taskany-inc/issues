@@ -33,6 +33,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                         starred={p._isStarred}
                                         watching={p._isWatching}
                                         participants={p.participants}
+                                        averageScore={p.averageScore}
                                     />
                                 </NextLink>
                             )),
