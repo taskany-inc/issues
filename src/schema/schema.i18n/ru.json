@@ -2,6 +2,7 @@
     "Title is required": "",
     "Title must be a string": "",
     "Title must be longer than 1 symbol": "",
+    "Title must be longer than 3 symbol": "",
     "Comments's description is required": "",
     "Comments's description must be a string": "",
     "Comments's description must be longer than 1 symbol": "",

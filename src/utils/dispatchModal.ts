@@ -10,6 +10,7 @@ export enum ModalEvent {
     UserInviteModal = 'UserInviteModal',
     FilterCreateModal = 'FilterCreateModal',
     FilterDeleteModal = 'FilterDeleteModal',
+    FeedbackCreateModal = 'FeedbackCreateModal',
 }
 
 export const dispatchModalEvent = (e: ModalEvent) => () => {
