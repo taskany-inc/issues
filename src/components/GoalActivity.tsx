@@ -96,11 +96,7 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                                         />
                                     )}
                                     {value.subject === 'description' && (
-                                        <HistoryRecordLongTextChange
-                                            from={value.previousValue}
-                                            to={value.nextValue}
-                                            createdAt={value.createdAt}
-                                        />
+                                        <HistoryRecordLongTextChange from={value.previousValue} to={value.nextValue} />
                                     )}
                                     {value.subject === 'title' && (
                                         <HistoryRecordTextChange from={value.previousValue} to={value.nextValue} />
