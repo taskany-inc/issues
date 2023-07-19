@@ -19,6 +19,7 @@ import {
     HistoryRecordState,
     HistoryRecordParticipant,
     HistoryRecordProject,
+    HistoryRecordLongTextChange,
 } from './HistoryRecord/HistoryRecord';
 
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm/CommentCreateForm'));
@@ -94,7 +95,14 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                                             to={excludeString(value.nextValue)}
                                         />
                                     )}
-                                    {(value.subject === 'description' || value.subject === 'title') && (
+                                    {value.subject === 'description' && (
+                                        <HistoryRecordLongTextChange
+                                            from={value.previousValue}
+                                            to={value.nextValue}
+                                            createdAt={value.createdAt}
+                                        />
+                                    )}
+                                    {value.subject === 'title' && (
                                         <HistoryRecordTextChange from={value.previousValue} to={value.nextValue} />
                                     )}
                                     {value.subject === 'estimate' && (
