@@ -10,6 +10,7 @@ export enum ModalEvent {
     UserInviteModal = 'UserInviteModal',
     FilterCreateModal = 'FilterCreateModal',
     FilterDeleteModal = 'FilterDeleteModal',
+    FeedbackCreateModal = 'FeedbackCreateModal',
 }
 
 export interface MapModalToComponentProps {
@@ -25,6 +26,7 @@ export interface MapModalToComponentProps {
     [ModalEvent.UserInviteModal]: unknown;
     [ModalEvent.FilterCreateModal]: unknown;
     [ModalEvent.FilterDeleteModal]: unknown;
+    [ModalEvent.FeedbackCreateModal]: unknown;
 }
 
 interface DispatchModalEvent {

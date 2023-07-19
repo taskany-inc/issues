@@ -13,7 +13,8 @@ type Namespaces =
     | SubscribeNamespacesAction<'goals'>
     | 'userSettingsUpdate'
     | 'tagCreate'
-    | 'userInvite';
+    | 'userInvite'
+    | 'sentFeedback';
 
 export type { Namespaces as NotificationNamespaces };
 
@@ -128,6 +129,10 @@ export const notificationKeyMap: NotificationMap = {
     userSettingsUpdate: {
         success: tr('Voila! Successfully updated 🎉'),
         pending: tr('We are updating user settings'),
+    },
+    sentFeedback: {
+        success: tr('Feedback sent 🎉'),
+        pending: tr('Feedback is formed'),
     },
     clearLSCache: tr('Local cache cleared successfully'),
     error: tr('Something went wrong 😿'),
