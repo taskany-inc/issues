@@ -25,6 +25,7 @@ const GoalCreateForm = dynamic(() => import('./GoalCreateForm/GoalCreateForm'));
 const UserInviteForm = dynamic(() => import('./UserInviteForm/UserInviteForm'));
 const HotkeysModal = dynamic(() => import('./HotkeysModal/HotkeysModal'));
 const NotificationsHub = dynamic(() => import('./NotificationsHub/NotificationsHub'));
+const FeedbackCreateForm = dynamic(() => import('./FeedbackCreateForm/FeedbackCreateForm'));
 
 interface PageProps {
     user: Session['user'];
@@ -98,6 +99,10 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
 
             <ModalOnEvent event={ModalEvent.UserInviteModal} hotkeys={inviteUserKeys}>
                 <UserInviteForm />
+            </ModalOnEvent>
+
+            <ModalOnEvent event={ModalEvent.FeedbackCreateModal}>
+                <FeedbackCreateForm />
             </ModalOnEvent>
 
             <HotkeysModal />
