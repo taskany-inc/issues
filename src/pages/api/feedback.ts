@@ -1,19 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import nextConnect from 'next-connect';
-import type { NextApiResponse } from 'next';
-import Cors from 'cors';
-import { getSession } from 'next-auth/react';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
 
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
-
-const cors = Cors({
-    origin: false,
-    methods: ['HEAD', 'OPTIONS', 'POST'],
-});
+import { authOptions } from '../../utils/auth';
 
 const route = nextConnect({
     onError(error: Error, _, res: NextApiResponse) {
@@ -22,43 +12,38 @@ const route = nextConnect({
     onNoMatch: (_, res: NextApiResponse) => {
         res.status(400).json({ error: 'We are sorry, but it is impossible' });
     },
-}).use(cors);
+});
 
-route.post(async (req: any, res: NextApiResponse) => {
-    const body = await new Promise<string>((resolve, reject) => {
-        let rawData = '';
-        req.on('data', (chunk: string) => {
-            rawData += chunk;
-        });
-        req.on('end', () => {
-            resolve(rawData);
-        });
-        req.on('error', (err: any) => {
-            reject(err);
-        });
-    });
-    const parsedBody = JSON.parse(body);
+route.post(async (req: NextApiRequest, res: NextApiResponse) => {
+    if (!process.env.FEEDBACK_URL) {
+        return res.status(401).json({ error: 'Feedback url is not set' });
+    }
+
+    const { body: parsedBody } = req;
 
     parsedBody.userAgent = req.headers['user-agent'];
 
-    const session = await getSession({ req });
-    if (session) {
-        const { name, email, image } = session.user;
-        parsedBody.name = name;
-        parsedBody.email = email;
-        parsedBody.avatarUrl = image;
-    }
-    if (process.env.FEEDBACK_URL) {
-        await fetch(process.env.FEEDBACK_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(parsedBody),
-        });
+    const session = await getServerSession(req, res, authOptions);
+    console.log('user', session);
+
+    if (!session?.user) {
+        return res.status(403).json({ error: 'User is not authorized' });
     }
 
-    return res;
+    const { name, email, image } = session.user;
+    parsedBody.name = name;
+    parsedBody.email = email;
+    parsedBody.avatarUrl = image;
+
+    const feedbackResponse = await fetch(process.env.FEEDBACK_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(parsedBody),
+    });
+
+    return res.status(feedbackResponse.status).send(feedbackResponse.body);
 });
 
 export default route;

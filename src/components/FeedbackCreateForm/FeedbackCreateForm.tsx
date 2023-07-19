@@ -22,17 +22,31 @@ const FeedbackCreateForm: React.FC = () => {
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
 
-    const onPending = useCallback((form: CreateFeedback) => {
+    const onPending = useCallback(async (form: CreateFeedback) => {
         setFormBusy(true);
-        fetch('/api/feedback', {
-            method: 'POST',
-            body: JSON.stringify({
-                title: form.title,
-                description: form.description,
-                href: window.location.href,
-            }),
-        });
-        dispatchModalEvent(ModalEvent.FeedbackCreateModal)();
+        try {
+            const res = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    title: form.title,
+                    description: form.description,
+                    href: window.location.href,
+                }),
+            });
+            console.log('resp', res);
+            if (res.status < 400) {
+                dispatchModalEvent(ModalEvent.FeedbackCreateModal)();
+            } else {
+                throw new Error('Request error', { cause: res });
+            }
+        } catch (e) {
+            console.log('request error: ', e);
+        }
+        setFormBusy(false);
     }, []);
 
     const onError = useCallback((err: typeof errors) => {
