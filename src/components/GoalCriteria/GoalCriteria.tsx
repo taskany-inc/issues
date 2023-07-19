@@ -246,7 +246,7 @@ const criteriaGuard = (props: GoalCriteriaItemProps): props is CriteriaAsGoalPro
 
 type CriteriaActionItem = {
     label: string;
-    onClick: () => void;
+    handler: () => void;
     color?: string;
     icon: React.ReactNode;
 };
@@ -293,7 +293,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
             actions.push({
                 label: tr('Create as goal'),
                 icon: <IconTargetOutline size="xxs" />,
-                onClick: onConvertToGoal,
+                handler: onConvertToGoal,
             });
         }
 
@@ -301,11 +301,15 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
             label: tr('Delete'),
             icon: <IconXCircleSolid size="xxs" />,
             color: danger0,
-            onClick: onRemove,
+            handler: onRemove,
         });
 
         return actions;
     }, [canEdit, onRemove, props, onConvertToGoal]);
+
+    const handleChange = useCallback((val: CriteriaActionItem) => {
+        val.handler();
+    }, []);
 
     return (
         <StyledTableRow>
@@ -342,12 +346,13 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = memo((props) => {
             <ContentItem>
                 {nullable(availableActions, (actions) => (
                     <Dropdown
+                        onChange={handleChange}
                         renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
                         items={actions}
                         renderItem={(props) => (
                             <MenuItem
                                 key={props.index}
-                                onClick={props.item.onClick}
+                                onClick={props.onClick}
                                 icon={props.item.icon}
                                 ghost
                                 color={props.item.color}
