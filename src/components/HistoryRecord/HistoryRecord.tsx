@@ -31,12 +31,6 @@ interface HistoryChangeProps<T> {
     to?: T | null;
 }
 
-interface HistoryRecordTextChangeProps<T> {
-    from?: T | null;
-    to?: T | null;
-    createdAt: Date;
-}
-
 const StyledActivityFeedItem = styled(ActivityFeedItem)`
     align-items: flex-start;
     grid-template-columns: 24px 1fr;
@@ -85,14 +79,15 @@ const StyledText = styled(Text)<{ strike?: boolean }>`
         `}
 `;
 
-const StyledTextWrapper = styled.div<{ description?: boolean }>`
+const StyledTextWrapper = styled.div<{ multiline?: boolean }>`
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.25em;
     flex: 1;
-    ${({ description }) =>
-        description &&
+
+    ${({ multiline }) =>
+        multiline &&
         css`
             align-items: flex-start;
         `}
@@ -116,6 +111,10 @@ const StyledButton = styled(Button)`
     bottom: 5px;
 `;
 
+const StyledFlexReset = styled.div`
+    width: 100%;
+`;
+
 interface HistoryRecordContext {
     setActionText: (value: SetStateAction<HistoryAction>) => void;
 }
@@ -132,17 +131,50 @@ export const HistorySimplifyRecord: React.FC<{ withPretext?: boolean } & History
     <>
         {nullable(from, (val) => (
             <>
-                {withPretext && <Text size="xs">{tr('from')}</Text>}
+                {nullable(withPretext, () => (
+                    <Text size="xs">{tr('from')}</Text>
+                ))}
                 {val}
             </>
         ))}
         {nullable(to, (val) => (
             <>
-                {withPretext && <Text size="xs">{tr('to')}</Text>}
+                {nullable(withPretext, () => (
+                    <Text size="xs">{tr('to')}</Text>
+                ))}
                 {val}
             </>
         ))}
     </>
+);
+
+export const HistoryMultilineRecord: React.FC<{ withPretext?: boolean } & HistoryChangeProps<React.ReactNode>> = ({
+    from,
+    to,
+    withPretext = true,
+}) => (
+    <StyledFlexReset>
+        {nullable(from, (val) => (
+            <div>
+                {nullable(withPretext, () => (
+                    <Text as="span" size="xs">
+                        {tr('from')}:{' '}
+                    </Text>
+                ))}
+                {val}
+            </div>
+        ))}
+        {nullable(to, (val) => (
+            <div>
+                {nullable(withPretext, () => (
+                    <Text as="span" size="xs">
+                        {tr('to')}:{' '}
+                    </Text>
+                ))}
+                {val}
+            </div>
+        ))}
+    </StyledFlexReset>
 );
 
 export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, action, createdAt, children }) => {
@@ -168,26 +200,27 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
     }, []);
 
     const [actionText, setActionText] = useState(action);
-    const isDescription = subject.toString() === 'description';
+
     return (
         <StyledActivityFeedItem>
             <RecordCtx.Provider value={{ setActionText }}>
                 <StyledIcon size="m" color={gray7} />
                 <StyledHistoryRecordWrapper>
                     <UserPic size={18} src={author?.image} email={author?.email} />
-                    <StyledTextWrapper description={isDescription}>
+                    <StyledTextWrapper multiline={subject.toString() === 'description'}>
                         <Text size="xs" weight="bold">
                             {author?.nickname ?? author?.name ?? author?.email}
                         </Text>
+
                         <Text size="xs">
                             {translates[actionText]} {translates[subject]}
                         </Text>
+
                         {children}
-                        {!isDescription && (
-                            <Text size="xs">
-                                <RelativeTime date={createdAt} />
-                            </Text>
-                        )}
+
+                        <Text size="xs">
+                            <RelativeTime date={createdAt} />
+                        </Text>
                     </StyledTextWrapper>
                 </StyledHistoryRecordWrapper>
             </RecordCtx.Provider>
@@ -259,35 +292,36 @@ export const HistoryRecordProject: React.FC<HistoryChangeProps<Project>> = ({ fr
     />
 );
 
-export const HistoryRecordLongTextChange: React.FC<HistoryRecordTextChangeProps<string>> = ({
-    from,
-    to,
-    createdAt,
-}) => {
+export const HistoryRecordLongTextChange: React.FC<HistoryChangeProps<string>> = ({ from, to }) => {
     const [viewDestiption, setViewDescription] = useState(false);
 
     const handlerViewDescription = () => {
         setViewDescription(!viewDestiption);
     };
+
     return (
         <>
-            <Text size="xs">
-                <RelativeTime date={createdAt} />
-            </Text>
+            <StyledButton
+                ghost={!viewDestiption}
+                outline={viewDestiption}
+                iconRight={<StyledDescriptionIcon size="xs" />}
+                onClick={handlerViewDescription}
+            />
+
             {viewDestiption && (
-                <HistorySimplifyRecord
+                <HistoryMultilineRecord
                     from={nullable(from, () => (
-                        <StyledText size="xs" strike>
+                        <StyledText as="span" size="xs" strike>
                             {from}
                         </StyledText>
                     ))}
                     to={nullable(to, () => (
-                        <StyledText size="xs">{to}</StyledText>
+                        <StyledText as="span" size="xs">
+                            {to}
+                        </StyledText>
                     ))}
                 />
             )}
-
-            <StyledButton outline iconRight={<StyledDescriptionIcon size="xs" />} onClick={handlerViewDescription} />
         </>
     );
 };
