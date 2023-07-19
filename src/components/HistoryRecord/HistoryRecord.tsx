@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, SetStateAction, useMemo } from 'react';
 import { User, Tag as TagData, Estimate, State as StateData, Activity, Project } from '@prisma/client';
 import styled, { css } from 'styled-components';
-import { UserPic, Text, Tag, nullable, DoubleCaretRightCircleIcon } from '@taskany/bricks';
+import { UserPic, Text, Tag, nullable, DoubleCaretRightCircleIcon, DividerLineIcon, Button } from '@taskany/bricks';
 import { backgroundColor, gray7 } from '@taskany/colors';
 
 import { ActivityFeedItem } from '../ActivityFeed';
@@ -29,6 +29,12 @@ interface HistoryRecordProps {
 interface HistoryChangeProps<T> {
     from?: T | null;
     to?: T | null;
+}
+
+interface HistoryRecordTextChangeProps<T> {
+    from?: T | null;
+    to?: T | null;
+    createdAt: Date;
 }
 
 const StyledActivityFeedItem = styled(ActivityFeedItem)`
@@ -79,12 +85,17 @@ const StyledText = styled(Text)<{ strike?: boolean }>`
         `}
 `;
 
-const StyledTextWrapper = styled.div`
+const StyledTextWrapper = styled.div<{ description?: boolean }>`
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.25em;
     flex: 1;
+    ${({ description }) =>
+        description &&
+        css`
+            align-items: flex-start;
+        `}
 `;
 
 const StyledIcon = styled(DoubleCaretRightCircleIcon)`
@@ -95,6 +106,14 @@ const StyledIcon = styled(DoubleCaretRightCircleIcon)`
     align-items: center;
     overflow: hidden;
     transform: translateY(-3px);
+`;
+
+const StyledDescriptionIcon = styled(DividerLineIcon)`
+    margin-top: 5px;
+`;
+
+const StyledButton = styled(Button)`
+    bottom: 5px;
 `;
 
 interface HistoryRecordContext {
@@ -149,14 +168,14 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
     }, []);
 
     const [actionText, setActionText] = useState(action);
-
+    const isDescription = subject.toString() === 'description';
     return (
         <StyledActivityFeedItem>
             <RecordCtx.Provider value={{ setActionText }}>
                 <StyledIcon size="m" color={gray7} />
                 <StyledHistoryRecordWrapper>
                     <UserPic size={18} src={author?.image} email={author?.email} />
-                    <StyledTextWrapper>
+                    <StyledTextWrapper description={isDescription}>
                         <Text size="xs" weight="bold">
                             {author?.nickname ?? author?.name ?? author?.email}
                         </Text>
@@ -164,9 +183,11 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
                             {translates[actionText]} {translates[subject]}
                         </Text>
                         {children}
-                        <Text size="xs">
-                            <RelativeTime date={createdAt} />
-                        </Text>
+                        {!isDescription && (
+                            <Text size="xs">
+                                <RelativeTime date={createdAt} />
+                            </Text>
+                        )}
                     </StyledTextWrapper>
                 </StyledHistoryRecordWrapper>
             </RecordCtx.Provider>
@@ -238,18 +259,53 @@ export const HistoryRecordProject: React.FC<HistoryChangeProps<Project>> = ({ fr
     />
 );
 
-export const HistoryRecordTextChange: React.FC<HistoryChangeProps<string>> = ({ from, to }) => (
-    <HistorySimplifyRecord
-        from={
-            from ? (
+export const HistoryRecordLongTextChange: React.FC<HistoryRecordTextChangeProps<string>> = ({
+    from,
+    to,
+    createdAt,
+}) => {
+    const [viewDestiption, setViewDescription] = useState(false);
+
+    const handlerViewDescription = () => {
+        setViewDescription(!viewDestiption);
+    };
+    return (
+        <>
+            <Text size="xs">
+                <RelativeTime date={createdAt} />
+            </Text>
+            {viewDestiption && (
+                <HistorySimplifyRecord
+                    from={nullable(from, () => (
+                        <StyledText size="xs" strike>
+                            {from}
+                        </StyledText>
+                    ))}
+                    to={nullable(to, () => (
+                        <StyledText size="xs">{to}</StyledText>
+                    ))}
+                />
+            )}
+
+            <StyledButton outline iconRight={<StyledDescriptionIcon size="xs" />} onClick={handlerViewDescription} />
+        </>
+    );
+};
+
+export const HistoryRecordTextChange: React.FC<HistoryChangeProps<string>> = ({ from, to }) => {
+    return (
+        <HistorySimplifyRecord
+            from={nullable(from, () => (
                 <StyledText size="xs" strike>
                     {from}
                 </StyledText>
-            ) : null
-        }
-        to={to ? <StyledText size="xs">{to}</StyledText> : null}
-    />
-);
+            ))}
+            to={nullable(to, () => (
+                <StyledText size="xs">{to}</StyledText>
+            ))}
+        />
+    );
+};
 
 export const HistoryRecordPriority: React.FC<HistoryChangeProps<Priority>> = ({ from, to }) => (
     <HistorySimplifyRecord
