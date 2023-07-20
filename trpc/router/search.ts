@@ -10,17 +10,26 @@ export const search = router({
             prisma.goal.findMany({
                 take: 5,
                 where: {
-                    OR: [
+                    AND: [
                         {
-                            title: {
-                                contains: input,
-                                mode: 'insensitive',
-                            },
+                            OR: [
+                                {
+                                    title: {
+                                        contains: input,
+                                        mode: 'insensitive',
+                                    },
+                                },
+                                {
+                                    description: {
+                                        contains: input,
+                                        mode: 'insensitive',
+                                    },
+                                },
+                            ],
                         },
                         {
-                            description: {
-                                contains: input,
-                                mode: 'insensitive',
+                            archived: {
+                                not: true,
                             },
                         },
                     ],
