@@ -253,9 +253,9 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                     <IssueTitle title={goal.title} />
 
-                    {nullable(goal.state, (s) =>
-                        goal._isEditable ? (
-                            <StateSwitch state={s} flowId={project?.flowId} onClick={onGoalStateChange} />
+                    {nullable(goal?.state, (s) =>
+                        goal._isEditable && project?.flowId ? (
+                            <StateSwitch state={s} flowId={project.flowId} onClick={onGoalStateChange} />
                         ) : (
                             <State title={s.title} hue={s.hue} />
                         ),

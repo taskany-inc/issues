@@ -20,7 +20,7 @@ interface StateObject {
 
 interface StateSwitchProps {
     state: StateObject;
-    flowId?: string;
+    flowId: string;
 
     onClick?: (val: StateObject) => void;
 }
@@ -37,7 +37,7 @@ const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => 
     const upPress = useKeyPress('ArrowUp');
     const [cursor, setCursor] = useState<number>();
 
-    const flowById = flowId ? trpc.flow.getById.useQuery(flowId) : undefined;
+    const flowById = trpc.flow.getById.useQuery(flowId);
 
     const onClickOutside = useCallback(() => {
         setPopupVisibility(false);
