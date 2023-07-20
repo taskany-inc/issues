@@ -77,10 +77,10 @@ export const CommentForm: React.FC<CommentFormProps> = ({
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
-        defaultValues: {
-            id,
+        values: {
             goalId,
             stateId,
+            id,
             description,
         },
     });
