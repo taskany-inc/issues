@@ -18,8 +18,8 @@ export const toggleGoalDependencySchema = z.object({
     id: z.string().optional(),
     kind: z.nativeEnum(dependencyKind),
     relation: z.object({
-        id: z.string().cuid({
-            message: tr('Choose a dependency'),
+        id: z.string({
+            required_error: tr('Choose a dependency'),
         }),
     }),
 });
