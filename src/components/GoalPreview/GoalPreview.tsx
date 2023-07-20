@@ -235,8 +235,8 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
                     <StyledImportantActions>
                         <StyledPublicActions>
                             {nullable(goal?.state, (s) =>
-                                goal?._isEditable ? (
-                                    <StateSwitch state={s} flowId={goal?.project?.flowId} onClick={onGoalStateChange} />
+                                goal?._isEditable && goal.project?.flowId ? (
+                                    <StateSwitch state={s} flowId={goal.project?.flowId} onClick={onGoalStateChange} />
                                 ) : (
                                     <State title={s.title} hue={s.hue} />
                                 ),
