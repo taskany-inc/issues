@@ -2,7 +2,17 @@ import { useCallback, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
-import { Form, FormInput, FormActions, FormAction, ModalContent, Tag, nullable } from '@taskany/bricks';
+import {
+    Form,
+    FormInput,
+    FormActions,
+    FormAction,
+    ModalContent,
+    Tag,
+    nullable,
+    Button,
+    FlowIcon,
+} from '@taskany/bricks';
 import { Estimate, State, Tag as TagModel } from '@prisma/client';
 
 import { FormEditor } from '../FormEditor/FormEditor';
@@ -186,19 +196,23 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             )}
                         />
 
-                        <Controller
-                            name="state"
-                            control={control}
-                            render={({ field }) => (
-                                <StateDropdown
-                                    text={tr('State')}
-                                    flowId={parentWatcher?.flowId}
-                                    error={errorsResolver(field.name)}
-                                    disabled={busy}
-                                    {...field}
-                                />
-                            )}
-                        />
+                        {parentWatcher?.flowId ? (
+                            <Controller
+                                name="state"
+                                control={control}
+                                render={({ field }) => (
+                                    <StateDropdown
+                                        text={tr('State')}
+                                        flowId={parentWatcher.flowId}
+                                        error={errorsResolver(field.name)}
+                                        disabled={busy}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        ) : (
+                            <Button text={tr('State')} iconLeft={<FlowIcon noWrap size="xs" />} disabled />
+                        )}
 
                         <Controller
                             name="tags"
