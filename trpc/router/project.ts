@@ -1,5 +1,5 @@
+import { Activity, Prisma, Project, User } from '@prisma/client';
 import z from 'zod';
-import { Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { prisma } from '../../src/utils/prisma';
@@ -117,20 +117,125 @@ export const project = router({
                 })
                 .optional(),
         )
-        .query(({ ctx, input: { firstLevel, goalsQuery } = {} }) =>
-            prisma.project
-                .findMany({
-                    orderBy: {
-                        createdAt: 'asc',
+        .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
+            let result = [];
+            // const hasQueries = Object.values(goalsQuery || {}).some((i) =>
+            //     typeof i === 'object' ? Object.keys(i).length : !!i && i.toString().length,
+            // );
+
+            // if (!hasQueries) {
+            const [projects, watchers, stargizers] = await Promise.all([
+                prisma.$queryRaw`
+                        select
+                            p.id,
+                            p.title,
+                            p.description,
+                            p."flowId",
+                            p."createdAt",
+                            p."updatedAt",
+                            p."activityId",
+                            count(g) as "goalsCount"
+                        from "Project" as p
+                        left join "Goal" as g on p.id = g."projectId"
+                        group by p.id
+                        order by max(g."updatedAt") desc
+            ` as Promise<NonNullable<(Project & { goalsCount: number })[]>>,
+                prisma.$queryRaw`
+                        select pw."A" as id, pw."B" as "projectId"
+                        from "_projectWatchers" as pw
+                        where pw."A" in (${ctx.session.user.activityId})
+            ` as Promise<{ id: string; projectId: string }[]>,
+                prisma.$queryRaw`
+                        select ps."A" as id, ps."B" as "projectId"
+                        from "_projectStargizers" as ps
+                        where ps."A" in (${ctx.session.user.activityId})
+            ` as Promise<{ id: string; projectId: string }[]>,
+            ]);
+
+            const activities = (
+                (await prisma.$queryRaw`
+                select *
+                from "Activity" as a
+                left join "User" as u on u."activityId" = a.id
+            `) as NonNullable<(Activity & { activityId: string; user: User })[]>
+            ).reduce((acc, { ghostId, settingsId, createdAt, updatedAt, ...rest }) => {
+                acc[rest.activityId] = {
+                    id: rest.activityId,
+                    createdAt,
+                    ghostId,
+                    settingsId,
+                    updatedAt,
+                    user: rest as unknown as User,
+                };
+                return acc;
+            }, {} as Record<string, NonNullable<Activity & { user: User }>>);
+
+            const projectsDict = projects.reduce((acc, { goalsCount, ...project }) => {
+                acc[project.id] = {
+                    ...project,
+                    watchers: [],
+                    stargizers: [],
+                    parent: [],
+                    tags: [],
+                    children: [],
+                    participants: [],
+                    activity: activities[project.activityId],
+                    _count: {
+                        watchers: 0,
+                        stargizers: 0,
+                        goals: Number(goalsCount),
+                        participants: 0,
+                        children: 0,
+                        parent: 0,
                     },
-                    ...getProjectSchema({
-                        activityId: ctx.session.user.activityId,
-                        goalsQuery,
-                        firstLevel,
-                    }),
-                })
-                .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId))),
-        ),
+                };
+                return acc;
+            }, {} as Record<string, any>);
+
+            for (let i = 0; i < Math.max(watchers.length, stargizers.length); i++) {
+                const watcher = watchers[i];
+                const stargizer = stargizers[i];
+
+                if (watcher && watcher.projectId in projectsDict) {
+                    const cur = projectsDict[watcher.projectId];
+                    cur.watchers.push(watcher);
+                    cur._count = { ...cur._count, watchers: (cur._count.watchers += 1) };
+                }
+
+                if (stargizer && stargizer.projectId in projectsDict) {
+                    const cur = projectsDict[stargizer.projectId];
+                    cur.stargizers.push(stargizer);
+                    cur._count = { ...cur._count, stargizers: (cur._count.stargizers += 1) };
+                }
+            }
+
+            result = Object.values(projectsDict);
+            // } else {
+            //     result = await prisma.project.findMany({
+            //         ...getProjectSchema({
+            //             activityId: ctx.session.user.activityId,
+            //             goalsQuery,
+            //             firstLevel,
+            //         }),
+            //     });
+            // }
+
+            return result?.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId));
+        }),
+
+    // .query(
+    //     ({ ctx, input: { firstLevel, goalsQuery } = {} }) =>
+    //     prisma.project.findMany({
+    // ...getProjectSchema({
+    //     activityId: ctx.session.user.activityId,
+    //     goalsQuery,
+    //     firstLevel,
+    // }),
+    // })
+    // .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId));
+    // }),
+    // ),
+
     getTop: protectedProcedure
         .input(
             z
@@ -280,11 +385,11 @@ export const project = router({
                 });
 
                 // await mailServer.sendMail({
-                //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
+                //     from: `"Fred Foo 👻" < ${ process.env.MAIL_USER }> `,
                 //     to: 'bar@example.com, baz@example.com',
                 //     subject: 'Hello ✔',
                 //     text: `new post '${title}'`,
-                //     html: `new post <b>${title}</b>`,
+                //     html: `new post < b > ${ title } </>`,
                 // });
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
