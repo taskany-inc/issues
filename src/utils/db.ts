@@ -19,18 +19,17 @@ export const findOrCreateEstimate = async (
         return null;
     }
 
-    let currentEstimate = { ...estimate };
-
     if (estimate.id == null) {
-        const { id: _, ...whereParams } = currentEstimate;
+        const { id: _, q = null, date = null, ...whereParams } = estimate;
+
         const realEstimate = await prisma.estimate.findFirst({
-            where: whereParams,
+            where: { q, date, ...whereParams },
         });
 
         if (realEstimate) {
-            currentEstimate.id = realEstimate.id;
+            estimate.id = realEstimate.id;
         } else {
-            currentEstimate = await prisma.estimate.create({
+            estimate = await prisma.estimate.create({
                 data: {
                     date: estimate.date,
                     y: estimate.y,
@@ -42,7 +41,7 @@ export const findOrCreateEstimate = async (
         }
     }
 
-    return currentEstimate;
+    return estimate;
 };
 
 /**
