@@ -349,9 +349,10 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                             ))}
 
                             <>
-                                {relations.map((deps) =>
+                                {relations.map((deps, depIdx) =>
                                     nullable(deps.goals.length || _isEditable, () => (
                                         <GoalDependencyListByKind
+                                            showBeta={depIdx === 0}
                                             goalId={id}
                                             key={deps.kind}
                                             kind={deps.kind}

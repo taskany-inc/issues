@@ -1,6 +1,8 @@
 import React, { MouseEventHandler, useMemo } from 'react';
 import NextLink from 'next/link';
-import { nullable, GoalIcon } from '@taskany/bricks';
+import styled, { css } from 'styled-components';
+import { nullable, GoalIcon, Dropdown, MenuItem } from '@taskany/bricks';
+import { IconMoreVerticalOutline } from '@taskany/icons';
 import type { Estimate, State as StateType } from '@prisma/client';
 
 import { routes } from '../hooks/router';
@@ -10,7 +12,7 @@ import { estimateToString } from '../utils/estimateToString';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
-import { TableRow, ContentItem, TitleItem, TitleContainer, Title, TextItem } from './Table';
+import { TableRow, ContentItem, TitleItem, TitleContainer, Title, TextItem, Cell } from './Table';
 import { StateDot } from './StateDot';
 
 interface CommonGoalListItemCompactProps {
@@ -79,12 +81,10 @@ export const GoalListItemCompact: React.FC<GoalListItemCompactProps> = React.mem
     },
 );
 
-type ColumnRenderProps<T extends GoalListItemCompactProps> = Omit<
-    T,
-    'onClick' | 'className' | 'focused' | 'owner' | 'issuer'
-> & {
-    issuers: Array<ActivityByIdReturnType>;
-};
+type ColumnRenderProps<T extends Record<string, any>> = T &
+    Omit<GoalListItemCompactProps, 'onClick' | 'className' | 'focused' | 'owner' | 'issuer'> & {
+        issuers: Array<ActivityByIdReturnType>;
+    };
 
 type GoalListItemCompactColumnProps<T = any> = {
     name: 'icon' | 'title' | 'state' | 'priority' | 'projectId' | 'issuers' | 'estimate' | string;
@@ -92,8 +92,20 @@ type GoalListItemCompactColumnProps<T = any> = {
     columnProps?: React.ComponentProps<typeof ContentItem>;
 };
 
-interface GoalListItemCompactCustomizeProps<T extends GoalListItemCompactProps> {
-    item: T;
+interface GoalItemAction {
+    label: string;
+    handler: () => void;
+    color?: string;
+    icon: React.ReactNode;
+}
+
+type CanBeNullableValue<T> = { [K in keyof T]?: T[K] | null };
+
+interface GoalListItemCompactCustomizeProps<T extends Record<string, any>> {
+    item: T & CanBeNullableValue<CommonGoalListItemCompactProps>;
+    rowIcon?: React.ReactNode;
+    actions?: Array<GoalItemAction>;
+    onActionClick?: <A extends NonNullable<GoalListItemCompactCustomizeProps<T>['actions']>[number]>(action: A) => void;
     columns: Array<GoalListItemCompactColumnProps<ColumnRenderProps<T>>>;
     onClick?: React.MouseEventHandler;
     focused?: boolean;
@@ -102,17 +114,37 @@ interface GoalListItemCompactCustomizeProps<T extends GoalListItemCompactProps> 
 }
 
 interface GoalListItemCompactCustomizeRender {
-    <T extends GoalListItemCompactProps>(props: GoalListItemCompactCustomizeProps<T>): React.ReactElement<T>;
+    <T extends Record<string, any>>(props: GoalListItemCompactCustomizeProps<T>): React.ReactElement<T>;
 }
 
 interface RenderColumnProps<T> {
     col: GoalListItemCompactColumnProps;
-    componentProps: T;
+    componentProps: CanBeNullableValue<T>;
 }
 
 interface ColumnRender {
     <T extends GoalListItemCompactProps>(props: RenderColumnProps<T>): React.ReactElement | null;
 }
+
+const StyledCell = styled(Cell)<{ forIcon?: boolean }>`
+    display: inline-flex;
+    align-items: baseline;
+    padding: 0;
+
+    ${({ forIcon }) =>
+        forIcon &&
+        css`
+            &:first-child,
+            &:last-child {
+                padding: 0;
+                /* align icon be center of first line in title */
+                padding-top: 4px;
+            }
+
+            /* align icon be center of first line in title */
+            padding-top: 4px;
+        `}
+`;
 
 const Column: ColumnRender = ({ col, componentProps }) => {
     const issuers = useMemo(() => {
@@ -132,56 +164,49 @@ const Column: ColumnRender = ({ col, componentProps }) => {
 
     const columnProps = col.columnProps == null ? {} : col.columnProps;
 
+    let content: React.ReactNode;
+
     switch (col.name) {
         case 'title':
-            return (
-                <TitleItem {...columnProps}>
-                    <TitleContainer>
-                        <Title size="s" weight="bold">
-                            {title}
-                        </Title>
-                    </TitleContainer>
-                </TitleItem>
+            content = (
+                <Title size="s" weight="bold">
+                    {title}
+                </Title>
             );
+            break;
         case 'state':
-            return (
-                <ContentItem {...columnProps}>
-                    {nullable(state, (s) => (
-                        <StateDot size="m" title={s?.title} hue={s?.hue} />
-                    ))}
-                </ContentItem>
-            );
+            content = nullable(state, (s) => <StateDot size="m" title={s?.title} hue={s?.hue} />);
+            break;
         case 'priority':
-            return (
-                <ContentItem {...columnProps}>
-                    <TextItem weight="regular">{getPriorityText(priority as Priority)}</TextItem>
-                </ContentItem>
-            );
+            content = nullable(priority as Priority | null, (p) => (
+                <TextItem weight="regular">{getPriorityText(p)}</TextItem>
+            ));
+            break;
         case 'projectId':
-            return (
-                <ContentItem {...columnProps}>
-                    <TextItem>{projectId}</TextItem>
-                </ContentItem>
-            );
+            content = nullable(projectId, (id) => <TextItem>{id}</TextItem>);
+            break;
         case 'issuers':
-            return (
-                <ContentItem align="center" {...columnProps}>
-                    <UserGroup users={issuers} />
-                </ContentItem>
-            );
+            content = nullable(issuers, (list) => <UserGroup users={list} />);
+            break;
         case 'estimate':
-            return (
-                <ContentItem {...columnProps}>
-                    <TextItem>{nullable(estimate, (e) => estimateToString(e))}</TextItem>
-                </ContentItem>
-            );
+            content = nullable(estimate, (e) => <TextItem>{estimateToString(e)}</TextItem>);
+            break;
         default:
             return null;
     }
+
+    return (
+        <StyledCell {...columnProps} forIcon={col.name === 'state'}>
+            {content}
+        </StyledCell>
+    );
 };
 
 export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = ({
     columns,
+    actions,
+    rowIcon,
+    onActionClick,
     forwardedAs,
     onClick,
     className,
@@ -190,12 +215,34 @@ export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = 
 }) => {
     return (
         <TableRow as={forwardedAs} onClick={onClick} className={className} focused={focused}>
-            <ContentItem key="icon">
-                <GoalIcon size="s" />
-            </ContentItem>
+            <StyledCell key="icon" forIcon>
+                {rowIcon || <GoalIcon size="s" />}
+            </StyledCell>
             {columns.map((col) => (
                 <Column key={col.name} col={col} componentProps={item} />
             ))}
+            <StyledCell key="actions" forIcon>
+                {nullable(actions, (list) => (
+                    <Dropdown
+                        onChange={onActionClick}
+                        renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
+                        items={list}
+                        renderItem={(props) => (
+                            <MenuItem
+                                key={props.index}
+                                onClick={props.onClick}
+                                icon={props.item.icon}
+                                ghost
+                                color={props.item.color}
+                            >
+                                {props.item.label}
+                            </MenuItem>
+                        )}
+                    />
+                ))}
+            </StyledCell>
         </TableRow>
     );
 };
+
+export const CustomCell = StyledCell;

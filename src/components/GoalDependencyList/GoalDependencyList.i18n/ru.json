@@ -1,5 +1,6 @@
 {
-    "blocks": "Блокируют",
+    "blocks": "Блокирует",
     "dependsOn": "Зависит от",
-    "relatesTo": "Связана с"
+    "relatesTo": "Связана с",
+    "Delete": "Удалить"
 }
