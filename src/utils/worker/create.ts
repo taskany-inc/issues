@@ -1,6 +1,6 @@
 import { prisma } from '../prisma';
 
-import { EmailTemplatesPropsMap } from './mail/templates';
+import * as templates from './mail/templates';
 
 export enum jobState {
     scheduled = 'scheduled',
@@ -12,9 +12,11 @@ export enum jobKind {
     email = 'email',
 }
 
+type Templates = typeof templates;
+
 export interface JobDataMap {
     email: {
-        template: keyof EmailTemplatesPropsMap;
+        template: keyof Templates;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: any;
     };
@@ -42,7 +44,7 @@ export function createJob<K extends keyof JobDataMap>(kind: K, { data, priority,
     });
 }
 
-export function createEmailJob<T extends keyof EmailTemplatesPropsMap>(template: T, data: EmailTemplatesPropsMap[T]) {
+export function createEmailJob<T extends keyof typeof templates>(template: T, data: Parameters<Templates[T]>[number]) {
     return createJob('email', {
         data: {
             template,
