@@ -403,9 +403,13 @@ export const HistoryRecordState: React.FC<HistoryChangeProps<StateData>> = ({ fr
     />
 );
 
-const HistoryParticipant: React.FC<{ name?: string | null; pic?: string | null }> = ({ name = 'unknown', pic }) => (
+const HistoryParticipant: React.FC<{ name?: string | null; pic?: string | null; email?: string | null }> = ({
+    name = 'unknown',
+    pic,
+    email,
+}) => (
     <>
-        <UserPic src={pic} size={18} />
+        <UserPic src={pic} size={18} email={email} />
         <Text size="xs" weight="bold">
             {name}
         </Text>
@@ -422,13 +426,18 @@ export const HistoryRecordParticipant: React.FC<HistoryChangeProps<Activity & { 
             from ? (
                 <HistoryParticipant
                     name={from.user?.nickname ?? from.user?.name ?? from.user?.email}
+                    email={from.user?.email}
                     pic={from.user?.image}
                 />
             ) : null
         }
         to={
             to ? (
-                <HistoryParticipant name={to.user?.nickname ?? to.user?.name ?? to.user?.email} pic={to.user?.image} />
+                <HistoryParticipant
+                    name={to.user?.nickname ?? to.user?.name ?? to.user?.email}
+                    pic={to.user?.image}
+                    email={to.user?.email}
+                />
             ) : null
         }
     />
