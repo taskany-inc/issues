@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormInput, PlusIcon, Button } from '@taskany/bricks';
+import { FormInput, Button } from '@taskany/bricks';
 import { gray7 } from '@taskany/colors';
+import { IconTargetOutline, IconPlusCircleOutline } from '@taskany/icons';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
@@ -25,6 +26,11 @@ const StyledFormInput = styled(FormInput)`
 
 const StyledInlineTrigger = styled(InlineTrigger)`
     line-height: 28px;
+`;
+
+const StyledTableRow = styled.div`
+    display: grid;
+    grid-template-columns: 35px minmax(calc(240px), 20%) max-content;
 `;
 
 interface GoalDependencyAddFormProps {
@@ -99,7 +105,7 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
             renderTrigger={(props) => (
                 <StyledInlineTrigger
                     text={isEmpty ? translate[kind] : translate.default}
-                    icon={<PlusIcon noWrap size="s" />}
+                    icon={<IconPlusCircleOutline noWrap size="s" />}
                     {...props}
                 />
             )}
@@ -107,21 +113,32 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
             onSubmit={handleSubmit(onSubmit)}
             onReset={resetFormHandler}
         >
-            <GoalSuggest
-                value={query}
-                onChange={handleGoalSelect}
-                renderInput={(inputProps) => (
-                    <StyledFormInput
-                        autoFocus
-                        autoComplete="off"
-                        onChange={handleInputChange}
-                        brick="right"
-                        error={errors.relation?.id}
-                        {...inputProps}
-                    />
-                )}
-            />
-            <Button text={tr('Add')} brick="left" type="submit" view="primary" outline />
+            <StyledTableRow>
+                <Button
+                    type="button"
+                    view="primary"
+                    brick="right"
+                    outline
+                    iconLeft={<IconTargetOutline size="xs" noWrap />}
+                />
+                <GoalSuggest
+                    value={selected ? undefined : query}
+                    showSuggest={!selected}
+                    onChange={handleGoalSelect}
+                    renderInput={(inputProps) => (
+                        <StyledFormInput
+                            autoFocus
+                            autoComplete="off"
+                            onChange={handleInputChange}
+                            brick="center"
+                            error={errors.relation?.id}
+                            {...inputProps}
+                            value={inputProps.value || query}
+                        />
+                    )}
+                />
+                <Button text={tr('Add')} brick="left" type="submit" view="primary" outline />
+            </StyledTableRow>
             <input type="hidden" {...register('relation.id')} />
             <input type="hidden" {...register('id')} />
             <input type="hidden" {...register('kind')} />

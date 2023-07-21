@@ -21,6 +21,7 @@ const StyledTable = styled(Table)`
 interface GoalSuggestProps {
     onChange: (val: any) => void;
     value?: string;
+    showSuggest?: boolean;
     renderInput: React.ComponentProps<typeof ComboBox>['renderInput'];
 }
 
@@ -83,11 +84,11 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
 };
 
 export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
-    ({ onChange, value = '', renderInput }, ref) => {
-        const [visible, setVisible] = useState(false);
+    ({ onChange, value, renderInput, showSuggest }, ref) => {
+        const [visible, setVisible] = useState(showSuggest);
 
         const { data: items = [] } = trpc.goal.suggestions.useQuery(
-            { input: value, limit: 5 },
+            { input: value || '', limit: 5 },
             {
                 staleTime: 0,
                 cacheTime: 0,
@@ -117,9 +118,9 @@ export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
                 value={value}
                 onChange={onSelectItem}
                 items={items}
-                visible={visible}
+                visible={visible && showSuggest}
                 renderInput={renderInput}
-                maxWidth={400}
+                maxWidth={600}
                 renderItem={({ item, cursor, index, onClick }) => (
                     <GoalSuggestItem
                         key={item.id}
