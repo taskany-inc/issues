@@ -10,7 +10,11 @@ export const createFilterSchema = z.object({
             invalid_type_error: tr('Title must be a string'),
         })
         .min(1, {
-            message: tr('Title must be longer than 1 symbol'),
+            message: tr
+                .raw('Title must be longer than {upTo} symbol', {
+                    upTo: 1,
+                })
+                .join(''),
         }),
     mode: z.nativeEnum(FilterMode),
     params: z.string().min(1),
