@@ -99,6 +99,10 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
                 connect: [{ id: activityId }, { id: input.owner.id }],
             },
         },
+        include: {
+            activity: { include: { user: true, ghost: true } },
+            owner: { include: { user: true, ghost: true } },
+        },
     });
 
     return {

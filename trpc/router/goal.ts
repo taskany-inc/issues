@@ -41,6 +41,7 @@ import {
     removeCriteria,
     updateCriteriaState,
 } from '../../src/schema/criteria';
+import type { FieldDiff } from '../../src/types/common';
 
 import { addCalculatedProjectFields } from './project';
 
@@ -354,16 +355,49 @@ export const goal = router({
 
         const { activityId } = ctx.session.user;
 
-        try {
-            return createGoal(activityId, input);
+        const actualProject = await prisma.project.findUnique({
+            where: { id: input.parent.id },
+            include: {
+                activity: { include: { user: true, ghost: true } },
+                participants: { include: { user: true, ghost: true } },
+                watchers: { include: { user: true, ghost: true } },
+            },
+        });
 
-            // await mailServer.sendMail({
-            //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
-            //     to: 'bar@example.com, baz@example.com',
-            //     subject: 'Hello ✔',
-            //     text: `new post '${title}'`,
-            //     html: `new post <b>${title}</b>`,
-            // });
+        if (!actualProject) {
+            return null;
+        }
+
+        try {
+            const newGoal = await createGoal(activityId, input);
+
+            const recipients = Array.from(
+                new Set(
+                    [...actualProject.participants, ...actualProject.watchers, actualProject.activity]
+                        .filter(Boolean)
+                        .filter((p) => p.user?.email !== ctx.session.user.email)
+                        .map((r) => r.user?.email),
+                ),
+            );
+
+            await Promise.all([
+                createEmailJob('goalCreated', {
+                    to: recipients,
+                    projectKey: actualProject.id,
+                    projectTitle: actualProject.title,
+                    shortId: newGoal._shortId,
+                    title: newGoal.title,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                }),
+                createEmailJob('goalAssigned', {
+                    to: [newGoal.owner?.user?.email],
+                    shortId: newGoal._shortId,
+                    title: newGoal.title,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                }),
+            ]);
+
+            return newGoal;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
@@ -399,6 +433,8 @@ export const goal = router({
                 },
             });
 
+            // TODO: goal was moved
+
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, activityId),
@@ -411,16 +447,14 @@ export const goal = router({
         const actualGoal = await prisma.goal.findUnique({
             where: { id: input.id },
             include: {
-                participants: true,
+                participants: { include: { user: true, ghost: true } },
+                watchers: { include: { user: true, ghost: true } },
+                activity: { include: { user: true, ghost: true } },
+                owner: { include: { user: true, ghost: true } },
                 project: true,
                 tags: true,
                 estimate: {
                     include: { estimate: true },
-                },
-                owner: {
-                    include: {
-                        user: true,
-                    },
                 },
                 goalAsCriteria: true,
             },
@@ -428,7 +462,7 @@ export const goal = router({
 
         if (!actualGoal) return null;
 
-        const { _isEditable } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
 
         if (!_isEditable) {
             return null;
@@ -438,6 +472,12 @@ export const goal = router({
         const tagsToConnect = calculateDiffBetweenArrays(input.tags, actualGoal.tags);
 
         const history: Omit<GoalHistory, 'id' | 'activityId' | 'goalId' | 'createdAt'>[] = [];
+        const updatedFields: {
+            title?: FieldDiff;
+            description?: FieldDiff;
+            estimate?: FieldDiff;
+            priority?: FieldDiff;
+        } = {};
 
         if (actualGoal.title !== input.title) {
             history.push({
@@ -446,6 +486,8 @@ export const goal = router({
                 previousValue: actualGoal.title,
                 nextValue: input.title,
             });
+
+            updatedFields.title = [actualGoal.title, input.title];
         }
 
         if (actualGoal.description !== input.description) {
@@ -455,6 +497,8 @@ export const goal = router({
                 previousValue: actualGoal.description,
                 nextValue: input.description,
             });
+
+            updatedFields.description = [actualGoal.description, input.description];
         }
 
         if (tagsToConnect.length || tagsToDisconnect.length) {
@@ -476,6 +520,8 @@ export const goal = router({
                 previousValue: actualGoal.priority,
                 nextValue: input.priority,
             });
+
+            updatedFields.priority = [actualGoal.priority, input.priority];
         }
 
         if (actualGoal.ownerId !== input.owner.id) {
@@ -498,6 +544,9 @@ export const goal = router({
                 previousValue: previousEstimate,
                 nextValue: String(correctEstimate.id),
             });
+
+            // TODO: estimate diff
+            // updatedFields.estimate = [];
         }
 
         try {
@@ -547,6 +596,40 @@ export const goal = router({
                 await updateGoalWithCalculatedWeight(goal.goalAsCriteria.goalId);
             }
 
+            const recipients = Array.from(
+                new Set(
+                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
+                        .filter(Boolean)
+                        .filter((p) => p.user?.email !== ctx.session.user.email)
+                        .map((r) => r.user?.email),
+                ),
+            );
+
+            await createEmailJob('goalUpdated', {
+                to: recipients,
+                shortId: _shortId,
+                title: actualGoal.title,
+                updatedFields,
+                author: ctx.session.user.name || ctx.session.user.email,
+            });
+
+            if (actualGoal.ownerId !== input.owner.id) {
+                await Promise.all([
+                    createEmailJob('goalUnassigned', {
+                        to: [actualGoal.owner?.user?.email],
+                        shortId: _shortId,
+                        title: actualGoal.title,
+                        author: ctx.session.user.name || ctx.session.user.email,
+                    }),
+                    createEmailJob('goalAssigned', {
+                        to: [input.owner.user.email],
+                        shortId: _shortId,
+                        title: actualGoal.title,
+                        author: ctx.session.user.name || ctx.session.user.email,
+                    }),
+                ]);
+            }
+
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
@@ -554,14 +637,6 @@ export const goal = router({
                 estimate: getEstimateListFormJoin(goal),
                 activityFeed: [],
             };
-
-            // await mailServer.sendMail({
-            //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
-            //     to: 'bar@example.com, baz@example.com',
-            //     subject: 'Hello ✔',
-            //     text: `new post '${title}'`,
-            //     html: `new post <b>${title}</b>`,
-            // });
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
@@ -596,43 +671,83 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    toggleArchive: protectedProcedure.input(toggleGoalArchiveSchema).mutation(({ input: { id, archived }, ctx }) => {
-        try {
-            return prisma.goal.update({
-                where: { id },
-                data: {
-                    archived,
-                    history: {
-                        create: {
-                            subject: 'state',
-                            action: 'archive',
-                            activityId: ctx.session.user.activityId,
-                            nextValue: archived ? 'move to archive' : 'move from archive',
-                        },
-                    },
+    toggleArchive: protectedProcedure
+        .input(toggleGoalArchiveSchema)
+        .mutation(async ({ input: { id, archived }, ctx }) => {
+            const actualGoal = await prisma.goal.findFirst({
+                where: {
+                    id,
+                },
+                include: {
+                    participants: { include: { user: true, ghost: true } },
+                    watchers: { include: { user: true, ghost: true } },
+                    activity: { include: { user: true, ghost: true } },
+                    owner: { include: { user: true, ghost: true } },
+                    state: true,
+                    project: true,
                 },
             });
 
-            // await mailServer.sendMail({
-            //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
-            //     to: 'bar@example.com, baz@example.com',
-            //     subject: 'Hello ✔',
-            //     text: `new post '${title}'`,
-            //     html: `new post <b>${title}</b>`,
-            // });
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
+            if (!actualGoal) {
+                return null;
+            }
+
+            const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+
+            if (!_isEditable) {
+                return null;
+            }
+
+            try {
+                const updatedGoal = prisma.goal.update({
+                    where: { id },
+                    data: {
+                        archived,
+                        history: {
+                            create: {
+                                subject: 'state',
+                                action: 'archive',
+                                activityId: ctx.session.user.activityId,
+                                nextValue: archived ? 'move to archive' : 'move from archive',
+                            },
+                        },
+                    },
+                });
+
+                const recipients = Array.from(
+                    new Set(
+                        [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
+                            .filter(Boolean)
+                            .filter((p) => p.user?.email !== ctx.session.user.email)
+                            .map((r) => r.user?.email),
+                    ),
+                );
+
+                await createEmailJob('goalArchived', {
+                    to: recipients,
+                    shortId: _shortId,
+                    title: actualGoal.title,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                });
+
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
     switchState: protectedProcedure.input(goalStateChangeSchema).mutation(async ({ input, ctx }) => {
         const actualGoal = await prisma.goal.findFirst({
             where: {
                 id: input.id,
             },
             include: {
+                participants: { include: { user: true, ghost: true } },
+                watchers: { include: { user: true, ghost: true } },
+                activity: { include: { user: true, ghost: true } },
+                owner: { include: { user: true, ghost: true } },
+                state: true,
                 goalAsCriteria: true,
                 project: true,
-                state: true,
             },
         });
 
@@ -640,7 +755,7 @@ export const goal = router({
             return null;
         }
 
-        const { _isEditable } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
 
         if (!_isEditable) {
             return null;
@@ -673,6 +788,7 @@ export const goal = router({
                 },
                 include: {
                     goalAsCriteria: true,
+                    state: true,
                 },
             }),
         ];
@@ -703,6 +819,26 @@ export const goal = router({
             if (updatedGoal.goalAsCriteria) {
                 await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
             }
+
+            const recipients = Array.from(
+                new Set(
+                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
+                        .filter(Boolean)
+                        .filter((p) => p.user?.email !== ctx.session.user.email)
+                        .map((r) => r.user?.email),
+                ),
+            );
+
+            await createEmailJob('goalStateUpdated', {
+                to: recipients,
+                shortId: _shortId,
+                stateTitleBefore: actualGoal.state?.title,
+                stateTitleAfter: updatedGoal.state?.title,
+                title: actualGoal.title,
+                author: ctx.session.user.name || ctx.session.user.email,
+            });
+
+            return updatedGoal;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
@@ -719,7 +855,10 @@ export const goal = router({
                 where: { id: input.goalId },
                 include: {
                     participants: { include: { user: true, ghost: true } },
+                    watchers: { include: { user: true, ghost: true } },
                     activity: { include: { user: true, ghost: true } },
+                    owner: { include: { user: true, ghost: true } },
+                    state: true,
                     project: true,
                     goalAsCriteria: true,
                 },
@@ -729,7 +868,7 @@ export const goal = router({
         if (!commentAuthor) return null;
         if (!actualGoal) return null;
 
-        const { _isEditable } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
 
         try {
             // We want to see state changes record and comment next in activity feed.
@@ -759,9 +898,14 @@ export const goal = router({
                                       },
                                   }
                                 : undefined,
+                        // subscribe comment author
+                        watchers: {
+                            connect: [{ id: commentAuthor.id }],
+                        },
                     },
                     include: {
                         goalAsCriteria: true,
+                        state: true,
                     },
                 }),
                 // Create comment next.
@@ -772,6 +916,13 @@ export const goal = router({
                         goalId: input.goalId,
                         stateId: _isEditable ? input.stateId : undefined,
                     },
+                    include: {
+                        activity: {
+                            include: {
+                                user: true,
+                            },
+                        },
+                    },
                 }),
             ]);
 
@@ -779,18 +930,37 @@ export const goal = router({
                 await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
             }
 
-            let toEmails = actualGoal.participants;
+            const recipients = Array.from(
+                new Set(
+                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
+                        .filter(Boolean)
+                        .filter((p) => p.user?.email !== commentAuthor?.user?.email)
+                        .map((r) => r.user?.email),
+                ),
+            );
 
-            if (commentAuthor.user?.email === actualGoal.activity?.user?.email) {
-                toEmails = toEmails.filter((p) => p.user?.email !== commentAuthor?.user?.email);
-            }
-
-            if (toEmails.length) {
-                await createEmailJob('newComment', {
-                    to: toEmails.map((p) => p.user?.email),
-                    commentId: newComment.id,
-                    goalId: input.goalId,
-                });
+            if (recipients.length) {
+                if (input.stateId) {
+                    await createEmailJob('goalStateUpdatedWithComment', {
+                        to: recipients,
+                        shortId: _shortId,
+                        stateTitleBefore: actualGoal.state?.title,
+                        stateTitleAfter: updatedGoal.state?.title,
+                        title: actualGoal.title,
+                        commentId: newComment.id,
+                        author: newComment.activity.user?.name || newComment.activity.user?.email,
+                        body: newComment.description,
+                    });
+                } else {
+                    await createEmailJob('goalCommented', {
+                        to: recipients,
+                        shortId: _shortId,
+                        title: actualGoal.title,
+                        commentId: newComment.id,
+                        author: newComment.activity.user?.name || newComment.activity.user?.email,
+                        body: newComment.description,
+                    });
+                }
             }
 
             return newComment;
