@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { CleanButton, MessageTextAltIcon, Text, nullable } from '@taskany/bricks';
-import { backgroundColor, gray6 } from '@taskany/colors';
+import { Text, nullable } from '@taskany/bricks';
+import { backgroundColor, danger0, gray4, gray9 } from '@taskany/colors';
+import { IconBinOutline, IconMessageTextAltOutline } from '@taskany/icons';
 import { Estimate, State } from '@prisma/client';
 import NextLink from 'next/link';
 
@@ -9,8 +10,8 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { ToggleGoalDependency, dependencyKind } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { Circle, CircledIcon as CircleIconInner } from '../Circle';
-import { ContentItem, Table, Title, TitleContainer, TitleItem } from '../Table';
-import { GoalListItemCompactCustomize } from '../GoalListItemCompact';
+import { ContentItem, Table, Title } from '../Table';
+import { CustomCell, GoalListItemCompactCustomize } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
 import { UserGroup } from '../UserGroup';
 import { BetaBadge } from '../BetaBadge';
@@ -21,74 +22,42 @@ const StyledBetaMark = styled(BetaBadge)`
     right: -10px;
 `;
 
-const StyledWrapper = styled.div``;
+const StyledWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
 const StyledHeadingWrapper = styled.div`
     height: 32px;
     display: flex;
     align-items: center;
 `;
+
 const StyledTable = styled(Table)`
-    grid-template-columns: 15px minmax(350px, 20%) repeat(4, 1fr);
+    grid-template-columns: 15px minmax(40%, 350px) max-content repeat(4, max-content);
+    column-gap: 10px;
+    row-gap: 5px;
     padding: 0;
     margin: 0;
-
-    & ${ContentItem} {
-        padding: 2px 5px;
-        box-sizing: border-box;
-    }
-
-    & ${ContentItem}, & ${TitleItem} {
-        align-items: baseline;
-    }
-
-    & ${ContentItem}:first-child {
-        padding: 0;
-        padding-top: 2px;
-    }
-`;
-
-const StyledTitleContainer = styled(TitleContainer)`
-    flex: 0 1 auto;
-    max-width: 80%;
-`;
-
-const StyledCleanButton = styled(CleanButton)`
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    align-self: baseline;
+    margin-bottom: 10px;
 `;
 
 const StyledTableRow = styled(GoalListItemCompactCustomize)`
     display: contents;
     position: relative;
 
-    & > div,
-    & > div:first-child,
-    & > div:last-child {
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-
-    & > div:first-child {
-        padding-right: 0.7rem;
-    }
-
-    & ${StyledCleanButton} {
-        position: relative;
-        top: unset;
-        right: unset;
-    }
-
     &:hover {
-        & ${StyledCleanButton} {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        & ${ContentItem}, & ${TitleItem} {
+        & ${ContentItem} {
             background-color: unset;
         }
     }
+`;
+
+const StyledTextHeading = styled(Text)`
+    border-bottom: 1px solid ${gray4};
+    display: grid;
+    grid-template-columns: minmax(375px, 40%) max-content;
+    width: 100%;
+    max-width: calc(40% + 15px + 10px);
 `;
 
 interface GoalDependencyListItemProps {
@@ -104,33 +73,38 @@ interface GoalDependencyListItemProps {
 }
 
 const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({ onRemove, canEdit, ...props }) => {
-    const onRemoveHandler = useCallback<React.MouseEventHandler>(
-        (event) => {
-            event.preventDefault();
-            onRemove();
-        },
-        [onRemove],
-    );
+    const availableActions = useMemo(() => {
+        if (!canEdit) {
+            return;
+        }
+
+        return [
+            {
+                label: tr('Delete'),
+                color: danger0,
+                handler: onRemove,
+                icon: <IconBinOutline size="xxs" />,
+            },
+        ];
+    }, [canEdit, onRemove]);
+
     return (
         <StyledTableRow
             forwardedAs="div"
             item={props}
+            actions={availableActions}
+            onActionClick={({ handler }) => handler()}
             columns={[
                 {
                     name: 'title',
                     renderColumn: (values) => (
-                        <TitleItem>
-                            <StyledTitleContainer>
-                                <NextLink passHref href={routes.goal(props.shortId)}>
-                                    <Title size="s" weight="bold">
-                                        {values.title}
-                                    </Title>
-                                </NextLink>
-                            </StyledTitleContainer>
-                            {nullable(canEdit, () => (
-                                <StyledCleanButton onClick={onRemoveHandler} />
-                            ))}
-                        </TitleItem>
+                        <CustomCell>
+                            <NextLink passHref href={routes.goal(`${values.projectId}-${values.scopeId}`)}>
+                                <Title size="s" weight="bold">
+                                    {values.title}
+                                </Title>
+                            </NextLink>
+                        </CustomCell>
                     ),
                 },
                 { name: 'state' },
@@ -138,9 +112,9 @@ const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({ onRemov
                 {
                     name: 'issuers',
                     renderColumn: (values) => (
-                        <ContentItem>
+                        <CustomCell>
                             <UserGroup users={values.issuers} size={18} />
-                        </ContentItem>
+                        </CustomCell>
                     ),
                 },
                 { name: 'estimate' },
@@ -156,12 +130,14 @@ interface GoalDependencyListByKindProps<T> {
     canEdit: boolean;
     onRemove: (values: ToggleGoalDependency) => void;
     children: React.ReactNode;
+    showBeta?: boolean;
 }
 
 export function GoalDependencyListByKind<T extends GoalDependencyItem>({
     kind,
     goalId,
     items = [],
+    showBeta,
     canEdit,
     onRemove,
     children,
@@ -188,18 +164,18 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
     return (
         <ActivityFeedItem>
             <Circle size={32}>
-                <CircleIconInner as={MessageTextAltIcon} size="s" color={backgroundColor} />
-                <StyledBetaMark />
+                <CircleIconInner as={IconMessageTextAltOutline} size="s" color={backgroundColor} />
+                {showBeta && <StyledBetaMark />}
             </Circle>
             <StyledWrapper>
                 {nullable(items.length, () => (
                     <>
                         <StyledHeadingWrapper>
-                            <Text color={gray6} weight="thin">
+                            <StyledTextHeading size="s" weight="bold" color={gray9}>
                                 {heading[kind]}
-                            </Text>
+                            </StyledTextHeading>
                         </StyledHeadingWrapper>
-                        <StyledTable columns={6}>
+                        <StyledTable columns={7}>
                             {items.map((item) => (
                                 <GoalDependencyListItem
                                     key={item.id}

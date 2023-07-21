@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { gapS, gapSm, gray4, gray9, radiusM, textColor, gray6 } from '@taskany/colors';
 import React from 'react';
 import { Text } from '@taskany/bricks';
@@ -30,6 +30,17 @@ export const TableCell = styled.div<{ align?: 'center' | 'left' | 'right' }>`
     font-size: 0;
     transition: background-color 150ms ease-in;
     text-align: ${({ align = 'left' }) => align};
+    justify-content: ${({ align = 'left' }) => {
+        switch (align) {
+            case 'center':
+                return 'center';
+            case 'right':
+                return 'flex-end';
+            case 'left':
+            default:
+                return 'flex-start';
+        }
+    }};
     box-sizing: border-box;
 
     padding: ${({ children }) => (React.Children.count(children) ? gapS : 0)};
@@ -91,6 +102,12 @@ export const ContentItem = styled(TableCell)`
     padding: ${gapS} ${gapS};
 `;
 
+export const CellContent = styled.div`
+    display: flex;
+    align-items: center;
+    align-self: baseline;
+`;
+
 export const TitleContainer = styled.div`
     display: flex;
 `;
@@ -106,3 +123,11 @@ export const TextItem = styled(Text).attrs({
     weight: 'bold',
     color: gray9,
 })``;
+
+export const Cell: React.FC<
+    { children?: React.ReactNode; className?: string } & React.ComponentProps<typeof ContentItem>
+> = ({ children, ...rest }) => (
+    <ContentItem {...rest}>
+        <CellContent>{children}</CellContent>
+    </ContentItem>
+);

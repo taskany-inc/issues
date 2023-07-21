@@ -1,7 +1,8 @@
-import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef } from 'react';
+import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, GoalIcon, FormInput, PlusIcon } from '@taskany/bricks';
+import { Button, FormInput } from '@taskany/bricks';
+import { IconPlusCircleOutline, IconTargetOutline } from '@taskany/icons';
 import { gray7, gray8 } from '@taskany/colors';
 import { Controller, UseFormSetError, useForm } from 'react-hook-form';
 import { Goal } from '@prisma/client';
@@ -109,6 +110,7 @@ interface CriteriaTitleFieldProps {
     name: 'title';
     value?: string;
     titles: string[];
+    isItemSelected?: boolean;
     error?: { message?: string };
     onSelect: <T extends Goal>(goal: T) => void;
     onChange: ReactEventHandler<HTMLInputElement>;
@@ -116,7 +118,7 @@ interface CriteriaTitleFieldProps {
 }
 
 export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>(
-    ({ name, value = '', error, onSelect, onChange, titles = [], setError }, ref) => {
+    ({ name, value = '', error, onSelect, onChange, titles = [], setError, isItemSelected }, ref) => {
         const [type, setType] = useState<'plain' | 'search'>('plain');
         const [popupVisible, setPopupVisible] = useState(false);
         const btnRef = useRef<HTMLButtonElement>(null);
@@ -141,7 +143,7 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
                     view={type === 'search' ? 'primary' : 'default'}
                     brick="right"
                     outline
-                    iconLeft={<GoalIcon size="xs" noWrap />}
+                    iconLeft={<IconTargetOutline size="xs" noWrap />}
                     onClick={() => setType((prev) => (prev === 'search' ? 'plain' : 'search'))}
                     onMouseEnter={() => setPopupVisible(true)}
                     onMouseLeave={() => setPopupVisible(false)}
@@ -150,7 +152,8 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
 
                 {type === 'search' ? (
                     <GoalSuggest
-                        value={value}
+                        value={isItemSelected ? undefined : value}
+                        showSuggest={!isItemSelected}
                         onChange={onSelect}
                         renderInput={(inputProps) => (
                             <StyledFormInput
@@ -162,6 +165,8 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
                                 onBlur={onlyUniqueTitleHandler}
                                 error={error}
                                 {...inputProps}
+                                value={inputProps.value || value}
+                                ref={ref}
                             />
                         )}
                     />
@@ -203,6 +208,7 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
         reset,
         setValue,
         setError,
+        watch,
         formState: { isSubmitSuccessful },
     } = useForm<AddCriteriaScheme>({
         resolver: zodResolver(criteriaSchema),
@@ -234,12 +240,21 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
         });
     }, [goalId, reset]);
 
+    const selectedGoalId = watch('goalAsGriteria');
+    const title = watch('title');
+
+    useEffect(() => {
+        if (!title) {
+            setValue('goalAsGriteria', undefined);
+        }
+    }, [title, setValue]);
+
     return (
         <InlineForm
             renderTrigger={({ onClick }) => (
                 <StyledInlineTrigger
                     text={tr('Add achievement criteria')}
-                    icon={<PlusIcon noWrap size="s" />}
+                    icon={<IconPlusCircleOutline noWrap size="s" />}
                     onClick={onClick}
                 />
             )}
@@ -265,6 +280,7 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
                             setError={setError}
                             onSelect={handleSelectGoal}
                             titles={validityData.title}
+                            isItemSelected={selectedGoalId != null}
                         />
                     )}
                 />
