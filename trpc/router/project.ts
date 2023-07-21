@@ -20,6 +20,7 @@ import {
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { getProjectSchema } from '../queries/project';
+import { fillProject, sqlGoalsFilter } from '../queries/sqlProject';
 
 type WithId = { id: string };
 
@@ -118,38 +119,52 @@ export const project = router({
                 .optional(),
         )
         .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
-            let result = [];
-            // const hasQueries = Object.values(goalsQuery || {}).some((i) =>
-            //     typeof i === 'object' ? Object.keys(i).length : !!i && i.toString().length,
-            // );
+            const { activityId } = ctx.session.user;
+            const sqlFilters = sqlGoalsFilter(activityId, goalsQuery);
 
-            // if (!hasQueries) {
-            const [projects, watchers, stargizers] = await Promise.all([
+            const [projects, watchers, stargizers, projectsChildrenParent] = await Promise.all([
                 prisma.$queryRaw`
-                        select
-                            p.id,
-                            p.title,
-                            p.description,
-                            p."flowId",
-                            p."createdAt",
-                            p."updatedAt",
-                            p."activityId",
-                            count(g) as "goalsCount"
-                        from "Project" as p
-                        left join "Goal" as g on p.id = g."projectId"
-                        group by p.id
-                        order by max(g."updatedAt") desc
+                    select
+                        p.id,
+                        p.title,
+                        p.description,
+                        p."flowId",
+                        p."createdAt",
+                        p."updatedAt",
+                        p."activityId",
+                        count(distinct g) as "goalsCount"
+                    from "Project" as p
+                    left join "Goal" as g on p.id = g."projectId"
+                    left join "Activity" as a on a.id = p."activityId"
+                    left join "Tag" as t on g."activityId" = t."activityId"
+                    left join "_projectStargizers" as ps on ps."B" = p.id
+                    left join "_projectWatchers" as pw on pw."B" = p.id
+                    left join "_goalStargizers" as gs on gs."B" = g.id
+                    left join "_goalWatchers" as gw on gw."B" = g.id
+                    left join "_goalParticipants" as gp on gp."B" = g.id
+                    where g."archived" = ${false}
+                        ${sqlFilters}
+                    group by p.id
+                    order by max(g."updatedAt") desc
             ` as Promise<NonNullable<(Project & { goalsCount: number })[]>>,
                 prisma.$queryRaw`
                         select pw."A" as id, pw."B" as "projectId"
                         from "_projectWatchers" as pw
-                        where pw."A" in (${ctx.session.user.activityId})
+                        where pw."A" in (${activityId})
             ` as Promise<{ id: string; projectId: string }[]>,
                 prisma.$queryRaw`
                         select ps."A" as id, ps."B" as "projectId"
                         from "_projectStargizers" as ps
-                        where ps."A" in (${ctx.session.user.activityId})
+                        where ps."A" in (${activityId})
             ` as Promise<{ id: string; projectId: string }[]>,
+                prisma.$queryRaw`
+                    select
+                        pc."A" as "parentProjectId",
+                        pc."B" as "projectId"
+                    from "prisma-pg-test"."Project" as p
+                    left join "prisma-pg-test"."_parentChildren" as pc on pc."B" = p.id
+                    where pc."A" is not null and pc."B" is not null
+            ` as Promise<{ parentProjectId: string; projectId: string }[]>,
             ]);
 
             const activities = (
@@ -192,50 +207,16 @@ export const project = router({
                 return acc;
             }, {} as Record<string, any>);
 
-            for (let i = 0; i < Math.max(watchers.length, stargizers.length); i++) {
+            for (let i = 0; i < Math.max(watchers.length, stargizers.length, projectsChildrenParent.length); i++) {
                 const watcher = watchers[i];
                 const stargizer = stargizers[i];
+                const project = projectsChildrenParent[i];
 
-                if (watcher && watcher.projectId in projectsDict) {
-                    const cur = projectsDict[watcher.projectId];
-                    cur.watchers.push(watcher);
-                    cur._count = { ...cur._count, watchers: (cur._count.watchers += 1) };
-                }
-
-                if (stargizer && stargizer.projectId in projectsDict) {
-                    const cur = projectsDict[stargizer.projectId];
-                    cur.stargizers.push(stargizer);
-                    cur._count = { ...cur._count, stargizers: (cur._count.stargizers += 1) };
-                }
+                fillProject(projectsDict, { watcher, stargizer, project });
             }
 
-            result = Object.values(projectsDict);
-            // } else {
-            //     result = await prisma.project.findMany({
-            //         ...getProjectSchema({
-            //             activityId: ctx.session.user.activityId,
-            //             goalsQuery,
-            //             firstLevel,
-            //         }),
-            //     });
-            // }
-
-            return result?.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId));
+            return Object.values(projectsDict)?.map((project) => addCalculatedProjectFields(project, activityId));
         }),
-
-    // .query(
-    //     ({ ctx, input: { firstLevel, goalsQuery } = {} }) =>
-    //     prisma.project.findMany({
-    // ...getProjectSchema({
-    //     activityId: ctx.session.user.activityId,
-    //     goalsQuery,
-    //     firstLevel,
-    // }),
-    // })
-    // .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId));
-    // }),
-    // ),
-
     getTop: protectedProcedure
         .input(
             z
