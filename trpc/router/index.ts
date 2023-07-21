@@ -10,6 +10,7 @@ import { goal } from './goal';
 import { search } from './search';
 import { state } from './state';
 import { estimates } from './estimates';
+import { feedback } from './feedback';
 
 export const trpcRouter = router({
     filter,
@@ -22,6 +23,7 @@ export const trpcRouter = router({
     search,
     state,
     estimates,
+    feedback,
 });
 
 export type TrpcRouter = typeof trpcRouter;

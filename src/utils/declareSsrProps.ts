@@ -39,7 +39,14 @@ export function declareSsrProps<T = ExternalPageProps>(
             };
         }
 
-        const ssrHelpers = createServerSideHelpers({ router: trpcRouter, ctx: { session }, transformer: superjson });
+        const ssrHelpers = createServerSideHelpers({
+            router: trpcRouter,
+            ctx: {
+                session,
+                headers: req.headers,
+            },
+            transformer: superjson,
+        });
 
         const ssrTime = Date.now();
 

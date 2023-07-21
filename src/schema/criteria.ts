@@ -8,7 +8,11 @@ export const criteriaSchema = z.object({
             required_error: tr('Title is required'),
         })
         .min(1, {
-            message: tr('Title must be longer than 1 symbol'),
+            message: tr
+                .raw('Title must be longer than {upTo} symbol', {
+                    upTo: 1,
+                })
+                .join(''),
         }),
     weight: z.string().optional(),
     goalId: z.string(),

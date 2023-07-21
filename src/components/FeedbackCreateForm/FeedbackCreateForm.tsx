@@ -7,13 +7,14 @@ import * as Sentry from '@sentry/nextjs';
 import { errorsProvider } from '../../utils/forms';
 import { createFeedbackSchema, CreateFeedback } from '../../schema/feedback';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { dispatchErrorNotification } from '../../utils/dispatchNotification';
 import { notifyPromise } from '../../utils/notifyPromise';
+import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './FeedbackCreateForm.i18n';
 
 const FeedbackCreateForm: React.FC = () => {
     const [formBusy, setFormBusy] = useState(false);
+    const createMutation = trpc.feedback.create.useMutation();
 
     const {
         register,
@@ -25,28 +26,25 @@ const FeedbackCreateForm: React.FC = () => {
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
 
-    const onPending = useCallback(async (form: CreateFeedback) => {
-        setFormBusy(true);
-        const [res] = await notifyPromise(
-            fetch('/api/feedback', {
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/json',
-                    accept: 'application/json',
-                },
-                body: JSON.stringify({
+    const onPending = useCallback(
+        async (form: CreateFeedback) => {
+            setFormBusy(true);
+            const [res] = await notifyPromise(
+                createMutation.mutateAsync({
                     title: form.title,
                     description: form.description,
                     href: window.location.href,
                 }),
-            }),
-            'sentFeedback',
-        );
-        if (res) {
-            dispatchModalEvent(ModalEvent.FeedbackCreateModal)();
-        }
-        setFormBusy(false);
-    }, []);
+                'sentFeedback',
+            );
+            if (res) {
+                dispatchModalEvent(ModalEvent.FeedbackCreateModal)();
+            }
+
+            setFormBusy(false);
+        },
+        [createMutation],
+    );
 
     const onError = useCallback((err: typeof errors) => {
         Sentry.captureException(err);

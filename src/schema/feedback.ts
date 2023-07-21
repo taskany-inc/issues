@@ -9,9 +9,14 @@ export const createFeedbackSchema = z.object({
             invalid_type_error: tr('Title must be a string'),
         })
         .min(3, {
-            message: tr('Title must be longer than 3 symbol'),
+            message: tr
+                .raw('Title must be longer than {upTo} symbol', {
+                    upTo: 3,
+                })
+                .join(''),
         }),
     description: z.string().optional(),
+    href: z.string().optional(),
 });
 
 export type CreateFeedback = z.infer<typeof createFeedbackSchema>;
