@@ -161,8 +161,8 @@ export const project = router({
                     select
                         pc."A" as "parentProjectId",
                         pc."B" as "projectId"
-                    from "prisma-pg-test"."Project" as p
-                    left join "prisma-pg-test"."_parentChildren" as pc on pc."B" = p.id
+                    from "Project" as p
+                    left join "_parentChildren" as pc on pc."B" = p.id
                     where pc."A" is not null and pc."B" is not null
             ` as Promise<{ parentProjectId: string; projectId: string }[]>,
             ]);
