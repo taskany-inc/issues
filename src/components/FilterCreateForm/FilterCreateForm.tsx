@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Form, FormActions, FormAction, FormTextarea, FormInput, ModalContent } from '@taskany/bricks';
+import * as Sentry from '@sentry/nextjs';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFilterSchema, CreateFilter } from '../../schema/filter';
@@ -54,7 +55,7 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
     );
 
     const onError = useCallback((err: typeof errors) => {
-        // TODO: Sentry event
+        Sentry.captureException(err);
     }, []);
 
     return (

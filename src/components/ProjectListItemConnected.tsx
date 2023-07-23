@@ -71,12 +71,12 @@ export const ProjectListItemConnected: FC<{
                     id={g.id}
                     shortId={g._shortId}
                     projectId={g.projectId}
-                    state={g.state!}
+                    state={g.state}
                     title={g.title}
-                    issuer={g.activity!}
-                    owner={g.owner!}
+                    issuer={g.activity}
+                    owner={g.owner}
                     tags={g.tags}
-                    priority={g.priority!}
+                    priority={g.priority}
                     comments={g._count?.comments}
                     estimate={g._lastEstimate}
                     participants={g.participants}

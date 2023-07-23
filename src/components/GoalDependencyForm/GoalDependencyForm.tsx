@@ -82,11 +82,11 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
 
     const handleGoalSelect = useCallback((goal: NonNullable<GoalByIdReturnType>) => {
         setSelected(goal);
-        setQuery(`${goal.projectId!}-${goal.scopeId}`);
+        setQuery(`${goal.projectId}-${goal.scopeId}`);
     }, []);
 
     useEffect(() => {
-        if (selected && query !== `${selected.projectId!}-${selected.scopeId}`) {
+        if (selected && query !== `${selected.projectId}-${selected.scopeId}`) {
             resetFormHandler();
         }
     }, [query, selected, resetFormHandler]);

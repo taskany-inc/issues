@@ -127,7 +127,12 @@ const renderTriggerHelper = ({ ref, onClick }: { ref: React.RefObject<HTMLButton
     <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
 );
 
-const renderItemHelper = ({ item, cursor, index }: { item: any; cursor: number; index: number }) => (
+type MenuItemProps = React.ComponentProps<typeof MenuItem>;
+type HelperItemProps = Pick<MenuItemProps, 'color' | 'icon' | 'onClick'> & {
+    label: string;
+};
+
+const renderItemHelper = ({ item, cursor, index }: { item: HelperItemProps; cursor: number; index: number }) => (
     <MenuItem
         key={item.label}
         ghost

@@ -180,6 +180,7 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
                         onBlur={onlyUniqueTitleHandler}
                         placeholder={tr('Enter criteria')}
                         error={error}
+                        ref={ref}
                     />
                 )}
 

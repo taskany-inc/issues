@@ -31,7 +31,7 @@ export const useGlobalEvent = <E extends Event>(
                 window.removeEventListener(eventName, cb, opts);
             }
         };
-    }, [eventName, opts]);
+    }, [handler, eventName, opts]);
 
     return setHandler;
 };

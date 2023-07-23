@@ -19,7 +19,6 @@ import {
 } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
-import { useLocale } from '../../hooks/useLocale';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -45,7 +44,6 @@ const schemaProvider = () =>
     });
 
 const UserInviteForm: React.FC = () => {
-    const locale = useLocale();
     const inputRef = useRef<HTMLInputElement>(null);
     const [emails, setEmails] = useState<string[]>([]);
     const [error, setError] = useState<FieldError>();

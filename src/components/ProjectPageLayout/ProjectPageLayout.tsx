@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';

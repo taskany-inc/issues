@@ -45,10 +45,10 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             busy={busy}
             title={goal.title}
             description={goal.description}
-            owner={goal.owner!}
-            parent={goal.project!}
-            state={goal.state!}
-            priority={goal.priority!}
+            owner={goal.owner ?? undefined}
+            parent={goal.project ?? undefined}
+            state={goal.state ?? undefined}
+            priority={goal.priority ?? undefined}
             tags={goal.tags}
             estimate={goal._lastEstimate ?? undefined}
             onSumbit={updateGoal}

@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { Button, Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader, Text } from '@taskany/bricks';
 import { warn0 } from '@taskany/colors';
+import * as Sentry from '@sentry/nextjs';
 
 import { FilterById } from '../../../trpc/inferredTypes';
 import { useFilterResource } from '../../hooks/useFilterResource';
@@ -23,6 +24,8 @@ const FilterDeleteForm: React.FC<FilterDeleteFormProps> = ({ preset, onSubmit, o
 
             if (data) {
                 onSubmit(preset);
+            } else if (err) {
+                Sentry.captureException(err);
             }
         },
         [onSubmit, deleteFilter],

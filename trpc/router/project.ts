@@ -120,7 +120,7 @@ export const project = router({
                 })
                 .optional(),
         )
-        .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
+        .query(async ({ ctx, input: { goalsQuery } = {} }) => {
             const { activityId } = ctx.session.user;
             const sqlFilters = sqlGoalsFilter(activityId, goalsQuery);
 

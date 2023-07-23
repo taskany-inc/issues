@@ -1154,7 +1154,7 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    convertCriteriaToGoal: protectedProcedure.input(convertCriteriaToGoalSchema).mutation(async ({ input, ctx }) => {
+    convertCriteriaToGoal: protectedProcedure.input(convertCriteriaToGoalSchema).mutation(async ({ input }) => {
         try {
             const actualCriteria = await prisma.goalAchieveCriteria.findUnique({
                 where: { id: input.id },
