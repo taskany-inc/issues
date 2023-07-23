@@ -71,5 +71,11 @@ module.exports = {
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error'],
         'react/display-name': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'error',
+        'react-hooks/exhaustive-deps': 'error',
+        '@typescript-eslint/no-unused-vars': [
+            'error',
+            { argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        ],
     },
 };

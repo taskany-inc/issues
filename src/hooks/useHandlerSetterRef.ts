@@ -18,16 +18,13 @@ export const useHandlerSetterRef = <T extends (...args: any[]) => any>(handler?:
     // @ts-ignore
     const handlerRef: MutableRefObject<T> = useRef(handler);
 
-    const setHandler: CallbackSetter<T> = useCallback(
-        (nextCallback: T): void => {
-            if (typeof nextCallback !== 'function') {
-                throw new Error("the argument supplied to the 'setHandler' function should be of type function");
-            }
+    const setHandler: CallbackSetter<T> = useCallback((nextCallback: T): void => {
+        if (typeof nextCallback !== 'function') {
+            throw new Error("the argument supplied to the 'setHandler' function should be of type function");
+        }
 
-            handlerRef.current = nextCallback;
-        },
-        [handlerRef.current],
-    );
+        handlerRef.current = nextCallback;
+    }, []);
 
     return [handlerRef, setHandler];
 };

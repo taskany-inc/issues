@@ -1,16 +1,10 @@
 import { nanoid } from 'nanoid';
-import { z } from 'zod';
 import { GoalHistory, Comment, Activity, User, Goal } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
 import { addCalclulatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
-import {
-    HistoryRecordWithActivity,
-    HistoryRecordSubject,
-    HistoryAction,
-    subjectToTableNameMap,
-} from '../types/history';
+import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
 
 import { prisma } from './prisma';
 import { subjectToEnumValue } from './goalHistory';
@@ -151,7 +145,9 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
 
     const historyWithMeta: HistoryRecordWithActivity[] = Array.from(history);
     const needRequestForSubject = Object.keys(requestParamsBySubjects) as (keyof typeof requestParamsBySubjects)[];
-    const replacedValueIdx = needRequestForSubject.map((subject) => requestParamsBySubjects[subject]!.sourceIdx).flat();
+    const replacedValueIdx = needRequestForSubject
+        .map((subject) => (requestParamsBySubjects[subject] || {}).sourceIdx)
+        .flat();
 
     if (needRequestForSubject.length) {
         const results = await Promise.all(
@@ -161,7 +157,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                 const query = {
                     where: {
                         id: {
-                            in: data!.ids,
+                            in: (data || {}).ids,
                         },
                     },
                 };
@@ -190,7 +186,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                         return prisma.estimate.findMany({
                             where: {
                                 id: {
-                                    in: query.where.id.in.map((v) => Number(v)),
+                                    in: (query.where.id.in ?? []).map((v) => Number(v)),
                                 },
                                 goal: {
                                     some: {
@@ -237,6 +233,10 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
         }, {});
 
         replacedValueIdx.forEach((sourceIndex) => {
+            if (!sourceIndex) {
+                return;
+            }
+
             const record = history[sourceIndex];
             const valueCanBeArray = ['dependencies', 'tags'].includes(record.subject);
 

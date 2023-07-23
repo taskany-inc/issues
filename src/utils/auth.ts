@@ -51,8 +51,8 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
     providers.push(
         // https://next-auth.js.org/configuration/providers/oauth
         GitHubProvider({
-            clientId: process.env.GITHUB_CLIENT_ID!,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
         }),
     );
 }
@@ -61,9 +61,9 @@ if (process.env.KEYCLOAK_ID && process.env.KEYCLOAK_SECRET && process.env.KEYCLO
     providers.push(
         // https://next-auth.js.org/providers/keycloak
         KeycloakProvider({
-            clientId: process.env.KEYCLOAK_ID!,
-            clientSecret: process.env.KEYCLOAK_SECRET!,
-            issuer: process.env.KEYCLOAK_ISSUER!,
+            clientId: process.env.KEYCLOAK_ID,
+            clientSecret: process.env.KEYCLOAK_SECRET,
+            issuer: process.env.KEYCLOAK_ISSUER,
             client: {
                 authorization_signed_response_alg: process.env.JWS_ALGORITHM || 'RS256',
                 id_token_signed_response_alg: process.env.JWS_ALGORITHM || 'RS256',

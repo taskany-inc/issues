@@ -203,7 +203,7 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
                                     title={item.title}
                                     state={item.state ?? undefined}
                                     issuer={item.activity ?? undefined}
-                                    owner={item.owner!}
+                                    owner={item.owner ?? undefined}
                                     shortId={`${item.projectId}-${item.scopeId}`}
                                     estimate={item.estimate[item.estimate.length - 1]?.estimate}
                                     onRemove={() => onRemoveHandler(item)}

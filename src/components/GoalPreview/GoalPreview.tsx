@@ -413,7 +413,7 @@ export const GoalPreview: FC = () => {
 
     const onPreviewDestroy = useCallback(() => {
         setPreview(null);
-    }, []);
+    }, [setPreview]);
 
     return nullable(shortId, (id) => (
         <GoalPreviewModal
