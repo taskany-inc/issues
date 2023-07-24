@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.17.1](https://github.com/taskany-inc/issues/compare/v1.17.0...v1.17.1) (2023-07-24)
+
+
+### Bug Fixes
+
+* **db:** fix search estimate with optional parameters q and date ([0e262f0](https://github.com/taskany-inc/issues/commit/0e262f0bf9f6f5904936f86829a0615441aaca45))
+* **db:** fix search estimate with optional parameters q and date ([7a2862a](https://github.com/taskany-inc/issues/commit/7a2862a983e8e0c10bc5fac9bc35fc4a00f53073))
+* **HistoryRecord:** spelling issue ([0bde05c](https://github.com/taskany-inc/issues/commit/0bde05c121acc51cd8486bc9a26163b9ea3a1c3d))
+* **hooks:** unconditional hook call in StateDropdown and StateSwitch ([fdef66a](https://github.com/taskany-inc/issues/commit/fdef66ad7f9ed7380bd6bd4ed68eb315fd68ea61))
+* **search:** don't search for archived goals ([3638d0b](https://github.com/taskany-inc/issues/commit/3638d0b618df5a83905dba9981b36ca2b3453d94))
+
 ## [1.17.0](https://github.com/taskany-inc/issues/compare/v1.16.6...v1.17.0) (2023-07-20)
 
 
