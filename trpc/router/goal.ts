@@ -42,6 +42,7 @@ import {
     updateCriteriaState,
 } from '../../src/schema/criteria';
 import type { FieldDiff } from '../../src/types/common';
+import { createLocaleDate } from '../../src/utils/dateTime';
 
 import { addCalculatedProjectFields } from './project';
 
@@ -535,18 +536,26 @@ export const goal = router({
 
         const correctEstimate = await findOrCreateEstimate(input.estimate, ctx.session.user.activityId, actualGoal.id);
         const previousEstimate = actualGoal.estimate.length
-            ? String(actualGoal.estimate[actualGoal.estimate.length - 1].estimateId)
-            : '';
-        if (correctEstimate && String(correctEstimate.id) !== previousEstimate) {
+            ? actualGoal.estimate[actualGoal.estimate.length - 1]
+            : null;
+        const previousEstimateId = previousEstimate ? String(previousEstimate.estimateId) : '';
+        if (correctEstimate && String(correctEstimate.id) !== previousEstimateId) {
             history.push({
                 subject: 'estimate',
                 action: 'change',
-                previousValue: previousEstimate,
+                previousValue: previousEstimateId,
                 nextValue: String(correctEstimate.id),
             });
 
-            // TODO: estimate diff
-            // updatedFields.estimate = [];
+            // FIXME: https://github.com/taskany-inc/issues/issues/1359
+            updatedFields.estimate = [
+                previousEstimate?.estimate.date
+                    ? createLocaleDate(new Date(previousEstimate?.estimate.date), { locale: 'en' })
+                    : [previousEstimate?.estimate.q, previousEstimate?.estimate.y].join('/'),
+                correctEstimate.date
+                    ? createLocaleDate(new Date(correctEstimate.date), { locale: 'en' })
+                    : [correctEstimate.q, correctEstimate.y].join('/'),
+            ];
         }
 
         try {
