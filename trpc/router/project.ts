@@ -21,6 +21,8 @@ import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/sche
 import { connectionMap } from '../queries/connections';
 import { getProjectSchema } from '../queries/project';
 import { fillProject, sqlGoalsFilter } from '../queries/sqlProject';
+import { createEmailJob } from '../../src/utils/worker/create';
+import { FieldDiff } from '../../src/types/common';
 
 type WithId = { id: string };
 
@@ -364,23 +366,18 @@ export const project = router({
                         },
                     },
                 });
-
-                // await mailServer.sendMail({
-                //     from: `"Fred Foo 👻" < ${ process.env.MAIL_USER }> `,
-                //     to: 'bar@example.com, baz@example.com',
-                //     subject: 'Hello ✔',
-                //     text: `new post '${title}'`,
-                //     html: `new post < b > ${ title } </>`,
-                // });
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
         }),
-    update: protectedProcedure.input(projectUpdateSchema).mutation(async ({ input: { id, parent, ...data } }) => {
+    update: protectedProcedure.input(projectUpdateSchema).mutation(async ({ input: { id, parent, ...data }, ctx }) => {
         const project = await prisma.project.findUnique({
             where: { id },
             include: {
                 parent: true,
+                activity: { include: { user: true, ghost: true } },
+                participants: { include: { user: true, ghost: true } },
+                watchers: { include: { user: true, ghost: true } },
             },
         });
 
@@ -392,7 +389,7 @@ export const project = router({
         const parentsToDisconnect = project.parent.filter((p) => !parent?.some((pr) => p.id === pr.id));
 
         try {
-            return prisma.project.update({
+            const updatedProject = await prisma.project.update({
                 where: { id },
                 data: {
                     ...data,
@@ -406,13 +403,117 @@ export const project = router({
                 },
             });
 
-            // await mailServer.sendMail({
-            //     from: `"Fred Foo 👻" <${process.env.MAIL_USER}>`,
-            //     to: 'bar@example.com, baz@example.com',
-            //     subject: 'Hello ✔',
-            //     text: `new post '${title}'`,
-            //     html: `new post <b>${title}</b>`,
-            // });
+            if (parentsToConnect) {
+                const newParents = await prisma.project.findMany({
+                    where: {
+                        id: {
+                            in: parentsToConnect?.map(({ id }) => id),
+                        },
+                    },
+                    include: {
+                        activity: { include: { user: true, ghost: true } },
+                        participants: { include: { user: true, ghost: true } },
+                        watchers: { include: { user: true, ghost: true } },
+                    },
+                });
+
+                await Promise.all(
+                    newParents.map((parent) => {
+                        const recipients = Array.from(
+                            new Set(
+                                [parent.activity, ...parent.participants, ...parent.watchers]
+                                    .filter(Boolean)
+                                    .filter((p) => p.user?.email !== ctx.session.user.email)
+                                    .map((r) => r.user?.email),
+                            ),
+                        );
+
+                        return recipients.length
+                            ? createEmailJob('childProjectCreated', {
+                                  to: recipients,
+                                  childKey: updatedProject.id,
+                                  childTitle: updatedProject.title,
+                                  projectKey: parent.id,
+                                  projectTitle: parent.title,
+                                  author: ctx.session.user.name || ctx.session.user.email,
+                              })
+                            : null;
+                    }),
+                );
+            }
+
+            if (parentsToDisconnect) {
+                const oldParents = await prisma.project.findMany({
+                    where: {
+                        id: {
+                            in: parentsToDisconnect?.map(({ id }) => id),
+                        },
+                    },
+                    include: {
+                        activity: { include: { user: true, ghost: true } },
+                        participants: { include: { user: true, ghost: true } },
+                        watchers: { include: { user: true, ghost: true } },
+                    },
+                });
+
+                await Promise.all(
+                    oldParents.map((parent) => {
+                        const recipients = Array.from(
+                            new Set(
+                                [parent.activity, ...parent.participants, ...parent.watchers]
+                                    .filter(Boolean)
+                                    .filter((p) => p.user?.email !== ctx.session.user.email)
+                                    .map((r) => r.user?.email),
+                            ),
+                        );
+
+                        return recipients.length
+                            ? createEmailJob('childProjectDeleted', {
+                                  to: recipients,
+                                  childKey: updatedProject.id,
+                                  childTitle: updatedProject.title,
+                                  projectKey: parent.id,
+                                  projectTitle: parent.title,
+                                  author: ctx.session.user.name || ctx.session.user.email,
+                              })
+                            : null;
+                    }),
+                );
+            }
+
+            const updatedFields: {
+                title?: FieldDiff;
+                description?: FieldDiff;
+            } = {};
+
+            if (updatedProject.title !== project.title) {
+                updatedFields.title = [project.title, updatedProject.title];
+            }
+
+            if (updatedProject.description !== project.description) {
+                updatedFields.description = [project.description, updatedProject.description];
+            }
+
+            const recipients = Array.from(
+                new Set(
+                    [...project.participants, ...project.watchers, project.activity]
+                        .filter(Boolean)
+                        .filter((p) => p.user?.email !== ctx.session.user.email)
+                        .map((r) => r.user?.email),
+                ),
+            );
+
+            if (recipients.length) {
+                await createEmailJob('projectUpdated', {
+                    to: recipients,
+                    key: project.id,
+                    title: project.title,
+                    updatedFields,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                });
+            }
+
+            return updatedProject;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
@@ -460,14 +561,44 @@ export const project = router({
     }),
     transferOwnership: protectedProcedure
         .input(projectTransferOwnershipSchema)
-        .mutation(({ input: { id, activityId } }) => {
+        .mutation(async ({ input: { id, activityId }, ctx }) => {
+            const [project, newOwner] = await Promise.all([
+                prisma.project.findUnique({
+                    where: { id },
+                }),
+                prisma.activity.findUnique({
+                    where: { id: activityId },
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                }),
+            ]);
+
+            if (!project) {
+                return null;
+            }
+
+            if (!newOwner) {
+                return null;
+            }
+
             try {
-                return prisma.project.update({
+                const transferedProject = await prisma.project.update({
                     where: { id },
                     data: {
                         activityId,
                     },
                 });
+
+                await createEmailJob('projectTransfered', {
+                    to: [newOwner.user?.email],
+                    key: project.id,
+                    title: project.title,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                });
+
+                return transferedProject;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
