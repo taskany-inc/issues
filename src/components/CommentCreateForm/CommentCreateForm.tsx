@@ -33,12 +33,14 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, o
     const [pushState, setPushState] = useState<State | undefined>();
 
     const createComment = useCallback(
-        (form: GoalCommentSchema) => {
+        async (form: GoalCommentSchema) => {
             // FIXME: maybe async/await would be better API
-            create(({ id }) => {
+            const response = await create(({ id }) => {
                 onSubmit?.(id);
                 setPushState(undefined);
             })(form);
+
+            return Boolean(response?.id);
         },
         [create, onSubmit],
     );
