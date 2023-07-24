@@ -107,6 +107,8 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
 
             onGoalCreate?.(res);
         }
+
+        setBusy(false);
     };
 
     return (
