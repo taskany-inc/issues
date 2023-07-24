@@ -144,8 +144,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <GoalParentComboBox
-                                        text={tr('Enter project or team title')}
-                                        placeholder={tr('Enter project or team title')}
+                                        text={tr('Enter project')}
+                                        placeholder={tr('Enter project')}
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
                                         {...field}

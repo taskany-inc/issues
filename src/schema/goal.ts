@@ -36,7 +36,7 @@ export type ToggleGoalArchive = z.infer<typeof toggleGoalArchiveSchema>;
 export const goalCommonSchema = z.object({
     title: z
         .string({
-            required_error: tr("Goal's title is required"),
+            required_error: tr('Title is required'),
             invalid_type_error: tr("Goal's title must be a string"),
         })
         .min(10, {
@@ -58,8 +58,8 @@ export const goalCommonSchema = z.object({
             flowId: z.string(),
         },
         {
-            invalid_type_error: tr("Goal's project or team are required"),
-            required_error: tr("Goal's project or team are required"),
+            invalid_type_error: tr("Goal's project are is required"),
+            required_error: tr("Goal's project are is required"),
         },
     ),
     state: z.object({
@@ -99,7 +99,7 @@ export const goalUpdateSchema = z.object({
     id: z.string(),
     title: z
         .string({
-            required_error: tr("Goal's title is required"),
+            required_error: tr('Title is required'),
             invalid_type_error: tr("Goal's title must be a string"),
         })
         .min(10, {
@@ -124,8 +124,8 @@ export const goalUpdateSchema = z.object({
             flowId: z.string(),
         },
         {
-            invalid_type_error: tr("Goal's project or team are required"),
-            required_error: tr("Goal's project or team are required"),
+            invalid_type_error: tr("Goal's project are is required"),
+            required_error: tr("Goal's project are is required"),
         },
     ),
     state: z.object({
