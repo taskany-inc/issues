@@ -320,3 +320,158 @@ ${renderFooter()}`);
         text: subject,
     };
 };
+
+interface childProjectCreatedProps {
+    to: SendMailProps['to'];
+    childKey: string;
+    childTitle: string;
+    projectKey: string;
+    projectTitle: string;
+    author?: string;
+}
+
+export const childProjectCreated = async ({
+    to,
+    childKey,
+    childTitle,
+    projectKey,
+    projectTitle,
+    author = 'Somebody',
+}: childProjectCreatedProps) => {
+    const subject = `🎉 New child project in #${projectKey}: ${projectTitle}`;
+    const html = md.render(`
+🧑‍💻 **${author}** created new project **[${childKey}: ${childTitle}](${absUrl(
+        `/projects/${childKey}`,
+    )})** in **[#${projectKey}: ${projectTitle}](${absUrl(`/projects/${projectKey}`)})**.
+
+${renderNotice()}
+
+${renderFooter()}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
+
+interface childProjectDeletedProps {
+    to: SendMailProps['to'];
+    childKey: string;
+    childTitle: string;
+    projectKey: string;
+    projectTitle: string;
+    author?: string;
+}
+
+export const childProjectDeleted = async ({
+    to,
+    childKey,
+    childTitle,
+    projectKey,
+    projectTitle,
+    author = 'Somebody',
+}: childProjectDeletedProps) => {
+    const subject = `🎉 Child project was removed from #${projectKey}: ${projectTitle}`;
+    const html = md.render(`
+🧑‍💻 **${author}** removed project **[${childKey}: ${childTitle}](${absUrl(
+        `/projects/${childKey}`,
+    )})** from **[#${projectKey}: ${projectTitle}](${absUrl(`/projects/${projectKey}`)})**.
+
+${renderNotice()}
+
+${renderFooter()}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
+
+interface ProjectUpdatedEmailProps {
+    to: SendMailProps['to'];
+    key: string;
+    title: string;
+    updatedFields: {
+        title?: FieldDiff;
+        description?: FieldDiff;
+    };
+    author?: string;
+}
+
+export const projectUpdated = async ({
+    to,
+    key,
+    title,
+    updatedFields,
+    author = 'Somebody',
+}: ProjectUpdatedEmailProps) => {
+    const subject = `ℹ️ Project #${key}: ${title} was updated`;
+    const html = md.render(`
+🧑‍💻 **${author}** updated project **[#${key}: ${title}](${absUrl(`/projects/${key}`)})**.
+
+${
+    updatedFields.title
+        ? `
+Title:
+\`\`\` diff
+- ${updatedFields.title[0]}
++ ${updatedFields.title[1]}
+\`\`\`
+`
+        : ''
+}
+
+${
+    updatedFields.description
+        ? `
+Description:
+\`\`\` diff
+- ${updatedFields.description[0]}
++ ${updatedFields.description[1]}
+\`\`\`
+`
+        : ''
+}
+}
+
+${renderNotice()}
+
+${renderFooter()}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
+
+interface ProjectTransferedProps {
+    to: SendMailProps['to'];
+    key: string;
+    title: string;
+    author?: string;
+}
+
+export const projectTransfered = async ({ to, key, title, author = 'Somebody' }: ProjectTransferedProps) => {
+    const subject = `Project #${key}: ${title} was transfered`;
+    const html = md.render(`
+🧑‍💻 **${author}** transfered project **[${key}: ${title}](${absUrl(
+        `/projects/${key}`,
+    )})** to you. You are new owner. Congrats! 🎉
+
+${notice}
+
+${footer}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
