@@ -15,9 +15,8 @@ const renderQuote = (quote: string) =>
         .split('\n')
         .map((part: string) => `> ${part}`)
         .join('\n');
-const renderNotice = () =>
-    '_NB: you got this email because your are owner/issuer/participant/watcher of this goal or project._';
-const renderFooter = () => `
+const notice = "_NB: you got this email because  you're the owner/issuer/participant/watcher of this goal or project._";
+const footer = `
 ____
 
 © 2023 Taskany inc.
@@ -50,9 +49,9 @@ ${renderQuote(body)}
 
 🗣 [Reply](${replyUrl}) to this comment.
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -85,9 +84,9 @@ export const goalStateUpdated = async ({
         `/goals/${shortId}`,
     )})** from ~~\`${stateTitleBefore}\`~~ to \`${stateTitleAfter}\`.
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -128,9 +127,9 @@ ${renderQuote(body)}
 
 📍 [Jump to the comment](${replyUrl}).
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -200,9 +199,9 @@ Priority:
         : ''
 }
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -224,9 +223,9 @@ export const goalArchived = async ({ to, shortId, title, author = 'Somebody' }: 
     const html = md.render(`
 🧑‍💻 **${author}** archived goal **[${shortId}: ${title}](${absUrl(`/goals/${shortId}`)})**.
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -245,13 +244,13 @@ interface GoalAssignedEmailProps {
 
 // TODO: send notification to issuer if he is not author of changes
 export const goalAssigned = async ({ to, shortId, title, author = 'Somebody' }: GoalAssignedEmailProps) => {
-    const subject = `ℹ️ You was assigned to #${shortId}`;
+    const subject = `ℹ️ You were assigned to #${shortId}`;
     const html = md.render(`
 🧑‍💻 **${author}** assigned goal **[${shortId}: ${title}](${absUrl(
         `/goals/${shortId}`,
-    )})** on you. Congrats and good luck! 🎉
+    )})** to you. Congrats and good luck! 🎉
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -270,13 +269,13 @@ interface GoalUnassignedEmailProps {
 
 // TODO: send notification to issuer if he is not author of changes
 export const goalUnassigned = async ({ to, shortId, title, author = 'Somebody' }: GoalUnassignedEmailProps) => {
-    const subject = `ℹ️ You was unassigned from #${shortId}`;
+    const subject = `ℹ️ You were unassigned from #${shortId}`;
     const html = md.render(`
 🧑‍💻 **${author}** unassigned you from goal **[${shortId}: ${title}](${absUrl(
         `/goals/${shortId}`,
     )})**. So sad and c u on the next goal! 🤗
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -309,9 +308,9 @@ export const goalCreated = async ({
         `/goals/${shortId}`,
     )})** in **[#${projectKey}: ${projectTitle}](${absUrl(`/projects/${projectKey}`)})**.
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -344,9 +343,9 @@ export const childProjectCreated = async ({
         `/projects/${childKey}`,
     )})** in **[#${projectKey}: ${projectTitle}](${absUrl(`/projects/${projectKey}`)})**.
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -379,9 +378,9 @@ export const childProjectDeleted = async ({
         `/projects/${childKey}`,
     )})** from **[#${projectKey}: ${projectTitle}](${absUrl(`/projects/${projectKey}`)})**.
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
@@ -438,9 +437,9 @@ Description:
 }
 }
 
-${renderNotice()}
+${notice}
 
-${renderFooter()}`);
+${footer}`);
 
     return {
         to,
