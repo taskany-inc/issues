@@ -21,7 +21,7 @@ interface CommentFormProps {
     description?: string;
 
     renderActionButton: (props: { busy?: boolean }) => React.ReactNode;
-    onSubmit?: (form: GoalCommentSchema) => void | Promise<boolean>;
+    onSubmit?: (form: GoalCommentSchema) => void | Promise<void>;
     onFocus?: () => void;
     onCancel?: () => void;
 }
@@ -103,8 +103,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
             setCommentFocused(false);
             reset();
 
-            const isSuccess = await onSubmit?.(form);
-            if (!isSuccess) return;
+            await onSubmit?.(form);
 
             setBusy(false);
         },
