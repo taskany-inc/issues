@@ -71,14 +71,6 @@ const IssueContent = styled(PageContent)`
     gap: ${gapM};
 `;
 
-const StyledCard = styled(Card)`
-    min-height: auto; // FIXME: https://github.com/taskany-inc/bricks/issues/211
-`;
-
-const StyledCardContent = styled(CardContent)`
-    padding-bottom: 12px; // FIXME: https://github.com/taskany-inc/bricks/issues/211
-`;
-
 const StyledCardInfo = styled(CardInfo)`
     display: grid;
     grid-template-columns: 6fr 6fr;
@@ -298,14 +290,14 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
             <IssueContent>
                 <div>
-                    <StyledCard>
+                    <Card>
                         <StyledCardInfo>
                             <div>
                                 <RelativeTime kind="Created" date={goal.createdAt} />
                             </div>
                         </StyledCardInfo>
 
-                        <StyledCardContent>
+                        <CardContent>
                             {goal.description ? (
                                 <Md>{goal.description}</Md>
                             ) : (
@@ -313,8 +305,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     {tr('No description provided')}
                                 </Text>
                             )}
-                        </StyledCardContent>
-                    </StyledCard>
+                        </CardContent>
+                    </Card>
 
                     {nullable(goal, ({ activityFeed, id, goalAchiveCriteria, relations, _isEditable }) => (
                         <GoalActivity
