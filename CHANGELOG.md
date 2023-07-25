@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.18.0](https://github.com/taskany-inc/issues/compare/v1.17.0...v1.18.0) (2023-07-25)
+
+
+### Features
+
+* completely replaced to sql and add filters ([3130f88](https://github.com/taskany-inc/issues/commit/3130f8861eefa12403200366073a64e9f5787e00))
+* **Goal:** email notifications ([ff8da02](https://github.com/taskany-inc/issues/commit/ff8da029e6518a63acb4f9e01c90b6cadf9256ea))
+* **Project:** email notifications ([a28a804](https://github.com/taskany-inc/issues/commit/a28a8046ae4b79d0c1b122a8bf607ef723012c31))
+* replaced projects request to sql ([f691324](https://github.com/taskany-inc/issues/commit/f69132427f9b939ff9cc4845bab89d44d5a57976))
+* **schema:** added translations i18 ([d8a17ae](https://github.com/taskany-inc/issues/commit/d8a17ae7d98aabad06c1d42c0b6e3e14d3829c8a))
+
+
+### Bug Fixes
+
+* **db:** fix search estimate with optional parameters q and date ([0e262f0](https://github.com/taskany-inc/issues/commit/0e262f0bf9f6f5904936f86829a0615441aaca45))
+* **db:** fix search estimate with optional parameters q and date ([7a2862a](https://github.com/taskany-inc/issues/commit/7a2862a983e8e0c10bc5fac9bc35fc4a00f53073))
+* **FeedbackCreateForm:** change feedback api to trpc ([5c6a23d](https://github.com/taskany-inc/issues/commit/5c6a23d4f84ef9a2e52f041d48d020d3f4b12185))
+* **GoalCreateForm:** disable the local state busy after request response ([63b4d60](https://github.com/taskany-inc/issues/commit/63b4d60a722367f5bad8acf81c46e394be2dd8e3))
+* **GoalDependencies,GoalCriteria:** apply common styles for features ([51e8a9c](https://github.com/taskany-inc/issues/commit/51e8a9cf5b10ce3df33f80f43fbed187e2e9431e))
+* **GoalHistory:** fix user avatars ([5633bcb](https://github.com/taskany-inc/issues/commit/5633bcb916413fced10003dd2d4979a117dd00a7))
+* **Goal:** support estimate diff in email notification, [#1358](https://github.com/taskany-inc/issues/issues/1358) ([c28f287](https://github.com/taskany-inc/issues/commit/c28f28704760324cd1c8714e418b666962d4fe4a))
+* **HistoryRecord:** spelling issue ([0bde05c](https://github.com/taskany-inc/issues/commit/0bde05c121acc51cd8486bc9a26163b9ea3a1c3d))
+* **hooks:** unconditional hook call in StateDropdown and StateSwitch ([fdef66a](https://github.com/taskany-inc/issues/commit/fdef66ad7f9ed7380bd6bd4ed68eb315fd68ea61))
+* **ProjectSettingsPage:** change modal event on transfer ownership button ([8cffb63](https://github.com/taskany-inc/issues/commit/8cffb6309bf8f6b0ea0dbce2d6eddd079cb6a5ba))
+* remove test db name ([3732dda](https://github.com/taskany-inc/issues/commit/3732ddaa0a4329185e8be04052f79b525b6a4b3b))
+* **search:** don't search for archived goals ([3638d0b](https://github.com/taskany-inc/issues/commit/3638d0b618df5a83905dba9981b36ca2b3453d94))
+
 ## [1.17.0](https://github.com/taskany-inc/issues/compare/v1.16.6...v1.17.0) (2023-07-20)
 
 
