@@ -47,52 +47,60 @@ import { createLocaleDate } from '../../src/utils/dateTime';
 import { addCalculatedProjectFields } from './project';
 
 export const goal = router({
-    suggestions: protectedProcedure.input(suggestionsQueryScheme).query(async ({ input }) => {
-        const splittedInput = input.input.split('-');
-        let selectParams: Prisma.GoalFindManyArgs['where'] = {
-            title: {
-                contains: input.input,
-                mode: 'insensitive',
-            },
-        };
+    suggestions: protectedProcedure
+        .input(suggestionsQueryScheme)
+        .query(async ({ ctx, input: { input, limit = 5 } }) => {
+            const { activityId } = ctx.session.user || {};
 
-        if (splittedInput.length === 2 && !Number.isNaN(+splittedInput[1])) {
-            const [projectId, scopedId] = splittedInput;
-            selectParams = {
-                AND: [
-                    {
-                        projectId: {
-                            contains: projectId,
-                            mode: 'insensitive',
-                        },
-                    },
-                    {
-                        scopeId: Number(scopedId),
-                    },
-                ],
+            const splittedInput = input.split('-');
+            let selectParams: Prisma.GoalFindManyArgs['where'] = {
+                title: {
+                    contains: input,
+                    mode: 'insensitive',
+                },
             };
-        }
 
-        return prisma.goal.findMany({
-            take: input.limit || 5,
-            where: {
-                AND: {
-                    ...selectParams,
-                    OR: [
+            if (splittedInput.length === 2 && !Number.isNaN(+splittedInput[1])) {
+                const [projectId, scopedId] = splittedInput;
+                selectParams = {
+                    AND: [
                         {
-                            archived: false,
+                            projectId: {
+                                contains: projectId,
+                                mode: 'insensitive',
+                            },
                         },
                         {
-                            archived: null,
+                            scopeId: Number(scopedId),
                         },
                     ],
+                };
+            }
+
+            return prisma.goal.findMany({
+                take: limit,
+                orderBy: {
+                    createdAt: 'desc',
                 },
-            },
-            include: {
-                ...goalDeepQuery,
-            },
-        });
-    }),
+                where: {
+                    activityId: input.length ? { contains: '' } : activityId,
+                    AND: {
+                        ...selectParams,
+                        OR: [
+                            {
+                                archived: false,
+                            },
+                            {
+                                archived: null,
+                            },
+                        ],
+                    },
+                },
+                include: {
+                    ...goalDeepQuery,
+                },
+            });
+        }),
     getBatch: protectedProcedure
         .input(
             z.object({
