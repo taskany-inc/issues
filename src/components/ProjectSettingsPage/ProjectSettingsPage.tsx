@@ -323,7 +323,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                     />
                                 </FormAction>
                                 <FormAction right inline>
-                                    <Button size="m" text={tr('Cancel')} onClick={onDeleteCancel} />
+                                    <Button
+                                        size="m"
+                                        text={tr('Cancel')}
+                                        onClick={dispatchModalEvent(ModalEvent.ProjectTransferModal)}
+                                    />
                                     <Button
                                         size="m"
                                         view="warning"
