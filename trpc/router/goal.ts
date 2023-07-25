@@ -708,7 +708,7 @@ export const goal = router({
             }
 
             try {
-                const updatedGoal = prisma.goal.update({
+                const updatedGoal = await prisma.goal.update({
                     where: { id },
                     data: {
                         archived,
@@ -722,6 +722,10 @@ export const goal = router({
                         },
                     },
                 });
+
+                if (updatedGoal) {
+                    await updateGoalWithCalculatedWeight(updatedGoal.id);
+                }
 
                 const recipients = Array.from(
                     new Set(

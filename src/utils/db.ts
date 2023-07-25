@@ -335,7 +335,7 @@ export const updateGoalWithCalculatedWeight = async (goalId: string) => {
                 await ctx.$executeRaw`
                     UPDATE "Project"
                     SET "averageScore" = (SELECT AVG("completedCriteriaWeight") FROM "Goal"
-                        WHERE "projectId" = ${updatedGoal.projectId})
+                        WHERE "projectId" = ${updatedGoal.projectId} AND "archived" IS NOT true)
                     WHERE "id" = ${updatedGoal.projectId};
                 `;
             }
