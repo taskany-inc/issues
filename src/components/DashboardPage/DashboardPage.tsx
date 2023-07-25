@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -22,17 +22,16 @@ import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
+import { useGoalPreview } from '../GoalPreview/GoalPreview';
 
 import { tr } from './DashboardPage.i18n';
 
-const GoalPreview = dynamic(() => import('../GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
 export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
     const router = useRouter();
-    const [preview, setPreview] = useState<GoalByIdReturnType | null>(null);
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
@@ -97,11 +96,13 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
 
     const groups = Object.values(groupsMap);
 
+    const { setGoalPreview, preview } = useGoalPreview();
+
     useEffect(() => {
         const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
 
-        if (isGoalDeletedAlready) setPreview(null);
-    }, [goals, preview]);
+        if (isGoalDeletedAlready) setGoalPreview(null);
+    }, [goals, preview, setGoalPreview]);
 
     const onGoalPrewiewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
@@ -109,14 +110,10 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                 if (e.metaKey || e.ctrlKey) return;
 
                 e.preventDefault();
-                setPreview(goal);
+                setGoalPreview(goal);
             },
-        [],
+        [setGoalPreview],
     );
-
-    const onGoalPreviewDestroy = useCallback(() => {
-        setPreview(null);
-    }, []);
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
@@ -237,10 +234,6 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                     )}
                 </GoalsListContainer>
             </PageContent>
-
-            {nullable(preview, (p) => (
-                <GoalPreview preview={p} onClose={onGoalPreviewDestroy} onDelete={onGoalPreviewDestroy} />
-            ))}
 
             {nullable(queryString, (params) => (
                 <ModalOnEvent event={ModalEvent.FilterCreateModal} hotkeys={createFilterKeys}>
