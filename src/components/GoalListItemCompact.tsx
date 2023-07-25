@@ -43,7 +43,7 @@ export const GoalListItemCompact: React.FC<GoalListItemCompactProps> = React.mem
         }, [issuer, owner]);
 
         return (
-            <NextLink href={routes.goal(shortId)} passHref>
+            <NextLink href={routes.goal(shortId)} passHref legacyBehavior>
                 <TableRow as="a" focused={focused} onClick={onClick} className={className}>
                     <ContentItem>
                         <GoalIcon size="s" />

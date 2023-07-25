@@ -238,7 +238,11 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
 
                         return (
                             <CustomCell>
-                                <NextLink passHref href={routes.goal(`${values.projectId}-${values.scopeId}`)}>
+                                <NextLink
+                                    passHref
+                                    href={routes.goal(`${values.projectId}-${values.scopeId}`)}
+                                    legacyBehavior
+                                >
                                     <Title size="s" weight="bold">
                                         {values.title}
                                     </Title>

@@ -161,7 +161,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         }, [issuer, owner]);
 
         return (
-            <NextLink href={routes.goal(shortId)} passHref>
+            <NextLink href={routes.goal(shortId)} passHref legacyBehavior>
                 <TableRow as="a" focused={focused} className={className} onClick={onClick}>
                     <GoalTitleItem>
                         <GoalTitleContainer>

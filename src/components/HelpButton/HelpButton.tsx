@@ -13,7 +13,7 @@ interface HelpButtonProps {
 }
 
 export const HelpButton = React.memo(({ slug, size = 's', color = gray9 }: HelpButtonProps) => (
-    <NextLink passHref href={routes.help(slug)}>
+    <NextLink passHref href={routes.help(slug)} legacyBehavior>
         <Link>
             <QuestionIcon size={size} color={color} />
         </Link>

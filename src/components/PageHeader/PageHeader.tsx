@@ -74,7 +74,7 @@ export const PageHeader: FC = () => {
             nav={
                 <StyledHeaderNav>
                     {links.map(({ href, title, beta }) => (
-                        <NextLink href={href} passHref key={href}>
+                        <NextLink href={href} passHref key={href} legacyBehavior>
                             <HeaderNavLink>
                                 {title}{' '}
                                 {nullable(beta, () => (

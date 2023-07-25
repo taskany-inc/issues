@@ -25,7 +25,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                     <ProjectListContainer>
                         {projects.data.map((project) =>
                             nullable(project, (p) => (
-                                <NextLink key={p.id} href={routes.project(p.id)} passHref>
+                                <NextLink key={p.id} href={routes.project(p.id)} passHref legacyBehavior>
                                     <ProjectListItem
                                         as="a"
                                         title={p.title}

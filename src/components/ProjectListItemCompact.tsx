@@ -20,7 +20,7 @@ interface ProjectListItemCompactProps {
 export const ProjectListItemCompact: React.FC<ProjectListItemCompactProps> = React.memo(
     ({ id, owner, title, focused, className, onClick }) => {
         return (
-            <NextLink href={routes.project(id)} passHref>
+            <NextLink href={routes.project(id)} passHref legacyBehavior>
                 <TableRow as="a" focused={focused} onClick={onClick} className={className}>
                     <ContentItem>
                         <ProjectIcon size="s" />
