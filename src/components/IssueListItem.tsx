@@ -43,7 +43,7 @@ const StyledDotWrapper = styled.div<{ size: IssueListItemProps['size'] }>`
 
 export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, size = 's' }) => {
     return (
-        <NextLink passHref href={routes.goal(issue._shortId)}>
+        <NextLink passHref href={routes.goal(issue._shortId)} legacyBehavior>
             <StyledLink inline>
                 <StyledIssueListItem className={className}>
                     {nullable(issue.state, (state) => (

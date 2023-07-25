@@ -12,7 +12,7 @@ export const ProjectTitleList: React.FC<ProjectTitleListProps> = ({ projects = [
         {projects.map((project, i) =>
             nullable(project, (pr) => (
                 <span key={pr.title}>
-                    <NextLink key={pr.id} passHref href={routes.project(pr.id)}>
+                    <NextLink key={pr.id} passHref href={routes.project(pr.id)} legacyBehavior>
                         <Link inline title={pr.description ?? undefined}>
                             {pr.title}
                         </Link>

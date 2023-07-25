@@ -219,7 +219,7 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                                     onTagClick={setTagsFilterOutside}
                                 >
                                     <ProjectListContainer>
-                                        <NextLink href={routes.project(group.project.id)} passHref>
+                                        <NextLink href={routes.project(group.project.id)} passHref legacyBehavior>
                                             <ProjectListItem
                                                 key={group.project.id}
                                                 as="a"

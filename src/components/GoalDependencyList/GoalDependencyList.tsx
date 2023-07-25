@@ -99,7 +99,11 @@ const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({ onRemov
                     name: 'title',
                     renderColumn: (values) => (
                         <CustomCell>
-                            <NextLink passHref href={routes.goal(`${values.projectId}-${values.scopeId}`)}>
+                            <NextLink
+                                passHref
+                                href={routes.goal(`${values.projectId}-${values.scopeId}`)}
+                                legacyBehavior
+                            >
                                 <Title size="s" weight="bold">
                                     {values.title}
                                 </Title>

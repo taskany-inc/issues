@@ -8,9 +8,7 @@ export const PageHeaderLogo: React.FC = () => {
 
     return (
         <NextLink href={routes.index()} passHref>
-            <a>
-                <TaskanyLogo />
-            </a>
+            <TaskanyLogo />
         </NextLink>
     );
 };

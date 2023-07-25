@@ -119,7 +119,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                             </StyledProjectListItemAction>
                             <StyledProjectListItemAction>
                                 {nullable(href, (h) => (
-                                    <NextLink href={h} passHref>
+                                    <NextLink href={h} passHref legacyBehavior>
                                         <Link inline target="_blank" onClick={onExternalLinkClick}>
                                             <ExternalLinkIcon size="s" />
                                         </Link>
