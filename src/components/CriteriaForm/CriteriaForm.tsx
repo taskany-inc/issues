@@ -280,7 +280,7 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
                             setError={setError}
                             onSelect={handleSelectGoal}
                             titles={validityData.title}
-                            isItemSelected={selectedGoalId != null}
+                            isItemSelected={Boolean(selectedGoalId?.id)}
                         />
                     )}
                 />
