@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { createContext, FC, ReactNode, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { danger0, gapM, gapS, gray7 } from '@taskany/colors';
@@ -52,14 +52,15 @@ const StateSwitch = dynamic(() => import('../StateSwitch'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
 
+type Preview = {
+    _shortId: string;
+    id: string;
+    title: string;
+    description?: string | null;
+    updatedAt: Date;
+};
 interface GoalPreviewProps {
-    preview: {
-        _shortId: string;
-        id: string;
-        title: string;
-        description?: string | null;
-        updatedAt: Date;
-    };
+    preview: Preview;
 
     onClose?: () => void;
     onDelete?: () => void;
@@ -98,7 +99,29 @@ const StyledCard = styled(Card)`
     min-height: 60px;
 `;
 
-const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
+type ContextType = {
+    preview: Preview | null;
+    setGoalPreview: (preview: Preview | null) => void;
+};
+
+const GoalPreviewProviderContext = createContext<ContextType>({
+    preview: null,
+    setGoalPreview: () => {},
+});
+
+export const useGoalPreview = () => {
+    return useContext(GoalPreviewProviderContext);
+};
+
+export const GoalPreviewProvider: FC<{ children: ReactNode }> = ({ children }) => {
+    const [goalPreview, setGoalPreview] = useState<Preview | null>(null);
+
+    const value = useMemo(() => ({ preview: goalPreview, setGoalPreview }), [goalPreview]);
+
+    return <GoalPreviewProviderContext.Provider value={value}>{children}</GoalPreviewProviderContext.Provider>;
+};
+
+const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
     const { user } = usePageContext();
     const [isRelativeTime, setIsRelativeTime] = useState(true);
 
@@ -410,4 +433,14 @@ const GoalPreview: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete })
     );
 };
 
-export default GoalPreview;
+export const GoalPreview: FC = () => {
+    const { setGoalPreview, preview } = useGoalPreview();
+
+    const onPreviewDestroy = useCallback(() => {
+        setGoalPreview(null);
+    }, []);
+
+    return nullable(preview, (p) => (
+        <GoalPreviewModal preview={p} onClose={onPreviewDestroy} onDelete={onPreviewDestroy} />
+    ));
+};

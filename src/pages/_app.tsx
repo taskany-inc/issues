@@ -9,6 +9,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { usePageLoad } from '../hooks/usePageLoad';
 import { trpc } from '../utils/trpcClient';
 import { TLocale, setSSRLocale } from '../utils/getLang';
+import { GoalPreviewProvider, GoalPreview } from '../components/GoalPreview/GoalPreview';
 
 const App = ({ Component, pageProps, router }: AppProps) => {
     setSSRLocale(router.locale as TLocale);
@@ -23,9 +24,12 @@ const App = ({ Component, pageProps, router }: AppProps) => {
 
             <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
                 <ThemeProvider themes={['light', 'dark']}>
-                    <PageLoadProgress height={2} ref={pageLoadRef} />
-                    <Component {...pageProps} />
-                    <ReactQueryDevtools />
+                    <GoalPreviewProvider>
+                        <PageLoadProgress height={2} ref={pageLoadRef} />
+                        <Component {...pageProps} />
+                        <ReactQueryDevtools />
+                        <GoalPreview />
+                    </GoalPreviewProvider>
                 </ThemeProvider>
             </SessionProvider>
         </>
