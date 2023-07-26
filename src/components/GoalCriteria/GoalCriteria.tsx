@@ -143,6 +143,7 @@ interface GoalCriteriaItemProps {
     estimate?: GoalEstimate | null;
     state?: State | null;
     onConvertToGoal?: () => void;
+    onClick?: () => void;
 }
 
 const criteriaGuard = (props: GoalCriteriaItemProps): props is CriteriaAsGoalProps => {
@@ -162,6 +163,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
         canEdit,
         onRemove,
         onConvertToGoal,
+        onClick,
         title,
         isDone,
         weight,
@@ -207,6 +209,16 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
         val.handler();
     }, []);
 
+    const onTitleClickHandler = useCallback(
+        (e: React.MouseEvent) => {
+            if (onClick) {
+                e.preventDefault();
+                onClick();
+            }
+        },
+        [onClick],
+    );
+
     return (
         <StyledTableRow
             actions={availableActions}
@@ -243,7 +255,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
                                     href={routes.goal(`${values.projectId}-${values.scopeId}`)}
                                     legacyBehavior
                                 >
-                                    <Title size="s" weight="bold">
+                                    <Title size="s" weight="bold" onClick={onTitleClickHandler}>
                                         {values.title}
                                     </Title>
                                 </NextLink>
@@ -281,6 +293,7 @@ interface GoalCriteriaProps {
     goalId: string;
     criteriaList?: GoalAchiveCriteria[];
     canEdit: boolean;
+    onClick?: (itenm: GoalAchiveCriteria) => void;
     onAddCriteria: (val: AddCriteriaScheme) => void;
     onToggleCriteria: (val: UpdateCriteriaScheme) => void;
     onRemoveCriteria: (val: RemoveCriteriaScheme) => void;
@@ -298,6 +311,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     goalId,
     criteriaList = [],
     canEdit,
+    onClick,
     onAddCriteria,
     onToggleCriteria,
     onRemoveCriteria,
@@ -377,6 +391,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                     issuer={item.goalAsCriteria?.activity}
                                     state={item.goalAsCriteria?.state}
                                     onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
+                                    onClick={onClick ? () => onClick(item) : undefined}
                                     onRemove={() => onRemoveCriteria({ id: item.id, goalId })}
                                     onConvertToGoal={() => onConvertToGoal(item)}
                                     canEdit={canEdit}

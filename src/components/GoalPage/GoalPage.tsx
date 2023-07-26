@@ -37,7 +37,7 @@ import { trpc } from '../../utils/trpcClient';
 import { GoalStateChangeSchema } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
-import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType, GoalAchiveCriteria, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
 import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
@@ -52,6 +52,7 @@ import { State } from '../State';
 import { GoalParentComboBox } from '../GoalParentComboBox';
 import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
 import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm';
+import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 
 import { tr } from './GoalPage.i18n';
 
@@ -228,6 +229,37 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     const criteria = useCriteriaResource(invalidateFn);
     const dependency = useGoalDependencyResource(invalidateFn);
 
+    const { setPreview } = useGoalPreview();
+
+    const onGoalCriteriaClick = useCallback(
+        (item: GoalAchiveCriteria) => {
+            if (item.goalAsCriteria) {
+                const { projectId, scopeId, title, description, updatedAt } = item.goalAsCriteria;
+                const shortId = `${projectId}-${scopeId}`;
+
+                setPreview(shortId, {
+                    title,
+                    description,
+                    updatedAt,
+                });
+            }
+        },
+        [setPreview],
+    );
+
+    const onGoalDependencyClick = useCallback(
+        ({ projectId, scopeId, title, description, updatedAt }: GoalDependencyItem) => {
+            const shortId = `${projectId}-${scopeId}`;
+
+            setPreview(shortId, {
+                title,
+                description,
+                updatedAt,
+            });
+        },
+        [setPreview],
+    );
+
     if (!goal || !owner || !issuer) return null;
 
     const participantsFilter = goal.participants.map(({ id }) => id).concat([owner.id, issuer.id]);
@@ -327,6 +359,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onToggleCriteria={criteria.onToggleHandler}
                                     onRemoveCriteria={criteria.onRemoveHandler}
                                     onConvertToGoal={criteria.onConvertCriteria}
+                                    onClick={onGoalCriteriaClick}
                                     canEdit={_isEditable}
                                     renderForm={(props) =>
                                         nullable(_isEditable, () => (
@@ -351,6 +384,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                             items={deps.goals}
                                             canEdit={_isEditable}
                                             onRemove={dependency.onRemoveHandler}
+                                            onClick={onGoalDependencyClick}
                                         >
                                             {nullable(_isEditable, () => (
                                                 <GoalDependencyAddForm

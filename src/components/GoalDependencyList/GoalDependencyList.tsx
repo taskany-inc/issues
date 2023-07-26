@@ -70,9 +70,16 @@ interface GoalDependencyListItemProps {
     estimate?: Estimate;
     canEdit: boolean;
     onRemove: () => void;
+    onClick?: () => void;
 }
 
-const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({ onRemove, canEdit, ...props }) => {
+const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({
+    onRemove,
+    onClick,
+    shortId,
+    canEdit,
+    ...props
+}) => {
     const availableActions = useMemo(() => {
         if (!canEdit) {
             return;
@@ -88,6 +95,16 @@ const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({ onRemov
         ];
     }, [canEdit, onRemove]);
 
+    const onClickHandler = useCallback(
+        (e: React.MouseEvent) => {
+            if (onClick) {
+                e.preventDefault();
+                onClick();
+            }
+        },
+        [onClick],
+    );
+
     return (
         <StyledTableRow
             forwardedAs="div"
@@ -99,12 +116,8 @@ const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({ onRemov
                     name: 'title',
                     renderColumn: (values) => (
                         <CustomCell>
-                            <NextLink
-                                passHref
-                                href={routes.goal(`${values.projectId}-${values.scopeId}`)}
-                                legacyBehavior
-                            >
-                                <Title size="s" weight="bold">
+                            <NextLink passHref href={routes.goal(shortId)} legacyBehavior>
+                                <Title size="s" weight="bold" onClick={onClickHandler}>
                                     {values.title}
                                 </Title>
                             </NextLink>
@@ -133,6 +146,7 @@ interface GoalDependencyListByKindProps<T> {
     items: T[];
     canEdit: boolean;
     onRemove: (values: ToggleGoalDependency) => void;
+    onClick?: (item: T) => void;
     children: React.ReactNode;
     showBeta?: boolean;
 }
@@ -144,6 +158,7 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
     showBeta,
     canEdit,
     onRemove,
+    onClick,
     children,
 }: GoalDependencyListByKindProps<T>): React.ReactElement {
     const onRemoveHandler = useCallback(
@@ -192,6 +207,7 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
                                     shortId={`${item.projectId}-${item.scopeId}`}
                                     estimate={item.estimate[item.estimate.length - 1]?.estimate}
                                     onRemove={() => onRemoveHandler(item)}
+                                    onClick={onClick ? () => onClick(item) : undefined}
                                 />
                             ))}
                         </StyledTable>

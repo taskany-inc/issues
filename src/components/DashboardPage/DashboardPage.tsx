@@ -22,7 +22,7 @@ import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
-import { useGoalPreview } from '../GoalPreview/GoalPreview';
+import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -96,23 +96,23 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
 
     const groups = Object.values(groupsMap);
 
-    const { setGoalPreview, preview } = useGoalPreview();
+    const { setPreview, preview } = useGoalPreview();
 
     useEffect(() => {
         const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
 
-        if (isGoalDeletedAlready) setGoalPreview(null);
-    }, [goals, preview, setGoalPreview]);
+        if (isGoalDeletedAlready) setPreview(null);
+    }, [goals, preview, setPreview]);
 
     const onGoalPrewiewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
-                if (e.metaKey || e.ctrlKey) return;
+                if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
 
                 e.preventDefault();
-                setGoalPreview(goal);
+                setPreview(goal._shortId, goal);
             },
-        [setGoalPreview],
+        [setPreview],
     );
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
