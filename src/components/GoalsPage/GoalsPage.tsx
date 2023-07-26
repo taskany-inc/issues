@@ -19,7 +19,7 @@ import { GoalListItem, GoalsListContainer } from '../GoalListItem';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { Nullish } from '../../types/void';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
-import { useGoalPreview } from '../GoalPreview/GoalPreview';
+import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -90,23 +90,23 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
     });
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
-    const { preview, setGoalPreview } = useGoalPreview();
+    const { preview, setPreview } = useGoalPreview();
 
     useEffect(() => {
         const isGoalDeletedAlready = preview && !goalsOnScreen?.some((g) => g.id === preview.id);
 
-        if (isGoalDeletedAlready) setGoalPreview(null);
-    }, [goalsOnScreen, preview, setGoalPreview]);
+        if (isGoalDeletedAlready) setPreview(null);
+    }, [goalsOnScreen, preview, setPreview]);
 
     const onGoalPrewiewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
-                if (e.metaKey || e.ctrlKey) return;
+                if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
 
                 e.preventDefault();
-                setGoalPreview(goal);
+                setPreview(goal._shortId, goal);
             },
-        [setGoalPreview],
+        [setPreview],
     );
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);

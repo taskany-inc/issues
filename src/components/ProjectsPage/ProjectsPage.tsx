@@ -17,7 +17,7 @@ import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { CommonHeader } from '../CommonHeader';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
-import { useGoalPreview } from '../GoalPreview/GoalPreview';
+import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -58,7 +58,7 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
         preset: preset?.data,
     });
 
-    const { setGoalPreview, preview } = useGoalPreview();
+    const { setPreview, preview } = useGoalPreview();
 
     const { data: projects = [] } = trpc.project.getAll.useQuery({
         firstLevel: true,
@@ -70,12 +70,12 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const onGoalPrewiewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
-                if (e.metaKey || e.ctrlKey) return;
+                if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
 
                 e.preventDefault();
-                setGoalPreview(goal);
+                setPreview(goal._shortId, goal);
             },
-        [setGoalPreview],
+        [setPreview],
     );
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);

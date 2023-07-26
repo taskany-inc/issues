@@ -18,6 +18,7 @@ import { GlobalStyle } from './GlobalStyle';
 import { PageHeader } from './PageHeader/PageHeader';
 import { PageFooter } from './PageFooter/PageFooter';
 import { ModalContext } from './ModalOnEvent';
+import { GoalPreview } from './GoalPreview/GoalPreview';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm/ProjectCreateForm'));
@@ -104,6 +105,8 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
             <ModalOnEvent event={ModalEvent.FeedbackCreateModal}>
                 <FeedbackCreateForm />
             </ModalOnEvent>
+
+            <GoalPreview />
 
             <HotkeysModal />
 

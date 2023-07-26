@@ -1,4 +1,4 @@
-import React, { createContext, FC, ReactNode, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { danger0, gapM, gapS, gray7 } from '@taskany/colors';
@@ -21,12 +21,12 @@ import {
     Text,
 } from '@taskany/bricks';
 
-import { refreshInterval } from '../../utils/config';
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
+import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { IssueTitle } from '../IssueTitle';
 import { IssueParent } from '../IssueParent';
@@ -46,22 +46,17 @@ import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyLi
 import { CommentView } from '../CommentView/CommentView';
 
 import { tr } from './GoalPreview.i18n';
+import { useGoalPreview } from './GoalPreviewProvider';
 
 const Md = dynamic(() => import('../Md'));
 const StateSwitch = dynamic(() => import('../StateSwitch'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
 
-type Preview = {
-    _shortId: string;
-    id: string;
-    title: string;
-    description?: string | null;
-    updatedAt: Date;
-};
 interface GoalPreviewProps {
-    preview: Preview;
-
+    shortId: string;
+    goal: GoalByIdReturnType;
+    defaults: Partial<NonNullable<GoalByIdReturnType>>;
     onClose?: () => void;
     onDelete?: () => void;
 }
@@ -99,29 +94,7 @@ const StyledCard = styled(Card)`
     min-height: 60px;
 `;
 
-type ContextType = {
-    preview: Preview | null;
-    setGoalPreview: (preview: Preview | null) => void;
-};
-
-const GoalPreviewProviderContext = createContext<ContextType>({
-    preview: null,
-    setGoalPreview: () => {},
-});
-
-export const useGoalPreview = () => {
-    return useContext(GoalPreviewProviderContext);
-};
-
-export const GoalPreviewProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const [goalPreview, setGoalPreview] = useState<Preview | null>(null);
-
-    const value = useMemo(() => ({ preview: goalPreview, setGoalPreview }), [goalPreview]);
-
-    return <GoalPreviewProviderContext.Provider value={value}>{children}</GoalPreviewProviderContext.Provider>;
-};
-
-const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDelete }) => {
+export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose, onDelete, goal, defaults }) => {
     const { user } = usePageContext();
     const [isRelativeTime, setIsRelativeTime] = useState(true);
 
@@ -135,12 +108,8 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDele
     const utils = trpc.useContext();
 
     const invalidateFn = useCallback(() => {
-        return utils.goal.getById.invalidate(preview._shortId);
-    }, [utils.goal.getById, preview._shortId]);
-
-    const { data: goal } = trpc.goal.getById.useQuery(preview._shortId, {
-        staleTime: refreshInterval,
-    });
+        return utils.goal.getById.invalidate(shortId);
+    }, [utils.goal.getById, shortId]);
 
     const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
     const onGoalEdit = useCallback(() => {
@@ -161,7 +130,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDele
     const stateChangeMutations = trpc.goal.switchState.useMutation();
     const onGoalStateChange = useCallback(
         async (nextState: GoalStateChangeSchema['state']) => {
-            if (goal) {
+            if (goal?.id) {
                 await stateChangeMutations.mutateAsync({
                     id: goal.id,
                     state: nextState,
@@ -178,8 +147,8 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDele
     }, [invalidateFn]);
 
     const onCommentReactionToggle = useCallback(
-        (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(preview._shortId)),
-        [preview._shortId, commentReaction, utils.goal.getById],
+        (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(shortId)),
+        [shortId, commentReaction, utils.goal.getById],
     );
     const onCommentDelete = useCallback(() => {
         invalidateFn();
@@ -195,16 +164,20 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDele
     }, []);
 
     const onGoalDeleteConfirm = useCallback(async () => {
+        if (!goal?.id) {
+            return;
+        }
+
         onDelete?.();
         const promise = archiveMutation.mutateAsync({
-            id: preview.id,
+            id: goal.id,
             archived: true,
         });
 
         await notifyPromise(promise, 'goalsDelete');
 
         invalidateFn();
-    }, [onDelete, archiveMutation, preview.id, invalidateFn]);
+    }, [onDelete, archiveMutation, goal, invalidateFn]);
 
     const criteria = useCriteriaResource(invalidateFn);
     const dependency = useGoalDependencyResource(invalidateFn);
@@ -223,7 +196,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDele
             });
     }, []);
 
-    const { title, description, updatedAt } = goal || preview;
+    const { title, description, updatedAt } = goal || defaults;
 
     const lastChangedStatusComment = useMemo(() => {
         if (!goal || goal.comments.length <= 1) {
@@ -252,7 +225,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDele
                     ))}
 
                     {nullable(title, (t) => (
-                        <IssueTitle title={t} href={routes.goal(preview._shortId)} size="xl" />
+                        <IssueTitle title={t} href={routes.goal(shortId)} size="xl" />
                     ))}
 
                     <StyledImportantActions>
@@ -265,17 +238,19 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDele
                                 ),
                             )}
 
-                            <IssueStats
-                                mode="compact"
-                                issuer={goal?.activity}
-                                owner={goal?.owner}
-                                estimate={goal?._lastEstimate}
-                                priority={goal?.priority}
-                                achivedCriteriaWeight={goal?._achivedCriteriaWeight}
-                                comments={goal?._count?.comments ?? 0}
-                                onCommentsClick={onCommentsClick}
-                                updatedAt={updatedAt}
-                            />
+                            {nullable(updatedAt, (u) => (
+                                <IssueStats
+                                    mode="compact"
+                                    issuer={goal?.activity}
+                                    owner={goal?.owner}
+                                    estimate={goal?._lastEstimate}
+                                    priority={goal?.priority}
+                                    achivedCriteriaWeight={goal?._achivedCriteriaWeight}
+                                    comments={goal?._count?.comments ?? 0}
+                                    onCommentsClick={onCommentsClick}
+                                    updatedAt={u}
+                                />
+                            ))}
                         </StyledPublicActions>
 
                         {nullable(goal?._isEditable, () => (
@@ -434,13 +409,19 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ preview, onClose, onDele
 };
 
 export const GoalPreview: FC = () => {
-    const { setGoalPreview, preview } = useGoalPreview();
+    const { setPreview, shortId, preview, defaults } = useGoalPreview();
 
     const onPreviewDestroy = useCallback(() => {
-        setGoalPreview(null);
+        setPreview(null);
     }, []);
 
-    return nullable(preview, (p) => (
-        <GoalPreviewModal preview={p} onClose={onPreviewDestroy} onDelete={onPreviewDestroy} />
+    return nullable(shortId, (id) => (
+        <GoalPreviewModal
+            shortId={id}
+            goal={preview}
+            defaults={defaults || {}}
+            onClose={onPreviewDestroy}
+            onDelete={onPreviewDestroy}
+        />
     ));
 };
