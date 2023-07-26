@@ -22,6 +22,7 @@ export const useCommentResource = () => {
             const [data] = await notifyPromise(promise, 'commentCreate');
 
             data && cb(data);
+            return data;
         };
 
     const update =

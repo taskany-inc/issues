@@ -21,7 +21,7 @@ interface CommentFormProps {
     description?: string;
 
     renderActionButton: (props: { busy?: boolean }) => React.ReactNode;
-    onSubmit?: (form: GoalCommentSchema) => void;
+    onSubmit?: (form: GoalCommentSchema) => void | Promise<void>;
     onFocus?: () => void;
     onCancel?: () => void;
 }
@@ -85,6 +85,11 @@ export const CommentForm: React.FC<CommentFormProps> = ({
         },
     });
 
+    const setBusyAndCommentFocused = useCallback((busy: boolean, commentFocused: boolean) => {
+        setBusy(busy);
+        setCommentFocused(commentFocused);
+    }, []);
+
     const onCommentFocus = useCallback(() => {
         setCommentFocused(true);
         onFocus?.();
@@ -92,19 +97,20 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
     const onCommentCancel = useCallback(() => {
         reset();
-        setBusy(false);
-        setCommentFocused(false);
+        setBusyAndCommentFocused(false, false);
         onCancel?.();
-    }, [onCancel, reset]);
+    }, [onCancel, reset, setBusyAndCommentFocused]);
 
     const onCommentSubmit = useCallback(
-        (form: GoalCommentSchema) => {
-            setBusy(true);
-            setCommentFocused(false);
-            onSubmit?.(form);
+        async (form: GoalCommentSchema) => {
+            setBusyAndCommentFocused(true, false);
             reset();
+
+            await onSubmit?.(form);
+
+            setBusyAndCommentFocused(false, true);
         },
-        [onSubmit, reset],
+        [onSubmit, reset, setBusyAndCommentFocused],
     );
 
     useClickOutside(ref, () => {
