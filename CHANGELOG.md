@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.19.0](https://github.com/taskany-inc/issues/compare/v1.18.0...v1.19.0) (2023-07-27)
+
+
+### Features
+
+* **GoalPage:** remove specific styles ([1fab7eb](https://github.com/taskany-inc/issues/commit/1fab7ebff2a4e081db3926aacc1c3b6640a9da69))
+
+
+### Bug Fixes
+
+* **GoalHistory:** getting metadata about each record ([9c1027a](https://github.com/taskany-inc/issues/commit/9c1027af3a12d1f77549b669fac16668c4b87496))
+* **ProjectScore:** recalc score after move goal into archive ([b070d63](https://github.com/taskany-inc/issues/commit/b070d6348a244a7d6012c40266935817da697c4b))
+
 ## [1.18.0](https://github.com/taskany-inc/issues/compare/v1.17.0...v1.18.0) (2023-07-25)
 
 
