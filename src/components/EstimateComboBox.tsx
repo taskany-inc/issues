@@ -224,6 +224,8 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
             onChange?.(undefined);
         }, [defaultValuePlaceholder, text, onChange, setInputState, value?.date, locale]);
 
+        const onClickOutside = useCallback((cb: () => void) => cb(), []);
+
         return (
             <ComboBox
                 ref={ref}
@@ -235,6 +237,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                 items={Object.keys(quarterInfo)}
                 maxWidth={100}
                 minWidth={100}
+                onClickOutside={onClickOutside}
                 onChange={onChange}
                 renderTrigger={(props) => (
                     <StyledTriggerContainer>
@@ -247,7 +250,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                         />
                     </StyledTriggerContainer>
                 )}
-                renderInput={() => (
+                renderInput={({ ref }) => (
                     <InputMask mask={mask} maskPlaceholder={null} onChange={onInputChange} value={inputState}>
                         {/* @ts-ignore incorrect type in react-input-mask */}
                         {(props: { value: string; onChange: () => void }) => (
@@ -256,6 +259,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                                 placeholder={placeholder}
                                 value={props.value}
                                 onChange={props.onChange}
+                                ref={ref}
                             />
                         )}
                     </InputMask>
