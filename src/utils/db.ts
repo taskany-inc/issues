@@ -5,7 +5,12 @@ import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
 import { addCalclulatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
-import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
+import {
+    HistoryRecordWithActivity,
+    HistoryRecordSubject,
+    HistoryAction,
+    subjectToTableNameMap,
+} from '../types/history';
 
 import { prisma } from './prisma';
 import { subjectToEnumValue } from './goalHistory';
@@ -119,16 +124,6 @@ export const changeGoalProject = async (id: string, newProjectId: string) => {
     `;
 };
 
-const stringIsCiudOrId = (string: string): boolean => {
-    const valueAsNumber = Number(string);
-
-    if (String(valueAsNumber) === string) {
-        return true;
-    }
-
-    return z.string().cuid().safeParse(string).success;
-};
-
 type RequestParamsBySubject = { [K in keyof HistoryRecordSubject]?: { ids: string[]; sourceIdx: number[] } };
 
 export const getGoalHistory = async <T extends GoalHistory & { activity: Activity & { user: User | null } }>(
@@ -141,9 +136,8 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                 .split(',')
                 .concat((nextValue ?? '').split(','))
                 .filter(Boolean);
-            const valuesAsIds = allValues.length ? allValues.every((val) => stringIsCiudOrId(val)) : false;
 
-            if (subjectToEnumValue(subject) && valuesAsIds) {
+            if (subjectToEnumValue(subject)) {
                 acc[subject] = {
                     ids: (acc[subject]?.ids ?? []).concat(...allValues),
                     sourceIdx: (acc[subject]?.sourceIdx ?? []).concat(index),
