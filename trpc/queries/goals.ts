@@ -91,11 +91,26 @@ export const goalsFilter = (
 
     const projectFilter: Prisma.GoalFindManyArgs['where'] = data.project?.length
         ? {
-              project: {
-                  id: {
-                      in: data.project,
+              OR: [
+                  {
+                      project: {
+                          id: {
+                              in: data.project,
+                          },
+                      },
                   },
-              },
+                  {
+                      project: {
+                          parent: {
+                              some: {
+                                  id: {
+                                      in: data.project,
+                                  },
+                              },
+                          },
+                      },
+                  },
+              ],
           }
         : {};
 
