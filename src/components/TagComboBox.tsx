@@ -78,6 +78,8 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
               ]
             : [];
 
+        const onClickOutside = useCallback((cb: () => void) => cb(), []);
+
         return (
             <ComboBox
                 ref={ref}
@@ -86,6 +88,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                 visible={completionVisible}
                 error={error}
                 disabled={disabled}
+                onClickOutside={onClickOutside}
                 onChange={onTagClick}
                 items={items}
                 renderTrigger={(props) => (
