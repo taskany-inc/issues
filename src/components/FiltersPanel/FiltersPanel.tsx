@@ -33,7 +33,14 @@ import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 import { tr } from './FiltersPanel.i18n';
 
 const take = 5;
-const queryParams = {
+
+// disable refetchOnMount since we use filtersPanelSsrInit
+const useQueryOptionsRefetchOnMount = {
+    refetchOnMount: false,
+};
+
+const useQueryOptions = {
+    ...useQueryOptionsRefetchOnMount,
     keepPreviousData: true,
 };
 
@@ -130,7 +137,7 @@ export const FiltersPanel: FC<{
             include: queryState.owner,
             take,
         },
-        queryParams,
+        useQueryOptions,
     );
 
     const [issuersQuery, setIssuersQuery] = useState('');
@@ -141,7 +148,7 @@ export const FiltersPanel: FC<{
             include: queryState.issuer,
             take,
         },
-        queryParams,
+        useQueryOptions,
     );
 
     const [participantsQuery, setParticipantsQuery] = useState('');
@@ -152,7 +159,7 @@ export const FiltersPanel: FC<{
             include: queryState.participant,
             take,
         },
-        queryParams,
+        useQueryOptions,
     );
 
     const [projectsQuery, setProjectsQuery] = useState('');
@@ -163,7 +170,7 @@ export const FiltersPanel: FC<{
             include: queryState.project,
             take,
         },
-        queryParams,
+        useQueryOptions,
     );
 
     const [tagsQuery, setTagsQuery] = useState('');
@@ -174,11 +181,11 @@ export const FiltersPanel: FC<{
             include: queryState.tag,
             take,
         },
-        queryParams,
+        useQueryOptions,
     );
 
-    const { data: states = [] } = trpc.state.all.useQuery();
-    const { data: estimates = [] } = trpc.estimates.all.useQuery();
+    const { data: states = [] } = trpc.state.all.useQuery(undefined, useQueryOptionsRefetchOnMount);
+    const { data: estimates = [] } = trpc.estimates.all.useQuery(undefined, useQueryOptionsRefetchOnMount);
 
     return (
         <>
