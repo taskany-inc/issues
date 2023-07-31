@@ -23,6 +23,12 @@ export const criteriaSchema = z.object({
         .optional(),
 });
 
+export const updateCriteriaSchema = criteriaSchema.merge(
+    z.object({
+        id: z.string(),
+    }),
+);
+
 export const updateCriteriaState = z.object({
     id: z.string(),
     isDone: z.boolean(),
@@ -42,6 +48,7 @@ export const convertCriteriaToGoalSchema = z.object({
 });
 
 export type AddCriteriaScheme = z.infer<typeof criteriaSchema>;
-export type UpdateCriteriaScheme = z.infer<typeof updateCriteriaState>;
+export type UpdateCriteriaStateScheme = z.infer<typeof updateCriteriaState>;
+export type UpdateCriteriaScheme = z.infer<typeof updateCriteriaSchema>;
 export type RemoveCriteriaScheme = z.infer<typeof removeCriteria>;
 export type ConvertCriteriaToGoalScheme = z.infer<typeof convertCriteriaToGoalSchema>;

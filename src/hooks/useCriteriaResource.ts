@@ -2,12 +2,18 @@ import { useCallback } from 'react';
 import { GoalAchieveCriteria } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
-import { AddCriteriaScheme, RemoveCriteriaScheme, UpdateCriteriaScheme } from '../schema/criteria';
+import {
+    AddCriteriaScheme,
+    RemoveCriteriaScheme,
+    UpdateCriteriaScheme,
+    UpdateCriteriaStateScheme,
+} from '../schema/criteria';
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 
 export const useCriteriaResource = (invalidateFn: () => Promise<unknown>) => {
     const add = trpc.goal.addCriteria.useMutation();
     const toggle = trpc.goal.updateCriteriaState.useMutation();
+    const update = trpc.goal.updateCriteria.useMutation();
     const remove = trpc.goal.removeCriteria.useMutation();
     const convert = trpc.goal.convertCriteriaToGoal.useMutation();
 
@@ -20,11 +26,19 @@ export const useCriteriaResource = (invalidateFn: () => Promise<unknown>) => {
     );
 
     const onToggleHandler = useCallback(
-        async (val: UpdateCriteriaScheme) => {
+        async (val: UpdateCriteriaStateScheme) => {
             await toggle.mutateAsync(val);
             invalidateFn();
         },
         [invalidateFn, toggle],
+    );
+
+    const onUpdateHandler = useCallback(
+        async (val: UpdateCriteriaScheme) => {
+            await update.mutateAsync(val);
+            invalidateFn();
+        },
+        [invalidateFn, update],
     );
 
     const onRemoveHandler = useCallback(
@@ -62,5 +76,6 @@ export const useCriteriaResource = (invalidateFn: () => Promise<unknown>) => {
         onToggleHandler,
         onRemoveHandler,
         onConvertCriteria,
+        onUpdateHandler,
     };
 };
