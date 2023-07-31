@@ -1,9 +1,17 @@
 import React, { MouseEventHandler, useMemo } from 'react';
 import NextLink from 'next/link';
 import styled, { css } from 'styled-components';
-import { nullable, GoalIcon, Dropdown, MenuItem } from '@taskany/bricks';
+import {
+    nullable,
+    GoalIcon,
+    Dropdown,
+    MenuItem,
+    TableRow as BrickTableRow,
+    TableCell as BrickTableCel,
+} from '@taskany/bricks';
 import { IconMoreVerticalOutline } from '@taskany/icons';
 import type { Estimate, State as StateType } from '@prisma/client';
+import { gray4 } from '@taskany/colors';
 
 import { routes } from '../hooks/router';
 import { Priority } from '../types/priority';
@@ -12,7 +20,7 @@ import { estimateToString } from '../utils/estimateToString';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
-import { TableRow, ContentItem, TitleItem, TitleContainer, Title, TextItem, Cell } from './Table';
+import { TableRow, ContentItem, TitleItem, TitleContainer, Title, TextItem } from './Table';
 import { StateDot } from './StateDot';
 
 interface CommonGoalListItemCompactProps {
@@ -123,27 +131,45 @@ interface RenderColumnProps<T> {
 }
 
 interface ColumnRender {
-    <T extends GoalListItemCompactProps>(props: RenderColumnProps<T>): React.ReactElement | null;
+    <T extends GoalListItemCompactProps>(props: RenderColumnProps<T>): React.ReactNode;
 }
 
-const StyledCell = styled(Cell)<{ forIcon?: boolean }>`
-    display: inline-flex;
-    align-items: baseline;
-    padding: 0;
-
+const StyledCell = styled(BrickTableCel)<{ forIcon?: boolean }>`
     ${({ forIcon }) =>
         forIcon &&
         css`
-            &:first-child,
-            &:last-child {
-                padding: 0;
-                /* align icon be center of first line in title */
-                padding-top: 4px;
-            }
-
             /* align icon be center of first line in title */
-            padding-top: 4px;
+            transform: translateY(2px);
+
+            &:last-child {
+                margin-left: auto;
+            }
         `}
+`;
+
+const StyledTableRow = styled(BrickTableRow)<{ focused?: boolean }>`
+    ${({ focused }) =>
+        focused &&
+        css`
+            background-color: ${gray4};
+        `}
+`;
+
+const StyledDropdown = styled(Dropdown)`
+    position: relative;
+    z-index: 1;
+
+    & > span {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+    }
+`;
+
+const StyledActionsWrapper = styled.div`
+    display: flex;
+    position: relative;
+    z-index: 1;
 `;
 
 const Column: ColumnRender = ({ col, componentProps }) => {
@@ -195,11 +221,11 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             return null;
     }
 
-    return (
+    return nullable(content, (c) => (
         <StyledCell {...columnProps} forIcon={col.name === 'state'}>
-            {content}
+            {c}
         </StyledCell>
-    );
+    ));
 };
 
 export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = ({
@@ -214,34 +240,44 @@ export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = 
     item,
 }) => {
     return (
-        <TableRow as={forwardedAs} onClick={onClick} className={className} focused={focused}>
-            <StyledCell key="icon" forIcon>
+        <StyledTableRow
+            as={forwardedAs}
+            onClick={onClick}
+            className={className}
+            gap={7}
+            align="baseline"
+            focused={focused}
+        >
+            <StyledCell key="icon" forIcon min>
                 {rowIcon || <GoalIcon size="s" />}
             </StyledCell>
             {columns.map((col) => (
                 <Column key={col.name} col={col} componentProps={item} />
             ))}
-            <StyledCell key="actions" forIcon>
-                {nullable(actions, (list) => (
-                    <Dropdown
-                        onChange={onActionClick}
-                        renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
-                        items={list}
-                        renderItem={(props) => (
-                            <MenuItem
-                                key={props.index}
-                                onClick={props.onClick}
-                                icon={props.item.icon}
-                                ghost
-                                color={props.item.color}
-                            >
-                                {props.item.label}
-                            </MenuItem>
-                        )}
-                    />
-                ))}
+            <StyledCell key="actions" forIcon min>
+                <StyledActionsWrapper>
+                    {nullable(actions, (list) => (
+                        <StyledDropdown
+                            onChange={onActionClick}
+                            renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
+                            placement="top-end"
+                            items={list}
+                            renderItem={(props) => (
+                                <MenuItem
+                                    key={props.index}
+                                    onClick={props.onClick}
+                                    icon={props.item.icon}
+                                    ghost
+                                    color={props.item.color}
+                                >
+                                    {props.item.label}
+                                </MenuItem>
+                            )}
+                        />
+                    ))}
+                </StyledActionsWrapper>
             </StyledCell>
-        </TableRow>
+        </StyledTableRow>
     );
 };
 

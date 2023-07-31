@@ -18,17 +18,16 @@ interface InlineFormProps {
 }
 
 const StyledWrapper = styled.div`
-    display: flex;
+    display: contents;
 
     & form {
         background-color: transparent;
+        display: contents;
     }
 `;
 
 const StyledFormWrapper = styled.div`
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
+    display: contents;
     position: relative;
 `;
 
@@ -95,7 +94,7 @@ export const InlineForm: React.FC<InlineFormProps> = ({
                 <Form onSubmit={onSubmit}>
                     <StyledFormWrapper>
                         {children}
-                        {nullable(tip, (t) => (
+                        {nullable(tip, (t: React.ReactNode) => (
                             <>
                                 <a
                                     ref={hintRef}
