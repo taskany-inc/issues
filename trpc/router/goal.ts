@@ -40,6 +40,7 @@ import {
     convertCriteriaToGoalSchema,
     criteriaSchema,
     removeCriteria,
+    updateCriteriaSchema,
     updateCriteriaState,
 } from '../../src/schema/criteria';
 import type { FieldDiff } from '../../src/types/common';
@@ -1081,6 +1082,83 @@ export const goal = router({
             await updateGoalWithCalculatedWeight(newCriteria.goalId);
 
             return newCriteria;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    updateCriteria: protectedProcedure.input(updateCriteriaSchema).mutation(async ({ input, ctx }) => {
+        const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
+            where: { id: input.id },
+        });
+
+        try {
+            if (!currentCriteria) {
+                throw Error('No current criteria');
+            }
+
+            let isDoneByConnect: boolean | null = null;
+
+            if (input.goalAsGriteria?.id) {
+                const connectedGoal = await prisma.goal.findUnique({
+                    where: { id: input.goalAsGriteria.id },
+                    include: { state: true },
+                });
+
+                isDoneByConnect = connectedGoal?.state?.type === StateType.Completed;
+            }
+
+            const updatedCriteria = await prisma.goalAchieveCriteria.create({
+                data: {
+                    title: input.title,
+                    weight: Number(input.weight),
+                    isDone: isDoneByConnect == null ? currentCriteria.isDone : isDoneByConnect,
+                    activity: {
+                        connect: {
+                            id: ctx.session.user.activityId,
+                        },
+                    },
+                    goal: {
+                        connect: { id: input.goalId },
+                    },
+                    goalAsCriteria: input.goalAsGriteria?.id
+                        ? {
+                              connect: { id: input.goalAsGriteria.id },
+                          }
+                        : undefined,
+                    createdAt: currentCriteria.createdAt,
+                },
+            });
+
+            await Promise.all([
+                prisma.goalAchieveCriteria.update({
+                    where: { id: currentCriteria.id },
+                    data: {
+                        deleted: true,
+                    },
+                }),
+                prisma.goalHistory.create({
+                    data: {
+                        previousValue: currentCriteria.id,
+                        nextValue: updatedCriteria.id,
+                        action: 'change',
+                        subject: 'criteria',
+                        goal: {
+                            connect: {
+                                id: input.goalId,
+                            },
+                        },
+                        activity: {
+                            connect: {
+                                id: ctx.session.user.activityId,
+                            },
+                        },
+                    },
+                }),
+            ]);
+
+            if (updatedCriteria) {
+                await updateGoalWithCalculatedWeight(updatedCriteria.goalId);
+            }
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
