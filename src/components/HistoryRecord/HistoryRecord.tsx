@@ -443,17 +443,46 @@ export const HistoryRecordParticipant: React.FC<HistoryChangeProps<Activity & { 
     />
 );
 
-export const HistoryRecordCriteria: React.FC<
-    HistoryChangeProps<GoalAchieveCriteria & { goalAsCriteria: Goal & { state: StateData | null } }> & {
-        action: HistoryAction;
+type CriteriaItem = GoalAchieveCriteria & {
+    goalAsCriteria: (Goal & { state: StateData | null }) | null;
+    strike?: boolean;
+};
+
+const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ goalAsCriteria, title, strike }) => {
+    if (goalAsCriteria) {
+        return (
+            <StyledIssueListItem
+                strike={strike}
+                size="xs"
+                issue={{
+                    title: goalAsCriteria.title,
+                    _shortId: `${goalAsCriteria.projectId}-${goalAsCriteria.scopeId}`,
+                    id: goalAsCriteria.id,
+                }}
+            />
+        );
     }
-> = ({ to, action }) => {
+
+    return (
+        <StyledText size="xs" weight="bold" strike={strike}>
+            {title}
+        </StyledText>
+    );
+};
+
+export const HistoryRecordCriteria: React.FC<
+    HistoryChangeProps<CriteriaItem> & {
+        action: HistoryAction;
+        strike?: boolean;
+    }
+> = ({ from, to, action }) => {
     const recordCtx = useContext(RecordCtx);
 
     const isChangeAction = ['complete', 'uncomplete'].includes(action);
 
     recordCtx.setSubjectText((prev) => {
-        if (to?.goalAsCriteria != null) {
+        const target = from || to;
+        if (target?.goalAsCriteria != null) {
             if (isChangeAction) {
                 if (action === 'complete') {
                     return 'goalComplete';
@@ -470,43 +499,23 @@ export const HistoryRecordCriteria: React.FC<
         return prev;
     });
 
-    return nullable(to, (t) => {
-        if (t?.goalAsCriteria) {
-            return (
-                <HistorySimplifyRecord
-                    withPretext={false}
-                    to={
-                        <>
-                            <StyledIssueListItem
-                                strike={action === 'remove'}
-                                size="xs"
-                                issue={{
-                                    title: t.goalAsCriteria.title,
-                                    _shortId: `${t.goalAsCriteria.projectId}-${t.goalAsCriteria.scopeId}`,
-                                    id: t.goalAsCriteria.id,
-                                }}
-                            />
-                            <Text size="xs">{tr('as criteria')}</Text>
-                        </>
-                    }
-                />
-            );
-        }
-
-        return (
-            <HistorySimplifyRecord
-                withPretext={false}
-                to={
-                    <>
-                        <Text size="xs" weight="bold">
-                            {t.title}
-                        </Text>
-                        {nullable(isChangeAction, () => (
-                            <Text size="xs">{tr(action === 'complete' ? 'as completed' : 'as uncompleted')}</Text>
-                        ))}
-                    </>
-                }
-            />
-        );
-    });
+    return (
+        <HistorySimplifyRecord
+            withPretext={from != null}
+            from={nullable(from, (val) => (
+                <HistoryRecordCriteriaItem {...val} strike />
+            ))}
+            to={nullable(to, (val) => (
+                <>
+                    <HistoryRecordCriteriaItem {...val} strike={action === 'remove'} />
+                    {val?.goalAsCriteria && <Text size="xs">{tr('as criteria')}</Text>}
+                    {nullable(isChangeAction, () => (
+                        <StyledText size="xs">
+                            {tr(action === 'complete' ? 'as completed' : 'as uncompleted')}
+                        </StyledText>
+                    ))}
+                </>
+            ))}
+        />
+    );
 };

@@ -135,6 +135,7 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                                     )}
                                     {value.subject === 'criteria' && (
                                         <HistoryRecordCriteria
+                                            from={excludeString(value.previousValue)}
                                             to={excludeString(value.nextValue)}
                                             action={value.action as HistoryAction}
                                         />
