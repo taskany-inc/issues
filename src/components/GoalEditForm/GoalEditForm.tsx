@@ -29,7 +29,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         setBusy(true);
 
         if (form.estimate && form.estimate.date) {
-            form.estimate.date = parseLocaleDate(form.estimate?.date, { locale }).toString();
+            form.estimate.date = parseLocaleDate(form.estimate?.date, { locale }).toISOString();
         }
 
         const updatedGoal = await update(form);
