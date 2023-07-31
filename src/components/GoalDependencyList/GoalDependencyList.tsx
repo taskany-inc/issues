@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { Text, nullable } from '@taskany/bricks';
-import { backgroundColor, danger0, gray4, gray9 } from '@taskany/colors';
+import { Text, nullable, Table } from '@taskany/bricks';
+import { backgroundColor, danger0, gray4, gray9, textColor } from '@taskany/colors';
 import { IconBinOutline, IconMessageTextAltOutline } from '@taskany/icons';
 import { Estimate, State } from '@prisma/client';
 import NextLink from 'next/link';
@@ -10,7 +10,7 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { ToggleGoalDependency, dependencyKind } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { Circle, CircledIcon as CircleIconInner } from '../Circle';
-import { ContentItem, Table, Title } from '../Table';
+import { ContentItem, Title } from '../Table';
 import { CustomCell, GoalListItemCompactCustomize } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
 import { UserGroup } from '../UserGroup';
@@ -42,13 +42,21 @@ const StyledTable = styled(Table)`
 `;
 
 const StyledTableRow = styled(GoalListItemCompactCustomize)`
-    display: contents;
     position: relative;
 
     &:hover {
         & ${ContentItem} {
             background-color: unset;
         }
+    }
+`;
+
+const StyledTitle = styled(Title)`
+    text-decoration: none;
+    color: ${textColor};
+
+    &:visited {
+        color: ${textColor};
     }
 `;
 
@@ -115,26 +123,36 @@ const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({
                 {
                     name: 'title',
                     renderColumn: (values) => (
-                        <CustomCell>
+                        <CustomCell col={6}>
                             <NextLink passHref href={routes.goal(shortId)} legacyBehavior>
-                                <Title size="s" weight="bold" onClick={onClickHandler}>
+                                <StyledTitle size="s" weight="bold" onClick={onClickHandler} as="a">
                                     {values.title}
-                                </Title>
+                                </StyledTitle>
                             </NextLink>
                         </CustomCell>
                     ),
                 },
-                { name: 'state' },
-                { name: 'projectId' },
+                {
+                    name: 'state',
+                    columnProps: {
+                        min: true,
+                    },
+                },
+                {
+                    name: 'projectId',
+                    columnProps: {
+                        col: 1,
+                    },
+                },
                 {
                     name: 'issuers',
                     renderColumn: (values) => (
-                        <CustomCell>
+                        <CustomCell align="start" width={45}>
                             <UserGroup users={values.issuers} size={18} />
                         </CustomCell>
                     ),
                 },
-                { name: 'estimate' },
+                { name: 'estimate', columnProps: { width: '7ch' } },
             ]}
         />
     );
@@ -194,7 +212,7 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
                                 {heading[kind]}
                             </StyledTextHeading>
                         </StyledHeadingWrapper>
-                        <StyledTable columns={7}>
+                        <StyledTable gap={10}>
                             {items.map((item) => (
                                 <GoalDependencyListItem
                                     key={item.id}
