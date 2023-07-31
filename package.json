@@ -72,7 +72,7 @@
     "@commitlint/cli": "17.6.5",
     "@commitlint/config-conventional": "17.6.1",
     "@faker-js/faker": "7.6.0",
-    "@next/bundle-analyzer": "13.2.1",
+    "@next/bundle-analyzer": "13.4.12",
     "@prisma/client": "4.16.2",
     "@svgr/webpack": "7.0.0",
     "@types/cors": "2.8.13",
