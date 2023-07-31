@@ -1,7 +1,6 @@
 import { FC } from 'react';
-import { Footer, FooterItem } from '@taskany/bricks/components/Footer';
+import { Footer, Link, FooterItem } from '@taskany/bricks';
 import { gray9 } from '@taskany/colors';
-import { Link } from '@taskany/bricks';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 
