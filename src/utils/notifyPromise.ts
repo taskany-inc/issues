@@ -1,4 +1,4 @@
-import { NotificationNamespaces, notificationKeyMap } from '../components/NotificationsHub/NotificationHub.map';
+import { getNotificicationKeyMap, NotificationNamespaces } from '../components/NotificationsHub/NotificationHub.map';
 
 import { NotificationsEventPromiseData, dispatchPromisedNotificationsEvent } from './dispatchNotification';
 
@@ -12,9 +12,9 @@ export const notifyPromise: NotifyPromise = (promise, eventsOrNamespace) => {
 
     if (typeof eventsOrNamespace === 'string') {
         events = {
-            onSuccess: notificationKeyMap[eventsOrNamespace].success,
-            onPending: notificationKeyMap[eventsOrNamespace].pending,
-            onError: notificationKeyMap[eventsOrNamespace].error ?? notificationKeyMap.error,
+            onSuccess: getNotificicationKeyMap(eventsOrNamespace).success,
+            onPending: getNotificicationKeyMap(eventsOrNamespace).pending,
+            onError: getNotificicationKeyMap(eventsOrNamespace).error ?? getNotificicationKeyMap('error'),
         };
     } else {
         events = eventsOrNamespace;
