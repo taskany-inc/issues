@@ -9,6 +9,8 @@ import { GoalUpdate, goalUpdateSchema } from '../../schema/goal';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
+import { useLocale } from '../../hooks/useLocale';
+import { parseLocaleDate } from '../../utils/dateTime';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -19,11 +21,16 @@ interface GoalEditFormProps {
 }
 
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
+    const locale = useLocale();
     const [busy, setBusy] = useState(false);
     const update = useGoalUpdate(goal.id);
 
     const updateGoal = async (form: GoalUpdate) => {
         setBusy(true);
+
+        if (form.estimate && form.estimate.date) {
+            form.estimate.date = parseLocaleDate(form.estimate?.date, { locale }).toString();
+        }
 
         const updatedGoal = await update(form);
 
