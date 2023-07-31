@@ -11,6 +11,8 @@ import { trpc } from '../utils/trpcClient';
 import { TLocale, setSSRLocale } from '../utils/getLang';
 import { GoalPreviewProvider } from '../components/GoalPreview/GoalPreviewProvider';
 
+const defaultThemes = ['light', 'dark'];
+
 const App = ({ Component, pageProps, router }: AppProps) => {
     setSSRLocale(router.locale as TLocale);
 
@@ -23,7 +25,7 @@ const App = ({ Component, pageProps, router }: AppProps) => {
             </Head>
 
             <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
-                <ThemeProvider themes={['light', 'dark']}>
+                <ThemeProvider themes={defaultThemes}>
                     <GoalPreviewProvider>
                         <PageLoadProgress height={2} ref={pageLoadRef} />
                         <Component {...pageProps} />
