@@ -39,7 +39,6 @@ import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { ActivityByIdReturnType, GoalAchiveCriteria, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
-import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
 import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
@@ -360,44 +359,34 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onRemoveCriteria={criteria.onRemoveHandler}
                                     onConvertToGoal={criteria.onConvertCriteria}
                                     onClick={onGoalCriteriaClick}
+                                    onUpdateCriteria={criteria.onUpdateHandler}
                                     canEdit={_isEditable}
-                                    renderForm={(props) =>
-                                        nullable(_isEditable, () => (
-                                            <CriteriaForm
-                                                onSubmit={props.onAddCriteria}
-                                                goalId={id}
-                                                validityData={props.dataForValidateCriteria}
-                                            />
-                                        ))
-                                    }
                                 />
                             ))}
 
-                            <>
-                                {_relations.map((deps, depIdx) =>
-                                    nullable(deps.goals.length || _isEditable, () => (
-                                        <GoalDependencyListByKind
-                                            showBeta={depIdx === 0}
-                                            goalId={id}
-                                            key={deps.kind}
-                                            kind={deps.kind}
-                                            items={deps.goals}
-                                            canEdit={_isEditable}
-                                            onRemove={dependency.onRemoveHandler}
-                                            onClick={onGoalDependencyClick}
-                                        >
-                                            {nullable(_isEditable, () => (
-                                                <GoalDependencyAddForm
-                                                    onSubmit={dependency.onAddHandler}
-                                                    kind={deps.kind}
-                                                    goalId={id}
-                                                    isEmpty={deps.goals.length === 0}
-                                                />
-                                            ))}
-                                        </GoalDependencyListByKind>
-                                    )),
-                                )}
-                            </>
+                            {_relations.map((deps, depIdx) =>
+                                nullable(deps.goals.length || _isEditable, () => (
+                                    <GoalDependencyListByKind
+                                        showBeta={depIdx === 0}
+                                        goalId={id}
+                                        key={deps.kind}
+                                        kind={deps.kind}
+                                        items={deps.goals}
+                                        canEdit={_isEditable}
+                                        onRemove={dependency.onRemoveHandler}
+                                        onClick={onGoalDependencyClick}
+                                    >
+                                        {nullable(_isEditable, () => (
+                                            <GoalDependencyAddForm
+                                                onSubmit={dependency.onAddHandler}
+                                                kind={deps.kind}
+                                                goalId={id}
+                                                isEmpty={deps.goals.length === 0}
+                                            />
+                                        ))}
+                                    </GoalDependencyListByKind>
+                                )),
+                            )}
                         </GoalActivity>
                     ))}
                 </div>

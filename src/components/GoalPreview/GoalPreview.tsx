@@ -38,7 +38,6 @@ import { notifyPromise } from '../../utils/notifyPromise';
 import { GoalStateChangeSchema } from '../../schema/goal';
 import { GoalActivity } from '../GoalActivity';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
-import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { State } from '../State';
 import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
 import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm';
@@ -346,42 +345,32 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose,
                                     onToggleCriteria={criteria.onToggleHandler}
                                     onRemoveCriteria={criteria.onRemoveHandler}
                                     onConvertToGoal={criteria.onConvertCriteria}
+                                    onUpdateCriteria={criteria.onUpdateHandler}
                                     canEdit={_isEditable}
-                                    renderForm={(props) =>
-                                        nullable(_isEditable, () => (
-                                            <CriteriaForm
-                                                onSubmit={props.onAddCriteria}
-                                                goalId={id}
-                                                validityData={props.dataForValidateCriteria}
-                                            />
-                                        ))
-                                    }
                                 />
                             ))}
 
-                            <>
-                                {_relations.map((deps) =>
-                                    nullable(deps.goals.length || _isEditable, () => (
-                                        <GoalDependencyListByKind
-                                            goalId={id}
-                                            key={deps.kind}
-                                            kind={deps.kind}
-                                            items={deps.goals}
-                                            canEdit={_isEditable}
-                                            onRemove={dependency.onRemoveHandler}
-                                        >
-                                            {nullable(_isEditable, () => (
-                                                <GoalDependencyAddForm
-                                                    onSubmit={dependency.onAddHandler}
-                                                    kind={deps.kind}
-                                                    goalId={id}
-                                                    isEmpty={deps.goals.length === 0}
-                                                />
-                                            ))}
-                                        </GoalDependencyListByKind>
-                                    )),
-                                )}
-                            </>
+                            {_relations.map((deps) =>
+                                nullable(deps.goals.length || _isEditable, () => (
+                                    <GoalDependencyListByKind
+                                        goalId={id}
+                                        key={deps.kind}
+                                        kind={deps.kind}
+                                        items={deps.goals}
+                                        canEdit={_isEditable}
+                                        onRemove={dependency.onRemoveHandler}
+                                    >
+                                        {nullable(_isEditable, () => (
+                                            <GoalDependencyAddForm
+                                                onSubmit={dependency.onAddHandler}
+                                                kind={deps.kind}
+                                                goalId={id}
+                                                isEmpty={deps.goals.length === 0}
+                                            />
+                                        ))}
+                                    </GoalDependencyListByKind>
+                                )),
+                            )}
                         </GoalActivity>
                     ))}
                 </StyledModalContent>

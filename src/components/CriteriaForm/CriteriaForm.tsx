@@ -1,15 +1,16 @@
 import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, FormInput } from '@taskany/bricks';
+import { Button, FormInput, TableRow, TableCell } from '@taskany/bricks';
 import { IconPlusCircleOutline, IconTargetOutline } from '@taskany/icons';
 import { gray7, gray8 } from '@taskany/colors';
 import { Controller, UseFormSetError, useForm } from 'react-hook-form';
 import { Goal } from '@prisma/client';
 import Popup from '@taskany/bricks/components/Popup';
+import { z } from 'zod';
 
 import { InlineTrigger } from '../InlineTrigger';
-import { AddCriteriaScheme, criteriaSchema } from '../../schema/criteria';
+import { AddCriteriaScheme, criteriaSchema, updateCriteriaSchema } from '../../schema/criteria';
 import { GoalSuggest } from '../GoalSuggest';
 import { InlineForm } from '../InlineForm';
 import { Keyboard } from '../Keyboard';
@@ -30,6 +31,7 @@ const StyledFormInput = styled(FormInput)`
     font-size: 14px;
     font-weight: normal;
     padding: 5px 10px;
+    flex: 1;
 
     border: 1px solid ${gray7};
     box-sizing: border-box;
@@ -39,9 +41,23 @@ const StyledFormInput = styled(FormInput)`
     }
 `;
 
-const StyledTableRow = styled.div`
-    display: grid;
-    grid-template-columns: 35px minmax(calc(240px), 20%) repeat(2, max-content);
+const StyledTableRow = styled(TableRow)`
+    /* more specific above base style rules */
+    && {
+        flex-basis: auto;
+    }
+`;
+
+const StyledTableCell = styled(TableCell)`
+    flex-wrap: nowrap;
+    display: flex;
+    align-items: center;
+
+    & > div,
+    & > span {
+        flex: 1;
+        align-self: center;
+    }
 `;
 
 const StyledSubmitButton = styled(Button)`
@@ -117,9 +133,9 @@ interface CriteriaTitleFieldProps {
     setError: UseFormSetError<AddCriteriaScheme>;
 }
 
-export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>(
+const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>(
     ({ name, value = '', error, onSelect, onChange, titles = [], setError, isItemSelected }, ref) => {
-        const [type, setType] = useState<'plain' | 'search'>('plain');
+        const [type, setType] = useState<'plain' | 'search'>(!isItemSelected ? 'plain' : 'search');
         const [popupVisible, setPopupVisible] = useState(false);
         const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -193,15 +209,31 @@ export const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFiel
 );
 
 interface CriteriaFormProps {
-    onSubmit: (values: AddCriteriaScheme) => void;
+    onReset?: () => void;
     goalId: string;
     validityData: {
         sum: number;
         title: string[];
     };
+    renderTrigger?: React.ComponentProps<typeof InlineForm>['renderTrigger'];
+}
+interface CriteriaFormPropsWithSchema extends CriteriaFormProps {
+    schema: Zod.Schema;
+    values?: z.infer<CriteriaFormPropsWithSchema['schema']>;
+    btnText: string;
+    onSubmit: (values: CriteriaFormPropsWithSchema['values']) => void;
 }
 
-export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, validityData }) => {
+const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
+    onSubmit,
+    goalId,
+    validityData,
+    btnText,
+    schema,
+    values,
+    onReset,
+    renderTrigger,
+}) => {
     const {
         handleSubmit,
         control,
@@ -211,15 +243,10 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
         setError,
         watch,
         formState: { isSubmitSuccessful },
-    } = useForm<AddCriteriaScheme>({
-        resolver: zodResolver(criteriaSchema),
+    } = useForm<z.infer<typeof schema>>({
+        resolver: zodResolver(schema),
         reValidateMode: 'onChange',
-        defaultValues: {
-            goalId,
-            title: '',
-            weight: '',
-            goalAsGriteria: undefined,
-        },
+        values,
     });
 
     const handleSelectGoal = useCallback(
@@ -239,7 +266,9 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
             goalAsGriteria: undefined,
             goalId,
         });
-    }, [goalId, reset]);
+
+        onReset?.();
+    }, [goalId, reset, onReset]);
 
     const selectedGoalId = watch('goalAsGriteria');
     const title = watch('title');
@@ -251,7 +280,69 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
     }, [title, setValue]);
 
     return (
-        <InlineForm
+        <StyledTableRow align="center">
+            <InlineForm
+                renderTrigger={renderTrigger}
+                onSubmit={handleSubmit(onSubmit)}
+                onReset={onResetHandler}
+                isSubmitted={isSubmitSuccessful}
+                tip={
+                    <Tip>
+                        {tr.raw('Press key to add criteria', {
+                            key: <Keyboard key="cmd/enter" size="s" command enter />,
+                        })}
+                    </Tip>
+                }
+            >
+                <StyledTableCell col={5} align="start">
+                    <Controller
+                        name="title"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <CriteriaTitleField
+                                {...field}
+                                error={fieldState.error}
+                                setError={setError}
+                                onSelect={handleSelectGoal}
+                                titles={validityData.title}
+                                isItemSelected={selectedGoalId != null && !!selectedGoalId.id}
+                            />
+                        )}
+                    />
+                </StyledTableCell>
+                <StyledTableCell col={4} align="start">
+                    <Controller
+                        name="weight"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <WeightField
+                                {...field}
+                                error={fieldState.error}
+                                maxValue={validityData.sum}
+                                setError={setError}
+                            />
+                        )}
+                    />
+                    <StyledSubmitButton brick="left" view="primary" text={btnText} size="m" type="submit" outline />
+                </StyledTableCell>
+                <input type="hidden" {...register('goalId')} />
+                <input type="hidden" {...register('goalAsGriteria.id')} />
+            </InlineForm>
+        </StyledTableRow>
+    );
+};
+
+export const AddCriteriaForm: React.FC<
+    CriteriaFormProps & { onSubmit: (val: z.infer<typeof criteriaSchema>) => void }
+> = ({ validityData, onSubmit, goalId, onReset }) => {
+    return (
+        <CriteriaForm
+            schema={criteriaSchema}
+            btnText={tr('Add')}
+            goalId={goalId}
+            onSubmit={onSubmit}
+            onReset={onReset}
+            validityData={validityData}
             renderTrigger={({ onClick }) => (
                 <StyledInlineTrigger
                     text={tr('Add achievement criteria')}
@@ -259,48 +350,25 @@ export const CriteriaForm: React.FC<CriteriaFormProps> = ({ onSubmit, goalId, va
                     onClick={onClick}
                 />
             )}
-            onSubmit={handleSubmit(onSubmit)}
-            onReset={onResetHandler}
-            isSubmitted={isSubmitSuccessful}
-            tip={
-                <Tip>
-                    {tr.raw('Press key to add criteria', {
-                        key: <Keyboard key="cmd/enter" size="s" command enter />,
-                    })}
-                </Tip>
-            }
-        >
-            <StyledTableRow>
-                <Controller
-                    name="title"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <CriteriaTitleField
-                            {...field}
-                            error={fieldState.error}
-                            setError={setError}
-                            onSelect={handleSelectGoal}
-                            titles={validityData.title}
-                            isItemSelected={Boolean(selectedGoalId?.id)}
-                        />
-                    )}
-                />
-                <Controller
-                    name="weight"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <WeightField
-                            {...field}
-                            error={fieldState.error}
-                            maxValue={validityData.sum}
-                            setError={setError}
-                        />
-                    )}
-                />
-                <StyledSubmitButton brick="left" view="primary" text={tr('Add')} size="m" type="submit" outline />
-            </StyledTableRow>
-            <input type="hidden" {...register('goalId')} />
-            <input type="hidden" {...register('goalAsGriteria.id')} />
-        </InlineForm>
+        />
+    );
+};
+
+export const EditCriteriaForm: React.FC<
+    CriteriaFormProps & {
+        values: z.infer<typeof updateCriteriaSchema>;
+        onSubmit: (val: z.infer<typeof updateCriteriaSchema>) => void;
+    }
+> = ({ validityData, onSubmit, goalId, onReset, values }) => {
+    return (
+        <CriteriaForm
+            schema={updateCriteriaSchema}
+            btnText={tr('Save')}
+            goalId={goalId}
+            onSubmit={onSubmit}
+            onReset={onReset}
+            validityData={validityData}
+            values={values}
+        />
     );
 };
