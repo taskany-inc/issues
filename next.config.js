@@ -43,6 +43,13 @@ const nextConfig = {
                 }
                 return entries;
             };
+
+            config.resolve.alias = {
+                ...config.resolve.alias,
+                react: path.resolve(__dirname, 'node_modules', 'react'),
+                'react-dom': path.resolve(__dirname, 'node_modules', 'react-dom'),
+                'styled-components': path.resolve(__dirname, 'node_modules', 'styled-components'),
+            };
         }
 
         if (!dev && !isServer && !process.env.INCLUDE_SCRIPTS_TO_MAIN_BUNDLE) {
