@@ -1,4 +1,7 @@
-import { SimpliestNotificationMessages, notificationKeyMap } from '../components/NotificationsHub/NotificationHub.map';
+import {
+    getNotificicationKeyMap,
+    SimpliestNotificationMessages,
+} from '../components/NotificationsHub/NotificationHub.map';
 
 export interface NotificationsEventPromiseData {
     promise: Promise<unknown>;
@@ -19,7 +22,7 @@ export const dispatchPromisedNotificationsEvent = (
 export const dispatchErrorNotification = (key: keyof SimpliestNotificationMessages) => {
     window.dispatchEvent(
         new CustomEvent('notifyError', {
-            detail: notificationKeyMap[key],
+            detail: getNotificicationKeyMap(key),
         }),
     );
 };
@@ -27,7 +30,7 @@ export const dispatchErrorNotification = (key: keyof SimpliestNotificationMessag
 export const dispatchSuccessNotification = (key: keyof SimpliestNotificationMessages) => {
     window.dispatchEvent(
         new CustomEvent('notifySuccess', {
-            detail: notificationKeyMap[key],
+            detail: getNotificicationKeyMap(key),
         }),
     );
 };

@@ -3,6 +3,8 @@ import toast from 'react-hot-toast';
 
 import type { NotificationsEventPromiseData } from '../../utils/dispatchNotification';
 
+import { I18nKey, tr } from './NotificationsHub.i18n';
+
 declare global {
     interface WindowEventMap {
         notifyPromise: CustomEvent<NotificationsEventPromiseData>;
@@ -13,17 +15,17 @@ declare global {
 
 const NotificationsHub: React.FC = () => {
     const promiseListener = async (e: WindowEventMap['notifyPromise']) => {
-        const id = toast.loading(e.detail.events.onPending);
+        const id = toast.loading(tr(e.detail.events.onPending as I18nKey));
 
         await e.detail.promise
             .then((data) => {
                 toast.dismiss(id);
-                toast.success(e.detail.events.onSuccess);
+                toast.success(tr(e.detail.events.onSuccess as I18nKey));
                 return [data, null];
             })
             .catch((error) => {
                 toast.dismiss(id);
-                toast.error(e.detail.events.onError);
+                toast.error(tr(e.detail.events.onError as I18nKey));
                 return [null, error];
             });
     };
