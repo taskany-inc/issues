@@ -119,7 +119,7 @@ export const parseLocaleDate = (date: string | Date, { locale }: LocaleArg) => {
     return parsers[resolvedLocale](date);
 };
 
-const createValue = (date: string | Date, locale: TLocale) => {
+export const createValue = (date: string | Date, locale: TLocale) => {
     const localDate = typeof date === 'object' ? date : parseLocaleDate(date, { locale });
 
     return {
@@ -127,6 +127,17 @@ const createValue = (date: string | Date, locale: TLocale) => {
         y: String(yearFromDate(localDate)),
         date: createLocaleDate(localDate, { locale }),
     };
+};
+
+export const incYearIfDateHasPassed = (date: Date) => {
+    if (isPastDate(date)) {
+        const incrementedYear = date.getFullYear() + 1;
+        const updatedDateInTimestamp = date.setFullYear(incrementedYear);
+
+        date = new Date(updatedDateInTimestamp);
+    }
+
+    return date;
 };
 
 export const formatEstimate = (estimate: { date: string; q?: string; y: string }, locale: TLocale) => {
