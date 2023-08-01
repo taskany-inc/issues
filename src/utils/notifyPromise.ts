@@ -11,16 +11,19 @@ export const notifyPromise: NotifyPromise = (promise, eventsOrNamespace) => {
     let events: NotificationsEventPromiseData['events'];
 
     if (typeof eventsOrNamespace === 'string') {
+        const notifyMap = getNotificicationKeyMap(eventsOrNamespace);
+
         events = {
-            onSuccess: getNotificicationKeyMap(eventsOrNamespace).success,
-            onPending: getNotificicationKeyMap(eventsOrNamespace).pending,
-            onError: getNotificicationKeyMap(eventsOrNamespace).error ?? getNotificicationKeyMap('error'),
+            onSuccess: notifyMap.onSuccess,
+            onPending: notifyMap.onPending,
+            onError: notifyMap.onError ?? getNotificicationKeyMap('error').onError,
         };
     } else {
         events = eventsOrNamespace;
     }
 
     dispatchPromisedNotificationsEvent(promise, events);
+
     return promise.then(
         (data) => [data, null],
         (error) => [null, error],
