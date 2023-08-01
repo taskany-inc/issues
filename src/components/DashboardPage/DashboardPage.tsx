@@ -84,7 +84,7 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
             if (k) {
                 if (!r[k]) {
                     r[k] = {
-                        project: g.project,
+                        project: g._project,
                         goals: [],
                     };
                 }

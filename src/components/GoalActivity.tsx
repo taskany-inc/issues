@@ -27,7 +27,7 @@ import {
 const CommentCreateForm = dynamic(() => import('./CommentCreateForm/CommentCreateForm'));
 
 interface GoalActivityProps {
-    feed: NonNullable<GoalByIdReturnType>['activityFeed'];
+    feed: NonNullable<GoalByIdReturnType>['_activityFeed'];
     userId?: string | null;
     onCommentReaction: (id: string) => (val?: string | undefined) => Promise<void>;
     onCommentPublish: (id?: string) => void;

@@ -214,7 +214,7 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             tags={g.tags}
                             priority={g.priority}
                             comments={g._count?.comments}
-                            estimate={g.estimate?.length ? g.estimate[g.estimate.length - 1] : undefined}
+                            estimate={g._estimate?.length ? g._estimate[g._estimate.length - 1] : undefined}
                             participants={g.participants}
                             starred={g._isStarred}
                             watching={g._isWatching}

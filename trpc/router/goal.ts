@@ -139,8 +139,8 @@ export const goal = router({
                 items: items.map((g) => ({
                     ...g,
                     ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
-                    estimate: getEstimateListFormJoin(g),
-                    project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
+                    _estimate: getEstimateListFormJoin(g),
+                    _project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
                 })),
                 nextCursor,
                 meta: {
@@ -228,10 +228,10 @@ export const goal = router({
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
-                project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
-                estimate: getEstimateListFormJoin(goal),
-                activityFeed: mixHistoryWithComments(history, goal.comments),
-                relations: makeGoalRelationMap({
+                _project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
+                _estimate: getEstimateListFormJoin(goal),
+                _activityFeed: mixHistoryWithComments(history, goal.comments),
+                _relations: makeGoalRelationMap({
                     dependsOn: goal.dependsOn,
                     blocks: goal.blocks,
                     relatedTo: goal.relatedTo,
@@ -353,8 +353,8 @@ export const goal = router({
             goals: filtredUserGoals.map((g) => ({
                 ...g,
                 ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
-                estimate: getEstimateListFormJoin(g),
-                project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
+                _estimate: getEstimateListFormJoin(g),
+                _project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
             })),
             meta: calcGoalsMeta(allUserGoals),
         };
@@ -651,9 +651,9 @@ export const goal = router({
             return {
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
-                project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
-                estimate: getEstimateListFormJoin(goal),
-                activityFeed: [],
+                _project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
+                _estimate: getEstimateListFormJoin(goal),
+                _activityFeed: [],
             };
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
