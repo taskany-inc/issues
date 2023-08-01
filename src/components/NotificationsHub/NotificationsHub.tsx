@@ -8,8 +8,8 @@ import { I18nKey, tr } from './NotificationsHub.i18n';
 declare global {
     interface WindowEventMap {
         notifyPromise: CustomEvent<NotificationsEventPromiseData>;
-        notifyError: CustomEvent<string>;
-        notifySuccess: CustomEvent<string>;
+        notifyError: CustomEvent<NotificationsEventPromiseData>;
+        notifySuccess: CustomEvent<NotificationsEventPromiseData>;
     }
 }
 
@@ -31,11 +31,11 @@ const NotificationsHub: React.FC = () => {
     };
 
     const notifyErrorHandler = (ev: WindowEventMap['notifyError']) => {
-        toast.error(ev.detail);
+        if (ev.detail.events?.onError) toast.error(tr(ev.detail.events.onError as I18nKey));
     };
 
     const notifySuccessHandler = (ev: WindowEventMap['notifySuccess']) => {
-        toast.success(ev.detail);
+        if (ev.detail.events?.onSuccess) toast.success(tr(ev.detail.events.onSuccess as I18nKey));
     };
 
     useEffect(() => {
