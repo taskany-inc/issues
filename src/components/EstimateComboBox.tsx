@@ -6,12 +6,13 @@ import { Button, Input, ComboBox, CalendarTickIcon } from '@taskany/bricks';
 
 import {
     createLocaleDate,
-    quarterFromDate,
-    yearFromDate,
     endOfQuarter,
     parseLocaleDate,
     formatEstimate,
     quarters,
+    createValue,
+    incYearIfDateHasPassed,
+    isPastDate,
 } from '../utils/dateTime';
 import { useLocale } from '../hooks/useLocale';
 import { TLocale } from '../utils/getLang';
@@ -96,17 +97,10 @@ const CheckableButton = styled(Button)<{ checked?: boolean }>`
         `}
 `;
 
-const isValidDate = (d: string) => !d.includes('_');
+const isFullDate = (str: string) => !str.includes('_');
 
-const createValue = (date: string | Date, locale: TLocale) => {
-    const localDate = typeof date === 'object' ? date : parseLocaleDate(date, { locale });
-
-    return {
-        q: quarterFromDate(localDate),
-        y: String(yearFromDate(localDate)),
-        date: createLocaleDate(localDate, { locale }),
-    };
-};
+const getDate = (val: string, locale: TLocale) =>
+    val ? createLocaleDate(parseLocaleDate(val, { locale }), { locale }) : '';
 
 export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBoxProps>(
     ({ text = '', value, defaultValuePlaceholder, placeholder, mask, disabled, error, onChange }, ref) => {
@@ -119,110 +113,81 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
         const [currentYear, setCurrentYear] = useState(inputVal.getFullYear().toString());
 
         const quarterInfo = useMemo(() => {
-            const quarterInfo: Record<string, { date: string; q: string; y?: string }> = {
-                [defaultValuePlaceholder.q]: defaultValuePlaceholder,
-            };
+            const result: Record<string, { date: string; q: string; y: string }> = {};
+            const map = new Map(Object.entries(quarters));
 
-            const qOrder = Object.keys(quarters);
-            const qLen = qOrder.length;
-            const nextIndex = qOrder.indexOf(defaultValuePlaceholder.q) + 1;
+            map.forEach((quarter) => {
+                const curYearEndOfQuarter = incYearIfDateHasPassed(endOfQuarter(quarter));
 
-            for (let i = nextIndex; i <= nextIndex + 3; i++) {
-                const relatedIndex = `Q${i <= qLen ? i : i - qLen}`;
-                if (i <= qLen) {
-                    quarterInfo[relatedIndex] = createValue(
-                        createLocaleDate(endOfQuarter(relatedIndex), { locale }),
-                        locale,
-                    );
-                } else {
-                    const temp = parseLocaleDate(createLocaleDate(endOfQuarter(relatedIndex), { locale }), { locale });
-                    temp.setFullYear(temp.getFullYear() + 1);
-                    quarterInfo[relatedIndex] = createValue(temp, locale);
-                }
-            }
-            return quarterInfo;
-        }, [defaultValuePlaceholder, locale]);
+                result[quarter] = createValue(createLocaleDate(curYearEndOfQuarter, { locale }), locale);
+            });
+
+            return result;
+        }, [locale]);
 
         const handlerOnKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
             e.preventDefault();
         }, []);
 
+        useEffect(() => {
+            if (!value) return;
+            const date = getDate(value?.date, locale);
+            setInputState(date);
+            setSelectedQ(value?.q);
+        }, [locale, value]);
+
+        useEffect(() => {
+            if (!changed) return;
+            setButtonText(value?.date ? formatEstimate(value, locale) : currentYear);
+        }, [changed, currentYear, locale, value]);
+
         const onQButtonClick = useCallback(
-            (nextQ: string | undefined) => () => {
-                setSelectedQ(nextQ);
-                if (nextQ === undefined) {
-                    setButtonText(currentYear);
-                } else {
-                    setChanged(true);
+            (nextQ?: string) => () => {
+                setChanged(true);
+
+                if (nextQ) {
+                    const quarter = quarterInfo[nextQ];
+                    onChange?.(quarter);
+                    return;
                 }
+
+                onChange?.({ date: undefined, q: undefined, y: currentYear });
+                setInputState('');
             },
-            [currentYear],
+            [currentYear, onChange, quarterInfo],
         );
 
-        const onInputYearChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-            setCurrentYear(e.target.value);
-        }, []);
+        const onInputYearChange = useCallback(
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                setChanged(true);
+                setCurrentYear(e.target.value);
+                onChange?.({ date: undefined, q: undefined, y: e.target.value });
+            },
+            [onChange],
+        );
 
         const onInputChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
+                const inputValue = e.target.value;
+                setInputState(inputValue);
                 setChanged(true);
-                setInputState(e.target.value);
-                if (isValidDate(e.target.value)) {
-                    setSelectedQ(quarterFromDate(parseLocaleDate(inputState, { locale })));
+
+                if (!isFullDate(inputValue)) return;
+                if (!isPastDate(parseLocaleDate(inputValue, { locale }))) {
+                    onChange?.(createValue(inputValue, locale));
+                } else {
+                    if (!value) return;
+                    onChange?.(value);
                 }
             },
-            [inputState, locale],
+            [locale, onChange, value],
         );
 
-        useEffect(() => {
-            if (selectedQ !== undefined) {
-                setInputState(
-                    createLocaleDate(
-                        parseLocaleDate(quarterInfo[selectedQ].date, {
-                            locale,
-                        }),
-                        { locale },
-                    ),
-                );
-            }
-        }, [selectedQ, locale, quarterInfo, currentYear]);
-
-        useEffect(() => {
-            if (changed && isValidDate(inputState) && selectedQ !== undefined) {
-                const v = createValue(inputState, locale);
-                setButtonText(formatEstimate(v, locale));
-                onChange?.(v);
-            }
-            if (selectedQ === undefined) {
-                onChange?.({ q: undefined, y: currentYear, date: undefined });
-            }
-        }, [changed, selectedQ, inputState, locale, onChange, currentYear]);
-
-        useEffect(() => {
-            if (value) {
-                setButtonText(
-                    selectedQ === undefined
-                        ? currentYear
-                        : formatEstimate(
-                              {
-                                  q: quarterInfo[selectedQ].q,
-                                  y: quarterInfo[selectedQ].y || value.y,
-                                  date: quarterInfo[selectedQ].date,
-                              },
-                              locale,
-                          ),
-                );
-            }
-        }, [value, locale, quarterInfo, selectedQ, currentYear]);
-
         const onCleanClick = useCallback(() => {
-            setButtonText(text);
+            onChange?.();
             setChanged(false);
-            const inputVal = value?.date || defaultValuePlaceholder?.date;
-            setInputState(inputVal ? createLocaleDate(parseLocaleDate(inputVal, { locale }), { locale }) : '');
-            setSelectedQ(defaultValuePlaceholder?.q);
-            onChange?.(undefined);
-        }, [defaultValuePlaceholder, text, onChange, setInputState, value?.date, locale]);
+            setButtonText(text);
+        }, [onChange, text]);
 
         const onClickOutside = useCallback((cb: () => void) => cb(), []);
 
@@ -253,15 +218,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                 renderInput={({ ref }) => (
                     <InputMask mask={mask} maskPlaceholder={null} onChange={onInputChange} value={inputState}>
                         {/* @ts-ignore incorrect type in react-input-mask */}
-                        {(props: { value: string; onChange: () => void }) => (
-                            <StyledInput
-                                autoFocus
-                                placeholder={placeholder}
-                                value={props.value}
-                                onChange={props.onChange}
-                                ref={ref}
-                            />
-                        )}
+                        {(props) => <StyledInput placeholder={placeholder} ref={ref} {...props} />}
                     </InputMask>
                 )}
                 renderItem={(props) => (
@@ -287,10 +244,10 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                             />
                             <CheckableButton
                                 text={'Y'}
-                                checked={selectedQ === undefined}
+                                checked={!selectedQ}
                                 brick="left"
                                 size={'s'}
-                                onClick={onQButtonClick(undefined)}
+                                onClick={onQButtonClick()}
                             />
                         </StyledItemsYearContainer>
                     </>
