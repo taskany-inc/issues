@@ -120,6 +120,8 @@ export const changeGoalProject = async (id: string, newProjectId: string) => {
 
 type RequestParamsBySubject = { [K in keyof HistoryRecordSubject]?: { ids: string[]; sourceIdx: number[] } };
 
+export const goalHistorySeparator = ', ';
+
 export const getGoalHistory = async <T extends GoalHistory & { activity: Activity & { user: User | null } }>(
     history: T[],
     goalId: string,
@@ -127,8 +129,8 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
     const requestParamsBySubjects = history.reduce<RequestParamsBySubject>(
         (acc, { subject, previousValue, nextValue }, index) => {
             const allValues = (previousValue ?? '')
-                .split(',')
-                .concat((nextValue ?? '').split(','))
+                .split(goalHistorySeparator)
+                .concat((nextValue ?? '').split(goalHistorySeparator))
                 .filter(Boolean);
 
             if (subjectToEnumValue(subject)) {
@@ -157,7 +159,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                 const query = {
                     where: {
                         id: {
-                            in: (data || {}).ids,
+                            in: (data || {}).ids?.map((id) => id.trim()),
                         },
                     },
                 };

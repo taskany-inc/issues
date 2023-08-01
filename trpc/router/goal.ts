@@ -32,6 +32,7 @@ import {
     mixHistoryWithComments,
     makeGoalRelationMap,
     updateGoalWithCalculatedWeight,
+    goalHistorySeparator,
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
@@ -511,8 +512,8 @@ export const goal = router({
         }
 
         if (tagsToConnect.length || tagsToDisconnect.length) {
-            const prevIds = actualGoal.tags.map(({ id }) => id).join(', ');
-            const nextIds = input.tags.map(({ id }) => id).join(', ');
+            const prevIds = actualGoal.tags.map(({ id }) => id).join(goalHistorySeparator);
+            const nextIds = input.tags.map(({ id }) => id).join(goalHistorySeparator);
 
             history.push({
                 subject: 'tags',
