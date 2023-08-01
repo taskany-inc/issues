@@ -1,5 +1,12 @@
 import { TLocale } from './getLang';
-import { availableYears, createLocaleDate, parseLocaleDate, endOfQuarter, quarters } from './dateTime';
+import {
+    availableYears,
+    createLocaleDate,
+    parseLocaleDate,
+    endOfQuarter,
+    quarters,
+    incYearIfDateHasPassed,
+} from './dateTime';
 
 const locales: Array<TLocale> = ['en', 'ru'];
 
@@ -26,4 +33,23 @@ test('returns lastDayOfQuarter for en locale', () => {
 
 test('returns available years for passed number', () => {
     expect(availableYears(6)).toStrictEqual([2023, 2024, 2025, 2026, 2027, 2028]);
+});
+
+describe('increment year if the date has passed', () => {
+    it('should not increment', () => {
+        const currentDate = new Date();
+        const futureDate = new Date(currentDate.getFullYear() + 1, currentDate.getMonth());
+
+        const result = incYearIfDateHasPassed(futureDate);
+        expect(result).toEqual(futureDate);
+    });
+
+    it('should increment', () => {
+        const currentDate = new Date();
+        const expectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
+        let pastDate = new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), currentDate.getDay());
+
+        pastDate = incYearIfDateHasPassed(pastDate);
+        expect(pastDate).toEqual(expectedDate);
+    });
 });
