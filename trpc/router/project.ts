@@ -343,9 +343,9 @@ export const project = router({
             return {
                 goals: filtredProjectGoals.map((g) => ({
                     ...g,
-                    project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
+                    _project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
                     ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
-                    estimate: getEstimateListFormJoin(g),
+                    _estimate: getEstimateListFormJoin(g),
                 })),
                 meta: calcGoalsMeta(allProjectGoals),
             };

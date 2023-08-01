@@ -313,9 +313,9 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose,
                         </CardComment>
                     </StyledCard>
 
-                    {nullable(goal, ({ activityFeed, id, goalAchiveCriteria, relations, project, _isEditable }) => (
+                    {nullable(goal, ({ _activityFeed, id, goalAchiveCriteria, _relations, project, _isEditable }) => (
                         <GoalActivity
-                            feed={activityFeed}
+                            feed={_activityFeed}
                             ref={commentsRef}
                             userId={user?.activityId}
                             goalId={id}
@@ -360,7 +360,7 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose,
                             ))}
 
                             <>
-                                {relations.map((deps) =>
+                                {_relations.map((deps) =>
                                     nullable(deps.goals.length || _isEditable, () => (
                                         <GoalDependencyListByKind
                                             goalId={id}

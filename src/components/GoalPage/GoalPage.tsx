@@ -340,9 +340,9 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         </CardContent>
                     </Card>
 
-                    {nullable(goal, ({ activityFeed, id, goalAchiveCriteria, relations, _isEditable }) => (
+                    {nullable(goal, ({ _activityFeed, id, goalAchiveCriteria, _relations, _isEditable }) => (
                         <GoalActivity
-                            feed={activityFeed}
+                            feed={_activityFeed}
                             ref={commentsRef}
                             userId={user.activityId}
                             goalId={id}
@@ -374,7 +374,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                             ))}
 
                             <>
-                                {relations.map((deps, depIdx) =>
+                                {_relations.map((deps, depIdx) =>
                                     nullable(deps.goals.length || _isEditable, () => (
                                         <GoalDependencyListByKind
                                             showBeta={depIdx === 0}
