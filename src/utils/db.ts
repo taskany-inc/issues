@@ -235,7 +235,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
         }, {});
 
         replacedValueIdx.forEach((sourceIndex) => {
-            if (!sourceIndex) {
+            if (sourceIndex == null) {
                 return;
             }
 
