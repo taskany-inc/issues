@@ -115,7 +115,7 @@ interface GoalCriteriaItemProps {
     onCheck?: (val: boolean) => void;
     onConvertToGoal?: () => void;
     onClick?: () => void;
-    onUpdateCriteria: (val: UpdateCriteriaScheme) => void;
+    onUpdateClick: () => void;
     item: GoalAchiveCriteria & { goalAsCriteria?: (Goal & { state?: State | null }) | null };
     canEdit: boolean;
     goalId: string;
@@ -144,12 +144,10 @@ type CriteriaActionItem = {
 };
 
 const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
-    const { onCheck, canEdit, onRemove, onConvertToGoal, onUpdateCriteria, onClick, item, goalId } = props;
+    const { onCheck, canEdit, onRemove, onConvertToGoal, onUpdateClick, onClick, item } = props;
     const onToggle = useCallback(() => {
         onCheck?.(!item.isDone);
     }, [onCheck, item.isDone]);
-
-    const [mode, setMode] = useState<'view' | 'edit'>('view');
 
     const goalAsCriteria = criteriaGuard(props.item);
 
@@ -162,10 +160,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
             {
                 label: 'Edit',
                 icon: <IconEdit1Outline size="xxs" noWrap />,
-                handler: () =>
-                    setMode((prev) => {
-                        return prev === 'view' ? 'edit' : 'view';
-                    }),
+                handler: onUpdateClick,
             },
         ];
 
@@ -185,7 +180,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
         });
 
         return actions;
-    }, [canEdit, onRemove, goalAsCriteria, onConvertToGoal]);
+    }, [canEdit, onRemove, goalAsCriteria, onConvertToGoal, onUpdateClick]);
 
     const handleChange = useCallback((val: CriteriaActionItem) => {
         val.handler();
@@ -212,24 +207,6 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
 
         return item;
     }, [item]);
-
-    if (mode === 'edit') {
-        return (
-            <EditCriteriaForm
-                validityData={{ title: [], sum: 0 }}
-                goalId={goalId}
-                values={{
-                    id: item.id,
-                    title: item.title,
-                    goalId,
-                    goalAsGriteria: item.goalIdAsCriteria != null ? { id: item.goalIdAsCriteria } : undefined,
-                    weight: String(item.weight),
-                }}
-                onSubmit={onUpdateCriteria}
-                onReset={() => setMode('view')}
-            />
-        );
-    }
 
     return (
         <StyledTableRow
@@ -329,6 +306,10 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     onConvertToGoal,
     onUpdateCriteria,
 }) => {
+    const [{ mode, index }, setViewItemMode] = useState<{ mode: 'view'; index: -1 } | { mode: 'edit'; index: number }>({
+        mode: 'view',
+        index: -1,
+    });
     const onAddHandler = useCallback(
         (val: AddCriteriaScheme) => {
             if (goalId) {
@@ -338,19 +319,24 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
         [onAddCriteria, goalId],
     );
 
-    const dataForValidateCriteria = useMemo(() => {
-        return criteriaList.reduce(
-            (acc, { weight, title }) => {
-                acc.sum += weight;
-                acc.title.push(title);
-                return acc;
-            },
-            {
-                sum: 0,
-                title: [] as string[],
-            },
-        );
-    }, [criteriaList]);
+    const dataForValidateCriteria = useMemo(
+        () =>
+            criteriaList.reduce(
+                (acc, { weight, title }, criteriaIdx) => {
+                    if (mode === 'edit' && index === criteriaIdx) {
+                        return acc;
+                    }
+                    acc.sum += weight;
+                    acc.title.push(title);
+                    return acc;
+                },
+                {
+                    sum: 0,
+                    title: [] as string[],
+                },
+            ),
+        [criteriaList, mode, index],
+    );
 
     const sortedCriteriaItems = useMemo(() => {
         const list = criteriaList.reduce<Record<'done' | 'undone', GoalAchiveCriteria[]>>(
@@ -386,19 +372,54 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                     </StyledHeadingWrapper>
                 ))}
                 <StyledTable gap={5}>
-                    {sortedCriteriaItems.map((item) => (
-                        <GoalCriteriaItem
-                            key={item.id}
-                            goalId={goalId}
-                            onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
-                            onRemove={() => onRemoveCriteria({ id: item.id, goalId })}
-                            onConvertToGoal={() => onConvertToGoal(item)}
-                            onClick={onClick ? () => onClick(item) : undefined}
-                            onUpdateCriteria={onUpdateCriteria}
-                            canEdit={canEdit}
-                            item={item}
-                        />
-                    ))}
+                    {sortedCriteriaItems.map((item, i) => {
+                        if (mode === 'view' || i !== index) {
+                            return (
+                                <GoalCriteriaItem
+                                    key={item.id}
+                                    goalId={goalId}
+                                    onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
+                                    onRemove={() => onRemoveCriteria({ id: item.id, goalId })}
+                                    onConvertToGoal={() => onConvertToGoal(item)}
+                                    onClick={onClick ? () => onClick(item) : undefined}
+                                    onUpdateClick={() =>
+                                        setViewItemMode({
+                                            mode: 'edit',
+                                            index: i,
+                                        })
+                                    }
+                                    canEdit={canEdit}
+                                    item={item}
+                                />
+                            );
+                        }
+                        if (mode === 'edit' && index === i) {
+                            return (
+                                <EditCriteriaForm
+                                    key={item.id}
+                                    validityData={dataForValidateCriteria}
+                                    goalId={goalId}
+                                    values={{
+                                        id: item.id,
+                                        title: item.title,
+                                        goalId,
+                                        goalAsGriteria:
+                                            item.goalIdAsCriteria != null ? { id: item.goalIdAsCriteria } : undefined,
+                                        weight: String(item.weight),
+                                    }}
+                                    onSubmit={onUpdateCriteria}
+                                    onReset={() =>
+                                        setViewItemMode({
+                                            mode: 'view',
+                                            index: -1,
+                                        })
+                                    }
+                                />
+                            );
+                        }
+
+                        return null;
+                    })}
                     <AddCriteriaForm goalId={goalId} onSubmit={onAddHandler} validityData={dataForValidateCriteria} />
                 </StyledTable>
             </StyledWrapper>

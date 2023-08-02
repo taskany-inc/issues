@@ -11,7 +11,6 @@ import {
 } from '@taskany/bricks';
 import { IconMoreVerticalOutline } from '@taskany/icons';
 import type { Estimate, State as StateType } from '@prisma/client';
-import { gray4 } from '@taskany/colors';
 
 import { routes } from '../hooks/router';
 import { Priority } from '../types/priority';
@@ -147,23 +146,11 @@ const StyledCell = styled(BrickTableCel)<{ forIcon?: boolean }>`
         `}
 `;
 
-const StyledTableRow = styled(BrickTableRow)<{ focused?: boolean }>`
-    ${({ focused }) =>
-        focused &&
-        css`
-            background-color: ${gray4};
-        `}
-`;
-
 const StyledDropdown = styled(Dropdown)`
     position: relative;
     z-index: 1;
-
-    & > span {
-        position: relative;
-        z-index: 1;
-        display: inline-flex;
-    }
+    max-width: 300px;
+    width: 100%;
 `;
 
 const StyledActionsWrapper = styled.div`
@@ -233,21 +220,12 @@ export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = 
     actions,
     rowIcon,
     onActionClick,
-    forwardedAs,
     onClick,
     className,
-    focused,
     item,
 }) => {
     return (
-        <StyledTableRow
-            as={forwardedAs}
-            onClick={onClick}
-            className={className}
-            gap={7}
-            align="baseline"
-            focused={focused}
-        >
+        <BrickTableRow onClick={onClick} className={className} gap={7} align="baseline">
             <StyledCell key="icon" forIcon min>
                 {rowIcon || <GoalIcon size="s" />}
             </StyledCell>
@@ -277,7 +255,7 @@ export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = 
                     ))}
                 </StyledActionsWrapper>
             </StyledCell>
-        </StyledTableRow>
+        </BrickTableRow>
     );
 };
 
