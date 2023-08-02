@@ -31,19 +31,45 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, o
     const { user, themeId } = usePageContext();
     const { create } = useCommentResource();
     const [pushState, setPushState] = useState<State | undefined>();
+    const [description, setDescription] = useState<string>();
+    const [focused, setFocused] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [currentGoal, setCurrentGoal] = useState('');
+    const [prevGoal, setPrevGoal] = useState('');
+
+    if (goalId !== prevGoal) {
+        setCurrentGoal(goalId);
+        setPrevGoal(goalId);
+        setDescription('');
+        setFocused(false);
+    }
+
+    const onCommentFocus = useCallback(() => {
+        setFocused(true);
+        onFocus?.();
+    }, [onFocus]);
 
     const createComment = useCallback(
         async (form: GoalCommentSchema) => {
+            setBusy(true);
+            setFocused(false);
+
             await create(({ id }) => {
-                onSubmit?.(id);
+                setBusy(false);
+                setFocused(true);
+                setDescription('');
                 setPushState(undefined);
+                onSubmit?.(id);
             })(form);
         },
         [create, onSubmit],
     );
 
     const onCancelCreate = useCallback(() => {
+        setBusy(false);
+        setFocused(false);
         setPushState(undefined);
+        setDescription('');
         onCancel?.();
     }, [onCancel]);
 
@@ -59,12 +85,16 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, o
             <UserPic size={32} src={user?.image} email={user?.email} />
 
             <CommentForm
-                goalId={goalId}
+                goalId={currentGoal}
                 stateId={pushState?.id}
+                description={description}
+                focused={focused}
+                busy={busy}
+                onDescriptionChange={setDescription}
                 onSubmit={createComment}
                 onCancel={onCancelCreate}
-                onFocus={onFocus}
-                renderActionButton={({ busy }) =>
+                onFocus={onCommentFocus}
+                actionButton={
                     states ? (
                         <StyledStateUpdate>
                             <Button

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,7 +12,10 @@ import { HelpButton } from '../HelpButton/HelpButton';
 import { tr } from './CommentForm.i18n';
 
 interface CommentFormProps {
+    actionButton: React.ReactNode;
+    focused?: boolean;
     autoFocus?: boolean;
+    busy?: boolean;
     height?: number;
     error?: React.ComponentProps<typeof FormEditor>['error'];
     id?: string;
@@ -20,8 +23,8 @@ interface CommentFormProps {
     stateId?: string;
     description?: string;
 
-    renderActionButton: (props: { busy?: boolean }) => React.ReactNode;
-    onSubmit?: (form: GoalCommentSchema) => void | Promise<void>;
+    onDescriptionChange: (description: string) => void;
+    onSubmit: (form: GoalCommentSchema) => void | Promise<void>;
     onFocus?: () => void;
     onCancel?: () => void;
 }
@@ -62,76 +65,55 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     stateId,
     description = '',
     autoFocus,
+    focused,
+    busy,
     error,
-    renderActionButton,
+    actionButton,
+    onDescriptionChange,
     onSubmit,
     onFocus,
     onCancel,
 }) => {
-    const [commentFocused, setCommentFocused] = useState(false);
-    const [busy, setBusy] = useState(false);
     const ref = useRef(null);
 
-    const { control, handleSubmit, reset, register } = useForm<GoalCommentSchema>({
+    const { control, handleSubmit, register, watch } = useForm<GoalCommentSchema>({
         resolver: zodResolver(goalCommentSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
         values: {
+            id,
             goalId,
             stateId,
-            id,
             description,
         },
     });
 
-    const setBusyAndCommentFocused = useCallback((busy: boolean, commentFocused: boolean) => {
-        setBusy(busy);
-        setCommentFocused(commentFocused);
-    }, []);
+    const descriptionWatcher = watch('description');
 
-    const onCommentFocus = useCallback(() => {
-        setCommentFocused(true);
-        onFocus?.();
-    }, [onFocus]);
-
-    const onCommentCancel = useCallback(() => {
-        reset();
-        setBusyAndCommentFocused(false, false);
-        onCancel?.();
-    }, [onCancel, reset, setBusyAndCommentFocused]);
-
-    const onCommentSubmit = useCallback(
-        async (form: GoalCommentSchema) => {
-            setBusyAndCommentFocused(true, false);
-            reset();
-
-            await onSubmit?.(form);
-
-            setBusyAndCommentFocused(false, true);
-        },
-        [onSubmit, reset, setBusyAndCommentFocused],
-    );
+    useEffect(() => {
+        onDescriptionChange(descriptionWatcher);
+    }, [descriptionWatcher, onDescriptionChange]);
 
     useClickOutside(ref, () => {
         if (!Object.values(control._fields).some((v) => v?._f.value)) {
-            onCommentCancel();
+            onCancel?.();
         }
     });
 
     return (
         <StyledCommentForm ref={ref} tabIndex={0}>
-            <Form onSubmit={handleSubmit(onCommentSubmit)}>
+            <Form onSubmit={handleSubmit(onSubmit)}>
                 {nullable(id, () => (
-                    <input type="hidden" value={id} {...register('id')} />
+                    <input type="hidden" {...register('id')} />
                 ))}
 
                 {nullable(goalId, () => (
-                    <input type="hidden" value={goalId} {...register('goalId')} />
+                    <input type="hidden" {...register('goalId')} />
                 ))}
 
                 {nullable(stateId, () => (
-                    <input type="hidden" value={stateId} {...register('stateId')} />
+                    <input type="hidden" {...register('stateId')} />
                 ))}
 
                 <Controller
@@ -142,19 +124,19 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                             {...field}
                             disabled={busy}
                             placeholder={tr('Leave a comment')}
-                            height={commentFocused ? 120 : 40}
-                            onCancel={onCommentCancel}
-                            onFocus={onCommentFocus}
+                            height={focused ? 120 : 40}
+                            onCancel={onCancel}
+                            onFocus={onFocus}
                             autoFocus={autoFocus}
-                            error={commentFocused ? error : undefined}
+                            error={focused ? error : undefined}
                         />
                     )}
                 />
 
-                {nullable(commentFocused, () => (
+                {nullable(focused, () => (
                     <FormActions>
                         <FormAction left inline>
-                            {nullable(commentFocused, () => (
+                            {nullable(focused, () => (
                                 <StyledFormBottom>
                                     <HelpButton slug="comments" />
                                 </StyledFormBottom>
@@ -162,10 +144,10 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         </FormAction>
                         <FormAction right inline>
                             {nullable(!busy, () => (
-                                <Button outline text={tr('Cancel')} onClick={onCommentCancel} />
+                                <Button outline text={tr('Cancel')} onClick={onCancel} />
                             ))}
 
-                            {renderActionButton({ busy })}
+                            {actionButton}
                         </FormAction>
                     </FormActions>
                 ))}
