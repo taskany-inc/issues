@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button } from '@taskany/bricks';
 
 import { useCommentResource } from '../../hooks/useCommentResource';
@@ -15,16 +15,38 @@ interface CommentEditFormProps {
     onUpdate: (comment?: { id: string; description: string }) => void;
     onChange: (comment: { description: string }) => void;
     onCancel: () => void;
+    onFocus?: () => void;
 }
 
-const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onUpdate, onChange, onCancel }) => {
+const CommentEditForm: React.FC<CommentEditFormProps> = ({
+    id,
+    description: currentDescription,
+    onUpdate,
+    onChange,
+    onCancel,
+    onFocus,
+}) => {
     const { update } = useCommentResource();
+    const [description, setDescription] = useState(currentDescription);
+    const [focused, setFocused] = useState(false);
+    const [busy, setBusy] = useState(false);
+
+    const onCommentFocus = useCallback(() => {
+        setFocused(true);
+        onFocus?.();
+    }, [onFocus]);
 
     const onCommentUpdate = useCallback(
         (form: GoalCommentSchema) => {
+            setBusy(true);
+            setFocused(false);
+
             // optimistic update
             onChange?.({ description: form.description });
+
             update((comment) => {
+                setBusy(false);
+                setDescription(comment.description);
                 onUpdate?.(comment);
             })(form);
         },
@@ -35,13 +57,24 @@ const CommentEditForm: React.FC<CommentEditFormProps> = ({ id, description, onUp
         <CommentForm
             id={id}
             description={description}
+            focused={focused}
+            busy={busy}
             autoFocus
             height={120}
+            onDescriptionChange={setDescription}
+            onFocus={onCommentFocus}
             onSubmit={onCommentUpdate}
             onCancel={onCancel}
-            renderActionButton={({ busy }) => (
-                <Button size="m" view="primary" disabled={busy} outline type="submit" text={tr('Save')} />
-            )}
+            actionButton={
+                <Button
+                    size="m"
+                    view="primary"
+                    disabled={currentDescription === description || busy}
+                    outline
+                    type="submit"
+                    text={tr('Save')}
+                />
+            }
         />
     );
 };
