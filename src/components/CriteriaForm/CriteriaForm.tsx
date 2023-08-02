@@ -4,13 +4,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, FormInput, TableRow, TableCell } from '@taskany/bricks';
 import { IconPlusCircleOutline, IconTargetOutline } from '@taskany/icons';
 import { gray7, gray8 } from '@taskany/colors';
-import { Controller, UseFormSetError, useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { Goal } from '@prisma/client';
 import Popup from '@taskany/bricks/components/Popup';
 import { z } from 'zod';
 
 import { InlineTrigger } from '../InlineTrigger';
-import { AddCriteriaScheme, criteriaSchema, updateCriteriaSchema } from '../../schema/criteria';
+import { criteriaSchema, updateCriteriaSchema } from '../../schema/criteria';
 import { GoalSuggest } from '../GoalSuggest';
 import { InlineForm } from '../InlineForm';
 import { Keyboard } from '../Keyboard';
@@ -35,29 +35,12 @@ const StyledFormInput = styled(FormInput)`
 
     border: 1px solid ${gray7};
     box-sizing: border-box;
-
-    & ~ div {
-        top: 50%;
-    }
-`;
-
-const StyledTableRow = styled(TableRow)`
-    /* more specific above base style rules */
-    && {
-        flex-basis: auto;
-    }
 `;
 
 const StyledTableCell = styled(TableCell)`
     flex-wrap: nowrap;
     display: flex;
     align-items: center;
-
-    & > div,
-    & > span {
-        flex: 1;
-        align-self: center;
-    }
 `;
 
 const StyledSubmitButton = styled(Button)`
@@ -72,54 +55,25 @@ interface WeightFieldProps {
     onChange: ReactEventHandler<HTMLInputElement>;
     error?: { message?: string };
     maxValue: number;
-    setError: UseFormSetError<AddCriteriaScheme>;
 }
 
 const WeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
-    ({ error, maxValue, setError, value, onChange, name }, ref) => {
-        const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-            (event) => {
-                onChange(event);
-
-                const { value } = event.target;
-
-                const parsedValue = +value;
-                let message: string | undefined;
-
-                if (!Number.isNaN(parsedValue)) {
-                    if (parsedValue < minPossibleWeight || maxValue + parsedValue > maxPossibleWeigth) {
-                        message = tr
-                            .raw('Weight must be in range', {
-                                upTo: `${maxPossibleWeigth - maxValue}`,
-                            })
-                            .join('');
-                    }
-                } else {
-                    message = tr('Weight must be integer');
-                }
-
-                setError('weight', { message });
-            },
-            [setError, maxValue, onChange],
-        );
-
-        return (
-            <StyledFormInput
-                autoComplete="off"
-                name={name}
-                value={value}
-                error={error?.message != null ? error : undefined}
-                placeholder={tr
-                    .raw('Weight', {
-                        upTo: maxPossibleWeigth - maxValue,
-                    })
-                    .join('')}
-                brick="center"
-                onChange={handleChange}
-                ref={ref}
-            />
-        );
-    },
+    ({ error, maxValue, value, onChange, name }, ref) => (
+        <StyledFormInput
+            autoComplete="off"
+            name={name}
+            value={value}
+            error={error?.message != null ? error : undefined}
+            placeholder={tr
+                .raw('Weight', {
+                    upTo: maxPossibleWeigth - maxValue,
+                })
+                .join('')}
+            brick="center"
+            onChange={onChange}
+            ref={ref}
+        />
+    ),
 );
 
 interface CriteriaTitleFieldProps {
@@ -130,27 +84,13 @@ interface CriteriaTitleFieldProps {
     error?: { message?: string };
     onSelect: <T extends Goal>(goal: T) => void;
     onChange: ReactEventHandler<HTMLInputElement>;
-    setError: UseFormSetError<AddCriteriaScheme>;
 }
 
 const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>(
-    ({ name, value = '', error, onSelect, onChange, titles = [], setError, isItemSelected }, ref) => {
+    ({ name, value = '', error, onSelect, onChange, isItemSelected }, ref) => {
         const [type, setType] = useState<'plain' | 'search'>(!isItemSelected ? 'plain' : 'search');
         const [popupVisible, setPopupVisible] = useState(false);
         const btnRef = useRef<HTMLButtonElement>(null);
-
-        const onlyUniqueTitleHandler = useCallback<React.FocusEventHandler<HTMLInputElement>>(
-            (event) => {
-                const { value } = event.target;
-
-                if (titles.some((t) => t === value)) {
-                    setError('title', {
-                        message: tr('Title must be unique'),
-                    });
-                }
-            },
-            [titles, setError],
-        );
 
         return (
             <>
@@ -178,7 +118,6 @@ const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>
                                 name={name}
                                 onChange={onChange}
                                 placeholder={tr('Enter goal name')}
-                                onBlur={onlyUniqueTitleHandler}
                                 error={error}
                                 {...inputProps}
                                 value={inputProps.value || value}
@@ -193,7 +132,6 @@ const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>
                         value={value}
                         name={name}
                         onChange={onChange}
-                        onBlur={onlyUniqueTitleHandler}
                         placeholder={tr('Enter criteria')}
                         error={error}
                         ref={ref}
@@ -220,7 +158,7 @@ interface CriteriaFormProps {
 interface CriteriaFormPropsWithSchema extends CriteriaFormProps {
     schema: Zod.Schema;
     values?: z.infer<CriteriaFormPropsWithSchema['schema']>;
-    btnText: string;
+    actionBtnText: string;
     onSubmit: (values: CriteriaFormPropsWithSchema['values']) => void;
 }
 
@@ -228,7 +166,7 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
     onSubmit,
     goalId,
     validityData,
-    btnText,
+    actionBtnText,
     schema,
     values,
     onReset,
@@ -240,11 +178,11 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
         register,
         reset,
         setValue,
-        setError,
         watch,
         formState: { isSubmitSuccessful },
     } = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
+        mode: 'onChange',
         reValidateMode: 'onChange',
         values,
     });
@@ -280,7 +218,7 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
     }, [title, setValue]);
 
     return (
-        <StyledTableRow align="center">
+        <TableRow align="center">
             <InlineForm
                 renderTrigger={renderTrigger}
                 onSubmit={handleSubmit(onSubmit)}
@@ -294,7 +232,7 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
                     </Tip>
                 }
             >
-                <StyledTableCell col={5} align="start">
+                <StyledTableCell col={5} align="center">
                     <Controller
                         name="title"
                         control={control}
@@ -302,7 +240,6 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
                             <CriteriaTitleField
                                 {...field}
                                 error={fieldState.error}
-                                setError={setError}
                                 onSelect={handleSelectGoal}
                                 titles={validityData.title}
                                 isItemSelected={selectedGoalId != null && !!selectedGoalId.id}
@@ -310,35 +247,62 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
                         )}
                     />
                 </StyledTableCell>
-                <StyledTableCell col={4} align="start">
+                <StyledTableCell col={4} align="center">
                     <Controller
                         name="weight"
                         control={control}
                         render={({ field, fieldState }) => (
-                            <WeightField
-                                {...field}
-                                error={fieldState.error}
-                                maxValue={validityData.sum}
-                                setError={setError}
-                            />
+                            <WeightField {...field} error={fieldState.error} maxValue={validityData.sum} />
                         )}
                     />
-                    <StyledSubmitButton brick="left" view="primary" text={btnText} size="m" type="submit" outline />
+                    <StyledSubmitButton
+                        brick="left"
+                        view="primary"
+                        text={actionBtnText}
+                        size="m"
+                        type="submit"
+                        outline
+                    />
                 </StyledTableCell>
                 <input type="hidden" {...register('goalId')} />
                 <input type="hidden" {...register('goalAsGriteria.id')} />
             </InlineForm>
-        </StyledTableRow>
+        </TableRow>
     );
 };
+
+function patchZodSchema<T extends typeof criteriaSchema | typeof updateCriteriaSchema>(
+    schema: T,
+    data: CriteriaFormProps['validityData'],
+) {
+    const patched = schema.merge(
+        z.object({
+            title: schema.shape.title.refine((val) => !data.title.some((t) => t === val), {
+                message: tr('Title must be unique'),
+            }),
+            weight: schema.shape.weight
+                .transform((val) => Number(val))
+                .refine((val) => !Number.isNaN(val), { message: tr('Weight must be integer') })
+                .refine((val) => val >= minPossibleWeight && data.sum + val <= maxPossibleWeigth, {
+                    message: tr
+                        .raw('Weight must be in range', {
+                            upTo: `${maxPossibleWeigth - data.sum}`,
+                        })
+                        .join(''),
+                }),
+        }),
+    );
+
+    return patched;
+}
 
 export const AddCriteriaForm: React.FC<
     CriteriaFormProps & { onSubmit: (val: z.infer<typeof criteriaSchema>) => void }
 > = ({ validityData, onSubmit, goalId, onReset }) => {
     return (
         <CriteriaForm
-            schema={criteriaSchema}
-            btnText={tr('Add')}
+            schema={patchZodSchema(criteriaSchema, validityData)}
+            actionBtnText={tr('Add')}
             goalId={goalId}
             onSubmit={onSubmit}
             onReset={onReset}
@@ -362,8 +326,8 @@ export const EditCriteriaForm: React.FC<
 > = ({ validityData, onSubmit, goalId, onReset, values }) => {
     return (
         <CriteriaForm
-            schema={updateCriteriaSchema}
-            btnText={tr('Save')}
+            schema={patchZodSchema(updateCriteriaSchema, validityData)}
+            actionBtnText={tr('Save')}
             goalId={goalId}
             onSubmit={onSubmit}
             onReset={onReset}

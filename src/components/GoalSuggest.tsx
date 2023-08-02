@@ -23,6 +23,7 @@ interface GoalSuggestProps {
     value?: string;
     showSuggest?: boolean;
     renderInput: React.ComponentProps<typeof ComboBox>['renderInput'];
+    className?: string;
 }
 
 interface GoalSuggestItemProps {
@@ -84,7 +85,7 @@ const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
 };
 
 export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
-    ({ onChange, value, renderInput, showSuggest }, ref) => {
+    ({ onChange, value, renderInput, showSuggest, className }, ref) => {
         const [visible, setVisible] = useState(showSuggest);
 
         const { data: items = [] } = trpc.goal.suggestions.useQuery(
@@ -115,6 +116,7 @@ export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
         return (
             <ComboBox
                 ref={ref}
+                className={className}
                 value={value}
                 onChange={onSelectItem}
                 items={items}
