@@ -306,9 +306,11 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     onConvertToGoal,
     onUpdateCriteria,
 }) => {
-    const [{ mode, index }, setViewItemMode] = useState<{ mode: 'view'; index: -1 } | { mode: 'edit'; index: number }>({
+    const [{ mode, criteriaId }, setViewItemMode] = useState<
+        { mode: 'view'; criteriaId: null } | { mode: 'edit'; criteriaId: string }
+    >({
         mode: 'view',
-        index: -1,
+        criteriaId: null,
     });
     const onAddHandler = useCallback(
         (val: AddCriteriaScheme) => {
@@ -317,25 +319,6 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             }
         },
         [onAddCriteria, goalId],
-    );
-
-    const dataForValidateCriteria = useMemo(
-        () =>
-            criteriaList.reduce<{ sum: number; title: string[] }>(
-                (acc, { weight, title }, criteriaIdx) => {
-                    if (mode === 'edit' && index === criteriaIdx) {
-                        return acc;
-                    }
-                    acc.sum += weight;
-                    acc.title.push(title);
-                    return acc;
-                },
-                {
-                    sum: 0,
-                    title: [],
-                },
-            ),
-        [criteriaList, mode, index],
     );
 
     const sortedCriteriaItems = useMemo(() => {
@@ -358,6 +341,25 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
         return list.done.concat(list.undone);
     }, [criteriaList]);
 
+    const dataForValidateCriteria = useMemo(
+        () =>
+            sortedCriteriaItems.reduce<{ sum: number; title: string[] }>(
+                (acc, { weight, title, id }) => {
+                    if (mode === 'edit' && id === criteriaId) {
+                        return acc;
+                    }
+                    acc.sum += weight;
+                    acc.title.push(title);
+                    return acc;
+                },
+                {
+                    sum: 0,
+                    title: [],
+                },
+            ),
+        [sortedCriteriaItems, mode, criteriaId],
+    );
+
     return (
         <ActivityFeedItem>
             <Circle size={32}>
@@ -372,8 +374,8 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                     </StyledHeadingWrapper>
                 ))}
                 <StyledTable gap={5}>
-                    {sortedCriteriaItems.map((item, i) => {
-                        if (mode === 'view' || i !== index) {
+                    {sortedCriteriaItems.map((item) => {
+                        if (mode === 'view' || item.id !== criteriaId) {
                             return (
                                 <GoalCriteriaItem
                                     key={item.id}
@@ -385,7 +387,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                     onUpdateClick={() =>
                                         setViewItemMode({
                                             mode: 'edit',
-                                            index: i,
+                                            criteriaId: item.id,
                                         })
                                     }
                                     canEdit={canEdit}
@@ -393,7 +395,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                 />
                             );
                         }
-                        if (mode === 'edit' && index === i) {
+                        if (mode === 'edit' && criteriaId === item.id) {
                             return (
                                 <EditCriteriaForm
                                     key={item.id}
@@ -411,7 +413,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                     onReset={() =>
                                         setViewItemMode({
                                             mode: 'view',
-                                            index: -1,
+                                            criteriaId: null,
                                         })
                                     }
                                 />
