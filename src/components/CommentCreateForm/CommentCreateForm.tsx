@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ArrowDownSmallIcon, ArrowUpSmallIcon, Button, Dropdown, UserPic } from '@taskany/bricks';
 import { State } from '@prisma/client';
 import styled from 'styled-components';
+import { debounce } from 'throttle-debounce';
 
 import { usePageContext } from '../../hooks/usePageContext';
 import { useCommentResource } from '../../hooks/useCommentResource';
@@ -10,16 +11,19 @@ import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { ColorizedMenuItem } from '../ColorizedMenuItem';
 import { StateDot } from '../StateDot';
+import { DraftComment } from '../../types/draftComment';
 
 import { tr } from './CommentCreateForm.i18n';
 
 interface CommentCreateFormProps {
     goalId: string;
     states?: State[];
+    draftComment?: DraftComment;
 
     onSubmit?: (id?: string) => void;
     onFocus?: () => void;
     onCancel?: () => void;
+    onDraftComment?: (comment: DraftComment | null) => void;
 }
 
 const StyledStateUpdate = styled.div`
@@ -27,22 +31,50 @@ const StyledStateUpdate = styled.div`
     align-items: center;
 `;
 
-const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, onSubmit, onFocus, onCancel }) => {
+const findStateHelper = (draftComment?: DraftComment) => (state?: State) => state?.id === draftComment?.stateId;
+
+const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
+    goalId,
+    states,
+    draftComment,
+    onSubmit,
+    onFocus,
+    onCancel,
+    onDraftComment,
+}) => {
     const { user, themeId } = usePageContext();
     const { create } = useCommentResource();
     const [pushState, setPushState] = useState<State | undefined>();
-    const [description, setDescription] = useState<string>();
+    const [description, setDescription] = useState<string | undefined>('');
     const [focused, setFocused] = useState(false);
     const [busy, setBusy] = useState(false);
-    const [currentGoal, setCurrentGoal] = useState('');
+    const [currentGoal, setCurrentGoal] = useState(goalId);
     const [prevGoal, setPrevGoal] = useState('');
 
-    if (goalId !== prevGoal) {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const debouncedOnDraftComment = useCallback(
+        debounce(500, (comment: DraftComment) => {
+            onDraftComment?.(comment);
+        }),
+        [onDraftComment],
+    );
+
+    useEffect(() => {
+        if (!description) return;
+
+        debouncedOnDraftComment({ description, stateId: pushState?.id });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pushState?.id, description]);
+
+    useEffect(() => {
+        if (goalId === prevGoal) return;
+
         setCurrentGoal(goalId);
         setPrevGoal(goalId);
-        setDescription('');
-        setFocused(false);
-    }
+        setDescription(draftComment?.description ?? '');
+        setFocused(Boolean(draftComment?.description));
+        setPushState(states?.find(findStateHelper(draftComment)));
+    }, [draftComment, goalId, prevGoal, states]);
 
     const onCommentFocus = useCallback(() => {
         setFocused(true);
@@ -55,14 +87,16 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, o
             setFocused(false);
 
             await create(({ id }) => {
-                setBusy(false);
-                setFocused(true);
+                onSubmit?.(id);
                 setDescription('');
                 setPushState(undefined);
-                onSubmit?.(id);
+                onDraftComment?.(null);
             })(form);
+
+            setBusy(false);
+            setFocused(true);
         },
-        [create, onSubmit],
+        [create, onSubmit, onDraftComment],
     );
 
     const onCancelCreate = useCallback(() => {
@@ -71,14 +105,12 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({ goalId, states, o
         setPushState(undefined);
         setDescription('');
         onCancel?.();
-    }, [onCancel]);
+        onDraftComment?.(null);
+    }, [onCancel, onDraftComment]);
 
-    const onStateSelect = useCallback(
-        (state: State) => {
-            setPushState(state.id === pushState?.id ? undefined : state);
-        },
-        [pushState],
-    );
+    const onStateSelect = useCallback((state: State) => {
+        setPushState((prev) => (state.id === prev?.id ? undefined : state));
+    }, []);
 
     return (
         <ActivityFeedItem>
