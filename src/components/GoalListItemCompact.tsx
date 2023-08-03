@@ -1,25 +1,25 @@
 import React, { MouseEventHandler, useMemo } from 'react';
-import NextLink from 'next/link';
 import styled, { css } from 'styled-components';
 import {
     nullable,
     GoalIcon,
     Dropdown,
     MenuItem,
-    TableRow as BrickTableRow,
-    TableCell as BrickTableCel,
+    TableRow,
+    TableCell,
+    TableRowProps,
+    TableCellProps,
 } from '@taskany/bricks';
 import { IconMoreVerticalOutline } from '@taskany/icons';
 import type { Estimate, State as StateType } from '@prisma/client';
 
-import { routes } from '../hooks/router';
 import { Priority } from '../types/priority';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { estimateToString } from '../utils/estimateToString';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
-import { TableRow, ContentItem, TitleItem, TitleContainer, Title, TextItem } from './Table';
+import { Title, TextItem } from './Table';
 import { StateDot } from './StateDot';
 
 interface CommonGoalListItemCompactProps {
@@ -39,55 +39,6 @@ type GoalListItemCompactProps = {
     onClick?: MouseEventHandler<HTMLAnchorElement>;
 } & CommonGoalListItemCompactProps;
 
-export const GoalListItemCompact: React.FC<GoalListItemCompactProps> = React.memo(
-    ({ shortId, projectId, owner, issuer, title, state, focused, estimate, priority, className, onClick }) => {
-        const issuers = useMemo(() => {
-            if (issuer && owner && owner.id === issuer.id) {
-                return [owner];
-            }
-
-            return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
-        }, [issuer, owner]);
-
-        return (
-            <NextLink href={routes.goal(shortId)} passHref legacyBehavior>
-                <TableRow as="a" focused={focused} onClick={onClick} className={className}>
-                    <ContentItem>
-                        <GoalIcon size="s" />
-                    </ContentItem>
-                    <TitleItem>
-                        <TitleContainer>
-                            <Title size="s" weight="bold">
-                                {title}
-                            </Title>
-                        </TitleContainer>
-                    </TitleItem>
-                    <ContentItem>
-                        {nullable(state, (s) => (
-                            <StateDot size="m" title={s?.title} hue={s?.hue} />
-                        ))}
-                    </ContentItem>
-                    <ContentItem>
-                        <TextItem weight="regular">{getPriorityText(priority as Priority)}</TextItem>
-                    </ContentItem>
-
-                    <ContentItem>
-                        <TextItem>{projectId}</TextItem>
-                    </ContentItem>
-
-                    <ContentItem align="center">
-                        <UserGroup users={issuers} />
-                    </ContentItem>
-
-                    <ContentItem>
-                        <TextItem>{nullable(estimate, (e) => estimateToString(e))}</TextItem>
-                    </ContentItem>
-                </TableRow>
-            </NextLink>
-        );
-    },
-);
-
 type ColumnRenderProps<T extends Record<string, any>> = T &
     Omit<GoalListItemCompactProps, 'onClick' | 'className' | 'focused' | 'owner' | 'issuer'> & {
         issuers: Array<ActivityByIdReturnType>;
@@ -96,7 +47,7 @@ type ColumnRenderProps<T extends Record<string, any>> = T &
 type GoalListItemCompactColumnProps<T = any> = {
     name: 'icon' | 'title' | 'state' | 'priority' | 'projectId' | 'issuers' | 'estimate' | string;
     renderColumn?: (props: T) => React.ReactElement<T>;
-    columnProps?: React.ComponentProps<typeof ContentItem>;
+    columnProps?: TableCellProps;
 };
 
 interface GoalItemAction {
@@ -121,7 +72,9 @@ interface GoalListItemCompactCustomizeProps<T extends Record<string, any>> {
 }
 
 interface GoalListItemCompactCustomizeRender {
-    <T extends Record<string, any>>(props: GoalListItemCompactCustomizeProps<T>): React.ReactElement<T>;
+    <T extends Record<string, any>>(
+        props: GoalListItemCompactCustomizeProps<T> & Omit<TableRowProps, 'interactive'>,
+    ): React.ReactElement<T>;
 }
 
 interface RenderColumnProps<T> {
@@ -133,7 +86,7 @@ interface ColumnRender {
     <T extends GoalListItemCompactProps>(props: RenderColumnProps<T>): React.ReactNode;
 }
 
-const StyledCell = styled(BrickTableCel)<{ forIcon?: boolean }>`
+const StyledCell = styled(TableCell)<{ forIcon?: boolean }>`
     ${({ forIcon }) =>
         forIcon &&
         css`
@@ -208,14 +161,10 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             return null;
     }
 
-    return nullable(content, (c) => (
-        <StyledCell {...columnProps} forIcon={col.name === 'state'}>
-            {c}
-        </StyledCell>
-    ));
+    return nullable(content, (c) => <StyledCell {...columnProps}>{c}</StyledCell>);
 };
 
-export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = ({
+export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
     columns,
     actions,
     rowIcon,
@@ -223,9 +172,21 @@ export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = 
     onClick,
     className,
     item,
+    gap = 7,
+    align,
+    justify,
+    focused,
 }) => {
     return (
-        <BrickTableRow onClick={onClick} className={className} gap={7} align="baseline">
+        <TableRow
+            onClick={onClick}
+            className={className}
+            interactive={focused != null}
+            focused={focused}
+            gap={gap}
+            align={align}
+            justify={justify}
+        >
             <StyledCell key="icon" forIcon min>
                 {rowIcon || <GoalIcon size="s" />}
             </StyledCell>
@@ -255,7 +216,7 @@ export const GoalListItemCompactCustomize: GoalListItemCompactCustomizeRender = 
                     ))}
                 </StyledActionsWrapper>
             </StyledCell>
-        </BrickTableRow>
+        </TableRow>
     );
 };
 

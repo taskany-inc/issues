@@ -1,16 +1,16 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, ChangeEvent, useCallback, useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import { ComboBox, Input, SearchIcon, Text } from '@taskany/bricks';
-import { gray7, textColor } from '@taskany/colors';
+import { ComboBox, Input, SearchIcon, Text, Table } from '@taskany/bricks';
+import { gapS, gapXs, gray7, radiusM, textColor } from '@taskany/colors';
+import NextLink from 'next/link';
 
 import { trpc } from '../../utils/trpcClient';
-import { useRouter } from '../../hooks/router';
+import { routes, useRouter } from '../../hooks/router';
 import { useHotkey } from '../../hooks/useHotkeys';
 import { Keyboard } from '../Keyboard';
 import { GoalListItemCompact } from '../GoalListItemCompact';
 import { ProjectListItemCompact } from '../ProjectListItemCompact';
-import { Table } from '../Table';
 
 import { tr } from './GlobalSearch.i18n';
 
@@ -34,8 +34,10 @@ const StyledTrigger = styled(StyledSearchIcon)`
     }
 `;
 
-const StyledResultsTable = styled(Table)`
-    grid-template-columns: 1fr minmax(300px, 30%) repeat(4, max-content) 1fr;
+const StyledRow = styled(GoalListItemCompact)`
+    padding: ${gapXs} ${gapS};
+    border-radius: ${radiusM};
+    cursor: pointer;
 `;
 
 enum ItemType {
@@ -120,26 +122,42 @@ export const GlobalSearch = React.forwardRef<HTMLDivElement>((_, ref) => {
                     {...props}
                 />
             )}
-            renderItems={(children) => (
-                <StyledResultsTable columns={6}>{children as React.ReactNode}</StyledResultsTable>
-            )}
+            renderItems={(children) => <Table width={700}>{children as React.ReactNode}</Table>}
             renderItem={(props) => {
                 switch (props.item.__kind) {
                     case ItemType.goal:
                         return (
-                            <GoalListItemCompact
+                            <NextLink
                                 key={props.item.id}
-                                shortId={props.item._shortId}
-                                projectId={props.item.projectId}
-                                title={props.item.title}
-                                state={props.item.state}
-                                issuer={props.item.activity}
-                                owner={props.item.owner}
-                                priority={props.item.priority}
-                                estimate={props.item._lastEstimate}
-                                focused={props.index === props.cursor}
-                                onClick={props.onClick}
-                            />
+                                passHref
+                                href={routes.goal(props.item._shortId)}
+                                legacyBehavior
+                            >
+                                <StyledRow
+                                    forwardedAs="a"
+                                    focused={props.index === props.cursor}
+                                    align="center"
+                                    gap={10}
+                                    onClick={props.onClick}
+                                    item={{
+                                        title: props.item.title,
+                                        priority: props.item.priority,
+                                        state: props.item.state,
+                                        owner: props.item.owner,
+                                        issuer: props.item.activity,
+                                        estimate: props.item._lastEstimate,
+                                        projectId: props.item.projectId,
+                                    }}
+                                    columns={[
+                                        { name: 'title', columnProps: { col: 3 } },
+                                        { name: 'state', columnProps: { col: 1, justify: 'end' } },
+                                        { name: 'priority', columnProps: { width: '12ch' } },
+                                        { name: 'projectId', columnProps: { col: 3 } },
+                                        { name: 'issuers' },
+                                        { name: 'estimate', columnProps: { width: '8ch' } },
+                                    ]}
+                                />
+                            </NextLink>
                         );
 
                     case ItemType.project:

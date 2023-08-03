@@ -100,6 +100,9 @@ export const goal = router({
                 },
                 include: {
                     ...goalDeepQuery,
+                    estimate: {
+                        include: { estimate: true },
+                    },
                 },
             });
         }),
