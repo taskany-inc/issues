@@ -7,6 +7,8 @@ import { Priority } from '../types/priority';
 import { useHighlightedComment } from '../hooks/useHighlightedComment';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { HistoryAction } from '../types/history';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { DraftComment } from '../types/draftComment';
 
 import { ActivityFeed } from './ActivityFeed';
 import { CommentView } from './CommentView/CommentView';
@@ -43,11 +45,23 @@ function excludeString<T>(val: T): Exclude<T, string> {
 
 export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
     ({ feed, onCommentReaction, onCommentPublish, userId, goalId, goalStates, onCommentDelete, children }, ref) => {
+        const [draftComment, setDraftComment] = useLocalStorage('draftGoalComment', {});
         const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
 
         const onPublish = (id?: string) => {
             onCommentPublish(id);
             setHighlightCommentId(id);
+        };
+
+        const onDraftComment = (comment: DraftComment | null) => {
+            setDraftComment((prev) => {
+                if (comment) {
+                    prev[goalId] = comment;
+                } else {
+                    delete prev[goalId];
+                }
+                return prev;
+            });
         };
 
         return (
@@ -146,7 +160,13 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                     )),
                 )}
 
-                <CommentCreateForm goalId={goalId} onSubmit={onPublish} states={goalStates} />
+                <CommentCreateForm
+                    goalId={goalId}
+                    states={goalStates}
+                    onSubmit={onPublish}
+                    onDraftComment={onDraftComment}
+                    draftComment={draftComment?.[goalId]}
+                />
             </ActivityFeed>
         );
     },

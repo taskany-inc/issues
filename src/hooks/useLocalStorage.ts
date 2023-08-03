@@ -8,12 +8,14 @@ export type RecentProjectsCache = Record<
     { rate: number; cache: { id: string; title: string; flowId: string; description?: string | null } }
 >;
 export type GoalCreateFormAction = number | null;
+export type DraftGoalComment = Record<string, { stateId?: string; description?: string }>;
 type SetValue<TValue> = (value: TValue | ((previousValue: TValue) => TValue)) => void;
 interface StorageKey {
     lastProjectCache: LastOrCurrentProject;
     currentProjectCache: LastOrCurrentProject;
     recentProjectsCache: RecentProjectsCache;
     goalCreateFormAction: GoalCreateFormAction;
+    draftGoalComment: DraftGoalComment;
 }
 
 export function useLocalStorage<T extends keyof StorageKey>(
