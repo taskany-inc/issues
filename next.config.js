@@ -52,6 +52,11 @@ const nextConfig = {
             };
         }
 
+        if (process.env.ANALYZE === 'true') {
+            const StatoscopeWebpackPlugin = require('@statoscope/webpack-plugin').default;
+            config.plugins.push(new StatoscopeWebpackPlugin());
+        }
+
         if (!dev && !isServer && !process.env.INCLUDE_SCRIPTS_TO_MAIN_BUNDLE) {
             config.externals = {
                 React: 'react',
@@ -64,7 +69,7 @@ const nextConfig = {
 };
 
 module.exports =
-    process.env.NODE_ENV === 'development' && process.env.ANALYZE === 'true'
+    process.env.ANALYZE === 'true'
         ? require('@next/bundle-analyzer')({})(nextConfig)
         : withSentryConfig(nextConfig, {
               silent: true,
