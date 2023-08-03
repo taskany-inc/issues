@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.20.1](https://github.com/taskany-inc/issues/compare/v1.20.0...v1.20.1) (2023-08-03)
+
+
+### Bug Fixes
+
+* **CriteriaForm:** validation rules for `weight` field ([0200ca1](https://github.com/taskany-inc/issues/commit/0200ca1d513dd7e557988e294b7d34316ffcc7ea))
+
 ## [1.20.0](https://github.com/taskany-inc/issues/compare/v1.19.0...v1.20.0) (2023-08-03)
 
 
