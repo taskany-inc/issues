@@ -321,7 +321,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
 
     const dataForValidateCriteria = useMemo(
         () =>
-            criteriaList.reduce(
+            criteriaList.reduce<{ sum: number; title: string[] }>(
                 (acc, { weight, title }, criteriaIdx) => {
                     if (mode === 'edit' && index === criteriaIdx) {
                         return acc;
@@ -332,7 +332,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                 },
                 {
                     sum: 0,
-                    title: [] as string[],
+                    title: [],
                 },
             ),
         [criteriaList, mode, index],
@@ -405,7 +405,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                         goalId,
                                         goalAsGriteria:
                                             item.goalIdAsCriteria != null ? { id: item.goalIdAsCriteria } : undefined,
-                                        weight: String(item.weight),
+                                        weight: item.weight ? String(item.weight) : '',
                                     }}
                                     onSubmit={onUpdateCriteria}
                                     onReset={() =>

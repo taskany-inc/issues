@@ -49,6 +49,10 @@ const StyledSubmitButton = styled(Button)`
     justify-content: center;
 `;
 
+const StyledGoalSuggest = styled(GoalSuggest)`
+    flex: 1;
+`;
+
 interface WeightFieldProps {
     name: 'weight';
     value?: string;
@@ -107,7 +111,7 @@ const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>
                 />
 
                 {type === 'search' ? (
-                    <GoalSuggest
+                    <StyledGoalSuggest
                         value={isItemSelected ? undefined : value}
                         showSuggest={!isItemSelected}
                         onChange={onSelect}
@@ -280,16 +284,34 @@ function patchZodSchema<T extends typeof criteriaSchema | typeof updateCriteriaS
             title: schema.shape.title.refine((val) => !data.title.some((t) => t === val), {
                 message: tr('Title must be unique'),
             }),
-            weight: schema.shape.weight
-                .transform((val) => Number(val))
-                .refine((val) => !Number.isNaN(val), { message: tr('Weight must be integer') })
-                .refine((val) => val >= minPossibleWeight && data.sum + val <= maxPossibleWeigth, {
-                    message: tr
-                        .raw('Weight must be in range', {
-                            upTo: `${maxPossibleWeigth - data.sum}`,
-                        })
-                        .join(''),
-                }),
+            // INFO: https://github.com/colinhacks/zod#abort-early
+            weight: schema.shape.weight.superRefine((val, ctx): val is string => {
+                if (!val || !val.length) {
+                    return z.NEVER;
+                }
+
+                const parsed = Number(val);
+
+                if (Number.isNaN(parsed)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: tr('Weight must be integer'),
+                    });
+                }
+
+                if (parsed < minPossibleWeight || data.sum + parsed > maxPossibleWeigth) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: tr
+                            .raw('Weight must be in range', {
+                                upTo: `${maxPossibleWeigth - data.sum}`,
+                            })
+                            .join(''),
+                    });
+                }
+
+                return z.NEVER;
+            }),
         }),
     );
 
