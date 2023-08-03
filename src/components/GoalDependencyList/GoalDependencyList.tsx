@@ -11,7 +11,7 @@ import { ToggleGoalDependency, dependencyKind } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { Circle, CircledIcon as CircleIconInner } from '../Circle';
 import { ContentItem, Title } from '../Table';
-import { CustomCell, GoalListItemCompactCustomize } from '../GoalListItemCompact';
+import { CustomCell, GoalListItemCompact } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
 import { UserGroup } from '../UserGroup';
 import { BetaBadge } from '../BetaBadge';
@@ -41,7 +41,7 @@ const StyledTable = styled(Table)`
     margin-bottom: 10px;
 `;
 
-const StyledTableRow = styled(GoalListItemCompactCustomize)`
+const StyledTableRow = styled(GoalListItemCompact)`
     position: relative;
 
     &:hover {

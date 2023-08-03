@@ -1,22 +1,13 @@
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { ComboBox, GoalIcon, nullable } from '@taskany/bricks';
+import { ComboBox, Table } from '@taskany/bricks';
+import { radiusM, gapS, gapXs } from '@taskany/colors';
 import { Estimate, State as StateType } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
-import { estimateToString } from '../utils/estimateToString';
 
-import { TableRow, ContentItem, TitleItem, TitleContainer, Title, TextItem, Table } from './Table';
-import { StateDot } from './StateDot';
-import { UserGroup } from './UserGroup';
-
-const StyledTable = styled(Table)`
-    display: grid;
-    grid-template-columns: 35px minmax(250px, 20%) repeat(4, max-content);
-    padding: 0;
-    margin: 0;
-`;
+import { GoalListItemCompact } from './GoalListItemCompact';
 
 interface GoalSuggestProps {
     onChange: (val: any) => void;
@@ -25,6 +16,11 @@ interface GoalSuggestProps {
     renderInput: React.ComponentProps<typeof ComboBox>['renderInput'];
     className?: string;
 }
+
+const StyledTableRow = styled(GoalListItemCompact)`
+    border-radius: ${radiusM};
+    padding: ${gapXs} ${gapS};
+`;
 
 interface GoalSuggestItemProps {
     projectId: string | null;
@@ -37,50 +33,22 @@ interface GoalSuggestItemProps {
     onClick?: () => void;
 }
 
-const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({
-    title,
-    projectId,
-    owner,
-    issuer,
-    state,
-    estimate,
-    focused,
-    onClick,
-}) => {
-    const rowRef = useRef<HTMLDivElement>(null);
-    const issuers = useMemo(() => {
-        if (issuer && owner && owner.id === issuer.id) {
-            return [owner];
-        }
-
-        return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
-    }, [issuer, owner]);
-
+const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({ focused, onClick, ...props }) => {
     return (
-        <TableRow onClick={onClick} focused={focused} tabIndex={-1} ref={rowRef}>
-            <ContentItem>
-                <GoalIcon size="s" />
-            </ContentItem>
-            <TitleItem>
-                <TitleContainer>
-                    <Title>{title}</Title>
-                </TitleContainer>
-            </TitleItem>
-            <ContentItem>
-                {nullable(state, (s) => (
-                    <StateDot size="m" title={s?.title} hue={s?.hue} />
-                ))}
-            </ContentItem>
-            <ContentItem>
-                <TextItem>{projectId}</TextItem>
-            </ContentItem>
-            <ContentItem>
-                <UserGroup users={issuers} />
-            </ContentItem>
-            <ContentItem>
-                <TextItem>{nullable(estimate, (e) => estimateToString(e))}</TextItem>
-            </ContentItem>
-        </TableRow>
+        <StyledTableRow
+            onClick={onClick}
+            focused={focused}
+            align="center"
+            gap={10}
+            item={props}
+            columns={[
+                { name: 'title', columnProps: { col: 4 } },
+                { name: 'state', columnProps: { col: 1, justify: 'end' } },
+                { name: 'projectId', columnProps: { col: 3 } },
+                { name: 'issuers', columnProps: { col: 1 } },
+                { name: 'estimate', columnProps: { width: '8ch' } },
+            ]}
+        />
     );
 };
 
@@ -122,7 +90,7 @@ export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
                 items={items}
                 visible={visible && showSuggest}
                 renderInput={renderInput}
-                maxWidth={600}
+                maxWidth={550}
                 renderItem={({ item, cursor, index, onClick }) => (
                     <GoalSuggestItem
                         key={item.id}
@@ -133,10 +101,10 @@ export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
                         state={item.state}
                         issuer={item.activity}
                         owner={item.owner}
-                        estimate={item._lastEstimate}
+                        estimate={item.estimate[item.estimate.length - 1]?.estimate ?? undefined}
                     />
                 )}
-                renderItems={(children) => <StyledTable columns={6}>{children as React.ReactNode}</StyledTable>}
+                renderItems={(children) => <Table width={550}>{children as React.ReactNode}</Table>}
             />
         );
     },

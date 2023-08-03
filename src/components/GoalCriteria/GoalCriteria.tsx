@@ -24,7 +24,7 @@ import { GoalAchiveCriteria } from '../../../trpc/inferredTypes';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { Circle, CircledIcon } from '../Circle';
 import { UserGroup } from '../UserGroup';
-import { GoalListItemCompactCustomize, CustomCell } from '../GoalListItemCompact';
+import { GoalListItemCompact, CustomCell } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
 import { AddCriteriaForm, EditCriteriaForm } from '../CriteriaForm/CriteriaForm';
 
@@ -77,7 +77,7 @@ const StyledCheckboxWrapper = styled.span<{ canEdit: boolean }>`
         `}
 `;
 
-const StyledTableRow = styled(GoalListItemCompactCustomize)`
+const StyledTableRow = styled(GoalListItemCompact)`
     padding: 3px 0 4px;
 `;
 

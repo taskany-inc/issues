@@ -36,6 +36,11 @@ export const search = router({
                 },
                 include: {
                     ...goalDeepQuery,
+                    estimate: {
+                        include: {
+                            estimate: true,
+                        },
+                    },
                 },
             }),
             prisma.project.findMany({
