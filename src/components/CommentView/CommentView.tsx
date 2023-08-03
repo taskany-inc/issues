@@ -115,6 +115,7 @@ const StyledCardComment = styled(CardComment)`
     display: flex;
     flex-direction: column;
     gap: ${gapM};
+    word-break: break-all;
 `;
 
 const StyledTimestamp = styled.div`
