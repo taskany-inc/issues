@@ -32,7 +32,7 @@ const nextConfig = {
             fs: false,
         };
 
-        if (dev && !isServer) {
+        if (process.env.NEXT_PUBLIC_WDYR === '1' && dev && !isServer) {
             const originalEntry = config.entry;
             config.entry = async () => {
                 const wdrPath = path.resolve(__dirname, './src/utils/wdyr.ts');
