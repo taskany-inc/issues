@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.20.3](https://github.com/taskany-inc/issues/compare/v1.20.2...v1.20.3) (2023-08-04)
+
+
+### Bug Fixes
+
+* **CommentView:** long word doesnt expand comment card ([74b334e](https://github.com/taskany-inc/issues/commit/74b334e40f0b5ed9d0e4c46888ea0316b459d9ee))
+* **Workers:** changed worker path ([02f06a8](https://github.com/taskany-inc/issues/commit/02f06a892bf72f4f3c80c384d241e4b936975ea4))
+
 ## [1.20.2](https://github.com/taskany-inc/issues/compare/v1.20.1...v1.20.2) (2023-08-03)
 
 
