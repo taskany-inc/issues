@@ -19,6 +19,7 @@ interface ProjectListItemProps {
     className?: string;
     disabled?: boolean;
     averageScore: number | null;
+    onClick?: (e: React.MouseEvent) => void;
 }
 
 const StyledTitleCell = styled(TableCell)`

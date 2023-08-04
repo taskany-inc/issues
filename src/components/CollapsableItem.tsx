@@ -38,6 +38,7 @@ const StyledCollapsableHeader = styled.div`
 
 const StyledCollapsableItem = styled.div`
     position: relative;
+    padding-bottom: 1px;
 
     &:before {
         content: '';
@@ -56,7 +57,7 @@ const StyledHeaderContent = styled.div<{ highlighted?: boolean }>`
     `}
 `;
 
-const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number }>`
+const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number; hasChild: boolean }>`
     position: relative;
 
     border-radius: ${radiusM};
@@ -85,8 +86,9 @@ const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number
         padding-left: ${collapseOffset}px;
     `}
 
-    ${({ collapsed, deep }) =>
+    ${({ collapsed, deep, hasChild }) =>
         !collapsed &&
+        hasChild &&
         css`
             padding-left: ${collapseOffset}px;
             margin-left: ${deep === 0 ? -collapseOffset : 0}px;
@@ -143,11 +145,19 @@ const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number
                 margin-left: -${collapseOffset}px;
             }
 
-            > ${StyledCollapsableItem}:before {
+            /** show grey line for additional content section (for example goals list) if it's not last item. See design :) */
+            // TODO: Remove this here https://github.com/taskany-inc/issues/issues/1448
+
+            > ${StyledCollapsableItem}:not(:last-child):before {
                 display: block;
             }
         `}
 `;
+
+export const CollapsableContentItem: FC<{
+    children?: ReactNode;
+    className?: string;
+}> = ({ children, className }) => <StyledCollapsableItem className={className}>{children}</StyledCollapsableItem>;
 
 export const CollapsableItem: FC<{
     children?: ReactNode;
@@ -156,16 +166,19 @@ export const CollapsableItem: FC<{
     content: ReactNode;
     deep?: number;
     collapsed: boolean;
-}> = ({ onClick, children, header, collapsed, deep = 0, content }) => (
-    <StyledCollapsableContainer collapsed={collapsed} deep={deep}>
-        <StyledCollapsableHeader onClick={onClick}>
-            <StyledParentDot />
-            <StyledDot />
-            <StyledHeaderContent highlighted={!!onClick && collapsed}>{header}</StyledHeaderContent>
-        </StyledCollapsableHeader>
-        {nullable(children, (ch) => (
-            <StyledCollapsableItem>{ch}</StyledCollapsableItem>
-        ))}
-        {!collapsed ? content : null}
-    </StyledCollapsableContainer>
-);
+    hasChild: boolean;
+}> = ({ onClick, children, header, collapsed, deep = 0, hasChild, content }) => {
+    return (
+        <StyledCollapsableContainer collapsed={collapsed} deep={deep} hasChild={hasChild}>
+            <StyledCollapsableHeader onClick={onClick}>
+                <StyledParentDot />
+                <StyledDot />
+                <StyledHeaderContent highlighted={!!onClick && collapsed}>{header}</StyledHeaderContent>
+            </StyledCollapsableHeader>
+            {nullable(children, (ch) => (
+                <StyledCollapsableItem>{ch}</StyledCollapsableItem>
+            ))}
+            {!collapsed ? content : null}
+        </StyledCollapsableContainer>
+    );
+};

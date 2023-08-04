@@ -17,7 +17,6 @@ export const ProjectListItemConnected: FC<{
     selectedResolver?: (id: string) => boolean;
     deep?: number;
     collapsed?: boolean;
-    collapsedGoals?: boolean;
     hasLink?: boolean;
 }> = ({
     hasLink = false,
@@ -28,10 +27,8 @@ export const ProjectListItemConnected: FC<{
     selectedResolver,
     deep = 0,
     collapsed: defaultCollapsed = false,
-    collapsedGoals: defaultCollapsedGoals = false,
 }) => {
     const [collapsed, setIsCollapsed] = useState(defaultCollapsed);
-    const [collapsedGoals, setIsCollapsedGoals] = useState(defaultCollapsedGoals);
 
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
@@ -39,7 +36,7 @@ export const ProjectListItemConnected: FC<{
             goalsQuery: queryState,
         },
         {
-            enabled: !collapsedGoals,
+            enabled: !collapsed,
             keepPreviousData: true,
             staleTime: refreshInterval,
         },
@@ -57,9 +54,11 @@ export const ProjectListItemConnected: FC<{
         setIsCollapsed((value) => !value);
     }, []);
 
-    const onGoalsClick = useCallback(() => {
-        setIsCollapsedGoals((value) => !value);
-    }, []);
+    // hide projects without goals
+
+    if (!project._count.goals) {
+        return null;
+    }
 
     return (
         <ProjectListItemCollapsable
@@ -91,9 +90,7 @@ export const ProjectListItemConnected: FC<{
             ))}
             project={project}
             collapsed={collapsed}
-            collapsedGoals={collapsedGoals}
             onClick={onClick}
-            onGoalsClick={onGoalsClick}
             loading={status === 'loading'}
             deep={deep}
         >
@@ -107,7 +104,6 @@ export const ProjectListItemConnected: FC<{
                     onTagClick={onTagClick}
                     onClickProvider={onClickProvider}
                     selectedResolver={selectedResolver}
-                    collapsedGoals
                     collapsed
                 />
             ))}

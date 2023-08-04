@@ -2,7 +2,8 @@
 import { MouseEventHandler, useCallback } from 'react';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import { Button, nullable } from '@taskany/bricks';
+import NextLink from 'next/link';
+import { Button, TabsMenu, TabsMenuItem, nullable } from '@taskany/bricks';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
@@ -18,6 +19,7 @@ import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { CommonHeader } from '../CommonHeader';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
+import { routes } from '../../hooks/router';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -64,6 +66,8 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
         firstLevel: true,
         goalsQuery: queryState,
     });
+
+    const tabsMenuOptions: Array<[string, string]> = [[tr('Goals'), routes.projects()]];
 
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
@@ -145,7 +149,16 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
 
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
-            <CommonHeader title={title} description={description} />
+            <CommonHeader title={title} description={description}>
+                <TabsMenu>
+                    {tabsMenuOptions.map(([title, href]) => (
+                        <NextLink key={title} href={href} passHref legacyBehavior>
+                            <TabsMenuItem active={nextRouter.asPath.split('?')[0] === href}>{title}</TabsMenuItem>
+                        </NextLink>
+                    ))}
+                </TabsMenu>
+            </CommonHeader>
+
             <FiltersPanel
                 queryState={queryState}
                 queryString={queryString}
@@ -178,7 +191,6 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                         onClickProvider={onGoalPrewiewShow}
                         selectedResolver={selectedGoalResolver}
                         queryState={queryState}
-                        collapsedGoals
                         collapsed
                         hasLink
                     />

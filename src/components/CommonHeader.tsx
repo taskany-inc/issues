@@ -9,6 +9,7 @@ interface CommonHeaderProps {
     preTitle?: React.ReactNode;
     description?: React.ReactNode;
     children?: React.ReactNode;
+    actions?: React.ReactNode;
 }
 
 const StyledCommonHeader = styled(PageContent)`
@@ -35,7 +36,7 @@ const StyledCommonHeaderTitle = styled(Text)`
     padding-top: ${gapM};
 `;
 
-export const CommonHeader: React.FC<CommonHeaderProps> = ({ preTitle, title, description, children }) => {
+export const CommonHeader: React.FC<CommonHeaderProps> = ({ preTitle, title, description, children, actions }) => {
     return (
         <StyledCommonHeader>
             <StyledCommonHeaderInfo align="left">
@@ -55,6 +56,8 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({ preTitle, title, des
                     </Text>
                 ))}
             </StyledCommonHeaderInfo>
+
+            <div>{actions}</div>
 
             {children}
         </StyledCommonHeader>

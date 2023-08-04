@@ -58,7 +58,7 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(id);
 
     const tabsMenuOptions: Array<[string, string, boolean]> = [
-        [tr('Goals'), routes.project(id), true],
+        [tr('Goals'), routes.project(id), false],
         [tr('Settings'), routes.projectSettings(id), true],
     ];
 
@@ -93,7 +93,7 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
                     ))}
                 </PageActions>
 
-                {owned && (
+                {
                     <TabsMenu>
                         {tabsMenuOptions.map(([title, href, ownerOnly]) =>
                             nullable(ownerOnly ? owned : true, () => (
@@ -103,7 +103,7 @@ export const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
                             )),
                         )}
                     </TabsMenu>
-                )}
+                }
             </ProjectHeader>
 
             {children}
