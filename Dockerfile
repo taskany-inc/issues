@@ -22,4 +22,4 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD ["node_modules/.bin/concurrently", "node background/utils/worker/index.js", "node server.js"]
+CMD ["node_modules/.bin/concurrently", "node background/worker/index.js", "node server.js"]

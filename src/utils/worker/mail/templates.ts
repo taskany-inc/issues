@@ -1,8 +1,8 @@
 import mdit from 'markdown-it';
 
-import type { FieldDiff } from '../../../types/common';
-
 import { SendMailProps } from '.';
+
+type FieldDiff = [string | undefined | null, string | undefined | null];
 
 const md = mdit('default', {
     typographer: true,
