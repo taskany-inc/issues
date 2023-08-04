@@ -7,8 +7,7 @@ import { Priority } from '../types/priority';
 import { useHighlightedComment } from '../hooks/useHighlightedComment';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { HistoryAction } from '../types/history';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { DraftComment } from '../types/draftComment';
+import { useLSDraft } from '../hooks/useLSDraft';
 
 import { ActivityFeed } from './ActivityFeed';
 import { CommentView } from './CommentView/CommentView';
@@ -45,23 +44,27 @@ function excludeString<T>(val: T): Exclude<T, string> {
 
 export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
     ({ feed, onCommentReaction, onCommentPublish, userId, goalId, goalStates, onCommentDelete, children }, ref) => {
-        const [draftComment, setDraftComment] = useLocalStorage('draftGoalComment', {});
+        const { saveDraft, resolveDraft, removeDraft } = useLSDraft('draftGoalComment', {});
         const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
+
+        const draft = resolveDraft(goalId);
 
         const onPublish = (id?: string) => {
             onCommentPublish(id);
             setHighlightCommentId(id);
+            removeDraft(goalId);
         };
 
-        const onDraftComment = (comment: DraftComment | null) => {
-            setDraftComment((prev) => {
-                if (comment) {
-                    prev[goalId] = comment;
-                } else {
-                    delete prev[goalId];
-                }
-                return prev;
-            });
+        const onCancel = () => {
+            removeDraft(goalId);
+        };
+
+        const onChange = (comment?: { stateId?: string; description?: string }) => {
+            if (!comment) {
+                removeDraft(goalId);
+                return;
+            }
+            saveDraft(goalId, comment);
         };
 
         return (
@@ -163,9 +166,11 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                 <CommentCreateForm
                     goalId={goalId}
                     states={goalStates}
+                    description={draft?.description}
+                    stateId={draft?.stateId}
                     onSubmit={onPublish}
-                    onDraftComment={onDraftComment}
-                    draftComment={draftComment?.[goalId]}
+                    onCancel={onCancel}
+                    onChange={onChange}
                 />
             </ActivityFeed>
         );
