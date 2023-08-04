@@ -26,8 +26,6 @@ export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ children }
                 title={tr('Explore')}
                 description={tr('See what the Taskany community is most excited about today')}
             >
-                <div className="exploreActions"></div>
-
                 <TabsMenu>
                     {tabsMenuOptions.map(([title, href]) => (
                         <NextLink key={href} href={href} passHref>
