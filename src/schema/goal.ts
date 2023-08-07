@@ -3,6 +3,7 @@ import { StateType } from '@prisma/client';
 
 import { tr } from './schema.i18n';
 import { queryWithFiltersSchema } from './common';
+import { commentSchema } from './comment';
 
 export const userGoalsSchema = queryWithFiltersSchema;
 
@@ -188,21 +189,14 @@ export const goalStateChangeSchema = z.object({
 
 export type GoalStateChangeSchema = z.infer<typeof goalStateChangeSchema>;
 
-export const goalCommentSchema = z.object({
-    id: z.string().optional(),
-    goalId: z.string().optional(),
-    description: z
-        .string({
-            required_error: tr("Comments's description is required"),
-            invalid_type_error: tr("Comments's description must be a string"),
-        })
-        .min(1, {
-            message: tr("Comments's description must be longer than 1 symbol"),
-        }),
+export const goalCommentFormSchema = commentSchema.extend({
     stateId: z.string().optional(),
-    stateType: z
-        .enum([StateType.Canceled, StateType.Completed, StateType.Failed, StateType.InProgress, StateType.NotStarted])
-        .optional(),
 });
 
-export type GoalCommentSchema = z.infer<typeof goalCommentSchema>;
+export type GoalCommentFormSchema = z.infer<typeof goalCommentFormSchema>;
+
+export const goalCommentCreateSchema = goalCommentFormSchema.extend({
+    goalId: z.string(),
+});
+
+export type GoalCommentCreateSchema = z.infer<typeof goalCommentCreateSchema>;

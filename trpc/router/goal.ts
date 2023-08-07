@@ -11,6 +11,7 @@ import {
     goalsFilter,
     getEstimateListFormJoin,
 } from '../queries/goals';
+import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
     goalCommonSchema,
@@ -19,7 +20,7 @@ import {
     toggleGoalArchiveSchema,
     toggleGoalDependencySchema,
     userGoalsSchema,
-    goalCommentSchema,
+    goalCommentCreateSchema,
     toggleParticipantsSchema,
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema, suggestionsQueryScheme, queryWithFiltersSchema } from '../../src/schema/common';
@@ -869,10 +870,10 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    createComment: protectedProcedure.input(goalCommentSchema).mutation(async ({ ctx, input }) => {
+    createComment: protectedProcedure.input(goalCommentCreateSchema).mutation(async ({ ctx, input }) => {
         if (!input.goalId) return null;
 
-        const [commentAuthor, actualGoal] = await Promise.all([
+        const [commentAuthor, actualGoal, pushState] = await Promise.all([
             prisma.activity.findUnique({
                 where: { id: ctx.session.user.activityId },
                 include: { user: true, ghost: true },
@@ -889,6 +890,7 @@ export const goal = router({
                     goalAsCriteria: true,
                 },
             }),
+            input.stateId ? prisma.state.findUnique({ where: { id: input.stateId } }) : Promise.resolve(undefined),
         ]);
 
         if (!commentAuthor) return null;
@@ -904,11 +906,11 @@ export const goal = router({
                     where: { id: input.goalId },
                     data: {
                         id: input.goalId,
-                        stateId: _isEditable ? input.stateId : actualGoal.stateId,
+                        stateId: _isEditable ? pushState?.id : actualGoal.stateId,
                         goalAsCriteria: actualGoal.goalAsCriteria
                             ? {
                                   update: {
-                                      isDone: _isEditable && input.stateType && input.stateType === StateType.Completed,
+                                      isDone: _isEditable && pushState?.type && pushState?.type === StateType.Completed,
                                   },
                               }
                             : undefined,
@@ -994,7 +996,7 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    updateComment: protectedProcedure.input(goalCommentSchema).mutation(async ({ input: { id, description } }) => {
+    updateComment: protectedProcedure.input(commentEditSchema).mutation(async ({ input: { id, description } }) => {
         try {
             const newComment = await prisma.comment.update({
                 where: {

@@ -1,8 +1,9 @@
 import { Comment } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
-import { GoalCommentSchema } from '../schema/goal';
+import { GoalCommentCreateSchema } from '../schema/goal';
 import { notifyPromise } from '../utils/notifyPromise';
+import { CommentEditSchema } from '../schema/comment';
 
 export const useCommentResource = () => {
     const createMutation = trpc.goal.createComment.useMutation();
@@ -11,12 +12,11 @@ export const useCommentResource = () => {
 
     const create =
         (cb: (params: Comment) => void) =>
-        async ({ goalId, stateId, description, stateType }: GoalCommentSchema) => {
+        async ({ goalId, stateId, description }: GoalCommentCreateSchema) => {
             const promise = createMutation.mutateAsync({
                 goalId,
                 stateId,
                 description,
-                stateType,
             });
 
             const [data] = await notifyPromise(promise, 'commentCreate');
@@ -27,7 +27,7 @@ export const useCommentResource = () => {
 
     const update =
         (cb: (params: Comment) => void) =>
-        async ({ id, description }: GoalCommentSchema) => {
+        async ({ id, description }: CommentEditSchema) => {
             const promise = updateMutation.mutateAsync({
                 id,
                 description,
