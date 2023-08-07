@@ -1,16 +1,11 @@
 import React, { forwardRef } from 'react';
 import { nullable } from '@taskany/bricks';
-import dynamic from 'next/dynamic';
-import { State } from '@prisma/client';
 
 import { Priority } from '../types/priority';
-import { useHighlightedComment } from '../hooks/useHighlightedComment';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { HistoryAction } from '../types/history';
-import { useLSDraft } from '../hooks/useLSDraft';
 
 import { ActivityFeed } from './ActivityFeed';
-import { CommentView } from './CommentView/CommentView';
 import {
     HistoryRecord,
     HistoryRecordDependency,
@@ -25,17 +20,12 @@ import {
     HistoryRecordCriteria,
 } from './HistoryRecord/HistoryRecord';
 
-const CommentCreateForm = dynamic(() => import('./CommentCreateForm/CommentCreateForm'));
-
 interface GoalActivityProps {
     feed: NonNullable<GoalByIdReturnType>['_activityFeed'];
-    userId?: string | null;
-    onCommentReaction: (id: string) => (val?: string | undefined) => Promise<void>;
-    onCommentPublish: (id?: string) => void;
-    onCommentDelete: (id?: string) => void;
-    goalId: string;
-    goalStates?: State[];
-    children: React.ReactNode;
+    header?: React.ReactNode;
+    footer?: React.ReactNode;
+
+    renderCommentItem: (item: NonNullable<GoalByIdReturnType>['comments'][number]) => React.ReactNode;
 }
 
 function excludeString<T>(val: T): Exclude<T, string> {
@@ -43,50 +33,16 @@ function excludeString<T>(val: T): Exclude<T, string> {
 }
 
 export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
-    ({ feed, onCommentReaction, onCommentPublish, userId, goalId, goalStates, onCommentDelete, children }, ref) => {
-        const { saveDraft, resolveDraft, removeDraft } = useLSDraft('draftGoalComment', {});
-        const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
-
-        const draft = resolveDraft(goalId);
-
-        const onPublish = (id?: string) => {
-            onCommentPublish(id);
-            setHighlightCommentId(id);
-            removeDraft(goalId);
-        };
-
-        const onCancel = () => {
-            removeDraft(goalId);
-        };
-
-        const onChange = (comment?: { stateId?: string; description?: string }) => {
-            if (!comment) {
-                removeDraft(goalId);
-                return;
-            }
-            saveDraft(goalId, comment);
-        };
-
+    ({ feed, header, footer, renderCommentItem }, ref) => {
         return (
             <ActivityFeed ref={ref}>
-                {children}
+                {header}
+
                 {feed.map((item) =>
                     nullable(item, ({ type, value }) => (
                         <React.Fragment key={value.id}>
-                            {type === 'comment' && (
-                                <CommentView
-                                    id={value.id}
-                                    author={value.activity?.user}
-                                    description={value.description}
-                                    state={value.state}
-                                    createdAt={value.createdAt}
-                                    isEditable={value.activity?.id === userId}
-                                    isNew={value.id === highlightCommentId}
-                                    reactions={value.reactions}
-                                    onReactionToggle={onCommentReaction(value.id)}
-                                    onDelete={onCommentDelete}
-                                />
-                            )}
+                            {type === 'comment' && renderCommentItem(value)}
+
                             {type === 'history' && (
                                 <HistoryRecord
                                     author={value.activity.user}
@@ -163,15 +119,7 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                     )),
                 )}
 
-                <CommentCreateForm
-                    goalId={goalId}
-                    states={goalStates}
-                    description={draft?.description}
-                    stateId={draft?.stateId}
-                    onSubmit={onPublish}
-                    onCancel={onCancel}
-                    onChange={onChange}
-                />
+                {footer}
             </ActivityFeed>
         );
     },

@@ -17,28 +17,26 @@ import {
     UserPic,
     nullable,
     PinAltIcon,
+    Button,
 } from '@taskany/bricks';
 import { Reaction, State, User } from '@prisma/client';
 import colorLayer from 'color-layer';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
-import { useCommentResource } from '../../hooks/useCommentResource';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useLocale } from '../../hooks/useLocale';
-<<<<<<< HEAD
-=======
 import { useClickSwitch } from '../../hooks/useClickSwitch';
->>>>>>> f3d0f72 (fix: rename hook)
 import { createLocaleDate } from '../../utils/dateTime';
+import { CommentSchema } from '../../schema/comment';
 import { Reactions } from '../Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Circle, CircledIcon } from '../Circle';
+import { CommentForm } from '../CommentForm/CommentForm';
 
 import { tr } from './CommentView.i18n';
 
 const Md = dynamic(() => import('../Md'));
-const CommentEditForm = dynamic(() => import('../CommentEditForm/CommentEditForm'));
 const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
 
 interface CommentViewProps {
@@ -48,13 +46,15 @@ interface CommentViewProps {
     updatedAt?: Date;
     reactions?: Reaction[];
     author?: User | null;
-    isNew?: boolean;
-    isEditable?: boolean;
+    highlight?: boolean;
     state?: State | null;
-    isPinned?: boolean;
+    pin?: boolean;
 
     onReactionToggle?: React.ComponentProps<typeof ReactionsDropdown>['onClick'];
-    onDelete?: (id: string) => void;
+    onSubmit?: (comment?: CommentSchema) => void;
+    onChange?: (comment: CommentSchema) => void;
+    onCancel?: () => void;
+    onDelete?: () => void;
 }
 
 const StyledCommentActions = styled.div`
@@ -69,14 +69,14 @@ const StyledCommentActions = styled.div`
     }
 `;
 
-const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
+const StyledCommentCard = styled(Card)<Pick<CommentViewProps, 'highlight'>>`
     position: relative;
     min-height: 60px;
 
     transition: border-color 200ms ease-in-out;
 
-    ${({ isNew }) =>
-        isNew &&
+    ${({ highlight }) =>
+        highlight &&
         `
             border-color: ${brandColor};
         `}
@@ -102,8 +102,8 @@ const StyledCommentCard = styled(Card)<{ isNew?: boolean }>`
         top: 8px;
         left: -6px;
 
-        ${({ isNew }) =>
-            isNew &&
+        ${({ highlight }) =>
+            highlight &&
             `
                 border-color: ${brandColor};
             `}
@@ -128,144 +128,134 @@ const StyledTimestamp = styled.div`
     gap: ${gapS};
 `;
 
-const renderTriggerHelper = ({ ref, onClick }: { ref: React.RefObject<HTMLButtonElement>; onClick: () => void }) => (
-    <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
-);
-
-type MenuItemProps = React.ComponentProps<typeof MenuItem>;
-type HelperItemProps = Pick<MenuItemProps, 'color' | 'icon' | 'onClick'> & {
-    label: string;
-};
-
-const renderItemHelper = ({ item, cursor, index }: { item: HelperItemProps; cursor: number; index: number }) => (
-    <MenuItem
-        key={item.label}
-        ghost
-        color={item.color}
-        focused={cursor === index}
-        icon={item.icon}
-        onClick={item.onClick}
-    >
-        {item.label}
-    </MenuItem>
-);
-
-const iconRenderCondition = (isPinned: boolean, image?: User['image'], email?: User['email']) => (
-    <Circle size={32}>
-        {isPinned ? (
-            <CircledIcon as={PinAltIcon} size="s" color={backgroundColor} />
-        ) : (
-            <UserPic size={32} src={image} email={email} />
-        )}
-    </Circle>
-);
-
 export const CommentView: FC<CommentViewProps> = ({
     id,
     author,
     description,
     createdAt,
-    isNew,
-    isEditable,
+    highlight,
     reactions,
     state,
+    pin,
+    onChange,
+    onCancel,
+    onSubmit,
     onDelete,
     onReactionToggle,
-    isPinned = false,
 }) => {
     const { themeId } = usePageContext();
     const locale = useLocale();
-    const { remove } = useCommentResource();
     const [editMode, setEditMode] = useState(false);
-    const [commentDescription, setCommentDescription] = useState(description);
+    const [focused, setFocused] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [commentDescription, setCommentDescription] = useState({ description });
     const { reactionsProps } = useReactionsResource(reactions);
     const [isRelative, onDateViewTypeChange] = useClickSwitch();
 
-    const onChangeTypeDate = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | undefined) => {
-        if (e && e.target === e.currentTarget) {
-            setIsRelativeTime(!isRelativeTime);
+    const onCommentDoubleClick = useCallback<React.MouseEventHandler>((e) => {
+        if (e.detail === 2) {
+            setEditMode(true);
         }
-    };
-
-    const onEditClick = useCallback(() => {
-        setEditMode(true);
     }, []);
 
-    const onDoubleCommentClick = useCallback<React.MouseEventHandler>(
-        (e) => {
-            if (isEditable && e.detail === 2) {
-                onEditClick();
+    const onCommentSubmit = useCallback(
+        async (form: CommentSchema) => {
+            setBusy(true);
+            setFocused(false);
+
+            onChange?.({ description: form.description });
+
+            // optimistic update
+            setCommentDescription({ description: form.description });
+            try {
+                await onSubmit?.({ description: form.description });
+            } catch (error) {
+                setCommentDescription({ description });
             }
+
+            setBusy(false);
         },
-        [isEditable, onEditClick],
+        [onSubmit, onChange, description],
     );
-
-    const onUpdate = useCallback<React.ComponentProps<typeof CommentEditForm>['onUpdate']>(
-        (comment) => {
-            setEditMode(false);
-            setCommentDescription(comment?.description || commentDescription);
-        },
-        [commentDescription],
-    );
-
-    const onChange = useCallback<React.ComponentProps<typeof CommentEditForm>['onChange']>(({ description }) => {
-        setCommentDescription(description);
-    }, []);
-
-    // FIXME: think twice about this
-    const onDeleteClick = useCallback(() => {
-        remove(({ id }) => {
-            id && onDelete?.(id);
-        })({ id });
-    }, [id, onDelete, remove]);
 
     const dropdownItems = useMemo(
         () => [
             {
                 label: tr('Edit'),
                 icon: <EditIcon size="xxs" />,
-                onClick: onEditClick,
+                onClick: () => setEditMode(true),
             },
             {
                 label: tr('Delete'),
                 color: danger0,
                 icon: <BinIcon size="xxs" />,
-                onClick: onDeleteClick,
+                onClick: onDelete,
             },
         ],
-        [onDeleteClick, onEditClick],
+        [onDelete],
     );
 
     return (
-        <ActivityFeedItem id={isPinned ? '' : `comment-${id}`}>
-            {iconRenderCondition(isPinned, author?.image, author?.email)}
+        <ActivityFeedItem id={pin ? '' : `comment-${id}`}>
+            <Circle size={32}>
+                {pin ? (
+                    <CircledIcon as={PinAltIcon} size="s" color={backgroundColor} />
+                ) : (
+                    <UserPic size={32} src={author?.image} email={author?.email} />
+                )}
+            </Circle>
 
             {editMode ? (
-                <CommentEditForm
-                    id={id}
-                    description={commentDescription}
-                    onCancel={onUpdate}
-                    onChange={onChange}
-                    onUpdate={onUpdate}
+                <CommentForm
+                    description={description}
+                    focused={focused}
+                    busy={busy}
+                    autoFocus
+                    onChange={setCommentDescription}
+                    onSubmit={onCommentSubmit}
+                    onCancel={onCancel}
+                    actionButton={
+                        <Button
+                            size="m"
+                            view="primary"
+                            disabled={commentDescription.description === description || busy}
+                            outline
+                            type="submit"
+                            text={tr('Save')}
+                        />
+                    }
                 />
             ) : (
-                <StyledCommentCard isNew={isNew} onClick={onDoubleCommentClick}>
-                    <StyledCardInfo onClick={onChangeTypeDate}>
+                <StyledCommentCard highlight={highlight} onClick={onSubmit ? onCommentDoubleClick : undefined}>
+                    <StyledCardInfo onClick={onDateViewTypeChange}>
                         <div>
                             <Link inline>{author?.name}</Link> —{' '}
                             <Link inline href={`#comment-${id}`}>
-                                <RelativeTime isRelativeTime={isRelativeTime} date={createdAt} hover />
+                                <RelativeTime isRelativeTime={isRelative} date={createdAt} hover />
                             </Link>
                         </div>
                         <StyledCommentActions>
                             {nullable(!reactionsProps.limited, () => (
                                 <ReactionsDropdown view="icon" onClick={onReactionToggle} />
                             ))}
-                            {nullable(isEditable, () => (
+                            {nullable(onSubmit, () => (
                                 <Dropdown
                                     items={dropdownItems}
-                                    renderTrigger={renderTriggerHelper}
-                                    renderItem={renderItemHelper}
+                                    renderTrigger={({ ref, onClick }) => (
+                                        <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
+                                    )}
+                                    renderItem={({ item, cursor, index }) => (
+                                        <MenuItem
+                                            key={item.label}
+                                            ghost
+                                            color={item.color}
+                                            focused={cursor === index}
+                                            icon={item.icon}
+                                            onClick={item.onClick}
+                                        >
+                                            {item.label}
+                                        </MenuItem>
+                                    )}
                                 />
                             ))}
                         </StyledCommentActions>
@@ -281,7 +271,7 @@ export const CommentView: FC<CommentViewProps> = ({
                             </StyledTimestamp>
                         ))}
 
-                        <Md>{commentDescription}</Md>
+                        <Md>{commentDescription.description}</Md>
 
                         {nullable(reactions?.length, () => (
                             <Reactions reactions={reactionsProps.reactions} onClick={onReactionToggle} />
