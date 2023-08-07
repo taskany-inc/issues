@@ -25,6 +25,10 @@ import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCommentResource } from '../../hooks/useCommentResource';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useLocale } from '../../hooks/useLocale';
+<<<<<<< HEAD
+=======
+import { useClickSwitch } from '../../hooks/useClickSwitch';
+>>>>>>> f3d0f72 (fix: rename hook)
 import { createLocaleDate } from '../../utils/dateTime';
 import { Reactions } from '../Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
@@ -175,7 +179,7 @@ export const CommentView: FC<CommentViewProps> = ({
     const [editMode, setEditMode] = useState(false);
     const [commentDescription, setCommentDescription] = useState(description);
     const { reactionsProps } = useReactionsResource(reactions);
-    const [isRelativeTime, setIsRelativeTime] = useState(true);
+    const [isRelative, onDateViewTypeChange] = useClickSwitch();
 
     const onChangeTypeDate = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | undefined) => {
         if (e && e.target === e.currentTarget) {
