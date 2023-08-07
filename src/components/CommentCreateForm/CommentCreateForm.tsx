@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { ArrowDownSmallIcon, ArrowUpSmallIcon, Button, Dropdown, UserPic } from '@taskany/bricks';
 import { State } from '@prisma/client';
 import styled from 'styled-components';
 
 import { usePageContext } from '../../hooks/usePageContext';
-import { useCommentResource } from '../../hooks/useCommentResource';
-import { GoalCommentSchema } from '../../schema/goal';
+import { GoalCommentFormSchema } from '../../schema/goal';
+import { CommentSchema } from '../../schema/comment';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { ColorizedMenuItem } from '../ColorizedMenuItem';
@@ -13,16 +13,12 @@ import { StateDot } from '../StateDot';
 
 import { tr } from './CommentCreateForm.i18n';
 
-interface CommentCreateFormProps {
-    goalId: string;
+interface CommentCreateFormProps extends Omit<React.ComponentProps<typeof CommentForm>, 'actionButton'> {
     states?: State[];
-    description?: string;
     stateId?: string;
 
-    onSubmit?: (id?: string) => void;
-    onFocus?: () => void;
-    onCancel?: () => void;
-    onChange?: (comment?: { description?: string; stateId?: string }) => void;
+    onSubmit: (comment: GoalCommentFormSchema) => void;
+    onChange?: (comment: GoalCommentFormSchema) => void;
 }
 
 const StyledStateUpdate = styled.div`
@@ -31,10 +27,9 @@ const StyledStateUpdate = styled.div`
 `;
 
 const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
-    goalId,
     states,
-    description: currentDescription,
-    stateId = '',
+    description: currentDescription = '',
+    stateId,
     onSubmit,
     onFocus,
     onCancel,
@@ -43,60 +38,48 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     const statesMap = useMemo(() => {
         if (!states) return {};
 
-        return states.reduce((acc, cur) => {
+        return states.reduce<Record<string, State>>((acc, cur) => {
             acc[cur.id] = cur;
             return acc;
-        }, {} as Record<string, State>);
+        }, {});
     }, [states]);
 
     const { user, themeId } = usePageContext();
-    const { create } = useCommentResource();
-    const [pushState, setPushState] = useState<State | undefined>(statesMap[stateId]);
-    const [description, setDescription] = useState<string | undefined>(currentDescription);
+
+    const [pushState, setPushState] = useState(stateId ? statesMap[stateId] : undefined);
+    const [description, setDescription] = useState(currentDescription);
     const [focused, setFocused] = useState(Boolean(currentDescription));
     const [busy, setBusy] = useState(false);
-    const [currentGoal, setCurrentGoal] = useState(goalId);
-    const [prevGoal, setPrevGoal] = useState('');
-
-    useEffect(() => {
-        if (!description) {
-            onChange?.();
-            return;
-        }
-
-        onChange?.({ description, stateId: pushState?.id });
-    }, [pushState?.id, description, onChange]);
-
-    useEffect(() => {
-        if (goalId === prevGoal) return;
-
-        setCurrentGoal(goalId);
-        setPrevGoal(goalId);
-        setDescription(currentDescription);
-        setFocused(Boolean(currentDescription));
-        setPushState(statesMap[stateId]);
-    }, [currentDescription, goalId, prevGoal, stateId, statesMap]);
 
     const onCommentFocus = useCallback(() => {
         setFocused(true);
         onFocus?.();
     }, [onFocus]);
 
-    const createComment = useCallback(
-        async (form: GoalCommentSchema) => {
+    const onCommentChange = useCallback(
+        ({ description }: { description: string }) => {
+            onChange?.({ description, stateId: pushState?.id });
+        },
+        [onChange, pushState?.id],
+    );
+
+    const onCommentSubmit = useCallback(
+        async (form: CommentSchema) => {
             setBusy(true);
             setFocused(false);
 
-            await create(({ id }) => {
-                onSubmit?.(id);
-                setDescription('');
-                setPushState(undefined);
-            })(form);
+            await onSubmit?.({
+                ...form,
+                stateId: pushState?.id,
+            });
+
+            setDescription('');
+            setPushState(undefined);
 
             setBusy(false);
             setFocused(true);
         },
-        [create, onSubmit],
+        [onSubmit, pushState?.id],
     );
 
     const onCancelCreate = useCallback(() => {
@@ -107,22 +90,28 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
         onCancel?.();
     }, [onCancel]);
 
-    const onStateSelect = useCallback((state: State) => {
-        setPushState((prev) => (state.id === prev?.id ? undefined : state));
-    }, []);
+    const onStateSelect = useCallback(
+        (state: State) => {
+            setPushState((prev) => {
+                const newState = state.id === prev?.id ? undefined : state;
+                onChange?.({ description, stateId: newState?.id });
+
+                return newState;
+            });
+        },
+        [onChange, setPushState, description],
+    );
 
     return (
         <ActivityFeedItem>
             <UserPic size={32} src={user?.image} email={user?.email} />
 
             <CommentForm
-                goalId={currentGoal}
-                stateId={pushState?.id}
                 description={description}
                 focused={focused}
                 busy={busy}
-                onDescriptionChange={setDescription}
-                onSubmit={createComment}
+                onChange={onCommentChange}
+                onSubmit={onCommentSubmit}
                 onCancel={onCancelCreate}
                 onFocus={onCommentFocus}
                 actionButton={

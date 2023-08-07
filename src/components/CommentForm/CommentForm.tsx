@@ -1,11 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { backgroundColor, gapM, gray4 } from '@taskany/colors';
 import { Button, Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
 
-import { GoalCommentSchema, goalCommentSchema } from '../../schema/goal';
+import { CommentSchema } from '../../schema/comment';
 import { FormEditor } from '../FormEditor/FormEditor';
 import { HelpButton } from '../HelpButton/HelpButton';
 
@@ -16,15 +14,10 @@ interface CommentFormProps {
     focused?: boolean;
     autoFocus?: boolean;
     busy?: boolean;
-    height?: number;
-    error?: React.ComponentProps<typeof FormEditor>['error'];
-    id?: string;
-    goalId?: string;
-    stateId?: string;
     description?: string;
 
-    onDescriptionChange: (description: string) => void;
-    onSubmit: (form: GoalCommentSchema) => void | Promise<void>;
+    onSubmit: (form: CommentSchema) => void | Promise<void>;
+    onChange?: (form: CommentSchema) => void;
     onFocus?: () => void;
     onCancel?: () => void;
 }
@@ -60,77 +53,55 @@ const StyledCommentForm = styled(FormCard)`
 `;
 
 export const CommentForm: React.FC<CommentFormProps> = ({
-    id,
-    goalId,
-    stateId,
     description = '',
     autoFocus,
     focused,
     busy,
-    error,
     actionButton,
-    onDescriptionChange,
+    onChange,
     onSubmit,
     onFocus,
     onCancel,
 }) => {
     const ref = useRef(null);
+    const [newDescription, setNewDescription] = useState(description);
 
-    const { control, handleSubmit, register, watch } = useForm<GoalCommentSchema>({
-        resolver: zodResolver(goalCommentSchema),
-        mode: 'onChange',
-        reValidateMode: 'onChange',
-        shouldFocusError: true,
-        values: {
-            id,
-            goalId,
-            stateId,
-            description,
+    const onDescriptionChange = useCallback(
+        (descr = '') => {
+            setNewDescription(descr);
+            onChange?.({ description: descr });
         },
-    });
+        [onChange],
+    );
 
-    const descriptionWatcher = watch('description');
+    const onCommentCancel = useCallback(() => {
+        setNewDescription('');
+        onCancel?.();
+    }, [onCancel]);
 
-    useEffect(() => {
-        onDescriptionChange(descriptionWatcher);
-    }, [descriptionWatcher, onDescriptionChange]);
+    const onCommentSubmit = useCallback(() => {
+        onSubmit?.({ description: newDescription });
+        setNewDescription('');
+    }, [onSubmit, newDescription]);
 
     useClickOutside(ref, () => {
-        if (!Object.values(control._fields).some((v) => v?._f.value)) {
+        if (newDescription === '') {
             onCancel?.();
         }
     });
 
     return (
         <StyledCommentForm ref={ref} tabIndex={0}>
-            <Form onSubmit={handleSubmit(onSubmit)}>
-                {nullable(id, () => (
-                    <input type="hidden" {...register('id')} />
-                ))}
-
-                {nullable(goalId, () => (
-                    <input type="hidden" {...register('goalId')} />
-                ))}
-
-                {nullable(stateId, () => (
-                    <input type="hidden" {...register('stateId')} />
-                ))}
-
-                <Controller
-                    name="description"
-                    control={control}
-                    render={({ field }) => (
-                        <FormEditor
-                            {...field}
-                            disabled={busy}
-                            placeholder={tr('Leave a comment')}
-                            height={focused ? 120 : 40}
-                            onCancel={onCancel}
-                            onFocus={onFocus}
-                            autoFocus={autoFocus}
-                            error={focused ? error : undefined}
-                        />
-                    )}
+            <Form onSubmit={onCommentSubmit}>
+                <FormEditor
+                    disabled={busy}
+                    placeholder={tr('Leave a comment')}
+                    height={focused ? 120 : 40}
+                    onCancel={onCommentCancel}
+                    onFocus={onFocus}
+                    autoFocus={autoFocus}
+                    value={newDescription}
+                    onChange={onDescriptionChange}
                 />
 
                 {nullable(focused, () => (
