@@ -1,4 +1,4 @@
-import React, { MouseEvent, ReactNode, useMemo } from 'react';
+import React, { MouseEvent, ReactNode } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { gapXs, gray4, radiusM } from '@taskany/colors';
@@ -26,6 +26,7 @@ const StyledProjectIcons = styled.div`
 interface ProjectListItemCollapsableProps {
     href?: string;
     project: NonNullable<ProjectByIdReturnType>;
+    childShown?: number;
     goals?: ReactNode;
     children?: ReactNode;
     collapsed: boolean;
@@ -49,11 +50,10 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     children,
     goals,
     loading = false,
+    childShown = 0,
     deep = 0,
     href,
 }) => {
-    const childs = useMemo(() => project.children.map(({ id }) => id), [project]);
-
     const contentHidden = collapsed || loading;
 
     const offset = collapseOffset * (deep > 0 && contentHidden ? deep - 1 : deep);
@@ -69,7 +69,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
             averageScore={project.averageScore}
             onClick={onProjectClickHandler}
         >
-            {nullable(childs.length, (c) => (
+            {nullable(childShown, (c) => (
                 <StyledProjectIcons>
                     <IconServersOutline size="xs" />
                     <Text size="xs">{c}</Text>
@@ -82,7 +82,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         <CollapsableItem
             collapsed={contentHidden}
             onClick={onClick}
-            hasChild={!!childs.length}
+            hasChild={!!childShown}
             header={
                 <ProjectListContainer offset={offset}>
                     {href ? (
