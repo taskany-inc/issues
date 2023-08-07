@@ -54,6 +54,13 @@ export const ProjectListItemConnected: FC<{
         setIsCollapsed((value) => !value);
     }, []);
 
+    const childrenNodeShown = childrenProjects.reduce((acum, p) => {
+        if (p._count.goals) {
+            return acum + 1;
+        }
+        return acum;
+    }, 0);
+
     // hide projects without goals
 
     if (!project._count.goals) {
@@ -88,6 +95,7 @@ export const ProjectListItemConnected: FC<{
                     onTagClick={onTagClick}
                 />
             ))}
+            childShown={childrenNodeShown}
             project={project}
             collapsed={collapsed}
             onClick={onClick}
