@@ -23,13 +23,10 @@ import {
 
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
-import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useCriteriaResource } from '../../hooks/useCriteriaResource';
-import { useCommentResource } from '../../hooks/useCommentResource';
-import { useHighlightedComment } from '../../hooks/useHighlightedComment';
-import { useDateViewType } from '../../hooks/useDateViewType';
-import { useLSDraft } from '../../hooks/useLSDraft';
+import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
+import { useGoalCommentsActions } from '../../hooks/useGoalCommentsActions';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { editGoalKeys } from '../../utils/hotkeys';
@@ -98,11 +95,10 @@ const StyledCard = styled(Card)`
     min-height: 60px;
 `;
 
-export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose, onDelete, goal, defaults }) => {
+export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults, onClose, onDelete }) => {
     const { user } = usePageContext();
-    const { isRelative, onDateViewTypeChange } = useDateViewType();
+    const [isRelative, onDateViewTypeChange] = useClickSwitch();
 
-    // --------------------------------------------------------------------------- goal actions
     const archiveMutation = trpc.goal.toggleArchive.useMutation();
     const utils = trpc.useContext();
 
@@ -187,85 +183,29 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose,
         [],
     );
 
-    // --------------------------------------------------------------------------- comments actions
     const {
-        saveDraft: saveCommentDraft,
-        resolveDraft: resolveCommentDraft,
-        removeDraft: removeCommentDraft,
-    } = useLSDraft('draftGoalComment', {});
-    const commentDraft = resolveCommentDraft(goal?.id);
-    const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
-    const { create: createComment, update: updateComment, remove: removeComment } = useCommentResource();
-    const { commentReaction } = useReactionsResource(goal?.reactions);
+        highlightCommentId,
+        lastStateComment,
+        resolveCommentDraft,
+        onCommentChange,
+        onCommentCreate,
+        onCommentUpdate,
+        onCommentDelete,
+        onCommentCancel,
+        onCommentReactionToggle,
+    } = useGoalCommentsActions({
+        id: goal?.id,
+        shortId: goal?._shortId,
+        stateId: goal?.stateId,
+        reactions: goal?.reactions,
+        comments: goal?.comments,
+        cb: invalidateFn,
+    });
 
-    const onCommentChange = useCallback(
-        (comment?: { stateId?: string; description?: string }) => {
-            if (goal?.id) {
-                if (!comment?.description) {
-                    removeCommentDraft(goal.id);
-                    return;
-                }
-
-                saveCommentDraft(goal?.id, comment);
-            }
-        },
-        [goal?.id, removeCommentDraft, saveCommentDraft],
-    );
-
-    const onCommentCreate = useCallback(
-        async (comment?: { description: string; stateId?: string }) => {
-            if (comment && goal?.id) {
-                await createComment(({ id }) => {
-                    invalidateFn();
-                    removeCommentDraft(goal.id);
-                    setHighlightCommentId(id);
-                })({
-                    ...comment,
-                    goalId: goal?.id,
-                });
-            }
-        },
-        [goal?.id, invalidateFn, removeCommentDraft, setHighlightCommentId, createComment],
-    );
-
-    const onCommentUpdate = useCallback(
-        (id: string) => async (comment?: { description: string }) => {
-            if (comment && goal?.id) {
-                await updateComment(() => {
-                    invalidateFn();
-                })({
-                    ...comment,
-                    id,
-                });
-            }
-        },
-        [goal?.id, invalidateFn, updateComment],
-    );
-
-    const onCommentCancel = useCallback(() => {
-        if (goal?.id) {
-            removeCommentDraft(goal?.id);
-        }
-    }, [removeCommentDraft, goal?.id]);
-
-    const onCommentReactionToggle = useCallback(
-        (id: string) => commentReaction(id, () => utils.goal.getById.invalidate(shortId)),
-        [shortId, commentReaction, utils.goal.getById],
-    );
-
-    const onCommentDelete = useCallback(
-        (id: string) => () => {
-            removeComment(() => {
-                invalidateFn();
-            })({ id });
-        },
-        [invalidateFn, removeComment],
-    );
-
+    const commentDraft = resolveCommentDraft();
     const commentsRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
-
     const onCommentsClick = useCallback(() => {
         commentsRef.current &&
             contentRef.current &&
@@ -275,15 +215,6 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose,
                 top: commentsRef.current.offsetTop - headerRef.current.offsetHeight,
             });
     }, []);
-
-    const lastChangedStatusComment = useMemo(() => {
-        if (!goal || goal.comments.length <= 1) {
-            return null;
-        }
-
-        const foundResult = goal.comments.findLast((comment) => comment.stateId);
-        return foundResult?.stateId === goal.stateId ? foundResult : null;
-    }, [goal]);
 
     return (
         <>
@@ -384,7 +315,7 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose,
                             feed={_activityFeed}
                             header={
                                 <>
-                                    {nullable(lastChangedStatusComment, (value) => (
+                                    {nullable(lastStateComment, (value) => (
                                         <CommentView
                                             pin
                                             id={value.id}
@@ -464,7 +395,7 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, onClose,
                                     onDelete={onCommentDelete(value.id)}
                                 />
                             )}
-                        ></GoalActivity>
+                        />
                     ))}
                 </StyledModalContent>
             </ModalPreview>
