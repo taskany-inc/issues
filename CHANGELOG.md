@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.20.5](https://github.com/taskany-inc/issues/compare/v1.20.4...v1.20.5) (2023-08-08)
+
+
+### Bug Fixes
+
+* **Database:** use utc-based timestamp by default ([d4b2139](https://github.com/taskany-inc/issues/commit/d4b213988639a61db38a58abfcefccc90f8c9a17))
+* **ProjectListItemCollapsable:** icorrect children state ([f589b65](https://github.com/taskany-inc/issues/commit/f589b65b733bd835b6864f7b578e081657b78e6e))
+
 ## [1.20.4](https://github.com/taskany-inc/issues/compare/v1.20.3...v1.20.4) (2023-08-07)
 
 
