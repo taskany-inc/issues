@@ -3,9 +3,21 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { withSentryConfig } = require('@sentry/nextjs');
 const path = require('path');
+const withMDX = require('@next/mdx')({
+    extension: /\.mdx?$/,
+    options: {
+        // If you use remark-gfm, you'll need to use next.config.mjs
+        // as the package is ESM only
+        // https://github.com/remarkjs/remark-gfm#install
+        remarkPlugins: [],
+        rehypePlugins: [],
+        providerImportSource: '@mdx-js/react',
+    },
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     reactStrictMode: true,
     swcMinify: true,
     output: 'standalone',
@@ -68,10 +80,12 @@ const nextConfig = {
     },
 };
 
+const configWithPlugins = withMDX(nextConfig);
+
 module.exports =
     process.env.ANALYZE === 'true'
-        ? require('@next/bundle-analyzer')({})(nextConfig)
-        : withSentryConfig(nextConfig, {
+        ? require('@next/bundle-analyzer')({})(configWithPlugins)
+        : withSentryConfig(configWithPlugins, {
               silent: true,
               hideSourcemaps: true,
               ignore: ['node_modules'],
