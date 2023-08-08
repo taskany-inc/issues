@@ -353,24 +353,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                             feed={_activityFeed}
                             header={
                                 <>
-                                    {nullable(lastStateComment, (value) => (
-                                        <CommentView
-                                            pin
-                                            id={value.id}
-                                            author={value.activity?.user}
-                                            description={value.description}
-                                            state={value.state}
-                                            createdAt={value.createdAt}
-                                            reactions={value.reactions}
-                                            onSubmit={
-                                                value.activity?.id === user?.activityId
-                                                    ? onCommentUpdate(value.id)
-                                                    : undefined
-                                            }
-                                            onReactionToggle={onCommentReactionToggle(value.id)}
-                                            onDelete={onCommentDelete(value.id)}
-                                        />
-                                    ))}
                                     {nullable(goalAchiveCriteria.length || _isEditable, () => (
                                         <GoalCriteria
                                             goalId={id}
@@ -408,6 +390,25 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                             </GoalDependencyListByKind>
                                         )),
                                     )}
+
+                                    {nullable(lastStateComment, (value) => (
+                                        <CommentView
+                                            pin
+                                            id={value.id}
+                                            author={value.activity?.user}
+                                            description={value.description}
+                                            state={value.state}
+                                            createdAt={value.createdAt}
+                                            reactions={value.reactions}
+                                            onSubmit={
+                                                value.activity?.id === user?.activityId
+                                                    ? onCommentUpdate(value.id)
+                                                    : undefined
+                                            }
+                                            onReactionToggle={onCommentReactionToggle(value.id)}
+                                            onDelete={onCommentDelete(value.id)}
+                                        />
+                                    ))}
                                 </>
                             }
                             footer={
