@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.20.6](https://github.com/taskany-inc/issues/compare/v1.20.5...v1.20.6) (2023-08-08)
+
+
+### Bug Fixes
+
+* **ProjectListItemConnected:** subproject count visible before open collapsed ([b53dd17](https://github.com/taskany-inc/issues/commit/b53dd171864bb825277cd5569eb558fdc11c529a))
+
 ## [1.20.5](https://github.com/taskany-inc/issues/compare/v1.20.4...v1.20.5) (2023-08-08)
 
 
