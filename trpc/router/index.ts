@@ -11,6 +11,7 @@ import { search } from './search';
 import { state } from './state';
 import { estimates } from './estimates';
 import { feedback } from './feedback';
+import { whatsnew } from './whatsnew';
 
 export const trpcRouter = router({
     filter,
@@ -24,6 +25,7 @@ export const trpcRouter = router({
     state,
     estimates,
     feedback,
+    whatsnew,
 });
 
 export type TrpcRouter = typeof trpcRouter;

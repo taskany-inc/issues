@@ -128,6 +128,8 @@ model Activity {
   tags               Tag[]
   goalActions        GoalHistory[]         @relation("goalActions")
   criterion          GoalAchieveCriteria[]
+  releasesRead       Release[]             @relation("releasesRead")
+  releasesDelayed    Release[]             @relation("releasesDelayed")
 
   createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
@@ -390,4 +392,14 @@ model GoalAchieveCriteria {
 
   @@index([title])
   @@index([goalId])
+}
+
+model Release {
+  id       String     @id @default(cuid())
+  version  String     @unique
+  readers  Activity[] @relation("releasesRead")
+  delayers Activity[] @relation("releasesDelayed")
+
+  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
 }
