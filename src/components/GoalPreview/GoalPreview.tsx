@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { danger0, gapM, gapS, gray7 } from '@taskany/colors';
@@ -106,21 +106,10 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, de
         return utils.goal.getById.invalidate(shortId);
     }, [utils.goal.getById, shortId]);
 
-    const [goalEditModalVisible, setGoalEditModalVisible] = useState(false);
-
     const onGoalEdit = useCallback(() => {
-        setGoalEditModalVisible(false);
-
+        dispatchModalEvent(ModalEvent.GoalEditModal)();
         invalidateFn();
     }, [invalidateFn]);
-
-    const onGoalEditModalShow = useCallback(() => {
-        setGoalEditModalVisible(true);
-    }, []);
-
-    const onGoalEditModalClose = useCallback(() => {
-        setGoalEditModalVisible(false);
-    }, []);
 
     const stateChangeMutations = trpc.goal.switchState.useMutation();
     const onGoalStateChange = useCallback(
@@ -138,7 +127,6 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, de
     );
 
     const onPreviewClose = useCallback(() => {
-        setGoalEditModalVisible(false);
         onClose?.();
     }, [onClose]);
 
@@ -404,13 +392,7 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, de
             {nullable(goal, (g) =>
                 nullable(g._isEditable, () => (
                     <>
-                        <ModalOnEvent
-                            event={ModalEvent.GoalEditModal}
-                            hotkeys={editGoalKeys}
-                            visible={goalEditModalVisible}
-                            onShow={onGoalEditModalShow}
-                            onClose={onGoalEditModalClose}
-                        >
+                        <ModalOnEvent event={ModalEvent.GoalEditModal} hotkeys={editGoalKeys}>
                             <GoalEditForm goal={g} onSubmit={onGoalEdit} />
                         </ModalOnEvent>
 
