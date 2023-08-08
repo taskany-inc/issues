@@ -18,8 +18,8 @@ import { GlobalStyle } from './GlobalStyle';
 import { PageHeader } from './PageHeader/PageHeader';
 import { PageFooter } from './PageFooter/PageFooter';
 import { ModalContext } from './ModalOnEvent';
-import { GoalPreview } from './GoalPreview/GoalPreview';
 
+const GoalPreview = dynamic(() => import('./GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm/ProjectCreateForm'));
 const GoalCreateForm = dynamic(() => import('./GoalCreateForm/GoalCreateForm'));

@@ -421,3 +421,5 @@ export const GoalPreview: FC = () => {
         />
     ));
 };
+
+export default GoalPreview;
