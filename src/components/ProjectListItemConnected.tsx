@@ -54,12 +54,15 @@ export const ProjectListItemConnected: FC<{
         setIsCollapsed((value) => !value);
     }, []);
 
-    const childrenNodeShown = childrenProjects.reduce((acum, p) => {
-        if (p._count.goals) {
-            return acum + 1;
-        }
-        return acum;
-    }, 0);
+    const childrenNodeShown =
+        status === 'success'
+            ? childrenProjects.reduce((acum, p) => {
+                  if (p._count.goals) {
+                      return acum + 1;
+                  }
+                  return acum;
+              }, 0)
+            : project.children.length;
 
     // hide projects without goals
 
