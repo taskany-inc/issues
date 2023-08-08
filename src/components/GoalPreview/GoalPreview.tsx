@@ -315,24 +315,6 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, de
                             feed={_activityFeed}
                             header={
                                 <>
-                                    {nullable(lastStateComment, (value) => (
-                                        <CommentView
-                                            pin
-                                            id={value.id}
-                                            author={value.activity?.user}
-                                            description={value.description}
-                                            state={value.state}
-                                            createdAt={value.createdAt}
-                                            reactions={value.reactions}
-                                            onSubmit={
-                                                value.activity?.id === user?.activityId
-                                                    ? onCommentUpdate(value.id)
-                                                    : undefined
-                                            }
-                                            onReactionToggle={onCommentReactionToggle(value.id)}
-                                            onDelete={onCommentDelete(value.id)}
-                                        />
-                                    ))}
                                     {nullable(goalAchiveCriteria.length || _isEditable, () => (
                                         <GoalCriteria
                                             goalId={id}
@@ -367,6 +349,25 @@ export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, de
                                             </GoalDependencyListByKind>
                                         )),
                                     )}
+
+                                    {nullable(lastStateComment, (value) => (
+                                        <CommentView
+                                            pin
+                                            id={value.id}
+                                            author={value.activity?.user}
+                                            description={value.description}
+                                            state={value.state}
+                                            createdAt={value.createdAt}
+                                            reactions={value.reactions}
+                                            onSubmit={
+                                                value.activity?.id === user?.activityId
+                                                    ? onCommentUpdate(value.id)
+                                                    : undefined
+                                            }
+                                            onReactionToggle={onCommentReactionToggle(value.id)}
+                                            onDelete={onCommentDelete(value.id)}
+                                        />
+                                    ))}
                                 </>
                             }
                             footer={
