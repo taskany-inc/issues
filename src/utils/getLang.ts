@@ -1,4 +1,4 @@
-const languages = ['en', 'ru'] as const;
+export const languages = ['en', 'ru'] as const;
 
 export type TLocale = (typeof languages)[number];
 

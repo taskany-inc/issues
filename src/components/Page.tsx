@@ -27,6 +27,7 @@ const UserInviteForm = dynamic(() => import('./UserInviteForm/UserInviteForm'));
 const HotkeysModal = dynamic(() => import('./HotkeysModal/HotkeysModal'));
 const NotificationsHub = dynamic(() => import('./NotificationsHub/NotificationsHub'));
 const FeedbackCreateForm = dynamic(() => import('./FeedbackCreateForm/FeedbackCreateForm'));
+const WhatsNew = dynamic(() => import('./WhatsNew/WhatsNew'));
 
 interface PageProps {
     user: Session['user'];
@@ -111,6 +112,8 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
             <HotkeysModal />
 
             <NotificationsHub />
+
+            <WhatsNew />
 
             <PageFooter />
         </pageContext.Provider>

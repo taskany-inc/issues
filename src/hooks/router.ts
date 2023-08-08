@@ -1,6 +1,7 @@
 import { useRouter as NextRouter } from 'next/router';
 
 import { AvailableHelpPages } from '../types/help';
+import { TLocale } from '../utils/getLang';
 
 export const routes = {
     index: () => '/',
@@ -20,6 +21,7 @@ export const routes = {
     exploreGoals: () => '/explore/goals',
 
     help: (slug: AvailableHelpPages) => `/help/${slug}`,
+    whatsnew: (release: string, locale: TLocale) => `/whatsnew/${release}/${locale}`,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
