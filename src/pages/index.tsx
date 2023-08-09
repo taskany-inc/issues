@@ -12,7 +12,7 @@ export const getServerSideProps = declareSsrProps(
             typeof query.filter === 'string' ? await ssrHelpers.filter.getById.fetch(query.filter) : undefined;
 
         await ssrHelpers.filter.getUserFilters.fetch();
-        await ssrHelpers.goal.getUserGoals.fetch(
+        await ssrHelpers.project.getUserProjectsWithGoals.fetch(
             parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
         );
     },
