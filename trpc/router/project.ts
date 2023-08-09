@@ -160,6 +160,7 @@ export const project = router({
                     goals: {
                         where: {
                             // all goals where the user is a participant / watcher / issuer / owner
+                            // with filters
                             OR: requestSchema({ withOwner: true }),
                             AND: [input ? { ...goalsFilter(input, activityId).where } : {}],
                         },
@@ -172,6 +173,7 @@ export const project = router({
                             goals: {
                                 where: {
                                     // all goals where the user is a participant / watcher / issuer / owner
+                                    // without filters to count the total goals
                                     OR: requestSchema({ withOwner: true }),
                                 },
                             },
