@@ -4,13 +4,7 @@ import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import {
-    addCalclulatedGoalsFields,
-    calcGoalsMeta,
-    goalDeepQuery,
-    goalsFilter,
-    getEstimateListFormJoin,
-} from '../queries/goals';
+import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter, getEstimateListFormJoin } from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
@@ -19,7 +13,6 @@ import {
     goalUpdateSchema,
     toggleGoalArchiveSchema,
     toggleGoalDependencySchema,
-    userGoalsSchema,
     goalCommentCreateSchema,
     toggleParticipantsSchema,
 } from '../../src/schema/goal';
@@ -245,124 +238,6 @@ export const goal = router({
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
-    }),
-    getUserGoals: protectedProcedure.input(userGoalsSchema).query(async ({ ctx, input }) => {
-        const { activityId } = ctx.session.user;
-
-        const userDashboardGoals: Prisma.GoalFindManyArgs['where'] = {
-            AND: {
-                OR: [
-                    // all projects where the user is a participant
-                    {
-                        project: {
-                            participants: {
-                                some: {
-                                    id: activityId,
-                                },
-                            },
-                        },
-                    },
-                    // all projects where the user is a watcher
-                    {
-                        project: {
-                            watchers: {
-                                some: {
-                                    id: activityId,
-                                },
-                            },
-                        },
-                    },
-                    // all projects where the user is owner
-                    {
-                        project: {
-                            activityId,
-                        },
-                    },
-                    // all goals where the user is a participant
-                    {
-                        participants: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    // all goals where the user is a watcher
-                    {
-                        watchers: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    // all goals where the user is issuer
-                    {
-                        activityId,
-                    },
-                    // all goals where the user is owner
-                    {
-                        ownerId: activityId,
-                    },
-                ],
-            },
-        };
-
-        const [allUserGoals, filtredUserGoals] = await Promise.all([
-            prisma.goal.findMany({
-                ...goalsFilter(
-                    {
-                        priority: [],
-                        state: [],
-                        tag: [],
-                        estimate: [],
-                        owner: [],
-                        project: [],
-                        sort: {},
-                        query: '',
-                    },
-                    ctx.session.user.activityId,
-                    {
-                        ...userDashboardGoals,
-                    },
-                ),
-                include: {
-                    ...goalDeepQuery,
-                    estimate: {
-                        include: {
-                            estimate: true,
-                        },
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                    },
-                },
-            }),
-            prisma.goal.findMany({
-                ...goalsFilter(input, ctx.session.user.activityId, {
-                    ...userDashboardGoals,
-                }),
-                include: {
-                    ...goalDeepQuery,
-                    estimate: {
-                        include: {
-                            estimate: true,
-                        },
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                    },
-                },
-            }),
-        ]);
-
-        return {
-            goals: filtredUserGoals.map((g) => ({
-                ...g,
-                ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
-                _estimate: getEstimateListFormJoin(g),
-                _project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
-            })),
-            meta: calcGoalsMeta(allUserGoals),
-        };
     }),
     create: protectedProcedure.input(goalCommonSchema).mutation(async ({ ctx, input }) => {
         if (!input.owner.id) return null;
