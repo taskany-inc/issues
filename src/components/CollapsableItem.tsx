@@ -1,12 +1,12 @@
-import { FC, ReactNode, createContext, useContext } from 'react';
-import styled, { css } from 'styled-components';
+import { FC, ReactNode } from 'react';
+import styled from 'styled-components';
 import { gray7 } from '@taskany/colors';
 
 export const collapseOffset = 20;
 
 const dotSize = 8;
 
-const line = css`
+const line = `
     position: absolute;
     width: 1px;
     top: 0;
@@ -30,29 +30,6 @@ const StyledDot = styled.div`
 
 const StyledParentDot = styled(StyledDot)`
     left: ${-1.5 * collapseOffset - dotSize / 2}px;
-`;
-
-const CollapsableItemContainer = styled.div<{ isSubTree: boolean }>`
-    position: relative;
-    margin-left: -${collapseOffset}px;
-    padding-left: ${collapseOffset}px;
-
-    &:after {
-        display: none;
-        content: '';
-        ${line}
-        left: ${-collapseOffset / 2}px;
-    }
-
-    ${({ isSubTree }) =>
-        isSubTree &&
-        `   
-            margin-left: 0px;
-
-            &:after {
-                display: block;
-            }
-        `}
 `;
 
 type BorderType = 'hidden' | 'top' | 'center' | 'bottom';
@@ -104,60 +81,72 @@ const CollapsableItemContent = styled.div<{
     }
 `;
 
+const CollapsableItemContainer = styled.div<{ isSubTree: boolean; border: 'center' | 'hidden' }>`
+    position: relative;
+    margin-left: -${collapseOffset}px;
+    padding-left: ${collapseOffset}px;
+
+    &:after {
+        display: none;
+        content: '';
+        ${line}
+        left: ${-collapseOffset / 2}px;
+    }
+
+    ${({ isSubTree, border }) =>
+        isSubTree &&
+        `   
+            margin-left: 0px;
+
+            &:after {
+                ${border !== 'hidden' && 'display: block;'};
+            }
+
+            > ${CollapsableItemContent}:first-child:before {
+                content: '';
+                ${line};
+                bottom: 50%;
+                left: ${-1.5 * collapseOffset}px;
+            }
+        `}
+`;
+
 type NodePosition = 'root' | 'first-child' | 'last-child' | 'default';
 
-const getNodePosition = (index: number, max: number): NodePosition => {
+export const getNodePosition = (index: number, max: number): NodePosition => {
     if (index === max) return 'last-child';
     if (index === 0) return 'first-child';
 
     return 'default';
 };
 
-const collapsableItemRenderContext = createContext<{
-    position: NodePosition;
-}>({
-    position: 'root',
-});
-
 export const CollapsableItem: FC<{
     children?: ReactNode;
-    nodes?: ReactNode[];
+    position?: NodePosition;
+    nodes?: ReactNode | null;
     collapsed: boolean;
     header: ReactNode;
     onClick?: () => void;
-}> = ({ children = [], collapsed, header, nodes = [], onClick }) => {
-    const { position } = useContext(collapsableItemRenderContext);
-
-    const hasChilds = !!nodes.length;
-
-    const border = getBorderType(position, collapsed, hasChilds);
+}> = ({ children = [], collapsed, header, nodes, onClick, position = 'root' }) => {
+    const border = getBorderType(position, collapsed, !!nodes);
     const isSubTree = position !== 'root' && border === 'top';
 
     // CollapsableItemContent for children block has NO border if there are no other childs below
-    const contentBorder = (position === 'last-child' || position === 'root') && !hasChilds ? 'hidden' : 'center';
+    const contentBorder = (position === 'last-child' || position === 'root') && !nodes ? 'hidden' : 'center';
 
     return (
-        <CollapsableItemContainer isSubTree={isSubTree}>
+        <CollapsableItemContainer isSubTree={isSubTree} border={position === 'last-child' ? 'hidden' : 'center'}>
             <CollapsableItemContent onClick={onClick} border={border}>
                 {border !== 'hidden' && <StyledDot />}
                 {isSubTree && <StyledParentDot />}
                 {header}
             </CollapsableItemContent>
             {!collapsed ? (
-                <collapsableItemRenderContext.Provider value={{ position: 'root' }}>
+                <>
                     <CollapsableItemContent border={contentBorder}>{children}</CollapsableItemContent>
-                </collapsableItemRenderContext.Provider>
+                    {nodes}
+                </>
             ) : null}
-            {!collapsed
-                ? nodes.map((n, i) => (
-                      <collapsableItemRenderContext.Provider
-                          key={i}
-                          value={{ position: getNodePosition(i, nodes.length - 1) }}
-                      >
-                          {n}
-                      </collapsableItemRenderContext.Provider>
-                  ))
-                : null}
         </CollapsableItemContainer>
     );
 };

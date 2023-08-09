@@ -1,4 +1,4 @@
-import React, { MouseEvent, ReactNode } from 'react';
+import React, { ComponentProps, MouseEvent, ReactNode } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { gapXs, gray4, radiusM } from '@taskany/colors';
@@ -26,8 +26,9 @@ const StyledProjectIcons = styled.div`
 interface ProjectListItemCollapsableProps {
     href?: string;
     project: NonNullable<ProjectByIdReturnType>;
+    position?: ComponentProps<typeof CollapsableItem>['position'];
     disabled?: boolean;
-    nodes?: ReactNode[];
+    nodes?: ComponentProps<typeof CollapsableItem>['nodes'];
     children?: ReactNode;
     collapsed: boolean;
     onClick?: () => void;
@@ -46,11 +47,12 @@ const onProjectClickHandler = (e: MouseEvent) => {
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
     project,
     collapsed = true,
+    position = 'root',
     onClick,
     children,
     loading = false,
     disabled,
-    nodes = [],
+    nodes,
     deep = 0,
     href,
 }) => {
@@ -82,6 +84,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
 
     return (
         <CollapsableItem
+            position={position}
             collapsed={contentHidden}
             onClick={disabled ? undefined : onClick}
             nodes={nodes}

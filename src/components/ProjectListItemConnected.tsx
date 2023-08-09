@@ -1,4 +1,4 @@
-import { FC, MouseEventHandler, useState, useMemo, useCallback } from 'react';
+import { FC, MouseEventHandler, useState, useMemo, useCallback, ComponentProps } from 'react';
 
 import { GoalByIdReturnType, ProjectByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';
@@ -8,9 +8,11 @@ import { routes } from '../hooks/router';
 
 import { ProjectListItemCollapsable } from './ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { GoalListItem } from './GoalListItem';
+import { getNodePosition } from './CollapsableItem';
 
 export const ProjectListItemConnected: FC<{
     project: NonNullable<ProjectByIdReturnType>;
+    position?: ComponentProps<typeof ProjectListItemCollapsable>['position'];
     queryState: QueryState;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
     onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
@@ -19,6 +21,7 @@ export const ProjectListItemConnected: FC<{
     collapsed?: boolean;
     hasLink?: boolean;
 }> = ({
+    position = 'root',
     hasLink = false,
     queryState,
     project,
@@ -58,19 +61,25 @@ export const ProjectListItemConnected: FC<{
         <ProjectListItemCollapsable
             href={hasLink ? routes.project(project.id) : undefined}
             disabled={!project._count.children && !project._count.goals}
-            nodes={childrenProjects.map((p) => (
-                <ProjectListItemConnected
-                    key={p.id}
-                    hasLink
-                    project={p}
-                    queryState={queryState}
-                    deep={deep + 1}
-                    onTagClick={onTagClick}
-                    onClickProvider={onClickProvider}
-                    selectedResolver={selectedResolver}
-                    collapsed
-                />
-            ))}
+            position={position}
+            nodes={
+                childrenProjects.length
+                    ? childrenProjects.map((p, i) => (
+                          <ProjectListItemConnected
+                              key={p.id}
+                              hasLink
+                              project={p}
+                              position={getNodePosition(i, childrenProjects.length - 1)}
+                              queryState={queryState}
+                              deep={deep + 1}
+                              onTagClick={onTagClick}
+                              onClickProvider={onClickProvider}
+                              selectedResolver={selectedResolver}
+                              collapsed
+                          />
+                      ))
+                    : null
+            }
             project={project}
             collapsed={collapsed}
             onClick={onClick}
