@@ -26,7 +26,6 @@ import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { InlineTrigger } from '../InlineTrigger';
 
 import { tr } from './DashboardPage.i18n';
@@ -35,14 +34,13 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-const StyledInlineTrigger = styled(InlineTrigger)`
+const StyledInlineTriggerWrapper = styled.div`
     padding-left: ${gapSm};
 `;
 
 export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
     const router = useRouter();
     const { toggleFilterStar } = useFilterResource();
-    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
 
     const utils = trpc.useContext();
 
@@ -158,18 +156,6 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
             ? currentPreset.description
             : tr('This is your personal goals bundle');
 
-    const createGoal = useCallback(
-        (projectId: string) => () => {
-            dispatchModalEvent(ModalEvent.GoalCreateModal)();
-            setCurrentProjectCache({
-                id: projectId,
-                title: '',
-                flowId: '',
-            });
-        },
-        [setCurrentProjectCache],
-    );
-
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <CommonHeader title={title} description={description} />
@@ -229,11 +215,15 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                                     </GoalsGroup>
 
                                     {!group.goals.length && (
-                                        <StyledInlineTrigger
-                                            text={tr('Create goal')}
-                                            onClick={createGoal(group.project.id)}
-                                            icon={<IconPlusCircleOutline noWrap size="s" />}
-                                        />
+                                        <StyledInlineTriggerWrapper>
+                                            <InlineTrigger
+                                                text={tr('Create goal')}
+                                                onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, {
+                                                    id: group.project.id,
+                                                })}
+                                                icon={<IconPlusCircleOutline noWrap size="s" />}
+                                            />
+                                        </StyledInlineTriggerWrapper>
                                     )}
                                 </React.Fragment>
                             ),
