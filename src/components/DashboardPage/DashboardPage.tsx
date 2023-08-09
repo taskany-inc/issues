@@ -19,10 +19,11 @@ import { GoalsGroup } from '../GoalsGroup';
 import { GoalsListContainer } from '../GoalListItem';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById, GoalByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -33,6 +34,7 @@ const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteF
 export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
     const router = useRouter();
     const { toggleFilterStar } = useFilterResource();
+    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
 
     const utils = trpc.useContext();
 
@@ -61,40 +63,16 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
         preset: presetData?.data,
     });
 
-    const { data, isLoading } = trpc.goal.getUserGoals.useQuery(queryState, {
+    const { data, isLoading } = trpc.project.getUserProjectsWithGoals.useQuery(queryState, {
         keepPreviousData: true,
         staleTime: refreshInterval,
     });
 
-    const goals = data?.goals;
-    const meta = data?.meta;
     const userFilters = trpc.filter.getUserFilters.useQuery();
     const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
 
-    const groupsMap =
-        // eslint-disable-next-line no-spaced-func
-        (goals as NonNullable<GoalByIdReturnType>[])?.reduce<{
-            [key: string]: {
-                project?: ProjectByIdReturnType | null;
-                goals: NonNullable<GoalByIdReturnType>[];
-            };
-        }>((r, g) => {
-            const k = g.projectId;
-
-            if (k) {
-                if (!r[k]) {
-                    r[k] = {
-                        project: g._project,
-                        goals: [],
-                    };
-                }
-
-                r[k].goals.push(g);
-            }
-            return r;
-        }, Object.create(null)) || {};
-
-    const groups = Object.values(groupsMap);
+    const groups = data?.groups;
+    const goals = groups?.flatMap((group) => group.goals);
 
     const { setPreview, preview } = useGoalPreview();
 
@@ -172,13 +150,27 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
             ? currentPreset.description
             : tr('This is your personal goals bundle');
 
+    const createGoal = useCallback(
+        (projectId: string) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.preventDefault();
+
+            dispatchModalEvent(ModalEvent.GoalCreateModal)();
+            setCurrentProjectCache({
+                id: projectId,
+                title: '',
+                flowId: '',
+            });
+        },
+        [setCurrentProjectCache],
+    );
+
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <CommonHeader title={title} description={description} />
 
             <FiltersPanel
                 loading={isLoading}
-                total={meta?.count}
+                total={data?.totalGoalsCount}
                 counter={goals?.length}
                 queryState={queryState}
                 queryString={queryString}
@@ -206,11 +198,11 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                 <GoalsListContainer>
                     {groups?.map(
                         (group) =>
-                            Boolean(group.goals.length) &&
+                            (queryString ? Boolean(group.goals.length) : true) &&
                             group.project && (
                                 <GoalsGroup
                                     key={group.project.id}
-                                    goals={group.goals}
+                                    goals={group.goals as NonNullable<GoalByIdReturnType>[]}
                                     selectedResolver={selectedGoalResolver}
                                     onClickProvider={onGoalPrewiewShow}
                                     onTagClick={setTagsFilterOutside}
@@ -226,7 +218,14 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                                                 starred={group.project?._isStarred}
                                                 watching={group.project?._isWatching}
                                                 averageScore={group.project?.averageScore}
-                                            />
+                                            >
+                                                {!group.goals.length && (
+                                                    <Button
+                                                        text={tr('Create goal')}
+                                                        onClick={createGoal(group.project.id)}
+                                                    />
+                                                )}
+                                            </ProjectListItem>
                                         </NextLink>
                                     </ProjectListContainer>
                                 </GoalsGroup>

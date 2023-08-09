@@ -111,6 +111,113 @@ export const project = router({
 
         return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
     }),
+    getUserProjectsWithGoals: protectedProcedure.input(queryWithFiltersSchema).query(async ({ ctx, input = {} }) => {
+        const { activityId } = ctx.session.user;
+
+        const projectsSchema = getProjectSchema({
+            activityId,
+            goalsQuery: input,
+        });
+
+        const requestSchema = ({ withOwner }: { withOwner: boolean }) => {
+            return [
+                {
+                    // all projects / goals where the user is a participant
+                    participants: {
+                        some: {
+                            id: activityId,
+                        },
+                    },
+                },
+                {
+                    // all projects / goals where the user is a watcher
+                    watchers: {
+                        some: {
+                            id: activityId,
+                        },
+                    },
+                },
+                {
+                    // all projects / goals where the user is issuer
+                    activityId,
+                },
+                withOwner
+                    ? {
+                          // all goals where the user is owner
+                          ownerId: activityId,
+                      }
+                    : {},
+            ];
+        };
+
+        const res = await prisma.project
+            .findMany({
+                orderBy: {
+                    updatedAt: 'desc',
+                },
+                include: {
+                    ...projectsSchema.include,
+                    goals: {
+                        where: {
+                            // all goals where the user is a participant / watcher / issuer / owner
+                            OR: requestSchema({ withOwner: true }),
+                            AND: [input ? { ...goalsFilter(input, activityId).where } : {}],
+                        },
+                        include: {
+                            ...goalDeepQuery,
+                        },
+                    },
+                    _count: {
+                        select: {
+                            goals: {
+                                where: {
+                                    // all goals where the user is a participant / watcher / issuer / owner
+                                    OR: requestSchema({ withOwner: true }),
+                                },
+                            },
+                        },
+                    },
+                },
+                where: {
+                    OR: [
+                        // all projects where the user is a participant / watcher / issuer
+                        ...requestSchema({ withOwner: false }),
+                        {
+                            goals: {
+                                some: {
+                                    // all goals where the user is a participant / watcher / issuer / owner
+                                    OR: requestSchema({ withOwner: true }),
+                                },
+                            },
+                        },
+                    ],
+                },
+            })
+            .then((res) => ({
+                groups: res.map((project) => {
+                    const goals = project.goals.map((goal) => {
+                        return {
+                            ...goal,
+                            ...addCalclulatedGoalsFields(goal, activityId),
+                            _estimate: getEstimateListFormJoin(goal),
+                        };
+                    });
+
+                    const { goals: _, _count, ...rest } = project;
+
+                    return {
+                        goals,
+                        project: addCalculatedProjectFields(rest, activityId),
+                    };
+                }),
+                totalGoalsCount: res.reduce((acc, cur) => {
+                    acc += cur._count.goals;
+                    return acc;
+                }, 0),
+            }));
+
+        return res;
+    }),
     getAll: protectedProcedure
         .input(
             z
