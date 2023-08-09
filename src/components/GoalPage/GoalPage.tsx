@@ -185,11 +185,11 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
     const changeProjectMutation = trpc.goal.changeProject.useMutation();
     const onGoalTransfer = useCallback(
-        async ({ id: projectId }: { id: string }) => {
-            if (goal) {
+        async (project?: { id: string }) => {
+            if (project && goal) {
                 const promise = changeProjectMutation.mutateAsync({
                     id: goal?.id,
-                    projectId,
+                    projectId: project.id,
                 });
 
                 await notifyPromise(promise, 'goalsUpdate');
