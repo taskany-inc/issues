@@ -12,7 +12,6 @@ import {
     Link,
     MenuItem,
     MoreVerticalIcon,
-    StateDot,
     Text,
     UserPic,
     nullable,
@@ -20,10 +19,8 @@ import {
     Button,
 } from '@taskany/bricks';
 import { Reaction, State, User } from '@prisma/client';
-import colorLayer from 'color-layer';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
-import { usePageContext } from '../../hooks/usePageContext';
 import { useLocale } from '../../hooks/useLocale';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { createLocaleDate } from '../../utils/dateTime';
@@ -33,6 +30,7 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Circle, CircledIcon } from '../Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
+import { StateDot } from '../StateDot';
 
 import { tr } from './CommentView.i18n';
 
@@ -143,7 +141,6 @@ export const CommentView: FC<CommentViewProps> = ({
     onDelete,
     onReactionToggle,
 }) => {
-    const { themeId } = usePageContext();
     const locale = useLocale();
     const [editMode, setEditMode] = useState(false);
     const [focused, setFocused] = useState(false);
@@ -264,7 +261,7 @@ export const CommentView: FC<CommentViewProps> = ({
                     <StyledCardComment>
                         {nullable(state, (s) => (
                             <StyledTimestamp>
-                                <StateDot color={colorLayer(s.hue, 9, s.hue === 1 ? 0 : undefined)[themeId]} />
+                                <StateDot hue={s.hue} />
                                 <Text size="m" weight="bolder" color={gray9}>
                                     {createLocaleDate(createdAt, { locale })}
                                 </Text>
