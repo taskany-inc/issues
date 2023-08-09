@@ -144,9 +144,9 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
     const addParticipantMutation = trpc.goal.addParticipant.useMutation();
     const onParticipantAdd = useCallback(
-        async ({ id: activityId }: ActivityByIdReturnType) => {
-            if (goal && activityId) {
-                await addParticipantMutation.mutateAsync({ id: goal.id, activityId });
+        async (activity?: ActivityByIdReturnType) => {
+            if (activity && goal) {
+                await addParticipantMutation.mutateAsync({ id: goal.id, activityId: activity.id });
                 invalidateFn();
             }
         },
