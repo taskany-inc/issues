@@ -20,3 +20,6 @@ jobs:
         run: docker-compose -f docker-compose.ci.yml up -d
       - name: Run specs
         uses: cypress-io/github-action@v5
+        env:
+          CYPRESS_ADMIN_EMAIL: test@taskany.org
+          CYPRESS_ADMIN_PASSWORD: test
