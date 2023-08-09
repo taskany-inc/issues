@@ -19,4 +19,4 @@ jobs:
       - name: Setup Docker
         run: docker-compose -f docker-compose.ci.yml up -d
       - name: Run specs
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v5
