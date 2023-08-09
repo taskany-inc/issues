@@ -2,7 +2,7 @@ FROM node:18.12.0-alpine as build
 
 WORKDIR /app
 COPY . .
-RUN npm ci
+RUN npm ci --no-audit --progress=false
 RUN npm run build
 
 FROM node:18.12.0-alpine AS runner
