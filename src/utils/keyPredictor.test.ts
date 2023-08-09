@@ -1,3 +1,5 @@
+import { test, expect } from '@jest/globals';
+
 import { keyPredictor } from './keyPredictor';
 
 describe('keyPredictor', () => {
