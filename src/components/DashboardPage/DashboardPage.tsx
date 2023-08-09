@@ -1,9 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect } from 'react';
+import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { nullable, Button } from '@taskany/bricks';
+import { gapSm } from '@taskany/colors';
+import { IconPlusCircleOutline } from '@taskany/icons';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -24,12 +27,17 @@ import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { InlineTrigger } from '../InlineTrigger';
 
 import { tr } from './DashboardPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
+
+const StyledInlineTrigger = styled(InlineTrigger)`
+    padding-left: ${gapSm};
+`;
 
 export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
     const router = useRouter();
@@ -151,9 +159,7 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
             : tr('This is your personal goals bundle');
 
     const createGoal = useCallback(
-        (projectId: string) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-            e.preventDefault();
-
+        (projectId: string) => () => {
             dispatchModalEvent(ModalEvent.GoalCreateModal)();
             setCurrentProjectCache({
                 id: projectId,
@@ -198,37 +204,38 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                 <GoalsListContainer>
                     {groups?.map(
                         (group) =>
-                            (queryString ? Boolean(group.goals.length) : true) &&
-                            group.project && (
-                                <GoalsGroup
-                                    key={group.project.id}
-                                    goals={group.goals as NonNullable<GoalByIdReturnType>[]}
-                                    selectedResolver={selectedGoalResolver}
-                                    onClickProvider={onGoalPrewiewShow}
-                                    onTagClick={setTagsFilterOutside}
-                                >
-                                    <ProjectListContainer>
-                                        <NextLink href={routes.project(group.project.id)} passHref legacyBehavior>
-                                            <ProjectListItem
-                                                key={group.project.id}
-                                                as="a"
-                                                title={group.project.title}
-                                                owner={group.project?.activity}
-                                                participants={group.project?.participants}
-                                                starred={group.project?._isStarred}
-                                                watching={group.project?._isWatching}
-                                                averageScore={group.project?.averageScore}
-                                            >
-                                                {!group.goals.length && (
-                                                    <Button
-                                                        text={tr('Create goal')}
-                                                        onClick={createGoal(group.project.id)}
-                                                    />
-                                                )}
-                                            </ProjectListItem>
-                                        </NextLink>
-                                    </ProjectListContainer>
-                                </GoalsGroup>
+                            (queryString ? Boolean(group.goals.length) : true) && (
+                                <React.Fragment key={group.project.id}>
+                                    <GoalsGroup
+                                        goals={group.goals as NonNullable<GoalByIdReturnType>[]}
+                                        selectedResolver={selectedGoalResolver}
+                                        onClickProvider={onGoalPrewiewShow}
+                                        onTagClick={setTagsFilterOutside}
+                                    >
+                                        <ProjectListContainer>
+                                            <NextLink href={routes.project(group.project.id)} passHref legacyBehavior>
+                                                <ProjectListItem
+                                                    key={group.project.id}
+                                                    as="a"
+                                                    title={group.project.title}
+                                                    owner={group.project?.activity}
+                                                    participants={group.project?.participants}
+                                                    starred={group.project?._isStarred}
+                                                    watching={group.project?._isWatching}
+                                                    averageScore={group.project?.averageScore}
+                                                />
+                                            </NextLink>
+                                        </ProjectListContainer>
+                                    </GoalsGroup>
+
+                                    {!group.goals.length && (
+                                        <StyledInlineTrigger
+                                            text={tr('Create goal')}
+                                            onClick={createGoal(group.project.id)}
+                                            icon={<IconPlusCircleOutline noWrap size="s" />}
+                                        />
+                                    )}
+                                </React.Fragment>
                             ),
                     )}
                 </GoalsListContainer>
