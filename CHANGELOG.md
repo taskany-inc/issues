@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.21.0](https://github.com/taskany-inc/issues/compare/v1.20.6...v1.21.0) (2023-08-09)
+
+
+### Features
+
+* **upload:** upload attaches with error handling ([ff191d0](https://github.com/taskany-inc/issues/commit/ff191d0537dea9ab03fd5b66b5f5d92c4df6741d))
+* **UserGroup:** use component from bricks ([2ce55d8](https://github.com/taskany-inc/issues/commit/2ce55d80d8d08ab0cade0e0e1ed7c897ef3bd959))
+
+
+### Bug Fixes
+
+* pin comment after achivements criteria and deps, [#1434](https://github.com/taskany-inc/issues/issues/1434) ([bdd7ec2](https://github.com/taskany-inc/issues/commit/bdd7ec2c844efb9996dd3b4bfbcbdefc3b213fb9))
+* **ProjectListItemConnected:** return hidden projects ([ea6451c](https://github.com/taskany-inc/issues/commit/ea6451ce792f9162d7479e47aaa793cb43ca470f))
+
 ## [1.20.6](https://github.com/taskany-inc/issues/compare/v1.20.5...v1.20.6) (2023-08-08)
 
 
