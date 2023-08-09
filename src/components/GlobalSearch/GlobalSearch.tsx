@@ -91,9 +91,11 @@ export const GlobalSearch = React.forwardRef<HTMLDivElement>((_, ref) => {
     }, []);
 
     const onSearchChange = useCallback(
-        (item: ItemsType[number]) => {
-            setQuery('');
-            router[item.__kind](item.__urlParams);
+        (item?: ItemsType[number]) => {
+            if (item) {
+                setQuery('');
+                router[item.__kind](item.__urlParams);
+            }
         },
         [router],
     );
