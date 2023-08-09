@@ -58,7 +58,26 @@ export const ProjectListItemConnected: FC<{
         <ProjectListItemCollapsable
             href={hasLink ? routes.project(project.id) : undefined}
             disabled={!project._count.children && !project._count.goals}
-            goals={projectDeepInfo?.goals.map((g) => (
+            nodes={childrenProjects.map((p) => (
+                <ProjectListItemConnected
+                    key={p.id}
+                    hasLink
+                    project={p}
+                    queryState={queryState}
+                    deep={deep + 1}
+                    onTagClick={onTagClick}
+                    onClickProvider={onClickProvider}
+                    selectedResolver={selectedResolver}
+                    collapsed
+                />
+            ))}
+            project={project}
+            collapsed={collapsed}
+            onClick={onClick}
+            loading={status === 'loading'}
+            deep={deep}
+        >
+            {projectDeepInfo?.goals.map((g) => (
                 <GoalListItem
                     createdAt={g.createdAt}
                     updatedAt={g.updatedAt}
@@ -81,25 +100,6 @@ export const ProjectListItemConnected: FC<{
                     focused={selectedResolver?.(g.id)}
                     onClick={onClickProvider?.(g as NonNullable<GoalByIdReturnType>)}
                     onTagClick={onTagClick}
-                />
-            ))}
-            project={project}
-            collapsed={collapsed}
-            onClick={onClick}
-            loading={status === 'loading'}
-            deep={deep}
-        >
-            {childrenProjects.map((p) => (
-                <ProjectListItemConnected
-                    key={p.id}
-                    hasLink
-                    project={p}
-                    queryState={queryState}
-                    deep={deep + 1}
-                    onTagClick={onTagClick}
-                    onClickProvider={onClickProvider}
-                    selectedResolver={selectedResolver}
-                    collapsed
                 />
             ))}
         </ProjectListItemCollapsable>

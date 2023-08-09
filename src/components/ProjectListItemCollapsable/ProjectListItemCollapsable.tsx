@@ -7,7 +7,7 @@ import { IconServersOutline } from '@taskany/icons';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalsListContainer } from '../GoalListItem';
-import { CollapsableItem, CollapsableContentItem, collapseOffset } from '../CollapsableItem';
+import { CollapsableItem, collapseOffset } from '../CollapsableItem';
 import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 
 const StyledGoalsListContainer = styled(GoalsListContainer)`
@@ -27,7 +27,7 @@ interface ProjectListItemCollapsableProps {
     href?: string;
     project: NonNullable<ProjectByIdReturnType>;
     disabled?: boolean;
-    goals?: ReactNode;
+    nodes?: ReactNode[];
     children?: ReactNode;
     collapsed: boolean;
     onClick?: () => void;
@@ -48,9 +48,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     collapsed = true,
     onClick,
     children,
-    goals,
     loading = false,
     disabled,
+    nodes = [],
     deep = 0,
     href,
 }) => {
@@ -84,7 +84,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         <CollapsableItem
             collapsed={contentHidden}
             onClick={disabled ? undefined : onClick}
-            hasChild={!!childsLength}
+            nodes={nodes}
             header={
                 <ProjectListContainer offset={offset}>
                     {href ? (
@@ -96,15 +96,8 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                     )}
                 </ProjectListContainer>
             }
-            content={
-                <>
-                    <CollapsableContentItem>
-                        <StyledGoalsListContainer offset={offset}>{goals}</StyledGoalsListContainer>
-                    </CollapsableContentItem>
-                    {children}
-                </>
-            }
-            deep={deep}
-        ></CollapsableItem>
+        >
+            <StyledGoalsListContainer offset={offset}>{children}</StyledGoalsListContainer>
+        </CollapsableItem>
     );
 };

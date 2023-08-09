@@ -1,7 +1,6 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, createContext, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { gray4, gray7, radiusM } from '@taskany/colors';
-import { nullable } from '@taskany/bricks';
+import { gray7 } from '@taskany/colors';
 
 export const collapseOffset = 20;
 
@@ -12,173 +11,153 @@ const line = css`
     width: 1px;
     top: 0;
     bottom: 0;
-    left: ${collapseOffset / 2}px;
+    left: ${-collapseOffset / 2}px;
     background: ${gray7};
     z-index: 1;
 `;
 
 const StyledDot = styled.div`
-    display: none;
     position: absolute;
     top: 50%;
     width: ${dotSize}px;
     height: ${dotSize}px;
     margin-top: -${dotSize / 2}px;
-    left: ${collapseOffset / 2 - dotSize / 2}px;
+    left: ${-collapseOffset / 2 - dotSize / 2}px;
 
     border-radius: 100%;
     background: ${gray7};
 `;
 
-const StyledParentDot = styled(StyledDot)``;
-
-const StyledCollapsableHeader = styled.div`
-    padding-bottom: 1px;
+const StyledParentDot = styled(StyledDot)`
+    left: ${-1.5 * collapseOffset - dotSize / 2}px;
 `;
 
-const StyledCollapsableItem = styled.div`
+const CollapsableItemContainer = styled.div<{ isSubTree: boolean }>`
     position: relative;
-    padding-bottom: 1px;
+    margin-left: -${collapseOffset}px;
+    padding-left: ${collapseOffset}px;
 
-    &:before {
+    &:after {
+        display: none;
         content: '';
         ${line}
-        margin-left: -${collapseOffset}px;
-    }
-`;
-
-const StyledHeaderContent = styled.div<{ highlighted?: boolean }>`
-    border-radius: ${radiusM};
-
-    ${({ highlighted }) =>
-        highlighted &&
-        `
-        background: ${gray4};
-    `}
-`;
-
-const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number; hasChild: boolean }>`
-    position: relative;
-
-    border-radius: ${radiusM};
-
-    > ${StyledCollapsableItem}:before {
-        display: none;
+        left: ${-collapseOffset / 2}px;
     }
 
-    &:last-child:before {
-        display: none;
-    }
+    ${({ isSubTree }) =>
+        isSubTree &&
+        `   
+            margin-left: 0px;
 
-    &:last-child > ${StyledCollapsableHeader}:after {
-        content: '';
-        ${line}
-
-        bottom: 50%;
-
-        ${({ deep }) => deep === 0 && 'display: none;'}
-    }
-
-    ${({ deep }) =>
-        deep > 0 &&
-        `
-        margin-left: -${collapseOffset}px;
-        padding-left: ${collapseOffset}px;
-    `}
-
-    ${({ collapsed, deep, hasChild }) =>
-        !collapsed &&
-        hasChild &&
-        css`
-            padding-left: ${collapseOffset}px;
-            margin-left: ${deep === 0 ? -collapseOffset : 0}px;
-
-            /** show dot and add paddings for earch item is opened */
-
-            & > & > ${StyledCollapsableHeader}, & > ${StyledCollapsableHeader} {
-                padding-left: ${collapseOffset}px;
-                margin-left: -${collapseOffset}px;
-                position: relative;
-
-                /** display dot */
-
-                > ${StyledDot} {
-                    display: block;
-                }
-            }
-
-            /** add parent dot if not first lvl */
-
-            & > ${StyledCollapsableHeader} > ${StyledParentDot} {
-                ${deep > 0 &&
-                css`
-                    display: block;
-                    margin-left: -${collapseOffset}px;
-                `}
-            }
-
-            /** first item vertical line */
-
-            & > &:before,
-            & > ${StyledCollapsableHeader}:before {
-                content: '';
-                ${line}
-            }
-
-            /** first item vertical line */
-
-            & > ${StyledCollapsableHeader}:before {
-                top: 50%;
-            }
-
-            /** last item vertical line */
-
-            & > &:last-of-type:before {
-                bottom: 50%;
-            }
-
-            &:before {
-                margin-left: -${collapseOffset}px;
-            }
-
-            &:last-child > ${StyledCollapsableHeader}:after {
-                margin-left: -${collapseOffset}px;
-            }
-
-            /** show grey line for additional content section (for example goals list) if it's not last item. See design :) */
-            // TODO: Remove this here https://github.com/taskany-inc/issues/issues/1448
-
-            > ${StyledCollapsableItem}:not(:last-child):before {
+            &:after {
                 display: block;
             }
         `}
 `;
 
-export const CollapsableContentItem: FC<{
-    children?: ReactNode;
-    className?: string;
-}> = ({ children, className }) => <StyledCollapsableItem className={className}>{children}</StyledCollapsableItem>;
+type BorderType = 'hidden' | 'top' | 'center' | 'bottom';
+
+const getBorderType = (nodeType: NodePosition, collapsed: boolean, hasChilds: boolean): BorderType => {
+    if (nodeType === 'root' && (collapsed || !hasChilds)) {
+        return 'hidden';
+    }
+
+    if (!collapsed && hasChilds) {
+        return 'top';
+    }
+
+    if (nodeType === 'last-child') {
+        return 'bottom';
+    }
+
+    return 'center';
+};
+
+const CollapsableItemContent = styled.div<{
+    border: BorderType;
+}>`
+    position: relative;
+    padding-bottom: 1px;
+
+    &:after {
+        content: '';
+        ${line};
+        ${({ border }) => {
+            if (border === 'hidden') {
+                return `
+                    display: none;
+                `;
+            }
+
+            if (border === 'top') {
+                return `
+                    top: 50%;
+                `;
+            }
+
+            if (border === 'bottom') {
+                return `
+                    bottom: 50%;
+                `;
+            }
+        }}
+    }
+`;
+
+type NodePosition = 'root' | 'first-child' | 'last-child' | 'default';
+
+const getNodePosition = (index: number, max: number): NodePosition => {
+    if (index === max) return 'last-child';
+    if (index === 0) return 'first-child';
+
+    return 'default';
+};
+
+const collapsableItemRenderContext = createContext<{
+    position: NodePosition;
+}>({
+    position: 'root',
+});
 
 export const CollapsableItem: FC<{
     children?: ReactNode;
-    onClick?: () => void;
-    header: ReactNode;
-    content: ReactNode;
-    deep?: number;
+    nodes?: ReactNode[];
     collapsed: boolean;
-    hasChild: boolean;
-}> = ({ onClick, children, header, collapsed, deep = 0, hasChild, content }) => {
+    header: ReactNode;
+    onClick?: () => void;
+}> = ({ children = [], collapsed, header, nodes = [], onClick }) => {
+    const { position } = useContext(collapsableItemRenderContext);
+
+    const hasChilds = !!nodes.length;
+
+    const border = getBorderType(position, collapsed, hasChilds);
+    const isSubTree = position !== 'root' && border === 'top';
+
+    // CollapsableItemContent for children block has NO border if there are no other childs below
+    const contentBorder = (position === 'last-child' || position === 'root') && !hasChilds ? 'hidden' : 'center';
+
     return (
-        <StyledCollapsableContainer collapsed={collapsed} deep={deep} hasChild={hasChild}>
-            <StyledCollapsableHeader onClick={onClick}>
-                <StyledParentDot />
-                <StyledDot />
-                <StyledHeaderContent highlighted={!!onClick && collapsed}>{header}</StyledHeaderContent>
-            </StyledCollapsableHeader>
-            {nullable(children, (ch) => (
-                <StyledCollapsableItem>{ch}</StyledCollapsableItem>
-            ))}
-            {!collapsed ? content : null}
-        </StyledCollapsableContainer>
+        <CollapsableItemContainer isSubTree={isSubTree}>
+            <CollapsableItemContent onClick={onClick} border={border}>
+                {border !== 'hidden' && <StyledDot />}
+                {isSubTree && <StyledParentDot />}
+                {header}
+            </CollapsableItemContent>
+            {!collapsed ? (
+                <collapsableItemRenderContext.Provider value={{ position: 'root' }}>
+                    <CollapsableItemContent border={contentBorder}>{children}</CollapsableItemContent>
+                </collapsableItemRenderContext.Provider>
+            ) : null}
+            {!collapsed
+                ? nodes.map((n, i) => (
+                      <collapsableItemRenderContext.Provider
+                          key={i}
+                          value={{ position: getNodePosition(i, nodes.length - 1) }}
+                      >
+                          {n}
+                      </collapsableItemRenderContext.Provider>
+                  ))
+                : null}
+        </CollapsableItemContainer>
     );
 };
