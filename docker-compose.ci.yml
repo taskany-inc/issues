@@ -24,19 +24,6 @@ services:
       - 3000:3000
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.ci
     depends_on:
       - db
-    environment:
-      - DATABASE_URL=postgresql://prisma:hilly-sand-pit@db:5432/prisma?schema=prisma-pg-test
-      - NEXTAUTH_URL=http://localhost:3000
-      - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=ololo
-      - ADMIN_EMAIL=test@taskany.org
-      - ADMIN_PASSWORD=test
-      - MAIL_USER=notify@taskany.org
-      - SENTRY_DISABLED=1
-      - SENTRY_IGNORE_API_RESOLUTION_ERROR=1
-    command: >
-      sh -c "node_modules/.bin/prisma migrate dev &&
-             node_modules/.bin/concurrently 'node background/worker/index.js' 'node server.js'"

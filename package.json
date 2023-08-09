@@ -10,7 +10,7 @@
     "db:migrate": "npx prisma migrate deploy",
     "db:seed": "npx prisma db seed",
     "worker": "ts-node -r dotenv/config src/utils/worker/index.ts",
-    "build": "next build && npm run build:worker",
+    "build": "concurrently \"next build\" \"npm run build:worker\"",
     "build:worker": "tsc -p ./src/utils/worker",
     "build:analyze": "ANALYZE=true next build",
     "start": "concurrently \"npm run worker\" \"next start\"",
