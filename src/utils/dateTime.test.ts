@@ -1,3 +1,5 @@
+import { test, expect } from '@jest/globals';
+
 import { TLocale } from './getLang';
 import {
     availableYears,
