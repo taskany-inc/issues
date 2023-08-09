@@ -87,8 +87,8 @@ model User {
   activity      Activity? @relation(fields: [activityId], references: [id])
   activityId    String?   @unique
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
 model Ghost {
@@ -98,8 +98,8 @@ model Ghost {
   hostId   String
   activity Activity?
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 
   @@index([hostId])
 }
@@ -131,8 +131,8 @@ model Activity {
   releasesRead       Release[]             @relation("releasesRead")
   releasesDelayed    Release[]             @relation("releasesDelayed")
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 
   @@index([ghostId])
 }
@@ -154,8 +154,8 @@ model Project {
   stargizers   Activity[] @relation("projectStargizers")
   averageScore Int?
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
 model Estimate {
@@ -168,8 +168,8 @@ model Estimate {
   activity   Activity         @relation(fields: [activityId], references: [id])
   activityId String
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 
   @@index([date])
 }
@@ -181,7 +181,7 @@ model EstimateToGoal {
   estimate   Estimate @relation(fields: [estimateId], references: [id])
   estimateId Int
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
 
   @@index([goalId])
   @@index([estimateId])
@@ -232,8 +232,8 @@ model Goal {
   goalAsCriteria          GoalAchieveCriteria?  @relation("GoalAsCriteria")
   completedCriteriaWeight Int?
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 
   @@unique([projectId, scopeId])
   @@index([ownerId])
@@ -250,8 +250,8 @@ model Filter {
   activityId  String
   stargizers  Activity[] @relation("filterStargizers")
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
 model Comment {
@@ -265,8 +265,8 @@ model Comment {
   stateId     String?
   reactions   Reaction[]
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 
   @@index([activityId])
   @@index([goalId])
@@ -282,8 +282,8 @@ model Reaction {
   comment    Comment? @relation(fields: [commentId], references: [id])
   commentId  String?
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 
   @@index([activityId])
   @@index([goalId])
@@ -299,8 +299,8 @@ model Flow {
   states      State[]
   recommended Boolean?
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
 model State {
@@ -313,8 +313,8 @@ model State {
   goals    Goal[]    @relation("goalState")
   comments Comment[]
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
 model Settings {
@@ -325,8 +325,8 @@ model Settings {
   flowId   String?
   activity Activity?
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
 model Tag {
@@ -338,8 +338,8 @@ model Tag {
   activity    Activity  @relation(fields: [activityId], references: [id])
   activityId  String
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
 model Job {
@@ -353,8 +353,8 @@ model Job {
   cron     String?
   error    String?
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
 model GoalHistory {
@@ -368,7 +368,7 @@ model GoalHistory {
   activity      Activity @relation("goalActions", fields: [activityId], references: [id])
   activityId    String
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
 
   @@index([id])
   @@index([goalId])
@@ -387,8 +387,8 @@ model GoalAchieveCriteria {
   activityId       String
   deleted          Boolean?
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 
   @@index([title])
   @@index([goalId])
@@ -400,6 +400,6 @@ model Release {
   readers  Activity[] @relation("releasesRead")
   delayers Activity[] @relation("releasesDelayed")
 
-  createdAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc', current_timestamp)")) @updatedAt
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
