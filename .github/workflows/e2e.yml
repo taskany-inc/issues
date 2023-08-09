@@ -1,19 +1,22 @@
-name: e2e
+name: Cypress testing
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths:
+      - '**/**.json'
+      - '**/**.js'
+      - '**/**.jsx'
+      - '**/**.ts'
+      - '**/**.tsx'
 
 jobs:
-  build_and_run_e2e:
+  e2e:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Build the stack
+      - uses: actions/checkout@v3
+      - name: Setup Docker
         run: docker-compose -f docker-compose.ci.yml up -d
-
-      - name: run e2e
+      - name: Run specs
         uses: cypress-io/github-action@v4
