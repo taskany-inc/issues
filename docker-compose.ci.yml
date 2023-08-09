@@ -24,7 +24,7 @@ services:
       - 3000:3000
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     depends_on:
       - db
     environment:
