@@ -26,7 +26,7 @@ const StyledProjectIcons = styled.div`
 interface ProjectListItemCollapsableProps {
     href?: string;
     project: NonNullable<ProjectByIdReturnType>;
-    childShown?: number;
+    disabled?: boolean;
     goals?: ReactNode;
     children?: ReactNode;
     collapsed: boolean;
@@ -50,10 +50,11 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     children,
     goals,
     loading = false,
-    childShown = 0,
+    disabled,
     deep = 0,
     href,
 }) => {
+    const childsLength = project.children.length;
     const contentHidden = collapsed || loading;
 
     const offset = collapseOffset * (deep > 0 && contentHidden ? deep - 1 : deep);
@@ -68,8 +69,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
             watching={project._isWatching}
             averageScore={project.averageScore}
             onClick={onProjectClickHandler}
+            disabled={disabled}
         >
-            {nullable(childShown, (c) => (
+            {nullable(childsLength, (c) => (
                 <StyledProjectIcons>
                     <IconServersOutline size="xs" />
                     <Text size="xs">{c}</Text>
@@ -81,8 +83,8 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     return (
         <CollapsableItem
             collapsed={contentHidden}
-            onClick={onClick}
-            hasChild={!!childShown}
+            onClick={disabled ? undefined : onClick}
+            hasChild={!!childsLength}
             header={
                 <ProjectListContainer offset={offset}>
                     {href ? (

@@ -54,25 +54,10 @@ export const ProjectListItemConnected: FC<{
         setIsCollapsed((value) => !value);
     }, []);
 
-    const childrenNodeShown =
-        status === 'success'
-            ? childrenProjects.reduce((acum, p) => {
-                  if (p._count.goals) {
-                      return acum + 1;
-                  }
-                  return acum;
-              }, 0)
-            : project.children.length;
-
-    // hide projects without goals
-
-    if (!project._count.goals) {
-        return null;
-    }
-
     return (
         <ProjectListItemCollapsable
             href={hasLink ? routes.project(project.id) : undefined}
+            disabled={!project._count.children && !project._count.goals}
             goals={projectDeepInfo?.goals.map((g) => (
                 <GoalListItem
                     createdAt={g.createdAt}
@@ -98,7 +83,6 @@ export const ProjectListItemConnected: FC<{
                     onTagClick={onTagClick}
                 />
             ))}
-            childShown={childrenNodeShown}
             project={project}
             collapsed={collapsed}
             onClick={onClick}
@@ -108,7 +92,7 @@ export const ProjectListItemConnected: FC<{
             {childrenProjects.map((p) => (
                 <ProjectListItemConnected
                     key={p.id}
-                    hasLink={hasLink}
+                    hasLink
                     project={p}
                     queryState={queryState}
                     deep={deep + 1}
