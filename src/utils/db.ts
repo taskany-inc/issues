@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { GoalHistory, Comment, Activity, User, Goal } from '@prisma/client';
+import { GoalHistory, Comment, Activity, User, Goal, Role } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
@@ -50,7 +50,7 @@ export const findOrCreateEstimate = async (
  * @param input goal FormData
  * @returns new goal id
  */
-export const createGoal = async (activityId: string, input: GoalCommon) => {
+export const createGoal = async (input: GoalCommon, activityId: string, role: Role) => {
     const id = nanoid();
 
     await prisma.$executeRaw`
@@ -106,7 +106,7 @@ export const createGoal = async (activityId: string, input: GoalCommon) => {
 
     return {
         ...goal,
-        ...addCalclulatedGoalsFields(goal, activityId),
+        ...addCalclulatedGoalsFields(goal, activityId, role),
     };
 };
 

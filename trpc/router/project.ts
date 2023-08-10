@@ -1,4 +1,4 @@
-import { Activity, Prisma, Project, User } from '@prisma/client';
+import { Activity, Prisma, Project, Role, User } from '@prisma/client';
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
 
@@ -31,6 +31,7 @@ export const addCalculatedProjectFields = <
 >(
     project: T,
     activityId: string,
+    role: Role,
 ): T & {
     _isWatching?: boolean;
     _isStarred?: boolean;
@@ -38,7 +39,7 @@ export const addCalculatedProjectFields = <
 } => {
     const _isWatching = project.watchers?.some((watcher: any) => watcher.id === activityId);
     const _isStarred = project.stargizers?.some((stargizer: any) => stargizer.id === activityId);
-    const _isOwner = project.activityId === activityId;
+    const _isOwner = project.activityId === activityId || role === 'ADMIN';
 
     return {
         ...project,
@@ -112,7 +113,7 @@ export const project = router({
         return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
     }),
     getUserProjectsWithGoals: protectedProcedure.input(queryWithFiltersSchema).query(async ({ ctx, input = {} }) => {
-        const { activityId } = ctx.session.user;
+        const { activityId, role } = ctx.session.user;
 
         const projectsSchema = getProjectSchema({
             activityId,
@@ -200,7 +201,7 @@ export const project = router({
                     const goals = project.goals.map((goal) => {
                         return {
                             ...goal,
-                            ...addCalclulatedGoalsFields(goal, activityId),
+                            ...addCalclulatedGoalsFields(goal, activityId, role),
                             _estimate: getEstimateListFormJoin(goal),
                         };
                     });
@@ -209,7 +210,7 @@ export const project = router({
 
                     return {
                         goals,
-                        project: addCalculatedProjectFields(rest, activityId),
+                        project: addCalculatedProjectFields(rest, activityId, role),
                     };
                 }),
                 totalGoalsCount: res.reduce((acc, cur) => {
@@ -230,7 +231,7 @@ export const project = router({
                 .optional(),
         )
         .query(async ({ ctx, input: { goalsQuery } = {} }) => {
-            const { activityId } = ctx.session.user;
+            const { activityId, role } = ctx.session.user;
             const sqlFilters = sqlGoalsFilter(activityId, goalsQuery);
 
             const [projects, watchers, stargizers, projectsChildrenParent] = await Promise.all([
@@ -326,7 +327,7 @@ export const project = router({
                 fillProject(projectsDict, { watcher, stargizer, project });
             }
 
-            return Object.values(projectsDict)?.map((project) => addCalculatedProjectFields(project, activityId));
+            return Object.values(projectsDict)?.map((project) => addCalculatedProjectFields(project, activityId, role));
         }),
     getTop: protectedProcedure
         .input(
@@ -338,18 +339,20 @@ export const project = router({
                 .optional(),
         )
         .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
+            const { activityId, role } = ctx.session.user;
+
             const allProjects = await prisma.project
                 .findMany({
                     orderBy: {
                         createdAt: 'asc',
                     },
                     ...getProjectSchema({
-                        activityId: ctx.session.user.activityId,
+                        activityId,
                         goalsQuery,
                         firstLevel,
                     }),
                 })
-                .then((res) => res.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId)));
+                .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
 
             // FIX: it is hack!
             return allProjects.filter((p) => p._count.parent === 0);
@@ -362,9 +365,11 @@ export const project = router({
             }),
         )
         .query(async ({ ctx, input: { id, goalsQuery } }) => {
+            const { activityId, role } = ctx.session.user;
+
             const project = await prisma.project.findUnique({
                 ...getProjectSchema({
-                    activityId: ctx.session.user.activityId,
+                    activityId,
                     goalsQuery,
                 }),
                 where: {
@@ -374,7 +379,7 @@ export const project = router({
 
             if (!project) return null;
 
-            return addCalculatedProjectFields(project, ctx.session.user.activityId);
+            return addCalculatedProjectFields(project, activityId, role);
         }),
     getByIds: protectedProcedure
         .input(
@@ -384,6 +389,8 @@ export const project = router({
             }),
         )
         .query(async ({ ctx, input: { ids, goalsQuery } }) => {
+            const { activityId, role } = ctx.session.user;
+
             const projects = await prisma.project.findMany({
                 where: {
                     id: {
@@ -391,12 +398,12 @@ export const project = router({
                     },
                 },
                 ...getProjectSchema({
-                    activityId: ctx.session.user.activityId,
+                    activityId,
                     goalsQuery,
                 }),
             });
 
-            return projects.map((project) => addCalculatedProjectFields(project, ctx.session.user.activityId));
+            return projects.map((project) => addCalculatedProjectFields(project, activityId, role));
         }),
     getDeepInfo: protectedProcedure
         .input(
@@ -406,6 +413,8 @@ export const project = router({
             }),
         )
         .query(async ({ ctx, input: { id, goalsQuery } }) => {
+            const { activityId, role } = ctx.session.user;
+
             const [allProjectGoals, filtredProjectGoals] = await Promise.all([
                 prisma.goal.findMany({
                     ...goalsFilter(
@@ -418,7 +427,7 @@ export const project = router({
                             project: [],
                             query: '',
                         },
-                        ctx.session.user.activityId,
+                        activityId,
                         { projectId: id },
                     ),
                     include: {
@@ -434,7 +443,7 @@ export const project = router({
                     },
                 }),
                 prisma.goal.findMany({
-                    ...goalsFilter(goalsQuery, ctx.session.user.activityId, { projectId: id }),
+                    ...goalsFilter(goalsQuery, activityId, { projectId: id }),
                     include: {
                         ...goalDeepQuery,
                         estimate: {
@@ -452,8 +461,8 @@ export const project = router({
             return {
                 goals: filtredProjectGoals.map((g) => ({
                     ...g,
-                    _project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
-                    ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+                    _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
+                    ...addCalclulatedGoalsFields(g, activityId, role),
                     _estimate: getEstimateListFormJoin(g),
                 })),
                 meta: calcGoalsMeta(allProjectGoals),
@@ -462,16 +471,18 @@ export const project = router({
     create: protectedProcedure
         .input(projectCreateSchema)
         .mutation(async ({ ctx, input: { id, title, description, flow } }) => {
+            const { activityId } = ctx.session.user;
+
             try {
                 return prisma.project.create({
                     data: {
                         id,
                         title,
                         description,
-                        activityId: ctx.session.user.activityId,
+                        activityId,
                         flowId: flow.id,
                         watchers: {
-                            connect: [ctx.session.user.activityId].map((id) => ({ id })),
+                            connect: [activityId].map((id) => ({ id })),
                         },
                     },
                 });

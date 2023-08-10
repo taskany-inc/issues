@@ -6,6 +6,8 @@ import { addCalclulatedGoalsFields, goalDeepQuery } from '../queries/goals';
 
 export const search = router({
     global: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+        const { activityId, role } = ctx.session.user;
+
         const [goals, projects] = await Promise.all([
             prisma.goal.findMany({
                 take: 5,
@@ -75,7 +77,7 @@ export const search = router({
         return {
             goals: goals.map((g) => ({
                 ...g,
-                ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+                ...addCalclulatedGoalsFields(g, activityId, role),
             })),
             projects,
         };

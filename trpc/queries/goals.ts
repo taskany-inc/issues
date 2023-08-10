@@ -1,4 +1,4 @@
-import { Estimate, EstimateToGoal, Goal, GoalAchieveCriteria, Prisma, State, StateType } from '@prisma/client';
+import { Estimate, EstimateToGoal, Goal, GoalAchieveCriteria, Prisma, Role, State, StateType } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
 
@@ -482,7 +482,7 @@ export const calcAchievedWeight = (
     );
 };
 
-export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
+export const addCalclulatedGoalsFields = (goal: any, activityId: string, role: Role) => {
     const _isOwner = goal.ownerId === activityId;
     const _isParticipant = goal.participants?.some((participant: any) => participant?.id === activityId);
     const _isWatching = goal.watchers?.some((watcher: any) => watcher?.id === activityId);
@@ -510,7 +510,7 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string) => {
     }
     checkParent(goal.project);
 
-    const _isEditable = _isOwner || _isIssuer || parentOwner;
+    const _isEditable = _isOwner || _isIssuer || parentOwner || role === 'ADMIN';
 
     return {
         _isOwner,

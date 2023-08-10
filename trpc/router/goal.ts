@@ -110,12 +110,14 @@ export const goal = router({
             }),
         )
         .query(async ({ ctx, input: { query, limit, skip, cursor } }) => {
+            const { activityId, role } = ctx.session.user;
+
             const [items, count] = await Promise.all([
                 prisma.goal.findMany({
                     take: limit + 1,
                     skip,
                     cursor: cursor ? { id: cursor } : undefined,
-                    ...(query ? goalsFilter(query, ctx.session.user.activityId) : {}),
+                    ...(query ? goalsFilter(query, activityId) : {}),
                     orderBy: {
                         id: 'asc',
                     },
@@ -136,9 +138,9 @@ export const goal = router({
             return {
                 items: items.map((g) => ({
                     ...g,
-                    ...addCalclulatedGoalsFields(g, ctx.session.user.activityId),
+                    ...addCalclulatedGoalsFields(g, activityId, role),
                     _estimate: getEstimateListFormJoin(g),
-                    _project: g.project ? addCalculatedProjectFields(g.project, ctx.session.user.activityId) : null,
+                    _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
                 })),
                 nextCursor,
                 meta: {
@@ -157,6 +159,7 @@ export const goal = router({
     getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
         // try to recognize shot id like: FRNTND-23
         const [projectId, scopeIdStr] = input.split('-');
+        const { activityId, role } = ctx.session.user;
 
         if (!projectId) return null;
 
@@ -225,8 +228,8 @@ export const goal = router({
 
             return {
                 ...goal,
-                ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
-                _project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
+                ...addCalclulatedGoalsFields(goal, activityId, role),
+                _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                 _estimate: getEstimateListFormJoin(goal),
                 _activityFeed: mixHistoryWithComments(history, goal.comments),
                 _relations: makeGoalRelationMap({
@@ -243,7 +246,7 @@ export const goal = router({
         if (!input.owner.id) return null;
         if (!input.parent.id) return null;
 
-        const { activityId } = ctx.session.user;
+        const { activityId, role } = ctx.session.user;
 
         const actualProject = await prisma.project.findUnique({
             where: { id: input.parent.id },
@@ -259,7 +262,7 @@ export const goal = router({
         }
 
         try {
-            const newGoal = await createGoal(activityId, input);
+            const newGoal = await createGoal(input, activityId, role);
 
             const recipients = Array.from(
                 new Set(
@@ -299,7 +302,7 @@ export const goal = router({
 
         if (!actualGoal) return null;
 
-        const { activityId } = ctx.session.user;
+        const { activityId, role } = ctx.session.user;
 
         try {
             await changeGoalProject(input.id, input.projectId);
@@ -327,13 +330,15 @@ export const goal = router({
 
             return {
                 ...goal,
-                ...addCalclulatedGoalsFields(goal, activityId),
+                ...addCalclulatedGoalsFields(goal, activityId, role),
             };
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
     update: protectedProcedure.input(goalUpdateSchema).mutation(async ({ ctx, input }) => {
+        const { activityId, role } = ctx.session.user;
+
         const actualGoal = await prisma.goal.findUnique({
             where: { id: input.id },
             include: {
@@ -352,7 +357,7 @@ export const goal = router({
 
         if (!actualGoal) return null;
 
-        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
 
         if (!_isEditable) {
             return null;
@@ -423,7 +428,7 @@ export const goal = router({
             });
         }
 
-        const correctEstimate = await findOrCreateEstimate(input.estimate, ctx.session.user.activityId, actualGoal.id);
+        const correctEstimate = await findOrCreateEstimate(input.estimate, activityId, actualGoal.id);
         const previousEstimate = actualGoal.estimate.length
             ? actualGoal.estimate[actualGoal.estimate.length - 1]
             : null;
@@ -473,7 +478,7 @@ export const goal = router({
                     },
                     history: {
                         createMany: {
-                            data: history.map((record) => ({ ...record, activityId: ctx.session.user.activityId })),
+                            data: history.map((record) => ({ ...record, activityId })),
                         },
                     },
                     goalAsCriteria: actualGoal.goalAsCriteria
@@ -530,8 +535,8 @@ export const goal = router({
 
             return {
                 ...goal,
-                ...addCalclulatedGoalsFields(goal, ctx.session.user.activityId),
-                _project: goal.project ? addCalculatedProjectFields(goal.project, ctx.session.user.activityId) : null,
+                ...addCalclulatedGoalsFields(goal, activityId, role),
+                _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                 _estimate: getEstimateListFormJoin(goal),
                 _activityFeed: [],
             };
@@ -572,6 +577,8 @@ export const goal = router({
     toggleArchive: protectedProcedure
         .input(toggleGoalArchiveSchema)
         .mutation(async ({ input: { id, archived }, ctx }) => {
+            const { activityId, role } = ctx.session.user;
+
             const actualGoal = await prisma.goal.findFirst({
                 where: {
                     id,
@@ -590,7 +597,7 @@ export const goal = router({
                 return null;
             }
 
-            const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+            const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
 
             if (!_isEditable) {
                 return null;
@@ -605,7 +612,7 @@ export const goal = router({
                             create: {
                                 subject: 'state',
                                 action: 'archive',
-                                activityId: ctx.session.user.activityId,
+                                activityId,
                                 nextValue: archived ? 'move to archive' : 'move from archive',
                             },
                         },
@@ -638,6 +645,8 @@ export const goal = router({
             }
         }),
     switchState: protectedProcedure.input(goalStateChangeSchema).mutation(async ({ input, ctx }) => {
+        const { activityId, role } = ctx.session.user;
+
         const actualGoal = await prisma.goal.findFirst({
             where: {
                 id: input.id,
@@ -657,7 +666,7 @@ export const goal = router({
             return null;
         }
 
-        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
 
         if (!_isEditable) {
             return null;
@@ -677,7 +686,7 @@ export const goal = router({
                             action: 'change',
                             previousValue: actualGoal.stateId,
                             nextValue: input.state.id,
-                            activityId: ctx.session.user.activityId,
+                            activityId,
                         },
                     },
                     goalAsCriteria: actualGoal.goalAsCriteria
@@ -708,7 +717,7 @@ export const goal = router({
                             subject: 'criteria',
                             action: nowIsCompleted ? 'complete' : 'uncomplete',
                             nextValue: actualGoal.goalAsCriteria.id,
-                            activityId: ctx.session.user.activityId,
+                            activityId,
                         },
                     }),
                 );
@@ -748,6 +757,8 @@ export const goal = router({
     createComment: protectedProcedure.input(goalCommentCreateSchema).mutation(async ({ ctx, input }) => {
         if (!input.goalId) return null;
 
+        const { activityId, role } = ctx.session.user;
+
         const [commentAuthor, actualGoal, pushState] = await Promise.all([
             prisma.activity.findUnique({
                 where: { id: ctx.session.user.activityId },
@@ -771,7 +782,7 @@ export const goal = router({
         if (!commentAuthor) return null;
         if (!actualGoal) return null;
 
-        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, ctx.session.user.activityId);
+        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
 
         try {
             // We want to see state changes record and comment next in activity feed.
@@ -797,7 +808,7 @@ export const goal = router({
                                           action: 'change',
                                           previousValue: actualGoal.stateId,
                                           nextValue: input.stateId,
-                                          activityId: ctx.session.user.activityId,
+                                          activityId,
                                       },
                                   }
                                 : undefined,
