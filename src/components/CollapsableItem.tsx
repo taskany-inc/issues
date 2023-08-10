@@ -81,7 +81,7 @@ const CollapsableItemContent = styled.div<{
     }
 `;
 
-const CollapsableItemContainer = styled.div<{ isSubTree: boolean; border: 'center' | 'hidden' }>`
+const CollapsableItemContainer = styled.div<{ isSubTree: boolean; subTreeBorder: 'center' | 'hidden' }>`
     position: relative;
     margin-left: -${collapseOffset}px;
     padding-left: ${collapseOffset}px;
@@ -93,13 +93,13 @@ const CollapsableItemContainer = styled.div<{ isSubTree: boolean; border: 'cente
         left: ${-collapseOffset / 2}px;
     }
 
-    ${({ isSubTree, border }) =>
+    ${({ isSubTree, subTreeBorder }) =>
         isSubTree &&
         `   
             margin-left: 0px;
 
             &:after {
-                ${border !== 'hidden' && 'display: block;'};
+                ${subTreeBorder !== 'hidden' && 'display: block;'};
             }
 
             > ${CollapsableItemContent}:first-child:before {
@@ -123,19 +123,19 @@ export const getNodePosition = (index: number, max: number): NodePosition => {
 export const CollapsableItem: FC<{
     children?: ReactNode;
     position?: NodePosition;
-    nodes?: ReactNode | null;
+    nodes?: ReactNode[];
     collapsed: boolean;
     header: ReactNode;
     onClick?: () => void;
-}> = ({ children = [], collapsed, header, nodes, onClick, position = 'root' }) => {
-    const border = getBorderType(position, collapsed, !!nodes);
+}> = ({ children = [], collapsed, header, nodes = [], onClick, position = 'root' }) => {
+    const border = getBorderType(position, collapsed, !!nodes.length);
     const isSubTree = position !== 'root' && border === 'top';
 
     // CollapsableItemContent for children block has NO border if there are no other childs below
-    const contentBorder = (position === 'last-child' || position === 'root') && !nodes ? 'hidden' : 'center';
+    const contentBorder = (position === 'last-child' || position === 'root') && !nodes?.length ? 'hidden' : 'center';
 
     return (
-        <CollapsableItemContainer isSubTree={isSubTree} border={position === 'last-child' ? 'hidden' : 'center'}>
+        <CollapsableItemContainer isSubTree={isSubTree} subTreeBorder={position === 'last-child' ? 'hidden' : 'center'}>
             <CollapsableItemContent onClick={onClick} border={border}>
                 {border !== 'hidden' && <StyledDot />}
                 {isSubTree && <StyledParentDot />}

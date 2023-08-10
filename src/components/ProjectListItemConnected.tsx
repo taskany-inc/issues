@@ -62,24 +62,20 @@ export const ProjectListItemConnected: FC<{
             href={hasLink ? routes.project(project.id) : undefined}
             disabled={!project._count.children && !project._count.goals}
             position={position}
-            nodes={
-                childrenProjects.length
-                    ? childrenProjects.map((p, i) => (
-                          <ProjectListItemConnected
-                              key={p.id}
-                              hasLink
-                              project={p}
-                              position={getNodePosition(i, childrenProjects.length - 1)}
-                              queryState={queryState}
-                              deep={deep + 1}
-                              onTagClick={onTagClick}
-                              onClickProvider={onClickProvider}
-                              selectedResolver={selectedResolver}
-                              collapsed
-                          />
-                      ))
-                    : null
-            }
+            nodes={childrenProjects.map((p, i) => (
+                <ProjectListItemConnected
+                    key={p.id}
+                    hasLink
+                    project={p}
+                    position={getNodePosition(i, childrenProjects.length - 1)}
+                    queryState={queryState}
+                    deep={deep + 1}
+                    onTagClick={onTagClick}
+                    onClickProvider={onClickProvider}
+                    selectedResolver={selectedResolver}
+                    collapsed
+                />
+            ))}
             project={project}
             collapsed={collapsed}
             onClick={onClick}
