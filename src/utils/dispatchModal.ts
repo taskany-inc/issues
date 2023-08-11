@@ -12,6 +12,7 @@ export enum ModalEvent {
     FilterDeleteModal = 'FilterDeleteModal',
     FeedbackCreateModal = 'FeedbackCreateModal',
     WhatsNewModal = 'WhatsNewModal',
+    ImageFullScreen = 'ImageFullScreen',
 }
 
 export interface MapModalToComponentProps {
@@ -30,6 +31,10 @@ export interface MapModalToComponentProps {
     [ModalEvent.FilterDeleteModal]: unknown;
     [ModalEvent.FeedbackCreateModal]: unknown;
     [ModalEvent.WhatsNewModal]: unknown;
+    [ModalEvent.ImageFullScreen]: {
+        src: string;
+        alt?: string;
+    };
 }
 
 interface DispatchModalEvent {
