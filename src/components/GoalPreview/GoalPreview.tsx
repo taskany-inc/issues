@@ -45,8 +45,8 @@ import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm'
 import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
 import { CommentView } from '../CommentView/CommentView';
 
-import { tr } from './GoalPreview.i18n';
 import { useGoalPreview } from './GoalPreviewProvider';
+import { tr } from './GoalPreview.i18n';
 
 const Md = dynamic(() => import('../Md'));
 const StateSwitch = dynamic(() => import('../StateSwitch'));
@@ -95,7 +95,7 @@ const StyledCard = styled(Card)`
     min-height: 60px;
 `;
 
-export const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults, onClose, onDelete }) => {
+const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults, onClose, onDelete }) => {
     const { user } = usePageContext();
     const [isRelative, onDateViewTypeChange] = useClickSwitch();
 
