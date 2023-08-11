@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { useTheme } from 'next-themes';
@@ -18,9 +19,10 @@ import { GlobalStyle } from './GlobalStyle';
 import { PageHeader } from './PageHeader/PageHeader';
 import { PageFooter } from './PageFooter/PageFooter';
 import { ModalContext } from './ModalOnEvent';
+import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
 
-const GoalPreview = dynamic(() => import('./GoalPreview/GoalPreview'));
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
+const GoalPreview = dynamic(() => import('./GoalPreview/GoalPreview'));
 const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm/ProjectCreateForm'));
 const GoalCreateForm = dynamic(() => import('./GoalCreateForm/GoalCreateForm'));
 const UserInviteForm = dynamic(() => import('./UserInviteForm/UserInviteForm'));
@@ -59,12 +61,20 @@ export const PageActions = styled.div`
 const mapThemeOnId = { light: 0, dark: 1 } as const;
 
 export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children }) => {
+    const { setPreview } = useGoalPreview();
+
     useHotkeys();
 
     const { resolvedTheme } = useTheme();
     const theme = (
         user?.settings?.theme === 'system' ? resolvedTheme || 'dark' : user?.settings?.theme || 'light'
     ) as PageContext['theme'];
+
+    const router = useRouter();
+
+    useEffect(() => {
+        setPreview(null);
+    }, [router.asPath, setPreview]);
 
     return (
         <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], ssrTime }}>
