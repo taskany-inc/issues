@@ -55,3 +55,6 @@ next.config.original.js
 unsafe-prod-db-update.ts
 .release_bot
 background
+
+# local version
+public/version.txt
