@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.23.0](https://github.com/taskany-inc/issues/compare/v1.22.0...v1.23.0) (2023-08-11)
+
+
+### Features
+
+* **Md:** add fullscreen image ([c0de899](https://github.com/taskany-inc/issues/commit/c0de899a4ea02b8a5dad2b7254f9f39205e8de77))
+* support admin role ([a03d250](https://github.com/taskany-inc/issues/commit/a03d25063d0cfccf9d50fff7d197d41faead0611))
+
 ## [1.22.0](https://github.com/taskany-inc/issues/compare/v1.21.0...v1.22.0) (2023-08-10)
 
 
