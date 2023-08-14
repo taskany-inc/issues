@@ -16,6 +16,7 @@ import {
     ModalContent,
     Tag,
     KeyCode,
+    TagCleanButton,
 } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
@@ -115,7 +116,10 @@ const UserInviteForm: React.FC = () => {
                     {isValid ? (
                         <>
                             {emails.map((email) => (
-                                <Tag key={email} title={email} onHide={onEmailRemove(email)} />
+                                <Tag key={email}>
+                                    <TagCleanButton onClick={onEmailRemove(email)} />
+                                    {email}
+                                </Tag>
                             ))}
                         </>
                     ) : (

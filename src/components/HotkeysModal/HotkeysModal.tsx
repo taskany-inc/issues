@@ -68,7 +68,7 @@ const HotkeysModal = () => {
     }, [keyupListener]);
 
     return (
-        <Modal cross={false} visible={modalVisible}>
+        <Modal visible={modalVisible}>
             <ModalContent>
                 <StyledTitle size="xl" weight="bolder">
                     {tr('Available hotkeys')}

@@ -48,7 +48,7 @@ export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, 
                 <StyledIssueListItem className={className}>
                     {nullable(issue.state, (state) => (
                         <StyledDotWrapper size={size}>
-                            <StateDot {...state} size={size !== 'xs' ? 'm' : 's'} />
+                            <StateDot title={state.title} hue={state.hue} size={size !== 'xs' ? 'm' : 's'} />
                         </StyledDotWrapper>
                     ))}
                     <StyledIssueListItemTitle size={size} weight="bold" color="inherit">

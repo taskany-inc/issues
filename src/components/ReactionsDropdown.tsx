@@ -1,16 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import type { EmojiSelection, EmojiPicker } from 'picmo';
-import dynamic from 'next/dynamic';
 import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '@taskany/colors';
-import { EmojiIcon } from '@taskany/bricks';
+import { EmojiIcon, Popup } from '@taskany/bricks';
 
 import { PageContext } from '../utils/pageContext';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { ReactionsButton } from './ReactionsButton';
-
-const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 
 interface ReactionsDropdownProps {
     view?: 'button' | 'icon';

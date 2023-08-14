@@ -274,7 +274,9 @@ const HistoryTags: React.FC<{ tags: { title: string; id: string }[] }> = ({ tags
     return (
         <>
             {tags.map((item) => (
-                <Tag key={item.id} size="s" title={item.title} />
+                <Tag key={item.id} size="s">
+                    {item.title}
+                </Tag>
             ))}
         </>
     );
@@ -309,15 +311,15 @@ export const HistoryRecordTags: React.FC<HistoryChangeProps<TagData[]>> = ({ fro
 
 export const HistoryRecordEstimate: React.FC<HistoryChangeProps<Estimate>> = ({ from, to }) => (
     <HistorySimplifyRecord
-        from={from ? <Tag size="s" title={`${from.q}/${from.y}`} /> : null}
-        to={to ? <Tag size="s" title={`${to.q}/${to.y}`} /> : null}
+        from={from ? <Tag size="s">{`${from.q}/${from.y}`}</Tag> : null}
+        to={to ? <Tag size="s">{`${to.q}/${to.y}`}</Tag> : null}
     />
 );
 
 export const HistoryRecordProject: React.FC<HistoryChangeProps<Project>> = ({ from, to }) => (
     <HistorySimplifyRecord
-        from={from ? <Tag size="s" title={from.id} /> : null}
-        to={to ? <Tag size="s" title={to.id} /> : null}
+        from={from ? <Tag size="s">{from.id}</Tag> : null}
+        to={to ? <Tag size="s">{to.id}</Tag> : null}
     />
 );
 

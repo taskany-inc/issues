@@ -57,7 +57,7 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     }, [event, modalVisible]);
 
     return (
-        <Modal cross={false} view={view} visible={modalVisible} onShow={onShow} onClose={onModalClose}>
+        <Modal view={view} visible={modalVisible} onShow={onShow} onClose={onModalClose}>
             <ModalContext.Provider value={{ [event]: modalProps }}>{children}</ModalContext.Provider>
         </Modal>
     );
