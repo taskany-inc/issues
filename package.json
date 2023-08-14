@@ -80,7 +80,7 @@
     "@next/bundle-analyzer": "13.4.12",
     "@prisma/client": "4.16.2",
     "@statoscope/webpack-plugin": "5.26.2",
-    "@svgr/webpack": "7.0.0",
+    "@svgr/webpack": "8.0.1",
     "@types/cors": "2.8.13",
     "@types/jest": "29.5.3",
     "@types/markdown-it": "12.2.3",
