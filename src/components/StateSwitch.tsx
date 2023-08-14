@@ -1,15 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import dynamic from 'next/dynamic';
 import { gapM } from '@taskany/colors';
-import { KeyCode, useKeyPress, useKeyboard } from '@taskany/bricks';
+import { KeyCode, useKeyPress, useKeyboard, Popup } from '@taskany/bricks';
 import { StateType } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
 
 import { State } from './State';
-
-const Popup = dynamic(() => import('@taskany/bricks/components/Popup'));
 
 interface StateObject {
     id: string;

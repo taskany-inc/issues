@@ -1,5 +1,4 @@
-import { Form, KeyCode, QuestionIcon, nullable, useClickOutside, useKeyboard } from '@taskany/bricks';
-import Popup from '@taskany/bricks/components/Popup';
+import { Form, KeyCode, QuestionIcon, nullable, useClickOutside, useKeyboard, Popup } from '@taskany/bricks';
 import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import styled from 'styled-components';
 

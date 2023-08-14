@@ -86,7 +86,8 @@ interface ColumnRender {
     <T extends GoalListItemCompactProps>(props: RenderColumnProps<T>): React.ReactNode;
 }
 
-const StyledCell = styled(TableCell)<{ forIcon?: boolean }>`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledCell = styled(({ forIcon, ...props }: TableCellProps & { forIcon?: boolean }) => <TableCell {...props} />)`
     ${({ forIcon }) =>
         forIcon &&
         css`

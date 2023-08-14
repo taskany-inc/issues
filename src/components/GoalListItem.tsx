@@ -83,7 +83,7 @@ const GoalTitle = styled(Text)`
     overflow: hidden;
 `;
 
-const GoalTag = styled(TagItem)`
+const StyledGoalTag = styled(TagItem)`
     margin: calc(${gapXs} / 2) 0;
     margin-right: ${gapXs};
 
@@ -199,12 +199,13 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                     <GoalContentItem>
                         {tags?.map((tag) =>
                             nullable(tag, (t) => (
-                                <GoalTag
+                                <StyledGoalTag
                                     key={t.id}
-                                    title={t.title}
                                     description={t.description ?? undefined}
                                     onClick={onTagClick?.(t)}
-                                />
+                                >
+                                    {t.title}
+                                </StyledGoalTag>
                             )),
                         )}
                     </GoalContentItem>

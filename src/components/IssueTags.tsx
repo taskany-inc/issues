@@ -15,7 +15,9 @@ export const IssueTags: React.FC<IssueTagsProps> = ({ tags, size = 'm' }) => (
     <StyledIssueTags>
         {tags?.map((tag) =>
             nullable(tag, (t) => (
-                <Tag key={t.id} size={size} title={t.title} description={t.description ?? undefined} />
+                <Tag key={t.id} size={size} description={t.description ?? undefined}>
+                    {t.title}
+                </Tag>
             )),
         )}
     </StyledIssueTags>

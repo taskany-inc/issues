@@ -9,6 +9,7 @@ import {
     FormAction,
     ModalContent,
     Tag,
+    TagCleanButton,
     nullable,
     Button,
     FlowIcon,
@@ -235,7 +236,10 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         {tagsWatcher.length ? (
                             <>
                                 {tagsWatcher?.map((tag) => (
-                                    <Tag key={tag.id} title={tag.title} onHide={onTagDeleteProvider(tag)} />
+                                    <Tag key={tag.id}>
+                                        <TagCleanButton onClick={onTagDeleteProvider(tag)} />
+                                        {tag.title}
+                                    </Tag>
                                 ))}
                             </>
                         ) : (
