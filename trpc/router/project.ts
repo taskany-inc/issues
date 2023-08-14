@@ -139,6 +139,13 @@ export const project = router({
                     },
                 },
                 {
+                    stargizers: {
+                        some: {
+                            id: activityId,
+                        },
+                    },
+                },
+                {
                     // all projects / goals where the user is issuer
                     activityId,
                 },
@@ -159,41 +166,26 @@ export const project = router({
                 include: {
                     ...projectsSchema.include,
                     goals: {
+                        //  all goals with filters
                         where: {
-                            // all goals where the user is a participant / watcher / issuer / owner
-                            // with filters
-                            OR: requestSchema({ withOwner: true }),
                             AND: [input ? { ...goalsFilter(input, activityId).where } : {}],
                         },
-                        include: {
-                            ...goalDeepQuery,
-                        },
+                        include: goalDeepQuery,
                     },
                     _count: {
                         select: {
+                            // all goals without filters to count the total goals
                             goals: {
                                 where: {
-                                    // all goals where the user is a participant / watcher / issuer / owner
-                                    // without filters to count the total goals
-                                    OR: requestSchema({ withOwner: true }),
+                                    archived: false,
                                 },
                             },
                         },
                     },
                 },
                 where: {
-                    OR: [
-                        // all projects where the user is a participant / watcher / issuer
-                        ...requestSchema({ withOwner: false }),
-                        {
-                            goals: {
-                                some: {
-                                    // all goals where the user is a participant / watcher / issuer / owner
-                                    OR: requestSchema({ withOwner: true }),
-                                },
-                            },
-                        },
-                    ],
+                    // all projects where the user is a participant / watcher / issuer / stargizer
+                    OR: requestSchema({ withOwner: false }),
                 },
             })
             .then((res) => ({
