@@ -139,6 +139,7 @@ export const project = router({
                     },
                 },
                 {
+                    // all projects / goals where the user is a stargizer
                     stargizers: {
                         some: {
                             id: activityId,
@@ -184,8 +185,19 @@ export const project = router({
                     },
                 },
                 where: {
-                    // all projects where the user is a participant / watcher / issuer / stargizer
-                    OR: requestSchema({ withOwner: false }),
+                    OR: [
+                        // all projects where the user is a participant / watcher / issuer / stargizer
+                        ...requestSchema({ withOwner: false }),
+
+                        // all goals where the user is a participant / watcher / issuer / stargizer / owner
+                        {
+                            goals: {
+                                some: {
+                                    OR: requestSchema({ withOwner: true }),
+                                },
+                            },
+                        },
+                    ],
                 },
             })
             .then((res) => ({
