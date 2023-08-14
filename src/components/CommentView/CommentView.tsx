@@ -152,11 +152,13 @@ export const CommentView: FC<CommentViewProps> = ({
     const onCommentDoubleClick = useCallback<React.MouseEventHandler>((e) => {
         if (e.detail === 2) {
             setEditMode(true);
+            setFocused(true);
         }
     }, []);
 
     const onCommentSubmit = useCallback(
         async (form: CommentSchema) => {
+            setEditMode(false);
             setBusy(true);
             setFocused(false);
 
@@ -175,12 +177,22 @@ export const CommentView: FC<CommentViewProps> = ({
         [onSubmit, onChange, description],
     );
 
+    const onCommentCancel = useCallback(() => {
+        setEditMode(false);
+        setFocused(false);
+        setCommentDescription({ description });
+        onCancel?.();
+    }, [description, onCancel]);
+
     const dropdownItems = useMemo(
         () => [
             {
                 label: tr('Edit'),
                 icon: <EditIcon size="xxs" />,
-                onClick: () => setEditMode(true),
+                onClick: () => {
+                    setEditMode(true);
+                    setFocused(true);
+                },
             },
             {
                 label: tr('Delete'),
@@ -210,7 +222,7 @@ export const CommentView: FC<CommentViewProps> = ({
                     autoFocus
                     onChange={setCommentDescription}
                     onSubmit={onCommentSubmit}
-                    onCancel={onCancel}
+                    onCancel={onCommentCancel}
                     actionButton={
                         <Button
                             size="m"
