@@ -10,7 +10,7 @@ export const feedback = router({
             }
             const { name, email, image } = ctx.session.user;
             const userAgent = ctx.headers['user-agent'];
-            await fetch(process.env.FEEDBACK_URL, {
+            const res = await fetch(process.env.FEEDBACK_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -25,5 +25,6 @@ export const feedback = router({
                     avatarUrl: image,
                 }),
             });
+            return res;
         }),
 });

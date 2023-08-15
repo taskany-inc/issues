@@ -29,7 +29,7 @@ const FeedbackCreateForm: React.FC = () => {
     const onPending = useCallback(
         async (form: CreateFeedback) => {
             setFormBusy(true);
-            const [res] = await notifyPromise(
+            const res = await notifyPromise(
                 createMutation.mutateAsync({
                     title: form.title,
                     description: form.description,
