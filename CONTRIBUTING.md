@@ -60,16 +60,38 @@ Point your browser to http://localhost:3000 :tada:
 
 ### Testing and Linting
 
-To only run linting:
+#### Run linting
 
 ```sh
 npm run lint
 ```
 
-To only run tests:
+#### Run unit tests
 
 ```sh
 npm run test
+```
+
+#### Run e2e
+
+```sh
+npm run test:e2e
+```
+
+NB: dev server must be stopped.
+
+#### Run e2e with Cypress UI and watch mode
+
+In one terminal tab start environment:
+
+```sh
+npm run test:e2e
+```
+
+In another:
+
+```sh
+cypress open
 ```
 
 ### Docs
