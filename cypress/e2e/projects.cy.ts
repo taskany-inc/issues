@@ -12,7 +12,6 @@ import {
     projectSubmitButton,
     projectTitleInput,
 } from '../../src/utils/domObjects';
-import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 
@@ -31,6 +30,10 @@ describe('Projects', () => {
             // NB: no way to test in all locales, but this test runs via keyCode.
             // It means doesn't matter what letter on key. It must work.
             it('should open and close dialog via hotkey', () => {
+                /**
+                 * This is magic waiting.
+                 * If you press hokeys immediately nothing will happen.
+                 */
                 cy.wait(50);
                 cy.realPress('C').realPress('P');
 
@@ -63,7 +66,10 @@ describe('Projects', () => {
             it('should have clean fields', () => {
                 cy.get(projectTitleInput.query).should('have.value', '');
                 cy.get(projectDescriptionInput.query).should('have.value', '');
-                // screenshot
+                cy.get(projectCreateForm.query).matchImage({
+                    title: 'emptyForm',
+                    screenshotConfig: { padding: 40 },
+                });
             });
 
             it('should create project with recommended key', () => {
@@ -73,13 +79,15 @@ describe('Projects', () => {
 
                 cy.get(projectKeyPredictorHint.query).should('contain.text', `#${testProjectKey}-42`);
                 cy.get(projectKeyPredictorHint.query).should('contain.text', `#${testProjectKey}-911`);
-                // screenshot
+                cy.get(projectCreateForm.query).matchImage({
+                    title: 'keyPredictorHint',
+                    screenshotConfig: { padding: 40 },
+                });
 
                 cy.get(projectSubmitButton.query).click();
 
-                cy.url().should('equal', exactUrl(routes.project(testProjectKey)));
+                cy.exactUrl(routes.project(testProjectKey));
                 cy.get(projectCreateForm.query).should('not.exist');
-                // screenshot
             });
 
             it('should create project with custom key', () => {
@@ -88,20 +96,25 @@ describe('Projects', () => {
                 cy.get(projectKeyPredictor.query).click();
 
                 cy.get(projectKeyPredictorError.query).should('exist');
-                // screenshot
+                cy.get(projectCreateForm.query).matchImage({
+                    title: 'keyPredictorError',
+                    screenshotConfig: { padding: 40 },
+                });
 
                 cy.get(projectKeyPredictorInput.query).clear();
                 cy.get(projectKeyPredictorInput.query).type(customKey);
                 cy.wait(1);
                 cy.get(projectKeyPredictorHint.query).should('contain.text', `#${customKey}-42`);
                 cy.get(projectKeyPredictorHint.query).should('contain.text', `#${customKey}-911`);
-                // screenshot
+                cy.get(projectCreateForm.query).matchImage({
+                    title: 'customKeyHint',
+                    screenshotConfig: { padding: 40 },
+                });
 
                 cy.get(projectSubmitButton.query).click();
 
-                cy.url().should('equal', exactUrl(routes.project(customKey)));
+                cy.exactUrl(routes.project(customKey));
                 cy.get(projectCreateForm.query).should('not.exist');
-                // screenshot
             });
 
             it('not allows to create project with too short title', () => {
@@ -109,14 +122,15 @@ describe('Projects', () => {
                 cy.get(projectKeyPredictor.query).trigger('mouseover');
 
                 cy.get(projectKeyPredictorError.query).should('exist');
-                // screenshot
+                cy.get(projectCreateForm.query).matchImage({
+                    title: 'tooShortTitleError',
+                    screenshotConfig: { padding: 40 },
+                });
 
                 cy.get(projectSubmitButton.query).click();
 
                 cy.get(projectCreateForm.query).should('exist');
-                cy.url().should('equal', exactUrl(routes.index()));
-                // check field error
-                // screenshot
+                cy.exactUrl(routes.index());
             });
 
             it('not allows to create project with existing key', () => {
@@ -124,14 +138,17 @@ describe('Projects', () => {
                 cy.get(projectKeyPredictor.query).trigger('mouseover');
 
                 cy.get(projectKeyPredictorError.query).should('exist');
-                // incorrect info in error
-                // screenshot
+                // FIXME: https://github.com/taskany-inc/issues/issues/1535
+                cy.get(projectCreateForm.query).matchImage({
+                    title: 'projectAlreadyExistError',
+                    screenshotConfig: { padding: 40 },
+                });
 
+                // FIXME: https://github.com/taskany-inc/issues/issues/1534
                 cy.get(projectSubmitButton.query).click();
 
                 cy.get(projectCreateForm.query).should('exist');
-                cy.url().should('equal', exactUrl(routes.index()));
-                // screenshot
+                cy.exactUrl(routes.index());
             });
         });
     });
