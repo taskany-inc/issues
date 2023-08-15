@@ -169,7 +169,8 @@ export const project = router({
                     goals: {
                         //  all goals with filters
                         where: {
-                            AND: [input ? { ...goalsFilter(input, activityId).where } : {}],
+                            OR: requestSchema({ withOwner: true }),
+                            AND: [{ ...goalsFilter(input, activityId).where }],
                         },
                         include: goalDeepQuery,
                     },
@@ -178,6 +179,7 @@ export const project = router({
                             // all goals without filters to count the total goals
                             goals: {
                                 where: {
+                                    OR: requestSchema({ withOwner: true }),
                                     archived: false,
                                 },
                             },
@@ -222,6 +224,46 @@ export const project = router({
                     return acc;
                 }, 0),
             }));
+
+        const projectsMap: Record<string, (typeof res.groups)[number]['goals'][number][]> = {};
+
+        await prisma.goal
+            .findMany({
+                include: goalDeepQuery,
+                where: {
+                    archived: false,
+                    AND: [{ ...goalsFilter(input, activityId).where }],
+                    NOT: {
+                        OR: requestSchema({ withOwner: true }),
+                    },
+                    project: {
+                        OR: requestSchema({ withOwner: false }),
+                    },
+                },
+            })
+            .then((goals) => {
+                return goals.forEach((goal) => {
+                    if (goal.project) {
+                        if (projectsMap[goal.project.id]) {
+                            projectsMap[goal.project.id].push({
+                                ...goal,
+                                ...addCalclulatedGoalsFields(goal, activityId, role),
+                                _estimate: getEstimateListFormJoin(goal),
+                            });
+                        } else {
+                            projectsMap[goal.project.id] = [];
+                        }
+                    }
+                });
+            });
+
+        const { groups } = res;
+        groups.forEach((group) => {
+            if (projectsMap[group.project.id]) {
+                group.goals.push(...projectsMap[group.project.id]);
+                res.totalGoalsCount += projectsMap[group.project.id].length;
+            }
+        });
 
         return res;
     }),
