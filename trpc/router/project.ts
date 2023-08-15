@@ -158,6 +158,30 @@ export const project = router({
             ];
         };
 
+        const requestSchemaWithoutOwner = requestSchema({ withOwner: false });
+        const projectIds = await prisma.project.findMany({
+            where: {
+                OR: [
+                    ...requestSchemaWithoutOwner,
+                    {
+                        parent: {
+                            some: {
+                                OR: requestSchemaWithoutOwner,
+                            },
+                        },
+                    },
+                ],
+            },
+            select: {
+                id: true,
+            },
+        });
+        const projectIdsArray = projectIds.map(({ id }) => id);
+
+        const nonArchived = {
+            archived: false,
+        };
+
         const res = await prisma.project
             .findMany({
                 orderBy: {
@@ -168,7 +192,20 @@ export const project = router({
                     goals: {
                         //  all goals with filters
                         where: {
-                            AND: [input ? { ...goalsFilter(input, activityId).where } : {}],
+                            AND: [
+                                input ? { ...goalsFilter(input, activityId).where } : {},
+                                {
+                                    OR: [
+                                        ...requestSchema({ withOwner: true }),
+                                        {
+                                            projectId: {
+                                                in: projectIdsArray,
+                                            },
+                                        },
+                                    ],
+                                },
+                                nonArchived,
+                            ],
                         },
                         include: goalDeepQuery,
                     },
@@ -176,16 +213,32 @@ export const project = router({
                         select: {
                             // all goals without filters to count the total goals
                             goals: {
-                                where: {
-                                    archived: false,
-                                },
+                                where: nonArchived,
                             },
                         },
                     },
                 },
                 where: {
                     // all projects where the user is a participant / watcher / issuer / stargizer
-                    OR: requestSchema({ withOwner: false }),
+                    OR: [
+                        {
+                            id: {
+                                in: projectIdsArray,
+                            },
+                        },
+                        {
+                            goals: {
+                                some: {
+                                    AND: [
+                                        {
+                                            OR: requestSchema({ withOwner: true }),
+                                        },
+                                        nonArchived,
+                                    ],
+                                },
+                            },
+                        },
+                    ],
                 },
             })
             .then((res) => ({
