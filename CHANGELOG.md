@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.23.2](https://github.com/taskany-inc/issues/compare/v1.23.1...v1.23.2) (2023-08-15)
+
+
+### Bug Fixes
+
+* **CommentView:** correct hyphenation ([920f088](https://github.com/taskany-inc/issues/commit/920f08897639e4bb462f3de64f8334aececc94b7))
+* **Dashboard:** rewrite selects into two queries ([78e4cc1](https://github.com/taskany-inc/issues/commit/78e4cc1f97722202e55123592c8c9a90a4d0e7f2))
+
 ## [1.23.1](https://github.com/taskany-inc/issues/compare/v1.23.0...v1.23.1) (2023-08-14)
 
 
