@@ -6,7 +6,7 @@
     "prepare": "husky install",
     "lint": "next lint && eslint --ext .js,.ts,.tsx .",
     "type-check": "npx tsc",
-    "dev": "concurrently \"npm run dev:worker\" \"next dev\"",
+    "dev": "concurrently -k \"npm run dev:worker\" \"next dev\"",
     "dev:worker": "ts-node -r dotenv/config src/utils/worker/index.ts",
     "dev:db:init": "npx prisma migrate dev && npx prisma db seed",
     "dev:db:run": "docker-compose -f docker-compose.dev.yml up -d",
