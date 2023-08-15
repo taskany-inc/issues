@@ -3,6 +3,12 @@ import styled from 'styled-components';
 import { Button, Text, Input, KeyCode, useKeyboard, Popup } from '@taskany/bricks';
 
 import { keyPredictor } from '../utils/keyPredictor';
+import {
+    projectKeyPredictor,
+    projectKeyPredictorError,
+    projectKeyPredictorHint,
+    projectKeyPredictorInput,
+} from '../utils/domObjects';
 
 interface KeyInputProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -100,6 +106,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                         onBlur={onInputBlur}
                         tabIndex={tabIndex}
                         {...onENTER}
+                        {...projectKeyPredictorInput.attr}
                     />
                 ) : (
                     <StyledButton
@@ -113,6 +120,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                         onClick={onButtonClick}
                         onMouseEnter={onMouseEnter}
                         onMouseLeave={onMouseLeave}
+                        {...projectKeyPredictor.attr}
                     />
                 )}
             </span>
@@ -125,6 +133,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                 interactive
                 minWidth={200}
                 maxWidth={250}
+                {...(available === true && !error ? projectKeyPredictorHint.attr : projectKeyPredictorError.attr)}
             >
                 <Text size="s">{error?.message || tooltip}</Text>
             </Popup>

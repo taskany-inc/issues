@@ -2,6 +2,7 @@ import { FC, useCallback } from 'react';
 import { ArrowUpSmallIcon, Button, Dropdown, ArrowDownSmallIcon, MenuItem } from '@taskany/bricks';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { createFastButton, createGoalItem, createProjectItem, createSelectButton } from '../../utils/domObjects';
 
 import { tr } from './PageHeaderActionButton.i18n';
 
@@ -18,6 +19,7 @@ export const PageHeaderActionButton: FC = () => {
                 outline
                 brick="right"
                 onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                {...createFastButton.attr}
             />
             <Dropdown
                 onChange={onMenuItemClick}
@@ -25,10 +27,12 @@ export const PageHeaderActionButton: FC = () => {
                     {
                         title: tr('Create goal'),
                         event: ModalEvent.GoalCreateModal,
+                        attrs: createGoalItem.attr,
                     },
                     {
                         title: tr('Create project'),
                         event: ModalEvent.ProjectCreateModal,
+                        attrs: createProjectItem.attr,
                     },
                 ]}
                 renderTrigger={(props) => (
@@ -45,6 +49,7 @@ export const PageHeaderActionButton: FC = () => {
                         }
                         ref={props.ref}
                         onClick={props.onClick}
+                        {...createSelectButton.attr}
                     />
                 )}
                 renderItem={(props) => (
@@ -54,6 +59,7 @@ export const PageHeaderActionButton: FC = () => {
                         onClick={props.onClick}
                         view="primary"
                         ghost
+                        {...props.item.attrs}
                     >
                         {props.item.title}
                     </MenuItem>

@@ -39,7 +39,7 @@ interface PageProps {
     children?: React.ReactNode;
 }
 
-const StyledContent = styled.div`
+const StyledContent = styled.main`
     /* presses the footer to the bottom*/
     min-height: calc(100vh - 160px);
 `;

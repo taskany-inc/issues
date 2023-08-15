@@ -30,6 +30,13 @@ import { trpc } from '../../utils/trpcClient';
 import { ProjectCreate, projectCreateSchema } from '../../schema/project';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { HelpButton } from '../HelpButton/HelpButton';
+import {
+    projectCancelButton,
+    projectCreateForm,
+    projectDescriptionInput,
+    projectSubmitButton,
+    projectTitleInput,
+} from '../../utils/domObjects';
 
 import { tr } from './ProjectCreateForm.i18n';
 
@@ -155,7 +162,7 @@ const ProjectCreateForm: React.FC = () => {
     return (
         <>
             <ModalContent>
-                <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined}>
+                <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined} {...projectCreateForm.attr}>
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
@@ -164,6 +171,7 @@ const ProjectCreateForm: React.FC = () => {
                             brick="right"
                             disabled={busy}
                             error={errorsResolver('title')}
+                            {...projectTitleInput.attr}
                         />
 
                         {nullable(titleWatcher, () => (
@@ -195,6 +203,7 @@ const ProjectCreateForm: React.FC = () => {
                         disabled={busy}
                         placeholder={tr('Short description')}
                         error={errorsResolver('description')}
+                        {...projectDescriptionInput.attr}
                     />
 
                     <FormActions flat="top">
@@ -229,8 +238,16 @@ const ProjectCreateForm: React.FC = () => {
                                 outline
                                 text={tr('Cancel')}
                                 onClick={dispatchModalEvent(ModalEvent.ProjectCreateModal)}
+                                {...projectCancelButton.attr}
                             />
-                            <Button view="primary" outline disabled={busy} type="submit" text={tr('Create')} />
+                            <Button
+                                view="primary"
+                                outline
+                                disabled={busy}
+                                type="submit"
+                                text={tr('Create')}
+                                {...projectSubmitButton.attr}
+                            />
                         </FormAction>
                     </FormActions>
                 </Form>
