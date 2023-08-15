@@ -13,6 +13,7 @@ import {
 } from '@taskany/bricks';
 import { gapM } from '@taskany/colors';
 
+import { header } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
 import { routes, useRouter } from '../../hooks/router';
 import { PageHeaderActionButton } from '../PageHeaderActionButton/PageHeaderActionButton';
@@ -88,6 +89,7 @@ export const PageHeader: FC = () => {
                     </HeaderSearch>
                 </StyledHeaderNav>
             }
+            {...header.attr}
         >
             <HeaderContent>
                 <PageHeaderActionButton />
