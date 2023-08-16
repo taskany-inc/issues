@@ -43,6 +43,7 @@ const StyledTable = styled(Table)`
 
 const StyledTableRow = styled(GoalListItemCompact)`
     position: relative;
+    align-items: center;
 
     &:hover {
         & ${ContentItem} {
