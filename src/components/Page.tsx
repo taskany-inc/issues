@@ -30,7 +30,6 @@ const HotkeysModal = dynamic(() => import('./HotkeysModal/HotkeysModal'));
 const NotificationsHub = dynamic(() => import('./NotificationsHub/NotificationsHub'));
 const FeedbackCreateForm = dynamic(() => import('./FeedbackCreateForm/FeedbackCreateForm'));
 const WhatsNew = dynamic(() => import('./WhatsNew/WhatsNew'));
-const ImageFullScreen = dynamic(() => import('./ImageFullScreen'));
 
 interface PageProps {
     user: Session['user'];
@@ -116,12 +115,6 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
 
             <ModalOnEvent event={ModalEvent.FeedbackCreateModal}>
                 <FeedbackCreateForm />
-            </ModalOnEvent>
-
-            <ModalOnEvent event={ModalEvent.ImageFullScreen}>
-                <ModalContext.Consumer>
-                    {(ctx) => <ImageFullScreen {...ctx[ModalEvent.ImageFullScreen]} />}
-                </ModalContext.Consumer>
             </ModalOnEvent>
 
             <GoalPreview />

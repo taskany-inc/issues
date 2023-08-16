@@ -54,6 +54,7 @@ import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm'
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import CommentCreateForm from '../CommentCreateForm/CommentCreateForm';
 import { CommentView } from '../CommentView/CommentView';
+import { ModalContext } from '../ModalOnEvent';
 
 import { tr } from './GoalPage.i18n';
 
@@ -61,6 +62,7 @@ const StateSwitch = dynamic(() => import('../StateSwitch'));
 const Md = dynamic(() => import('../Md'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
+const ImageFullScreen = dynamic(() => import('../ImageFullScreen'));
 
 const IssueHeader = styled(PageContent)`
     display: grid;
@@ -518,6 +520,11 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
             {nullable(goal._isEditable, () => (
                 <GoalDeleteModal shortId={goal._shortId} onConfirm={onGoalDeleteConfirm} />
             ))}
+            <ModalOnEvent event={ModalEvent.ImageFullScreen}>
+                <ModalContext.Consumer>
+                    {(ctx) => <ImageFullScreen {...ctx[ModalEvent.ImageFullScreen]} />}
+                </ModalContext.Consumer>
+            </ModalOnEvent>
         </Page>
     );
 };
