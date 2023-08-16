@@ -44,6 +44,7 @@ import { State } from '../State';
 import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm';
 import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
 import { CommentView } from '../CommentView/CommentView';
+import { ModalContext } from '../ModalOnEvent';
 
 import { useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
@@ -53,6 +54,7 @@ const StateSwitch = dynamic(() => import('../StateSwitch'));
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
 const CommentCreateForm = dynamic(() => import('../CommentCreateForm/CommentCreateForm'));
+const ImageFullScreen = dynamic(() => import('../ImageFullScreen'));
 
 interface GoalPreviewProps {
     shortId: string;
@@ -400,6 +402,12 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                     </>
                 )),
             )}
+
+            <ModalOnEvent event={ModalEvent.ImageFullScreen}>
+                <ModalContext.Consumer>
+                    {(ctx) => <ImageFullScreen {...ctx[ModalEvent.ImageFullScreen]} />}
+                </ModalContext.Consumer>
+            </ModalOnEvent>
         </>
     );
 };
