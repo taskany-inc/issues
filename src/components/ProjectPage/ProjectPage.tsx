@@ -45,6 +45,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
         queryString,
         setPriorityFilter,
         setStateFilter,
+        setStateTypeFilter,
         setTagsFilter,
         setTagsFilterOutside,
         setEstimateFilter,
@@ -78,7 +79,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
         },
     );
 
-    const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
+    const shadowPreset = userFilters.data?.filter((f) => decodeURIComponent(f.params) === queryString)[0];
 
     const { preview, setPreview } = useGoalPreview();
 
@@ -156,10 +157,10 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
         <PageTitlePreset
             activityId={user.activityId}
             currentPresetActivityId={currentPreset?.activityId}
-            currentPresetActivityUserName={currentPreset?.activity.user?.name}
+            currentPresetActivityUserName={currentPreset?.activity?.user?.name}
             currentPresetTitle={currentPreset?.title}
             shadowPresetActivityId={shadowPreset?.activityId}
-            shadowPresetActivityUserName={shadowPreset?.activity.user?.name}
+            shadowPresetActivityUserName={shadowPreset?.activity?.user?.name}
             shadowPresetId={shadowPreset?.id}
             shadowPresetTitle={shadowPreset?.title}
             title={project.data?.title}
@@ -198,6 +199,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
                     onParticipantChange={setParticipantFilter}
                     onProjectChange={setProjectFilter}
                     onStateChange={setStateFilter}
+                    onStateTypeChange={setStateTypeFilter}
                     onTagChange={setTagsFilter}
                     onEstimateChange={setEstimateFilter}
                     onPriorityChange={setPriorityFilter}

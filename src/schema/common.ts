@@ -23,6 +23,7 @@ export const sortablePropertiesSchema = z
 export const queryWithFiltersSchema = z.object({
     priority: z.array(z.string()).optional(),
     state: z.array(z.string()).optional(),
+    stateType: z.array(z.string()).optional(),
     tag: z.array(z.string()).optional(),
     estimate: z.array(z.string()).optional(),
     issuer: z.array(z.string()).optional(),

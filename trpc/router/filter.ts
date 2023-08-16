@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
+import { defaultFilterAlias } from '../../src/utils/defaultFilterAlias';
 import { protectedProcedure, router } from '../trpcBackend';
 import { connectionMap } from '../queries/connections';
 import { createFilterSchema } from '../../src/schema/filter';
@@ -9,20 +10,29 @@ import { ToggleSubscriptionSchema } from '../../src/schema/common';
 
 export const filter = router({
     getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
-        const filter = await prisma.filter.findUnique({
-            where: {
-                id: input,
-            },
-            include: {
-                stargizers: true,
-                activity: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
+        const include = {
+            stargizers: true,
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
                 },
             },
-        });
+        };
+        const filter =
+            input === defaultFilterAlias
+                ? await prisma.filter.findFirst({
+                      where: {
+                          default: true,
+                      },
+                      include,
+                  })
+                : await prisma.filter.findUnique({
+                      where: {
+                          id: input,
+                      },
+                      include,
+                  });
 
         if (!filter) {
             throw new TRPCError({ code: 'NOT_FOUND', message: `No filter with id ${input}` });
@@ -48,6 +58,7 @@ export const filter = router({
                             },
                         },
                     },
+                    { mode: 'Global' },
                 ],
             },
             include: {

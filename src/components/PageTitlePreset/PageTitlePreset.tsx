@@ -6,10 +6,10 @@ import { tr } from './PageTitlePreset.i18n';
 
 interface PageTitlePresetProps {
     activityId: string;
-    currentPresetActivityId?: string;
+    currentPresetActivityId?: string | null;
     currentPresetActivityUserName?: string | null;
     currentPresetTitle?: string;
-    shadowPresetActivityId?: string;
+    shadowPresetActivityId?: string | null;
     shadowPresetActivityUserName?: string | null;
     shadowPresetId?: string;
     shadowPresetTitle?: string;
@@ -30,16 +30,23 @@ export const PageTitlePreset: React.FC<PageTitlePresetProps> = ({
     setPreset,
 }) => {
     const titleDefault = <PageTitle title={title} />;
+
     const presetInfo =
-        activityId !== currentPresetActivityId ? `${tr('created by')} ${currentPresetActivityUserName}` : undefined;
+        activityId !== currentPresetActivityId && currentPresetActivityUserName
+            ? `${tr('created by')} ${currentPresetActivityUserName}`
+            : undefined;
+
     const titlePreset = <PageTitle title={title} subtitle={currentPresetTitle} info={presetInfo} />;
 
     const shadowPresetInfo =
-        activityId !== shadowPresetActivityId ? `${tr('created by')} ${shadowPresetActivityUserName}` : undefined;
+        activityId !== shadowPresetActivityId && shadowPresetActivityUserName
+            ? `${tr('created by')} ${shadowPresetActivityUserName}`
+            : undefined;
 
     const onShadowPresetTitleClick = useCallback(() => {
         if (shadowPresetId) setPreset(shadowPresetId);
     }, [setPreset, shadowPresetId]);
+
     const titleShadow = (
         <PageTitle
             title={title}
@@ -48,6 +55,7 @@ export const PageTitlePreset: React.FC<PageTitlePresetProps> = ({
             onClick={onShadowPresetTitleClick}
         />
     );
+
     // eslint-disable-next-line no-nested-ternary
     return currentPresetTitle ? titlePreset : shadowPresetTitle ? titleShadow : titleDefault;
 };

@@ -466,6 +466,7 @@ export const project = router({
                         {
                             priority: [],
                             state: [],
+                            stateType: [],
                             tag: [],
                             estimate: [],
                             owner: [],

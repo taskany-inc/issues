@@ -1,7 +1,7 @@
 import { GoalsPage } from '../../components/GoalsPage/GoalsPage';
-import { filtersPanelSsrInit } from '../../components/FiltersPanel/FiltersPanel';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 import { parseFilterValues } from '../../hooks/useUrlFilterParams';
+import { filtersPanelSsrInit } from '../../utils/filters';
 
 const pageSize = 20;
 
