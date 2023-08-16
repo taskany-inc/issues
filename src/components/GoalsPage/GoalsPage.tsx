@@ -34,7 +34,6 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
-
     const presetData = trpc.filter.getById.useQuery(router.query.filter as string, { enabled: !!router.query.filter });
 
     const {
@@ -43,6 +42,7 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
         queryString,
         setPriorityFilter,
         setStateFilter,
+        setStateTypeFilter,
         setTagsFilter,
         setTagsFilterOutside,
         setEstimateFilter,
@@ -88,7 +88,10 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
         keepPreviousData: true,
         staleTime: refreshInterval,
     });
-    const shadowPreset = userFilters.data?.filter((f) => f.params === queryString)[0];
+
+    const shadowPreset = userFilters.data?.filter(
+        (f) => decodeURIComponent(f.params) === decodeURIComponent(queryString),
+    )[0];
 
     const { preview, setPreview } = useGoalPreview();
 
@@ -150,10 +153,10 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
         <PageTitlePreset
             activityId={user.activityId}
             currentPresetActivityId={currentPreset?.activityId}
-            currentPresetActivityUserName={currentPreset?.activity.user?.name}
+            currentPresetActivityUserName={currentPreset?.activity?.user?.name}
             currentPresetTitle={currentPreset?.title}
             shadowPresetActivityId={shadowPreset?.activityId}
-            shadowPresetActivityUserName={shadowPreset?.activity.user?.name}
+            shadowPresetActivityUserName={shadowPreset?.activity?.user?.name}
             shadowPresetId={shadowPreset?.id}
             shadowPresetTitle={shadowPreset?.title}
             title={tr('Goals')}
@@ -184,6 +187,7 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 onParticipantChange={setParticipantFilter}
                 onProjectChange={setProjectFilter}
                 onStateChange={setStateFilter}
+                onStateTypeChange={setStateTypeFilter}
                 onTagChange={setTagsFilter}
                 onEstimateChange={setEstimateFilter}
                 onPriorityChange={setPriorityFilter}

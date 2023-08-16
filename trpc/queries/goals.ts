@@ -6,6 +6,31 @@ const defaultOrderBy = {
     updatedAt: 'desc',
 };
 
+const getStateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['where'] => {
+    const state: Prisma.GoalFindManyArgs['where'] = {};
+    const stateTypes = (data.stateType?.filter((data) => data in StateType) || []) as StateType[];
+
+    if (!data.state?.length && !stateTypes.length) {
+        return {};
+    }
+
+    state.state = {};
+
+    if (stateTypes.length) {
+        state.state.type = {
+            in: stateTypes,
+        };
+    }
+
+    if (data.state?.length) {
+        state.state.id = {
+            in: data.state,
+        };
+    }
+
+    return state;
+};
+
 export const goalsFilter = (
     data: QueryWithFilters,
     activityId: string,
@@ -16,15 +41,7 @@ export const goalsFilter = (
 } => {
     const priorityFilter = data.priority?.length ? { priority: { in: data.priority } } : {};
 
-    const statesFilter: Prisma.GoalFindManyArgs['where'] = data.state?.length
-        ? {
-              state: {
-                  id: {
-                      in: data.state,
-                  },
-              },
-          }
-        : {};
+    const statesFilter: Prisma.GoalFindManyArgs['where'] = getStateFilter(data);
 
     const tagsFilter: Prisma.GoalFindManyArgs['where'] = data.tag?.length
         ? {

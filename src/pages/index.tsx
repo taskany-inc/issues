@@ -1,7 +1,7 @@
 import { DashboardPage } from '../components/DashboardPage/DashboardPage';
-import { filtersPanelSsrInit } from '../components/FiltersPanel/FiltersPanel';
 import { parseFilterValues } from '../hooks/useUrlFilterParams';
 import { declareSsrProps } from '../utils/declareSsrProps';
+import { filtersPanelSsrInit } from '../utils/filters';
 
 export const getServerSideProps = declareSsrProps(
     async (params) => {

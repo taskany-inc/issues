@@ -246,8 +246,9 @@ model Filter {
   title       String
   description String?
   params      String
-  activity    Activity   @relation(fields: [activityId], references: [id])
-  activityId  String
+  default     Boolean    @default(false)
+  activity    Activity?  @relation(fields: [activityId], references: [id])
+  activityId  String?
   stargizers  Activity[] @relation("filterStargizers")
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()

@@ -12,7 +12,8 @@ import {
     nullable,
 } from '@taskany/bricks';
 
-import { QueryState, parseFilterValues } from '../../hooks/useUrlFilterParams';
+import { filtersTakeCount } from '../../utils/filters';
+import { QueryState } from '../../hooks/useUrlFilterParams';
 import { SearchFilter } from '../SearchFilter';
 import { ProjectFilter } from '../ProjectFilter';
 import { TagFilter } from '../TagFilter';
@@ -25,14 +26,11 @@ import { StateFilter } from '../StateFilter';
 import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
 import { FilterById } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
-import { SSRProps } from '../../utils/declareSsrProps';
 import { SortFilter } from '../SortFilter/SortFilter';
 import { StarredFilter } from '../StarredFilter/StarredFilter';
 import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 
 import { tr } from './FiltersPanel.i18n';
-
-const take = 5;
 
 // disable refetchOnMount since we use filtersPanelSsrInit
 const useQueryOptionsRefetchOnMount = {
@@ -42,40 +40,6 @@ const useQueryOptionsRefetchOnMount = {
 const useQueryOptions = {
     ...useQueryOptionsRefetchOnMount,
     keepPreviousData: true,
-};
-
-export const filtersPanelSsrInit = async ({ query, ssrHelpers }: SSRProps) => {
-    const { owner, participant, issuer, project, tag } = parseFilterValues(query);
-
-    await Promise.all([
-        ssrHelpers.user.suggestions.fetch({
-            take,
-            query: '',
-            include: owner,
-        }),
-        ssrHelpers.user.suggestions.fetch({
-            take,
-            query: '',
-            include: participant,
-        }),
-        ssrHelpers.user.suggestions.fetch({
-            take,
-            query: '',
-            include: issuer,
-        }),
-        ssrHelpers.project.suggestions.fetch({
-            take,
-            query: '',
-            include: project,
-        }),
-        ssrHelpers.tag.suggestions.fetch({
-            take,
-            query: '',
-            include: tag,
-        }),
-        ssrHelpers.state.all.fetch(),
-        ssrHelpers.estimates.all.fetch(),
-    ]);
 };
 
 export const FiltersPanel: FC<{
@@ -91,7 +55,8 @@ export const FiltersPanel: FC<{
 
     onSearchChange: (search: string) => void;
     onPriorityChange: React.ComponentProps<typeof PriorityFilter>['onChange'];
-    onStateChange: React.ComponentProps<typeof StateFilter>['onChange'];
+    onStateChange: React.ComponentProps<typeof StateFilter>['onStateChange'];
+    onStateTypeChange: React.ComponentProps<typeof StateFilter>['onStateTypeChange'];
     onIssuerChange: React.ComponentProps<typeof UserFilter>['onChange'];
     onOwnerChange: React.ComponentProps<typeof UserFilter>['onChange'];
     onParticipantChange: React.ComponentProps<typeof UserFilter>['onChange'];
@@ -115,6 +80,7 @@ export const FiltersPanel: FC<{
     presets = [],
     onPriorityChange,
     onStateChange,
+    onStateTypeChange,
     onIssuerChange,
     onOwnerChange,
     onParticipantChange,
@@ -135,7 +101,7 @@ export const FiltersPanel: FC<{
         {
             query: ownersQuery,
             include: queryState.owner,
-            take,
+            take: filtersTakeCount,
         },
         useQueryOptions,
     );
@@ -146,7 +112,7 @@ export const FiltersPanel: FC<{
         {
             query: issuersQuery,
             include: queryState.issuer,
-            take,
+            take: filtersTakeCount,
         },
         useQueryOptions,
     );
@@ -157,7 +123,7 @@ export const FiltersPanel: FC<{
         {
             query: participantsQuery,
             include: queryState.participant,
-            take,
+            take: filtersTakeCount,
         },
         useQueryOptions,
     );
@@ -168,7 +134,7 @@ export const FiltersPanel: FC<{
         {
             query: projectsQuery,
             include: queryState.project,
-            take,
+            take: filtersTakeCount,
         },
         useQueryOptions,
     );
@@ -179,7 +145,7 @@ export const FiltersPanel: FC<{
         {
             query: tagsQuery,
             include: queryState.tag,
-            take,
+            take: filtersTakeCount,
         },
         useQueryOptions,
     );
@@ -206,8 +172,10 @@ export const FiltersPanel: FC<{
                             <StateFilter
                                 text={tr('State')}
                                 value={queryState.state}
+                                stateTypes={queryState.stateType}
                                 states={states}
-                                onChange={onStateChange}
+                                onStateChange={onStateChange}
+                                onStateTypeChange={onStateTypeChange}
                             />
                         )}
 
@@ -298,11 +266,12 @@ export const FiltersPanel: FC<{
                                 <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={onLimitChange} />
                             ))}
 
-                        {((Boolean(queryString) && !preset) || (preset && !preset._isOwner && !preset._isStarred)) && (
-                            <FiltersAction onClick={onFilterStar}>
-                                <StarIcon size="s" noWrap />
-                            </FiltersAction>
-                        )}
+                        {((Boolean(queryString) && !preset) || (preset && !preset._isOwner && !preset._isStarred)) &&
+                            !preset?.default && (
+                                <FiltersAction onClick={onFilterStar}>
+                                    <StarIcon size="s" noWrap />
+                                </FiltersAction>
+                            )}
 
                         {preset && (preset._isOwner || preset._isStarred) && (
                             <FiltersAction onClick={onFilterStar}>

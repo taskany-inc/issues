@@ -86,6 +86,14 @@ const adminPassword = process.env.ADMIN_PASSWORD || 'taskany';
                 states: true,
             },
         }),
+        prisma.filter.create({
+            data: {
+                mode: 'Global',
+                title: 'Default',
+                params: 'stateType=InProgress,NotStarted',
+                default: true,
+            },
+        }),
         prisma.user.create({
             data: {
                 email: adminEmail,

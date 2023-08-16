@@ -2,15 +2,16 @@ import { useRouter as NextRouter } from 'next/router';
 
 import { AvailableHelpPages } from '../types/help';
 import { TLocale } from '../utils/getLang';
+import { defaultFilterAlias } from '../utils/defaultFilterAlias';
 
 export const routes = {
-    index: () => '/',
+    index: () => `/?filter=${defaultFilterAlias}`,
 
-    projects: () => '/projects',
-    project: (id: string) => `/projects/${id}`,
+    projects: () => `/projects?filter=${defaultFilterAlias}`,
+    project: (id: string) => `/projects/${id}?filter=${defaultFilterAlias}`,
     projectSettings: (id: string) => `/projects/${id}/settings`,
 
-    goals: () => '/goals',
+    goals: () => `/goals?filter=${defaultFilterAlias}`,
     goal: (shortId: string) => `/goals/${shortId}`,
 
     signIn: () => '/api/auth/signin',
