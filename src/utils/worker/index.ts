@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import * as Sentry from '@sentry/nextjs';
 
 import { JobDataMap, JobKind, jobKind, jobState } from './create';
 import * as resolve from './resolve';
@@ -19,6 +20,10 @@ console.log('Worker started successfully');
                     priority: 'desc',
                 },
             });
+
+            if (jobs.length > 300) {
+                Sentry.captureMessage('Queue too long. Smth went wrong.');
+            }
 
             jobs.forEach(async (job) => {
                 if (job.state === jobState.completed) {
@@ -46,6 +51,15 @@ console.log('Worker started successfully');
                                         data: { state: jobState.scheduled, error: error?.message, retry },
                                     });
                                 }, retry * defaultJobDelay);
+                            } else {
+                                Sentry.captureException(error, {
+                                    fingerprint: ['worker', 'resolve', 'retry'],
+                                    extra: {
+                                        job,
+                                    },
+                                });
+
+                                await prisma.job.delete({ where: { id: job.id } });
                             }
                         }
                     }, job.delay || defaultJobDelay);
