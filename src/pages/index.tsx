@@ -1,20 +1,14 @@
 import { DashboardPage } from '../components/DashboardPage/DashboardPage';
-import { parseFilterValues } from '../hooks/useUrlFilterParams';
 import { declareSsrProps } from '../utils/declareSsrProps';
 import { filtersPanelSsrInit } from '../utils/filters';
 
 export const getServerSideProps = declareSsrProps(
     async (params) => {
-        filtersPanelSsrInit(params);
+        const queryState = await filtersPanelSsrInit(params);
 
-        const { query, ssrHelpers } = params;
-        const preset =
-            typeof query.filter === 'string' ? await ssrHelpers.filter.getById.fetch(query.filter) : undefined;
+        const { ssrHelpers } = params;
 
-        await ssrHelpers.filter.getUserFilters.fetch();
-        await ssrHelpers.project.getUserProjectsWithGoals.fetch(
-            parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
-        );
+        await ssrHelpers.project.getUserProjectsWithGoals.fetch(queryState);
     },
     {
         private: true,

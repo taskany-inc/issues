@@ -20,6 +20,7 @@ import { CommonHeader } from '../CommonHeader';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { routes } from '../../hooks/router';
+import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -32,10 +33,8 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
-    const preset = trpc.filter.getById.useQuery(String(nextRouter.query.filter), {
-        enabled: Boolean(nextRouter.query.filter),
-    });
-    const userFilters = trpc.filter.getUserFilters.useQuery();
+
+    const { preset, shadowPreset, userFilters } = useFiltersPreset();
 
     const {
         currentPreset,
@@ -58,7 +57,7 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset: preset?.data,
+        preset,
     });
 
     const { setPreview, preview } = useGoalPreview();
@@ -69,10 +68,6 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     });
 
     const tabsMenuOptions: Array<[string, string]> = [[tr('Goals'), routes.projects()]];
-
-    const shadowPreset = userFilters.data?.filter(
-        (f) => decodeURIComponent(f.params) === decodeURIComponent(queryString),
-    )[0];
 
     const onGoalPrewiewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
@@ -166,7 +161,7 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 queryState={queryState}
                 queryString={queryString}
                 preset={currentPreset}
-                presets={userFilters.data}
+                presets={userFilters}
                 onSearchChange={setFulltextFilter}
                 onIssuerChange={setIssuerFilter}
                 onOwnerChange={setOwnerFilter}
@@ -183,7 +178,7 @@ export const ProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 onFilterStar={onFilterStar}
                 onSortChange={setSortFilter}
             >
-                {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
+                {(Boolean(queryString) || preset) && <Button text={tr('Reset')} onClick={resetQueryState} />}
             </FiltersPanel>
 
             <PageContent>

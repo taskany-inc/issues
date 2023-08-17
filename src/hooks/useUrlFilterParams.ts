@@ -6,6 +6,10 @@ import { Tag } from '@prisma/client';
 import { FilterById } from '../../trpc/inferredTypes';
 import { SortDirection, SortableProps } from '../components/SortFilter/SortFilter';
 
+import { useCookies } from './useCookies';
+
+export const filtersNoSearchPresetCookie = 'takany.NoSearchPreset';
+
 // TODO: replace it with QueryWithFilters from schema/common
 export interface QueryState {
     priority: string[];
@@ -91,6 +95,8 @@ const buildURLSearchParams = ({
     return urlParams;
 };
 
+export const isFilterStateEmpty = (state: QueryState): boolean => !Array.from(buildURLSearchParams(state)).length;
+
 export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     priority: parseQueryParam(query.priority?.toString()),
     state: parseQueryParam(query.state?.toString()),
@@ -110,6 +116,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
 
 export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
+    const { setCookie } = useCookies();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
     const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
@@ -125,10 +132,15 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         (queryState: QueryState) => {
             const newurl = router.asPath.split('?')[0];
             const urlParams = buildURLSearchParams(queryState);
+            const isEmptySearch = !Array.from(urlParams.keys()).length;
 
-            router.push(Array.from(urlParams.keys()).length ? `${newurl}?${urlParams}` : newurl);
+            if (isEmptySearch) {
+                setCookie(filtersNoSearchPresetCookie, true);
+            }
+
+            router.push(!isEmptySearch ? `${newurl}?${urlParams}` : newurl);
         },
-        [router],
+        [router, setCookie],
     );
 
     const pushStateProvider = useMemo(() => {

@@ -12,6 +12,7 @@ import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType, GoalBatchReturnType } from '../../../trpc/inferredTypes';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../hooks/useFilterResource';
+import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
@@ -34,7 +35,8 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
-    const presetData = trpc.filter.getById.useQuery(router.query.filter as string, { enabled: !!router.query.filter });
+
+    const { preset, shadowPreset, userFilters } = useFiltersPreset();
 
     const {
         currentPreset,
@@ -57,7 +59,7 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset: presetData?.data,
+        preset,
     });
 
     const [, setPage] = useState(0);
@@ -84,14 +86,6 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
         [pages],
     );
     const meta = data?.pages?.[0].meta;
-    const userFilters = trpc.filter.getUserFilters.useQuery(undefined, {
-        keepPreviousData: true,
-        staleTime: refreshInterval,
-    });
-
-    const shadowPreset = userFilters.data?.filter(
-        (f) => decodeURIComponent(f.params) === decodeURIComponent(queryString),
-    )[0];
 
     const { preview, setPreview } = useGoalPreview();
 
@@ -180,7 +174,7 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 queryState={queryState}
                 queryString={queryString}
                 preset={currentPreset}
-                presets={userFilters.data}
+                presets={userFilters}
                 onSearchChange={setFulltextFilter}
                 onIssuerChange={setIssuerFilter}
                 onOwnerChange={setOwnerFilter}
@@ -197,7 +191,7 @@ export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 onFilterStar={onFilterStar}
                 onSortChange={setSortFilter}
             >
-                {nullable(queryString, () => (
+                {nullable(queryString || preset, () => (
                     <Button text={tr('Reset')} onClick={resetQueryState} />
                 ))}
             </FiltersPanel>

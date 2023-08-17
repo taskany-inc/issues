@@ -2,37 +2,29 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
-import { defaultFilterAlias } from '../../src/utils/defaultFilterAlias';
 import { protectedProcedure, router } from '../trpcBackend';
 import { connectionMap } from '../queries/connections';
 import { createFilterSchema } from '../../src/schema/filter';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 
+const fitlerIncludeSchema = {
+    stargizers: true,
+    activity: {
+        include: {
+            user: true,
+            ghost: true,
+        },
+    },
+};
+
 export const filter = router({
     getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
-        const include = {
-            stargizers: true,
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
+        const filter = await prisma.filter.findUnique({
+            where: {
+                id: input,
             },
-        };
-        const filter =
-            input === defaultFilterAlias
-                ? await prisma.filter.findFirst({
-                      where: {
-                          default: true,
-                      },
-                      include,
-                  })
-                : await prisma.filter.findUnique({
-                      where: {
-                          id: input,
-                      },
-                      include,
-                  });
+            include: fitlerIncludeSchema,
+        });
 
         if (!filter) {
             throw new TRPCError({ code: 'NOT_FOUND', message: `No filter with id ${input}` });
@@ -43,6 +35,26 @@ export const filter = router({
             _isOwner: filter.activityId === ctx.session.user.activityId,
             _isStarred: filter.stargizers.some((stargizer) => stargizer.id === ctx.session.user.activityId),
         };
+    }),
+    getDefaultFilter: protectedProcedure.query(async ({ ctx }) => {
+        const filter = await prisma.filter.findFirst({
+            where: {
+                default: true,
+            },
+            include: fitlerIncludeSchema,
+        });
+
+        if (!filter) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'No default filters' });
+        }
+
+        return {
+            ...filter,
+            _isOwner: false,
+            _isStarred: filter.stargizers.some((stargizer) => stargizer.id === ctx.session.user.activityId),
+        };
+
+        return;
     }),
     getUserFilters: protectedProcedure.query(({ ctx }) => {
         const { activityId } = ctx.session.user;
