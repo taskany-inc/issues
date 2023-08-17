@@ -17,6 +17,7 @@ import { Page, PageContent } from '../Page';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
+import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
@@ -34,10 +35,8 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
-    const preset = trpc.filter.getById.useQuery(String(nextRouter.query.filter), {
-        enabled: Boolean(nextRouter.query.filter),
-    });
-    const userFilters = trpc.filter.getUserFilters.useQuery();
+
+    const { preset, shadowPreset, userFilters } = useFiltersPreset();
 
     const {
         currentPreset,
@@ -60,7 +59,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset: preset?.data,
+        preset,
     });
 
     const project = trpc.project.getById.useQuery({
@@ -78,8 +77,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
             staleTime: refreshInterval,
         },
     );
-
-    const shadowPreset = userFilters.data?.filter((f) => decodeURIComponent(f.params) === queryString)[0];
 
     const { preview, setPreview } = useGoalPreview();
 
@@ -192,7 +189,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
                     queryState={queryState}
                     queryString={queryString}
                     preset={currentPreset}
-                    presets={userFilters.data}
+                    presets={userFilters}
                     onSearchChange={setFulltextFilter}
                     onIssuerChange={setIssuerFilter}
                     onOwnerChange={setOwnerFilter}
@@ -209,7 +206,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps
                     onFilterStar={onFilterStar}
                     onSortChange={setSortFilter}
                 >
-                    {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
+                    {(Boolean(queryString) || preset) && <Button text={tr('Reset')} onClick={resetQueryState} />}
                 </FiltersPanel>
 
                 <PageContent>

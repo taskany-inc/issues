@@ -73,6 +73,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                 ...resProps,
                 locale,
                 params: params as Record<string, string>,
+                cookies: req.cookies,
                 user: session ? session.user : null,
                 ssrTime,
                 trpcState: ssrHelpers.dehydrate(),

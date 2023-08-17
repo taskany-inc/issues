@@ -14,6 +14,7 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../hooks/useFilterResource';
+import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { routes } from '../../hooks/router';
 import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
@@ -44,7 +45,7 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
 
     const utils = trpc.useContext();
 
-    const presetData = trpc.filter.getById.useQuery(router.query.filter as string, { enabled: !!router.query.filter });
+    const { preset, shadowPreset, userFilters } = useFiltersPreset();
 
     const {
         currentPreset,
@@ -67,18 +68,13 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
         resetQueryState,
         setPreset,
     } = useUrlFilterParams({
-        preset: presetData?.data,
+        preset,
     });
 
     const { data, isLoading } = trpc.project.getUserProjectsWithGoals.useQuery(queryState, {
         keepPreviousData: true,
         staleTime: refreshInterval,
     });
-
-    const userFilters = trpc.filter.getUserFilters.useQuery();
-    const shadowPreset = userFilters.data?.filter(
-        (f) => decodeURIComponent(f.params) === decodeURIComponent(queryString),
-    )[0];
 
     const groups = data?.groups;
     const goals = groups?.flatMap((group) => group.goals);
@@ -170,7 +166,7 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                 queryState={queryState}
                 queryString={queryString}
                 preset={currentPreset}
-                presets={userFilters.data}
+                presets={userFilters}
                 onSearchChange={setFulltextFilter}
                 onIssuerChange={setIssuerFilter}
                 onOwnerChange={setOwnerFilter}
@@ -187,7 +183,7 @@ export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
                 onFilterStar={onFilterStar}
                 onSortChange={setSortFilter}
             >
-                {Boolean(queryString) && <Button text={tr('Reset')} onClick={resetQueryState} />}
+                {(Boolean(queryString) || preset) && <Button text={tr('Reset')} onClick={resetQueryState} />}
             </FiltersPanel>
 
             <PageContent>

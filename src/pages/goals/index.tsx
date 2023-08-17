@@ -1,25 +1,19 @@
 import { GoalsPage } from '../../components/GoalsPage/GoalsPage';
 import { declareSsrProps } from '../../utils/declareSsrProps';
-import { parseFilterValues } from '../../hooks/useUrlFilterParams';
 import { filtersPanelSsrInit } from '../../utils/filters';
 
 const pageSize = 20;
 
 export const getServerSideProps = declareSsrProps(
     async (props) => {
-        filtersPanelSsrInit(props);
+        const { ssrHelpers } = props;
 
-        const { query, ssrHelpers } = props;
-
-        const preset =
-            typeof query.filter === 'string' ? await ssrHelpers.filter.getById.fetch(query.filter) : undefined;
+        const queryState = await filtersPanelSsrInit(props);
 
         await ssrHelpers.goal.getBatch.fetchInfinite({
             limit: pageSize,
-            query: parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
+            query: queryState,
         });
-
-        await ssrHelpers.filter.getUserFilters.fetch();
     },
     {
         private: true,
