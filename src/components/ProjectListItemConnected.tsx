@@ -28,7 +28,7 @@ export const ProjectListItemConnected: FC<{
     deep = 0,
     collapsed: defaultCollapsed = false,
 }) => {
-    const [collapsed, setIsCollapsed] = useState(defaultCollapsed);
+    const [collapsed, setIsCollapsed] = useState(() => defaultCollapsed);
 
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
@@ -54,6 +54,8 @@ export const ProjectListItemConnected: FC<{
         setIsCollapsed((value) => !value);
     }, []);
 
+    const contentHidden = status === 'loading' || collapsed;
+
     return (
         <ProjectListItemCollapsable
             href={hasLink ? routes.project(project.id) : undefined}
@@ -64,7 +66,6 @@ export const ProjectListItemConnected: FC<{
                     updatedAt={g.updatedAt}
                     id={g.id}
                     shortId={g._shortId}
-                    projectId={g.projectId}
                     state={g.state}
                     title={g.title}
                     issuer={g.activity}
@@ -81,13 +82,15 @@ export const ProjectListItemConnected: FC<{
                     focused={selectedResolver?.(g.id)}
                     onClick={onClickProvider?.(g as NonNullable<GoalByIdReturnType>)}
                     onTagClick={onTagClick}
+                    // if current project haven't child projects need to decrease deep for correct view in tree
+                    deep={(project.children.length || 0) === 0 ? deep - 1 : deep}
                 />
             ))}
             project={project}
-            collapsed={collapsed}
+            projectChidlsLen={project.children.length || 0}
             onClick={onClick}
-            loading={status === 'loading'}
             deep={deep}
+            contentHidden={contentHidden}
         >
             {childrenProjects.map((p) => (
                 <ProjectListItemConnected

@@ -2,7 +2,7 @@
 import React, { MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { nullable, Button } from '@taskany/bricks';
+import { nullable, Button, Table } from '@taskany/bricks';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -16,7 +16,7 @@ import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
-import { GoalListItem, GoalsListContainer } from '../GoalListItem';
+import { GoalListItem } from '../GoalListItem';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { Nullish } from '../../types/void';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
@@ -202,7 +202,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
             </FiltersPanel>
 
             <PageContent>
-                <GoalsListContainer>
+                <Table>
                     {goalsOnScreen?.map((g) => (
                         <GoalListItem
                             createdAt={g.createdAt}
@@ -228,7 +228,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                             onTagClick={setTagsFilterOutside}
                         />
                     ))}
-                </GoalsListContainer>
+                </Table>
 
                 <LoadMoreButton onClick={onFetchNextPage} />
             </PageContent>

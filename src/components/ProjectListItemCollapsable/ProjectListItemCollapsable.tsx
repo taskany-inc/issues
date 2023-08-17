@@ -1,16 +1,16 @@
-import React, { MouseEvent, ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { gapXs, gray4, radiusM } from '@taskany/colors';
-import { Text, nullable } from '@taskany/bricks';
+import { Table, Text, nullable } from '@taskany/bricks';
 import { IconServersOutline } from '@taskany/icons';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
-import { GoalsListContainer } from '../GoalListItem';
-import { CollapsableItem, CollapsableContentItem, collapseOffset } from '../CollapsableItem';
-import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
+import { CollapsableItem, CollapsableContentItem } from '../CollapsableItem';
+import { ProjectListItem } from '../ProjectListItem';
+import { WrappedRowLink } from '../WrappedRowLink';
 
-const StyledGoalsListContainer = styled(GoalsListContainer)`
+const StyledGoalsListContainer = styled(Table)<{ children?: React.ReactNode }>`
     background-color: ${gray4};
     border-radius: ${radiusM};
     margin: 0px;
@@ -28,14 +28,14 @@ interface ProjectListItemCollapsableProps {
     project: NonNullable<ProjectByIdReturnType>;
     disabled?: boolean;
     goals?: ReactNode;
-    children?: ReactNode;
-    collapsed: boolean;
+    children?: React.ReactNode;
     onClick?: () => void;
-    loading?: boolean;
+    contentHidden: boolean;
     deep?: number;
+    projectChidlsLen?: number;
 }
 
-const onProjectClickHandler = (e: MouseEvent) => {
+const onProjectClickHandler = (e: React.MouseEvent) => {
     if (!e.metaKey && !e.ctrlKey) {
         e.preventDefault();
     } else {
@@ -45,23 +45,27 @@ const onProjectClickHandler = (e: MouseEvent) => {
 
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
     project,
-    collapsed = true,
     onClick,
     children,
     goals,
-    loading = false,
     disabled,
+    contentHidden,
     deep = 0,
+    projectChidlsLen = 0,
     href,
 }) => {
-    const childsLength = project.children.length;
-    const contentHidden = collapsed || loading;
+    const calculatedDeep = useMemo(() => {
+        if (deep > 0) {
+            if (contentHidden || !projectChidlsLen) {
+                return deep - 1;
+            }
+        }
 
-    const offset = collapseOffset * (deep > 0 && contentHidden ? deep - 1 : deep);
+        return deep;
+    }, [deep, contentHidden, projectChidlsLen]);
 
     const projectComponent = (
         <ProjectListItem
-            as="a"
             title={project.title}
             owner={project.activity}
             participants={project.participants}
@@ -70,8 +74,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
             averageScore={project.averageScore}
             onClick={onProjectClickHandler}
             disabled={disabled}
+            deep={calculatedDeep}
         >
-            {nullable(childsLength, (c) => (
+            {nullable(projectChidlsLen, (c) => (
                 <StyledProjectIcons>
                     <IconServersOutline size="xs" />
                     <Text size="xs">{c}</Text>
@@ -84,27 +89,27 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         <CollapsableItem
             collapsed={contentHidden}
             onClick={disabled ? undefined : onClick}
-            hasChild={!!childsLength}
+            hasChild={projectChidlsLen > 0}
             header={
-                <ProjectListContainer offset={offset}>
+                <Table>
                     {href ? (
                         <NextLink href={href} passHref legacyBehavior>
-                            {projectComponent}
+                            <WrappedRowLink>{projectComponent}</WrappedRowLink>
                         </NextLink>
                     ) : (
                         projectComponent
                     )}
-                </ProjectListContainer>
+                </Table>
             }
             content={
                 <>
                     <CollapsableContentItem>
-                        <StyledGoalsListContainer offset={offset}>{goals}</StyledGoalsListContainer>
+                        <StyledGoalsListContainer>{goals}</StyledGoalsListContainer>
                     </CollapsableContentItem>
                     {children}
                 </>
             }
             deep={deep}
-        ></CollapsableItem>
+        />
     );
 };
