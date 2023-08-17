@@ -43,7 +43,6 @@ export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
                     updatedAt={g.updatedAt}
                     id={g.id}
                     shortId={g._shortId}
-                    projectId={g.projectId}
                     state={g.state}
                     title={g.title}
                     issuer={g.activity}

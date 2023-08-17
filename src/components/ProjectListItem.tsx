@@ -1,15 +1,28 @@
-import { FC, ReactNode, forwardRef } from 'react';
-import { CircleProgressBar, EyeIcon, StarFilledIcon, Text, nullable } from '@taskany/bricks';
-import styled from 'styled-components';
+import { ReactNode } from 'react';
+import styled, { css } from 'styled-components';
+import { CircleProgressBar, Text, nullable, TableCell, TableRowProps, TableRow } from '@taskany/bricks';
+import { textColor, gapS, radiusM } from '@taskany/colors';
+import { IconStarSolid, IconEyeOutline } from '@taskany/icons';
 
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 
-import { Table, TableCell, TableRow } from './Table';
 import { UserGroup } from './UserGroup';
+import { collapseOffset } from './CollapsableItem';
+
+const StyledTableRow = styled(TableRow)`
+    text-decoration: none;
+    color: ${textColor};
+    padding: ${gapS};
+    border-radius: ${radiusM};
+
+    ${({ interactive }) =>
+        interactive &&
+        css`
+            cursor: pointer;
+        `}
+`;
 
 interface ProjectListItemProps {
-    as?: 'a' | 'div';
-    href?: string;
     children?: ReactNode;
     title: string;
     owner?: ActivityByIdReturnType;
@@ -20,51 +33,66 @@ interface ProjectListItemProps {
     disabled?: boolean;
     averageScore: number | null;
     onClick?: (e: React.MouseEvent) => void;
+    deep?: number;
 }
 
-const StyledTitleCell = styled(TableCell)`
-    justify-content: space-between;
-`;
+// px
+const maxTitleColumnWidth = 400;
 
-export const ProjectListContainer: FC<{ children: ReactNode; offset?: number }> = ({ children, offset = 0 }) => (
-    <Table columns={6} offset={offset}>
-        {children}
-    </Table>
-);
+export const ProjectListItem: React.FC<ProjectListItemProps & TableRowProps> = ({
+    children,
+    title,
+    owner,
+    participants,
+    starred,
+    watching,
+    averageScore,
+    className,
+    onClick,
+    gap = 10,
+    align = 'center',
+    justify = 'start',
+    deep,
+}) => {
+    const titleColumnWidth = maxTitleColumnWidth - (deep ?? 0) * collapseOffset;
 
-export const ProjectListItem = forwardRef<HTMLDivElement, ProjectListItemProps>(
-    (
-        { as = 'div', children, title, owner, participants, starred, watching, averageScore, className, ...props },
-        ref,
-    ) => (
-        <TableRow as={as} className={className} ref={ref} {...props}>
-            <StyledTitleCell>
+    return (
+        <StyledTableRow className={className} gap={gap} align={align} justify={justify} onClick={onClick} interactive>
+            <TableCell width={titleColumnWidth} align="center" justify="between">
                 <Text size="l" weight="bold">
                     {title}
                 </Text>
                 {children}
-            </StyledTitleCell>
-
-            <TableCell>
-                {nullable(owner, (o) => (
+            </TableCell>
+            {nullable(owner, (o) => (
+                <TableCell min>
                     <UserGroup users={[o]} />
-                ))}
-            </TableCell>
+                </TableCell>
+            ))}
+            {nullable(participants, (p) =>
+                p.length ? (
+                    <TableCell col={1}>
+                        <UserGroup users={p} />
+                    </TableCell>
+                ) : null,
+            )}
+            {averageScore != null ? (
+                <TableCell min>
+                    <CircleProgressBar value={averageScore} size="m" />
+                </TableCell>
+            ) : null}
 
-            <TableCell>{nullable(participants, (p) => (p.length ? <UserGroup users={p} /> : null))}</TableCell>
-            <TableCell>{averageScore != null ? <CircleProgressBar value={averageScore} size="m" /> : null}</TableCell>
+            {nullable(starred, () => (
+                <TableCell min>
+                    <IconStarSolid size="s" color={textColor} />
+                </TableCell>
+            ))}
 
-            <TableCell>
-                {nullable(starred, () => (
-                    <StarFilledIcon size="s" />
-                ))}
-            </TableCell>
-
-            <TableCell>
-                {nullable(watching, () => (
-                    <EyeIcon size="s" />
-                ))}
-            </TableCell>
-        </TableRow>
-    ),
-);
+            {nullable(watching, () => (
+                <TableCell min>
+                    <IconEyeOutline size="s" color={textColor} />
+                </TableCell>
+            ))}
+        </StyledTableRow>
+    );
+};
