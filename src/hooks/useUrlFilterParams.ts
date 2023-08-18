@@ -135,7 +135,9 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             const isEmptySearch = !Array.from(urlParams.keys()).length;
 
             if (isEmptySearch) {
-                setCookie(filtersNoSearchPresetCookie, true);
+                setCookie(filtersNoSearchPresetCookie, true, {
+                    'max-age': 30,
+                });
             }
 
             router.push(!isEmptySearch ? `${newurl}?${urlParams}` : newurl);

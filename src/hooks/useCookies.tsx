@@ -55,7 +55,7 @@ const setCookie = (name: string, value: string | number | boolean, defaults: Coo
 
 const deleteCookie = (name: string) => {
     setCookie(name, '', {
-        'max-age': -1,
+        'max-age': -999,
     });
 };
 
