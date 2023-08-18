@@ -33,13 +33,6 @@ export const sqlGoalsFilter = (activityId: string, data?: QueryWithFilters) => {
         `
         : Prisma.empty;
 
-    const stateTypeFilter = Prisma.empty;
-    // const stateTypeFilter = data?.stateType?.length
-    //     ? Prisma.sql`
-    //         and g.state.type" in (${Prisma.join(data?.stateType)})
-    //     `
-    //     : Prisma.empty;
-
     const starredFilter = data?.starred
         ? Prisma.sql`
             and (ps."A" = ${activityId} or gs."B" = g.id)
@@ -79,7 +72,6 @@ export const sqlGoalsFilter = (activityId: string, data?: QueryWithFilters) => {
         ${issuerFilter}
         ${priorityFilter}
         ${stateFilter}
-        ${stateTypeFilter}
         ${starredFilter}
         ${watchingFilter}
         ${tagFilter}

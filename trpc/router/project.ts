@@ -1,4 +1,4 @@
-import { Activity, Prisma, Project, Role, User } from '@prisma/client';
+import { Activity, Prisma, Project, Role, StateType, User } from '@prisma/client';
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
 
@@ -275,8 +275,29 @@ export const project = router({
                 })
                 .optional(),
         )
-        .query(async ({ ctx, input: { goalsQuery } = {} }) => {
+        .query(async ({ ctx, input: { goalsQuery = {} } = {} }) => {
             const { activityId, role } = ctx.session.user;
+
+            const stateByTypes = goalsQuery?.stateType
+                ? await prisma.state.findMany({
+                      where: {
+                          type: {
+                              in: goalsQuery.stateType as StateType[],
+                          },
+                      },
+                  })
+                : [];
+
+            stateByTypes.forEach((state) => {
+                if (!goalsQuery.state) {
+                    goalsQuery.state = [];
+                }
+
+                if (!goalsQuery.state.includes(state.id)) {
+                    goalsQuery.state.push(state.id);
+                }
+            });
+
             const sqlFilters = sqlGoalsFilter(activityId, goalsQuery);
 
             const [projects, watchers, stargizers, projectsChildrenParent] = await Promise.all([
