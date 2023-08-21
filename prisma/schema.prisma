@@ -153,6 +153,7 @@ model Project {
   watchers     Activity[] @relation("projectWatchers")
   stargizers   Activity[] @relation("projectStargizers")
   averageScore Int?
+  archived     Boolean?   @default(false)
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt

@@ -200,3 +200,9 @@ export const goalCommentCreateSchema = goalCommentFormSchema.extend({
 });
 
 export type GoalCommentCreateSchema = z.infer<typeof goalCommentCreateSchema>;
+
+export const batchGoalByProjectIdSchema = z.object({
+    projectId: z.string(),
+});
+
+export type BatchGoalsByProjectIdSchema = z.infer<typeof batchGoalByProjectIdSchema>;

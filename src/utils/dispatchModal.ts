@@ -7,6 +7,7 @@ export enum ModalEvent {
     ProjectCreateModal = 'ProjectCreateModal',
     ProjectTransferModal = 'ProjectTransferModal',
     ProjectDeleteModal = 'ProjectDeleteModal',
+    ProjectCannotDeleteModal = 'ProjectCannotDeleteModal',
     UserInviteModal = 'UserInviteModal',
     FilterCreateModal = 'FilterCreateModal',
     FilterDeleteModal = 'FilterDeleteModal',
@@ -26,6 +27,7 @@ export interface MapModalToComponentProps {
     [ModalEvent.ProjectCreateModal]: unknown;
     [ModalEvent.ProjectTransferModal]: unknown;
     [ModalEvent.ProjectDeleteModal]: unknown;
+    [ModalEvent.ProjectCannotDeleteModal]: unknown;
     [ModalEvent.UserInviteModal]: unknown;
     [ModalEvent.FilterCreateModal]: unknown;
     [ModalEvent.FilterDeleteModal]: unknown;

@@ -6,6 +6,10 @@ const defaultOrderBy = {
     updatedAt: 'desc',
 };
 
+export const nonArchievedGoalsPartialQuery = {
+    archived: { not: true },
+};
+
 const getStateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['where'] => {
     const state: Prisma.GoalFindManyArgs['where'] = {};
     const stateTypes = (data.stateType?.filter((data) => data in StateType) || []) as StateType[];
@@ -213,7 +217,7 @@ export const goalsFilter = (
 
     return {
         where: {
-            archived: false,
+            ...nonArchievedGoalsPartialQuery,
             OR: [
                 {
                     title: {
@@ -358,6 +362,7 @@ export const goalDeepQuery = {
                 },
             },
         },
+        where: nonArchievedGoalsPartialQuery,
     },
     relatedTo: {
         include: {
@@ -376,6 +381,7 @@ export const goalDeepQuery = {
                 },
             },
         },
+        where: nonArchievedGoalsPartialQuery,
     },
     blocks: {
         include: {
@@ -394,6 +400,7 @@ export const goalDeepQuery = {
                 },
             },
         },
+        where: nonArchievedGoalsPartialQuery,
     },
     comments: {
         orderBy: {
@@ -472,6 +479,11 @@ export const calcAchievedWeight = (
 ): number => {
     const { achivedWithWeight, comletedWithoutWeight, anyWithoutWeight, allWeight } = list.reduce(
         (acc, value) => {
+            // `where` filter by `deleted` field doesn't work in *Many queries
+            if (value.deleted) {
+                return acc;
+            }
+
             acc.allWeight += value.weight;
 
             if (!value.weight) {

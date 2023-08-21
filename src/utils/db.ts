@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { GoalHistory, Comment, Activity, User, Goal, Role } from '@prisma/client';
+import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
@@ -338,5 +338,118 @@ export const updateGoalWithCalculatedWeight = async (goalId: string) => {
         });
     } catch (error: any) {
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', cause: error, message: error?.message });
+    }
+};
+
+export const updateLinkedGoalsByProject = async (projectId: string, activityId: string) => {
+    // current projects's goals
+    const goalIds = await prisma.goal.findMany({
+        where: {
+            projectId,
+            AND: {
+                archived: {
+                    not: true,
+                },
+            },
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    if (goalIds.length) {
+        try {
+            await prisma.$transaction(async (ctx) => {
+                // move all active goals to archive
+                const archiveGoals = ctx.goal.updateMany({
+                    where: {
+                        projectId,
+                        AND: {
+                            archived: { not: true },
+                        },
+                    },
+                    data: { archived: true },
+                });
+
+                // create history records for these goals
+                const createHistoryRecords = ctx.goalHistory.createMany({
+                    data: goalIds.map(({ id }) => ({
+                        subject: 'state',
+                        action: 'archive',
+                        activityId,
+                        nextValue: 'move to archive',
+                        goalId: id,
+                    })),
+                });
+
+                // mark criterias with these goals as deleted
+                const updateCriterias = ctx.goalAchieveCriteria.updateMany({
+                    where: {
+                        goalIdAsCriteria: {
+                            in: goalIds.map(({ id }) => id),
+                        },
+                    },
+                    data: { deleted: true },
+                });
+
+                await Promise.all([archiveGoals, createHistoryRecords, updateCriterias]);
+
+                // get all goals which current project's goals as criteria
+                const linkedGoalsWithCriteria = await ctx.goal.findMany({
+                    where: {
+                        goalAchiveCriteria: {
+                            some: {
+                                goalIdAsCriteria: { in: goalIds.map(({ id }) => id) },
+                            },
+                        },
+                    },
+                    select: {
+                        id: true,
+                        goalAchiveCriteria: {
+                            include: {
+                                goalAsCriteria: {
+                                    include: { state: true },
+                                },
+                            },
+                        },
+                    },
+                });
+
+                if (linkedGoalsWithCriteria.length) {
+                    const inFilter = Prisma.join(linkedGoalsWithCriteria.map(({ id }) => id));
+                    const values = Prisma.join(
+                        linkedGoalsWithCriteria.map((value) =>
+                            Prisma.join([value.id, calcAchievedWeight(value.goalAchiveCriteria)], ',', '(', ')'),
+                        ),
+                    );
+
+                    const tempTableValues = Prisma.sql`(VALUES${values}) AS criteria(goalId, score)`;
+                    const tempSelectScoreGoals = Prisma.sql`
+                        SELECT avg(g."completedCriteriaWeight") AS score, g."projectId" AS "projectId"
+                            FROM "Goal" AS g
+                            WHERE g.id IN (${inFilter}) AND g.archived IS NOT TRUE
+                            GROUP BY g."projectId"
+                    `;
+
+                    // update goal score after mark criteria as deleted
+                    await ctx.$executeRaw`
+                        UPDATE "Goal" AS goal
+                            SET "completedCriteriaWeight" = criteria.score
+                            FROM ${tempTableValues}
+                        WHERE goal.id = criteria.goalId;
+                    `;
+
+                    // recalc average affected projects score
+                    await ctx.$executeRaw`
+                        UPDATE "Project" AS project
+                            SET "averageScore" = goal."score"
+                            FROM (${tempSelectScoreGoals}) AS goal
+                            WHERE project.id = goal."projectId";
+                        `;
+                }
+            });
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', cause: error, message: error?.message });
+        }
     }
 };

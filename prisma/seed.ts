@@ -16,26 +16,22 @@ const adminPassword = process.env.ADMIN_PASSWORD || 'taskany';
         prisma.priority.createMany({
             data: [
                 {
-                    id: 4,
                     title: 'Highest',
                     value: 4,
                 },
                 {
-                    id: 3,
                     title: 'High',
                     value: 3,
                 },
                 {
-                    id: 2,
                     title: 'Medium',
                     value: 2,
                 },
                 {
-                    id: 1,
                     title: 'Low',
                     value: 1,
                 },
-            ],
+            ].reverse(),
         }),
         prisma.flow.create({
             data: {

@@ -5,7 +5,7 @@ type SubscribeNamespacesAction<T extends string> = NamespacedAction<T, 'Watch' |
 type Namespaces =
     | CUDNamespacedAction<'goals'>
     | CUDNamespacedAction<'comment'>
-    | NamespacedAction<'project', 'Transfer' | 'Create' | 'Update'>
+    | NamespacedAction<'project', 'Transfer' | 'Create' | 'Update' | 'Delete'>
     | NamespacedAction<'filter', 'Star' | 'Unstar' | 'Delete' | 'Create'>
     | SubscribeNamespacesAction<'project'>
     | SubscribeNamespacesAction<'goals'>
@@ -96,6 +96,10 @@ export const getNotificicationKeyMap = (key: keyof NotificationMap) => {
         projectWatch: {
             onSuccess: 'Voila! You are watcher now 🎉',
             onPending: 'We are calling owner',
+        },
+        projectDelete: {
+            onSuccess: 'Project removed',
+            onPending: 'We are deleting the project',
         },
         tagCreate: {
             onSuccess: 'Voila! Tag is here 🎉',

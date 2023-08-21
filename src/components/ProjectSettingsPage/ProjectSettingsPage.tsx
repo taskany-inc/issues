@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { ChangeEvent, useCallback, useState } from 'react';
+import styled from 'styled-components';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
@@ -17,6 +18,7 @@ import {
     ModalHeader,
     ModalContent,
 } from '@taskany/bricks';
+import { IconExclamationCircleSolid } from '@taskany/icons';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { PageSep } from '../PageSep';
@@ -32,10 +34,29 @@ import { UserComboBox } from '../UserComboBox';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectUpdate, projectUpdateSchema } from '../../schema/project';
 import { ActivityByIdReturnType, ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
+import { Tip } from '../Tip';
+import { TextList, TextListItem } from '../TextList';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
+
+const StyledTip = styled(Tip)`
+    display: flex;
+    align-items: center;
+    color: ${warn0};
+    padding: ${gapS} 0;
+    & span {
+        display: inline-flex;
+    }
+`;
+
+const StyledModalActions = styled.div`
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-end;
+`;
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
@@ -80,15 +101,22 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         [reset],
     );
 
-    const [deleteConfirmation, setDeleteConfirmation] = useState('');
+    const [keyConfirmation, setKeyConfirmation] = useState('');
+    const [transferTo, setTransferTo] = useState<NonNullable<ActivityByIdReturnType> | undefined>();
 
     const onConfirmationInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setDeleteConfirmation(e.currentTarget.value);
+        setKeyConfirmation(e.currentTarget.value);
     }, []);
 
     const onDeleteCancel = useCallback(() => {
-        setDeleteConfirmation('');
+        setKeyConfirmation('');
         dispatchModalEvent(ModalEvent.ProjectDeleteModal)();
+    }, []);
+
+    const onTransferCancel = useCallback(() => {
+        setKeyConfirmation('');
+        setTransferTo(undefined);
+        dispatchModalEvent(ModalEvent.ProjectTransferModal)();
     }, []);
 
     const onProjectDelete = useCallback(() => {
@@ -120,7 +148,15 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         setLastProjectCache,
     ]);
 
-    const [transferTo, setTransferTo] = useState<NonNullable<ActivityByIdReturnType> | undefined>();
+    const handleDeleteProjectBtnClick = useCallback(() => {
+        if (project.data?.children.length) {
+            dispatchModalEvent(ModalEvent.ProjectCannotDeleteModal)();
+            return;
+        }
+
+        dispatchModalEvent(ModalEvent.ProjectDeleteModal)();
+    }, [project.data?.children]);
+
     const onTransferToChange = useCallback((a: NonNullable<ActivityByIdReturnType>) => {
         setTransferTo(a);
     }, []);
@@ -224,14 +260,14 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                         <Form>
                             <Fieldset title={tr('Danger zone')} view="warning">
                                 <FormActions flat="top">
-                                    <FormAction left>
+                                    <FormAction left inline>
                                         <Text color={gray9} style={{ paddingLeft: gapS }}>
                                             {tr('Be careful — all data will be lost')}
                                         </Text>
                                     </FormAction>
                                     <FormAction right inline>
                                         <Button
-                                            onClick={dispatchModalEvent(ModalEvent.ProjectDeleteModal)}
+                                            onClick={handleDeleteProjectBtnClick}
                                             size="m"
                                             view="warning"
                                             text={tr('Delete project')}
@@ -265,9 +301,44 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     </ModalHeader>
 
                     <ModalContent>
+                        <SettingsCard view="warning">
+                            <TextList
+                                type="unordered"
+                                heading={
+                                    <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} noWrap />}>
+                                        <Text weight="bold" size="s" color={warn0}>
+                                            {tr('What happens when you delete a project')}
+                                        </Text>
+                                    </StyledTip>
+                                }
+                            >
+                                <TextListItem>
+                                    <Text size="s">{tr('All active goals will be archived')}</Text>
+                                </TextListItem>
+                                <TextListItem>
+                                    <Text size="s">{tr('Criteria as project goals will be removed')}</Text>
+                                </TextListItem>
+                                <TextListItem>
+                                    <Text size="s">
+                                        {tr(
+                                            'Criteria-affected goals will be recalculated as progress towards meeting the criteria',
+                                        )}
+                                    </Text>
+                                </TextListItem>
+                                <TextListItem>
+                                    <Text size="s">
+                                        {tr(
+                                            'For affected projects, average progress across all goals will be recalculated',
+                                        )}
+                                    </Text>
+                                </TextListItem>
+                            </TextList>
+                        </SettingsCard>
+                        <br />
                         <Text>
-                            {tr.raw('To confirm deleting project {project} please type project key below.', {
+                            {tr.raw('To confirm deleting project {project} please type project key {key} below.', {
                                 project: <b key={project.data.title}>{project.data.title}</b>,
+                                key: <b key={project.data.id}>{project.data.id}</b>,
                             })}
                         </Text>
 
@@ -276,7 +347,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                         <Form>
                             <FormInput
                                 flat="bottom"
-                                placeholder={project.data.id}
+                                placeholder={tr('Project key')}
                                 autoComplete="off"
                                 onChange={onConfirmationInputChange}
                             />
@@ -288,7 +359,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                     <Button
                                         size="m"
                                         view="warning"
-                                        disabled={deleteConfirmation !== project.data.id}
+                                        disabled={keyConfirmation !== project.data.id}
                                         onClick={deleteProject(onProjectDelete)}
                                         text={tr('Yes, delete it')}
                                     />
@@ -305,14 +376,24 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                     <ModalContent>
                         <Text>
-                            {tr.raw('To confirm transfering {project} ownership please select new owner below.', {
-                                project: <b key={project.data.title}>{project.data.title}</b>,
-                            })}
+                            {tr.raw(
+                                'To confirm transfering {project} ownership please type project key {key} and select new owner below.',
+                                {
+                                    project: <b key={project.data.title}>{project.data.title}</b>,
+                                    key: <b key={project.data.id}>{project.data.id}</b>,
+                                },
+                            )}
                         </Text>
 
                         <br />
 
                         <Form>
+                            <FormInput
+                                flat="bottom"
+                                placeholder={tr('Project key')}
+                                autoComplete="off"
+                                onChange={onConfirmationInputChange}
+                            />
                             <FormActions flat="top">
                                 <FormAction left>
                                     <UserComboBox
@@ -323,15 +404,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                     />
                                 </FormAction>
                                 <FormAction right inline>
-                                    <Button
-                                        size="m"
-                                        text={tr('Cancel')}
-                                        onClick={dispatchModalEvent(ModalEvent.ProjectTransferModal)}
-                                    />
+                                    <Button size="m" text={tr('Cancel')} onClick={onTransferCancel} />
                                     <Button
                                         size="m"
                                         view="warning"
-                                        disabled={!transferTo}
+                                        disabled={!transferTo || keyConfirmation !== project.data.id}
                                         onClick={
                                             transferTo
                                                 ? transferOwnership(onProjectTransferOwnership, transferTo.id)
@@ -342,6 +419,28 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 </FormAction>
                             </FormActions>
                         </Form>
+                    </ModalContent>
+                </ModalOnEvent>
+
+                <ModalOnEvent view="warn" event={ModalEvent.ProjectCannotDeleteModal}>
+                    <ModalHeader>
+                        <FormTitle color={warn0}>{tr('Cannot delete project now')}</FormTitle>
+                    </ModalHeader>
+                    <ModalContent>
+                        <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} noWrap />}>
+                            {tr('The project has child projects')}
+                        </StyledTip>
+                        <Text size="s">
+                            {tr('Before delete a project, you must move it to another project or delete')}
+                        </Text>
+                        <StyledModalActions>
+                            <Button
+                                size="m"
+                                view="warning"
+                                text={tr('Ok, got it')}
+                                onClick={dispatchModalEvent(ModalEvent.ProjectCannotDeleteModal)}
+                            />
+                        </StyledModalActions>
                     </ModalContent>
                 </ModalOnEvent>
             </ProjectPageLayout>
