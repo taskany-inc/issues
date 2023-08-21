@@ -55,6 +55,7 @@ import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import CommentCreateForm from '../CommentCreateForm/CommentCreateForm';
 import { CommentView } from '../CommentView/CommentView';
 import { ModalContext } from '../ModalOnEvent';
+import { useFMPMetric } from '../../utils/telemetry';
 
 import { tr } from './GoalPage.i18n';
 
@@ -112,6 +113,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     const { data: goal } = trpc.goal.getById.useQuery(id, {
         staleTime: refreshInterval,
     });
+
+    useFMPMetric(!!goal);
 
     const { project, activity: issuer, owner } = goal || {};
 

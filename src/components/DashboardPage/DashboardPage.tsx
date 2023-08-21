@@ -28,6 +28,7 @@ import { ProjectListContainer, ProjectListItem } from '../ProjectListItem';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { InlineTrigger } from '../InlineTrigger';
+import { useFMPMetric } from '../../utils/telemetry';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -75,6 +76,8 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         keepPreviousData: true,
         staleTime: refreshInterval,
     });
+
+    useFMPMetric(!!data);
 
     const groups = data?.groups;
     const goals = groups?.flatMap((group) => group.goals);
