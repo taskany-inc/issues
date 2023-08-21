@@ -82,7 +82,7 @@
     "@faker-js/faker": "7.6.0",
     "@jest/globals": "29.6.2",
     "@next/bundle-analyzer": "13.4.12",
-    "@prisma/client": "4.16.2",
+    "@prisma/client": "5.1.1",
     "@statoscope/webpack-plugin": "5.26.2",
     "@svgr/webpack": "8.1.0",
     "@types/cors": "2.8.13",
