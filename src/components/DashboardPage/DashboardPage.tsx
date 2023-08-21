@@ -39,13 +39,13 @@ const StyledInlineTriggerWrapper = styled.div`
     padding-left: ${gapSm};
 `;
 
-export const DashboardPage = ({ user, ssrTime }: ExternalPageProps) => {
+export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const router = useRouter();
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
 
-    const { preset, shadowPreset, userFilters } = useFiltersPreset();
+    const { preset, shadowPreset, userFilters } = useFiltersPreset({ defaultPresetFallback });
 
     const {
         currentPreset,
