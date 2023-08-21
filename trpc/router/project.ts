@@ -9,6 +9,7 @@ import {
     projectTransferOwnershipSchema,
     projectUpdateSchema,
     projectSuggestionsSchema,
+    projectDeleteSchema,
 } from '../../src/schema/project';
 import {
     addCalclulatedGoalsFields,
@@ -19,10 +20,11 @@ import {
 } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
-import { getProjectSchema } from '../queries/project';
+import { getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
 import { fillProject, sqlGoalsFilter } from '../queries/sqlProject';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { FieldDiff } from '../../src/types/common';
+import { updateLinkedGoalsByProject } from '../../src/utils/db';
 
 type WithId = { id: string };
 
@@ -50,68 +52,72 @@ export const addCalculatedProjectFields = <
 };
 
 export const project = router({
-    suggestions: protectedProcedure.input(projectSuggestionsSchema).query(({ input: { query, take = 5, include } }) => {
-        const includeInput = {
-            activity: {
-                include: {
-                    user: true,
-                },
-            },
-            flow: {
-                include: {
-                    states: true,
-                },
-            },
-        };
-
-        const where: Prisma.ProjectWhereInput = {
-            title: {
-                contains: query,
-                mode: 'insensitive',
-            },
-        };
-
-        if (include) {
-            where.id = {
-                notIn: include,
-            };
-        }
-
-        const requests = [
-            prisma.project.findMany({
-                take,
-                where: {
-                    title: {
-                        contains: query,
-                        mode: 'insensitive',
+    suggestions: protectedProcedure
+        .input(projectSuggestionsSchema)
+        .query(async ({ input: { query, take = 5, include } }) => {
+            const includeInput = {
+                activity: {
+                    include: {
+                        user: true,
                     },
-                    ...(include
-                        ? {
-                              id: {
-                                  notIn: include,
-                              },
-                          }
-                        : {}),
                 },
-                include: includeInput,
-            }),
-        ];
+                flow: {
+                    include: {
+                        states: true,
+                    },
+                },
+            };
 
-        if (include) {
-            requests.push(
+            const where: Prisma.ProjectWhereInput = {
+                title: {
+                    contains: query,
+                    mode: 'insensitive',
+                },
+            };
+
+            if (include) {
+                where.id = {
+                    notIn: include,
+                };
+            }
+
+            const requests = [
                 prisma.project.findMany({
+                    take,
                     where: {
-                        id: {
-                            in: include,
+                        title: {
+                            contains: query,
+                            mode: 'insensitive',
                         },
+                        ...(include
+                            ? {
+                                  id: {
+                                      notIn: include,
+                                  },
+                              }
+                            : {}),
+                        ...nonArchivedPartialQuery,
                     },
                     include: includeInput,
                 }),
-            );
-        }
+            ];
 
-        return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
-    }),
+            if (include) {
+                requests.push(
+                    prisma.project.findMany({
+                        where: {
+                            id: {
+                                in: include,
+                            },
+                            ...nonArchivedPartialQuery,
+                        },
+                        include: includeInput,
+                    }),
+                );
+            }
+
+            return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
+        }),
     getUserProjectsWithGoals: protectedProcedure.input(queryWithFiltersSchema).query(async ({ ctx, input = {} }) => {
         const { activityId, role } = ctx.session.user;
 
@@ -178,10 +184,6 @@ export const project = router({
         });
         const projectIdsArray = projectIds.map(({ id }) => id);
 
-        const nonArchived = {
-            archived: false,
-        };
-
         const res = await prisma.project
             .findMany({
                 orderBy: {
@@ -204,7 +206,7 @@ export const project = router({
                                         },
                                     ],
                                 },
-                                nonArchived,
+                                nonArchivedPartialQuery,
                             ],
                         },
                         include: goalDeepQuery,
@@ -213,7 +215,7 @@ export const project = router({
                         select: {
                             // all goals without filters to count the total goals
                             goals: {
-                                where: nonArchived,
+                                where: nonArchivedPartialQuery,
                             },
                         },
                     },
@@ -225,6 +227,7 @@ export const project = router({
                             id: {
                                 in: projectIdsArray,
                             },
+                            AND: nonArchivedPartialQuery,
                         },
                         {
                             goals: {
@@ -233,7 +236,7 @@ export const project = router({
                                         {
                                             OR: requestSchema({ withOwner: true }),
                                         },
-                                        nonArchived,
+                                        nonArchivedPartialQuery,
                                     ],
                                 },
                             },
@@ -322,7 +325,7 @@ export const project = router({
                     left join "_goalParticipants" as gp on gp."B" = g.id
                     left join "_parentChildren" as pc on pc."B" = p.id
                     where g."archived" is not true
-                        ${sqlFilters}
+                        ${sqlFilters} and p."archived" is not true
                         ${firstLevel ? Prisma.sql`and pc."A" is null` : Prisma.empty}
                     group by p.id
                     order by max(g."updatedAt") desc
@@ -460,14 +463,14 @@ export const project = router({
             const { activityId, role } = ctx.session.user;
 
             const projects = await prisma.project.findMany({
-                where: {
-                    id: {
-                        in: ids,
-                    },
-                },
                 ...getProjectSchema({
                     activityId,
                     goalsQuery,
+                    whereQuery: {
+                        id: {
+                            in: ids,
+                        },
+                    },
                 }),
             });
 
@@ -598,6 +601,7 @@ export const project = router({
                         id: {
                             in: parentsToConnect?.map(({ id }) => id),
                         },
+                        AND: nonArchivedPartialQuery,
                     },
                     include: {
                         activity: { include: { user: true, ghost: true } },
@@ -637,6 +641,7 @@ export const project = router({
                         id: {
                             in: parentsToDisconnect?.map(({ id }) => id),
                         },
+                        AND: nonArchivedPartialQuery,
                     },
                     include: {
                         activity: { include: { user: true, ghost: true } },
@@ -707,11 +712,33 @@ export const project = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    delete: protectedProcedure.input(z.string()).mutation(async ({ input: id }) => {
+    delete: protectedProcedure.input(projectDeleteSchema).mutation(async ({ input, ctx }) => {
         try {
-            return prisma.project.delete({
+            const currentProject = await prisma.project.findUnique({
                 where: {
-                    id,
+                    id: input.id,
+                },
+                include: {
+                    parent: true,
+                },
+            });
+
+            if (!currentProject || currentProject.archived) {
+                return;
+            }
+
+            // before update project need to update project goals
+            await updateLinkedGoalsByProject(input.id, ctx.session.user.activityId);
+
+            return prisma.project.update({
+                where: {
+                    id: input.id,
+                },
+                data: {
+                    archived: true,
+                    parent: {
+                        disconnect: currentProject.parent.map(({ id }) => ({ id })),
+                    },
                 },
             });
         } catch (error: any) {

@@ -4,7 +4,13 @@ import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter, getEstimateListFormJoin } from '../queries/goals';
+import {
+    addCalclulatedGoalsFields,
+    goalDeepQuery,
+    goalsFilter,
+    getEstimateListFormJoin,
+    nonArchievedGoalsPartialQuery,
+} from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
@@ -15,6 +21,7 @@ import {
     toggleGoalDependencySchema,
     goalCommentCreateSchema,
     toggleParticipantsSchema,
+    batchGoalByProjectIdSchema,
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema, suggestionsQueryScheme, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
@@ -80,16 +87,9 @@ export const goal = router({
                 },
                 where: {
                     activityId: input.length ? { contains: '' } : activityId,
+                    ...nonArchievedGoalsPartialQuery,
                     AND: {
                         ...selectParams,
-                        OR: [
-                            {
-                                archived: false,
-                            },
-                            {
-                                archived: null,
-                            },
-                        ],
                     },
                 },
                 include: {
@@ -582,6 +582,7 @@ export const goal = router({
             const actualGoal = await prisma.goal.findFirst({
                 where: {
                     id,
+                    ...nonArchievedGoalsPartialQuery,
                 },
                 include: {
                     participants: { include: { user: true, ghost: true } },
@@ -650,6 +651,7 @@ export const goal = router({
         const actualGoal = await prisma.goal.findFirst({
             where: {
                 id: input.id,
+                ...nonArchievedGoalsPartialQuery,
             },
             include: {
                 participants: { include: { user: true, ghost: true } },
@@ -1229,6 +1231,18 @@ export const goal = router({
                             activityId: ctx.session.user.activityId,
                         },
                     },
+                },
+            });
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+        }
+    }),
+    getListByProjectId: protectedProcedure.input(batchGoalByProjectIdSchema).query(async ({ input }) => {
+        try {
+            return prisma.goal.findMany({
+                where: {
+                    projectId: input.projectId,
+                    ...nonArchievedGoalsPartialQuery,
                 },
             });
         } catch (error: any) {
