@@ -1,9 +1,12 @@
+import { StateType } from '@prisma/client';
 import { z } from 'zod';
 
 export const ToggleSubscriptionSchema = z.object({
     id: z.string().nullish(),
     direction: z.boolean().nullish(),
 });
+
+export const StateTypeEnum = z.nativeEnum(StateType);
 
 export type ToggleSubscription = z.infer<typeof ToggleSubscriptionSchema>;
 
@@ -23,7 +26,7 @@ export const sortablePropertiesSchema = z
 export const queryWithFiltersSchema = z.object({
     priority: z.array(z.string()).optional(),
     state: z.array(z.string()).optional(),
-    stateType: z.array(z.string()).optional(),
+    stateType: z.array(StateTypeEnum).optional(),
     tag: z.array(z.string()).optional(),
     estimate: z.array(z.string()).optional(),
     issuer: z.array(z.string()).optional(),

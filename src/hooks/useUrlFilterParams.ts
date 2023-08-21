@@ -1,20 +1,21 @@
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
-import { Tag } from '@prisma/client';
+import { StateType, Tag } from '@prisma/client';
 
 import { FilterById } from '../../trpc/inferredTypes';
 import { SortDirection, SortableProps } from '../components/SortFilter/SortFilter';
+import { StateTypeEnum } from '../schema/common';
 
 import { useCookies } from './useCookies';
 
-export const filtersNoSearchPresetCookie = 'takany.NoSearchPreset';
+export const filtersNoSearchPresetCookie = 'taskany.NoSearchPreset';
 
 // TODO: replace it with QueryWithFilters from schema/common
 export interface QueryState {
     priority: string[];
     state: string[];
-    stateType: string[];
+    stateType: StateType[];
     tag: string[];
     estimate: string[];
     issuer: string[];
@@ -100,7 +101,7 @@ export const isFilterStateEmpty = (state: QueryState): boolean => !Array.from(bu
 export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     priority: parseQueryParam(query.priority?.toString()),
     state: parseQueryParam(query.state?.toString()),
-    stateType: parseQueryParam(query.stateType?.toString()),
+    stateType: parseQueryParam(query.stateType?.toString()).map((type) => StateTypeEnum.parse(type)),
     tag: parseQueryParam(query.tag?.toString()),
     estimate: parseQueryParam(query.estimate?.toString()),
     issuer: parseQueryParam(query.issuer?.toString()),
@@ -146,15 +147,28 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     );
 
     const pushStateProvider = useMemo(() => {
-        const state = queryState;
+        const state = { ...queryState };
+        let queued = false;
 
         return <T extends keyof QueryState>(key: T) =>
             (value: QueryState[T]) => {
                 state[key] = value;
 
-                queueMicrotask(() => {
-                    pushStateToRouter(queryState);
-                });
+                if (!queued) {
+                    queued = true;
+                    // we batch state changes due current call stack
+                    // and will push it to router together in microtask queue.
+
+                    // Example
+                    // setPriorityFilter([priority]);
+                    // setStateTypeFilter([typeA, typeB]);
+
+                    // ...will produce one router push
+
+                    queueMicrotask(() => {
+                        pushStateToRouter(state);
+                    });
+                }
             };
     }, [queryState, pushStateToRouter]);
 

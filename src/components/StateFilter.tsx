@@ -1,4 +1,5 @@
 import { FC, useCallback, useMemo } from 'react';
+import { StateType } from '@prisma/client';
 
 import { ColorizedFilterDropdown } from './ColorizedFilterDropdown';
 
@@ -10,7 +11,7 @@ export const StateFilter: FC<{
     states: State[];
     stateTypes: string[];
     onStateChange: (value: string[]) => void;
-    onStateTypeChange: (value: string[]) => void;
+    onStateTypeChange: (value: StateType[]) => void;
 }> = ({ text, value, states, stateTypes, onStateChange, onStateTypeChange }) => {
     const items = useMemo(
         () =>
