@@ -1,4 +1,4 @@
-import { Activity, Prisma, Project, Role, StateType, User } from '@prisma/client';
+import { Activity, Prisma, Project, Role, User } from '@prisma/client';
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
 
@@ -282,7 +282,7 @@ export const project = router({
                 ? await prisma.state.findMany({
                       where: {
                           type: {
-                              in: goalsQuery.stateType as StateType[],
+                              in: goalsQuery.stateType,
                           },
                       },
                   })

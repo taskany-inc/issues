@@ -7,7 +7,7 @@ import { connectionMap } from '../queries/connections';
 import { createFilterSchema } from '../../src/schema/filter';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 
-const fitlerIncludeSchema = {
+const includeStargizersAndActivity = {
     stargizers: true,
     activity: {
         include: {
@@ -23,7 +23,7 @@ export const filter = router({
             where: {
                 id: input,
             },
-            include: fitlerIncludeSchema,
+            include: includeStargizersAndActivity,
         });
 
         if (!filter) {
@@ -41,7 +41,7 @@ export const filter = router({
             where: {
                 default: true,
             },
-            include: fitlerIncludeSchema,
+            include: includeStargizersAndActivity,
         });
 
         if (!filter) {
