@@ -4,14 +4,18 @@ import { filtersPanelSsrInit } from '../../utils/filters';
 
 export const getServerSideProps = declareSsrProps(
     async (props) => {
-        const goalsQuery = await filtersPanelSsrInit(props);
+        const { queryState, defaultPresetFallback } = await filtersPanelSsrInit(props);
 
         const { ssrHelpers } = props;
 
         await ssrHelpers.project.getAll.fetch({
             firstLevel: true,
-            goalsQuery,
+            goalsQuery: queryState,
         });
+
+        return {
+            defaultPresetFallback,
+        };
     },
     {
         private: true,

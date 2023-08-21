@@ -4,18 +4,18 @@ import { filtersPanelSsrInit } from '../../../utils/filters';
 
 export const getServerSideProps = declareSsrProps(
     async (props) => {
-        const goalsQuery = await filtersPanelSsrInit(props);
+        const { queryState, defaultPresetFallback } = await filtersPanelSsrInit(props);
 
         const {
             params: { id },
             ssrHelpers,
         } = props;
 
-        const project = await ssrHelpers.project.getById.fetch({ id, goalsQuery });
+        const project = await ssrHelpers.project.getById.fetch({ id, goalsQuery: queryState });
 
         await ssrHelpers.project.getDeepInfo.fetch({
             id,
-            goalsQuery,
+            goalsQuery: queryState,
         });
 
         if (!project) {
@@ -23,6 +23,10 @@ export const getServerSideProps = declareSsrProps(
                 notFound: true,
             };
         }
+
+        return {
+            defaultPresetFallback,
+        };
     },
     {
         private: true,

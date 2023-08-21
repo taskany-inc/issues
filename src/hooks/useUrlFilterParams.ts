@@ -6,8 +6,7 @@ import { StateType, Tag } from '@prisma/client';
 import { FilterById } from '../../trpc/inferredTypes';
 import { SortDirection, SortableProps } from '../components/SortFilter/SortFilter';
 import { StateTypeEnum } from '../schema/common';
-
-import { useCookies } from './useCookies';
+import { setCookie } from '../utils/cookies';
 
 export const filtersNoSearchPresetCookie = 'taskany.NoSearchPreset';
 
@@ -117,7 +116,6 @@ export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
 
 export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
-    const { setCookie } = useCookies();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
     const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
@@ -143,7 +141,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
 
             router.push(!isEmptySearch ? `${newurl}?${urlParams}` : newurl);
         },
-        [router, setCookie],
+        [router],
     );
 
     const pushStateProvider = useMemo(() => {

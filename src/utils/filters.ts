@@ -49,5 +49,8 @@ export const filtersPanelSsrInit = async ({ query: browserQuery, ssrHelpers, req
         ssrHelpers.filter.getUserFilters.fetch(),
     ]);
 
-    return queryState;
+    return {
+        queryState,
+        defaultPresetFallback: isDefaultPreset,
+    };
 };

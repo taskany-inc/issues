@@ -2,26 +2,21 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { trpc } from '../utils/trpcClient';
+import { deleteCookie } from '../utils/cookies';
 import { refreshInterval } from '../utils/config';
 
-import { useCookies } from './useCookies';
 import { filtersNoSearchPresetCookie } from './useUrlFilterParams';
 
-export const useFiltersPreset = () => {
+export const useFiltersPreset = ({ defaultPresetFallback = true }: { defaultPresetFallback?: boolean }) => {
     const router = useRouter();
     const queryString = router.asPath.split('?')[1];
 
-    const { getCookie, deleteCookie } = useCookies();
-
-    const emptySearchCookie = getCookie(filtersNoSearchPresetCookie);
-    const shouldApplyDefaultPreset = !emptySearchCookie && !queryString?.length;
-
     const userPreset = trpc.filter.getById.useQuery(router.query.filter as string, { enabled: !!router.query.filter });
-    const defaultPreseet = trpc.filter.getDefaultFilter.useQuery(undefined, {
-        enabled: shouldApplyDefaultPreset,
+    const defaultPreset = trpc.filter.getDefaultFilter.useQuery(undefined, {
+        enabled: defaultPresetFallback,
     });
 
-    const preset = shouldApplyDefaultPreset ? defaultPreseet : userPreset;
+    const preset = defaultPresetFallback ? defaultPreset : userPreset;
 
     const userFilters = trpc.filter.getUserFilters.useQuery(undefined, {
         keepPreviousData: true,
@@ -33,10 +28,10 @@ export const useFiltersPreset = () => {
     )[0];
 
     useEffect(() => {
-        if (emptySearchCookie) {
+        if (!defaultPresetFallback) {
             deleteCookie(filtersNoSearchPresetCookie);
         }
-    }, [emptySearchCookie, deleteCookie]);
+    }, [defaultPresetFallback]);
 
     return {
         preset: preset.data,

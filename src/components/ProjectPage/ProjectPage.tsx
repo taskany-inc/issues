@@ -29,14 +29,14 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-export const ProjectPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
+export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallback }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
 
-    const { preset, shadowPreset, userFilters } = useFiltersPreset();
+    const { preset, shadowPreset, userFilters } = useFiltersPreset({ defaultPresetFallback });
 
     const {
         currentPreset,

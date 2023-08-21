@@ -10,7 +10,6 @@ import { usePageLoad } from '../hooks/usePageLoad';
 import { trpc } from '../utils/trpcClient';
 import { TLocale, setSSRLocale } from '../utils/getLang';
 import { GoalPreviewProvider } from '../components/GoalPreview/GoalPreviewProvider';
-import { CookiesProvider } from '../hooks/useCookies';
 
 const defaultThemes = ['light', 'dark'];
 
@@ -26,15 +25,13 @@ const App = ({ Component, pageProps, router }: AppProps) => {
             </Head>
 
             <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
-                <CookiesProvider serverSideCookies={pageProps.cookies}>
-                    <ThemeProvider themes={defaultThemes}>
-                        <GoalPreviewProvider>
-                            <PageLoadProgress height={2} ref={pageLoadRef} />
-                            <Component {...pageProps} />
-                            <ReactQueryDevtools />
-                        </GoalPreviewProvider>
-                    </ThemeProvider>
-                </CookiesProvider>
+                <ThemeProvider themes={defaultThemes}>
+                    <GoalPreviewProvider>
+                        <PageLoadProgress height={2} ref={pageLoadRef} />
+                        <Component {...pageProps} />
+                        <ReactQueryDevtools />
+                    </GoalPreviewProvider>
+                </ThemeProvider>
             </SessionProvider>
         </>
     );

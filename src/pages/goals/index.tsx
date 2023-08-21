@@ -8,12 +8,16 @@ export const getServerSideProps = declareSsrProps(
     async (props) => {
         const { ssrHelpers } = props;
 
-        const queryState = await filtersPanelSsrInit(props);
+        const { queryState, defaultPresetFallback } = await filtersPanelSsrInit(props);
 
         await ssrHelpers.goal.getBatch.fetchInfinite({
             limit: pageSize,
             query: queryState,
         });
+
+        return {
+            defaultPresetFallback,
+        };
     },
     {
         private: true,

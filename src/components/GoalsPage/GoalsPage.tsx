@@ -30,13 +30,15 @@ const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteF
 
 const pageSize = 20;
 
-export const GoalsPage = ({ user, ssrTime }: ExternalPageProps) => {
+export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const router = useRouter();
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
 
-    const { preset, shadowPreset, userFilters } = useFiltersPreset();
+    const { preset, shadowPreset, userFilters } = useFiltersPreset({
+        defaultPresetFallback,
+    });
 
     const {
         currentPreset,
