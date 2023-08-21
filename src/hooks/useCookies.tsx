@@ -63,11 +63,14 @@ export const CookiesProvider: FC<{
     children: ReactNode;
     serverSideCookies: GetServerSidePropsContext['req']['cookies'];
 }> = ({ serverSideCookies, children }) => {
-    const cookies = useMemo(() => {
-        return isServer() ? serverSideCookies : parseClientCookies();
-    }, [serverSideCookies]);
+    const getCookie = useCallback(
+        (name: string) => {
+            const cookies = isServer() ? serverSideCookies : parseClientCookies();
 
-    const getCookie = useCallback((name: string) => cookies[name] ?? null, [cookies]);
+            return cookies[name] ?? null;
+        },
+        [serverSideCookies],
+    );
 
     const value = useMemo(
         () => ({
