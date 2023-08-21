@@ -1,4 +1,4 @@
-import type { AppProps } from 'next/app';
+import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import '../utils/wdyr';
 import { PageLoadProgress } from '@taskany/bricks';
 import Head from 'next/head';
@@ -10,13 +10,25 @@ import { usePageLoad } from '../hooks/usePageLoad';
 import { trpc } from '../utils/trpcClient';
 import { TLocale, setSSRLocale } from '../utils/getLang';
 import { GoalPreviewProvider } from '../components/GoalPreview/GoalPreviewProvider';
+import { getTelemetryInstanceSingleton, useWebTelemetryMonitoringInit } from '../utils/telemetry';
 
 const defaultThemes = ['light', 'dark'];
+
+export function reportWebVitals(metric: NextWebVitalsMetric) {
+    getTelemetryInstanceSingleton().then((telemetry) => {
+        telemetry?.KV.push({
+            key: metric.name,
+            value: Math.round(metric.value),
+        });
+    });
+}
 
 const App = ({ Component, pageProps, router }: AppProps) => {
     setSSRLocale(router.locale as TLocale);
 
     const pageLoadRef = usePageLoad(router);
+
+    useWebTelemetryMonitoringInit();
 
     return (
         <>

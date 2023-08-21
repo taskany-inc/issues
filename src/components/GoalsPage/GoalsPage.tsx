@@ -21,6 +21,7 @@ import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { Nullish } from '../../types/void';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
+import { useFMPMetric } from '../../utils/telemetry';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -76,6 +77,8 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
             staleTime: refreshInterval,
         },
     );
+
+    useFMPMetric(!!data);
 
     const onFetchNextPage = useCallback(() => {
         fetchNextPage();
