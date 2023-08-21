@@ -275,7 +275,7 @@ export const project = router({
                 })
                 .optional(),
         )
-        .query(async ({ ctx, input: { goalsQuery = {} } = {} }) => {
+        .query(async ({ ctx, input: { goalsQuery = {}, firstLevel } = {} }) => {
             const { activityId, role } = ctx.session.user;
 
             const stateByTypes = goalsQuery?.stateType
@@ -320,8 +320,10 @@ export const project = router({
                     left join "_goalStargizers" as gs on gs."B" = g.id
                     left join "_goalWatchers" as gw on gw."B" = g.id
                     left join "_goalParticipants" as gp on gp."B" = g.id
+                    left join "_parentChildren" as pc on pc."B" = p.id
                     where g."archived" = ${false}
                         ${sqlFilters}
+                        ${firstLevel ? Prisma.sql`and pc."A" is null` : Prisma.empty}
                     group by p.id
                     order by max(g."updatedAt") desc
             ` as Promise<NonNullable<(Project & { goalsCount: number })[]>>,
