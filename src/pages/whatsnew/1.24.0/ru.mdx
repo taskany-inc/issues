@@ -1,0 +1,19 @@
+import { WhatsNewLayout } from '../../../components/WhatsNewLayout';
+
+### Фильтр целей по умолчанию
+
+Мы как никто другой понимаем как огромное кол-во целей на рабочем столе и в проектах может раздражать.
+Теперь мы показываем только активные цели по умолчанию.
+Активные — значит в активном статусе: __Draft__, __InProgress__, __Blocked__, __AtRisk__.
+
+![](/ActivePreset.png)
+
+Это работает точно также как пользовательские пресеты фильтров только по умолчанию.
+В любое время вы можете сбросить фильтры по кнопке "Сбросить".
+
+![](/ResetButton.png)
+
+_Use it and test. Leave feedback at any time via button in footer from any page._
+
+
+export default ({ children }) => <WhatsNewLayout>{children}</WhatsNewLayout>;
