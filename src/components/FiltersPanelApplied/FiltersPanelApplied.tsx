@@ -66,6 +66,15 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
         appliedMap[tr('State')] = queryState.state.map((s) => statesMap[s]?.title).filter(Boolean);
     }
 
+    if (queryState.stateType.length && states?.length) {
+        appliedMap[tr('State')] = states.reduce((acum, { type, title }) => {
+            if (queryState.stateType.includes(type) && !acum.includes(title)) {
+                acum.push(title);
+            }
+            return acum;
+        }, appliedMap[tr('State')] || []);
+    }
+
     if (queryState.issuer.length && issuers?.length) {
         appliedMap[tr('Issuer')] = queryState.issuer.map((u) => issuersMap[u]?.user?.name).filter(Boolean) as string[];
     }
