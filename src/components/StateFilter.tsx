@@ -3,7 +3,7 @@ import { StateType } from '@prisma/client';
 
 import { ColorizedFilterDropdown } from './ColorizedFilterDropdown';
 
-type State = { id: string; title: string; hue: number; type: string };
+type State = { id: string; title: string; hue: number; type: StateType };
 
 export const StateFilter: FC<{
     text: string;
