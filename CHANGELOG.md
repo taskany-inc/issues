@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.24.0](https://github.com/taskany-inc/issues/compare/v1.23.2...v1.24.0) (2023-08-22)
+
+
+### Features
+
+* **CookiesProvider:** remove extra cache ([8b7603f](https://github.com/taskany-inc/issues/commit/8b7603f713657a4d87e6a79ee72d02fffa25f364))
+* **CookiesProvider:** use cookies for noPresetSearch on filters ([fb68a25](https://github.com/taskany-inc/issues/commit/fb68a25af677168cdba3dabf37edaa3685900b2a))
+* **FiltersApplied:** stateType support ([cf03dd5](https://github.com/taskany-inc/issues/commit/cf03dd574f1a1556155a5edc6d4e8a0ccf725592))
+* **FiltersPanel:** default global filter support ([6590989](https://github.com/taskany-inc/issues/commit/65909893dfdfd01847ea1b23a57f6496e3dde710))
+* **seed:** beautify filter title ([6b61840](https://github.com/taskany-inc/issues/commit/6b61840b2810497f550627a19c5a0882811b591c))
+* **sqlGoalsFilter:** add stateType filter ([0e32cca](https://github.com/taskany-inc/issues/commit/0e32cca214f8e794e6b2970c552a3a3db738c230))
+* **sqlGoalsFilter:** stateType native enum ([3794962](https://github.com/taskany-inc/issues/commit/37949626b3be693dfbc5984ccf4c654380339172))
+
+
+### Bug Fixes
+
+* **CookiesProvider:** remove cookies provider ([7d5fbeb](https://github.com/taskany-inc/issues/commit/7d5fbeb08d523bb60a0d698e25540997eb3b1373))
+* **FeedbackCreateForm:** form closes after submit ([0772007](https://github.com/taskany-inc/issues/commit/077200727616478b5a33c5a00349b6f12352fd6c))
+* **GoalDependencyList:** the circle is in the center ([d3f937e](https://github.com/taskany-inc/issues/commit/d3f937ee6eb9a44012d172f33fff2b5cc78aa222))
+* **ImageFullScreen:** no closed GoalPreview on ESC and can be closed on outside click ([12ece5b](https://github.com/taskany-inc/issues/commit/12ece5b569ac20ad5b069e3327cf20c66722c13c))
+* **trpc:** return firstLevel param to sql ([ac25056](https://github.com/taskany-inc/issues/commit/ac2505643ebc8d7de2e8124bf843b5fd87450356))
+
 ## [1.23.2](https://github.com/taskany-inc/issues/compare/v1.23.1...v1.23.2) (2023-08-15)
 
 
