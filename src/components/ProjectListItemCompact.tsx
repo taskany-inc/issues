@@ -1,7 +1,7 @@
 import React, { MouseEventHandler } from 'react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
-import { TableRow, TableCell } from '@taskany/bricks';
+import { TableRow, TableCell, nullable } from '@taskany/bricks';
 import { gapS, gapXs, radiusM } from '@taskany/colors';
 import { IconUsersOutline } from '@taskany/icons';
 
@@ -16,6 +16,7 @@ interface ProjectListItemCompactProps {
     title: string;
     owner?: ActivityByIdReturnType;
     focused?: boolean;
+    icon?: boolean;
     className?: string;
     onClick?: MouseEventHandler<HTMLDivElement>;
 }
@@ -27,20 +28,15 @@ const StyledRow = styled(TableRow)`
 `;
 
 export const ProjectListItemCompact: React.FC<ProjectListItemCompactProps> = React.memo(
-    ({ id, owner, title, focused, className, onClick }) => {
+    ({ id, owner, title, icon, ...attrs }) => {
         return (
             <NextLink href={routes.project(id)} passHref legacyBehavior>
-                <StyledRow
-                    interactive
-                    focused={focused}
-                    onClick={onClick}
-                    className={className}
-                    align="center"
-                    gap={10}
-                >
-                    <TableCell min>
-                        <IconUsersOutline size="s" />
-                    </TableCell>
+                <StyledRow interactive align="center" gap={10} {...attrs}>
+                    {nullable(icon, () => (
+                        <TableCell min>
+                            <IconUsersOutline size="s" />
+                        </TableCell>
+                    ))}
                     <TableCell col={6.5}>
                         <TitleContainer>
                             <Title size="s" weight="bold">

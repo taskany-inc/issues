@@ -52,14 +52,16 @@ type CanBeNullableValue<T> = { [K in keyof T]?: T[K] | null };
 
 interface GoalListItemCompactCustomizeProps<T extends Record<string, any>> {
     item: T & CanBeNullableValue<CommonGoalListItemCompactProps>;
-    rowIcon?: React.ReactNode;
+    icon?: boolean;
+    rawIcon?: React.ReactNode;
     actions?: Array<GoalItemAction>;
-    onActionClick?: <A extends NonNullable<GoalListItemCompactCustomizeProps<T>['actions']>[number]>(action: A) => void;
     columns: Array<GoalListItemCompactColumnProps<ColumnRenderProps<T>>>;
-    onClick?: React.MouseEventHandler;
     focused?: boolean;
     forwardedAs?: keyof JSX.IntrinsicElements;
     className?: string;
+
+    onActionClick?: <A extends NonNullable<GoalListItemCompactCustomizeProps<T>['actions']>[number]>(action: A) => void;
+    onClick?: React.MouseEventHandler;
 }
 
 interface GoalListItemCompactCustomizeRender {
@@ -159,29 +161,22 @@ const Column: ColumnRender = ({ col, componentProps }) => {
 export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
     columns,
     actions,
-    rowIcon,
-    onActionClick,
-    onClick,
-    className,
+    icon,
+    rawIcon = <IconTargetOutline size="s" />,
     item,
     gap = 7,
     align,
     justify,
-    focused,
+    onActionClick,
+    ...attrs
 }) => {
     return (
-        <TableRow
-            onClick={onClick}
-            className={className}
-            interactive={focused != null}
-            focused={focused}
-            gap={gap}
-            align={align}
-            justify={justify}
-        >
-            <StyledCell key="icon" forIcon min>
-                {rowIcon || <IconTargetOutline size="s" />}
-            </StyledCell>
+        <TableRow interactive={attrs.focused != null} gap={gap} align={align} justify={justify} {...attrs}>
+            {nullable(icon || rawIcon, () => (
+                <StyledCell key="icon" forIcon min>
+                    {rawIcon}
+                </StyledCell>
+            ))}
             {columns.map((col) => (
                 <Column key={col.name} col={col} componentProps={item} />
             ))}
