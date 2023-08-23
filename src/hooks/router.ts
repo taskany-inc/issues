@@ -32,6 +32,7 @@ export const useRouter = () => {
         index: () => router.push(routes.index()),
 
         project: (id: string) => router.push(routes.project(id)),
+        projects: () => router.push(routes.projects()),
         projectSettings: (id: string) => router.push(routes.projectSettings(id)),
 
         goals: () => router.push(routes.goals()),
