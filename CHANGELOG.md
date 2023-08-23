@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.24.1](https://github.com/taskany-inc/issues/compare/v1.24.0...v1.24.1) (2023-08-23)
+
+
+### Bug Fixes
+
+* **Projects:** show projects without goals ([5f4c18c](https://github.com/taskany-inc/issues/commit/5f4c18cef759f4c20f40774cd482725a6b414aea))
+
 ## [1.24.0](https://github.com/taskany-inc/issues/compare/v1.23.2...v1.24.0) (2023-08-22)
 
 
