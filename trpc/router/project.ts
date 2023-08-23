@@ -321,7 +321,7 @@ export const project = router({
                     left join "_goalWatchers" as gw on gw."B" = g.id
                     left join "_goalParticipants" as gp on gp."B" = g.id
                     left join "_parentChildren" as pc on pc."B" = p.id
-                    where g."archived" = ${false}
+                    where g."archived" is not true
                         ${sqlFilters}
                         ${firstLevel ? Prisma.sql`and pc."A" is null` : Prisma.empty}
                     group by p.id
