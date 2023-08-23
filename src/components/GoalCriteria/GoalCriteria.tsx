@@ -77,7 +77,7 @@ const StyledCheckboxWrapper = styled.span<{ canEdit: boolean }>`
         `}
 `;
 
-const StyledTableRow = styled(GoalListItemCompact)`
+const StyledGoalListItemCompact = styled(GoalListItemCompact)`
     padding: 3px 0 4px;
 `;
 
@@ -209,11 +209,11 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
     }, [item]);
 
     return (
-        <StyledTableRow
+        <StyledGoalListItemCompact
             actions={availableActions}
             onActionClick={handleChange}
             item={itemToRender}
-            rowIcon={
+            rawIcon={
                 !goalAsCriteria && <GoalCriteriaCheckBox onClick={onToggle} checked={item.isDone} canEdit={canEdit} />
             }
             columns={[

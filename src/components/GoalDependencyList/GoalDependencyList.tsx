@@ -41,7 +41,7 @@ const StyledTable = styled(Table)`
     margin-bottom: 10px;
 `;
 
-const StyledTableRow = styled(GoalListItemCompact)`
+const StyledGoalListItemCompact = styled(GoalListItemCompact)`
     position: relative;
     align-items: center;
 
@@ -115,7 +115,8 @@ const GoalDependencyListItem: React.FC<GoalDependencyListItemProps> = ({
     );
 
     return (
-        <StyledTableRow
+        <StyledGoalListItemCompact
+            icon
             forwardedAs="div"
             item={props}
             actions={availableActions}

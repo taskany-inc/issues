@@ -17,7 +17,7 @@ interface GoalSuggestProps {
     className?: string;
 }
 
-const StyledTableRow = styled(GoalListItemCompact)`
+const StyledGoalListItemCompact = styled(GoalListItemCompact)`
     border-radius: ${radiusM};
     padding: ${gapXs} ${gapS};
 `;
@@ -35,7 +35,8 @@ interface GoalSuggestItemProps {
 
 const GoalSuggestItem: React.FC<GoalSuggestItemProps> = ({ focused, onClick, ...props }) => {
     return (
-        <StyledTableRow
+        <StyledGoalListItemCompact
+            icon
             onClick={onClick}
             focused={focused}
             align="center"
