@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.25.0](https://github.com/taskany-inc/issues/compare/v1.24.1...v1.25.0) (2023-08-24)
+
+
+### Features
+
+* **Project:** mark project as deleted ([cf74be6](https://github.com/taskany-inc/issues/commit/cf74be6a4236e3957053cf6e32eb0f1946f1a114))
+
+
+### Bug Fixes
+
+* **ProjectListItem,GoalListItem:** rewrite with Table components usage ([e38b907](https://github.com/taskany-inc/issues/commit/e38b90757f0cdb6f3c34970f839b8745e9765180))
+* **Projects:** show projects with archived goals ([c586f9e](https://github.com/taskany-inc/issues/commit/c586f9e262d75b2d3e7e8125dd767f28527c8682))
+
 ## [1.24.1](https://github.com/taskany-inc/issues/compare/v1.24.0...v1.24.1) (2023-08-23)
 
 
