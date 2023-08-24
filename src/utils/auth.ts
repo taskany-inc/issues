@@ -65,8 +65,8 @@ if (process.env.KEYCLOAK_ID && process.env.KEYCLOAK_SECRET && process.env.KEYCLO
             clientSecret: process.env.KEYCLOAK_SECRET,
             issuer: process.env.KEYCLOAK_ISSUER,
             client: {
-                authorization_signed_response_alg: process.env.JWS_ALGORITHM || 'RS256',
-                id_token_signed_response_alg: process.env.JWS_ALGORITHM || 'RS256',
+                authorization_signed_response_alg: process.env.JWS_ALGORITHM || 'ES256',
+                id_token_signed_response_alg: process.env.JWS_ALGORITHM || 'ES256',
             },
         }),
     );
