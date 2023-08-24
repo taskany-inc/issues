@@ -315,7 +315,7 @@ export const project = router({
                         p."activityId",
                         count(distinct g) as "goalsCount"
                     from "Project" as p
-                    left join "Goal" as g on p.id = g."projectId"
+                    left join "Goal" as g on p.id = g."projectId" and g."archived" is not true
                     left join "Activity" as a on a.id = p."activityId"
                     left join "Tag" as t on g."activityId" = t."activityId"
                     left join "_projectStargizers" as ps on ps."B" = p.id
@@ -324,8 +324,8 @@ export const project = router({
                     left join "_goalWatchers" as gw on gw."B" = g.id
                     left join "_goalParticipants" as gp on gp."B" = g.id
                     left join "_parentChildren" as pc on pc."B" = p.id
-                    where g."archived" is not true
-                        ${sqlFilters} and p."archived" is not true
+                    where p."archived" is not true
+                        ${sqlFilters}
                         ${firstLevel ? Prisma.sql`and pc."A" is null` : Prisma.empty}
                     group by p.id
                     order by max(g."updatedAt") desc
