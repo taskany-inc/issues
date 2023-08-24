@@ -123,7 +123,7 @@ export const createValue = (date: string | Date, locale: TLocale) => {
     const localDate = typeof date === 'object' ? date : parseLocaleDate(date, { locale });
 
     return {
-        q: quarterFromDate(localDate) as string,
+        q: quarterFromDate(localDate),
         y: String(yearFromDate(localDate)),
         date: createLocaleDate(localDate, { locale }),
     };

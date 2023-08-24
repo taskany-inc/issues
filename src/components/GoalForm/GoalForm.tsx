@@ -13,22 +13,23 @@ import {
     TagCleanButton,
     nullable,
     Button,
+    CalendarTickIcon,
 } from '@taskany/bricks';
 import { IconGitPullOutline } from '@taskany/icons';
 
 import { FormEditor } from '../FormEditor/FormEditor';
-import { estimatedMeta } from '../../utils/dateTime';
+import { formatEstimate } from '../../utils/dateTime';
 import { errorsProvider } from '../../utils/forms';
 import { useLocale } from '../../hooks/useLocale';
 import { Priority } from '../../types/priority';
 import { UserComboBox } from '../UserComboBox';
 import { GoalParentComboBox } from '../GoalParentComboBox';
-import { EstimateComboBox } from '../EstimateComboBox';
 import { TagComboBox } from '../TagComboBox';
 import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { HelpButton } from '../HelpButton/HelpButton';
+import { Estimate as EstimateComponent } from '../Estimate/Estimate';
 
 import { tr } from './GoalForm.i18n';
 
@@ -185,16 +186,31 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         <Controller
                             name="estimate"
                             control={control}
-                            render={({ field }) => (
-                                <EstimateComboBox
-                                    placeholder={tr('Date input mask placeholder')}
-                                    mask={tr('Date input mask')}
-                                    defaultValuePlaceholder={estimatedMeta({ locale })}
-                                    error={errorsResolver(field.name)}
-                                    disabled={busy}
-                                    {...field}
-                                />
-                            )}
+                            render={({ field }) => {
+                                return (
+                                    <EstimateComponent
+                                        placeholder={tr('Date input mask placeholder')}
+                                        mask={tr('Date input mask')}
+                                        placement="top"
+                                        renderTrigger={(props) => {
+                                            return (
+                                                <Button
+                                                    onClick={props.onClick}
+                                                    disabled={busy}
+                                                    text={
+                                                        field.value?.date
+                                                            ? formatEstimate(field.value || {}, locale)
+                                                            : field.value?.y
+                                                    }
+                                                    iconLeft={<CalendarTickIcon noWrap size="xs" />}
+                                                />
+                                            );
+                                        }}
+                                        error={errorsResolver(field.name)}
+                                        {...field}
+                                    />
+                                );
+                            }}
                         />
 
                         {parentWatcher?.flowId ? (
