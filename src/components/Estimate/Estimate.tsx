@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 import { isPastDate, parseLocaleDate, quarterFromDate } from '../../utils/dateTime';
 import { PopupProps } from '../OutlinePopup';
@@ -12,14 +12,14 @@ import { EstimatePopup } from '../EstimatePopup';
 import { tr } from './Estimate.i18n';
 
 interface EstimateProps {
+    mask: string;
+    placeholder: string;
+    value?: EstimateType;
+    placement?: PopupProps['placement'];
+    error?: { message?: string };
     renderTrigger: (values: { onClick: () => void }) => ReactNode;
     onChange?: (value?: EstimateType) => void;
     onClose?: () => void;
-    value?: EstimateType;
-    placeholder: string;
-    mask: string;
-    placement?: PopupProps['placement'];
-    error?: { message?: string };
 }
 
 export const Estimate: React.FC<EstimateProps> = ({
@@ -32,23 +32,51 @@ export const Estimate: React.FC<EstimateProps> = ({
     placement,
     error,
 }) => {
+    const [readOnly, setReadOnly] = useState({ year: false, quarter: true, date: true });
     const locale = useLocale();
     const options = [
         {
             title: tr('Year title'),
             clue: tr('Year clue'),
-            renderItem: (option: Option) => <EstimateYear option={option} onChange={onChange} value={value} />,
+            renderItem: (option: Option) => (
+                <EstimateYear
+                    key={option.title}
+                    option={option}
+                    value={value}
+                    readOnly={readOnly.year}
+                    onChange={onChange}
+                    setReadOnly={setReadOnly}
+                />
+            ),
         },
         {
             title: tr('Quarter title'),
             clue: `${tr('Quarter clue')} ${quarterFromDate(new Date())}.`,
-            renderItem: (option: Option) => <EstimateQuarter option={option} onChange={onChange} value={value} />,
+            renderItem: (option: Option) => (
+                <EstimateQuarter
+                    key={option.title}
+                    option={option}
+                    value={value}
+                    readOnly={readOnly.quarter}
+                    onChange={onChange}
+                    setReadOnly={setReadOnly}
+                />
+            ),
         },
         {
             title: tr('Date title'),
             clue: null,
-            renderItem: (option: Omit<Option, 'clue'>) => (
-                <EstimateDate placeholder={placeholder} mask={mask} option={option} onChange={onChange} value={value} />
+            renderItem: (option: Option) => (
+                <EstimateDate
+                    key={option.title}
+                    mask={mask}
+                    placeholder={placeholder}
+                    option={option}
+                    value={value}
+                    readOnly={readOnly.date}
+                    onChange={onChange}
+                    setReadOnly={setReadOnly}
+                />
             ),
         },
     ];
@@ -73,9 +101,7 @@ export const Estimate: React.FC<EstimateProps> = ({
             placement={placement}
             error={error}
             warning={warning}
-            renderItem={(option: Option) => {
-                return optionsMap[option.title].renderItem(option);
-            }}
+            renderItem={(option: Option) => optionsMap[option.title].renderItem(option)}
             renderTrigger={renderTrigger}
             onClose={onClose}
         />

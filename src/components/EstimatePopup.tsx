@@ -2,6 +2,7 @@ import { useClickOutside, Popup, nullable, Text } from '@taskany/bricks';
 import { gapS, danger10, warn0, gapXs } from '@taskany/colors';
 import { ReactNode, useRef, useState, useCallback } from 'react';
 import styled from 'styled-components';
+import { IconExclamationSmallOutline } from '@taskany/icons';
 
 import { Option } from '../types/estimate';
 
@@ -25,8 +26,8 @@ const StyledErrorTrigger = styled.div`
 `;
 
 const StyledWarningCircle = styled.div`
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background: ${warn0};
     border-radius: 100%;
     display: flex;
@@ -80,7 +81,7 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
     });
 
     return (
-        <div style={{ position: 'relative' }}>
+        <div>
             {nullable(error, (err) => (
                 <>
                     <StyledErrorTrigger ref={errorRef} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} />
@@ -91,23 +92,20 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
             ))}
 
             <div ref={triggerRef}>{renderTrigger({ onClick: onToggleVisible })}</div>
-            <OutlinePopup visible={visible} placement={placement} reference={triggerRef} interactive minWidth={160}>
+
+            <OutlinePopup
+                visible={visible}
+                placement={placement}
+                reference={triggerRef}
+                interactive
+                minWidth={160}
+                maxWidth={180}
+            >
                 <StyledWrapper ref={popupContentRef}>
                     {nullable(warning, (warn) => (
                         <StyledWarningWrapper>
                             <StyledWarningCircle>
-                                <svg
-                                    viewBox="0 0 15 15"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="15"
-                                    height="15"
-                                >
-                                    <path
-                                        d="M8 10.5V10H7v.5h1zm-1 .01v.5h1v-.5H7zM7 4v4h1V4H7zm0 6.5v.01h1v-.01H7z"
-                                        fill="currentColor"
-                                    ></path>
-                                </svg>
+                                <IconExclamationSmallOutline size="xxs" />
                             </StyledWarningCircle>
                             <Text color={warn0} size="xxs">
                                 {warn.message}
