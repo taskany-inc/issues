@@ -12,6 +12,7 @@ const StyledWrapper = styled.div`
 
 const StyledContent = styled.div`
     display: flex;
+    align-items: end;
     gap: ${gapS};
 `;
 
