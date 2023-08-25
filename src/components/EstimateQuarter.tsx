@@ -1,62 +1,51 @@
-import { Button, Text, useClickOutside } from '@taskany/bricks';
-import { gray9, gray7, gray6, gapXs, gapS } from '@taskany/colors';
-import { IconPlusCircleSolid } from '@taskany/icons';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { Button, useClickOutside } from '@taskany/bricks';
+import { gray6, gapXs } from '@taskany/colors';
+import { useState, useRef, useCallback, Dispatch, SetStateAction, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { quarters, endOfQuarter, createLocaleDate } from '../utils/dateTime';
 import { Estimate, Option, QuartersKeys } from '../types/estimate';
 import { useLocale } from '../hooks/useLocale';
 
-const StyledWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: ${gapXs};
-`;
-
-const StyledContent = styled.div<{ readOnly: boolean }>`
-    display: flex;
-    align-items: ${({ readOnly }) => (readOnly ? 'center' : 'start')};
-    gap: ${gapS};
-    width: fit-content;
-`;
+import { EstimateOption } from './EstimateOption';
 
 const StyledQuarters = styled.div`
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: ${gapXs};
 `;
 
 const StyledCheckableButton = styled(Button)<{ checked?: boolean }>`
-    ${({ checked }) =>
-        checked &&
-        `
-            background-color: ${gray6};
-        `}
+    background-color: ${({ checked }) => checked && gray6};
 `;
 
 interface EstimateQuarterProps {
     option: Option;
-    onChange?: (value?: Estimate) => void;
     value?: Estimate;
+    readOnly?: boolean;
+    onChange?: (value?: Estimate) => void;
+    setReadOnly: Dispatch<
+        SetStateAction<{
+            year: boolean;
+            quarter: boolean;
+            date: boolean;
+        }>
+    >;
 }
 
 const quartersList = Object.values(quarters);
 
-export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, onChange, value }) => {
+export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, value, readOnly, onChange, setReadOnly }) => {
     const locale = useLocale();
     const [selectedQuarter, setSelectedQuarter] = useState<QuartersKeys | null | undefined>(value?.q || null);
-    const [readOnly, setReadOnly] = useState(true);
     const ref = useRef(null);
-    useClickOutside(ref, () => !selectedQuarter && setReadOnly(true));
 
-    useEffect(() => {
-        if (value && !value?.q && selectedQuarter && !readOnly) {
-            value.q = selectedQuarter;
-            value.date = createLocaleDate(endOfQuarter(selectedQuarter), { locale });
-            onChange?.(value);
-        }
-    }, [locale, onChange, readOnly, selectedQuarter, value]);
+    useClickOutside(ref, () => {
+        if (selectedQuarter) return;
+
+        setReadOnly((prev) => ({ ...prev, quarter: true, date: true }));
+        setSelectedQuarter(null);
+    });
 
     useEffect(() => {
         if (readOnly) {
@@ -66,58 +55,60 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, onChan
         setSelectedQuarter(value?.q);
     }, [value?.q, readOnly]);
 
-    const onToggleQuarter = (quarter: QuartersKeys) => {
-        return () => {
-            setSelectedQuarter((prev) => {
-                if (!value) return prev;
-                const q = prev === quarter ? null : quarter;
+    const onToggleQuarter = useCallback(
+        (quarter: QuartersKeys) => {
+            return () => {
+                setSelectedQuarter((prev) => {
+                    if (!value) return prev;
+                    const q = prev === quarter ? null : quarter;
 
-                if (q) {
-                    const tmp = endOfQuarter(q);
-                    tmp.setFullYear(+value.y);
-                    value.date = createLocaleDate(tmp, { locale });
-                } else {
-                    value.date = null;
-                }
+                    if (q) {
+                        const tmp = endOfQuarter(q);
+                        tmp.setFullYear(+value.y);
+                        value.date = createLocaleDate(tmp, { locale });
+                    } else {
+                        value.date = null;
+                    }
 
-                value.q = q;
-                onChange?.(value);
-                return q;
-            });
-        };
-    };
+                    value.q = q;
+                    onChange?.(value);
+                    return q;
+                });
+            };
+        },
+        [locale, onChange, value],
+    );
 
     const onClickIcon = useCallback(() => {
-        setReadOnly(false);
-    }, []);
+        setReadOnly({
+            quarter: false,
+            year: false,
+            date: true,
+        });
+        onChange?.({ y: value?.y || `${new Date().getFullYear()}`, q: null, date: null });
+    }, [onChange, setReadOnly, value?.y]);
 
     return (
-        <StyledWrapper key={option.title}>
-            <StyledContent readOnly={readOnly}>
-                <Text weight="regular" size="s">
-                    {option.title}
-                </Text>
-                {readOnly ? (
-                    <IconPlusCircleSolid size="xs" color={gray9} onClick={onClickIcon} style={{ cursor: 'pointer' }} />
-                ) : (
-                    <StyledQuarters ref={ref}>
-                        {quartersList.map((quarter) => {
-                            return (
-                                <StyledCheckableButton
-                                    key={quarter}
-                                    size="s"
-                                    text={quarter}
-                                    checked={selectedQuarter === quarter}
-                                    onClick={onToggleQuarter(quarter)}
-                                />
-                            );
-                        })}
-                    </StyledQuarters>
-                )}
-            </StyledContent>
-            <Text weight="regular" size="xxs" color={gray7}>
-                {option.clue}
-            </Text>
-        </StyledWrapper>
+        <EstimateOption
+            title={option.title}
+            clue={option.clue}
+            readOnly={readOnly}
+            onClickIcon={onClickIcon}
+            renderTrigger={() => (
+                <StyledQuarters ref={ref}>
+                    {quartersList.map((quarter) => {
+                        return (
+                            <StyledCheckableButton
+                                key={quarter}
+                                size="s"
+                                text={quarter}
+                                checked={selectedQuarter === quarter}
+                                onClick={onToggleQuarter(quarter)}
+                            />
+                        );
+                    })}
+                </StyledQuarters>
+            )}
+        />
     );
 };
