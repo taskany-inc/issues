@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import type { EmojiSelection, EmojiPicker } from 'picmo';
 import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '@taskany/colors';
-import { EmojiIcon, Popup } from '@taskany/bricks';
+import { Popup } from '@taskany/bricks';
+import { IconMoodTongueOutline } from '@taskany/icons';
 
 import { PageContext } from '../utils/pageContext';
 import { usePageContext } from '../hooks/usePageContext';
@@ -99,7 +100,7 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
 
     const viewModeMap: Record<'button' | 'icon', React.ReactNode> = {
         button: <ReactionsButton ref={buttonRef} onClick={onButtonClick} />,
-        icon: <EmojiIcon ref={buttonRef} noWrap size="xs" onClick={onButtonClick} />,
+        icon: <IconMoodTongueOutline ref={buttonRef} noWrap size="xs" onClick={onButtonClick} />,
     };
 
     return (

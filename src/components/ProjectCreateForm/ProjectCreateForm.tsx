@@ -13,10 +13,10 @@ import {
     FormAction,
     FormTextarea,
     FormInput,
-    BulbOnIcon,
     ModalContent,
     nullable,
 } from '@taskany/bricks';
+import { IconBulbOnSolid } from '@taskany/icons';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
@@ -227,7 +227,7 @@ const ProjectCreateForm: React.FC = () => {
                     </FormActions>
                     <FormActions flat="top">
                         <FormAction left>
-                            <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                            <Tip title={tr('Pro tip!')} icon={<IconBulbOnSolid size="s" color={gray10} />}>
                                 {tr.raw('Press key to create project', {
                                     key: <Keyboard key="command/enter" command enter />,
                                 })}

@@ -1,6 +1,7 @@
-import { Form, KeyCode, QuestionIcon, nullable, useClickOutside, useKeyboard, Popup } from '@taskany/bricks';
 import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { Form, KeyCode, nullable, useClickOutside, useKeyboard, Popup } from '@taskany/bricks';
+import { IconQuestionCircleOutline } from '@taskany/icons';
 
 interface RenderTriggerProps {
     onClick: () => void;
@@ -30,7 +31,7 @@ const StyledFormWrapper = styled.div`
     position: relative;
 `;
 
-const StyledQuestionIcon = styled(QuestionIcon)`
+const StyledQuestionIcon = styled(IconQuestionCircleOutline)`
     margin-left: 4px;
 `;
 

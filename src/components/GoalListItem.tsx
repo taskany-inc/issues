@@ -2,8 +2,8 @@ import React, { MouseEventHandler, useCallback, useMemo, useRef, useState } from
 import styled from 'styled-components';
 import NextLink from 'next/link';
 import { textColor, gapS, gapXs, gray9, radiusM } from '@taskany/colors';
-import { MessageIcon, Text, Tag as TagItem, nullable, CircleProgressBar, TableRow, TableCell } from '@taskany/bricks';
-import { IconEyeOutline, IconStarSolid } from '@taskany/icons';
+import { Text, Tag as TagItem, nullable, CircleProgressBar, TableRow, TableCell } from '@taskany/bricks';
+import { IconEyeOutline, IconStarSolid, IconMessageOutline } from '@taskany/icons';
 import type { Estimate, State as StateType, Tag } from '@prisma/client';
 
 import { routes } from '../hooks/router';
@@ -94,7 +94,7 @@ const CommentsCount = styled(Text)`
     vertical-align: middle;
 `;
 
-const CommentsCountIcon = styled(MessageIcon)`
+const CommentsCountIcon = styled(IconMessageOutline)`
     display: inline-block;
     vertical-align: middle;
 `;

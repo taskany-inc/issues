@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { gray9, gray10 } from '@taskany/colors';
-import { BulbOnIcon, Button, Dropdown, ArrowUpSmallIcon, ArrowDownSmallIcon, MenuItem, Text } from '@taskany/bricks';
+import { Button, Dropdown, MenuItem, Text } from '@taskany/bricks';
+import { IconBulbOnOutline, IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 
 import { useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -146,9 +147,9 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
                                     brick="left"
                                     iconRight={
                                         props.visible ? (
-                                            <ArrowUpSmallIcon size="s" noWrap />
+                                            <IconUpSmallSolid size="s" noWrap />
                                         ) : (
-                                            <ArrowDownSmallIcon size="s" noWrap />
+                                            <IconDownSmallSolid size="s" noWrap />
                                         )
                                     }
                                     ref={props.ref}
@@ -170,7 +171,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
                 </>
             }
             tip={
-                <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
                     {tr.raw('Press key to create the goal', {
                         key: <Keyboard key={'cmd/enter'} command enter />,
                     })}

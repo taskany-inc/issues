@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, EyeClosedIcon, EyeIcon } from '@taskany/bricks';
+import { Button } from '@taskany/bricks';
+import { IconEyeOutline, IconEyeClosedSolid } from '@taskany/icons';
 
 import { tr } from './WatchButton.i18n';
 
@@ -14,7 +15,7 @@ interface IconProps {
 }
 
 const Icon: React.FC<IconProps> = ({ watching }) => {
-    const Comp = watching ? EyeIcon : EyeClosedIcon;
+    const Comp = watching ? IconEyeOutline : IconEyeClosedSolid;
 
     return <Comp size="s" noWrap />;
 };

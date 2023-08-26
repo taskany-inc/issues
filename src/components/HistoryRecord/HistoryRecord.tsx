@@ -10,8 +10,8 @@ import {
     Goal,
 } from '@prisma/client';
 import styled, { css } from 'styled-components';
-import { UserPic, Text, Tag, nullable, DividerLineIcon, Button } from '@taskany/bricks';
-import { IconDoubleCaretRightCircleSolid } from '@taskany/icons';
+import { UserPic, Text, Tag, nullable, Button } from '@taskany/bricks';
+import { IconDoubleCaretRightCircleSolid, IconDividerLineOutline } from '@taskany/icons';
 import { backgroundColor, gray7 } from '@taskany/colors';
 
 import { ActivityFeedItem } from '../ActivityFeed';
@@ -120,7 +120,7 @@ const StyledCircledIcon = styled(CircledIcon)`
     background-color: ${backgroundColor};
 `;
 
-const StyledDescriptionIcon = styled(DividerLineIcon)`
+const StyledDescriptionIcon = styled(IconDividerLineOutline)`
     margin-top: 5px;
 `;
 

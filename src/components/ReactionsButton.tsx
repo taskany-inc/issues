@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { gapXs } from '@taskany/colors';
-import { Button, EmojiIcon, iconSizesMap } from '@taskany/bricks';
+import { Button } from '@taskany/bricks';
+import { IconMoodTongueOutline, iconSizesMap } from '@taskany/icons';
 
 interface ReactionsButtonProps {
     emoji?: string;
@@ -33,7 +34,11 @@ export const ReactionsButton = React.memo(
                 ref={ref}
                 text={count && count > 1 ? String(count) : undefined}
                 iconLeft={
-                    emoji ? <StyledEmoji dangerouslySetInnerHTML={{ __html: emoji }} /> : <EmojiIcon noWrap size="xs" />
+                    emoji ? (
+                        <StyledEmoji dangerouslySetInnerHTML={{ __html: emoji }} />
+                    ) : (
+                        <IconMoodTongueOutline noWrap size="xs" />
+                    )
                 }
                 onClick={onButtonClick(emoji)}
             />

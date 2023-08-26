@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { BulbOnIcon, Button } from '@taskany/bricks';
+import { Button } from '@taskany/bricks';
 import { gray10 } from '@taskany/colors';
+import { IconBulbOnOutline } from '@taskany/icons';
 
 import { GoalForm } from '../GoalForm/GoalForm';
 import { GoalUpdateReturnType, GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -59,7 +60,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
                 </>
             }
             tip={
-                <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
                     {tr.raw('Press key to update goal', {
                         key: <Keyboard key={'cmd/enter'} command enter />,
                     })}

@@ -1,24 +1,21 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
 import dynamic from 'next/dynamic';
+import { Reaction, State, User } from '@prisma/client';
+import styled from 'styled-components';
 import { brandColor, danger0, gapM, gapS, gray4, gray9, backgroundColor } from '@taskany/colors';
 import {
-    BinIcon,
     Card,
     CardComment,
     CardInfo,
     Dropdown,
-    EditIcon,
     Link,
     MenuItem,
-    MoreVerticalIcon,
     Text,
     UserPic,
     nullable,
-    PinAltIcon,
     Button,
 } from '@taskany/bricks';
-import { Reaction, State, User } from '@prisma/client';
+import { IconBinOutline, IconEditOutline, IconMoreVerticalOutline, IconPinAltOutline } from '@taskany/icons';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useLocale } from '../../hooks/useLocale';
@@ -188,7 +185,7 @@ export const CommentView: FC<CommentViewProps> = ({
         () => [
             {
                 label: tr('Edit'),
-                icon: <EditIcon size="xxs" />,
+                icon: <IconEditOutline size="xxs" />,
                 onClick: () => {
                     setEditMode(true);
                     setFocused(true);
@@ -197,7 +194,7 @@ export const CommentView: FC<CommentViewProps> = ({
             {
                 label: tr('Delete'),
                 color: danger0,
-                icon: <BinIcon size="xxs" />,
+                icon: <IconBinOutline size="xxs" />,
                 onClick: onDelete,
             },
         ],
@@ -208,7 +205,7 @@ export const CommentView: FC<CommentViewProps> = ({
         <ActivityFeedItem id={pin ? '' : `comment-${id}`}>
             <Circle size={32}>
                 {pin ? (
-                    <CircledIcon as={PinAltIcon} size="s" color={backgroundColor} />
+                    <CircledIcon as={IconPinAltOutline} size="s" color={backgroundColor} />
                 ) : (
                     <UserPic size={32} src={author?.image} email={author?.email} />
                 )}
@@ -251,7 +248,7 @@ export const CommentView: FC<CommentViewProps> = ({
                                 <Dropdown
                                     items={dropdownItems}
                                     renderTrigger={({ ref, onClick }) => (
-                                        <MoreVerticalIcon size="xs" ref={ref} onClick={onClick} />
+                                        <IconMoreVerticalOutline size="xs" ref={ref} onClick={onClick} />
                                     )}
                                     renderItem={({ item, cursor, index }) => (
                                         <MenuItem

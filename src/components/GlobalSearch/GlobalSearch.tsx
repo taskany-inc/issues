@@ -1,9 +1,10 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, ChangeEvent, useCallback, useMemo, useRef } from 'react';
-import styled from 'styled-components';
-import { ComboBox, Input, SearchIcon, Text, Table } from '@taskany/bricks';
-import { gapS, gapXs, gray7, radiusM, textColor } from '@taskany/colors';
 import NextLink from 'next/link';
+import styled from 'styled-components';
+import { ComboBox, Input, Text, Table } from '@taskany/bricks';
+import { gapS, gapXs, gray7, radiusM, textColor } from '@taskany/colors';
+import { IconSearchOutline } from '@taskany/icons';
 
 import { trpc } from '../../utils/trpcClient';
 import { routes, useRouter } from '../../hooks/router';
@@ -19,7 +20,7 @@ const StyledInput = styled(Input)`
     display: inline-block;
 `;
 
-const StyledSearchIcon = styled(SearchIcon)`
+const StyledSearchIcon = styled(IconSearchOutline)`
     position: relative;
     top: 2px;
 `;

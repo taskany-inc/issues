@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import InputMask from 'react-input-mask';
 import { danger8, danger9, gray6, textColor } from '@taskany/colors';
-import { Button, Input, ComboBox, CalendarTickIcon } from '@taskany/bricks';
+import { Button, Input, ComboBox } from '@taskany/bricks';
+import { IconCalendarTickOutline } from '@taskany/icons';
 
 import {
     createLocaleDate,
@@ -210,7 +211,7 @@ export const EstimateComboBox = React.forwardRef<HTMLDivElement, EstimateComboBo
                         <Button
                             disabled={props.disabled}
                             text={buttonText}
-                            iconLeft={<CalendarTickIcon noWrap size="xs" />}
+                            iconLeft={<IconCalendarTickOutline noWrap size="xs" />}
                             onClick={props.onClick}
                         />
                     </StyledTriggerContainer>

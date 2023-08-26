@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
+import { Estimate, State, Tag as TagModel } from '@prisma/client';
 import {
     Form,
     FormInput,
@@ -12,9 +13,8 @@ import {
     TagCleanButton,
     nullable,
     Button,
-    FlowIcon,
 } from '@taskany/bricks';
-import { Estimate, State, Tag as TagModel } from '@prisma/client';
+import { IconGitPullOutline } from '@taskany/icons';
 
 import { FormEditor } from '../FormEditor/FormEditor';
 import { estimatedMeta } from '../../utils/dateTime';
@@ -212,7 +212,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 )}
                             />
                         ) : (
-                            <Button text={tr('State')} iconLeft={<FlowIcon noWrap size="xs" />} disabled />
+                            <Button text={tr('State')} iconLeft={<IconGitPullOutline noWrap size="xs" />} disabled />
                         )}
 
                         <Controller

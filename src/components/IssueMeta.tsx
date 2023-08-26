@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { gapS, gapXs, gray4, gray9, textColor } from '@taskany/colors';
-import { EditCircleIcon, Text, nullable } from '@taskany/bricks';
+import { Text, nullable } from '@taskany/bricks';
+import { IconEdgeOutline } from '@taskany/icons';
 
 interface IssueMetaProps {
     title?: string;
@@ -42,7 +43,7 @@ export const IssueMeta: React.FC<IssueMetaProps> = ({ title, onEdit, children })
                 {title}{' '}
                 {nullable(onEdit, () => (
                     <EditButton>
-                        <EditCircleIcon size="s" onClick={onEdit} />
+                        <IconEdgeOutline size="s" onClick={onEdit} />
                     </EditButton>
                 ))}
             </StyledIssueMetaTitle>
