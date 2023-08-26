@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { ArrowDownSmallIcon, ArrowUpSmallIcon, Button, Dropdown, UserPic } from '@taskany/bricks';
-import { State } from '@prisma/client';
 import styled from 'styled-components';
+import { State } from '@prisma/client';
+import { Button, Dropdown, UserPic } from '@taskany/bricks';
+import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
 
 import { usePageContext } from '../../hooks/usePageContext';
 import { GoalCommentFormSchema } from '../../schema/goal';
@@ -141,9 +142,9 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                         brick="left"
                                         iconRight={
                                             props.visible ? (
-                                                <ArrowUpSmallIcon size="s" noWrap />
+                                                <IconUpSmallSolid size="s" noWrap />
                                             ) : (
-                                                <ArrowDownSmallIcon size="s" noWrap />
+                                                <IconDownSmallSolid size="s" noWrap />
                                             )
                                         }
                                         ref={props.ref}

@@ -1,7 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
-import { Button, ComboBox, Input, Tag, TagIcon } from '@taskany/bricks';
+import { Button, ComboBox, Input, Tag } from '@taskany/bricks';
+import { IconTagOutline } from '@taskany/icons';
 
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
@@ -96,7 +97,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                         text={props.text}
                         disabled={props.disabled}
                         onClick={props.onClick}
-                        iconLeft={<TagIcon noWrap size="xs" />}
+                        iconLeft={<IconTagOutline noWrap size="xs" />}
                     />
                 )}
                 renderInput={(props) => (

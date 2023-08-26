@@ -1,7 +1,8 @@
 import React from 'react';
 import NextLink from 'next/link';
-import { Link, QuestionIcon, iconSizesMap } from '@taskany/bricks';
+import { Link } from '@taskany/bricks';
 import { gray9 } from '@taskany/colors';
+import { IconQuestionCircleOutline, iconSizesMap } from '@taskany/icons';
 
 import { routes } from '../../hooks/router';
 import { AvailableHelpPages } from '../../types/help';
@@ -15,7 +16,7 @@ interface HelpButtonProps {
 export const HelpButton = React.memo(({ slug, size = 's', color = gray9 }: HelpButtonProps) => (
     <NextLink passHref href={routes.help(slug)} legacyBehavior>
         <Link>
-            <QuestionIcon size={size} color={color} />
+            <IconQuestionCircleOutline size={size} color={color} />
         </Link>
     </NextLink>
 ));

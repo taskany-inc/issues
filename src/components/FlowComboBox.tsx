@@ -2,7 +2,8 @@
 import React, { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
 import { Flow } from '@prisma/client';
-import { Button, Input, ComboBox, FlowIcon, MenuItem } from '@taskany/bricks';
+import { Button, Input, ComboBox, MenuItem } from '@taskany/bricks';
+import { IconGitPullOutline } from '@taskany/icons';
 
 import { trpc } from '../utils/trpcClient';
 
@@ -44,7 +45,7 @@ export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
                         text={props.text}
                         disabled={props.disabled}
                         onClick={props.onClick}
-                        iconLeft={<FlowIcon noWrap size="s" />}
+                        iconLeft={<IconGitPullOutline noWrap size="s" />}
                     />
                 )}
                 renderInput={(props) => (

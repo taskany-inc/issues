@@ -7,10 +7,9 @@ import {
     FiltersPanelContainer,
     FiltersPanelContent,
     FiltersSearchContainer,
-    StarFilledIcon,
-    StarIcon,
     nullable,
 } from '@taskany/bricks';
+import { IconStarOutline, IconStarSolid } from '@taskany/icons';
 
 import { filtersTakeCount } from '../../utils/filters';
 import { QueryState } from '../../hooks/useUrlFilterParams';
@@ -269,13 +268,13 @@ export const FiltersPanel: FC<{
                         {((Boolean(queryString) && !preset) || (preset && !preset._isOwner && !preset._isStarred)) &&
                             !preset?.default && (
                                 <FiltersAction onClick={onFilterStar}>
-                                    <StarIcon size="s" noWrap />
+                                    <IconStarOutline size="s" noWrap />
                                 </FiltersAction>
                             )}
 
                         {preset && (preset._isOwner || preset._isStarred) && (
                             <FiltersAction onClick={onFilterStar}>
-                                <StarFilledIcon size="s" noWrap />
+                                <IconStarSolid size="s" noWrap />
                             </FiltersAction>
                         )}
                     </FiltersMenuContainer>

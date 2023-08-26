@@ -1,22 +1,13 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState, useCallback, ChangeEventHandler } from 'react';
+import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { gray10 } from '@taskany/colors';
-import {
-    Button,
-    Fieldset,
-    Form,
-    FormInput,
-    FormAction,
-    FormActions,
-    FormRadio,
-    FormRadioInput,
-    BulbOnIcon,
-} from '@taskany/bricks';
-import styled from 'styled-components';
+import { Button, Fieldset, Form, FormInput, FormAction, FormActions, FormRadio, FormRadioInput } from '@taskany/bricks';
+import { IconBulbOnOutline } from '@taskany/icons';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { shallowEqual } from '../../utils/shallowEqual';
@@ -249,7 +240,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                     </Form>
                 </SettingsCard>
 
-                <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
                     {tr.raw('Press {key} to save settings', {
                         key: <Keyboard key="keyboard" command enter />,
                     })}

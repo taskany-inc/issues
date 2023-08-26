@@ -11,13 +11,13 @@ import {
     FormAction,
     FormActions,
     FormTitle,
-    BulbOnIcon,
     ModalHeader,
     ModalContent,
     Tag,
     KeyCode,
     TagCleanButton,
 } from '@taskany/bricks';
+import { IconBulbOnOutline } from '@taskany/icons';
 
 import { trpc } from '../../utils/trpcClient';
 import { Tip } from '../Tip';
@@ -160,7 +160,7 @@ const UserInviteForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={tr('Pro tip!')} icon={<BulbOnIcon size="s" color={gray10} />}>
+                    <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
                         {tr.raw('Press key to send invites', {
                             key: <Keyboard command enter />,
                         })}

@@ -10,9 +10,6 @@ import {
     CardInfo,
     Dropdown,
     Link,
-    MoreVerticalIcon,
-    BinIcon,
-    EditIcon,
     MenuItem,
     ModalContent,
     ModalHeader,
@@ -20,6 +17,7 @@ import {
     nullable,
     Text,
 } from '@taskany/bricks';
+import { IconMoreVerticalOutline, IconBinOutline, IconEditOutline } from '@taskany/icons';
 
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -160,13 +158,13 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         () => [
             {
                 label: tr('Edit'),
-                icon: <EditIcon size="xxs" />,
+                icon: <IconEditOutline size="xxs" />,
                 onClick: dispatchModalEvent(ModalEvent.GoalEditModal),
             },
             {
                 label: tr('Delete'),
                 color: danger0,
-                icon: <BinIcon size="xxs" />,
+                icon: <IconBinOutline size="xxs" />,
                 onClick: dispatchModalEvent(ModalEvent.GoalDeleteModal),
             },
         ],
@@ -259,7 +257,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                     <Button
                                         ref={ref}
                                         ghost
-                                        iconLeft={<MoreVerticalIcon noWrap size="xs" />}
+                                        iconLeft={<IconMoreVerticalOutline noWrap size="xs" />}
                                         onClick={onClick}
                                     />
                                 )}

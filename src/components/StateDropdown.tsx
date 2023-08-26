@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Dropdown, FlowIcon } from '@taskany/bricks';
+import { Button, Dropdown } from '@taskany/bricks';
+import { IconGitPullOutline } from '@taskany/icons';
 import { State } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
@@ -54,7 +55,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                         text={props.text}
                         onClick={props.onClick}
                         disabled={props.disabled}
-                        iconLeft={state ? <StateDot hue={state.hue} /> : <FlowIcon noWrap size="xs" />}
+                        iconLeft={state ? <StateDot hue={state.hue} /> : <IconGitPullOutline noWrap size="xs" />}
                     />
                 )}
                 renderItem={(props) => (

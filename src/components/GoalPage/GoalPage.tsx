@@ -3,18 +3,8 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { gapM, gray7 } from '@taskany/colors';
-import {
-    Button,
-    Card,
-    CardInfo,
-    CardContent,
-    EditIcon,
-    BinIcon,
-    nullable,
-    Text,
-    PlusIcon,
-    ArrowRightIcon,
-} from '@taskany/bricks';
+import { Button, Card, CardInfo, CardContent, nullable, Text } from '@taskany/bricks';
+import { IconEditOutline, IconBinOutline, IconPlusCircleOutline, IconArrowRightOutline } from '@taskany/icons';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { editGoalKeys } from '../../utils/hotkeys';
@@ -322,7 +312,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         {nullable(goal._isEditable, () => (
                             <Button
                                 text={tr('Edit')}
-                                iconLeft={<EditIcon noWrap size="xs" />}
+                                iconLeft={<IconEditOutline noWrap size="xs" />}
                                 onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
                             />
                         ))}
@@ -475,7 +465,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onChange={onParticipantAdd}
                                     renderTrigger={(props) => (
                                         <StyledInlineTrigger
-                                            icon={<PlusIcon noWrap size="xs" />}
+                                            icon={<IconPlusCircleOutline noWrap size="xs" />}
                                             text={tr('Add participant')}
                                             onClick={props.onClick}
                                         />
@@ -494,7 +484,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onChange={onGoalTransfer}
                                     renderTrigger={(props) => (
                                         <StyledInlineTrigger
-                                            icon={<ArrowRightIcon noWrap size="xs" />}
+                                            icon={<IconArrowRightOutline noWrap size="xs" />}
                                             text={tr('Transfer goal')}
                                             onClick={props.onClick}
                                         />
@@ -504,7 +494,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                             <StyledInlineInput>
                                 <StyledInlineTrigger
-                                    icon={<BinIcon noWrap size="xs" />}
+                                    icon={<IconBinOutline noWrap size="xs" />}
                                     text={tr('Archive goal')}
                                     onClick={dispatchModalEvent(ModalEvent.GoalDeleteModal)}
                                 />

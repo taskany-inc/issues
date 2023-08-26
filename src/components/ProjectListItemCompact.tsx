@@ -1,8 +1,9 @@
 import React, { MouseEventHandler } from 'react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
-import { ProjectIcon, TableRow, TableCell } from '@taskany/bricks';
+import { TableRow, TableCell } from '@taskany/bricks';
 import { gapS, gapXs, radiusM } from '@taskany/colors';
+import { IconUsersOutline } from '@taskany/icons';
 
 import { routes } from '../hooks/router';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
@@ -38,7 +39,7 @@ export const ProjectListItemCompact: React.FC<ProjectListItemCompactProps> = Rea
                     gap={10}
                 >
                     <TableCell min>
-                        <ProjectIcon size="s" />
+                        <IconUsersOutline size="s" />
                     </TableCell>
                     <TableCell col={6.5}>
                         <TitleContainer>

@@ -1,16 +1,7 @@
 import React, { MouseEventHandler, useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import {
-    nullable,
-    GoalIcon,
-    Dropdown,
-    MenuItem,
-    TableRow,
-    TableCell,
-    TableRowProps,
-    TableCellProps,
-} from '@taskany/bricks';
-import { IconMoreVerticalOutline } from '@taskany/icons';
+import { nullable, Dropdown, MenuItem, TableRow, TableCell, TableRowProps, TableCellProps } from '@taskany/bricks';
+import { IconMoreVerticalOutline, IconTargetOutline } from '@taskany/icons';
 import type { Estimate, State as StateType } from '@prisma/client';
 
 import { Priority } from '../types/priority';
@@ -189,7 +180,7 @@ export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
             justify={justify}
         >
             <StyledCell key="icon" forIcon min>
-                {rowIcon || <GoalIcon size="s" />}
+                {rowIcon || <IconTargetOutline size="s" />}
             </StyledCell>
             {columns.map((col) => (
                 <Column key={col.name} col={col} componentProps={item} />

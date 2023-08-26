@@ -1,5 +1,6 @@
 import React from 'react';
-import { Badge, Button, StarFilledIcon, StarIcon } from '@taskany/bricks';
+import { Badge, Button } from '@taskany/bricks';
+import { IconStarOutline, IconStarSolid } from '@taskany/icons';
 
 import { tr } from './StarButton.i18n';
 
@@ -15,7 +16,7 @@ interface IconProps {
 }
 
 const Icon: React.FC<IconProps> = ({ filled }) => {
-    const Comp = filled ? StarFilledIcon : StarIcon;
+    const Comp = filled ? IconStarSolid : IconStarOutline;
 
     return <Comp size="s" />;
 };

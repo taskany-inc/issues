@@ -1,5 +1,6 @@
 import { FC, useCallback } from 'react';
-import { ArrowUpSmallIcon, Button, Dropdown, ArrowDownSmallIcon, MenuItem } from '@taskany/bricks';
+import { Button, Dropdown, MenuItem } from '@taskany/bricks';
+import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { createFastButton, createGoalItem, createProjectItem, createSelectButton } from '../../utils/domObjects';
@@ -42,9 +43,9 @@ export const PageHeaderActionButton: FC = () => {
                         brick="left"
                         iconRight={
                             props.visible ? (
-                                <ArrowUpSmallIcon size="s" noWrap />
+                                <IconUpSmallSolid size="s" noWrap />
                             ) : (
-                                <ArrowDownSmallIcon size="s" noWrap />
+                                <IconDownSmallSolid size="s" noWrap />
                             )
                         }
                         ref={props.ref}
