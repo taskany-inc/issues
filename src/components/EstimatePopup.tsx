@@ -1,12 +1,10 @@
 import { useClickOutside, Popup, nullable, Text } from '@taskany/bricks';
-import { gapS, danger10, warn0, gapXs } from '@taskany/colors';
-import { ReactNode, useRef, useState, useCallback } from 'react';
+import { gapS, danger10, warn0, gapXs, radiusM } from '@taskany/colors';
+import { ReactNode, useRef, useState, useCallback, ComponentProps } from 'react';
 import styled from 'styled-components';
 import { IconExclamationSmallOutline } from '@taskany/icons';
 
 import { Option } from '../types/estimate';
-
-import { PopupProps, OutlinePopup } from './OutlinePopup';
 
 const StyledWrapper = styled.div`
     display: flex;
@@ -40,12 +38,20 @@ const StyledWarningWrapper = styled.div`
     gap: ${gapXs};
 `;
 
+const StyledPopup = styled(Popup)`
+    border-radius: ${radiusM};
+    padding: ${gapS};
+`;
+
+interface EstimateOption extends Option {
+    renderItem?: (option: Option) => ReactNode;
+}
 interface EstimatePopupProps {
-    renderItem: (option: Option) => ReactNode;
+    renderItem: (option: EstimateOption) => ReactNode;
     renderTrigger: (values: { onClick: () => void }) => ReactNode;
     onClose?: () => void;
-    items: Option[];
-    placement?: PopupProps['placement'];
+    items: EstimateOption[];
+    placement?: ComponentProps<typeof Popup>['placement'];
     error?: { message?: string };
     warning?: { message?: string };
 }
@@ -93,7 +99,7 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
 
             <div ref={triggerRef}>{renderTrigger({ onClick: onToggleVisible })}</div>
 
-            <OutlinePopup
+            <StyledPopup
                 visible={visible}
                 placement={placement}
                 reference={triggerRef}
@@ -114,7 +120,7 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
                     ))}
                     {items.map((item) => renderItem?.(item))}
                 </StyledWrapper>
-            </OutlinePopup>
+            </StyledPopup>
         </div>
     );
 };

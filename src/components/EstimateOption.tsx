@@ -16,11 +16,15 @@ const StyledContent = styled.div`
     gap: ${gapS};
 `;
 
+const StyledIconPlusCircleSolid = styled(IconPlusCircleSolid)`
+    cursor: pointer;
+`;
+
 interface EstimateOptionProps {
     title?: string;
     clue?: string | null;
     readOnly?: boolean;
-    onClickIcon?: () => void;
+    onClick?: () => void;
     renderTrigger?: () => ReactNode;
 }
 
@@ -28,7 +32,7 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({
     title,
     clue,
     readOnly,
-    onClickIcon,
+    onClick: onClickIcon,
     renderTrigger,
 }) => {
     const onClick = useCallback(() => {
@@ -39,18 +43,16 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({
         <StyledWrapper>
             <StyledContent>
                 {nullable(title, (t) => (
-                    <Text weight="regular" size="s">
-                        {t}
-                    </Text>
+                    <Text size="s">{t}</Text>
                 ))}
 
                 {nullable(readOnly, () => (
-                    <IconPlusCircleSolid size="xs" color={gray9} onClick={onClick} style={{ cursor: 'pointer' }} />
+                    <StyledIconPlusCircleSolid size="xs" color={gray9} onClick={onClick} />
                 ))}
             </StyledContent>
 
             {nullable(clue, (c) => (
-                <Text weight="regular" size="xxs" color={gray7}>
+                <Text size="xxs" color={gray7}>
                     {c}
                 </Text>
             ))}

@@ -25,6 +25,12 @@ interface EstimateDateProps {
     >;
 }
 
+const expectedLength = 8;
+const isDateFullyFilled = (date: string) => {
+    const cleanedDate = date.replace(/[^0-9]/g, '');
+    return cleanedDate.length === expectedLength;
+};
+
 export const EstimateDate: React.FC<EstimateDateProps> = ({
     mask,
     placeholder,
@@ -40,7 +46,7 @@ export const EstimateDate: React.FC<EstimateDateProps> = ({
     const ref = useRef(null);
 
     useClickOutside(ref, () => {
-        if (!fullDate.includes('_')) return;
+        if (isDateFullyFilled(fullDate)) return;
 
         setFullDate(currentDate);
         setReadOnly((prev) => {
@@ -53,7 +59,7 @@ export const EstimateDate: React.FC<EstimateDateProps> = ({
     });
 
     useEffect(() => {
-        if (fullDate.includes('_') || fullDate === currentDate) return;
+        if (!isDateFullyFilled(fullDate) || fullDate === currentDate) return;
 
         const values = createValue(fullDate, locale);
         onChange?.(values);
@@ -73,7 +79,7 @@ export const EstimateDate: React.FC<EstimateDateProps> = ({
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const { value } = e.target;
 
-            if (value.includes('_')) {
+            if (!isDateFullyFilled(value)) {
                 setFullDate(value);
                 return;
             }
@@ -105,7 +111,7 @@ export const EstimateDate: React.FC<EstimateDateProps> = ({
         onChange?.(value);
     }, [currentDate, onChange, setReadOnly, value]);
 
-    const onClickIcon = useCallback(() => {
+    const onClick = useCallback(() => {
         const estimate = onCreateEstimate(currentDate);
 
         setReadOnly({
@@ -121,7 +127,7 @@ export const EstimateDate: React.FC<EstimateDateProps> = ({
         <EstimateOption
             title={option.title}
             readOnly={readOnly}
-            onClickIcon={onClickIcon}
+            onClick={onClick}
             renderTrigger={() => (
                 <InputMask mask={mask} placeholder={placeholder} onChange={onChangeDate} value={fullDate}>
                     {/* @ts-ignore incorrect type in react-input-mask */}

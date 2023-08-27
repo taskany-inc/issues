@@ -1,11 +1,20 @@
 import { Input, Dropdown, Button, ArrowUpSmallIcon, ArrowDownSmallIcon, MenuItem, Text } from '@taskany/bricks';
 import { useState, useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
+import styled from 'styled-components';
 
 import { createLocaleDate, parseLocaleDate, yearFromDate } from '../utils/dateTime';
 import { Estimate, Option } from '../types/estimate';
 import { useLocale } from '../hooks/useLocale';
 
 import { EstimateOption } from './EstimateOption';
+
+const StyledTriggerWrapper = styled.div`
+    display: flex;
+`;
+
+const StyledInput = styled(Input)`
+    padding: 2px 8px;
+`;
 
 interface EstimateYearProps {
     option: Option;
@@ -77,7 +86,7 @@ export const EstimateYear: React.FC<EstimateYearProps> = ({ option, value, readO
         setSelectedYear(year);
     }, []);
 
-    const onClickIcon = useCallback(() => {
+    const onClick = useCallback(() => {
         const year = value?.y || `${currentYear}`;
         onChange?.({ y: year, q: null, date: null });
         setSelectedYear(+year);
@@ -89,18 +98,17 @@ export const EstimateYear: React.FC<EstimateYearProps> = ({ option, value, readO
             title={option.title}
             clue={option.clue}
             readOnly={readOnly}
-            onClickIcon={onClickIcon}
+            onClick={onClick}
             renderTrigger={() => (
-                <div style={{ display: 'flex' }} ref={inputRef}>
-                    <Input
+                <StyledTriggerWrapper ref={inputRef}>
+                    <StyledInput
                         onChange={onChangeYear}
                         value={selectedYear}
-                        brick={'right'}
-                        type={'number'}
+                        brick="right"
+                        type="number"
                         view="default"
                         size="s"
-                        min={currentYear - 2}
-                        style={{ padding: '2px 8px' }}
+                        min={currentYear - 1}
                     />
                     <Dropdown
                         placement="top-end"
@@ -128,7 +136,7 @@ export const EstimateYear: React.FC<EstimateYearProps> = ({ option, value, readO
                             </MenuItem>
                         )}
                     />
-                </div>
+                </StyledTriggerWrapper>
             )}
         />
     );
