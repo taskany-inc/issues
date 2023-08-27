@@ -79,7 +79,7 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, value,
         [locale, onChange, value],
     );
 
-    const onClickIcon = useCallback(() => {
+    const onClick = useCallback(() => {
         setReadOnly({
             quarter: false,
             year: false,
@@ -93,7 +93,7 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, value,
             title={option.title}
             clue={option.clue}
             readOnly={readOnly}
-            onClickIcon={onClickIcon}
+            onClick={onClick}
             renderTrigger={() => (
                 <StyledQuarters ref={ref}>
                     {quartersList.map((quarter) => {
