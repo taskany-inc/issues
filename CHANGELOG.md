@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.26.0](https://github.com/taskany-inc/issues/compare/v1.25.0...v1.26.0) (2023-08-28)
+
+
+### Features
+
+* **GlobalSearch:** full size search with keyboard nav ([ca705c6](https://github.com/taskany-inc/issues/commit/ca705c6070f9c390c76610260873e58290e6e0a0))
+
 ## [1.25.0](https://github.com/taskany-inc/issues/compare/v1.24.1...v1.25.0) (2023-08-24)
 
 
