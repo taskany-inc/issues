@@ -1,5 +1,6 @@
-import { Input, Dropdown, Button, ArrowUpSmallIcon, ArrowDownSmallIcon, MenuItem, Text } from '@taskany/bricks';
+import { Input, Dropdown, Button, MenuItem, Text } from '@taskany/bricks';
 import { useState, useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
+import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 import styled from 'styled-components';
 
 import { createLocaleDate, parseLocaleDate, yearFromDate } from '../utils/dateTime';
@@ -121,9 +122,9 @@ export const EstimateYear: React.FC<EstimateYearProps> = ({ option, value, readO
                                 brick="left"
                                 iconRight={
                                     props.visible ? (
-                                        <ArrowUpSmallIcon size="s" noWrap />
+                                        <IconUpSmallSolid size="s" noWrap />
                                     ) : (
-                                        <ArrowDownSmallIcon size="s" noWrap />
+                                        <IconDownSmallSolid size="s" noWrap />
                                     )
                                 }
                                 ref={props.ref}

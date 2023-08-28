@@ -3,7 +3,7 @@ import { gray6, gapXs } from '@taskany/colors';
 import { useState, useRef, useCallback, Dispatch, SetStateAction, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { quarters, endOfQuarter, createLocaleDate } from '../utils/dateTime';
+import { quarters, endOfQuarter, createLocaleDate, yearFromDate } from '../utils/dateTime';
 import { Estimate, Option, QuartersKeys } from '../types/estimate';
 import { useLocale } from '../hooks/useLocale';
 
@@ -85,7 +85,7 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, value,
             year: false,
             date: true,
         });
-        onChange?.({ y: value?.y || `${new Date().getFullYear()}`, q: null, date: null });
+        onChange?.({ y: value?.y || `${yearFromDate(new Date())}`, q: null, date: null });
     }, [onChange, setReadOnly, value?.y]);
 
     return (

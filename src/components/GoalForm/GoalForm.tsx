@@ -13,9 +13,8 @@ import {
     TagCleanButton,
     nullable,
     Button,
-    CalendarTickIcon,
 } from '@taskany/bricks';
-import { IconGitPullOutline } from '@taskany/icons';
+import { IconGitPullOutline, IconCalendarTickOutline } from '@taskany/icons';
 
 import { FormEditor } from '../FormEditor/FormEditor';
 import { formatEstimate } from '../../utils/dateTime';
@@ -202,7 +201,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                                             ? formatEstimate(field.value || {}, locale)
                                                             : field.value?.y
                                                     }
-                                                    iconLeft={<CalendarTickIcon noWrap size="xs" />}
+                                                    iconLeft={<IconCalendarTickOutline noWrap size="xs" />}
                                                 />
                                             );
                                         }}
