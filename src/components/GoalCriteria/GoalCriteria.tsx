@@ -210,11 +210,14 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
 
     return (
         <StyledGoalListItemCompact
+            icon
             actions={availableActions}
             onActionClick={handleChange}
             item={itemToRender}
             rawIcon={
-                !goalAsCriteria && <GoalCriteriaCheckBox onClick={onToggle} checked={item.isDone} canEdit={canEdit} />
+                goalAsCriteria ? undefined : (
+                    <GoalCriteriaCheckBox onClick={onToggle} checked={item.isDone} canEdit={canEdit} />
+                )
             }
             columns={[
                 {

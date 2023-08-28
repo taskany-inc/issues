@@ -172,7 +172,7 @@ export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
 }) => {
     return (
         <TableRow interactive={attrs.focused != null} gap={gap} align={align} justify={justify} {...attrs}>
-            {nullable(icon || rawIcon, () => (
+            {nullable(icon, () => (
                 <StyledCell key="icon" forIcon min>
                     {rawIcon}
                 </StyledCell>
