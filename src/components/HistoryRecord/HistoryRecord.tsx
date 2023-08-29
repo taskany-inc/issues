@@ -312,7 +312,7 @@ export const HistoryRecordTags: React.FC<HistoryChangeProps<TagData[]>> = ({ fro
 export const HistoryRecordEstimate: React.FC<HistoryChangeProps<Estimate>> = ({ from, to }) => (
     <HistorySimplifyRecord
         from={from ? <Tag size="s">{`${from.q}/${from.y}`}</Tag> : null}
-        to={to ? <Tag size="s">{`${to.q}/${to.y}`}</Tag> : null}
+        to={to ? <Tag size="s">{to.q ? `${to.q}/${to.y}` : to.y}</Tag> : null}
     />
 );
 
