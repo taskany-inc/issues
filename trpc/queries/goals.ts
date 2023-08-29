@@ -1,6 +1,7 @@
 import { Estimate, EstimateToGoal, Goal, GoalAchieveCriteria, Prisma, Role, State, StateType } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
+import { quarters } from '../../src/utils/dateTime';
 
 const defaultOrderBy = {
     updatedAt: 'desc',
@@ -35,6 +36,50 @@ const getStateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['where'
     return state;
 };
 
+const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['where'] => {
+    const state: Prisma.GoalFindManyArgs['where'] = {};
+
+    if (data.estimate?.length) {
+        return {
+            estimate: {
+                some: {
+                    estimate: {
+                        OR: data.estimate.reduce((acum, e) => {
+                            const match = e.match(
+                                new RegExp(`((?<q>${Object.keys(quarters).join('|')})/)?(?<y>[0-9]+$)`),
+                            );
+
+                            if (match) {
+                                const { groups: { q, y } = {} } = match;
+
+                                if (q) {
+                                    acum.push({
+                                        q,
+                                        y,
+                                    });
+
+                                    acum.push({
+                                        q: null,
+                                        y,
+                                    });
+                                } else {
+                                    acum.push({
+                                        y,
+                                    });
+                                }
+                            }
+
+                            return acum;
+                        }, [] as { q?: string | null; y: string }[]),
+                    },
+                },
+            },
+        };
+    }
+
+    return state;
+};
+
 export const goalsFilter = (
     data: QueryWithFilters,
     activityId: string,
@@ -59,24 +104,7 @@ export const goalsFilter = (
           }
         : {};
 
-    const estimateFilter: Prisma.GoalFindManyArgs['where'] = data.estimate?.length
-        ? {
-              estimate: {
-                  some: {
-                      estimate: {
-                          OR: data.estimate.map((e) => {
-                              const [q, y] = e.split('/');
-
-                              return {
-                                  q,
-                                  y,
-                              };
-                          }),
-                      },
-                  },
-              },
-          }
-        : {};
+    const estimateFilter: Prisma.GoalFindManyArgs['where'] = getEstimateFilter(data);
 
     const issuerFilter: Prisma.GoalFindManyArgs['where'] = data.issuer?.length
         ? {
