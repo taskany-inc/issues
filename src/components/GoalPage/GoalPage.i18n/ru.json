@@ -9,5 +9,8 @@
     "Archive goal": "Удалить цель",
     "Type user name or email": "Введите имя или email",
     "Type project title": "Введите название проекта",
-    "Transfer goal": "Перенести цель"
+    "Transfer goal": "Перенести цель",
+    "Tags": "Теги",
+    "Add tag": "Добавить тег",
+    "Enter tag title": "Название тега"
 }
