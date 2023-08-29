@@ -1,5 +1,5 @@
 import { Button, useClickOutside } from '@taskany/bricks';
-import { gray6, gapXs } from '@taskany/colors';
+import { gapXs } from '@taskany/colors';
 import { useState, useRef, useCallback, Dispatch, SetStateAction, useEffect } from 'react';
 import styled from 'styled-components';
 
@@ -13,10 +13,6 @@ const StyledQuarters = styled.div`
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: ${gapXs};
-`;
-
-const StyledCheckableButton = styled(Button)<{ checked?: boolean }>`
-    background-color: ${({ checked }) => checked && gray6};
 `;
 
 interface EstimateQuarterProps {
@@ -98,7 +94,7 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, value,
                 <StyledQuarters ref={ref}>
                     {quartersList.map((quarter) => {
                         return (
-                            <StyledCheckableButton
+                            <Button
                                 key={quarter}
                                 size="s"
                                 text={quarter}

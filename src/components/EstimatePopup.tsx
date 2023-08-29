@@ -87,7 +87,7 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
     });
 
     return (
-        <div>
+        <>
             {nullable(error, (err) => (
                 <>
                     <StyledErrorTrigger ref={errorRef} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} />
@@ -104,7 +104,7 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
                 placement={placement}
                 reference={triggerRef}
                 interactive
-                minWidth={160}
+                minWidth={180}
                 maxWidth={180}
             >
                 <StyledWrapper ref={popupContentRef}>
@@ -121,6 +121,6 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
                     {items.map((item) => renderItem?.(item))}
                 </StyledWrapper>
             </StyledPopup>
-        </div>
+        </>
     );
 };
