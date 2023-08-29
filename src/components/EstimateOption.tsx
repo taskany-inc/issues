@@ -1,7 +1,7 @@
 import { Text, nullable } from '@taskany/bricks';
 import { gapXs, gapS, gray9, gray7 } from '@taskany/colors';
 import { IconPlusCircleSolid } from '@taskany/icons';
-import React, { ReactNode, useCallback } from 'react';
+import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 
 const StyledWrapper = styled.div`
@@ -16,10 +16,6 @@ const StyledContent = styled.div`
     gap: ${gapS};
 `;
 
-const StyledIconPlusCircleSolid = styled(IconPlusCircleSolid)`
-    cursor: pointer;
-`;
-
 interface EstimateOptionProps {
     title?: string;
     clue?: string | null;
@@ -28,17 +24,7 @@ interface EstimateOptionProps {
     renderTrigger?: () => ReactNode;
 }
 
-export const EstimateOption: React.FC<EstimateOptionProps> = ({
-    title,
-    clue,
-    readOnly,
-    onClick: onClickIcon,
-    renderTrigger,
-}) => {
-    const onClick = useCallback(() => {
-        onClickIcon?.();
-    }, [onClickIcon]);
-
+export const EstimateOption: React.FC<EstimateOptionProps> = ({ title, clue, readOnly, onClick, renderTrigger }) => {
     return (
         <StyledWrapper>
             <StyledContent>
@@ -47,7 +33,7 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({
                 ))}
 
                 {nullable(readOnly, () => (
-                    <StyledIconPlusCircleSolid size="xs" color={gray9} onClick={onClick} />
+                    <IconPlusCircleSolid size="xs" color={gray9} onClick={onClick} />
                 ))}
             </StyledContent>
 
