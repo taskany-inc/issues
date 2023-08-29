@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { gapM, gray7 } from '@taskany/colors';
-import { Button, Card, CardInfo, CardContent, nullable, Text } from '@taskany/bricks';
+import { Button, Card, CardInfo, CardContent, nullable, Text, Tag } from '@taskany/bricks';
 import { IconEditOutline, IconBinOutline, IconPlusCircleOutline, IconArrowRightOutline } from '@taskany/icons';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -46,6 +46,8 @@ import CommentCreateForm from '../CommentCreateForm/CommentCreateForm';
 import { CommentView } from '../CommentView/CommentView';
 import { ModalContext } from '../ModalOnEvent';
 import { useFMPMetric } from '../../utils/telemetry';
+import { TagComboBox } from '../TagComboBox';
+import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 
 import { tr } from './GoalPage.i18n';
 
@@ -95,6 +97,14 @@ const StyledInlineInput = styled.div`
     height: 28px;
 `;
 
+interface TagObject {
+    id: string;
+    title: string;
+    description?: string | null;
+}
+
+const tagsLimit = 5;
+
 export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
 
@@ -135,6 +145,39 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
             }
         },
         [goal, invalidateFn, stateMutation],
+    );
+    const update = useGoalUpdate(goal?.id);
+    const onTagAdd = useCallback(
+        async (value: TagObject[]) => {
+            if (goal) {
+                await update({
+                    ...goal,
+                    tags: [...goal.tags, ...value],
+                    state: {
+                        id: goal.state?.id || '',
+                        hue: goal.state?.hue,
+                        title: goal.state?.title,
+                        type: goal.state?.type || 'NotStarted',
+                    },
+                    parent: {
+                        id: goal.project?.id || '',
+                        title: goal.project?.title || '',
+                        flowId: goal.project?.flowId || '',
+                    },
+                    owner: {
+                        id: goal.owner?.id || '',
+                        user: {
+                            nickname: goal.owner?.user?.nickname || null,
+                            name: goal.owner?.user?.name || null,
+                            email: goal.owner?.user?.email || '',
+                        },
+                    },
+                    estimate: goal.estimate[0]?.estimate,
+                });
+                invalidateFn();
+            }
+        },
+        [goal, invalidateFn, update],
     );
 
     const addParticipantMutation = trpc.goal.addParticipant.useMutation();
@@ -474,7 +517,31 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                             </StyledInlineInput>
                         ))}
                     </IssueMeta>
-
+                    {nullable(!(!goal.tags.length && !goal._isEditable), () => (
+                        <>
+                            <IssueMeta title={tr('Tags')}>
+                                {goal.tags?.map((tag) => (
+                                    <Tag key={tag.id}>{tag.title}</Tag>
+                                ))}
+                            </IssueMeta>
+                            {nullable(goal._isEditable, () => (
+                                <StyledInlineInput>
+                                    <TagComboBox
+                                        disabled={(goal.tags || []).length >= tagsLimit}
+                                        placeholder={tr('Enter tag title')}
+                                        onChange={onTagAdd}
+                                        renderTrigger={(props) => (
+                                            <StyledInlineTrigger
+                                                icon={<IconPlusCircleOutline noWrap size="xs" />}
+                                                text={tr('Add tag')}
+                                                onClick={props.onClick}
+                                            />
+                                        )}
+                                    />
+                                </StyledInlineInput>
+                            ))}
+                        </>
+                    ))}
                     {nullable(goal._isEditable, () => (
                         <IssueMeta>
                             <StyledInlineInput>
