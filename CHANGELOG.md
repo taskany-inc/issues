@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.27.0](https://github.com/taskany-inc/issues/compare/v1.26.0...v1.27.0) (2023-08-30)
+
+
+### Features
+
+* **Estimate:** create new popup for estimate ([54832a9](https://github.com/taskany-inc/issues/commit/54832a9573a9c0c32745167edab17933a067e13c))
+* **GoalPage:** show goal tags in sidebar ([450a6fd](https://github.com/taskany-inc/issues/commit/450a6fddfc1f9ca9fa48ba4c9f25caad2660def2))
+
+
+### Bug Fixes
+
+* **EstimateFilter:** simple year filter support ([5355b76](https://github.com/taskany-inc/issues/commit/5355b76be41924360c77498065a1745d7fb9613b))
+* **Estimate:** resolve all conversations ([b752980](https://github.com/taskany-inc/issues/commit/b752980236ea9403261243ea4a5db07e2ea7e906))
+* **FiltersPanel:** estimate as JSON at search URL ([d8ef40e](https://github.com/taskany-inc/issues/commit/d8ef40ea73d731e91febee9512352721b1a484d2))
+* **FiltersPanel:** user filters became avalible ([9625dc1](https://github.com/taskany-inc/issues/commit/9625dc12179337c4aa225eb22362351613f76642))
+* **GlobalSearch:** do not show icon for goals ([26f83a3](https://github.com/taskany-inc/issues/commit/26f83a39a353549dd28f60c85a71a7ee8a649d51))
+* **HistoryRecordEstimate:** fix text content ([a51a96c](https://github.com/taskany-inc/issues/commit/a51a96c1aa9cd93171391ae3a2dea858330c05ee))
+
 ## [1.26.0](https://github.com/taskany-inc/issues/compare/v1.25.0...v1.26.0) (2023-08-28)
 
 
