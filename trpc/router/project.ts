@@ -1,4 +1,4 @@
-import { Activity, Prisma, Project, Role, User } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
 
@@ -21,7 +21,6 @@ import {
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
-import { fillProject, sqlGoalsFilter } from '../queries/sqlProject';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { FieldDiff } from '../../src/types/common';
 import { updateLinkedGoalsByProject } from '../../src/utils/db';
@@ -278,127 +277,48 @@ export const project = router({
                 })
                 .optional(),
         )
-        .query(async ({ ctx, input: { goalsQuery = {}, firstLevel } = {} }) => {
+        .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
             const { activityId, role } = ctx.session.user;
 
-            const stateByTypes = goalsQuery?.stateType
-                ? await prisma.state.findMany({
-                      where: {
-                          type: {
-                              in: goalsQuery.stateType,
-                          },
-                      },
-                  })
-                : [];
+            if (goalsQuery && goalsQuery.stateType) {
+                goalsQuery.state = goalsQuery.state ?? [];
 
-            stateByTypes.forEach((state) => {
-                if (!goalsQuery.state) {
-                    goalsQuery.state = [];
-                }
-
-                if (!goalsQuery.state.includes(state.id)) {
-                    goalsQuery.state.push(state.id);
-                }
-            });
-
-            const sqlFilters = sqlGoalsFilter(activityId, goalsQuery);
-
-            const [projects, watchers, stargizers, projectsChildrenParent] = await Promise.all([
-                prisma.$queryRaw`
-                    select
-                        p.id,
-                        p.title,
-                        p.description,
-                        p."flowId",
-                        p."createdAt",
-                        p."updatedAt",
-                        p."activityId",
-                        count(distinct g) as "goalsCount"
-                    from "Project" as p
-                    left join "Goal" as g on p.id = g."projectId" and g."archived" is not true
-                    left join "Activity" as a on a.id = p."activityId"
-                    left join "Tag" as t on g."activityId" = t."activityId"
-                    left join "_projectStargizers" as ps on ps."B" = p.id
-                    left join "_projectWatchers" as pw on pw."B" = p.id
-                    left join "_goalStargizers" as gs on gs."B" = g.id
-                    left join "_goalWatchers" as gw on gw."B" = g.id
-                    left join "_goalParticipants" as gp on gp."B" = g.id
-                    left join "_parentChildren" as pc on pc."B" = p.id
-                    where p."archived" is not true
-                        ${sqlFilters}
-                        ${firstLevel ? Prisma.sql`and pc."A" is null` : Prisma.empty}
-                    group by p.id
-                    order by max(g."updatedAt") desc
-            ` as Promise<NonNullable<(Project & { goalsCount: number })[]>>,
-                prisma.$queryRaw`
-                        select pw."A" as id, pw."B" as "projectId"
-                        from "_projectWatchers" as pw
-                        where pw."A" in (${activityId})
-            ` as Promise<{ id: string; projectId: string }[]>,
-                prisma.$queryRaw`
-                        select ps."A" as id, ps."B" as "projectId"
-                        from "_projectStargizers" as ps
-                        where ps."A" in (${activityId})
-            ` as Promise<{ id: string; projectId: string }[]>,
-                prisma.$queryRaw`
-                    select
-                        pc."A" as "parentProjectId",
-                        pc."B" as "projectId"
-                    from "Project" as p
-                    left join "_parentChildren" as pc on pc."B" = p.id
-                    where pc."A" is not null and pc."B" is not null
-            ` as Promise<{ parentProjectId: string; projectId: string }[]>,
-            ]);
-
-            const activities = (
-                (await prisma.$queryRaw`
-                select *
-                from "Activity" as a
-                left join "User" as u on u."activityId" = a.id
-            `) as NonNullable<(Activity & { activityId: string; user: User })[]>
-            ).reduce((acc, { ghostId, settingsId, createdAt, updatedAt, ...rest }) => {
-                acc[rest.activityId] = {
-                    id: rest.activityId,
-                    createdAt,
-                    ghostId,
-                    settingsId,
-                    updatedAt,
-                    user: rest as unknown as User,
-                };
-                return acc;
-            }, {} as Record<string, NonNullable<Activity & { user: User }>>);
-
-            const projectsDict = projects.reduce((acc, { goalsCount, ...project }) => {
-                acc[project.id] = {
-                    ...project,
-                    watchers: [],
-                    stargizers: [],
-                    parent: [],
-                    tags: [],
-                    children: [],
-                    participants: [],
-                    activity: activities[project.activityId],
-                    _count: {
-                        watchers: 0,
-                        stargizers: 0,
-                        goals: Number(goalsCount),
-                        participants: 0,
-                        children: 0,
-                        parent: 0,
+                const stateByTypes = await prisma.state.findMany({
+                    where: {
+                        type: {
+                            in: goalsQuery.stateType,
+                        },
                     },
-                };
-                return acc;
-            }, {} as Record<string, any>);
+                });
 
-            for (let i = 0; i < Math.max(watchers.length, stargizers.length, projectsChildrenParent.length); i++) {
-                const watcher = watchers[i];
-                const stargizer = stargizers[i];
-                const project = projectsChildrenParent[i];
+                stateByTypes.forEach((state) => {
+                    if (goalsQuery.state?.includes(state.id)) {
+                        return;
+                    }
 
-                fillProject(projectsDict, { watcher, stargizer, project });
+                    goalsQuery.state?.push(state.id);
+                });
             }
 
-            return Object.values(projectsDict)?.map((project) => addCalculatedProjectFields(project, activityId, role));
+            const projects = await prisma.project
+                .findMany({
+                    orderBy: {
+                        updatedAt: 'desc',
+                    },
+                    ...getProjectSchema({
+                        activityId,
+                        goalsQuery,
+                        firstLevel,
+                        whereQuery: {
+                            goals: {
+                                some: goalsQuery ? goalsFilter(goalsQuery, activityId).where : {},
+                            },
+                        },
+                    }),
+                })
+                .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
+
+            return projects;
         }),
     getTop: protectedProcedure
         .input(
