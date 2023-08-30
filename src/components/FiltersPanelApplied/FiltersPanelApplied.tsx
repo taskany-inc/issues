@@ -10,6 +10,7 @@ import { ProjectFilter } from '../ProjectFilter';
 import { TagFilter } from '../TagFilter';
 import { EstimateFilter } from '../EstimateFilter';
 import { SortableProps, sortFilterTr } from '../SortFilter/SortFilter';
+import { decodeEstimateFilterValue, estimateToString } from '../../utils/estimateToString';
 
 import { tr } from './FiltersPanelApplied.i18n';
 
@@ -98,7 +99,13 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }
 
     if (queryState.estimate.length && estimates?.length) {
-        appliedMap[tr('Estimate')] = queryState.estimate.filter(Boolean);
+        appliedMap[tr('Estimate')] = queryState.estimate
+            .map((e) => {
+                const estimate = decodeEstimateFilterValue(e);
+
+                return estimate ? estimateToString(estimate) : null;
+            })
+            .filter(Boolean);
     }
 
     Object.entries(appliedMap).forEach(([k, v]) => {

@@ -1,7 +1,7 @@
 import { Estimate, EstimateToGoal, Goal, GoalAchieveCriteria, Prisma, Role, State, StateType } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
-import { quarters } from '../../src/utils/dateTime';
+import { decodeEstimateFilterValue } from '../../src/utils/estimateToString';
 
 const defaultOrderBy = {
     updatedAt: 'desc',
@@ -44,13 +44,11 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
             estimate: {
                 some: {
                     estimate: {
-                        OR: data.estimate.reduce((acum, e) => {
-                            const match = e.match(
-                                new RegExp(`((?<q>${Object.keys(quarters).join('|')})/)?(?<y>[0-9]+$)`),
-                            );
+                        OR: data.estimate.reduce<{ q?: string | null; y: string }[]>((acum, e) => {
+                            const match = decodeEstimateFilterValue(e);
 
                             if (match) {
-                                const { groups: { q, y } = {} } = match;
+                                const { q, y } = match;
 
                                 if (q) {
                                     acum.push({
@@ -70,7 +68,7 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
                             }
 
                             return acum;
-                        }, [] as { q?: string | null; y: string }[]),
+                        }, []),
                     },
                 },
             },
