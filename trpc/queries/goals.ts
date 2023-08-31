@@ -305,7 +305,14 @@ export const goalDeepQuery = {
     },
     tags: true,
     state: true,
-    estimate: true,
+    estimate: {
+        include: {
+            estimate: true,
+        },
+        orderBy: {
+            createdAt: 'asc',
+        },
+    },
     project: {
         include: {
             parent: true,
@@ -625,24 +632,4 @@ export const calcGoalsMeta = (goals: any[]) => {
         estimates: Array.from(uniqEstimates.values()),
         count: goals.length,
     };
-};
-
-export const getEstimateListFormJoin = <
-    T extends Goal & { estimate?: Array<EstimateToGoal & { estimate?: Estimate }> },
->(
-    goal: T,
-): Estimate[] | null => {
-    const { estimate } = goal;
-
-    if (estimate == null || !estimate.length) {
-        return null;
-    }
-
-    return estimate.reduce<Estimate[]>((acc, value) => {
-        if (value.estimate != null) {
-            acc.push(value.estimate);
-        }
-
-        return acc;
-    }, []);
 };
