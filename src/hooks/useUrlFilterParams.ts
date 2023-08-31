@@ -118,8 +118,10 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
-    const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
-    const queryState = useMemo<QueryState>(() => parseFilterValues(query), [query]);
+    const queryState = useMemo<QueryState>(() => {
+        const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
+        return parseFilterValues(query);
+    }, [router.query, currentPreset]);
     const queryString = router.asPath.split('?')[1];
 
     if (prevPreset?.id !== preset?.id || prevPreset?._isStarred !== preset?._isStarred) {
