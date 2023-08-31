@@ -10,7 +10,7 @@ import { ProjectListItem } from '../ProjectListItem';
 import { WrappedRowLink } from '../WrappedRowLink';
 import { trpc } from '../../utils/trpcClient';
 
-import { tr } from './ExporeProjectsPage.i18n';
+import { tr } from './ExploreProjectsPage.i18n';
 
 export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const projects = trpc.project.getAll.useQuery();
