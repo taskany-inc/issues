@@ -4,13 +4,7 @@ import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import {
-    addCalclulatedGoalsFields,
-    goalDeepQuery,
-    goalsFilter,
-    getEstimateListFormJoin,
-    nonArchievedGoalsPartialQuery,
-} from '../queries/goals';
+import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
@@ -102,9 +96,6 @@ export const goal = router({
                 },
                 include: {
                     ...goalDeepQuery,
-                    estimate: {
-                        include: { estimate: true },
-                    },
                 },
             });
         }),
@@ -147,7 +138,6 @@ export const goal = router({
                 items: items.map((g) => ({
                     ...g,
                     ...addCalclulatedGoalsFields(g, activityId, role),
-                    _estimate: getEstimateListFormJoin(g),
                     _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
                 })),
                 nextCursor,
@@ -238,7 +228,6 @@ export const goal = router({
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, activityId, role),
                 _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
-                _estimate: getEstimateListFormJoin(goal),
                 _activityFeed: mixHistoryWithComments(history, goal.comments),
                 _relations: makeGoalRelationMap({
                     dependsOn: goal.dependsOn,
@@ -548,7 +537,6 @@ export const goal = router({
                 ...goal,
                 ...addCalclulatedGoalsFields(goal, activityId, role),
                 _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
-                _estimate: getEstimateListFormJoin(goal),
                 _activityFeed: [],
             };
         } catch (error: any) {

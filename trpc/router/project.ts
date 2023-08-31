@@ -11,13 +11,7 @@ import {
     projectSuggestionsSchema,
     projectDeleteSchema,
 } from '../../src/schema/project';
-import {
-    addCalclulatedGoalsFields,
-    calcGoalsMeta,
-    getEstimateListFormJoin,
-    goalDeepQuery,
-    goalsFilter,
-} from '../queries/goals';
+import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
@@ -249,7 +243,6 @@ export const project = router({
                         return {
                             ...goal,
                             ...addCalclulatedGoalsFields(goal, activityId, role),
-                            _estimate: getEstimateListFormJoin(goal),
                         };
                     });
 
@@ -424,28 +417,12 @@ export const project = router({
                     ),
                     include: {
                         ...goalDeepQuery,
-                        estimate: {
-                            include: {
-                                estimate: true,
-                            },
-                            orderBy: {
-                                createdAt: 'asc',
-                            },
-                        },
                     },
                 }),
                 prisma.goal.findMany({
                     ...goalsFilter(goalsQuery, activityId, { projectId: id }),
                     include: {
                         ...goalDeepQuery,
-                        estimate: {
-                            include: {
-                                estimate: true,
-                            },
-                            orderBy: {
-                                createdAt: 'asc',
-                            },
-                        },
                     },
                 }),
             ]);
@@ -455,7 +432,6 @@ export const project = router({
                     ...g,
                     _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
                     ...addCalclulatedGoalsFields(g, activityId, role),
-                    _estimate: getEstimateListFormJoin(g),
                 })),
                 meta: calcGoalsMeta(allProjectGoals),
             };
