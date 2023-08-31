@@ -1,21 +1,35 @@
+/* eslint-disable prefer-arrow-callback */
 import React, { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 import { gapM, gapS } from '@taskany/colors';
+import { Table } from '@taskany/bricks';
+import NextLink from 'next/link';
 
-import { GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { ActivityByIdReturnType, GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { routes } from '../hooks/router';
 
 import { GoalListItem } from './GoalListItem';
 import { PageSep } from './PageSep';
 import { TableFullWidthCell } from './Table';
+import { WrappedRowLink } from './WrappedRowLink';
+import { ProjectListItem } from './ProjectListItem';
 
-interface GoalGroupProps {
+type GoalGroupProps = {
     goals: NonNullable<GoalByIdReturnType>[];
-    children: React.ReactNode;
     selectedResolver: (id: string) => boolean;
 
     onClickProvider: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
-}
+    project: {
+        id: string;
+        title: string;
+        averageScore: number | null;
+        activity?: ActivityByIdReturnType;
+        participants?: ActivityByIdReturnType[];
+        _isStarred?: boolean;
+        _isWatching?: boolean;
+    };
+};
 
 const GoalsGroupContainer = styled(TableFullWidthCell)`
     padding-top: ${gapM};
@@ -29,11 +43,30 @@ const GolasGroupSep = styled(PageSep)`
     margin: ${gapS} 0px;
 `;
 
-export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
-    ({ goals, children, selectedResolver, onClickProvider, onTagClick }) => (
+export const GoalsGroup = React.memo<GoalGroupProps>(function GoalsGroup({
+    goals,
+    selectedResolver,
+    onClickProvider,
+    onTagClick,
+    project,
+}) {
+    return (
         <>
             <GoalsGroupContainer>
-                {children}
+                <Table>
+                    <NextLink href={routes.project(project.id)} passHref legacyBehavior>
+                        <WrappedRowLink>
+                            <ProjectListItem
+                                title={project.title}
+                                owner={project.activity}
+                                participants={project.participants}
+                                starred={project._isStarred}
+                                watching={project._isWatching}
+                                averageScore={project.averageScore}
+                            />
+                        </WrappedRowLink>
+                    </NextLink>
+                </Table>
                 <GolasGroupSep />
             </GoalsGroupContainer>
 
@@ -62,5 +95,5 @@ export const GoalsGroup: React.FC<GoalGroupProps> = React.memo(
                 />
             ))}
         </>
-    ),
-);
+    );
+});

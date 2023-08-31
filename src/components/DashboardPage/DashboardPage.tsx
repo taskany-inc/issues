@@ -2,7 +2,6 @@
 import React, { MouseEventHandler, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { nullable, Button, Table } from '@taskany/bricks';
 import { gapSm } from '@taskany/colors';
@@ -15,7 +14,6 @@ import { createFilterKeys } from '../../utils/hotkeys';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFilterResource } from '../../hooks/useFilterResource';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
-import { routes } from '../../hooks/router';
 import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
@@ -23,12 +21,10 @@ import { GoalsGroup } from '../GoalsGroup';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { ProjectListItem } from '../ProjectListItem';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { InlineTrigger } from '../InlineTrigger';
 import { useFMPMetric } from '../../utils/telemetry';
-import { WrappedRowLink } from '../WrappedRowLink';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -200,24 +196,8 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                                         selectedResolver={selectedGoalResolver}
                                         onClickProvider={onGoalPrewiewShow}
                                         onTagClick={setTagsFilterOutside}
-                                    >
-                                        <Table>
-                                            <NextLink href={routes.project(group.project.id)} passHref legacyBehavior>
-                                                <WrappedRowLink>
-                                                    <ProjectListItem
-                                                        key={group.project.id}
-                                                        title={group.project.title}
-                                                        owner={group.project?.activity}
-                                                        participants={group.project?.participants}
-                                                        starred={group.project?._isStarred}
-                                                        watching={group.project?._isWatching}
-                                                        averageScore={group.project?.averageScore}
-                                                    />
-                                                </WrappedRowLink>
-                                            </NextLink>
-                                        </Table>
-                                    </GoalsGroup>
-
+                                        project={group.project}
+                                    />
                                     {!group.goals.length && (
                                         <StyledInlineTriggerWrapper>
                                             <InlineTrigger
