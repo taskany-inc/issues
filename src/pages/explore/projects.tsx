@@ -1,4 +1,4 @@
-import { ExploreProjectsPage } from '../../components/ExporeProjectsPage/ExporeProjectsPage';
+import { ExploreProjectsPage } from '../../components/ExploreProjectsPage/ExploreProjectsPage';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 import { parseFilterValues } from '../../hooks/useUrlFilterParams';
 
