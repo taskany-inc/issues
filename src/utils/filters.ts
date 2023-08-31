@@ -11,7 +11,9 @@ export const filtersPanelSsrInit = async ({ query: browserQuery, ssrHelpers, req
 
     const defaultPreset = isDefaultPreset ? await ssrHelpers.filter.getDefaultFilter.fetch() : undefined;
     const selectedPreset =
-        browserQuery.filter === 'string' ? await ssrHelpers.filter.getById.fetch(browserQuery.filter) : undefined;
+        typeof browserQuery.filter === 'string'
+            ? await ssrHelpers.filter.getById.fetch(browserQuery.filter)
+            : undefined;
 
     const preset = isDefaultPreset ? defaultPreset : selectedPreset;
 
