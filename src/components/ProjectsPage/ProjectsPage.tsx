@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { MouseEventHandler, useCallback } from 'react';
+import { MouseEventHandler, useCallback, useMemo } from 'react';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
@@ -21,12 +21,16 @@ import { ProjectListItemConnected } from '../ProjectListItemConnected';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { routes } from '../../hooks/router';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
+import { refreshInterval } from '../../utils/config';
+import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 
 import { tr } from './ProjectsPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
+
+export const projectsSize = 20;
 
 export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
@@ -62,10 +66,30 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
 
     const { setPreview, preview } = useGoalPreview();
 
-    const { data: projects = [] } = trpc.project.getAll.useQuery({
-        firstLevel: true,
-        goalsQuery: queryState,
-    });
+    const { data, isLoading, fetchNextPage, hasNextPage } = trpc.project.getAll.useInfiniteQuery(
+        {
+            limit: projectsSize,
+            firstLevel: true,
+            goalsQuery: queryState,
+        },
+        {
+            getNextPageParam: (p) => p.nextCursor,
+            keepPreviousData: true,
+            staleTime: refreshInterval,
+        },
+    );
+
+    const pages = useMemo(() => data?.pages || [], [data?.pages]);
+    const projects = pages?.[0]?.projects;
+
+    const projectsOnScreen = useMemo(
+        () =>
+            pages.reduce<typeof projects>((acc, cur) => {
+                acc.push(...cur.projects);
+                return acc;
+            }, []),
+        [pages],
+    );
 
     const tabsMenuOptions: Array<[string, string]> = [[tr('Goals'), routes.projects()]];
 
@@ -158,6 +182,7 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
             </CommonHeader>
 
             <FiltersPanel
+                loading={isLoading}
                 queryState={queryState}
                 queryString={queryString}
                 preset={currentPreset}
@@ -182,7 +207,7 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
             </FiltersPanel>
 
             <PageContent>
-                {projects.map((project) => (
+                {projectsOnScreen.map((project) => (
                     <ProjectListItemConnected
                         key={project.id}
                         project={project}
@@ -193,6 +218,10 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
                         collapsed
                         hasLink
                     />
+                ))}
+
+                {nullable(hasNextPage, () => (
+                    <LoadMoreButton onClick={() => fetchNextPage()} />
                 ))}
             </PageContent>
 

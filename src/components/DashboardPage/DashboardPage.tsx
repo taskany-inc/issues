@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { MouseEventHandler, useCallback, useEffect } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -25,6 +25,7 @@ import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { InlineTrigger } from '../InlineTrigger';
 import { useFMPMetric } from '../../utils/telemetry';
+import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -35,6 +36,8 @@ const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteF
 const StyledInlineTriggerWrapper = styled.div`
     padding-left: ${gapSm};
 `;
+
+export const projectsLimit = 5;
 
 export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const router = useRouter();
@@ -68,15 +71,32 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         preset,
     });
 
-    const { data, isLoading } = trpc.project.getUserProjectsWithGoals.useQuery(queryState, {
-        keepPreviousData: true,
-        staleTime: refreshInterval,
-    });
+    const { data, isLoading, fetchNextPage, hasNextPage } = trpc.project.getUserProjectsWithGoals.useInfiniteQuery(
+        {
+            limit: projectsLimit,
+            goalsQuery: queryState,
+        },
+        {
+            getNextPageParam: (p) => p.nextCursor,
+            keepPreviousData: true,
+            staleTime: refreshInterval,
+        },
+    );
+
+    const pages = useMemo(() => data?.pages || [], [data?.pages]);
+
+    const [groupsOnScreen, goals, totalGoalsCount] = useMemo(() => {
+        const groups = pages?.[0]?.groups;
+
+        const gr = pages.reduce<typeof groups>((acc, cur) => {
+            acc.push(...cur.groups);
+            return acc;
+        }, []);
+
+        return [gr, gr?.flatMap((group) => group.goals), pages?.[0]?.totalGoalsCount];
+    }, [pages]);
 
     useFMPMetric(!!data);
-
-    const groups = data?.groups;
-    const goals = groups?.flatMap((group) => group.goals);
 
     const { setPreview, preview } = useGoalPreview();
 
@@ -160,7 +180,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
             <FiltersPanel
                 loading={isLoading}
-                total={data?.totalGoalsCount}
+                total={totalGoalsCount}
                 counter={goals?.length}
                 queryState={queryState}
                 queryString={queryString}
@@ -187,7 +207,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
             <PageContent>
                 <Table>
-                    {groups?.map(
+                    {groupsOnScreen?.map(
                         (group) =>
                             (queryString ? Boolean(group.goals.length) : true) && (
                                 <React.Fragment key={group.project.id}>
@@ -213,6 +233,10 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                             ),
                     )}
                 </Table>
+
+                {nullable(hasNextPage, () => (
+                    <LoadMoreButton onClick={() => fetchNextPage()} />
+                ))}
             </PageContent>
 
             {nullable(queryString, (params) => (

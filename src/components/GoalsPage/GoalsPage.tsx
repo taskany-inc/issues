@@ -66,7 +66,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
     });
 
     const [, setPage] = useState(0);
-    const { data, fetchNextPage, isLoading } = trpc.goal.getBatch.useInfiniteQuery(
+    const { data, fetchNextPage, isLoading, hasNextPage } = trpc.goal.getBatch.useInfiniteQuery(
         {
             limit: pageSize,
             query: queryState,
@@ -230,7 +230,9 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                     ))}
                 </Table>
 
-                <LoadMoreButton onClick={onFetchNextPage} />
+                {nullable(hasNextPage, () => (
+                    <LoadMoreButton onClick={onFetchNextPage} />
+                ))}
             </PageContent>
 
             {nullable(queryString, (params) => (
