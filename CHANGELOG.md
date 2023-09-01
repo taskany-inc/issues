@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.27.1](https://github.com/taskany-inc/issues/compare/v1.27.0...v1.27.1) (2023-09-01)
+
+
+### Bug Fixes
+
+* **DashboardPage:** target has an estimate ([20bc5d9](https://github.com/taskany-inc/issues/commit/20bc5d963fc763723dbfa9cb3d73ce7b68950135))
+* **FiltersPanel:** filter SSR request aviability ([fd31ae5](https://github.com/taskany-inc/issues/commit/fd31ae56554fdbba9087968d396c0bbfac1b3f40))
+
+
+### Performance Improvements
+
+* **GoalsGroup:** fix memoization ([bb0b44a](https://github.com/taskany-inc/issues/commit/bb0b44ad7110638b499279e2c4c835fd7e111d28))
+
 ## [1.27.0](https://github.com/taskany-inc/issues/compare/v1.26.0...v1.27.0) (2023-08-30)
 
 
