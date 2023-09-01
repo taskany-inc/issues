@@ -13,9 +13,9 @@ import { trpc } from '../../utils/trpcClient';
 import { tr } from './ExploreProjectsPage.i18n';
 
 export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
-    const projects = trpc.project.getAll.useQuery();
+    const { data } = trpc.project.getAll.useQuery();
 
-    if (!projects.data) return null;
+    if (!data?.projects) return null;
 
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
@@ -24,7 +24,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
 
                 <PageContent>
                     <Table>
-                        {projects.data.map((project) =>
+                        {data.projects.map((project) =>
                             nullable(project, (p) => (
                                 <NextLink key={p.id} href={routes.project(p.id)} passHref legacyBehavior>
                                     <WrappedRowLink>

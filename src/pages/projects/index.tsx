@@ -1,4 +1,4 @@
-import { ProjectsPage } from '../../components/ProjectsPage/ProjectsPage';
+import { ProjectsPage, projectsSize } from '../../components/ProjectsPage/ProjectsPage';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 import { filtersPanelSsrInit } from '../../utils/filters';
 
@@ -9,6 +9,7 @@ export const getServerSideProps = declareSsrProps(
         const { ssrHelpers } = props;
 
         await ssrHelpers.project.getAll.fetch({
+            limit: projectsSize,
             firstLevel: true,
             goalsQuery: queryState,
         });

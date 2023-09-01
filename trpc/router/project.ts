@@ -111,171 +111,192 @@ export const project = router({
 
             return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
         }),
-    getUserProjectsWithGoals: protectedProcedure.input(queryWithFiltersSchema).query(async ({ ctx, input = {} }) => {
-        const { activityId, role } = ctx.session.user;
+    getUserProjectsWithGoals: protectedProcedure
+        .input(
+            z.object({
+                limit: z.number().optional(),
+                cursor: z.string().nullish(),
+                skip: z.number().optional(),
+                goalsQuery: queryWithFiltersSchema.optional(),
+            }),
+        )
+        .query(async ({ ctx, input = {} }) => {
+            const { activityId, role } = ctx.session.user;
+            const { limit = 10, cursor, skip, goalsQuery } = input;
 
-        const projectsSchema = getProjectSchema({
-            activityId,
-            goalsQuery: input,
-        });
+            const projectsSchema = getProjectSchema({
+                activityId,
+                goalsQuery,
+            });
 
-        const requestSchema = ({ withOwner }: { withOwner: boolean }) => {
-            return [
-                {
-                    // all projects / goals where the user is a participant
-                    participants: {
-                        some: {
-                            id: activityId,
-                        },
-                    },
-                },
-                {
-                    // all projects / goals where the user is a watcher
-                    watchers: {
-                        some: {
-                            id: activityId,
-                        },
-                    },
-                },
-                {
-                    stargizers: {
-                        some: {
-                            id: activityId,
-                        },
-                    },
-                },
-                {
-                    // all projects / goals where the user is issuer
-                    activityId,
-                },
-                withOwner
-                    ? {
-                          // all goals where the user is owner
-                          ownerId: activityId,
-                      }
-                    : {},
-            ];
-        };
-
-        const requestSchemaWithoutOwner = requestSchema({ withOwner: false });
-        const projectIds = await prisma.project.findMany({
-            where: {
-                OR: [
-                    ...requestSchemaWithoutOwner,
+            const requestSchema = ({ withOwner }: { withOwner: boolean }) => {
+                return [
                     {
-                        parent: {
+                        // all projects / goals where the user is a participant
+                        participants: {
                             some: {
-                                OR: requestSchemaWithoutOwner,
+                                id: activityId,
                             },
                         },
                     },
-                ],
-            },
-            select: {
-                id: true,
-            },
-        });
-        const projectIdsArray = projectIds.map(({ id }) => id);
+                    {
+                        // all projects / goals where the user is a watcher
+                        watchers: {
+                            some: {
+                                id: activityId,
+                            },
+                        },
+                    },
+                    {
+                        stargizers: {
+                            some: {
+                                id: activityId,
+                            },
+                        },
+                    },
+                    {
+                        // all projects / goals where the user is issuer
+                        activityId,
+                    },
+                    withOwner
+                        ? {
+                              // all goals where the user is owner
+                              ownerId: activityId,
+                          }
+                        : {},
+                ];
+            };
 
-        const res = await prisma.project
-            .findMany({
-                orderBy: {
-                    updatedAt: 'desc',
-                },
-                include: {
-                    ...projectsSchema.include,
-                    goals: {
-                        //  all goals with filters
-                        where: {
-                            AND: [
-                                input ? { ...goalsFilter(input, activityId).where } : {},
-                                {
-                                    OR: [
-                                        ...requestSchema({ withOwner: true }),
-                                        {
-                                            projectId: {
-                                                in: projectIdsArray,
-                                            },
-                                        },
-                                    ],
-                                },
-                                nonArchivedPartialQuery,
-                            ],
-                        },
-                        include: goalDeepQuery,
-                    },
-                    _count: {
-                        select: {
-                            // all goals without filters to count the total goals
-                            goals: {
-                                where: nonArchivedPartialQuery,
-                            },
-                        },
-                    },
-                },
+            const requestSchemaWithoutOwner = requestSchema({ withOwner: false });
+            const projectIds = await prisma.project.findMany({
                 where: {
-                    // all projects where the user is a participant / watcher / issuer / stargizer
                     OR: [
+                        ...requestSchemaWithoutOwner,
                         {
-                            id: {
-                                in: projectIdsArray,
-                            },
-                            AND: nonArchivedPartialQuery,
-                        },
-                        {
-                            goals: {
+                            parent: {
                                 some: {
-                                    AND: [
-                                        {
-                                            OR: requestSchema({ withOwner: true }),
-                                        },
-                                        nonArchivedPartialQuery,
-                                    ],
+                                    OR: requestSchemaWithoutOwner,
                                 },
                             },
                         },
                     ],
                 },
-            })
-            .then((res) => ({
-                groups: res.map((project) => {
-                    const goals = project.goals.map((goal) => {
+                select: {
+                    id: true,
+                },
+            });
+            const projectIdsArray = projectIds.map(({ id }) => id);
+
+            const { groups, totalGoalsCount } = await prisma.project
+                .findMany({
+                    take: limit + 1,
+                    skip,
+                    cursor: cursor ? { id: cursor } : undefined,
+                    orderBy: {
+                        updatedAt: 'desc',
+                    },
+                    include: {
+                        ...projectsSchema.include,
+                        goals: {
+                            //  all goals with filters
+                            where: {
+                                AND: [
+                                    goalsQuery ? { ...goalsFilter(goalsQuery, activityId).where } : {},
+                                    {
+                                        OR: [
+                                            ...requestSchema({ withOwner: true }),
+                                            {
+                                                projectId: {
+                                                    in: projectIdsArray,
+                                                },
+                                            },
+                                        ],
+                                    },
+                                    nonArchivedPartialQuery,
+                                ],
+                            },
+                            include: goalDeepQuery,
+                        },
+                        _count: {
+                            select: {
+                                // all goals without filters to count the total goals
+                                goals: {
+                                    where: nonArchivedPartialQuery,
+                                },
+                            },
+                        },
+                    },
+                    where: {
+                        // all projects where the user is a participant / watcher / issuer / stargizer
+                        OR: [
+                            {
+                                id: {
+                                    in: projectIdsArray,
+                                },
+                                AND: nonArchivedPartialQuery,
+                            },
+                            {
+                                goals: {
+                                    some: {
+                                        AND: [
+                                            {
+                                                OR: requestSchema({ withOwner: true }),
+                                            },
+                                            nonArchivedPartialQuery,
+                                        ],
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                })
+                .then((res) => ({
+                    groups: res.map((project) => {
+                        const goals = project.goals.map((goal) => {
+                            return {
+                                ...goal,
+                                ...addCalclulatedGoalsFields(goal, activityId, role),
+                            };
+                        });
+
+                        const { goals: _, _count, ...rest } = project;
+
                         return {
-                            ...goal,
-                            ...addCalclulatedGoalsFields(goal, activityId, role),
+                            goals,
+                            project: addCalculatedProjectFields(rest, activityId, role),
                         };
-                    });
+                    }),
+                    totalGoalsCount: res.reduce((acc, cur) => {
+                        acc += cur._count.goals;
+                        return acc;
+                    }, 0),
+                }));
 
-                    const { goals: _, _count, ...rest } = project;
+            let nextCursor: typeof cursor | undefined;
 
-                    return {
-                        goals,
-                        project: addCalculatedProjectFields(rest, activityId, role),
-                    };
-                }),
-                totalGoalsCount: res.reduce((acc, cur) => {
-                    acc += cur._count.goals;
-                    return acc;
-                }, 0),
-            }));
+            if (groups.length > limit) {
+                const nextItem = groups.pop();
+                nextCursor = nextItem?.project.id;
+            }
 
-        return res;
-    }),
+            return { groups, nextCursor, totalGoalsCount };
+        }),
     getAll: protectedProcedure
         .input(
             z
                 .object({
+                    limit: z.number().optional(),
+                    cursor: z.string().nullish(),
+                    skip: z.number().optional(),
                     firstLevel: z.boolean().optional(),
                     goalsQuery: queryWithFiltersSchema.optional(),
                 })
                 .optional(),
         )
-        .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
+        .query(async ({ ctx, input: { cursor, skip, limit, firstLevel, goalsQuery } = {} }) => {
             const { activityId, role } = ctx.session.user;
 
             if (goalsQuery && goalsQuery.stateType) {
-                goalsQuery.state = goalsQuery.state ?? [];
-
                 const stateByTypes = await prisma.state.findMany({
                     where: {
                         type: {
@@ -283,21 +304,24 @@ export const project = router({
                         },
                     },
                 });
-
                 stateByTypes.forEach((state) => {
-                    if (goalsQuery.state?.includes(state.id)) {
-                        return;
+                    if (!goalsQuery.state) {
+                        goalsQuery.state = [];
                     }
-
-                    goalsQuery.state?.push(state.id);
+                    if (!goalsQuery.state.includes(state.id)) {
+                        goalsQuery.state.push(state.id);
+                    }
                 });
             }
 
+            const projectPagination = limit
+                ? { take: limit + 1, skip, cursor: cursor ? { id: cursor } : undefined }
+                : undefined;
+
             const projects = await prisma.project
                 .findMany({
-                    orderBy: {
-                        updatedAt: 'desc',
-                    },
+                    ...projectPagination,
+                    orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
                     ...getProjectSchema({
                         activityId,
                         goalsQuery,
@@ -311,7 +335,14 @@ export const project = router({
                 })
                 .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
 
-            return projects;
+            let nextCursor: typeof cursor | undefined;
+
+            if (limit && projects.length > limit) {
+                const nextItem = projects.pop();
+                nextCursor = nextItem?.id;
+            }
+
+            return { projects, nextCursor };
         }),
     getTop: protectedProcedure
         .input(
