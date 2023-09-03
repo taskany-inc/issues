@@ -17,6 +17,11 @@ const withMDX = require('@next/mdx')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    compiler: {
+        styledComponents: {
+            ssr: true,
+        },
+    },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     reactStrictMode: true,
     swcMinify: true,
