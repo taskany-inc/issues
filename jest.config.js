@@ -1,9 +1,9 @@
-/*
- * For a detailed explanation regarding each configuration property and type check, visit:
- * https://jestjs.io/docs/configuration
- */
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+    transform: {
+        '^.+\\.(t|j)sx?$': '@swc/jest',
+    },
 
-export default {
     // Automatically clear mock calls, instances and results before every test
     clearMocks: true,
 
