@@ -8,7 +8,7 @@ export const getServerSideProps = declareSsrProps(
 
         const { ssrHelpers } = props;
 
-        await ssrHelpers.project.getAll.fetch({
+        await ssrHelpers.project.getAll.fetchInfinite({
             limit: projectsSize,
             firstLevel: true,
             goalsQuery: queryState,
