@@ -82,7 +82,7 @@
     "@commitlint/config-conventional": "17.7.0",
     "@faker-js/faker": "7.6.0",
     "@jest/globals": "29.6.2",
-    "@next/bundle-analyzer": "13.4.12",
+    "@next/bundle-analyzer": "13.4.19",
     "@prisma/client": "4.16.2",
     "@statoscope/webpack-plugin": "5.26.2",
     "@svgr/webpack": "8.1.0",
