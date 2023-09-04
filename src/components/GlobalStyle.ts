@@ -15,6 +15,5 @@ export const GlobalStyle = createGlobalStyle`
         height: 100%;
 
         background-color: ${backgroundColor};
-        --background-color-context: ${backgroundColor};
     }
 `;
