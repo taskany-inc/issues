@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.28.0](https://github.com/taskany-inc/issues/compare/v1.27.1...v1.28.0) (2023-09-04)
+
+
+### Features
+
+* added pagination projects to dashboard & projects pages ([07801a8](https://github.com/taskany-inc/issues/commit/07801a845efe9ae656c26077ebcd7fd75e569568))
+
 ## [1.27.1](https://github.com/taskany-inc/issues/compare/v1.27.0...v1.27.1) (2023-09-01)
 
 
