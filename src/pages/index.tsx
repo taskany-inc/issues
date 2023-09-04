@@ -8,7 +8,10 @@ export const getServerSideProps = declareSsrProps(
 
         const { ssrHelpers } = params;
 
-        await ssrHelpers.project.getUserProjectsWithGoals.fetch({ goalsQuery: queryState, limit: projectsLimit });
+        await ssrHelpers.project.getUserProjectsWithGoals.fetchInfinite({
+            goalsQuery: queryState,
+            limit: projectsLimit,
+        });
 
         return {
             defaultPresetFallback,
