@@ -46,7 +46,7 @@
     "@trpc/react-query": "10.35.0",
     "@trpc/server": "10.35.0",
     "color-layer": "1.0.3",
-    "concurrently": "8.2.0",
+    "concurrently": "8.2.1",
     "cors": "2.8.5",
     "cyrillic-to-translit-js": "3.2.1",
     "dom-objects": "1.0.5",
