@@ -68,7 +68,7 @@
     "react-hot-toast": "2.4.1",
     "react-input-mask": "2.0.4",
     "react-remark": "2.1.0",
-    "remark-emoji": "3.1.2",
+    "remark-emoji": "4.0.0",
     "remark-gfm": "3.0.1",
     "styled-components": "5.3.11",
     "superjson": "1.12.3",
