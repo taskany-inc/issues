@@ -1,4 +1,4 @@
-import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef, useEffect } from 'react';
+import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, FormInput, TableRow, TableCell, Popup, Keyboard } from '@taskany/bricks';
@@ -211,13 +211,19 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
     }, [goalId, reset, onReset]);
 
     const selectedGoalId = watch('goalAsGriteria');
-    const title = watch('title');
 
-    useEffect(() => {
-        if (!title) {
-            setValue('goalAsGriteria', undefined);
-        }
-    }, [title, setValue]);
+    const onChange = useCallback(
+        (fn: (e: ChangeEvent<HTMLInputElement>) => void) => {
+            return (e: ChangeEvent<HTMLInputElement>) => {
+                if (!e.target.value) {
+                    setValue('goalAsGriteria', undefined);
+                }
+
+                fn(e);
+            };
+        },
+        [setValue],
+    );
 
     return (
         <TableRow align="center">
@@ -243,6 +249,7 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
                                 {...field}
                                 error={fieldState.error}
                                 onSelect={handleSelectGoal}
+                                onChange={onChange(field.onChange)}
                                 titles={validityData.title}
                                 isItemSelected={selectedGoalId != null && !!selectedGoalId.id}
                             />
