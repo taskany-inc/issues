@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { ComboBox, Table } from '@taskany/bricks';
 import { radiusM, gapS, gapXs } from '@taskany/colors';
@@ -64,16 +64,9 @@ export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
             {
                 staleTime: 0,
                 cacheTime: 0,
+                onSuccess: (items = []) => setVisible(items.length > 0),
             },
         );
-
-        useEffect(() => {
-            if (items.length > 0) {
-                setVisible(true);
-            } else {
-                setVisible(false);
-            }
-        }, [items]);
 
         const onSelectItem = useCallback<typeof onChange>(
             (val) => {
