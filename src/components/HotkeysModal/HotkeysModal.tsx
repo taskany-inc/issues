@@ -27,14 +27,12 @@ const HotkeysModal = () => {
     const [modalVisible, setModalVisibility] = useState(false);
     const timer = useRef<NodeJS.Timeout | null>();
     const isLongPress = useRef<boolean>(false);
-    const [action, setAction] = useState<'shortpress' | 'longpress'>('shortpress');
 
     function startPressTimer() {
         isLongPress.current = false;
-        setAction('shortpress');
         timer.current = setTimeout(() => {
             isLongPress.current = true;
-            setAction('longpress');
+            setModalVisibility(true);
         }, 500);
     }
 
@@ -49,12 +47,6 @@ const HotkeysModal = () => {
         timer.current = null;
         setModalVisibility(false);
     }, []);
-
-    useEffect(() => {
-        if (action === 'longpress') {
-            setModalVisibility(true);
-        }
-    }, [action]);
 
     useEffect(() => {
         window.addEventListener('keydown', keydownListener, true);
