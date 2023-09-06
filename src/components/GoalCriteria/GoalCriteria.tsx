@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Text, nullable, Table } from '@taskany/bricks';
 import {
@@ -26,7 +26,7 @@ import { Circle, CircledIcon } from '../Circle';
 import { UserGroup } from '../UserGroup';
 import { GoalListItemCompact, CustomCell } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
-import { AddCriteriaForm, EditCriteriaForm } from '../CriteriaForm/CriteriaForm';
+import { EditCriteriaForm } from '../CriteriaForm/CriteriaForm';
 
 import { tr } from './GoalCriteria.i18n';
 
@@ -290,12 +290,17 @@ interface GoalCriteriaProps {
     goalId: string;
     criteriaList?: GoalAchiveCriteria[];
     canEdit: boolean;
-    onClick?: (itenm: GoalAchiveCriteria) => void;
+    onClick?: (item: GoalAchiveCriteria) => void;
     onAddCriteria: (val: AddCriteriaScheme) => void;
     onToggleCriteria: (val: UpdateCriteriaStateScheme) => void;
     onRemoveCriteria: (val: RemoveCriteriaScheme) => void;
     onConvertToGoal: (val: GoalAchiveCriteria) => void;
     onUpdateCriteria: (val: UpdateCriteriaScheme) => void;
+    renderTrigger?: (obj: {
+        goalId: string;
+        onSubmit: (val: AddCriteriaScheme) => void;
+        validityData: { sum: number; title: string[] };
+    }) => ReactNode;
 }
 
 export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
@@ -308,6 +313,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     onRemoveCriteria,
     onConvertToGoal,
     onUpdateCriteria,
+    renderTrigger,
 }) => {
     const [{ mode, criteriaId }, setViewItemMode] = useState<
         { mode: 'view'; criteriaId: null } | { mode: 'edit'; criteriaId: string }
@@ -425,7 +431,8 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
 
                         return null;
                     })}
-                    <AddCriteriaForm goalId={goalId} onSubmit={onAddHandler} validityData={dataForValidateCriteria} />
+
+                    {renderTrigger?.({ goalId, validityData: dataForValidateCriteria, onSubmit: onAddHandler })}
                 </StyledTable>
             </StyledWrapper>
         </ActivityFeedItem>

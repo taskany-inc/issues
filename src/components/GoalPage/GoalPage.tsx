@@ -48,6 +48,7 @@ import { ModalContext } from '../ModalOnEvent';
 import { useFMPMetric } from '../../utils/telemetry';
 import { TagComboBox } from '../TagComboBox';
 import { useGoalUpdate } from '../../hooks/useGoalUpdate';
+import { AddCriteriaForm } from '../CriteriaForm/CriteriaForm';
 
 import { tr } from './GoalPage.i18n';
 
@@ -402,6 +403,15 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                             onClick={onGoalCriteriaClick}
                                             onUpdateCriteria={criteria.onUpdateHandler}
                                             canEdit={_isEditable}
+                                            renderTrigger={(props) =>
+                                                nullable(_isEditable, () => (
+                                                    <AddCriteriaForm
+                                                        goalId={props.goalId}
+                                                        onSubmit={props.onSubmit}
+                                                        validityData={props.validityData}
+                                                    />
+                                                ))
+                                            }
                                         />
                                     ))}
 

@@ -43,6 +43,7 @@ import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm'
 import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
 import { CommentView } from '../CommentView/CommentView';
 import { ModalContext } from '../ModalOnEvent';
+import { AddCriteriaForm } from '../CriteriaForm/CriteriaForm';
 
 import { useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
@@ -313,6 +314,15 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                             onConvertToGoal={criteria.onConvertCriteria}
                                             onUpdateCriteria={criteria.onUpdateHandler}
                                             canEdit={_isEditable}
+                                            renderTrigger={(props) =>
+                                                nullable(_isEditable, () => (
+                                                    <AddCriteriaForm
+                                                        goalId={props.goalId}
+                                                        onSubmit={props.onSubmit}
+                                                        validityData={props.validityData}
+                                                    />
+                                                ))
+                                            }
                                         />
                                     ))}
 
