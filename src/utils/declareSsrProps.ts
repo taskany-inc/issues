@@ -64,7 +64,7 @@ export function declareSsrProps<T = ExternalPageProps>(
             : {};
 
         // @ts-ignore
-        if (resProps?.notFound) {
+        if (resProps?.notFound || resProps?.redirect) {
             return resProps;
         }
 
