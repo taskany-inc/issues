@@ -1,4 +1,4 @@
-import { StateType } from '@prisma/client';
+import { DateType, StateType } from '@prisma/client';
 import { z } from 'zod';
 
 export const ToggleSubscriptionSchema = z.object({
@@ -7,6 +7,8 @@ export const ToggleSubscriptionSchema = z.object({
 });
 
 export const StateTypeEnum = z.nativeEnum(StateType);
+
+export const DateTypeEnum = z.nativeEnum(DateType);
 
 export type ToggleSubscription = z.infer<typeof ToggleSubscriptionSchema>;
 

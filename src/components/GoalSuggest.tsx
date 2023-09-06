@@ -2,7 +2,7 @@ import { forwardRef, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ComboBox, Table } from '@taskany/bricks';
 import { radiusM, gapS, gapXs } from '@taskany/colors';
-import { Estimate, State as StateType } from '@prisma/client';
+import { DateType, State as StateType } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
@@ -28,7 +28,8 @@ interface GoalSuggestItemProps {
     owner?: ActivityByIdReturnType;
     issuer?: ActivityByIdReturnType;
     state?: StateType;
-    estimate?: Estimate;
+    estimate?: Date;
+    estimateType?: DateType;
     focused: boolean;
     onClick?: () => void;
 }
@@ -102,7 +103,8 @@ export const GoalSuggest = forwardRef<HTMLDivElement, GoalSuggestProps>(
                         state={item.state}
                         issuer={item.activity}
                         owner={item.owner}
-                        estimate={item.estimate[item.estimate.length - 1]?.estimate ?? undefined}
+                        estimate={item.estimate}
+                        estimateType={item.estimateType}
                     />
                 )}
                 renderItems={(children) => <Table width={550}>{children as React.ReactNode}</Table>}

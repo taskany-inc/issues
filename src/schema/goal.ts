@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { StateType } from '@prisma/client';
 
 import { tr } from './schema.i18n';
-import { queryWithFiltersSchema } from './common';
+import { DateTypeEnum, queryWithFiltersSchema } from './common';
 import { commentSchema } from './comment';
 
 export const userGoalsSchema = queryWithFiltersSchema;
@@ -71,11 +71,10 @@ export const goalCommonSchema = z.object({
     priority: z.string().nullable().optional(),
     estimate: z
         .object({
-            date: z.string().optional().nullable(),
-            q: z.string().optional().nullable(),
-            y: z.string(),
-            id: z.number().nullish(),
+            date: z.date(),
+            type: DateTypeEnum,
         })
+        .nullable()
         .optional(),
     tags: z
         .array(
@@ -144,11 +143,10 @@ export const goalUpdateSchema = z.object({
     priority: z.string().nullable(),
     estimate: z
         .object({
-            date: z.string().optional().nullable(),
-            q: z.string().optional().nullable(),
-            y: z.string(),
-            id: z.number().nullish(),
+            date: z.date(),
+            type: DateTypeEnum,
         })
+        .nullable()
         .optional(),
     tags: z.array(
         z.object({

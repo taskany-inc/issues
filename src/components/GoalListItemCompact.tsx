@@ -2,11 +2,12 @@ import React, { MouseEventHandler, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { nullable, Dropdown, MenuItem, TableRow, TableCell, TableRowProps, TableCellProps } from '@taskany/bricks';
 import { IconMoreVerticalOutline, IconTargetOutline } from '@taskany/icons';
-import type { Estimate, State as StateType } from '@prisma/client';
+import type { DateType, State as StateType } from '@prisma/client';
 
 import { Priority } from '../types/priority';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
-import { estimateToString } from '../utils/estimateToString';
+import { formateEstimate } from '../utils/dateTime';
+import { useLocale } from '../hooks/useLocale';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
@@ -20,7 +21,8 @@ interface CommonGoalListItemCompactProps {
     owner?: ActivityByIdReturnType;
     issuer?: ActivityByIdReturnType;
     state?: StateType;
-    estimate?: Estimate;
+    estimate?: Date;
+    estimateType?: DateType;
     focused?: boolean;
     priority?: string;
 }
@@ -107,6 +109,7 @@ const StyledActionsWrapper = styled.div`
 `;
 
 const Column: ColumnRender = ({ col, componentProps }) => {
+    const locale = useLocale();
     const issuers = useMemo(() => {
         const { issuer, owner } = componentProps;
         if (issuer && owner && owner.id === issuer.id) {
@@ -120,7 +123,7 @@ const Column: ColumnRender = ({ col, componentProps }) => {
         return col.renderColumn({ ...componentProps, issuers });
     }
 
-    const { title, state, priority, projectId, estimate } = componentProps;
+    const { title, state, priority, projectId, estimate, estimateType } = componentProps;
 
     const columnProps = col.columnProps == null ? {} : col.columnProps;
 
@@ -149,7 +152,14 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             content = nullable(issuers, (list) => <UserGroup users={list} />);
             break;
         case 'estimate':
-            content = nullable(estimate, (e) => <TextItem>{estimateToString(e)}</TextItem>);
+            content = nullable(estimate, (e) => (
+                <TextItem>
+                    {formateEstimate(e, {
+                        type: estimateType === 'Year' ? estimateType : 'Quarter',
+                        locale,
+                    })}
+                </TextItem>
+            ));
             break;
         default:
             return null;

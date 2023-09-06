@@ -2,12 +2,12 @@ import { test, expect } from '@jest/globals';
 
 import { TLocale } from './getLang';
 import {
-    availableYears,
+    getAvailableYears,
     createLocaleDate,
     parseLocaleDate,
-    endOfQuarter,
     quarters,
     incYearIfDateHasPassed,
+    createQuarterRange,
 } from './dateTime';
 
 const locales: Array<TLocale> = ['en', 'ru'];
@@ -30,11 +30,13 @@ test('returns locale date for ru locale', () => {
 });
 
 test('returns lastDayOfQuarter for en locale', () => {
-    expect(createLocaleDate(endOfQuarter(quarters.Q4), { locale: 'en' })).toBe(`12/31/${new Date().getFullYear()}`);
+    expect(createLocaleDate(createQuarterRange(quarters.Q4).end, { locale: 'en' })).toBe(
+        `12/31/${new Date().getFullYear()}`,
+    );
 });
 
 test('returns available years for passed number', () => {
-    expect(availableYears(6)).toStrictEqual([2023, 2024, 2025, 2026, 2027, 2028]);
+    expect(getAvailableYears(6)).toStrictEqual([2023, 2024, 2025, 2026, 2027, 2028]);
 });
 
 describe('increment year if the date has passed', () => {

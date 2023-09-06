@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import { gapXs, gray8 } from '@taskany/colors';
+import { DateType } from '@prisma/client';
 import { Dot, Text, Link, nullable, CircleProgressBar } from '@taskany/bricks';
 
 import { pluralize } from '../../utils/pluralize';
-import { formatEstimate } from '../../utils/dateTime';
+import { formateEstimate } from '../../utils/dateTime';
 import { useLocale } from '../../hooks/useLocale';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { getPriorityText } from '../PriorityText/PriorityText';
@@ -18,7 +19,8 @@ interface IssueStatsProps {
     comments: number;
     owner?: ActivityByIdReturnType | null;
     issuer?: ActivityByIdReturnType | null;
-    estimate?: { date: string; q?: string; y: string };
+    estimate?: Date | null;
+    estimateType?: DateType | null;
     priority?: string | null;
     achivedCriteriaWeight?: number | null;
     mode?: 'compact' | 'default';
@@ -57,6 +59,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
     issuer,
     owner,
     estimate,
+    estimateType,
     priority,
     comments,
     achivedCriteriaWeight,
@@ -84,7 +87,12 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
                 </DotSep>
             ))}
             {nullable(estimate, (e) => (
-                <DotSep>{formatEstimate(e, locale)}</DotSep>
+                <DotSep>
+                    {formateEstimate(e, {
+                        type: estimateType ?? 'Strict',
+                        locale,
+                    })}
+                </DotSep>
             ))}
             {nullable(priority, (p) => (
                 <DotSep>{getPriorityText(p)}</DotSep>

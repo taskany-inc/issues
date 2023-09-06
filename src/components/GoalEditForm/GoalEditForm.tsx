@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@taskany/bricks';
 import { gray10 } from '@taskany/colors';
 import { IconBulbOnOutline } from '@taskany/icons';
@@ -10,8 +10,6 @@ import { GoalUpdate, goalUpdateSchema } from '../../schema/goal';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
-import { useLocale } from '../../hooks/useLocale';
-import { parseLocaleDate } from '../../utils/dateTime';
 import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './GoalEditForm.i18n';
@@ -23,7 +21,6 @@ interface GoalEditFormProps {
 }
 
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
-    const locale = useLocale();
     const [busy, setBusy] = useState(false);
     const update = useGoalUpdate(goal.id);
 
@@ -32,15 +29,22 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const updateGoal = async (form: GoalUpdate) => {
         setBusy(true);
 
-        if (form.estimate && form.estimate.date) {
-            form.estimate.date = parseLocaleDate(form.estimate?.date, { locale }).toISOString();
-        }
-
         const updatedGoal = await update(form);
 
         onSubmit(updatedGoal);
         utils.project.getDeepInfo.invalidate({ id: form.parent.id });
     };
+
+    const estimateValue = useMemo(
+        () =>
+            goal.estimate
+                ? {
+                      date: goal.estimate,
+                      type: goal.estimateType || 'Strict',
+                  }
+                : undefined,
+        [goal],
+    );
 
     // FIXME: nullable values are conflicting with undefined
     return (
@@ -55,7 +59,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             state={goal.state ?? undefined}
             priority={goal.priority ?? undefined}
             tags={goal.tags}
-            estimate={goal._lastEstimate ?? undefined}
+            estimate={estimateValue}
             onSumbit={updateGoal}
             actionButton={
                 <>

@@ -73,7 +73,8 @@ export const ProjectListItemConnected: FC<{
                     tags={g.tags}
                     priority={g.priority}
                     comments={g._count?.comments}
-                    estimate={g._lastEstimate}
+                    estimate={g.estimate}
+                    estimateType={g.estimateType}
                     participants={g.participants}
                     starred={g._isStarred}
                     watching={g._isWatching}
