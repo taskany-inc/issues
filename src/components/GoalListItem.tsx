@@ -1,13 +1,11 @@
-import React, { MouseEventHandler, useCallback, useMemo, useRef, useState } from 'react';
+import React, { MouseEventHandler, useMemo } from 'react';
 import styled from 'styled-components';
-import NextLink from 'next/link';
-import { textColor, gapS, gapXs, gray9, radiusM } from '@taskany/colors';
-import { Text, Tag as TagItem, nullable, CircleProgressBar, TableRow, TableCell } from '@taskany/bricks';
-import { IconEyeOutline, IconStarSolid, IconMessageOutline } from '@taskany/icons';
+import { gapXs, gray9 } from '@taskany/colors';
+import { Text, Tag as TagItem, nullable, CircleProgressBar } from '@taskany/bricks';
+import { IconEyeOutline, IconStarSolid, IconMessageOutline, IconTargetOutline } from '@taskany/icons';
 import type { Estimate, State as StateType, Tag } from '@prisma/client';
+import { Row, Col } from 'react-awesome-styled-grid';
 
-import { routes } from '../hooks/router';
-import { Priority } from '../types/priority';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { estimateToString } from '../utils/estimateToString';
 
@@ -15,62 +13,28 @@ import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
 import { State } from './State';
 import { RelativeTime } from './RelativeTime/RelativeTime';
-import { WrappedRowLink } from './WrappedRowLink';
-import { collapseOffset } from './CollapsableItem';
+import { ListItem, ListItemIcons, ListItemProps } from './ListItem';
 
-interface GoalListItemProps {
-    id: string;
-    shortId: string;
-    projectId?: string | null;
+interface GoalListItemProps extends ListItemProps {
     title: string;
+    projectId?: string | null;
     owner?: ActivityByIdReturnType | null;
     issuer?: ActivityByIdReturnType | null;
     participants?: ActivityByIdReturnType[];
     tags?: Array<Tag | undefined>;
     state?: StateType | null;
-    createdAt: Date;
-    updatedAt: Date;
+    updatedAt?: Date;
     estimate?: Estimate | null;
     comments?: number;
-    isNotViewed?: boolean;
-    focused?: boolean;
     priority?: string | null;
     starred?: boolean;
     watching?: boolean;
-    className?: string;
     achivedCriteriaWeight?: number | null;
-    deep?: number;
-    onClick?: MouseEventHandler<HTMLAnchorElement>;
+    icon?: boolean;
+    size?: React.ComponentProps<typeof Text>['size'];
+
     onTagClick?: (tag: Tag) => MouseEventHandler<HTMLDivElement>;
 }
-
-const GoalTitleItem = styled(TableCell)`
-    overflow: hidden;
-    white-space: normal;
-`;
-
-const GoalTitleContainer = styled.div`
-    display: flex;
-`;
-
-const NotViewedDot = styled.div`
-    align-self: center;
-    justify-self: center;
-    width: 5px;
-    height: 5px;
-
-    margin-right: ${gapXs};
-
-    background-color: ${textColor};
-
-    border-radius: 100%;
-`;
-
-const GoalTitle = styled(Text)`
-    margin-right: ${gapS};
-    text-overflow: ellipsis;
-    overflow: hidden;
-`;
 
 const StyledGoalTag = styled(TagItem)`
     margin: calc(${gapXs} / 2) 0;
@@ -79,139 +43,14 @@ const StyledGoalTag = styled(TagItem)`
     & + & {
         margin-left: 0;
     }
+
     &:last-child {
         margin-right: 0;
     }
 `;
 
-const CommentsCountContainer = styled.div`
-    white-space: nowrap;
-`;
-
-const CommentsCount = styled(Text)`
-    display: inline-block;
-    margin-left: ${gapXs};
-    vertical-align: middle;
-`;
-
-const CommentsCountIcon = styled(IconMessageOutline)`
-    display: inline-block;
-    vertical-align: middle;
-`;
-
-const GoalTextItem = styled(Text).attrs({
-    size: 's',
-    color: gray9,
-})``;
-
-const RelatedTextItem = styled(GoalTextItem).attrs({
-    weight: 'regular',
-})``;
-
-const StyledOverTagsContentWrapper = styled.div<{ top: number; left: number; width: number }>`
-    position: absolute;
-    ${({ top, left, width }) => `
-        min-width: ${width}px;
-        top: ${top}px;
-        left: ${left}px;
-    `}
-    bottom: auto;
-    right: auto;
-
-    max-width: 150%;
-    width: 100%;
-
-    display: flex;
-    overflow: visible;
-    flex-wrap: wrap;
-
-    z-index: 1;
-`;
-
-const StyledNowrap = styled.span`
-    white-space: nowrap;
-`;
-
-const StyledTagsCell = styled(TableCell)<{ hover?: boolean }>`
-    display: flex;
-    flex-wrap: nowrap;
-    overflow: hidden;
-
-    position: relative;
-
-    ${({ hover }) =>
-        hover != null &&
-        `
-        opacity: ${hover ? 0 : 1}
-
-        &:hover ${StyledNowrap} {
-            opacity: 0;
-            visibility: hidden;
-        }
-    `}
-`;
-
-const StyledTableRow = styled(TableRow)`
-    position: relative;
-    text-decoration: none;
-    padding: ${gapS};
-
-    border-radius: ${radiusM};
-
-    color: ${textColor};
-`;
-
-const TagsCell: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-    const [rect, setRect] = useState({ top: 0, left: 0, width: 0 });
-    const [hovered, toggle] = useState<boolean | undefined>(undefined);
-    const targetRef = useRef<HTMLDivElement>(null);
-
-    const onEnterHandler = useCallback<React.MouseEventHandler<HTMLDivElement>>((event) => {
-        const {
-            currentTarget: { offsetTop, offsetLeft, offsetWidth, firstElementChild },
-        } = event;
-
-        if ((firstElementChild?.clientWidth ?? 0) > offsetWidth) {
-            setRect({
-                top: offsetTop,
-                left: offsetLeft,
-                width: offsetWidth,
-            });
-            toggle(true);
-        }
-    }, []);
-
-    const onLeaveHandler = useCallback<React.MouseEventHandler<HTMLDivElement>>(() => {
-        toggle((prev) => {
-            if (prev == null) {
-                return prev;
-            }
-
-            return false;
-        });
-        setRect({ top: 0, left: 0, width: 0 });
-    }, []);
-
-    return (
-        <>
-            {hovered && (
-                <StyledOverTagsContentWrapper onMouseLeave={onLeaveHandler} {...rect}>
-                    {children}
-                </StyledOverTagsContentWrapper>
-            )}
-            <StyledTagsCell ref={targetRef} col={1} onMouseOverCapture={onEnterHandler} hover={hovered}>
-                <StyledNowrap>{children}</StyledNowrap>
-            </StyledTagsCell>
-        </>
-    );
-};
-
-// px
-const maxTitleColumnWidth = 400;
-
 export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
     ({
-        shortId,
         owner,
         issuer,
         participants,
@@ -220,125 +59,158 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         tags,
         title,
         comments,
-        isNotViewed,
         state,
-        focused,
         estimate,
         priority,
         starred,
         watching,
         achivedCriteriaWeight,
-        deep,
-        onClick,
-        className,
+        icon,
+        size = 'm',
         onTagClick,
+        ...attrs
     }) => {
         const issuers = useMemo(() => {
             if (issuer && owner && owner.id === issuer.id) {
                 return [owner];
             }
 
-            return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
+            return [issuer, owner].filter(Boolean);
         }, [issuer, owner]);
 
-        const titleColumnWidth = maxTitleColumnWidth - (deep ?? 0) * collapseOffset;
+        const requiredCols = [
+            state && 2,
+            priority && 2,
+            issuers && 1,
+            estimate && 2,
+            achivedCriteriaWeight && 1,
+            comments && 1,
+        ]
+            .filter(Boolean)
+            .reduce((acc, curr) => acc + curr);
+
+        const optionalCols = [
+            icon && 1,
+            projectId && 4,
+            (starred || watching) && 2,
+            participants?.length && 2,
+            tags?.length && 2,
+            updatedAt && 3,
+        ]
+            .filter(Boolean)
+            .reduce((acc, curr) => acc + curr);
+
+        const titleCols = 24 - (requiredCols + optionalCols) - 1; // FIXME: this is hack
 
         return (
-            <NextLink href={routes.goal(shortId)} passHref legacyBehavior>
-                <WrappedRowLink>
-                    <StyledTableRow
-                        focused={focused}
-                        className={className}
-                        onClick={onClick}
-                        gap={10}
-                        align="center"
-                        interactive
-                    >
-                        <GoalTitleItem width={titleColumnWidth}>
-                            <GoalTitleContainer>
-                                {isNotViewed && <NotViewedDot />}
-                                <GoalTitle size="m" weight="bold">
-                                    {title}
-                                </GoalTitle>
-                            </GoalTitleContainer>
-                        </GoalTitleItem>
+            <ListItem {...attrs}>
+                <Row align="center">
+                    {nullable(icon, () => (
+                        <Col md={1}>
+                            <IconTargetOutline size="s" />
+                        </Col>
+                    ))}
 
-                        <TableCell col={1}>
-                            {nullable(state, (s) => (
+                    <Col md={titleCols}>
+                        <Text size={size} ellipsis lines={2}>
+                            {title}
+                        </Text>
+                    </Col>
+
+                    <Col md={2}>
+                        {nullable(state, (s) => (
+                            <div>
                                 <State size="s" title={s?.title} hue={s?.hue} />
-                            ))}
-                        </TableCell>
-
-                        <TableCell width="11ch">
-                            <GoalTextItem>{getPriorityText(priority as Priority)}</GoalTextItem>
-                        </TableCell>
-
-                        {nullable(projectId, (pId) => (
-                            <TableCell col={1}>
-                                <GoalTextItem>{pId}</GoalTextItem>
-                            </TableCell>
+                            </div>
                         ))}
+                    </Col>
 
-                        <TableCell align="center" width={32}>
-                            <UserGroup users={issuers} />
-                        </TableCell>
+                    <Col md={2}>
+                        {nullable(priority, (p) => (
+                            <Text size="s" color={gray9}>
+                                {getPriorityText(p)}
+                            </Text>
+                        ))}
+                    </Col>
 
-                        <TableCell width="8ch">
-                            <GoalTextItem>{nullable(estimate, (e) => estimateToString(e))}</GoalTextItem>
-                        </TableCell>
+                    {nullable(projectId, (pId) => (
+                        <Col md={4} justify="center" align="center">
+                            <Text size="s" color={gray9}>
+                                {pId}
+                            </Text>
+                        </Col>
+                    ))}
 
-                        <TableCell width={24}>
-                            {achivedCriteriaWeight != null && <CircleProgressBar value={achivedCriteriaWeight} />}
-                        </TableCell>
+                    <Col md={1}>
+                        <UserGroup users={issuers} />
+                    </Col>
 
-                        <TagsCell>
-                            {tags?.map((tag) =>
-                                nullable(tag, (t) => (
+                    {nullable(participants, (p) => (
+                        <Col md={2}>
+                            <UserGroup users={p} />
+                        </Col>
+                    ))}
+
+                    <Col md={2} justify="center" align="center">
+                        {nullable(estimate, (e) => (
+                            <Text size="s" color={gray9}>
+                                {estimateToString(e)}
+                            </Text>
+                        ))}
+                    </Col>
+
+                    <Col md={1}>
+                        {achivedCriteriaWeight != null && <CircleProgressBar value={achivedCriteriaWeight} />}
+                    </Col>
+
+                    {nullable(tags, (t) => (
+                        <Col md={2}>
+                            <div>
+                                {t?.filter(Boolean).map((tag) => (
                                     <StyledGoalTag
-                                        key={t.id}
-                                        description={t.description ?? undefined}
-                                        onClick={onTagClick?.(t)}
+                                        key={tag.id}
+                                        description={tag.description ?? undefined}
+                                        onClick={onTagClick?.(tag)}
                                     >
-                                        {t.title}
+                                        {tag.title}
                                     </StyledGoalTag>
-                                )),
-                            )}
-                        </TagsCell>
+                                ))}
+                            </div>
+                        </Col>
+                    ))}
 
-                        <TableCell width={90}>
-                            {nullable(participants, (p) => (
-                                <UserGroup users={p} />
-                            ))}
-                        </TableCell>
+                    <Col md={1}>
+                        {nullable(comments, (c) => (
+                            <ListItemIcons>
+                                <IconMessageOutline size="s" />
+                                <Text size="xs">{c}</Text>
+                            </ListItemIcons>
+                        ))}
+                    </Col>
 
-                        <TableCell width="6ch">
-                            {comments !== 0 && (
-                                <CommentsCountContainer>
-                                    <CommentsCountIcon size="s" />
-                                    <CommentsCount size="xs" weight="bold">
-                                        {comments}
-                                    </CommentsCount>
-                                </CommentsCountContainer>
-                            )}
-                        </TableCell>
+                    {nullable(updatedAt, (uA) => (
+                        <Col md={3}>
+                            <Text size="s" color={gray9}>
+                                <RelativeTime date={uA} />
+                            </Text>
+                        </Col>
+                    ))}
 
-                        <TableCell col={1} justify="end">
-                            <RelatedTextItem>
-                                <RelativeTime date={updatedAt} />
-                            </RelatedTextItem>
-                        </TableCell>
+                    {nullable(starred || watching, () => (
+                        <Col md={2} align="end">
+                            <ListItemIcons>
+                                {nullable(starred, () => (
+                                    <IconStarSolid size="s" color={gray9} />
+                                ))}
 
-                        <TableCell width={40} justify="between">
-                            {nullable(starred, () => (
-                                <IconStarSolid size="s" />
-                            ))}
-                            {nullable(watching, () => (
-                                <IconEyeOutline size="s" />
-                            ))}
-                        </TableCell>
-                    </StyledTableRow>
-                </WrappedRowLink>
-            </NextLink>
+                                {nullable(watching, () => (
+                                    <IconEyeOutline size="s" color={gray9} />
+                                ))}
+                            </ListItemIcons>
+                        </Col>
+                    ))}
+                </Row>
+            </ListItem>
         );
     },
 );
