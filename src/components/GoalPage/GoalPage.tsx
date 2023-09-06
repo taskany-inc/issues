@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { gapM, gray7 } from '@taskany/colors';
@@ -26,7 +26,7 @@ import { useRouter } from '../../hooks/router';
 import { StarButton } from '../StarButton/StarButton';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { trpc } from '../../utils/trpcClient';
-import { GoalStateChangeSchema } from '../../schema/goal';
+import { GoalStateChangeSchema, GoalUpdate } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { ActivityByIdReturnType, GoalAchiveCriteria, GoalDependencyItem } from '../../../trpc/inferredTypes';
@@ -119,6 +119,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
     const { project, activity: issuer, owner } = goal || {};
 
+    const [currentOwner, setCurrentOwner] = useState(owner?.user);
+
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     useEffect(() => {
         project && setCurrentProjectCache(project);
@@ -190,6 +192,32 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
             }
         },
         [goal, invalidateFn, addParticipantMutation],
+    );
+
+    const onAssigneeChange = useCallback(
+        async (activity?: ActivityByIdReturnType) => {
+            if (goal && activity?.user && goal.project) {
+                setCurrentOwner(activity.user);
+                try {
+                    await update({
+                        ...(goal as unknown as GoalUpdate),
+                        owner: {
+                            id: activity.id,
+                            user: {
+                                ...activity.user,
+                            },
+                        },
+                        // Need to pad fields due to zod validation
+                        parent: goal.project,
+                        estimate: goal._lastEstimate,
+                    });
+                    invalidateFn();
+                } catch (error: any) {
+                    setCurrentOwner(currentOwner);
+                }
+            }
+        },
+        [currentOwner, goal, invalidateFn, update],
     );
 
     const removeParticipantMutation = trpc.goal.removeParticipant.useMutation();
@@ -309,7 +337,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     if (!goal || !owner || !issuer) return null;
 
     const participantsFilter = goal.participants.map(({ id }) => id).concat([owner.id, issuer.id]);
-
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <IssueHeader>
@@ -495,7 +522,24 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                     </IssueMeta>
 
                     <IssueMeta title={tr('Assignee')}>
-                        <UserBadge user={owner?.user} />
+                        {goal._isEditable ? (
+                            <StyledInlineInput>
+                                <UserComboBox
+                                    placement="bottom-start"
+                                    placeholder={tr('Name/Email')}
+                                    filter={participantsFilter}
+                                    onChange={onAssigneeChange}
+                                    renderTrigger={(props) => (
+                                        <StyledInlineInput>
+                                            <UserBadge user={currentOwner} />
+                                            <IconEditOutline noWrap size="xs" onClick={props.onClick} />
+                                        </StyledInlineInput>
+                                    )}
+                                />
+                            </StyledInlineInput>
+                        ) : (
+                            <UserBadge user={owner?.user} />
+                        )}
                     </IssueMeta>
 
                     <IssueMeta title={tr('Participants')}>
