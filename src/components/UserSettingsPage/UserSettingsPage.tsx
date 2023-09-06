@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState, useCallback, ChangeEventHandler } from 'react';
 import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
@@ -21,7 +20,6 @@ import { IconBulbOnOutline } from '@taskany/icons';
 import { z } from 'zod';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
-import { shallowEqual } from '../../utils/shallowEqual';
 import { trpc } from '../../utils/trpcClient';
 import { Page } from '../Page';
 import { PageSep } from '../PageSep';
@@ -67,12 +65,6 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const getUserByNicknameMutation = trpc.user.getUserByNickname.useMutation();
     const utils = trpc.useContext();
 
-    const [actualUserFields, setActualUserFields] = useState({
-        name: user.name,
-        nickname: user.nickname,
-    });
-    const [generalFormChanged, setGeneralFormChanged] = useState(false);
-
     const validateNicknameAsync = useCallback(
         async (val: string) => {
             const result = await getUserByNicknameMutation.mutateAsync(val);
@@ -86,21 +78,27 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
-        defaultValues: actualUserFields,
+        defaultValues: {
+            name: user.name,
+            nickname: user.nickname,
+        },
     });
 
-    const generalFormValues = generalForm.watch();
-    useEffect(() => {
-        setGeneralFormChanged(!shallowEqual(generalFormValues, actualUserFields));
-    }, [generalFormValues, actualUserFields]);
+    const updateUser = useCallback(
+        async (data: UpdateUser) => {
+            const promise = updateMutation.mutateAsync(data);
 
-    const updateUser = async (data: UpdateUser) => {
-        const promise = updateMutation.mutateAsync(data);
+            const [res] = await notifyPromise(promise, 'userSettingsUpdate');
 
-        const [res] = await notifyPromise(promise, 'userSettingsUpdate');
+            if (!res) return;
 
-        if (res) setActualUserFields(res);
-    };
+            generalForm.reset({
+                name: res.name,
+                nickname: res.nickname,
+            });
+        },
+        [generalForm, updateMutation],
+    );
 
     const [appearanceTheme, setAppearanceTheme] = useState(settings?.data?.theme);
     const { resolvedTheme, setTheme } = useTheme();
@@ -171,7 +169,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
 
     const pageTitle = tr
         .raw('title', {
-            user: actualUserFields?.name,
+            user: generalForm.watch('name'),
         })
         .join('');
 
@@ -222,7 +220,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                     size="m"
                                     view="primary"
                                     type="submit"
-                                    disabled={!generalFormChanged}
+                                    disabled={!generalForm.formState.isDirty}
                                     text={tr('Save')}
                                     outline
                                 />
