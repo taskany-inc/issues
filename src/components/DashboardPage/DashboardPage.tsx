@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { nullable, Button, Table } from '@taskany/bricks';
-import { gapSm } from '@taskany/colors';
+import { nullable, Button, ListView, ListViewItem } from '@taskany/bricks';
 import { IconPlusCircleOutline } from '@taskany/icons';
 
 import { refreshInterval } from '../../utils/config';
@@ -17,7 +15,6 @@ import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { Page, PageContent } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
-import { GoalsGroup } from '../GoalsGroup';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -26,6 +23,12 @@ import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { InlineTrigger } from '../InlineTrigger';
 import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
+import { TreeView, TreeViewElement } from '../TreeView';
+import { ProjectListItem } from '../ProjectListItem';
+import { ProjectTreeNode, ProjectTreeNodeTitle } from '../ProjectTreeNode';
+import { NextLink } from '../NextLink';
+import { GoalListItem } from '../GoalListItem';
+import { routes } from '../../hooks/router';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -33,19 +36,14 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
-const StyledInlineTriggerWrapper = styled.div`
-    padding-left: ${gapSm};
-`;
-
 export const projectsLimit = 5;
 
 export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const router = useRouter();
     const { toggleFilterStar } = useFilterResource();
-
-    const utils = trpc.useContext();
-
     const { preset, shadowPreset, userFilters } = useFiltersPreset({ defaultPresetFallback });
+    const { preview, setPreview } = useGoalPreview();
+    const utils = trpc.useContext();
 
     const {
         currentPreset,
@@ -98,15 +96,13 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
     useFMPMetric(!!data);
 
-    const { setPreview, preview } = useGoalPreview();
-
     useEffect(() => {
         const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
 
         if (isGoalDeletedAlready) setPreview(null);
     }, [goals, preview, setPreview]);
 
-    const onGoalPrewiewShow = useCallback(
+    const onGoalPreviewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
@@ -202,37 +198,85 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 onFilterStar={onFilterStar}
                 onSortChange={setSortFilter}
             >
-                {(Boolean(queryString) || preset) && <Button text={tr('Reset')} onClick={resetQueryState} />}
+                {nullable(Boolean(queryString) || preset, () => (
+                    <Button text={tr('Reset')} onClick={resetQueryState} />
+                ))}
             </FiltersPanel>
 
             <PageContent>
-                <Table>
-                    {groupsOnScreen?.map(
-                        (group) =>
-                            (queryString ? Boolean(group.goals.length) : true) && (
-                                <React.Fragment key={group.project.id}>
-                                    <GoalsGroup
-                                        goals={group.goals as NonNullable<GoalByIdReturnType>[]}
-                                        selectedResolver={selectedGoalResolver}
-                                        onClickProvider={onGoalPrewiewShow}
-                                        onTagClick={setTagsFilterOutside}
-                                        project={group.project}
+                <ListView>
+                    <TreeView>
+                        {groupsOnScreen?.map((group) => (
+                            <ProjectTreeNode
+                                key={group.project.id}
+                                visible
+                                renderTitle={({ visible }) => (
+                                    <ListViewItem
+                                        renderItem={({ active, hovered, ...attrs }) => (
+                                            <NextLink href={routes.project(group.project.id)}>
+                                                <ProjectTreeNodeTitle decorated={visible && !active && !hovered}>
+                                                    <ProjectListItem
+                                                        title={group.project.title}
+                                                        owner={group.project.activity}
+                                                        participants={group.project.participants}
+                                                        starred={group.project._isStarred}
+                                                        watching={group.project._isWatching}
+                                                        averageScore={group.project.averageScore}
+                                                        focused={active}
+                                                        hovered={hovered}
+                                                        {...attrs}
+                                                    />
+                                                </ProjectTreeNodeTitle>
+                                            </NextLink>
+                                        )}
                                     />
-                                    {!group.goals.length && (
-                                        <StyledInlineTriggerWrapper>
-                                            <InlineTrigger
-                                                text={tr('Create goal')}
-                                                onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, {
-                                                    id: group.project.id,
-                                                })}
-                                                icon={<IconPlusCircleOutline noWrap size="s" />}
+                                )}
+                            >
+                                {group.goals.length ? (
+                                    group.goals.map((goal) => (
+                                        <TreeViewElement key={goal.id}>
+                                            <ListViewItem
+                                                renderItem={({ active, ...attrs }) => (
+                                                    <NextLink href={routes.goal(goal._shortId)}>
+                                                        <GoalListItem
+                                                            updatedAt={goal.updatedAt}
+                                                            state={goal.state}
+                                                            title={goal.title}
+                                                            issuer={goal.activity}
+                                                            owner={goal.owner}
+                                                            tags={goal.tags}
+                                                            priority={goal.priority}
+                                                            comments={goal._count?.comments}
+                                                            estimate={goal._lastEstimate}
+                                                            participants={goal.participants}
+                                                            starred={goal._isStarred}
+                                                            watching={goal._isWatching}
+                                                            achivedCriteriaWeight={goal._achivedCriteriaWeight}
+                                                            onClick={onGoalPreviewShow(goal)}
+                                                            onTagClick={setTagsFilterOutside}
+                                                            focused={active || selectedGoalResolver(goal.id)}
+                                                            {...attrs}
+                                                        />
+                                                    </NextLink>
+                                                )}
                                             />
-                                        </StyledInlineTriggerWrapper>
-                                    )}
-                                </React.Fragment>
-                            ),
-                    )}
-                </Table>
+                                        </TreeViewElement>
+                                    ))
+                                ) : (
+                                    <TreeViewElement>
+                                        <InlineTrigger
+                                            text={tr('Create goal')}
+                                            icon={<IconPlusCircleOutline noWrap size="s" />}
+                                            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, {
+                                                id: group.project.id,
+                                            })}
+                                        />
+                                    </TreeViewElement>
+                                )}
+                            </ProjectTreeNode>
+                        ))}
+                    </TreeView>
+                </ListView>
 
                 {nullable(hasNextPage, () => (
                     <LoadMoreButton onClick={() => fetchNextPage()} />
