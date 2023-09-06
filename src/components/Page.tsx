@@ -38,7 +38,7 @@ interface PageProps {
     children?: React.ReactNode;
 }
 
-const StyledContent = styled.main`
+const StyledContentWrapper = styled.main`
     /* presses the footer to the bottom*/
     min-height: calc(100vh - 160px);
 `;
@@ -97,7 +97,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
 
             <PageHeader />
 
-            <StyledContent>{children}</StyledContent>
+            <StyledContentWrapper>{children}</StyledContentWrapper>
 
             <ModalOnEvent event={ModalEvent.ProjectCreateModal} hotkeys={createProjectKeys}>
                 <ProjectCreateForm />
