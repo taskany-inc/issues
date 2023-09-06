@@ -4,8 +4,8 @@ import { useState, useRef, useCallback, Dispatch, SetStateAction, useEffect } fr
 import InputMask from 'react-input-mask';
 
 import { useLocale } from '../hooks/useLocale';
-import { currentLocaleDate, createValue, parseLocaleDate, createLocaleDate } from '../utils/dateTime';
-import { Option, Estimate } from '../types/estimate';
+import { currentLocaleDate, parseLocaleDate, createLocaleDate } from '../utils/dateTime';
+import { Option } from '../types/estimate';
 
 import { EstimateOption } from './EstimateOption';
 
@@ -13,9 +13,9 @@ interface EstimateDateProps {
     mask: string;
     placeholder: string;
     option: Omit<Option, 'clue'>;
-    value?: Estimate;
+    value?: Date;
     readOnly?: boolean;
-    onChange?: (value?: Estimate) => void;
+    onChange?: (value?: Date) => void;
     setReadOnly: Dispatch<
         SetStateAction<{
             year: boolean;
@@ -35,45 +35,32 @@ export const EstimateDate: React.FC<EstimateDateProps> = ({
     mask,
     placeholder,
     option,
-    value,
     readOnly,
     onChange,
     setReadOnly,
 }) => {
     const locale = useLocale();
     const currentDate = currentLocaleDate({ locale });
-    const [fullDate, setFullDate] = useState(currentDate);
+    const [fullDate, setFullDate] = useState<string>(currentDate);
     const ref = useRef(null);
 
     useClickOutside(ref, () => {
         if (isDateFullyFilled(fullDate)) return;
 
+        setReadOnly((prev) => ({
+            ...prev,
+            date: true,
+            year: false,
+        }));
+
         setFullDate(currentDate);
-        setReadOnly((prev) => {
-            prev.date = true;
-            prev.year = false;
-            return prev;
-        });
-        value ? (value.date = null) : undefined;
-        onChange?.(value);
     });
 
     useEffect(() => {
-        if (!isDateFullyFilled(fullDate) || fullDate === currentDate) return;
-
-        const values = createValue(fullDate, locale);
-        onChange?.(values);
-    }, [currentDate, fullDate, locale, onChange]);
-
-    const onCreateEstimate = useCallback(
-        (date: string | Date) => {
-            date = parseLocaleDate(date, { locale });
-            value?.y && date.setFullYear(+value.y);
-
-            return createValue(date, locale);
-        },
-        [locale, value?.y],
-    );
+        if (!readOnly && isDateFullyFilled(fullDate)) {
+            onChange?.(parseLocaleDate(fullDate, { locale }));
+        }
+    }, [readOnly, fullDate, locale, onChange]);
 
     const onChangeDate = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,31 +84,23 @@ export const EstimateDate: React.FC<EstimateDateProps> = ({
     );
 
     const onRemoveDate = useCallback(() => {
-        if (!value) return;
-
-        value.date = null;
-        value.q = null;
-
-        setReadOnly((prev) => {
-            prev.date = true;
-            prev.year = false;
-            return prev;
-        });
+        setReadOnly((prev) => ({
+            ...prev,
+            date: true,
+            year: false,
+        }));
         setFullDate(currentDate);
-        onChange?.(value);
-    }, [currentDate, onChange, setReadOnly, value]);
+        onChange?.();
+    }, [currentDate, setReadOnly, onChange]);
 
     const onClick = useCallback(() => {
-        const estimate = onCreateEstimate(currentDate);
-
         setReadOnly({
             date: false,
             year: true,
             quarter: true,
         });
-        setFullDate(estimate.date);
-        onChange?.(estimate);
-    }, [onCreateEstimate, currentDate, setReadOnly, onChange]);
+        setFullDate(currentDate);
+    }, [currentDate, setReadOnly]);
 
     return (
         <EstimateOption

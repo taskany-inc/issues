@@ -1,7 +1,7 @@
-import { Estimate, EstimateToGoal, Goal, GoalAchieveCriteria, Prisma, Role, State, StateType } from '@prisma/client';
+import { Goal, GoalAchieveCriteria, Prisma, Role, State, StateType } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
-import { decodeEstimateFilterValue } from '../../src/utils/estimateToString';
+import { decodeUrlDateRange } from '../../src/utils/dateTime';
 
 const defaultOrderBy = {
     updatedAt: 'desc',
@@ -41,36 +41,30 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
 
     if (data.estimate?.length) {
         return {
-            estimate: {
-                some: {
-                    estimate: {
-                        OR: data.estimate.reduce<{ q?: string | null; y: string }[]>((acum, e) => {
-                            const match = decodeEstimateFilterValue(e);
+            AND: {
+                OR: data.estimate.reduce<
+                    {
+                        estimate: {
+                            lte: Date | undefined;
+                            gte: Date | undefined;
+                        };
+                    }[]
+                >((acum, e) => {
+                    const estimate = decodeUrlDateRange(e);
 
-                            if (match) {
-                                const { q, y } = match;
+                    if (estimate) {
+                        const { start, end } = estimate;
 
-                                if (q) {
-                                    acum.push({
-                                        q,
-                                        y,
-                                    });
+                        acum.push({
+                            estimate: {
+                                gte: start || undefined,
+                                lte: end,
+                            },
+                        });
+                    }
 
-                                    acum.push({
-                                        q: null,
-                                        y,
-                                    });
-                                } else {
-                                    acum.push({
-                                        y,
-                                    });
-                                }
-                            }
-
-                            return acum;
-                        }, []),
-                    },
-                },
+                    return acum;
+                }, []),
             },
         };
     }
@@ -305,14 +299,6 @@ export const goalDeepQuery = {
     },
     tags: true,
     state: true,
-    estimate: {
-        include: {
-            estimate: true,
-        },
-        orderBy: {
-            createdAt: 'asc',
-        },
-    },
     project: {
         include: {
             parent: true,
@@ -357,7 +343,6 @@ export const goalDeepQuery = {
         include: {
             goalAsCriteria: {
                 include: {
-                    estimate: { include: { estimate: true } },
                     activity: {
                         include: {
                             user: true,
@@ -381,7 +366,6 @@ export const goalDeepQuery = {
     dependsOn: {
         include: {
             state: true,
-            estimate: { include: { estimate: true } },
             activity: {
                 include: {
                     user: true,
@@ -400,7 +384,6 @@ export const goalDeepQuery = {
     relatedTo: {
         include: {
             state: true,
-            estimate: { include: { estimate: true } },
             activity: {
                 include: {
                     user: true,
@@ -419,7 +402,6 @@ export const goalDeepQuery = {
     blocks: {
         include: {
             state: true,
-            estimate: { include: { estimate: true } },
             activity: {
                 include: {
                     user: true,
@@ -550,7 +532,6 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string, role: R
     const _isWatching = goal.watchers?.some((watcher: any) => watcher?.id === activityId);
     const _isStarred = goal.stargizers?.some((stargizer: any) => stargizer?.id === activityId);
     const _isIssuer = goal.activityId === activityId;
-    const _lastEstimate = goal.estimate?.length ? goal.estimate[goal.estimate.length - 1].estimate : undefined;
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
     const _hasAchievementCriteria = !!goal.goalAchiveCriteria?.length;
     const _achivedCriteriaWeight: number | null =
@@ -581,7 +562,6 @@ export const addCalclulatedGoalsFields = (goal: any, activityId: string, role: R
         _isStarred,
         _isIssuer,
         _isEditable,
-        _lastEstimate,
         _shortId,
         _hasAchievementCriteria,
         _achivedCriteriaWeight,
@@ -596,7 +576,6 @@ export const calcGoalsMeta = (goals: any[]) => {
     const uniqPriority = new Set<string>();
     const uniqStates = new Map();
     const uniqProjects = new Map();
-    const uniqEstimates = new Map();
 
     goals.forEach((goal: any) => {
         goal.state && uniqStates.set(goal.state?.id, goal.state);
@@ -614,11 +593,6 @@ export const calcGoalsMeta = (goals: any[]) => {
                 p && uniqParticipants.set(p.id, p);
             });
         goal.activity && uniqIssuers.set(goal.activity.id, goal.activity);
-
-        goal.estimate &&
-            goal.estimate.forEach(({ estimate }: EstimateToGoal & { estimate: Estimate }) => {
-                uniqEstimates.set(`${estimate?.q}/${estimate?.y}`, estimate);
-            });
     });
 
     return {
@@ -629,7 +603,6 @@ export const calcGoalsMeta = (goals: any[]) => {
         priority: Array.from(uniqPriority),
         states: Array.from(uniqStates.values()),
         projects: Array.from(uniqProjects.values()),
-        estimates: Array.from(uniqEstimates.values()),
         count: goals.length,
     };
 };

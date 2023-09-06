@@ -48,7 +48,7 @@ export const filtersPanelSsrInit = async ({ query: browserQuery, ssrHelpers, req
             include: queryState.tag,
         }),
         ssrHelpers.state.all.fetch(),
-        ssrHelpers.estimates.all.fetch(),
+        ssrHelpers.estimates.ranges.fetch(),
         ssrHelpers.filter.getUserFilters.fetch(),
     ]);
 

@@ -50,6 +50,7 @@ interface EstimatePopupProps {
     renderItem: (option: EstimateOption) => ReactNode;
     renderTrigger: (values: { onClick: () => void }) => ReactNode;
     onClose?: () => void;
+    onOpen?: () => void;
     items: EstimateOption[];
     placement?: ComponentProps<typeof Popup>['placement'];
     error?: { message?: string };
@@ -60,6 +61,7 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
     renderItem,
     renderTrigger,
     onClose,
+    onOpen,
     items,
     placement,
     error,
@@ -76,8 +78,15 @@ export const EstimatePopup: React.FC<EstimatePopupProps> = ({
     const onMouseLeave = useCallback(() => setErrorVisible(false), []);
 
     const onToggleVisible = useCallback(() => {
-        setVisible((prev) => !prev);
-    }, []);
+        setVisible((prev) => {
+            if (prev) {
+                onClose?.();
+            } else {
+                onOpen?.();
+            }
+            return !prev;
+        });
+    }, [onClose, onOpen]);
 
     useClickOutside(triggerRef, (e) => {
         if (!popupContentRef.current?.contains(e.target as Node)) {

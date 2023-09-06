@@ -23,7 +23,6 @@ import {
     createGoal,
     changeGoalProject,
     getGoalHistory,
-    findOrCreateEstimate,
     mixHistoryWithComments,
     makeGoalRelationMap,
     updateGoalWithCalculatedWeight,
@@ -39,7 +38,7 @@ import {
     updateCriteriaState,
 } from '../../src/schema/criteria';
 import type { FieldDiff } from '../../src/types/common';
-import { createLocaleDate } from '../../src/utils/dateTime';
+import { encodeHistoryEstimate, formateEstimate } from '../../src/utils/dateTime';
 
 import { addCalculatedProjectFields } from './project';
 
@@ -178,7 +177,6 @@ export const goal = router({
                         include: {
                             goalAsCriteria: {
                                 include: {
-                                    estimate: { include: { estimate: true } },
                                     activity: {
                                         include: {
                                             user: true,
@@ -202,27 +200,12 @@ export const goal = router({
                             OR: [{ deleted: false }, { deleted: null }],
                         },
                     },
-                    estimate: {
-                        include: {
-                            estimate: true,
-                        },
-                        where: {
-                            goal: {
-                                projectId,
-                                scopeId,
-                                archived: false,
-                            },
-                        },
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                    },
                 },
             });
 
             if (!goal) return null;
 
-            const history = await getGoalHistory(goal.history || [], goal.id);
+            const history = await getGoalHistory(goal.history || []);
 
             return {
                 ...goal,
@@ -348,9 +331,6 @@ export const goal = router({
                 owner: { include: { user: true, ghost: true } },
                 project: true,
                 tags: true,
-                estimate: {
-                    include: { estimate: true },
-                },
                 goalAsCriteria: true,
             },
         });
@@ -428,28 +408,30 @@ export const goal = router({
             });
         }
 
-        const correctEstimate = await findOrCreateEstimate(input.estimate, activityId, actualGoal.id);
-        const previousEstimate = actualGoal.estimate.length
-            ? actualGoal.estimate[actualGoal.estimate.length - 1]
-            : null;
-        const previousEstimateId = previousEstimate ? String(previousEstimate.estimateId) : '';
-        if (correctEstimate && String(correctEstimate.id) !== previousEstimateId) {
+        if (Number(input.estimate?.date) !== Number(actualGoal.estimate)) {
+            const prevHistoryEstimate = actualGoal.estimate
+                ? encodeHistoryEstimate(actualGoal.estimate, actualGoal.estimateType ?? 'Strict')
+                : null;
+            const nextHistoryEstimate = input.estimate
+                ? encodeHistoryEstimate(input.estimate.date, input.estimate.type)
+                : null;
+
             history.push({
                 subject: 'estimate',
                 action: 'change',
-                previousValue: previousEstimateId,
-                nextValue: String(correctEstimate.id),
+                previousValue: prevHistoryEstimate,
+                nextValue: nextHistoryEstimate,
             });
 
+            const prevFormatedEstimate = actualGoal.estimate
+                ? formateEstimate(actualGoal.estimate, { locale: 'en', type: actualGoal.estimateType ?? 'Strict' })
+                : null;
+            const nextFormatedEstimate = input.estimate
+                ? formateEstimate(input.estimate.date, { locale: 'en', type: input.estimate.type })
+                : null;
+
             // FIXME: https://github.com/taskany-inc/issues/issues/1359
-            updatedFields.estimate = [
-                previousEstimate?.estimate.date
-                    ? createLocaleDate(new Date(previousEstimate?.estimate.date), { locale: 'en' })
-                    : [previousEstimate?.estimate.q, previousEstimate?.estimate.y].join('/'),
-                correctEstimate.date
-                    ? createLocaleDate(new Date(correctEstimate.date), { locale: 'en' })
-                    : [correctEstimate.q, correctEstimate.y].join('/'),
-            ];
+            updatedFields.estimate = [prevFormatedEstimate, nextFormatedEstimate];
         }
 
         try {
@@ -461,17 +443,8 @@ export const goal = router({
                     description: input.description,
                     stateId: input.state?.id,
                     priority: input.priority,
-                    estimate: correctEstimate?.id
-                        ? {
-                              create: {
-                                  estimate: {
-                                      connect: {
-                                          id: correctEstimate.id,
-                                      },
-                                  },
-                              },
-                          }
-                        : undefined,
+                    estimate: input.estimate?.date,
+                    estimateType: input.estimate?.type,
                     tags: {
                         connect: tagsToConnect.map(({ id }) => ({ id })),
                         disconnect: tagsToDisconnect.map(({ id }) => ({ id })),

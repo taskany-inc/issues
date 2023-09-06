@@ -1,14 +1,5 @@
 import { createContext, useContext, useState, SetStateAction, useMemo } from 'react';
-import {
-    User,
-    Tag as TagData,
-    Estimate,
-    State as StateData,
-    Activity,
-    Project,
-    GoalAchieveCriteria,
-    Goal,
-} from '@prisma/client';
+import { User, Tag as TagData, State as StateData, Activity, Project, GoalAchieveCriteria, Goal } from '@prisma/client';
 import styled, { css } from 'styled-components';
 import { UserPic, Text, Tag, nullable, Button } from '@taskany/bricks';
 import { IconDoubleCaretRightCircleSolid, IconDividerLineOutline } from '@taskany/icons';
@@ -18,16 +9,19 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { IssueListItem } from '../IssueListItem';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Priority } from '../../types/priority';
+import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
 import { HistoryAction, HistoryRecordSubject } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { Circle, CircledIcon } from '../Circle';
+import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './HistoryRecord.i18n';
 
 type WholeSubject =
     | 'title'
+    | 'estimate'
     | 'description'
     | 'priority'
     | 'goalAsCriteria'
@@ -309,12 +303,27 @@ export const HistoryRecordTags: React.FC<HistoryChangeProps<TagData[]>> = ({ fro
     );
 };
 
-export const HistoryRecordEstimate: React.FC<HistoryChangeProps<Estimate>> = ({ from, to }) => (
-    <HistorySimplifyRecord
-        from={from ? <Tag size="s">{`${from.q}/${from.y}`}</Tag> : null}
-        to={to ? <Tag size="s">{to.q ? `${to.q}/${to.y}` : to.y}</Tag> : null}
-    />
-);
+export const HistoryRecordEstimate: React.FC<HistoryChangeProps<string>> = ({ from, to }) => {
+    const locale = useLocale();
+
+    const fromEstimate = from ? decodeHistoryEstimate(from) : null;
+    const toEstimate = to ? decodeHistoryEstimate(to) : null;
+
+    return (
+        <HistorySimplifyRecord
+            from={
+                fromEstimate ? (
+                    <Tag size="s">{formateEstimate(fromEstimate.date, { locale, type: fromEstimate?.type })}</Tag>
+                ) : null
+            }
+            to={
+                toEstimate ? (
+                    <Tag size="s">{formateEstimate(toEstimate.date, { locale, type: toEstimate?.type })}</Tag>
+                ) : null
+            }
+        />
+    );
+};
 
 export const HistoryRecordProject: React.FC<HistoryChangeProps<Project>> = ({ from, to }) => (
     <HistorySimplifyRecord

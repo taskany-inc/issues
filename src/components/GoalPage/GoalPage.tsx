@@ -284,7 +284,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                     )}
 
                     <IssueStats
-                        estimate={goal._lastEstimate}
+                        estimate={goal.estimate}
+                        estimateType={goal.estimateType}
                         priority={goal.priority}
                         achivedCriteriaWeight={goal._hasAchievementCriteria ? goal._achivedCriteriaWeight : undefined}
                         comments={goal._count?.comments ?? 0}

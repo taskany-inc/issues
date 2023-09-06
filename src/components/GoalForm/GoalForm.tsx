@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
-import { Estimate, State, Tag as TagModel } from '@prisma/client';
+import { State, Tag as TagModel } from '@prisma/client';
 import {
     Form,
     FormInput,
@@ -17,8 +17,9 @@ import {
 import { IconGitPullOutline, IconCalendarTickOutline } from '@taskany/icons';
 
 import { FormEditor } from '../FormEditor/FormEditor';
-import { formatEstimate } from '../../utils/dateTime';
 import { errorsProvider } from '../../utils/forms';
+import { formateEstimate } from '../../utils/dateTime';
+import { DateType } from '../../types/date';
 import { useLocale } from '../../hooks/useLocale';
 import { Priority } from '../../types/priority';
 import { UserComboBox } from '../UserComboBox';
@@ -28,8 +29,8 @@ import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { HelpButton } from '../HelpButton/HelpButton';
-import { Estimate as EstimateComponent } from '../Estimate/Estimate';
 
+import { GoalFormEstimate } from './GoalFormEstimate';
 import { tr } from './GoalForm.i18n';
 
 const tagsLimit = 5;
@@ -42,7 +43,10 @@ interface GoalFormProps {
     tags?: TagModel[];
     state?: State;
     priority?: Priority | string;
-    estimate?: Estimate;
+    estimate?: {
+        date: Date;
+        type: DateType;
+    };
     busy?: boolean;
     validityScheme: Schema;
     id?: string;
@@ -68,7 +72,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     onSumbit,
 }) => {
     const locale = useLocale();
-
     const {
         control,
         register,
@@ -187,24 +190,25 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             control={control}
                             render={({ field }) => {
                                 return (
-                                    <EstimateComponent
+                                    <GoalFormEstimate
                                         placeholder={tr('Date input mask placeholder')}
                                         mask={tr('Date input mask')}
                                         placement="top"
-                                        renderTrigger={(props) => {
-                                            return (
-                                                <Button
-                                                    onClick={props.onClick}
-                                                    disabled={busy}
-                                                    text={
-                                                        field.value?.date
-                                                            ? formatEstimate(field.value || {}, locale)
-                                                            : field.value?.y
-                                                    }
-                                                    iconLeft={<IconCalendarTickOutline noWrap size="xs" />}
-                                                />
-                                            );
-                                        }}
+                                        renderTrigger={(props) => (
+                                            <Button
+                                                onClick={props.onClick}
+                                                disabled={busy}
+                                                text={
+                                                    field.value
+                                                        ? formateEstimate(field.value.date, {
+                                                              locale,
+                                                              type: field.value.type,
+                                                          })
+                                                        : ''
+                                                }
+                                                iconLeft={<IconCalendarTickOutline noWrap size="xs" />}
+                                            />
+                                        )}
                                         error={errorsResolver(field.name)}
                                         {...field}
                                     />

@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import { Text, nullable, Table } from '@taskany/bricks';
 import { backgroundColor, danger0, gray4, gray9, textColor } from '@taskany/colors';
 import { IconBinOutline, IconMessageTextAltOutline } from '@taskany/icons';
-import { Estimate, State } from '@prisma/client';
+import { State } from '@prisma/client';
 import NextLink from 'next/link';
 
 import { ActivityFeedItem } from '../ActivityFeed';
+import { DateType } from '../../types/date';
 import { ToggleGoalDependency, dependencyKind } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { Circle, CircledIcon as CircleIconInner } from '../Circle';
@@ -76,7 +77,8 @@ interface GoalDependencyListItemProps {
     owner?: ActivityByIdReturnType;
     issuer?: ActivityByIdReturnType;
     state?: State;
-    estimate?: Estimate;
+    estimate?: Date | null;
+    estimateType?: DateType | null;
     canEdit: boolean;
     onRemove: () => void;
     onClick?: () => void;
@@ -225,7 +227,8 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
                                     issuer={item.activity ?? undefined}
                                     owner={item.owner ?? undefined}
                                     shortId={`${item.projectId}-${item.scopeId}`}
-                                    estimate={item.estimate[item.estimate.length - 1]?.estimate}
+                                    estimate={item.estimate}
+                                    estimateType={item.estimateType}
                                     onRemove={() => onRemoveHandler(item)}
                                     onClick={onClick ? () => onClick(item) : undefined}
                                 />

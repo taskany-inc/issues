@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { StateType } from '@prisma/client';
 
+import { DateType } from '../types/date';
+
 import { tr } from './schema.i18n';
 import { queryWithFiltersSchema } from './common';
 import { commentSchema } from './comment';
@@ -71,11 +73,10 @@ export const goalCommonSchema = z.object({
     priority: z.string().nullable().optional(),
     estimate: z
         .object({
-            date: z.string().optional().nullable(),
-            q: z.string().optional().nullable(),
-            y: z.string(),
-            id: z.number().nullish(),
+            date: z.date(),
+            type: z.enum([DateType.Quarter, DateType.Strict, DateType.Year]),
         })
+        .nullable()
         .optional(),
     tags: z
         .array(
@@ -144,11 +145,10 @@ export const goalUpdateSchema = z.object({
     priority: z.string().nullable(),
     estimate: z
         .object({
-            date: z.string().optional().nullable(),
-            q: z.string().optional().nullable(),
-            y: z.string(),
-            id: z.number().nullish(),
+            date: z.date(),
+            type: z.enum([DateType.Quarter, DateType.Strict, DateType.Year]),
         })
+        .nullable()
         .optional(),
     tags: z.array(
         z.object({

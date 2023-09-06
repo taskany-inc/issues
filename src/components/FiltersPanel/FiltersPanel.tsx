@@ -144,7 +144,7 @@ export const FiltersPanel: FC<{
     );
 
     const { data: states = [] } = trpc.state.all.useQuery();
-    const { data: estimates = [] } = trpc.estimates.all.useQuery();
+    const { data: estimates = [] } = trpc.estimates.ranges.useQuery();
 
     return (
         <>
@@ -283,7 +283,6 @@ export const FiltersPanel: FC<{
                 participants={participants}
                 projects={projects}
                 tags={tags}
-                estimates={estimates}
             />
         </>
     );

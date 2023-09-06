@@ -30,6 +30,12 @@ enum StateType {
   Canceled
 }
 
+enum DateType {
+  Strict
+  Quarter
+  Year
+}
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -208,7 +214,9 @@ model Goal {
   priority                String?
   priorityExact           Priority?             @relation(fields: [priorityId], references: [id])
   priorityId              Int?
-  estimate                EstimateToGoal[]
+  estimate                DateTime?
+  estimateType            DateType?
+  legacyEstimate          EstimateToGoal[]
   project                 Project?              @relation("projectGoals", fields: [projectId], references: [id])
   projectId               String?
   teamId                  String?

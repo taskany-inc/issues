@@ -3,9 +3,8 @@ import { gapXs } from '@taskany/colors';
 import { useState, useRef, useCallback, Dispatch, SetStateAction, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { quarters, endOfQuarter, createLocaleDate, yearFromDate } from '../utils/dateTime';
-import { Estimate, Option, QuartersKeys } from '../types/estimate';
-import { useLocale } from '../hooks/useLocale';
+import { Option } from '../types/estimate';
+import { Quarters, QuartersKeys } from '../types/date';
 
 import { EstimateOption } from './EstimateOption';
 
@@ -17,9 +16,9 @@ const StyledQuarters = styled.div`
 
 interface EstimateQuarterProps {
     option: Option;
-    value?: Estimate;
+    value?: QuartersKeys;
     readOnly?: boolean;
-    onChange?: (value?: Estimate) => void;
+    onChange?: (value?: QuartersKeys) => void;
     setReadOnly: Dispatch<
         SetStateAction<{
             year: boolean;
@@ -29,11 +28,16 @@ interface EstimateQuarterProps {
     >;
 }
 
-const quartersList = Object.values(quarters);
+const quartersList = Object.values(Quarters);
 
-export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, value, readOnly, onChange, setReadOnly }) => {
-    const locale = useLocale();
-    const [selectedQuarter, setSelectedQuarter] = useState<QuartersKeys | null | undefined>(value?.q || null);
+export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({
+    option,
+    value = null,
+    readOnly,
+    onChange,
+    setReadOnly,
+}) => {
+    const [selectedQuarter, setSelectedQuarter] = useState<QuartersKeys | null>(value);
     const ref = useRef(null);
 
     useClickOutside(ref, () => {
@@ -43,36 +47,11 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, value,
         setSelectedQuarter(null);
     });
 
-    useEffect(() => {
-        if (readOnly) {
-            setSelectedQuarter(null);
-        }
-
-        setSelectedQuarter(value?.q);
-    }, [value?.q, readOnly]);
-
     const onToggleQuarter = useCallback(
-        (quarter: QuartersKeys) => {
-            return () => {
-                setSelectedQuarter((prev) => {
-                    if (!value) return prev;
-                    const q = prev === quarter ? null : quarter;
-
-                    if (q) {
-                        const tmp = endOfQuarter(q);
-                        tmp.setFullYear(+value.y);
-                        value.date = createLocaleDate(tmp, { locale });
-                    } else {
-                        value.date = null;
-                    }
-
-                    value.q = q;
-                    onChange?.(value);
-                    return q;
-                });
-            };
+        (quarter: QuartersKeys) => () => {
+            setSelectedQuarter((prev) => (prev === quarter ? null : quarter));
         },
-        [locale, onChange, value],
+        [],
     );
 
     const onClick = useCallback(() => {
@@ -81,8 +60,15 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ option, value,
             year: false,
             date: true,
         });
-        onChange?.({ y: value?.y || `${yearFromDate(new Date())}`, q: null, date: null });
-    }, [onChange, setReadOnly, value?.y]);
+
+        setSelectedQuarter(value);
+    }, [setReadOnly, value]);
+
+    useEffect(() => {
+        if (!readOnly && value !== selectedQuarter) {
+            onChange?.(selectedQuarter || undefined);
+        }
+    }, [readOnly, onChange, selectedQuarter, value]);
 
     return (
         <EstimateOption
