@@ -4,6 +4,7 @@ import { PageLoadProgress } from '@taskany/bricks';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { usePageLoad } from '../hooks/usePageLoad';
@@ -13,6 +14,29 @@ import { GoalPreviewProvider } from '../components/GoalPreview/GoalPreviewProvid
 import { getTelemetryInstanceSingleton, useWebTelemetryMonitoringInit } from '../utils/telemetry';
 
 const defaultThemes = ['light', 'dark'];
+const defaultGrid = {
+    paddingWidth: {
+        xs: 0,
+        sm: 0,
+        md: 0,
+        lg: 0,
+        xl: 0,
+    },
+    gutterWidth: {
+        xs: 0,
+        sm: 0,
+        md: 0,
+        lg: 0,
+        xl: 0,
+    },
+    columns: {
+        xs: 24,
+        sm: 24,
+        md: 24,
+        lg: 24,
+        xl: 24,
+    },
+};
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
     getTelemetryInstanceSingleton().then((telemetry) => {
@@ -37,13 +61,15 @@ const App = ({ Component, pageProps, router }: AppProps) => {
             </Head>
 
             <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
-                <ThemeProvider themes={defaultThemes}>
-                    <GoalPreviewProvider>
-                        <PageLoadProgress height={2} ref={pageLoadRef} />
-                        <Component {...pageProps} />
-                        <ReactQueryDevtools />
-                    </GoalPreviewProvider>
-                </ThemeProvider>
+                <StyledThemeProvider theme={{ awesomegrid: defaultGrid }}>
+                    <ThemeProvider themes={defaultThemes}>
+                        <GoalPreviewProvider>
+                            <PageLoadProgress height={2} ref={pageLoadRef} />
+                            <Component {...pageProps} />
+                            <ReactQueryDevtools />
+                        </GoalPreviewProvider>
+                    </ThemeProvider>
+                </StyledThemeProvider>
             </SessionProvider>
         </>
     );
