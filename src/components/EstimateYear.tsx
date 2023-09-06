@@ -3,9 +3,8 @@ import { useState, useRef, useEffect, useCallback, Dispatch, SetStateAction } fr
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 import styled from 'styled-components';
 
-import { createLocaleDate, parseLocaleDate, yearFromDate } from '../utils/dateTime';
-import { Estimate, Option } from '../types/estimate';
-import { useLocale } from '../hooks/useLocale';
+import { getYearFromDate } from '../utils/dateTime';
+import { Option } from '../types/estimate';
 
 import { EstimateOption } from './EstimateOption';
 
@@ -19,9 +18,9 @@ const StyledInput = styled(Input)`
 
 interface EstimateYearProps {
     option: Option;
-    value?: Estimate;
+    value?: number;
     readOnly?: boolean;
-    onChange?: (value?: Estimate) => void;
+    onChange?: (value?: number) => void;
     setReadOnly: Dispatch<
         SetStateAction<{
             year: boolean;
@@ -31,68 +30,56 @@ interface EstimateYearProps {
     >;
 }
 
-const currentYear = yearFromDate(new Date());
+const currentYear = getYearFromDate(new Date());
 const years: number[] = [];
 for (let i = currentYear + 4; currentYear - 1 <= i; i--) {
     years.push(i);
 }
 
+const getValidYear = (year: number): number => {
+    if (year > years[0]) {
+        return years[0];
+    }
+    if (year < years[years.length - 1]) {
+        return years[years.length - 1];
+    }
+
+    return year;
+};
+
 export const EstimateYear: React.FC<EstimateYearProps> = ({ option, value, readOnly, onChange, setReadOnly }) => {
-    const locale = useLocale();
-    const [selectedYear, setSelectedYear] = useState(currentYear);
+    const yearValue = value ? getValidYear(value) : null;
+    const [selectedYear, setSelectedYear] = useState(yearValue || currentYear);
     const inputRef = useRef(null);
 
-    useEffect(() => {
-        if (+selectedYear < years[years.length - 1] || +selectedYear > years[0]) return;
+    const onChangeYear = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const { value } = e.target;
 
-        let estimate = value;
-        const yearString = `${selectedYear}`;
-
-        if (estimate) {
-            estimate.y = yearString;
-
-            if (estimate.date) {
-                estimate.date = createLocaleDate(
-                    new Date(parseLocaleDate(estimate.date, { locale }).setFullYear(selectedYear)),
-                    {
-                        locale,
-                    },
-                );
+            if (value.length === 4) {
+                setSelectedYear?.(getValidYear(+value));
             }
-        } else {
-            estimate = { y: yearString, date: null, q: null };
-        }
+        },
+        [setSelectedYear],
+    );
 
-        onChange?.(estimate);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [onChange, selectedYear]);
-
-    const onChangeYear = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = e.target;
-        const numValue = +value;
-
-        if (numValue > years[0] && value.length === 4) {
-            setSelectedYear(years[0]);
-            return;
-        }
-        if (numValue < years[years.length - 1] && value.length === 4) {
-            setSelectedYear(years[years.length - 1]);
-            return;
-        }
-
-        setSelectedYear(numValue);
-    }, []);
-
-    const onToggleEstimateYear = useCallback((year: number) => {
-        setSelectedYear(year);
-    }, []);
+    const onToggleEstimateYear = useCallback(
+        (year: number) => {
+            setSelectedYear?.(year);
+        },
+        [setSelectedYear],
+    );
 
     const onClick = useCallback(() => {
-        const year = value?.y || `${currentYear}`;
-        onChange?.({ y: year, q: null, date: null });
-        setSelectedYear(+year);
         setReadOnly((prev) => ({ ...prev, date: true, year: false }));
-    }, [onChange, setReadOnly, value?.y]);
+        onChange?.(selectedYear);
+    }, [setReadOnly, selectedYear, onChange]);
+
+    useEffect(() => {
+        if (!readOnly && selectedYear !== yearValue) {
+            onChange?.(selectedYear);
+        }
+    }, [readOnly, selectedYear, yearValue, onChange]);
 
     return (
         <EstimateOption

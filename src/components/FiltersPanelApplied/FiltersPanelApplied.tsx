@@ -8,9 +8,9 @@ import { StateFilter } from '../StateFilter';
 import { UserFilter } from '../UserFilter/UserFilter';
 import { ProjectFilter } from '../ProjectFilter';
 import { TagFilter } from '../TagFilter';
-import { EstimateFilter } from '../EstimateFilter';
 import { SortableProps, sortFilterTr } from '../SortFilter/SortFilter';
-import { decodeEstimateFilterValue, estimateToString } from '../../utils/estimateToString';
+import { decodeUrlDateRange, formateEstimate, getDateTypeFromRange } from '../../utils/dateTime';
+import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './FiltersPanelApplied.i18n';
 
@@ -22,7 +22,6 @@ interface FiltersPanelAppliedProps {
     participants?: React.ComponentProps<typeof UserFilter>['users'];
     projects?: React.ComponentProps<typeof ProjectFilter>['projects'];
     tags?: React.ComponentProps<typeof TagFilter>['tags'];
-    estimates?: React.ComponentProps<typeof EstimateFilter>['estimates'];
 }
 
 const arrToMap = <T extends Array<{ id: string }>>(arr: T): { [key: string]: T[number] } =>
@@ -42,9 +41,9 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     participants,
     projects,
     tags,
-    estimates,
 }) => {
     let infoString = '';
+    const locale = useLocale();
 
     const { statesMap, issuersMap, ownersMap, participantsMap, projectsMap, tagsMap } = useMemo(() => {
         return {
@@ -98,12 +97,19 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
         appliedMap[tr('Tag')] = queryState.tag.map((t) => tagsMap[t]?.title).filter(Boolean);
     }
 
-    if (queryState.estimate.length && estimates?.length) {
+    if (queryState.estimate.length) {
         appliedMap[tr('Estimate')] = queryState.estimate
             .map((e) => {
-                const estimate = decodeEstimateFilterValue(e);
+                const dateRange = decodeUrlDateRange(e);
 
-                return estimate ? estimateToString(estimate) : null;
+                if (dateRange) {
+                    return formateEstimate(dateRange.end, {
+                        locale,
+                        type: getDateTypeFromRange(dateRange),
+                    });
+                }
+
+                return null;
             })
             .filter(Boolean);
     }

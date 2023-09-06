@@ -2,42 +2,12 @@ import { nanoid } from 'nanoid';
 import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
-import { GoalCommon, GoalUpdate, dependencyKind } from '../schema/goal';
+import { GoalCommon, dependencyKind } from '../schema/goal';
 import { addCalclulatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
 
 import { prisma } from './prisma';
 import { subjectToEnumValue } from './goalHistory';
-
-export const findOrCreateEstimate = async (
-    estimate: GoalCommon['estimate'] | GoalUpdate['estimate'],
-    activityId: string,
-    goalId: string,
-) => {
-    if (!estimate) {
-        return null;
-    }
-
-    if (estimate.id == null) {
-        const { id: _, q = null, date = null, ...whereParams } = estimate;
-
-        const existingEstimate = await prisma.estimate.findFirst({
-            where: { q, date, ...whereParams },
-        });
-        return (
-            existingEstimate ||
-            prisma.estimate.create({
-                data: {
-                    date: estimate.date,
-                    y: estimate.y,
-                    q: estimate.q,
-                    activityId,
-                    goalId,
-                },
-            })
-        );
-    }
-};
 
 /**
  * Type-safe wrapper in raw SQL query.
@@ -68,8 +38,6 @@ export const createGoal = async (input: GoalCommon, activityId: string, role: Ro
         FROM "Goal" WHERE "projectId" = ${input.parent.id};
     `;
 
-    const correctEstimate = await findOrCreateEstimate(input.estimate, activityId, id);
-
     const goal = await prisma.goal.update({
         where: {
             id,
@@ -80,17 +48,8 @@ export const createGoal = async (input: GoalCommon, activityId: string, role: Ro
                       connect: input.tags.map(({ id }) => ({ id })),
                   }
                 : undefined,
-            estimate: correctEstimate?.id
-                ? {
-                      create: {
-                          estimate: {
-                              connect: {
-                                  id: correctEstimate.id,
-                              },
-                          },
-                      },
-                  }
-                : undefined,
+            estimate: input.estimate?.date,
+            estimateType: input.estimate?.type,
             watchers: {
                 connect: [{ id: activityId }, { id: input.owner.id }],
             },
@@ -124,7 +83,6 @@ export const goalHistorySeparator = ', ';
 
 export const getGoalHistory = async <T extends GoalHistory & { activity: Activity & { user: User | null } }>(
     history: T[],
-    goalId: string,
 ) => {
     const requestParamsBySubjects = history.reduce<RequestParamsBySubject>(
         (acc, { subject, previousValue, nextValue }, index) => {
@@ -184,19 +142,6 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                         });
                     case 'state':
                         return prisma.state.findMany({ where: query.where });
-                    case 'estimate':
-                        return prisma.estimate.findMany({
-                            where: {
-                                id: {
-                                    in: (query.where.id.in ?? []).map((v) => Number(v)),
-                                },
-                                goal: {
-                                    some: {
-                                        goalId,
-                                    },
-                                },
-                            },
-                        });
                     case 'project':
                         return prisma.project.findMany({ where: query.where });
                     case 'criteria':
@@ -240,7 +185,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
             }
 
             const record = history[sourceIndex];
-            const valueCanBeArray = ['dependencies', 'tags'].includes(record.subject);
+            const valueCanBeArray = ['dependencies', 'tags', 'estimates'].includes(record.subject);
 
             if (valueCanBeArray) {
                 historyWithMeta[sourceIndex] = {

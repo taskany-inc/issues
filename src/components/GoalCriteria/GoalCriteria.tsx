@@ -9,7 +9,7 @@ import {
     IconBinOutline,
     IconEdit1Outline,
 } from '@taskany/icons';
-import { Estimate, Goal, State } from '@prisma/client';
+import { Goal, State } from '@prisma/client';
 import { backgroundColor, brandColor, gray10, danger0, gray8, gray9, gray4, textColor } from '@taskany/colors';
 import NextLink from 'next/link';
 
@@ -26,6 +26,7 @@ import { Circle, CircledIcon } from '../Circle';
 import { UserGroup } from '../UserGroup';
 import { GoalListItemCompact, CustomCell } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
+import { DateType } from '../../types/date';
 import { EditCriteriaForm } from '../CriteriaForm/CriteriaForm';
 
 import { tr } from './GoalCriteria.i18n';
@@ -122,7 +123,9 @@ interface GoalCriteriaItemProps {
 }
 
 interface CriteriaAsGoalProps extends GoalCriteriaItemProps {
-    item: GoalAchiveCriteria & { goalAsCriteria: (Goal & { state: State | null; estimate: Estimate | null }) | null };
+    item: GoalAchiveCriteria & {
+        goalAsCriteria: (Goal & { state: State | null; estimate: Date | null; estimateType: DateType | null }) | null;
+    };
 }
 
 function criteriaGuard(props: unknown): props is CriteriaAsGoalProps['item'] {
@@ -200,7 +203,8 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
             return {
                 ...item.goalAsCriteria,
                 shortId: `${item.goalAsCriteria.projectId}-${item.goalAsCriteria.scopeId}`,
-                estimate: item.goalAsCriteria?.estimate[(item.goalAsCriteria?.estimate.length ?? 0) - 1]?.estimate,
+                estimate: item.goalAsCriteria.estimate,
+                estimateType: item.goalAsCriteria.estimateType,
                 weight: item.weight,
             };
         }

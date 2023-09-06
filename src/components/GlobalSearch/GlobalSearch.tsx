@@ -324,7 +324,8 @@ export const GlobalSearch: React.FC<HTMLAttributes<HTMLDivElement>> = (attrs) =>
                                                                     state: item.state,
                                                                     owner: item.owner,
                                                                     issuer: item.activity,
-                                                                    estimate: item._lastEstimate,
+                                                                    estimate: item.estimate,
+                                                                    estimateType: item.estimateType,
                                                                     projectId: item.projectId,
                                                                 }}
                                                                 columns={[

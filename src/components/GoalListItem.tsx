@@ -4,12 +4,14 @@ import NextLink from 'next/link';
 import { textColor, gapS, gapXs, gray9, radiusM } from '@taskany/colors';
 import { Text, Tag as TagItem, nullable, CircleProgressBar, TableRow, TableCell } from '@taskany/bricks';
 import { IconEyeOutline, IconStarSolid, IconMessageOutline } from '@taskany/icons';
-import type { Estimate, State as StateType, Tag } from '@prisma/client';
+import type { State as StateType, Tag } from '@prisma/client';
 
 import { routes } from '../hooks/router';
 import { Priority } from '../types/priority';
+import { DateType } from '../types/date';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
-import { estimateToString } from '../utils/estimateToString';
+import { formateEstimate } from '../utils/dateTime';
+import { useLocale } from '../hooks/useLocale';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
@@ -30,7 +32,8 @@ interface GoalListItemProps {
     state?: StateType | null;
     createdAt: Date;
     updatedAt: Date;
-    estimate?: Estimate | null;
+    estimate?: Date | null;
+    estimateType?: DateType | null;
     comments?: number;
     isNotViewed?: boolean;
     focused?: boolean;
@@ -224,6 +227,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         state,
         focused,
         estimate,
+        estimateType,
         priority,
         starred,
         watching,
@@ -233,6 +237,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         className,
         onTagClick,
     }) => {
+        const locale = useLocale();
         const issuers = useMemo(() => {
             if (issuer && owner && owner.id === issuer.id) {
                 return [owner];
@@ -284,7 +289,14 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                         </TableCell>
 
                         <TableCell width="8ch">
-                            <GoalTextItem>{nullable(estimate, (e) => estimateToString(e))}</GoalTextItem>
+                            <GoalTextItem>
+                                {nullable(estimate, (e) =>
+                                    formateEstimate(e, {
+                                        type: estimateType === 'Year' ? estimateType : 'Quarter',
+                                        locale,
+                                    }),
+                                )}
+                            </GoalTextItem>
                         </TableCell>
 
                         <TableCell width={24}>
