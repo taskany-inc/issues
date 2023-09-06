@@ -1,11 +1,9 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, ChangeEvent, useCallback, useRef, useEffect, HTMLAttributes } from 'react';
 import styled from 'styled-components';
-import NextLink from 'next/link';
 import {
     Input,
     Text,
-    Table,
     Popup,
     useKeyboard,
     KeyCode,
@@ -15,14 +13,15 @@ import {
     ListViewItem,
 } from '@taskany/bricks';
 import { IconTargetOutline, IconUsersOutline, IconSearchOutline } from '@taskany/icons';
-import { gapS, gapXs, gray4, radiusM, textColor } from '@taskany/colors';
+import { gapS, gapXs, gray4, textColor } from '@taskany/colors';
 
 import { trpc } from '../../utils/trpcClient';
 import { routes, useRouter } from '../../hooks/router';
 import { useHotkey } from '../../hooks/useHotkeys';
 import { Keyboard } from '../Keyboard';
-import { GoalListItemCompact } from '../GoalListItemCompact';
-import { ProjectListItemCompact } from '../ProjectListItemCompact';
+import { ProjectListItem } from '../ProjectListItem';
+import { GoalListItem } from '../GoalListItem';
+import { NextLink } from '../NextLink';
 
 import { tr } from './GlobalSearch.i18n';
 
@@ -46,8 +45,8 @@ const StyledInput = styled(({ focused, ...props }) => <Input {...props} />)<{ fo
 `;
 
 const StyledResults = styled.div`
-    padding-top: 36px; // Popup default offset + Input height 28px
-    padding-bottom: ${gapS};
+    padding: 36px ${gapS} ${gapS} ${gapS};
+    min-width: 700px;
 `;
 
 const StyledSearchIcon = styled(IconSearchOutline)<{ focused?: boolean }>`
@@ -59,89 +58,6 @@ const StyledSearchIcon = styled(IconSearchOutline)<{ focused?: boolean }>`
         `
             z-index: 99992; // 99991 — Input z-index
         `}
-`;
-
-// TODO: https://github.com/taskany-inc/issues/issues/1568
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledGoalListItemCompact = styled(({ hovered, ...props }) => <GoalListItemCompact {...props} />)<{
-    hovered?: boolean;
-}>`
-    padding: ${gapXs} ${gapS};
-    border-radius: ${radiusM};
-    cursor: pointer;
-
-    &:hover {
-        background-color: transparent;
-    }
-
-    ${({ hovered }) =>
-        hovered &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-
-    ${({ hovered, focused }) =>
-        hovered &&
-        focused &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-
-    ${({ focused }) =>
-        focused &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-`;
-
-// TODO: https://github.com/taskany-inc/issues/issues/1568
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledProjectListItemCompact = styled(({ hovered, ...props }) => <ProjectListItemCompact {...props} />)<{
-    hovered?: boolean;
-}>`
-    ${({ hovered }) =>
-        hovered &&
-        `
-
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-
-    ${({ hovered, focused }) =>
-        hovered &&
-        focused &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-
-    ${({ focused }) =>
-        focused &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
 `;
 
 const StyledGlobalSearch = styled.div`
@@ -157,7 +73,6 @@ const StyledGroupHeader = styled(Text)`
 
     padding-top: ${gapS};
     padding-bottom: ${gapXs};
-    margin: 0 ${gapS};
 
     max-width: 392px;
 
@@ -189,8 +104,6 @@ const StyledPopupSurface = styled.div<{ visible?: boolean }>`
         backdrop-filter: blur(5px);
     `}
 `;
-
-const tableWidth = 700;
 
 export const GlobalSearch: React.FC<HTMLAttributes<HTMLDivElement>> = (attrs) => {
     const popupContentRef = useRef<HTMLDivElement>(null);
@@ -295,85 +208,63 @@ export const GlobalSearch: React.FC<HTMLAttributes<HTMLDivElement>> = (attrs) =>
                 >
                     <StyledResults ref={popupContentRef} {...onESC}>
                         <ListView onKeyboardClick={onKeyboardNavigate}>
-                            {nullable(suggestions.data?.goals?.length, () => (
+                            {nullable(suggestions.data?.goals, (goals) => (
                                 <>
                                     <StyledGroupHeader size="m" weight="bolder">
                                         {tr('Goals')} <IconTargetOutline size="s" />
                                     </StyledGroupHeader>
-                                    <Table width={tableWidth}>
-                                        {suggestions.data?.goals.map((item) => {
-                                            const value: ListViewItemValue = ['goal', item._shortId];
+                                    {goals.map((item) => {
+                                        const value: ListViewItemValue = ['goal', item._shortId];
 
-                                            return (
-                                                <ListViewItem
-                                                    key={item.id}
-                                                    value={value}
-                                                    renderItem={({ active, ...props }) => (
-                                                        <NextLink
-                                                            passHref
-                                                            href={routes.goal(item._shortId)}
-                                                            legacyBehavior
-                                                        >
-                                                            <StyledGoalListItemCompact
-                                                                focused={active}
-                                                                align="center"
-                                                                gap={10}
-                                                                item={{
-                                                                    title: item.title,
-                                                                    priority: item.priority,
-                                                                    state: item.state,
-                                                                    owner: item.owner,
-                                                                    issuer: item.activity,
-                                                                    estimate: item._lastEstimate,
-                                                                    projectId: item.projectId,
-                                                                }}
-                                                                columns={[
-                                                                    { name: 'title', columnProps: { col: 3 } },
-                                                                    {
-                                                                        name: 'state',
-                                                                        columnProps: { col: 1, justify: 'end' },
-                                                                    },
-                                                                    {
-                                                                        name: 'priority',
-                                                                        columnProps: { width: '12ch' },
-                                                                    },
-                                                                    { name: 'projectId', columnProps: { col: 3 } },
-                                                                    { name: 'issuers' },
-                                                                    { name: 'estimate', columnProps: { width: '8ch' } },
-                                                                ]}
-                                                                {...props}
-                                                            />
-                                                        </NextLink>
-                                                    )}
-                                                />
-                                            );
-                                        })}
-                                    </Table>
+                                        return (
+                                            <ListViewItem
+                                                key={item.id}
+                                                value={value}
+                                                renderItem={({ active, ...props }) => (
+                                                    <NextLink href={routes.goal(item._shortId)}>
+                                                        <GoalListItem
+                                                            focused={active}
+                                                            title={item.title}
+                                                            priority={item.priority}
+                                                            state={item.state}
+                                                            owner={item.owner}
+                                                            issuer={item.activity}
+                                                            estimate={item._lastEstimate}
+                                                            projectId={item.projectId}
+                                                            {...props}
+                                                        />
+                                                    </NextLink>
+                                                )}
+                                            />
+                                        );
+                                    })}
                                 </>
                             ))}
-                            {nullable(suggestions.data?.projects?.length, () => (
+                            {nullable(suggestions.data?.projects, (projects) => (
                                 <>
                                     <StyledGroupHeader size="m" weight="bolder">
                                         {tr('Projects')} <IconUsersOutline size="s" />
                                     </StyledGroupHeader>
-                                    <Table width={tableWidth}>
-                                        {suggestions.data?.projects?.map((item) => (
-                                            <ListViewItem
-                                                key={item.id}
-                                                value={['project', item.id]}
-                                                renderItem={({ active, ...props }) => (
-                                                    <StyledProjectListItemCompact
+                                    {projects.map((item) => (
+                                        <ListViewItem
+                                            key={item.id}
+                                            value={['project', item.id]}
+                                            renderItem={({ active, ...props }) => (
+                                                <NextLink href={routes.project(item.id)}>
+                                                    <ProjectListItem
                                                         key={item.id}
                                                         id={item.id}
+                                                        size="m"
                                                         title={item.title}
                                                         owner={item.activity}
                                                         focused={active}
+                                                        childrenCount={item._count.children}
                                                         {...props}
                                                     />
-                                                )}
-                                            />
-                                        ))}
-                                    </Table>
+                                                </NextLink>
+                                            )}
+                                        />
+                                    ))}
                                 </>
                             ))}
                         </ListView>
