@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormInput, Button } from '@taskany/bricks';
 import { gray7 } from '@taskany/colors';
 import { IconTargetOutline, IconPlusCircleOutline } from '@taskany/icons';
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 
@@ -41,13 +41,14 @@ interface GoalDependencyAddFormProps {
 }
 
 export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ goalId, kind, isEmpty, onSubmit }) => {
-    const [selected, setSelected] = useState<GoalByIdReturnType | null>(null);
     const [query, setQuery] = useState('');
+
     const {
         register,
         handleSubmit,
         setValue,
         reset,
+        watch,
         formState: { isSubmitSuccessful, errors },
     } = useForm({
         resolver: zodResolver(toggleGoalDependencySchema),
@@ -59,8 +60,9 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
         },
     });
 
+    const selectedGoalId = watch('relation.id');
+
     const resetFormHandler = useCallback(() => {
-        setSelected(null);
         setQuery('');
 
         reset({
@@ -70,26 +72,27 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
         });
     }, [reset, goalId, kind]);
 
-    useEffect(() => {
-        if (selected) {
-            setValue('relation.id', selected.id);
-        }
-    }, [selected, setValue]);
+    const handleInputChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        (event) => {
+            const queryValue = event.target.value;
 
-    const handleInputChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-        setQuery(event.target.value);
-    }, []);
+            if (selectedGoalId) {
+                resetFormHandler();
+                return;
+            }
 
-    const handleGoalSelect = useCallback((goal: NonNullable<GoalByIdReturnType>) => {
-        setSelected(goal);
-        setQuery(`${goal.projectId}-${goal.scopeId}`);
-    }, []);
+            setQuery(queryValue);
+        },
+        [resetFormHandler, selectedGoalId],
+    );
 
-    useEffect(() => {
-        if (selected && query !== `${selected.projectId}-${selected.scopeId}`) {
-            resetFormHandler();
-        }
-    }, [query, selected, resetFormHandler]);
+    const handleGoalSelect = useCallback(
+        (goal: NonNullable<GoalByIdReturnType>) => {
+            setQuery(`${goal.projectId}-${goal.scopeId}`);
+            setValue('relation.id', goal.id);
+        },
+        [setValue],
+    );
 
     const translate = useMemo(() => {
         return {
@@ -122,8 +125,8 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
                     iconLeft={<IconTargetOutline size="xs" noWrap />}
                 />
                 <GoalSuggest
-                    value={selected ? undefined : query}
-                    showSuggest={!selected}
+                    value={selectedGoalId ? undefined : query}
+                    showSuggest={!selectedGoalId}
                     onChange={handleGoalSelect}
                     renderInput={(inputProps) => (
                         <StyledFormInput
