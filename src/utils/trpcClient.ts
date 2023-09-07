@@ -17,6 +17,19 @@ export const trpc = createTRPCNext<TrpcRouter>({
         return {
             transformer: superjson,
 
+            queryClientConfig: {
+                defaultOptions: {
+                    queries: {
+                        /**
+                         * Since we have SSR for the majority of pages,
+                         * we don't need to refetch data on mount
+                         * on the client by default.
+                         */
+                        refetchOnMount: false,
+                    },
+                },
+            },
+
             links: [
                 httpBatchLink({
                     url: `${getBaseUrl()}/api/trpc`,
