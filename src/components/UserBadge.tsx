@@ -39,7 +39,7 @@ export const UserBadge: React.FC<UserBadgeProps> = ({ user, onCleanButtonClick }
         <StyledIssuer>
             <StyledUserPick src={user?.image} email={user?.email} size={24} />
             <Text color={gray9} size="s">
-                {user?.nickname || user?.name}
+                {user?.nickname || user?.name || user?.email}
             </Text>
             {nullable(onCleanButtonClick, (onClick) => (
                 <StyledCleanButton onClick={onClick} />
