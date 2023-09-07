@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.29.0](https://github.com/taskany-inc/issues/compare/v1.28.0...v1.29.0) (2023-09-07)
+
+
+### Features
+
+* **GoalPage:** inline edit for goal owner ([8add2b2](https://github.com/taskany-inc/issues/commit/8add2b2933b9e7852606bdaae6b923010cc21332))
+
+
+### Bug Fixes
+
+* **GoalCriteria:** added render prop to create criteria trigger ([14d8452](https://github.com/taskany-inc/issues/commit/14d845221b0fcd6344a67b3cea3a8091630bca27))
+* user without permission cant route to project settings ([c1e154d](https://github.com/taskany-inc/issues/commit/c1e154d1f29706c24c19c34e9a5871e8fbf1d936))
+* **UserBadge:** show email if user noname ([a117332](https://github.com/taskany-inc/issues/commit/a117332973283fb3410fe96c10a58fbc778c8774))
+
+
+### Performance Improvements
+
+* **HelpPage:** drop gray-matter from client bundle ([562bbb2](https://github.com/taskany-inc/issues/commit/562bbb24cb6ec4f9b4ab8e3ddb75a1c506189ecd))
+
 ## [1.28.0](https://github.com/taskany-inc/issues/compare/v1.27.1...v1.28.0) (2023-09-05)
 
 
