@@ -97,6 +97,22 @@ const StyledInlineInput = styled.div`
     height: 28px;
 `;
 
+const StyledIconEditOutline = styled(IconEditOutline)``;
+
+const StyledInlineUserInput = styled.div`
+    display: flex;
+    align-items: center;
+    height: 28px;
+
+    ${StyledIconEditOutline} {
+        display: none;
+    }
+
+    &:hover ${StyledIconEditOutline} {
+        display: block;
+    }
+`;
+
 interface TagObject {
     id: string;
     title: string;
@@ -151,30 +167,11 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     const update = useGoalUpdate(goal?.id);
     const onTagAdd = useCallback(
         async (value: TagObject[]) => {
-            if (goal) {
+            if (goal && goal.project) {
                 await update({
-                    ...goal,
+                    ...(goal as unknown as GoalUpdate),
+                    parent: goal.project,
                     tags: [...goal.tags, ...value],
-                    state: {
-                        id: goal.state?.id || '',
-                        hue: goal.state?.hue,
-                        title: goal.state?.title,
-                        type: goal.state?.type || 'NotStarted',
-                    },
-                    parent: {
-                        id: goal.project?.id || '',
-                        title: goal.project?.title || '',
-                        flowId: goal.project?.flowId || '',
-                    },
-                    owner: {
-                        id: goal.owner?.id || '',
-                        user: {
-                            nickname: goal.owner?.user?.nickname || null,
-                            name: goal.owner?.user?.name || null,
-                            email: goal.owner?.user?.email || '',
-                        },
-                    },
-                    estimate: goal.estimate[0]?.estimate,
                 });
                 invalidateFn();
             }
@@ -194,21 +191,13 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     );
 
     const onAssigneeChange = useCallback(
-        async (activity?: ActivityByIdReturnType) => {
+        async (activity?: NonNullable<ActivityByIdReturnType>) => {
             if (goal && activity?.user && goal.project) {
                 setCurrentOwner(activity.user);
                 try {
                     await update({
                         ...(goal as unknown as GoalUpdate),
-                        owner: {
-                            id: activity.id,
-                            user: {
-                                ...activity.user,
-                            },
-                        },
-                        // Need to pad fields due to zod validation
                         parent: goal.project,
-                        estimate: goal._lastEstimate,
                     });
                     invalidateFn();
                 } catch (error: any) {
@@ -513,20 +502,18 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                     <IssueMeta title={tr('Assignee')}>
                         {goal._isEditable ? (
-                            <StyledInlineInput>
-                                <UserComboBox
-                                    placement="bottom-start"
-                                    placeholder={tr('Name/Email')}
-                                    filter={participantsFilter}
-                                    onChange={onAssigneeChange}
-                                    renderTrigger={(props) => (
-                                        <StyledInlineInput>
-                                            <UserBadge user={currentOwner} />
-                                            <IconEditOutline noWrap size="xs" onClick={props.onClick} />
-                                        </StyledInlineInput>
-                                    )}
-                                />
-                            </StyledInlineInput>
+                            <UserComboBox
+                                placement="bottom-start"
+                                placeholder={tr('Name/Email')}
+                                filter={participantsFilter}
+                                onChange={onAssigneeChange}
+                                renderTrigger={(props) => (
+                                    <StyledInlineUserInput>
+                                        <UserBadge user={currentOwner} />
+                                        <StyledIconEditOutline size="xxs" onClick={props.onClick} />
+                                    </StyledInlineUserInput>
+                                )}
+                            />
                         ) : (
                             <UserBadge user={owner?.user} />
                         )}
