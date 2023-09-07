@@ -31,13 +31,7 @@ import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 
 import { tr } from './FiltersPanel.i18n';
 
-// disable refetchOnMount since we use filtersPanelSsrInit
-const useQueryOptionsRefetchOnMount = {
-    refetchOnMount: false,
-};
-
 const useQueryOptions = {
-    ...useQueryOptionsRefetchOnMount,
     keepPreviousData: true,
 };
 
@@ -149,8 +143,8 @@ export const FiltersPanel: FC<{
         useQueryOptions,
     );
 
-    const { data: states = [] } = trpc.state.all.useQuery(undefined, useQueryOptionsRefetchOnMount);
-    const { data: estimates = [] } = trpc.estimates.all.useQuery(undefined, useQueryOptionsRefetchOnMount);
+    const { data: states = [] } = trpc.state.all.useQuery();
+    const { data: estimates = [] } = trpc.estimates.all.useQuery();
 
     return (
         <>

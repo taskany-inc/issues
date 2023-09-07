@@ -42,14 +42,9 @@ const WhatsNew = () => {
     const locale = useLocale();
     const [iframeReady, setIframeReady] = useState(false);
 
-    const { data } = trpc.whatsnew.check.useQuery(
-        {
-            locale,
-        },
-        {
-            refetchOnMount: false,
-        },
-    );
+    const { data } = trpc.whatsnew.check.useQuery({
+        locale,
+    });
 
     useEffect(() => {
         if (data?.releaseNotesExists && data?.version && !data?.read && !data?.delayed) {
