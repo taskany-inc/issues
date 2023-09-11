@@ -1,6 +1,7 @@
 import styled from 'styled-components';
-import { CleanButton, Text, UserPic, nullable } from '@taskany/bricks';
-import { gapS, gray9 } from '@taskany/colors';
+import { Text, UserPic, nullable } from '@taskany/bricks';
+import { IconXCircleSolid } from '@taskany/icons';
+import { gapS, gapXs, gray8, gray9 } from '@taskany/colors';
 
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 
@@ -13,8 +14,18 @@ const StyledUserPick = styled(UserPic)`
     margin-right: ${gapS};
 `;
 
-const StyledCleanButton = styled(CleanButton)`
-    top: unset;
+const StyledCleanButton = styled(IconXCircleSolid).attrs({
+    size: 'xs',
+})`
+    color: ${gray8};
+    margin-left: ${gapXs};
+    visibility: hidden;
+
+    transition: color 100ms ease-in-out;
+
+    &:hover {
+        color: ${gray9};
+    }
 `;
 
 const StyledIssuer = styled.span`
@@ -22,7 +33,6 @@ const StyledIssuer = styled.span`
     display: flex;
     align-items: center;
     margin: ${gapS} 0;
-    padding-right: var(--gap-m); // clean button place
     width: fit-content;
 
     &:hover {
