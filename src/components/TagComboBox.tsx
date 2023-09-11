@@ -125,11 +125,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                     />
                 )}
                 renderItem={(props) => (
-                    <Tag
-                        key={props.item.id}
-                        description={props.item.description}
-                        onClick={suggestions.data?.length ? props.onClick : createTag}
-                    >
+                    <Tag key={props.item.id} onClick={suggestions.data?.length ? props.onClick : createTag}>
                         {props.item.title}
                     </Tag>
                 )}
