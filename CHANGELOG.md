@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.29.1](https://github.com/taskany-inc/issues/compare/v1.29.0...v1.29.1) (2023-09-11)
+
+
+### Performance Improvements
+
+* drop redundant data refetch on the client ([1a1d715](https://github.com/taskany-inc/issues/commit/1a1d715d2ef203878091c81cae01e86ed9b9e93e))
+
 ## [1.29.0](https://github.com/taskany-inc/issues/compare/v1.28.0...v1.29.0) (2023-09-07)
 
 
