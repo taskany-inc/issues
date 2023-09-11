@@ -292,16 +292,14 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                         </TableCell>
 
                         <TagsCell>
-                            {tags?.map((tag) =>
-                                nullable(tag, (t) => (
-                                    <StyledGoalTag
-                                        key={t.id}
-                                        description={t.description ?? undefined}
-                                        onClick={onTagClick?.(t)}
-                                    >
-                                        {t.title}
-                                    </StyledGoalTag>
-                                )),
+                            {nullable(tags, (t) =>
+                                t.map((tag) =>
+                                    nullable(tag, (item) => (
+                                        <StyledGoalTag key={item.id} onClick={onTagClick?.(item)}>
+                                            {item.title}
+                                        </StyledGoalTag>
+                                    )),
+                                ),
                             )}
                         </TagsCell>
 

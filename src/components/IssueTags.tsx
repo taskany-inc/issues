@@ -11,14 +11,13 @@ const StyledIssueTags = styled.span`
     padding-left: ${gapS};
 `;
 
-export const IssueTags: React.FC<IssueTagsProps> = ({ tags, size = 'm' }) => (
-    <StyledIssueTags>
-        {tags?.map((tag) =>
-            nullable(tag, (t) => (
-                <Tag key={t.id} size={size} description={t.description ?? undefined}>
-                    {t.title}
+export const IssueTags: React.FC<IssueTagsProps> = ({ tags, size = 'm' }) =>
+    nullable(tags, (t) => (
+        <StyledIssueTags>
+            {t.map((tag) => (
+                <Tag key={tag.id} size={size}>
+                    {tag.title}
                 </Tag>
-            )),
-        )}
-    </StyledIssueTags>
-);
+            ))}
+        </StyledIssueTags>
+    ));
