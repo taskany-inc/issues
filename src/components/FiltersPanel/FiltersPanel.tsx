@@ -1,9 +1,10 @@
-import { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode, useCallback, useRef, useState } from 'react';
 import {
     FiltersAction,
     FiltersCounter,
     FiltersCounterContainer,
     FiltersMenuContainer,
+    FiltersMenuItem,
     FiltersPanelContainer,
     FiltersPanelContent,
     FiltersSearchContainer,
@@ -23,13 +24,31 @@ import { UserFilter } from '../UserFilter/UserFilter';
 import { PriorityFilter } from '../PriorityFilter';
 import { StateFilter } from '../StateFilter';
 import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
-import { FilterById } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType, FilterById } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
 import { SortFilter } from '../SortFilter/SortFilter';
 import { StarredFilter } from '../StarredFilter/StarredFilter';
 import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
+import { FilterPopup } from '../FilterPopup/FilterPopup';
 
 import { tr } from './FiltersPanel.i18n';
+
+type Users = React.ComponentProps<typeof UserFilter>['users'];
+
+function mapUserToView(list: ActivityByIdReturnType[]): Users {
+    return list.reduce<Users>((acc, { user }) => {
+        if (user != null && user.activityId) {
+            acc.push({
+                id: user.activityId,
+                name: user.name,
+                email: user.email,
+                image: user.image,
+            });
+        }
+
+        return acc;
+    }, []);
+}
 
 const useQueryOptions = {
     keepPreviousData: true,
@@ -47,14 +66,6 @@ export const FiltersPanel: FC<{
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
 
     onSearchChange: (search: string) => void;
-    onPriorityChange: React.ComponentProps<typeof PriorityFilter>['onChange'];
-    onStateChange: React.ComponentProps<typeof StateFilter>['onStateChange'];
-    onStateTypeChange: React.ComponentProps<typeof StateFilter>['onStateTypeChange'];
-    onIssuerChange: React.ComponentProps<typeof UserFilter>['onChange'];
-    onOwnerChange: React.ComponentProps<typeof UserFilter>['onChange'];
-    onParticipantChange: React.ComponentProps<typeof UserFilter>['onChange'];
-    onProjectChange: React.ComponentProps<typeof ProjectFilter>['onChange'];
-    onTagChange: React.ComponentProps<typeof TagFilter>['onChange'];
     onEstimateChange: React.ComponentProps<typeof EstimateFilter>['onChange'];
     onPresetChange: React.ComponentProps<typeof PresetDropdown>['onChange'];
     onStarredChange: React.ComponentProps<typeof StarredFilter>['onChange'];
@@ -62,6 +73,7 @@ export const FiltersPanel: FC<{
     onSortChange: React.ComponentProps<typeof SortFilter>['onChange'];
     onLimitChange?: React.ComponentProps<typeof LimitDropdown>['onChange'];
     onFilterStar?: () => void;
+    onFilterApply?: (state: Partial<QueryState>) => void;
 }> = ({
     children,
     loading,
@@ -71,24 +83,24 @@ export const FiltersPanel: FC<{
     queryString,
     preset,
     presets = [],
-    onPriorityChange,
-    onStateChange,
-    onStateTypeChange,
-    onIssuerChange,
-    onOwnerChange,
-    onParticipantChange,
     onSearchChange,
-    onProjectChange,
     onEstimateChange,
     onPresetChange,
-    onTagChange,
     onLimitChange,
     onFilterStar,
     onSortChange,
     onStarredChange,
     onWatchingChange,
+    onFilterApply,
 }) => {
+    const filterNodeRef = useRef<HTMLSpanElement>(null);
     const [ownersQuery, setOwnersQuery] = useState('');
+    const [issuersQuery, setIssuersQuery] = useState('');
+    const [participantsQuery, setParticipantsQuery] = useState('');
+    const [projectsQuery, setProjectsQuery] = useState('');
+    const [tagsQuery, setTagsQuery] = useState('');
+    const [filterVisible, setFilterVisible] = useState(false);
+    const [filterQuery, setFilterQuery] = useState<Partial<QueryState>>(() => queryState);
 
     const { data: owners = [] } = trpc.user.suggestions.useQuery(
         {
@@ -99,8 +111,6 @@ export const FiltersPanel: FC<{
         useQueryOptions,
     );
 
-    const [issuersQuery, setIssuersQuery] = useState('');
-
     const { data: issuers = [] } = trpc.user.suggestions.useQuery(
         {
             query: issuersQuery,
@@ -109,8 +119,6 @@ export const FiltersPanel: FC<{
         },
         useQueryOptions,
     );
-
-    const [participantsQuery, setParticipantsQuery] = useState('');
 
     const { data: participants = [] } = trpc.user.suggestions.useQuery(
         {
@@ -121,8 +129,6 @@ export const FiltersPanel: FC<{
         useQueryOptions,
     );
 
-    const [projectsQuery, setProjectsQuery] = useState('');
-
     const { data: projects = [] } = trpc.project.suggestions.useQuery(
         {
             query: projectsQuery,
@@ -132,8 +138,6 @@ export const FiltersPanel: FC<{
         useQueryOptions,
     );
 
-    const [tagsQuery, setTagsQuery] = useState('');
-
     const { data: tags = [] } = trpc.tag.suggestions.useQuery(
         {
             query: tagsQuery,
@@ -142,9 +146,24 @@ export const FiltersPanel: FC<{
         },
         useQueryOptions,
     );
-
     const { data: states = [] } = trpc.state.all.useQuery();
     const { data: estimates = [] } = trpc.estimates.ranges.useQuery();
+
+    const setPartialQueryByKey = useCallback(<K extends keyof QueryState>(key: K) => {
+        return (value: QueryState[K]) => {
+            setFilterQuery((prev) => {
+                return {
+                    ...prev,
+                    [key]: value,
+                };
+            });
+        };
+    }, []);
+
+    const onApplyClick = useCallback(() => {
+        setFilterVisible(false);
+        onFilterApply?.(filterQuery);
+    }, [filterQuery, onFilterApply]);
 
     return (
         <>
@@ -161,54 +180,9 @@ export const FiltersPanel: FC<{
                         <FiltersCounter total={total} counter={counter} />
                     </FiltersCounterContainer>
                     <FiltersMenuContainer>
-                        {Boolean(states.length) && (
-                            <StateFilter
-                                text={tr('State')}
-                                value={queryState.state}
-                                stateTypes={queryState.stateType}
-                                states={states}
-                                onStateChange={onStateChange}
-                                onStateTypeChange={onStateTypeChange}
-                            />
-                        )}
-
-                        {Boolean(states.length) && (
-                            <PriorityFilter
-                                text={tr('Priority')}
-                                value={queryState.priority}
-                                onChange={onPriorityChange}
-                            />
-                        )}
-
-                        {(Boolean(projects.length) || projectsQuery) && (
-                            <ProjectFilter
-                                text={tr('Project')}
-                                value={queryState.project}
-                                projects={projects}
-                                onChange={onProjectChange}
-                                onSearchChange={setProjectsQuery}
-                            />
-                        )}
-
-                        {(Boolean(issuers.length) || issuersQuery) && (
-                            <UserFilter
-                                users={issuers}
-                                text={tr('Issuer')}
-                                value={queryState.issuer}
-                                onChange={onIssuerChange}
-                                onSearchChange={setIssuersQuery}
-                            />
-                        )}
-
-                        {(Boolean(owners.length) || ownersQuery) && (
-                            <UserFilter
-                                users={owners}
-                                text={tr('Owner')}
-                                value={queryState.owner}
-                                onChange={onOwnerChange}
-                                onSearchChange={setOwnersQuery}
-                            />
-                        )}
+                        <FiltersMenuItem ref={filterNodeRef} onClick={() => setFilterVisible((p) => !p)}>
+                            Filter
+                        </FiltersMenuItem>
 
                         <EstimateFilter
                             text={tr('Estimate')}
@@ -216,26 +190,6 @@ export const FiltersPanel: FC<{
                             estimates={estimates}
                             onChange={onEstimateChange}
                         />
-
-                        {(Boolean(tags.length) || tagsQuery) && (
-                            <TagFilter
-                                text={tr('Tags')}
-                                value={queryState.tag}
-                                tags={tags}
-                                onChange={onTagChange}
-                                onSearchChange={setTagsQuery}
-                            />
-                        )}
-
-                        {(Boolean(participants.length) || participantsQuery) && (
-                            <UserFilter
-                                users={participants}
-                                text={tr('Participant')}
-                                value={queryState.participant}
-                                onChange={onParticipantChange}
-                                onSearchChange={setParticipantsQuery}
-                            />
-                        )}
 
                         <StarredFilter value={queryState.starred} onChange={onStarredChange} />
 
@@ -276,12 +230,71 @@ export const FiltersPanel: FC<{
             <FiltersPanelApplied
                 queryState={queryState}
                 states={states}
-                issuers={issuers}
-                owners={owners}
-                participants={participants}
+                issuers={mapUserToView(issuers)}
+                owners={mapUserToView(owners)}
+                participants={mapUserToView(participants)}
                 projects={projects}
                 tags={tags}
             />
+            <FilterPopup
+                visible={filterVisible}
+                onApplyClick={onApplyClick}
+                filterRef={filterNodeRef}
+                switchVisible={setFilterVisible}
+                activeTab="state"
+            >
+                <StateFilter
+                    text={tr('State')}
+                    value={filterQuery?.state}
+                    stateTypes={filterQuery?.stateType}
+                    states={states}
+                    onStateChange={setPartialQueryByKey('state')}
+                    onStateTypeChange={setPartialQueryByKey('stateType')}
+                />
+                <PriorityFilter
+                    text={tr('Priority')}
+                    value={filterQuery?.priority}
+                    onChange={setPartialQueryByKey('priority')}
+                />
+                <ProjectFilter
+                    text={tr('Project')}
+                    value={filterQuery?.project}
+                    projects={projects}
+                    onChange={setPartialQueryByKey('project')}
+                    onSearchChange={setProjectsQuery}
+                />
+                <UserFilter
+                    tabName="issuer"
+                    text={tr('Issuer')}
+                    users={mapUserToView(issuers)}
+                    value={filterQuery?.issuer}
+                    onChange={setPartialQueryByKey('issuer')}
+                    onSearchChange={setIssuersQuery}
+                />
+                <UserFilter
+                    tabName="owner"
+                    text={tr('Owner')}
+                    users={mapUserToView(owners)}
+                    value={filterQuery?.owner}
+                    onChange={setPartialQueryByKey('owner')}
+                    onSearchChange={setOwnersQuery}
+                />
+                <TagFilter
+                    text={tr('Tags')}
+                    value={filterQuery?.tag}
+                    tags={tags}
+                    onChange={setPartialQueryByKey('tag')}
+                    onSearchChange={setTagsQuery}
+                />
+                <UserFilter
+                    tabName="participant"
+                    text={tr('Participant')}
+                    users={mapUserToView(participants)}
+                    value={filterQuery?.participant}
+                    onChange={setPartialQueryByKey('participant')}
+                    onSearchChange={setParticipantsQuery}
+                />
+            </FilterPopup>
         </>
     );
 };
