@@ -1,72 +1,106 @@
 /* eslint-disable no-nested-ternary */
-import { FC, useMemo } from 'react';
-import { FiltersDropdownBase, FiltersDropdownItemProps, UserMenuItem } from '@taskany/bricks';
+import { useMemo } from 'react';
+import { UserPic, Text, Tab } from '@taskany/bricks';
+import { gray7 } from '@taskany/colors';
+import assert from 'assert';
 
-import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { usePageContext } from '../../hooks/usePageContext';
+import { FilterBase } from '../FilterBase/FilterBase';
+import { FilterCheckbox } from '../FilterCheckbox';
+import { FilterTabLabel } from '../FilterTabLabel';
 
 import { tr } from './UserFilter.i18n';
 
-export const UserFilter: FC<{
-    users: Array<NonNullable<ActivityByIdReturnType>>;
+interface User {
+    id: string;
+    name: string | null;
+    email: string;
+    image?: string | null;
+}
+interface UserFilterProps {
+    tabName: string;
     text: string;
-    value: string[];
-    onChange: React.ComponentProps<typeof FiltersDropdownBase>['onChange'];
-    onSearchChange: React.ComponentProps<typeof FiltersDropdownBase>['onSearchChange'];
-}> = ({ text, value, users, onChange, onSearchChange }) => {
-    const { user } = usePageContext();
+    users: User[];
+    value?: string[];
+    onChange: (items: string[]) => void;
+    onSearchChange: (searchQuery: string) => void;
+    title?: {
+        inputPlaceholder: string;
+        search: string;
+    };
+}
 
-    const items = useMemo(() => {
-        const excludeCurrentUser = users.filter((u) => u.id !== user?.activityId);
-        const isCurrentUserInList = users.length !== excludeCurrentUser.length;
+const getId = (item: User) => item.id;
 
-        if (isCurrentUserInList) {
-            const currentUser = users.filter((u) => u.id === user?.activityId)[0];
-            return [
-                {
-                    id: currentUser.id,
-                    data: currentUser,
-                },
-                ...excludeCurrentUser.map((user) => ({
-                    id: user.id,
-                    data: user,
-                })),
-            ];
+const pickUserName = (user: User) => user.name ?? user.email ?? 'Unknonw';
+
+export const UserFilter: React.FC<UserFilterProps> = ({
+    text,
+    tabName,
+    users,
+    value = [],
+    onChange,
+    onSearchChange,
+}) => {
+    const { user: authorizedUser } = usePageContext();
+
+    assert(authorizedUser, 'Cannot get current user');
+
+    const itemsToRender = useMemo(() => {
+        const indexOfCurrentUser = users.findIndex(({ id }) => id === authorizedUser.id);
+
+        if (indexOfCurrentUser < 0) {
+            return users;
         }
 
-        return users.map((user) => ({
-            id: user.id,
-            data: user,
-        }));
-    }, [user, users]);
+        const nextUserList: User[] = [
+            {
+                id: authorizedUser.id,
+                name: authorizedUser.name,
+                email: authorizedUser.email,
+                image: authorizedUser.email,
+            },
+        ];
+
+        users.forEach((user) => {
+            if (user.id !== authorizedUser.id) {
+                nextUserList.push(user);
+            }
+        });
+
+        return nextUserList;
+    }, [users, authorizedUser]);
+
+    const values = useMemo(() => {
+        return users.filter((u) => value.includes(getId(u)));
+    }, [value, users]);
 
     return (
-        <FiltersDropdownBase
-            onSearchChange={onSearchChange}
-            text={text}
-            items={items}
-            value={value}
-            onChange={onChange}
-            renderItem={({
-                item: { id, data },
-                selected,
-                onClick,
-            }: FiltersDropdownItemProps<NonNullable<ActivityByIdReturnType>>) => (
-                <UserMenuItem
-                    key={id}
-                    email={data.user?.email || data.ghost?.email}
-                    name={
-                        data.user?.name
-                            ? id === user?.activityId
-                                ? `${data.user?.name} (${tr('You')})`
-                                : data.user?.name
-                            : undefined
+        <Tab name={tabName} label={<FilterTabLabel text={text} selected={values.map(pickUserName)} />}>
+            <FilterBase
+                key={tabName}
+                mode="multiple"
+                viewMode="split"
+                items={itemsToRender}
+                inputProps={{ onChange: onSearchChange }}
+                keyGetter={getId}
+                value={values}
+                onChange={onChange}
+                renderItem={({ item, checked, onItemClick }) => {
+                    let label = pickUserName(item);
+
+                    if (item.id === authorizedUser.activityId) {
+                        label += ` (${tr('You')})`;
                     }
-                    image={data.user?.image ?? undefined}
-                    checked={selected}
-                    onClick={onClick}
-                />
-            )}
-        />
+
+                    return (
+                        <FilterCheckbox name="user" value={item.id} checked={checked} onClick={onItemClick}>
+                            <UserPic name={item.name} email={item.email} size={14} />
+                            <Text color={gray7}>{label}</Text>
+                        </FilterCheckbox>
+                    );
+                }}
+            />
+        </Tab>
     );
 };

@@ -1,19 +1,55 @@
-import { FC } from 'react';
-import { FiltersDropdown } from '@taskany/bricks';
+import { FC, useMemo } from 'react';
+import { Tab, Text } from '@taskany/bricks';
+import { gray7 } from '@taskany/colors';
 
-import { Priority, priorityVariants } from '../types/priority';
+import { Priority as PriorityName, priorityVariants } from '../types/priority';
 
 import { getPriorityText } from './PriorityText/PriorityText';
+import { FilterCheckbox } from './FilterCheckbox';
+import { FilterBase } from './FilterBase/FilterBase';
+import { FilterTabLabel } from './FilterTabLabel';
 
-const priorities = Object.keys(priorityVariants).map((p) => ({
+type Variant = keyof typeof priorityVariants;
+
+type Priority = {
+    id: Variant;
+    data: string;
+};
+
+const priorities: Priority[] = (Object.keys(priorityVariants) as Variant[]).map((p) => ({
     id: p,
-    data: getPriorityText(p as Priority),
+    data: getPriorityText(p as PriorityName),
 }));
+
+function getKey(item: Priority) {
+    return item.id;
+}
 
 export const PriorityFilter: FC<{
     text: string;
-    value: string[];
+    value?: string[];
     onChange: (value: string[]) => void;
-}> = ({ text, value, onChange }) => {
-    return <FiltersDropdown text={text} value={value} items={priorities} onChange={onChange} />;
+}> = ({ value = [], onChange, text }) => {
+    const values = useMemo(() => {
+        return priorities.filter((p) => value.includes(getKey(p)));
+    }, [value]);
+
+    return (
+        <Tab name="priority" label={<FilterTabLabel text={text} selected={values.map(({ data }) => data)} />}>
+            <FilterBase
+                key="priority"
+                mode="multiple"
+                viewMode="union"
+                items={priorities}
+                value={values}
+                keyGetter={getKey}
+                onChange={onChange}
+                renderItem={({ item, checked, onItemClick }) => (
+                    <FilterCheckbox name="priority" value={item.id} checked={checked} onClick={onItemClick}>
+                        <Text color={gray7}>{item.data}</Text>
+                    </FilterCheckbox>
+                )}
+            />
+        </Tab>
+    );
 };
