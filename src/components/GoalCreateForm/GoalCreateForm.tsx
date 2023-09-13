@@ -47,6 +47,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
     const [goalCreateFormActionCache, setGoalCreateFormActionCache] = useLocalStorage('goalCreateFormAction');
     const [busy, setBusy] = useState(false);
     const [createGoalType, setСreateGoalType] = useState<number>(goalCreateFormActionCache || 3);
+    const utils = trpc.useContext();
 
     const createOptions = [
         {
@@ -108,7 +109,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
 
             onGoalCreate?.(res);
         }
-
+        utils.project.getDeepInfo.invalidate({ id: form.parent.id });
         setBusy(false);
     };
 

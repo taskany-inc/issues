@@ -12,6 +12,7 @@ import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
 import { useLocale } from '../../hooks/useLocale';
 import { parseLocaleDate } from '../../utils/dateTime';
+import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -26,6 +27,8 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     const [busy, setBusy] = useState(false);
     const update = useGoalUpdate(goal.id);
 
+    const utils = trpc.useContext();
+
     const updateGoal = async (form: GoalUpdate) => {
         setBusy(true);
 
@@ -36,6 +39,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         const updatedGoal = await update(form);
 
         onSubmit(updatedGoal);
+        utils.project.getDeepInfo.invalidate({ id: form.parent.id });
     };
 
     // FIXME: nullable values are conflicting with undefined
