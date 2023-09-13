@@ -50,16 +50,8 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
         currentPreset,
         queryState,
         queryString,
-        setPriorityFilter,
-        setStateFilter,
-        setStateTypeFilter,
-        setTagsFilter,
         setTagsFilterOutside,
         setEstimateFilter,
-        setIssuerFilter,
-        setOwnerFilter,
-        setParticipantFilter,
-        setProjectFilter,
         setStarredFilter,
         setWatchingFilter,
         setSortFilter,
@@ -266,15 +258,7 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
                 preset={currentPreset}
                 presets={userFilters}
                 onSearchChange={setFulltextFilter}
-                onIssuerChange={setIssuerFilter}
-                onOwnerChange={setOwnerFilter}
-                onParticipantChange={setParticipantFilter}
-                onProjectChange={setProjectFilter}
-                onStateChange={setStateFilter}
-                onStateTypeChange={setStateTypeFilter}
-                onTagChange={setTagsFilter}
                 onEstimateChange={setEstimateFilter}
-                onPriorityChange={setPriorityFilter}
                 onStarredChange={setStarredFilter}
                 onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}
