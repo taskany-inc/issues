@@ -51,22 +51,15 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         currentPreset,
         queryState,
         queryString,
-        setPriorityFilter,
-        setStateFilter,
-        setStateTypeFilter,
-        setTagsFilter,
         setTagsFilterOutside,
         setEstimateFilter,
-        setIssuerFilter,
-        setOwnerFilter,
-        setParticipantFilter,
-        setProjectFilter,
         setStarredFilter,
         setWatchingFilter,
         setSortFilter,
         setFulltextFilter,
         resetQueryState,
         setPreset,
+        batch: batchQueryState,
     } = useUrlFilterParams({
         preset,
     });
@@ -187,20 +180,13 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 preset={currentPreset}
                 presets={userFilters}
                 onSearchChange={setFulltextFilter}
-                onIssuerChange={setIssuerFilter}
-                onOwnerChange={setOwnerFilter}
-                onParticipantChange={setParticipantFilter}
-                onProjectChange={setProjectFilter}
-                onStateChange={setStateFilter}
-                onStateTypeChange={setStateTypeFilter}
-                onTagChange={setTagsFilter}
                 onEstimateChange={setEstimateFilter}
-                onPriorityChange={setPriorityFilter}
                 onStarredChange={setStarredFilter}
                 onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}
                 onFilterStar={onFilterStar}
                 onSortChange={setSortFilter}
+                onFilterApply={batchQueryState}
             >
                 {(Boolean(queryString) || preset) && <Button text={tr('Reset')} onClick={resetQueryState} />}
             </FiltersPanel>
