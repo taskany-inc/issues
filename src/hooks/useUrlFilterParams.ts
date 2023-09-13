@@ -150,26 +150,38 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         const state = { ...queryState };
         let queued = false;
 
-        return <T extends keyof QueryState>(key: T) =>
-            (value: QueryState[T]) => {
-                state[key] = value;
+        const push = (nextState: QueryState) => {
+            if (!queued) {
+                queued = true;
+                // we batch state changes due current call stack
+                // and will push it to router together in microtask queue.
 
-                if (!queued) {
-                    queued = true;
-                    // we batch state changes due current call stack
-                    // and will push it to router together in microtask queue.
+                // Example
+                // setPriorityFilter([priority]);
+                // setStateTypeFilter([typeA, typeB]);
 
-                    // Example
-                    // setPriorityFilter([priority]);
-                    // setStateTypeFilter([typeA, typeB]);
+                // ...will produce one router push
+                queueMicrotask(() => {
+                    pushStateToRouter(nextState);
+                });
+            }
+        };
 
-                    // ...will produce one router push
+        return {
+            key:
+                <T extends keyof QueryState>(key: T) =>
+                (value: QueryState[T]) => {
+                    state[key] = value;
 
-                    queueMicrotask(() => {
-                        pushStateToRouter(state);
-                    });
-                }
-            };
+                    push(state);
+                },
+            batch: () => (nextState: Partial<QueryState>) => {
+                push({
+                    ...state,
+                    ...nextState,
+                });
+            },
+        };
     }, [queryState, pushStateToRouter]);
 
     const resetQueryState = useCallback(() => {
@@ -226,20 +238,21 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
 
     const setters = useMemo(
         () => ({
-            setPriorityFilter: pushStateProvider('priority'),
-            setStateFilter: pushStateProvider('state'),
-            setStateTypeFilter: pushStateProvider('stateType'),
-            setTagsFilter: pushStateProvider('tag'),
-            setEstimateFilter: pushStateProvider('estimate'),
-            setIssuerFilter: pushStateProvider('issuer'),
-            setOwnerFilter: pushStateProvider('owner'),
-            setParticipantFilter: pushStateProvider('participant'),
-            setProjectFilter: pushStateProvider('project'),
-            setStarredFilter: pushStateProvider('starred'),
-            setWatchingFilter: pushStateProvider('watching'),
-            setSortFilter: pushStateProvider('sort'),
-            setFulltextFilter: pushStateProvider('query'),
-            setLimitFilter: pushStateProvider('limit'),
+            setPriorityFilter: pushStateProvider.key('priority'),
+            setStateFilter: pushStateProvider.key('state'),
+            setStateTypeFilter: pushStateProvider.key('stateType'),
+            setTagsFilter: pushStateProvider.key('tag'),
+            setEstimateFilter: pushStateProvider.key('estimate'),
+            setIssuerFilter: pushStateProvider.key('issuer'),
+            setOwnerFilter: pushStateProvider.key('owner'),
+            setParticipantFilter: pushStateProvider.key('participant'),
+            setProjectFilter: pushStateProvider.key('project'),
+            setStarredFilter: pushStateProvider.key('starred'),
+            setWatchingFilter: pushStateProvider.key('watching'),
+            setSortFilter: pushStateProvider.key('sort'),
+            setFulltextFilter: pushStateProvider.key('query'),
+            setLimitFilter: pushStateProvider.key('limit'),
+            batch: pushStateProvider.batch(),
         }),
         [pushStateProvider],
     );
