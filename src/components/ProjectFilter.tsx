@@ -1,32 +1,53 @@
-import { FiltersDropdownBase, MenuItem } from '@taskany/bricks';
-import { FC, useMemo } from 'react';
+import { Tab } from '@taskany/bricks';
+import { useMemo } from 'react';
+
+import { FilterBase } from './FilterBase/FilterBase';
+import { FilterCheckbox } from './FilterCheckbox';
+import { FilterTabLabel } from './FilterTabLabel';
 
 type Project = {
     id: string;
     title: string;
 };
 
-export const ProjectFilter: FC<{
+interface ProjectFilterAutoCompleteProps {
     text: string;
-    value: string[];
     projects: Project[];
-    onChange: (value: string[]) => void;
-    onSearchChange: React.ComponentProps<typeof FiltersDropdownBase>['onSearchChange'];
-}> = ({ text, value, projects, onChange, onSearchChange }) => {
-    const items = useMemo(() => projects.map(({ id, title }) => ({ id, data: title })), [projects]);
+    value?: string[];
+    onChange: (items: string[]) => void;
+    onSearchChange: (query: string) => void;
+}
+
+const getKey = (project: Project) => project.id;
+
+export const ProjectFilter: React.FC<ProjectFilterAutoCompleteProps> = ({
+    text,
+    value = [],
+    projects,
+    onChange,
+    onSearchChange,
+}) => {
+    const values = useMemo(() => {
+        return projects.filter((p) => value.includes(getKey(p)));
+    }, [value, projects]);
 
     return (
-        <FiltersDropdownBase
-            text={text}
-            value={value}
-            items={items}
-            onChange={onChange}
-            onSearchChange={onSearchChange}
-            renderItem={({ item, selected, onClick }) => (
-                <MenuItem ghost key={item.id} selected={selected} onClick={onClick}>
-                    {item.data}
-                </MenuItem>
-            )}
-        />
+        <Tab name="projects" label={<FilterTabLabel text={text} selected={values.map(({ title }) => title)} />}>
+            <FilterBase
+                key="projects"
+                mode="multiple"
+                viewMode="split"
+                inputProps={{ onChange: onSearchChange }}
+                items={projects}
+                value={values}
+                keyGetter={getKey}
+                onChange={onChange}
+                renderItem={({ item, onItemClick, checked }) => (
+                    <FilterCheckbox name="project" value={item.id} checked={checked} onClick={onItemClick}>
+                        {item.title}
+                    </FilterCheckbox>
+                )}
+            />
+        </Tab>
     );
 };

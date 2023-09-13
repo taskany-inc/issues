@@ -1,5 +1,9 @@
-import { FiltersDropdownBase, MenuItem } from '@taskany/bricks';
-import { FC, useMemo } from 'react';
+import { Tab } from '@taskany/bricks';
+import { useMemo } from 'react';
+
+import { FilterBase } from './FilterBase/FilterBase';
+import { FilterCheckbox } from './FilterCheckbox';
+import { FilterTabLabel } from './FilterTabLabel';
 
 type Tag = {
     id: string;
@@ -7,27 +11,42 @@ type Tag = {
     description?: string | null;
 };
 
-export const TagFilter: FC<{
+interface TagFilterProps {
     text: string;
-    value: string[];
     tags: Tag[];
-    onChange: (value: string[]) => void;
-    onSearchChange: React.ComponentProps<typeof FiltersDropdownBase>['onSearchChange'];
-}> = ({ text, value, tags, onChange, onSearchChange }) => {
-    const items = useMemo(() => tags.map(({ id, title }) => ({ id, data: title })), [tags]);
+    value?: string[];
+    onChange: (items: string[]) => void;
+    onSearchChange: (searchQuery: string) => void;
+    title?: {
+        search: string;
+        inputPlaceholder: string;
+    };
+}
+
+const getId = (item: Tag) => item.id;
+
+export const TagFilter: React.FC<TagFilterProps> = ({ text, tags, value = [], onChange, onSearchChange }) => {
+    const values = useMemo(() => {
+        return tags.filter((tag) => value.includes(getId(tag)));
+    }, [tags, value]);
 
     return (
-        <FiltersDropdownBase
-            text={text}
-            value={value}
-            items={items}
-            onChange={onChange}
-            onSearchChange={onSearchChange}
-            renderItem={({ item, selected, onClick }) => (
-                <MenuItem ghost key={item.id} selected={selected} onClick={onClick}>
-                    {item.data}
-                </MenuItem>
-            )}
-        />
+        <Tab name="tags" label={<FilterTabLabel text={text} selected={values.map(({ title }) => title)} />}>
+            <FilterBase
+                key="tags"
+                mode="multiple"
+                viewMode="split"
+                items={tags}
+                keyGetter={getId}
+                inputProps={{ onChange: onSearchChange }}
+                value={values}
+                onChange={onChange}
+                renderItem={({ item, checked, onItemClick }) => (
+                    <FilterCheckbox name="tag" value={item.id} checked={checked} onClick={onItemClick}>
+                        {item.title}
+                    </FilterCheckbox>
+                )}
+            />
+        </Tab>
     );
 };

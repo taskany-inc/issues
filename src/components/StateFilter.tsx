@@ -1,36 +1,45 @@
-import { FC, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { StateType } from '@prisma/client';
+import { Tab, Text } from '@taskany/bricks';
 
-import { ColorizedFilterDropdown } from './ColorizedFilterDropdown';
+import { FilterBase } from './FilterBase/FilterBase';
+import { FilterCheckbox } from './FilterCheckbox';
+import { StateDot } from './StateDot';
+import { FilterTabLabel } from './FilterTabLabel';
 
-type State = { id: string; title: string; hue: number; type: StateType };
+interface State {
+    id: string;
+    title: string;
+    hue: number;
+    type: StateType;
+}
 
-export const StateFilter: FC<{
+interface StateFilterProps {
     text: string;
-    value: string[];
+    value?: string[];
     states: State[];
-    stateTypes: string[];
+    stateTypes?: string[];
     onStateChange: (value: string[]) => void;
     onStateTypeChange: (value: StateType[]) => void;
-}> = ({ text, value, states, stateTypes, onStateChange, onStateTypeChange }) => {
-    const items = useMemo(
-        () =>
-            states.map((state) => ({
-                id: state.id,
-                data: {
-                    text: state.title,
-                    hue: state.hue,
-                },
-            })),
-        [states],
-    );
+}
 
+const getId = (state: State) => state.id;
+
+export const StateFilter: React.FC<StateFilterProps> = ({
+    text,
+    value = [],
+    states,
+    stateTypes = [],
+    onStateChange,
+    onStateTypeChange,
+}) => {
     const values = useMemo(() => {
         if (stateTypes.length) {
-            return states.filter(({ type }) => stateTypes.includes(type)).map(({ id }) => id);
+            return states.filter(({ type }) => stateTypes.includes(type));
         }
-        return value;
-    }, [stateTypes, value, states]);
+
+        return states.filter(({ id }) => value.includes(id));
+    }, [stateTypes, states, value]);
 
     const onChange = useCallback(
         (value: string[]) => {
@@ -40,5 +49,27 @@ export const StateFilter: FC<{
         [onStateChange, onStateTypeChange],
     );
 
-    return <ColorizedFilterDropdown text={text} items={items} value={values} onChange={onChange} />;
+    return (
+        <Tab name="state" label={<FilterTabLabel text={text} selected={values.map(({ title }) => title)} />}>
+            <FilterBase
+                key="state"
+                mode="multiple"
+                viewMode="union"
+                onChange={onChange}
+                items={states}
+                value={values}
+                keyGetter={getId}
+                renderItem={(props) => (
+                    <FilterCheckbox
+                        name="state"
+                        value={props.item.id}
+                        onClick={props.onItemClick}
+                        checked={props.checked}
+                    >
+                        <StateDot hue={props.item.hue} /> <Text>{props.item.title}</Text>
+                    </FilterCheckbox>
+                )}
+            />
+        </Tab>
+    );
 };
