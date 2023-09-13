@@ -76,16 +76,16 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }
 
     if (queryState.issuer.length && issuers?.length) {
-        appliedMap[tr('Issuer')] = queryState.issuer.map((u) => issuersMap[u]?.user?.name).filter(Boolean) as string[];
+        appliedMap[tr('Issuer')] = queryState.issuer.map((u) => issuersMap[u]?.name).filter(Boolean) as string[];
     }
 
     if (queryState.owner.length && owners?.length) {
-        appliedMap[tr('Owner')] = queryState.owner.map((u) => ownersMap[u]?.user?.name).filter(Boolean) as string[];
+        appliedMap[tr('Owner')] = queryState.owner.map((u) => ownersMap[u]?.name).filter(Boolean) as string[];
     }
 
     if (queryState.participant.length && participants?.length) {
         appliedMap[tr('Participant')] = queryState.participant
-            .map((u) => participantsMap[u]?.user?.name)
+            .map((u) => participantsMap[u]?.name)
             .filter(Boolean) as string[];
     }
 
