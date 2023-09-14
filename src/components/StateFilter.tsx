@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { StateType } from '@prisma/client';
-import { Tab, Text } from '@taskany/bricks';
+import { Tab } from '@taskany/bricks';
 
 import { FilterBase } from './FilterBase/FilterBase';
 import { FilterCheckbox } from './FilterCheckbox';
@@ -65,9 +65,9 @@ export const StateFilter: React.FC<StateFilterProps> = ({
                         value={props.item.id}
                         onClick={props.onItemClick}
                         checked={props.checked}
-                    >
-                        <StateDot hue={props.item.hue} /> <Text>{props.item.title}</Text>
-                    </FilterCheckbox>
+                        iconLeft={<StateDot hue={props.item.hue} />}
+                        label={props.item.title}
+                    />
                 )}
             />
         </Tab>

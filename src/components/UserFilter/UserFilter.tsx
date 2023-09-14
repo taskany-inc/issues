@@ -1,13 +1,13 @@
 /* eslint-disable no-nested-ternary */
 import { useMemo } from 'react';
-import { UserPic, Text, Tab } from '@taskany/bricks';
-import { gray7 } from '@taskany/colors';
+import { UserPic, Tab } from '@taskany/bricks';
 import assert from 'assert';
 
 import { usePageContext } from '../../hooks/usePageContext';
 import { FilterBase } from '../FilterBase/FilterBase';
 import { FilterCheckbox } from '../FilterCheckbox';
 import { FilterTabLabel } from '../FilterTabLabel';
+import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 
 import { tr } from './UserFilter.i18n';
 
@@ -82,7 +82,6 @@ export const UserFilter: React.FC<UserFilterProps> = ({
                 mode="multiple"
                 viewMode="split"
                 items={itemsToRender}
-                inputProps={{ onChange: onSearchChange }}
                 keyGetter={getId}
                 value={values}
                 onChange={onChange}
@@ -94,13 +93,19 @@ export const UserFilter: React.FC<UserFilterProps> = ({
                     }
 
                     return (
-                        <FilterCheckbox name="user" value={item.id} checked={checked} onClick={onItemClick}>
-                            <UserPic name={item.name} email={item.email} size={14} />
-                            <Text color={gray7}>{label}</Text>
-                        </FilterCheckbox>
+                        <FilterCheckbox
+                            name="user"
+                            value={item.id}
+                            checked={checked}
+                            onClick={onItemClick}
+                            iconLeft={<UserPic name={item.name} email={item.email} size={14} />}
+                            label={label}
+                        />
                     );
                 }}
-            />
+            >
+                <FilterAutoCompleteInput onChange={onSearchChange} />
+            </FilterBase>
         </Tab>
     );
 };

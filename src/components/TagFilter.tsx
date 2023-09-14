@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { FilterBase } from './FilterBase/FilterBase';
 import { FilterCheckbox } from './FilterCheckbox';
 import { FilterTabLabel } from './FilterTabLabel';
+import { FilterAutoCompleteInput } from './FilterAutoCompleteInput/FilterAutoCompleteInput';
 
 type Tag = {
     id: string;
@@ -42,11 +43,17 @@ export const TagFilter: React.FC<TagFilterProps> = ({ text, tags, value = [], on
                 value={values}
                 onChange={onChange}
                 renderItem={({ item, checked, onItemClick }) => (
-                    <FilterCheckbox name="tag" value={item.id} checked={checked} onClick={onItemClick}>
-                        {item.title}
-                    </FilterCheckbox>
+                    <FilterCheckbox
+                        name="tag"
+                        value={item.id}
+                        checked={checked}
+                        onClick={onItemClick}
+                        label={item.title}
+                    />
                 )}
-            />
+            >
+                <FilterAutoCompleteInput onChange={onSearchChange} />
+            </FilterBase>
         </Tab>
     );
 };

@@ -1,6 +1,5 @@
 import { FC, useMemo } from 'react';
-import { Tab, Text } from '@taskany/bricks';
-import { gray7 } from '@taskany/colors';
+import { Tab } from '@taskany/bricks';
 
 import { Priority as PriorityName, priorityVariants } from '../types/priority';
 
@@ -45,9 +44,13 @@ export const PriorityFilter: FC<{
                 keyGetter={getKey}
                 onChange={onChange}
                 renderItem={({ item, checked, onItemClick }) => (
-                    <FilterCheckbox name="priority" value={item.id} checked={checked} onClick={onItemClick}>
-                        <Text color={gray7}>{item.data}</Text>
-                    </FilterCheckbox>
+                    <FilterCheckbox
+                        name="priority"
+                        value={item.id}
+                        checked={checked}
+                        onClick={onItemClick}
+                        label={item.data}
+                    />
                 )}
             />
         </Tab>
