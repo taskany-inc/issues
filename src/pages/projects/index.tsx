@@ -4,7 +4,11 @@ import { filtersPanelSsrInit } from '../../utils/filters';
 
 export const getServerSideProps = declareSsrProps(
     async (props) => {
-        const { queryState, defaultPresetFallback } = await filtersPanelSsrInit(props);
+        const { queryState, defaultPresetFallback, redirect } = await filtersPanelSsrInit(props);
+
+        if (redirect) {
+            return redirect;
+        }
 
         const { ssrHelpers } = props;
 

@@ -1,6 +1,60 @@
-import { parseFilterValues, filtersNoSearchPresetCookie, isFilterStateEmpty } from '../hooks/useUrlFilterParams';
+import {
+    parseFilterValues,
+    filtersNoSearchPresetCookie,
+    isFilterStateEmpty,
+    QueryState,
+    buildURLSearchParams,
+} from '../hooks/useUrlFilterParams';
 
+import { QuartersKeys, createDateRange, encodeUrlDateRange } from './dateTime';
 import { SSRProps } from './declareSsrProps';
+
+// TODO: remove here https://github.com/taskany-inc/issues/issues/1657
+
+const decodeLegaceEstimateFilterValue = (data: string): null | { q: QuartersKeys | null; y: string } => {
+    try {
+        const { q = null, y } = JSON.parse(decodeURIComponent(data));
+
+        if (y) {
+            return { q, y };
+        }
+
+        return null;
+    } catch (e) {
+        return null;
+    }
+};
+
+// TODO: remove here https://github.com/taskany-inc/issues/issues/1657
+
+export const catchLegacyEstimatesRedirect = (queryState: QueryState, req: SSRProps['req']) => {
+    const isLegacyEstimate = Boolean(decodeLegaceEstimateFilterValue(queryState.estimate[0]));
+
+    if (isLegacyEstimate) {
+        const query = buildURLSearchParams({
+            ...queryState,
+            estimate: queryState.estimate.reduce<string[]>((acum, raw) => {
+                const legacy = decodeLegaceEstimateFilterValue(raw);
+
+                if (legacy) {
+                    acum.push(encodeUrlDateRange(createDateRange(Number(legacy.y), legacy.q as QuartersKeys)));
+                }
+
+                return acum;
+            }, []),
+        });
+
+        const base = req.url?.split('?')[0];
+
+        return {
+            redirect: {
+                destination: `${base}?${query}`,
+            },
+        };
+    }
+
+    return null;
+};
 
 export const filtersTakeCount = 5;
 
@@ -20,6 +74,8 @@ export const filtersPanelSsrInit = async ({ query: browserQuery, ssrHelpers, req
     const queryState = preset
         ? parseFilterValues(Object.fromEntries(new URLSearchParams(preset.params)))
         : browserQueryState;
+
+    const redirect = catchLegacyEstimatesRedirect(queryState, req);
 
     await Promise.all([
         ssrHelpers.user.suggestions.fetch({
@@ -55,5 +111,6 @@ export const filtersPanelSsrInit = async ({ query: browserQuery, ssrHelpers, req
     return {
         queryState,
         defaultPresetFallback: isDefaultPreset,
+        redirect,
     };
 };

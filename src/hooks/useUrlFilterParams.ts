@@ -44,7 +44,7 @@ const stringifySortQueryParam = (param: QueryState['sort']) =>
         .map(([id, direction]) => `${id}:${direction}`)
         .join(',');
 
-const buildURLSearchParams = ({
+export const buildURLSearchParams = ({
     priority,
     state,
     stateType,
