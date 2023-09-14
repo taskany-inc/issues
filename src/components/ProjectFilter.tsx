@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { FilterBase } from './FilterBase/FilterBase';
 import { FilterCheckbox } from './FilterCheckbox';
 import { FilterTabLabel } from './FilterTabLabel';
+import { FilterAutoCompleteInput } from './FilterAutoCompleteInput/FilterAutoCompleteInput';
 
 type Project = {
     id: string;
@@ -37,17 +38,22 @@ export const ProjectFilter: React.FC<ProjectFilterAutoCompleteProps> = ({
                 key="projects"
                 mode="multiple"
                 viewMode="split"
-                inputProps={{ onChange: onSearchChange }}
                 items={projects}
                 value={values}
                 keyGetter={getKey}
                 onChange={onChange}
                 renderItem={({ item, onItemClick, checked }) => (
-                    <FilterCheckbox name="project" value={item.id} checked={checked} onClick={onItemClick}>
-                        {item.title}
-                    </FilterCheckbox>
+                    <FilterCheckbox
+                        name="project"
+                        value={item.id}
+                        checked={checked}
+                        onClick={onItemClick}
+                        label={item.title}
+                    />
                 )}
-            />
+            >
+                <FilterAutoCompleteInput onChange={onSearchChange} />
+            </FilterBase>
         </Tab>
     );
 };

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import styled from 'styled-components';
 import { useClickOutside, useKeyboard, KeyCode, Popup, Button, Tabs, TabContent, TabsMenu } from '@taskany/bricks';
-import { gray10, gapS, gapXs } from '@taskany/colors';
+import { gray10, gapS, gapXs, textColor, gapM, radiusM } from '@taskany/colors';
 import { IconBulbOnOutline } from '@taskany/icons';
 
 import { Tip } from '../Tip';
@@ -16,12 +16,15 @@ interface FilterPopupProps {
     activeTab?: string;
 }
 
-const StyledPopupWrapper = styled.div``;
+const StyledPopupWrapper = styled.div`
+    padding: ${gapXs};
+`;
 
 const StyledTabs = styled(Tabs)`
     width: 500px;
+    height: 200px;
 
-    gap: ${gapS};
+    gap: ${gapM};
 
     ${TabsMenu} {
         width: 200px;
@@ -30,7 +33,6 @@ const StyledTabs = styled(Tabs)`
     }
 
     ${TabContent} {
-        max-height: 240px;
         display: flex;
         flex-direction: column;
         overflow: auto;
@@ -39,9 +41,14 @@ const StyledTabs = styled(Tabs)`
     }
 `;
 
+const StyledPopup = styled(Popup)`
+    border-radius: ${radiusM};
+`;
+
 const StyledFilterPanelPopupFooter = styled.div`
     display: flex;
     padding: ${gapXs} ${gapS};
+    margin-top: ${gapXs};
     align-items: center;
 `;
 
@@ -50,6 +57,11 @@ const StyledActionWrapper = styled.div`
     flex-wrap: nowrap;
     margin-left: auto;
     gap: ${gapS};
+`;
+const StyledTip = styled(Tip)`
+    color: ${gray10};
+    font-size: 0.75rem;
+    padding: 0;
 `;
 
 export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = ({
@@ -75,21 +87,28 @@ export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = 
     });
 
     return (
-        <Popup reference={filterRef} interactive placement="bottom-start" arrow={false} visible={visible} {...onESC}>
+        <StyledPopup
+            reference={filterRef}
+            interactive
+            placement="bottom-start"
+            visible={visible}
+            {...onESC}
+            offset={[-5, 0]}
+        >
             <StyledPopupWrapper key={String(visible)} ref={popupWrapperRef}>
                 <StyledTabs active={activeTab} layout="vertical">
                     {children}
                 </StyledTabs>
                 <StyledFilterPanelPopupFooter>
-                    <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
+                    <StyledTip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={textColor} />}>
                         {tr('You can apply and save filters as preset.')}
-                    </Tip>
+                    </StyledTip>
                     <StyledActionWrapper>
                         <Button outline text={tr('Cancel')} onClick={() => switchVisible(false)} />
                         <Button view="primary" outline text={tr('Apply')} onClick={onApplyClick} />
                     </StyledActionWrapper>
                 </StyledFilterPanelPopupFooter>
             </StyledPopupWrapper>
-        </Popup>
+        </StyledPopup>
     );
 };

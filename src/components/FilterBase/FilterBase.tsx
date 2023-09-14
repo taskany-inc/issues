@@ -1,7 +1,5 @@
 import React, { useCallback } from 'react';
-import styled from 'styled-components';
 import { AutoComplete, AutoCompleteInput, AutoCompleteList, nullable } from '@taskany/bricks';
-import { gapS } from '@taskany/colors';
 
 import { tr } from './FilterBase.i18n';
 
@@ -11,17 +9,7 @@ interface FilterBaseProps<T> extends Omit<React.ComponentProps<typeof AutoComple
     onChange: (items: string[]) => void;
 }
 
-const StyledAutoCompleteInput = styled(AutoCompleteInput)`
-    margin-bottom: ${gapS};
-`;
-
-export function FilterBase<T>({
-    inputProps,
-    viewMode,
-    onChange,
-    keyGetter,
-    ...props
-}: Omit<FilterBaseProps<T>, 'children'>) {
+export function FilterBase<T>({ viewMode, onChange, keyGetter, children, ...props }: FilterBaseProps<T>) {
     const handleChange = useCallback(
         (items: T[]) => {
             onChange(items.map(keyGetter));
@@ -30,9 +18,7 @@ export function FilterBase<T>({
     );
     return (
         <AutoComplete {...props} keyGetter={keyGetter} onChange={handleChange}>
-            {nullable(inputProps, (input) => (
-                <StyledAutoCompleteInput placeholder={tr('Search')} {...input} />
-            ))}
+            {children}
             <AutoCompleteList selected={viewMode === 'split'} />
             {nullable(viewMode === 'split', () => (
                 <AutoCompleteList filterSelected title={tr('Suggestions')} />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, nullable } from '@taskany/bricks';
-import { gapXs, gray10 } from '@taskany/colors';
+import { gapXs, gray9 } from '@taskany/colors';
 import styled from 'styled-components';
 
 interface TabLabelProps {
@@ -22,12 +22,12 @@ const StyledBreakText = styled(Text)`
 
 export const FilterTabLabel: React.FC<TabLabelProps> = ({ text, selected }) => (
     <StyledLabelWrapper>
-        <Text>
+        <Text color={gray9}>
             {text}
-            {`${selected?.length ? ': ' : ''}`}
+            {nullable(selected, () => ': ')}
         </Text>
         {nullable(selected, (list) => (
-            <StyledBreakText ellipsis lines={1} color={gray10}>
+            <StyledBreakText ellipsis lines={1}>
                 {list.join(', ')}
             </StyledBreakText>
         ))}
