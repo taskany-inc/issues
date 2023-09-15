@@ -10,16 +10,18 @@ export const StateTypeEnum = z.nativeEnum(StateType);
 
 export type ToggleSubscription = z.infer<typeof ToggleSubscriptionSchema>;
 
+const sortDirectionValue = z.enum(['asc', 'desc']).nullish();
+
 export const sortablePropertiesSchema = z
     .object({
-        title: z.string().optional(),
-        state: z.string().optional(),
-        priority: z.string().optional(),
-        project: z.string().optional(),
-        activity: z.string().optional(),
-        owner: z.string().optional(),
-        updatedAt: z.string().optional(),
-        createdAt: z.string().optional(),
+        title: sortDirectionValue,
+        state: sortDirectionValue,
+        priority: sortDirectionValue,
+        project: sortDirectionValue,
+        activity: sortDirectionValue,
+        owner: sortDirectionValue,
+        updatedAt: sortDirectionValue,
+        createdAt: sortDirectionValue,
     })
     .optional();
 

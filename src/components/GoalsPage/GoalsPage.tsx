@@ -49,10 +49,10 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         setEstimateFilter,
         setStarredFilter,
         setWatchingFilter,
-        setSortFilter,
         setFulltextFilter,
         resetQueryState,
         setPreset,
+        batchQueryState,
     } = useUrlFilterParams({
         preset,
     });
@@ -178,7 +178,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}
                 onFilterStar={onFilterStar}
-                onSortChange={setSortFilter}
+                onFilterApply={batchQueryState}
             >
                 {nullable(queryString || preset, () => (
                     <Button text={tr('Reset')} onClick={resetQueryState} />

@@ -24,7 +24,7 @@ export interface QueryState {
     query: string;
     starred: boolean;
     watching: boolean;
-    sort: Record<SortableProps, NonNullable<SortDirection>> | Record<string, never>;
+    sort: { [K in SortableProps]?: SortDirection };
     limit?: number;
 }
 
@@ -198,7 +198,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             starred: false,
             watching: false,
             query: '',
-            sort: {},
+            sort: {} as { [K in SortableProps]: SortDirection },
         });
     }, [pushStateToRouter]);
 
@@ -252,7 +252,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setSortFilter: pushStateProvider.key('sort'),
             setFulltextFilter: pushStateProvider.key('query'),
             setLimitFilter: pushStateProvider.key('limit'),
-            batch: pushStateProvider.batch(),
+            batchQueryState: pushStateProvider.batch(),
         }),
         [pushStateProvider],
     );
