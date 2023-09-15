@@ -124,7 +124,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
 
         items.forEach(([k, v], i) => {
             const delimeter = items.length - 1 === i ? '.' : ', ';
-            if (v.length) infoString += `${sortFilterTr(k as SortableProps)}(${v})${delimeter}`;
+            if (v != null && v.length) infoString += `${sortFilterTr(k as SortableProps)}(${v})${delimeter}`;
         });
     }
 

@@ -22,7 +22,7 @@ const StyledPopupWrapper = styled.div`
 
 const StyledTabs = styled(Tabs)`
     width: 500px;
-    height: 200px;
+    min-height: 200px;
 
     gap: ${gapM};
 
@@ -33,10 +33,7 @@ const StyledTabs = styled(Tabs)`
     }
 
     ${TabContent} {
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
-        box-sizing: border-box;
+        display: block;
         flex: 1;
     }
 `;
@@ -58,6 +55,7 @@ const StyledActionWrapper = styled.div`
     margin-left: auto;
     gap: ${gapS};
 `;
+
 const StyledTip = styled(Tip)`
     color: ${gray10};
     font-size: 0.75rem;

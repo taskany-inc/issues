@@ -54,10 +54,10 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
         setEstimateFilter,
         setStarredFilter,
         setWatchingFilter,
-        setSortFilter,
         setFulltextFilter,
         resetQueryState,
         setPreset,
+        batchQueryState,
     } = useUrlFilterParams({
         preset,
     });
@@ -263,7 +263,7 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
                 onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}
                 onFilterStar={onFilterStar}
-                onSortChange={setSortFilter}
+                onFilterApply={batchQueryState}
             >
                 {(Boolean(queryString) || preset) && <Button text={tr('Reset')} onClick={resetQueryState} />}
             </FiltersPanel>

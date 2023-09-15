@@ -55,11 +55,11 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         setEstimateFilter,
         setStarredFilter,
         setWatchingFilter,
-        setSortFilter,
         setFulltextFilter,
+        setLimitFilter,
         resetQueryState,
         setPreset,
-        batch: batchQueryState,
+        batchQueryState,
     } = useUrlFilterParams({
         preset,
     });
@@ -185,8 +185,8 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}
                 onFilterStar={onFilterStar}
-                onSortChange={setSortFilter}
                 onFilterApply={batchQueryState}
+                onLimitChange={setLimitFilter}
             >
                 {(Boolean(queryString) || preset) && <Button text={tr('Reset')} onClick={resetQueryState} />}
             </FiltersPanel>
