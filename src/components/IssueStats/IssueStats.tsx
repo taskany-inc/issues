@@ -2,16 +2,14 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import { gapXs, gray8 } from '@taskany/colors';
 import { Dot, Text, Link, nullable, CircleProgressBar } from '@taskany/bricks';
+import { IconMessageOutline } from '@taskany/icons';
 
-import { pluralize } from '../../utils/pluralize';
 import { formatEstimate } from '../../utils/dateTime';
 import { useLocale } from '../../hooks/useLocale';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { UserGroup } from '../UserGroup';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
-
-import { tr } from './IssueStats.i18n';
 
 interface IssueStatsProps {
     updatedAt: Date;
@@ -26,6 +24,7 @@ interface IssueStatsProps {
 }
 
 const StyledIssueStats = styled(Text)<Pick<IssueStatsProps, 'mode'>>`
+    display: flex;
     ${({ mode }) =>
         mode === 'default' &&
         `
@@ -34,8 +33,9 @@ const StyledIssueStats = styled(Text)<Pick<IssueStatsProps, 'mode'>>`
 `;
 
 const StyledDotSep = styled.span`
-    display: inline-block;
-    vertical-align: middle;
+    display: flex;
+    align-items: center;
+}
 `;
 
 const StyledCircleProgressBar = styled(CircleProgressBar)`
@@ -43,13 +43,18 @@ const StyledCircleProgressBar = styled(CircleProgressBar)`
 `;
 
 const StyledUserGroupContainer = styled.span`
+    display: flex;
+    vertical-align: middle;
+`;
+const CommentsCountIcon = styled(IconMessageOutline)`
     display: inline-block;
     vertical-align: middle;
 `;
 
 const DotSep: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <StyledDotSep>
-        <Dot /> {children}
+        <Dot />
+        {children}
     </StyledDotSep>
 );
 
@@ -100,14 +105,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
             {nullable(comments, () => (
                 <DotSep>
                     <Link inline onClick={onCommentsClick}>
-                        <b>{comments}</b>{' '}
-                        {pluralize({
-                            locale,
-                            count: comments,
-                            one: tr('one'),
-                            few: tr('few'),
-                            many: tr('many'),
-                        })}
+                        {comments} <CommentsCountIcon size="s" />
                     </Link>
                 </DotSep>
             ))}
