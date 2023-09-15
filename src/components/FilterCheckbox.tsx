@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Checkbox, CheckboxInput, CheckboxLabel, Text, nullable } from '@taskany/bricks';
-import { gapM, gapSm, gapXs } from '@taskany/colors';
+import { gapS, gapSm, gapXs } from '@taskany/colors';
 
 const StyledCheckboxLabel = styled(CheckboxLabel)`
     display: inline-flex;
     gap: ${gapSm};
     align-items: center;
-    margin-left: ${gapM};
+    margin-left: ${gapS};
 `;
 
 const StyledCheckbox = styled(Checkbox)`
@@ -15,7 +15,8 @@ const StyledCheckbox = styled(Checkbox)`
 `;
 
 const StyledChekboxInput = styled(CheckboxInput)`
-    margin: 0;
+    // aligned by icon in input
+    margin-left: 9.5px;
 `;
 
 type CheckboxProps = React.ComponentProps<typeof Checkbox> & React.ComponentProps<typeof CheckboxInput>;
