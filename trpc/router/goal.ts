@@ -266,7 +266,6 @@ export const goal = router({
                 new Set(
                     [...actualProject.participants, ...actualProject.watchers, actualProject.activity]
                         .filter(Boolean)
-                        .filter((p) => p.user?.email !== ctx.session.user.email)
                         .map((r) => r.user?.email),
                 ),
             );
@@ -279,12 +278,14 @@ export const goal = router({
                     shortId: newGoal._shortId,
                     title: newGoal.title,
                     author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
                 }),
                 createEmailJob('goalAssigned', {
                     to: [newGoal.owner?.user?.email],
                     shortId: newGoal._shortId,
                     title: newGoal.title,
                     author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
                 }),
             ]);
 
@@ -503,7 +504,6 @@ export const goal = router({
                 new Set(
                     [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
                         .filter(Boolean)
-                        .filter((p) => p.user?.email !== ctx.session.user.email)
                         .map((r) => r.user?.email),
                 ),
             );
@@ -514,6 +514,7 @@ export const goal = router({
                 title: actualGoal.title,
                 updatedFields,
                 author: ctx.session.user.name || ctx.session.user.email,
+                authorEmail: ctx.session.user.email,
             });
 
             if (actualGoal.ownerId !== input.owner.id) {
@@ -523,12 +524,14 @@ export const goal = router({
                         shortId: _shortId,
                         title: actualGoal.title,
                         author: ctx.session.user.name || ctx.session.user.email,
+                        authorEmail: ctx.session.user.email,
                     }),
                     createEmailJob('goalAssigned', {
                         to: [input.owner.user.email],
                         shortId: _shortId,
                         title: actualGoal.title,
                         author: ctx.session.user.name || ctx.session.user.email,
+                        authorEmail: ctx.session.user.email,
                     }),
                 ]);
             }
@@ -628,7 +631,6 @@ export const goal = router({
                     new Set(
                         [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
                             .filter(Boolean)
-                            .filter((p) => p.user?.email !== ctx.session.user.email)
                             .map((r) => r.user?.email),
                     ),
                 );
@@ -638,6 +640,7 @@ export const goal = router({
                     shortId: _shortId,
                     title: actualGoal.title,
                     author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
                 });
 
                 return updatedGoal;
@@ -739,7 +742,6 @@ export const goal = router({
                 new Set(
                     [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
                         .filter(Boolean)
-                        .filter((p) => p.user?.email !== ctx.session.user.email)
                         .map((r) => r.user?.email),
                 ),
             );
@@ -751,6 +753,7 @@ export const goal = router({
                 stateTitleAfter: updatedGoal.state?.title,
                 title: actualGoal.title,
                 author: ctx.session.user.name || ctx.session.user.email,
+                authorEmail: ctx.session.user.email,
             });
 
             return updatedGoal;
@@ -853,33 +856,32 @@ export const goal = router({
                 new Set(
                     [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
                         .filter(Boolean)
-                        .filter((p) => p.user?.email !== commentAuthor?.user?.email)
                         .map((r) => r.user?.email),
                 ),
             );
 
-            if (recipients.length) {
-                if (input.stateId) {
-                    await createEmailJob('goalStateUpdatedWithComment', {
-                        to: recipients,
-                        shortId: _shortId,
-                        stateTitleBefore: actualGoal.state?.title,
-                        stateTitleAfter: updatedGoal.state?.title,
-                        title: actualGoal.title,
-                        commentId: newComment.id,
-                        author: newComment.activity.user?.name || newComment.activity.user?.email,
-                        body: newComment.description,
-                    });
-                } else {
-                    await createEmailJob('goalCommented', {
-                        to: recipients,
-                        shortId: _shortId,
-                        title: actualGoal.title,
-                        commentId: newComment.id,
-                        author: newComment.activity.user?.name || newComment.activity.user?.email,
-                        body: newComment.description,
-                    });
-                }
+            if (input.stateId) {
+                await createEmailJob('goalStateUpdatedWithComment', {
+                    to: recipients,
+                    shortId: _shortId,
+                    stateTitleBefore: actualGoal.state?.title,
+                    stateTitleAfter: updatedGoal.state?.title,
+                    title: actualGoal.title,
+                    commentId: newComment.id,
+                    author: newComment.activity.user?.name || newComment.activity.user?.email,
+                    authorEmail: ctx.session.user.email,
+                    body: newComment.description,
+                });
+            } else {
+                await createEmailJob('goalCommented', {
+                    to: recipients,
+                    shortId: _shortId,
+                    title: actualGoal.title,
+                    commentId: newComment.id,
+                    author: newComment.activity.user?.name || newComment.activity.user?.email,
+                    authorEmail: ctx.session.user.email,
+                    body: newComment.description,
+                });
             }
 
             return newComment;
