@@ -28,6 +28,7 @@ interface GoalCommentedEmailProps {
     title: string;
     body: string;
     commentId: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -67,6 +68,7 @@ interface GoalStateUpdatedEmailProps {
     stateTitleAfter?: string;
     shortId: string;
     title: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -104,6 +106,7 @@ interface GoalStateUpdatedWithCommentEmailProps {
     title: string;
     body: string;
     commentId: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -149,6 +152,7 @@ interface GoalUpdatedEmailProps {
         estimate?: FieldDiff;
         priority?: FieldDiff;
     };
+    authorEmail: string;
     author?: string;
 }
 
@@ -215,6 +219,7 @@ interface GoalArchivedEmailProps {
     to: SendMailProps['to'];
     shortId: string;
     title: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -239,6 +244,7 @@ interface GoalAssignedEmailProps {
     to: SendMailProps['to'];
     shortId: string;
     title: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -264,6 +270,7 @@ interface GoalUnassignedEmailProps {
     to: SendMailProps['to'];
     shortId: string;
     title: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -291,6 +298,7 @@ interface GoalCreatedEmailProps {
     projectTitle: string;
     shortId: string;
     title: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -326,6 +334,7 @@ interface childProjectCreatedProps {
     childTitle: string;
     projectKey: string;
     projectTitle: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -361,6 +370,7 @@ interface childProjectDeletedProps {
     childTitle: string;
     projectKey: string;
     projectTitle: string;
+    authorEmail: string;
     author?: string;
 }
 
@@ -398,6 +408,7 @@ interface ProjectUpdatedEmailProps {
         title?: FieldDiff;
         description?: FieldDiff;
     };
+    authorEmail: string;
     author?: string;
 }
 
@@ -453,6 +464,7 @@ interface ProjectTransferedProps {
     to: SendMailProps['to'];
     key: string;
     title: string;
+    authorEmail: string;
     author?: string;
 }
 

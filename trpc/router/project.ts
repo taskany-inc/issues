@@ -543,21 +543,19 @@ export const project = router({
                             new Set(
                                 [parent.activity, ...parent.participants, ...parent.watchers]
                                     .filter(Boolean)
-                                    .filter((p) => p.user?.email !== ctx.session.user.email)
                                     .map((r) => r.user?.email),
                             ),
                         );
 
-                        return recipients.length
-                            ? createEmailJob('childProjectCreated', {
-                                  to: recipients,
-                                  childKey: updatedProject.id,
-                                  childTitle: updatedProject.title,
-                                  projectKey: parent.id,
-                                  projectTitle: parent.title,
-                                  author: ctx.session.user.name || ctx.session.user.email,
-                              })
-                            : null;
+                        return createEmailJob('childProjectCreated', {
+                            to: recipients,
+                            childKey: updatedProject.id,
+                            childTitle: updatedProject.title,
+                            projectKey: parent.id,
+                            projectTitle: parent.title,
+                            author: ctx.session.user.name || ctx.session.user.email,
+                            authorEmail: ctx.session.user.email,
+                        });
                     }),
                 );
             }
@@ -583,21 +581,19 @@ export const project = router({
                             new Set(
                                 [parent.activity, ...parent.participants, ...parent.watchers]
                                     .filter(Boolean)
-                                    .filter((p) => p.user?.email !== ctx.session.user.email)
                                     .map((r) => r.user?.email),
                             ),
                         );
 
-                        return recipients.length
-                            ? createEmailJob('childProjectDeleted', {
-                                  to: recipients,
-                                  childKey: updatedProject.id,
-                                  childTitle: updatedProject.title,
-                                  projectKey: parent.id,
-                                  projectTitle: parent.title,
-                                  author: ctx.session.user.name || ctx.session.user.email,
-                              })
-                            : null;
+                        return createEmailJob('childProjectDeleted', {
+                            to: recipients,
+                            childKey: updatedProject.id,
+                            childTitle: updatedProject.title,
+                            projectKey: parent.id,
+                            projectTitle: parent.title,
+                            author: ctx.session.user.name || ctx.session.user.email,
+                            authorEmail: ctx.session.user.email,
+                        });
                     }),
                 );
             }
@@ -619,20 +615,18 @@ export const project = router({
                 new Set(
                     [...project.participants, ...project.watchers, project.activity]
                         .filter(Boolean)
-                        .filter((p) => p.user?.email !== ctx.session.user.email)
                         .map((r) => r.user?.email),
                 ),
             );
 
-            if (recipients.length) {
-                await createEmailJob('projectUpdated', {
-                    to: recipients,
-                    key: project.id,
-                    title: project.title,
-                    updatedFields,
-                    author: ctx.session.user.name || ctx.session.user.email,
-                });
-            }
+            await createEmailJob('projectUpdated', {
+                to: recipients,
+                key: project.id,
+                title: project.title,
+                updatedFields,
+                author: ctx.session.user.name || ctx.session.user.email,
+                authorEmail: ctx.session.user.email,
+            });
 
             return updatedProject;
         } catch (error: any) {
@@ -739,6 +733,7 @@ export const project = router({
                     key: project.id,
                     title: project.title,
                     author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
                 });
 
                 return transferedProject;
