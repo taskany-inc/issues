@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.30.0](https://github.com/taskany-inc/issues/compare/v1.29.0...v1.30.0) (2023-09-18)
+
+
+### Features
+
+* doesn't send email for action author ([f97b279](https://github.com/taskany-inc/issues/commit/f97b27913d0e15ac05a713d4742745c92e9499cf))
+
+
+### Bug Fixes
+
+* **GoalForm:** invalidate Project Page after goal list update ([9413ad4](https://github.com/taskany-inc/issues/commit/9413ad4e14904df8a26b0c266c888e1d21acb838))
+* **Tag:** remove unreachable `descrition` prop ([fb39f55](https://github.com/taskany-inc/issues/commit/fb39f5596a1d641e75156e6f249b64de34915e47))
+* **UserBadge:** use `IconX` instead of `CleanButton` ([9f7694f](https://github.com/taskany-inc/issues/commit/9f7694f826c8e97250a5a15c1001129935067373))
+
+
+### Performance Improvements
+
+* drop redundant data refetch on the client ([1a1d715](https://github.com/taskany-inc/issues/commit/1a1d715d2ef203878091c81cae01e86ed9b9e93e))
+
 ## [1.29.0](https://github.com/taskany-inc/issues/compare/v1.28.0...v1.29.0) (2023-09-07)
 
 
