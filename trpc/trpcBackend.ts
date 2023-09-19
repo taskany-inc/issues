@@ -23,4 +23,5 @@ const sessionCheck = t.middleware(({ next, ctx }) => {
 
 export const protectedProcedure = t.procedure.use(sessionCheck);
 
+export const { middleware } = t;
 export const { router, procedure } = t;
