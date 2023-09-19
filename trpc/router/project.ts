@@ -1,4 +1,4 @@
-import { Prisma, Role } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
 
@@ -14,33 +14,11 @@ import {
 import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
-import { getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
+import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { FieldDiff } from '../../src/types/common';
 import { updateLinkedGoalsByProject } from '../../src/utils/db';
-
-type WithId = { id: string };
-
-export const addCalculatedProjectFields = <
-    T extends { watchers?: WithId[]; stargizers?: WithId[]; activityId?: string },
->(
-    project: T,
-    activityId: string,
-    role: Role,
-) => {
-    const _isWatching = project.watchers?.some((watcher: any) => watcher.id === activityId);
-    const _isStarred = project.stargizers?.some((stargizer: any) => stargizer.id === activityId);
-    const _isOwner = project.activityId === activityId;
-    const _isEditable = _isOwner || role === 'ADMIN';
-
-    return {
-        ...project,
-        _isWatching,
-        _isStarred,
-        _isOwner,
-        _isEditable,
-    };
-};
+import { projectAccessMiddleware } from '../access/accessMiddlewares';
 
 export const project = router({
     suggestions: protectedProcedure
@@ -500,183 +478,189 @@ export const project = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
         }),
-    update: protectedProcedure.input(projectUpdateSchema).mutation(async ({ input: { id, parent, ...data }, ctx }) => {
-        const project = await prisma.project.findUnique({
-            where: { id },
-            include: {
-                parent: true,
-                activity: { include: { user: true, ghost: true } },
-                participants: { include: { user: true, ghost: true } },
-                watchers: { include: { user: true, ghost: true } },
-            },
-        });
-
-        if (!project) return null;
-
-        // TODO: support children
-
-        const parentsToConnect = parent?.filter((pr) => !project.parent.some((p) => p.id === pr.id));
-        const parentsToDisconnect = project.parent.filter((p) => !parent?.some((pr) => p.id === pr.id));
-
-        try {
-            const updatedProject = await prisma.project.update({
+    update: protectedProcedure
+        .input(projectUpdateSchema)
+        .use(projectAccessMiddleware)
+        .mutation(async ({ input: { id, parent, ...data }, ctx }) => {
+            const project = await prisma.project.findUnique({
                 where: { id },
-                data: {
-                    ...data,
-                    parent: {
-                        connect: parentsToConnect?.map((p) => ({ id: p.id })) || [],
-                        disconnect: parentsToDisconnect?.map((p) => ({ id: p.id })),
-                    },
-                },
                 include: {
                     parent: true,
+                    activity: { include: { user: true, ghost: true } },
+                    participants: { include: { user: true, ghost: true } },
+                    watchers: { include: { user: true, ghost: true } },
                 },
             });
 
-            if (parentsToConnect) {
-                const newParents = await prisma.project.findMany({
-                    where: {
-                        id: {
-                            in: parentsToConnect?.map(({ id }) => id),
+            if (!project) return null;
+
+            // TODO: support children
+
+            const parentsToConnect = parent?.filter((pr) => !project.parent.some((p) => p.id === pr.id));
+            const parentsToDisconnect = project.parent.filter((p) => !parent?.some((pr) => p.id === pr.id));
+
+            try {
+                const updatedProject = await prisma.project.update({
+                    where: { id },
+                    data: {
+                        ...data,
+                        parent: {
+                            connect: parentsToConnect?.map((p) => ({ id: p.id })) || [],
+                            disconnect: parentsToDisconnect?.map((p) => ({ id: p.id })),
                         },
-                        AND: nonArchivedPartialQuery,
                     },
                     include: {
-                        activity: { include: { user: true, ghost: true } },
-                        participants: { include: { user: true, ghost: true } },
-                        watchers: { include: { user: true, ghost: true } },
+                        parent: true,
                     },
                 });
 
-                await Promise.all(
-                    newParents.map((parent) => {
-                        const recipients = Array.from(
-                            new Set(
-                                [parent.activity, ...parent.participants, ...parent.watchers]
-                                    .filter(Boolean)
-                                    .map((r) => r.user?.email),
-                            ),
-                        );
-
-                        return createEmailJob('childProjectCreated', {
-                            to: recipients,
-                            childKey: updatedProject.id,
-                            childTitle: updatedProject.title,
-                            projectKey: parent.id,
-                            projectTitle: parent.title,
-                            author: ctx.session.user.name || ctx.session.user.email,
-                            authorEmail: ctx.session.user.email,
-                        });
-                    }),
-                );
-            }
-
-            if (parentsToDisconnect) {
-                const oldParents = await prisma.project.findMany({
-                    where: {
-                        id: {
-                            in: parentsToDisconnect?.map(({ id }) => id),
+                if (parentsToConnect) {
+                    const newParents = await prisma.project.findMany({
+                        where: {
+                            id: {
+                                in: parentsToConnect?.map(({ id }) => id),
+                            },
+                            AND: nonArchivedPartialQuery,
                         },
-                        AND: nonArchivedPartialQuery,
+                        include: {
+                            activity: { include: { user: true, ghost: true } },
+                            participants: { include: { user: true, ghost: true } },
+                            watchers: { include: { user: true, ghost: true } },
+                        },
+                    });
+
+                    await Promise.all(
+                        newParents.map((parent) => {
+                            const recipients = Array.from(
+                                new Set(
+                                    [parent.activity, ...parent.participants, ...parent.watchers]
+                                        .filter(Boolean)
+                                        .map((r) => r.user?.email),
+                                ),
+                            );
+
+                            return createEmailJob('childProjectCreated', {
+                                to: recipients,
+                                childKey: updatedProject.id,
+                                childTitle: updatedProject.title,
+                                projectKey: parent.id,
+                                projectTitle: parent.title,
+                                author: ctx.session.user.name || ctx.session.user.email,
+                                authorEmail: ctx.session.user.email,
+                            });
+                        }),
+                    );
+                }
+
+                if (parentsToDisconnect) {
+                    const oldParents = await prisma.project.findMany({
+                        where: {
+                            id: {
+                                in: parentsToDisconnect?.map(({ id }) => id),
+                            },
+                            AND: nonArchivedPartialQuery,
+                        },
+                        include: {
+                            activity: { include: { user: true, ghost: true } },
+                            participants: { include: { user: true, ghost: true } },
+                            watchers: { include: { user: true, ghost: true } },
+                        },
+                    });
+
+                    await Promise.all(
+                        oldParents.map((parent) => {
+                            const recipients = Array.from(
+                                new Set(
+                                    [parent.activity, ...parent.participants, ...parent.watchers]
+                                        .filter(Boolean)
+                                        .map((r) => r.user?.email),
+                                ),
+                            );
+
+                            return createEmailJob('childProjectDeleted', {
+                                to: recipients,
+                                childKey: updatedProject.id,
+                                childTitle: updatedProject.title,
+                                projectKey: parent.id,
+                                projectTitle: parent.title,
+                                author: ctx.session.user.name || ctx.session.user.email,
+                                authorEmail: ctx.session.user.email,
+                            });
+                        }),
+                    );
+                }
+
+                const updatedFields: {
+                    title?: FieldDiff;
+                    description?: FieldDiff;
+                } = {};
+
+                if (updatedProject.title !== project.title) {
+                    updatedFields.title = [project.title, updatedProject.title];
+                }
+
+                if (updatedProject.description !== project.description) {
+                    updatedFields.description = [project.description, updatedProject.description];
+                }
+
+                const recipients = Array.from(
+                    new Set(
+                        [...project.participants, ...project.watchers, project.activity]
+                            .filter(Boolean)
+                            .map((r) => r.user?.email),
+                    ),
+                );
+
+                await createEmailJob('projectUpdated', {
+                    to: recipients,
+                    key: project.id,
+                    title: project.title,
+                    updatedFields,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
+                });
+
+                return updatedProject;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    delete: protectedProcedure
+        .input(projectDeleteSchema)
+        .use(projectAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            try {
+                const currentProject = await prisma.project.findUnique({
+                    where: {
+                        id: input.id,
                     },
                     include: {
-                        activity: { include: { user: true, ghost: true } },
-                        participants: { include: { user: true, ghost: true } },
-                        watchers: { include: { user: true, ghost: true } },
+                        parent: true,
                     },
                 });
 
-                await Promise.all(
-                    oldParents.map((parent) => {
-                        const recipients = Array.from(
-                            new Set(
-                                [parent.activity, ...parent.participants, ...parent.watchers]
-                                    .filter(Boolean)
-                                    .map((r) => r.user?.email),
-                            ),
-                        );
+                if (!currentProject || currentProject.archived) {
+                    return;
+                }
 
-                        return createEmailJob('childProjectDeleted', {
-                            to: recipients,
-                            childKey: updatedProject.id,
-                            childTitle: updatedProject.title,
-                            projectKey: parent.id,
-                            projectTitle: parent.title,
-                            author: ctx.session.user.name || ctx.session.user.email,
-                            authorEmail: ctx.session.user.email,
-                        });
-                    }),
-                );
-            }
+                // before update project need to update project goals
+                await updateLinkedGoalsByProject(input.id, ctx.session.user.activityId);
 
-            const updatedFields: {
-                title?: FieldDiff;
-                description?: FieldDiff;
-            } = {};
-
-            if (updatedProject.title !== project.title) {
-                updatedFields.title = [project.title, updatedProject.title];
-            }
-
-            if (updatedProject.description !== project.description) {
-                updatedFields.description = [project.description, updatedProject.description];
-            }
-
-            const recipients = Array.from(
-                new Set(
-                    [...project.participants, ...project.watchers, project.activity]
-                        .filter(Boolean)
-                        .map((r) => r.user?.email),
-                ),
-            );
-
-            await createEmailJob('projectUpdated', {
-                to: recipients,
-                key: project.id,
-                title: project.title,
-                updatedFields,
-                author: ctx.session.user.name || ctx.session.user.email,
-                authorEmail: ctx.session.user.email,
-            });
-
-            return updatedProject;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    delete: protectedProcedure.input(projectDeleteSchema).mutation(async ({ input, ctx }) => {
-        try {
-            const currentProject = await prisma.project.findUnique({
-                where: {
-                    id: input.id,
-                },
-                include: {
-                    parent: true,
-                },
-            });
-
-            if (!currentProject || currentProject.archived) {
-                return;
-            }
-
-            // before update project need to update project goals
-            await updateLinkedGoalsByProject(input.id, ctx.session.user.activityId);
-
-            return prisma.project.update({
-                where: {
-                    id: input.id,
-                },
-                data: {
-                    archived: true,
-                    parent: {
-                        disconnect: currentProject.parent.map(({ id }) => ({ id })),
+                return prisma.project.update({
+                    where: {
+                        id: input.id,
                     },
-                },
-            });
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
+                    data: {
+                        archived: true,
+                        parent: {
+                            disconnect: currentProject.parent.map(({ id }) => ({ id })),
+                        },
+                    },
+                });
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
     toggleStargizer: protectedProcedure
         .input(ToggleSubscriptionSchema)
         .mutation(({ ctx, input: { id, direction } }) => {
@@ -709,6 +693,7 @@ export const project = router({
     }),
     transferOwnership: protectedProcedure
         .input(projectTransferOwnershipSchema)
+        .use(projectAccessMiddleware)
         .mutation(async ({ input: { id, activityId }, ctx }) => {
             const [project, newOwner] = await Promise.all([
                 prisma.project.findUnique({

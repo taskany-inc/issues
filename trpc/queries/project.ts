@@ -1,9 +1,34 @@
+import { Role } from '@prisma/client';
+
 import { QueryWithFilters } from '../../src/schema/common';
 
 import { goalsFilter } from './goals';
 
 export const nonArchivedPartialQuery = {
     OR: [{ archived: null }, { archived: false }],
+};
+
+type WithId = { id: string };
+
+export const addCalculatedProjectFields = <
+    T extends { watchers?: WithId[]; stargizers?: WithId[]; activityId?: string },
+>(
+    project: T,
+    activityId: string,
+    role: Role,
+) => {
+    const _isWatching = project.watchers?.some((watcher: any) => watcher.id === activityId);
+    const _isStarred = project.stargizers?.some((stargizer: any) => stargizer.id === activityId);
+    const _isOwner = project.activityId === activityId;
+    const _isEditable = _isOwner || role === 'ADMIN';
+
+    return {
+        ...project,
+        _isWatching,
+        _isStarred,
+        _isOwner,
+        _isEditable,
+    };
 };
 
 export const getProjectSchema = ({

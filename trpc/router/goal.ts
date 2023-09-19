@@ -39,8 +39,8 @@ import {
 } from '../../src/schema/criteria';
 import type { FieldDiff } from '../../src/types/common';
 import { encodeHistoryEstimate, formateEstimate } from '../../src/utils/dateTime';
-
-import { addCalculatedProjectFields } from './project';
+import { goalAccessMiddleware, commentAccessMiddleware } from '../access/accessMiddlewares';
+import { addCalculatedProjectFields } from '../queries/project';
 
 const updateProjectUpdatedAt = async (id?: string | null) => {
     if (!id) return;
@@ -277,247 +277,249 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    changeProject: protectedProcedure.input(goalChangeProjectSchema).mutation(async ({ ctx, input }) => {
-        const actualGoal = await prisma.goal.findUnique({
-            where: { id: input.id },
-        });
+    changeProject: protectedProcedure
+        .input(goalChangeProjectSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ ctx, input }) => {
+            const actualGoal = await prisma.goal.findUnique({
+                where: { id: input.id },
+            });
 
-        if (!actualGoal) return null;
+            if (!actualGoal) return null;
 
-        const { activityId, role } = ctx.session.user;
+            const { activityId, role } = ctx.session.user;
 
-        try {
-            await changeGoalProject(input.id, input.projectId);
-            const goal = await prisma.goal.update({
-                where: {
-                    id: input.id,
-                },
-                data: {
-                    history: {
-                        create: {
-                            activityId,
-                            subject: 'project',
-                            action: 'change',
-                            previousValue: actualGoal.projectId,
-                            nextValue: input.projectId,
+            try {
+                await changeGoalProject(input.id, input.projectId);
+                const goal = await prisma.goal.update({
+                    where: {
+                        id: input.id,
+                    },
+                    data: {
+                        history: {
+                            create: {
+                                activityId,
+                                subject: 'project',
+                                action: 'change',
+                                previousValue: actualGoal.projectId,
+                                nextValue: input.projectId,
+                            },
                         },
                     },
-                },
-                include: {
-                    ...goalDeepQuery,
-                },
-            });
-            await updateProjectUpdatedAt(goal.projectId);
-
-            // TODO: goal was moved
-
-            return {
-                ...goal,
-                ...addCalclulatedGoalsFields(goal, activityId, role),
-            };
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    update: protectedProcedure.input(goalUpdateSchema).mutation(async ({ ctx, input }) => {
-        const { activityId, role } = ctx.session.user;
-        const [estimate, estimateType] = input.estimate ? [new Date(input.estimate.date), input.estimate.type] : [];
-
-        const actualGoal = await prisma.goal.findUnique({
-            where: { id: input.id },
-            include: {
-                participants: { include: { user: true, ghost: true } },
-                watchers: { include: { user: true, ghost: true } },
-                activity: { include: { user: true, ghost: true } },
-                owner: { include: { user: true, ghost: true } },
-                project: true,
-                tags: true,
-                goalAsCriteria: true,
-            },
-        });
-
-        if (!actualGoal) return null;
-
-        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
-
-        if (!_isEditable) {
-            return null;
-        }
-
-        const tagsToDisconnect = calculateDiffBetweenArrays(actualGoal.tags, input.tags);
-        const tagsToConnect = calculateDiffBetweenArrays(input.tags, actualGoal.tags);
-
-        const history: Omit<GoalHistory, 'id' | 'activityId' | 'goalId' | 'createdAt'>[] = [];
-        const updatedFields: {
-            title?: FieldDiff;
-            description?: FieldDiff;
-            estimate?: FieldDiff;
-            priority?: FieldDiff;
-        } = {};
-
-        if (actualGoal.title !== input.title) {
-            history.push({
-                subject: 'title',
-                action: 'change',
-                previousValue: actualGoal.title,
-                nextValue: input.title,
-            });
-
-            updatedFields.title = [actualGoal.title, input.title];
-        }
-
-        if (actualGoal.description !== input.description) {
-            history.push({
-                subject: 'description',
-                action: 'change',
-                previousValue: actualGoal.description,
-                nextValue: input.description,
-            });
-
-            updatedFields.description = [actualGoal.description, input.description];
-        }
-
-        if (tagsToConnect.length || tagsToDisconnect.length) {
-            const prevIds = actualGoal.tags.map(({ id }) => id).join(goalHistorySeparator);
-            const nextIds = input.tags.map(({ id }) => id).join(goalHistorySeparator);
-
-            history.push({
-                subject: 'tags',
-                action: 'change',
-                previousValue: prevIds.length ? prevIds : null,
-                nextValue: nextIds.length ? nextIds : null,
-            });
-        }
-
-        if (actualGoal.priority !== input.priority) {
-            history.push({
-                subject: 'priority',
-                action: 'change',
-                previousValue: actualGoal.priority,
-                nextValue: input.priority,
-            });
-
-            updatedFields.priority = [actualGoal.priority, input.priority];
-        }
-
-        if (actualGoal.ownerId !== input.owner.id) {
-            history.push({
-                subject: 'owner',
-                action: 'change',
-                previousValue: actualGoal.ownerId,
-                nextValue: input.owner.id,
-            });
-        }
-
-        if (Number(estimate) !== Number(actualGoal.estimate) || estimateType !== actualGoal.estimateType) {
-            const prevHistoryEstimate = actualGoal.estimate
-                ? encodeHistoryEstimate(actualGoal.estimate, actualGoal.estimateType ?? 'Strict')
-                : null;
-            const nextHistoryEstimate = estimate ? encodeHistoryEstimate(estimate, estimateType ?? 'Strict') : null;
-
-            history.push({
-                subject: 'estimate',
-                action: 'change',
-                previousValue: prevHistoryEstimate,
-                nextValue: nextHistoryEstimate,
-            });
-
-            const prevFormatedEstimate = actualGoal.estimate
-                ? formateEstimate(actualGoal.estimate, { locale: 'en', type: actualGoal.estimateType ?? 'Strict' })
-                : null;
-            const nextFormatedEstimate = estimate
-                ? formateEstimate(estimate, { locale: 'en', type: estimateType ?? 'Strict' })
-                : null;
-
-            // FIXME: https://github.com/taskany-inc/issues/issues/1359
-            updatedFields.estimate = [prevFormatedEstimate, nextFormatedEstimate];
-        }
-
-        try {
-            const goal = await prisma.goal.update({
-                where: { id: actualGoal.id },
-                data: {
-                    ownerId: input.owner?.id,
-                    title: input.title,
-                    description: input.description,
-                    stateId: input.state?.id,
-                    priority: input.priority,
-                    estimate,
-                    estimateType,
-                    tags: {
-                        connect: tagsToConnect.map(({ id }) => ({ id })),
-                        disconnect: tagsToDisconnect.map(({ id }) => ({ id })),
+                    include: {
+                        ...goalDeepQuery,
                     },
-                    history: {
-                        createMany: {
-                            data: history.map((record) => ({ ...record, activityId })),
-                        },
-                    },
-                    goalAsCriteria: actualGoal.goalAsCriteria
-                        ? {
-                              update: {
-                                  isDone: input.state.type === StateType.Completed,
-                              },
-                          }
-                        : undefined,
-                },
+                });
+                await updateProjectUpdatedAt(goal.projectId);
+
+                // TODO: goal was moved
+
+                return {
+                    ...goal,
+                    ...addCalclulatedGoalsFields(goal, activityId, role),
+                };
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    update: protectedProcedure
+        .input(goalUpdateSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ ctx, input }) => {
+            const { activityId, role } = ctx.session.user;
+            const [estimate, estimateType] = input.estimate ? [new Date(input.estimate.date), input.estimate.type] : [];
+
+            const actualGoal = await prisma.goal.findUnique({
+                where: { id: input.id },
                 include: {
-                    ...goalDeepQuery,
+                    participants: { include: { user: true, ghost: true } },
+                    watchers: { include: { user: true, ghost: true } },
+                    activity: { include: { user: true, ghost: true } },
+                    owner: { include: { user: true, ghost: true } },
+                    project: true,
+                    tags: true,
                     goalAsCriteria: true,
                 },
             });
-            await updateProjectUpdatedAt(actualGoal?.projectId);
 
-            if (goal.goalAsCriteria) {
-                await updateGoalWithCalculatedWeight(goal.goalAsCriteria.goalId);
+            if (!actualGoal) return null;
+
+            const { _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
+
+            const tagsToDisconnect = calculateDiffBetweenArrays(actualGoal.tags, input.tags);
+            const tagsToConnect = calculateDiffBetweenArrays(input.tags, actualGoal.tags);
+
+            const history: Omit<GoalHistory, 'id' | 'activityId' | 'goalId' | 'createdAt'>[] = [];
+            const updatedFields: {
+                title?: FieldDiff;
+                description?: FieldDiff;
+                estimate?: FieldDiff;
+                priority?: FieldDiff;
+            } = {};
+
+            if (actualGoal.title !== input.title) {
+                history.push({
+                    subject: 'title',
+                    action: 'change',
+                    previousValue: actualGoal.title,
+                    nextValue: input.title,
+                });
+
+                updatedFields.title = [actualGoal.title, input.title];
             }
 
-            const recipients = Array.from(
-                new Set(
-                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
-                        .filter(Boolean)
-                        .map((r) => r.user?.email),
-                ),
-            );
+            if (actualGoal.description !== input.description) {
+                history.push({
+                    subject: 'description',
+                    action: 'change',
+                    previousValue: actualGoal.description,
+                    nextValue: input.description,
+                });
 
-            await createEmailJob('goalUpdated', {
-                to: recipients,
-                shortId: _shortId,
-                title: actualGoal.title,
-                updatedFields,
-                author: ctx.session.user.name || ctx.session.user.email,
-                authorEmail: ctx.session.user.email,
-            });
+                updatedFields.description = [actualGoal.description, input.description];
+            }
+
+            if (tagsToConnect.length || tagsToDisconnect.length) {
+                const prevIds = actualGoal.tags.map(({ id }) => id).join(goalHistorySeparator);
+                const nextIds = input.tags.map(({ id }) => id).join(goalHistorySeparator);
+
+                history.push({
+                    subject: 'tags',
+                    action: 'change',
+                    previousValue: prevIds.length ? prevIds : null,
+                    nextValue: nextIds.length ? nextIds : null,
+                });
+            }
+
+            if (actualGoal.priority !== input.priority) {
+                history.push({
+                    subject: 'priority',
+                    action: 'change',
+                    previousValue: actualGoal.priority,
+                    nextValue: input.priority,
+                });
+
+                updatedFields.priority = [actualGoal.priority, input.priority];
+            }
 
             if (actualGoal.ownerId !== input.owner.id) {
-                await Promise.all([
-                    createEmailJob('goalUnassigned', {
-                        to: [actualGoal.owner?.user?.email],
-                        shortId: _shortId,
-                        title: actualGoal.title,
-                        author: ctx.session.user.name || ctx.session.user.email,
-                        authorEmail: ctx.session.user.email,
-                    }),
-                    createEmailJob('goalAssigned', {
-                        to: [input.owner.user.email],
-                        shortId: _shortId,
-                        title: actualGoal.title,
-                        author: ctx.session.user.name || ctx.session.user.email,
-                        authorEmail: ctx.session.user.email,
-                    }),
-                ]);
+                history.push({
+                    subject: 'owner',
+                    action: 'change',
+                    previousValue: actualGoal.ownerId,
+                    nextValue: input.owner.id,
+                });
             }
 
-            return {
-                ...goal,
-                ...addCalclulatedGoalsFields(goal, activityId, role),
-                _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
-                _activityFeed: [],
-            };
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
+            if (Number(estimate) !== Number(actualGoal.estimate) || estimateType !== actualGoal.estimateType) {
+                const prevHistoryEstimate = actualGoal.estimate
+                    ? encodeHistoryEstimate(actualGoal.estimate, actualGoal.estimateType ?? 'Strict')
+                    : null;
+                const nextHistoryEstimate = estimate ? encodeHistoryEstimate(estimate, estimateType ?? 'Strict') : null;
+
+                history.push({
+                    subject: 'estimate',
+                    action: 'change',
+                    previousValue: prevHistoryEstimate,
+                    nextValue: nextHistoryEstimate,
+                });
+
+                const prevFormatedEstimate = actualGoal.estimate
+                    ? formateEstimate(actualGoal.estimate, { locale: 'en', type: actualGoal.estimateType ?? 'Strict' })
+                    : null;
+                const nextFormatedEstimate = estimate
+                    ? formateEstimate(estimate, { locale: 'en', type: estimateType ?? 'Strict' })
+                    : null;
+
+                // FIXME: https://github.com/taskany-inc/issues/issues/1359
+                updatedFields.estimate = [prevFormatedEstimate, nextFormatedEstimate];
+            }
+
+            try {
+                const goal = await prisma.goal.update({
+                    where: { id: actualGoal.id },
+                    data: {
+                        ownerId: input.owner?.id,
+                        title: input.title,
+                        description: input.description,
+                        stateId: input.state?.id,
+                        priority: input.priority,
+                        estimate,
+                        estimateType,
+                        tags: {
+                            connect: tagsToConnect.map(({ id }) => ({ id })),
+                            disconnect: tagsToDisconnect.map(({ id }) => ({ id })),
+                        },
+                        history: {
+                            createMany: {
+                                data: history.map((record) => ({ ...record, activityId })),
+                            },
+                        },
+                        goalAsCriteria: actualGoal.goalAsCriteria
+                            ? {
+                                  update: {
+                                      isDone: input.state.type === StateType.Completed,
+                                  },
+                              }
+                            : undefined,
+                    },
+                    include: {
+                        ...goalDeepQuery,
+                        goalAsCriteria: true,
+                    },
+                });
+                await updateProjectUpdatedAt(actualGoal?.projectId);
+
+                if (goal.goalAsCriteria) {
+                    await updateGoalWithCalculatedWeight(goal.goalAsCriteria.goalId);
+                }
+
+                const recipients = Array.from(
+                    new Set(
+                        [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
+                            .filter(Boolean)
+                            .map((r) => r.user?.email),
+                    ),
+                );
+
+                await createEmailJob('goalUpdated', {
+                    to: recipients,
+                    shortId: _shortId,
+                    title: actualGoal.title,
+                    updatedFields,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
+                });
+
+                if (actualGoal.ownerId !== input.owner.id) {
+                    await Promise.all([
+                        createEmailJob('goalUnassigned', {
+                            to: [actualGoal.owner?.user?.email],
+                            shortId: _shortId,
+                            title: actualGoal.title,
+                            author: ctx.session.user.name || ctx.session.user.email,
+                            authorEmail: ctx.session.user.email,
+                        }),
+                        createEmailJob('goalAssigned', {
+                            to: [input.owner.user.email],
+                            shortId: _shortId,
+                            title: actualGoal.title,
+                            author: ctx.session.user.name || ctx.session.user.email,
+                            authorEmail: ctx.session.user.email,
+                        }),
+                    ]);
+                }
+
+                return {
+                    ...goal,
+                    ...addCalclulatedGoalsFields(goal, activityId, role),
+                    _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
+                    _activityFeed: [],
+                };
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
     toggleStargizer: protectedProcedure
         .input(ToggleSubscriptionSchema)
         .mutation(({ ctx, input: { id, direction } }) => {
@@ -550,6 +552,7 @@ export const goal = router({
     }),
     toggleArchive: protectedProcedure
         .input(toggleGoalArchiveSchema)
+        .use(goalAccessMiddleware)
         .mutation(async ({ input: { id, archived }, ctx }) => {
             const { activityId, role } = ctx.session.user;
 
@@ -572,11 +575,7 @@ export const goal = router({
                 return null;
             }
 
-            const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
-
-            if (!_isEditable) {
-                return null;
-            }
+            const { _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
 
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -620,119 +619,118 @@ export const goal = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
         }),
-    switchState: protectedProcedure.input(goalStateChangeSchema).mutation(async ({ input, ctx }) => {
-        const { activityId, role } = ctx.session.user;
+    switchState: protectedProcedure
+        .input(goalStateChangeSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            const { activityId, role } = ctx.session.user;
 
-        const actualGoal = await prisma.goal.findFirst({
-            where: {
-                id: input.id,
-                ...nonArchievedGoalsPartialQuery,
-            },
-            include: {
-                participants: { include: { user: true, ghost: true } },
-                watchers: { include: { user: true, ghost: true } },
-                activity: { include: { user: true, ghost: true } },
-                owner: { include: { user: true, ghost: true } },
-                state: true,
-                goalAsCriteria: true,
-                project: true,
-            },
-        });
-
-        if (!actualGoal) {
-            return null;
-        }
-
-        await updateProjectUpdatedAt(actualGoal.projectId);
-
-        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
-
-        if (!_isEditable) {
-            return null;
-        }
-
-        const promises: Promise<any>[] = [
-            prisma.goal.update({
+            const actualGoal = await prisma.goal.findFirst({
                 where: {
                     id: input.id,
-                },
-                data: {
-                    id: input.id,
-                    stateId: input.state.id,
-                    history: {
-                        create: {
-                            subject: 'state',
-                            action: 'change',
-                            previousValue: actualGoal.stateId,
-                            nextValue: input.state.id,
-                            activityId,
-                        },
-                    },
-                    goalAsCriteria: actualGoal.goalAsCriteria
-                        ? {
-                              update: {
-                                  isDone: input.state.type === StateType.Completed,
-                              },
-                          }
-                        : undefined,
+                    ...nonArchievedGoalsPartialQuery,
                 },
                 include: {
-                    goalAsCriteria: true,
+                    participants: { include: { user: true, ghost: true } },
+                    watchers: { include: { user: true, ghost: true } },
+                    activity: { include: { user: true, ghost: true } },
+                    owner: { include: { user: true, ghost: true } },
                     state: true,
+                    goalAsCriteria: true,
+                    project: true,
                 },
-            }),
-        ];
-
-        // recording complete state for linked as criteria goal
-        if (actualGoal.goalAsCriteria && actualGoal.state) {
-            const earlyIsCompleted = actualGoal.state.type === StateType.Completed;
-            const nowIsCompleted = input.state.type === StateType.Completed;
-
-            if (earlyIsCompleted !== nowIsCompleted) {
-                promises.push(
-                    prisma.goalHistory.create({
-                        data: {
-                            goalId: actualGoal.goalAsCriteria.goalId,
-                            subject: 'criteria',
-                            action: nowIsCompleted ? 'complete' : 'uncomplete',
-                            nextValue: actualGoal.goalAsCriteria.id,
-                            activityId,
-                        },
-                    }),
-                );
-            }
-        }
-
-        try {
-            const [updatedGoal] = await Promise.all(promises);
-
-            if (updatedGoal.goalAsCriteria) {
-                await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
-            }
-
-            const recipients = Array.from(
-                new Set(
-                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
-                        .filter(Boolean)
-                        .map((r) => r.user?.email),
-                ),
-            );
-
-            await createEmailJob('goalStateUpdated', {
-                to: recipients,
-                shortId: _shortId,
-                stateTitleBefore: actualGoal.state?.title,
-                stateTitleAfter: updatedGoal.state?.title,
-                title: actualGoal.title,
-                author: ctx.session.user.name || ctx.session.user.email,
-                authorEmail: ctx.session.user.email,
             });
 
-            return updatedGoal;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
+            if (!actualGoal) {
+                return null;
+            }
+
+            await updateProjectUpdatedAt(actualGoal.projectId);
+
+            const { _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
+
+            const promises: Promise<any>[] = [
+                prisma.goal.update({
+                    where: {
+                        id: input.id,
+                    },
+                    data: {
+                        id: input.id,
+                        stateId: input.state.id,
+                        history: {
+                            create: {
+                                subject: 'state',
+                                action: 'change',
+                                previousValue: actualGoal.stateId,
+                                nextValue: input.state.id,
+                                activityId,
+                            },
+                        },
+                        goalAsCriteria: actualGoal.goalAsCriteria
+                            ? {
+                                  update: {
+                                      isDone: input.state.type === StateType.Completed,
+                                  },
+                              }
+                            : undefined,
+                    },
+                    include: {
+                        goalAsCriteria: true,
+                        state: true,
+                    },
+                }),
+            ];
+
+            // recording complete state for linked as criteria goal
+            if (actualGoal.goalAsCriteria && actualGoal.state) {
+                const earlyIsCompleted = actualGoal.state.type === StateType.Completed;
+                const nowIsCompleted = input.state.type === StateType.Completed;
+
+                if (earlyIsCompleted !== nowIsCompleted) {
+                    promises.push(
+                        prisma.goalHistory.create({
+                            data: {
+                                goalId: actualGoal.goalAsCriteria.goalId,
+                                subject: 'criteria',
+                                action: nowIsCompleted ? 'complete' : 'uncomplete',
+                                nextValue: actualGoal.goalAsCriteria.id,
+                                activityId,
+                            },
+                        }),
+                    );
+                }
+            }
+
+            try {
+                const [updatedGoal] = await Promise.all(promises);
+
+                if (updatedGoal.goalAsCriteria) {
+                    await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
+                }
+
+                const recipients = Array.from(
+                    new Set(
+                        [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
+                            .filter(Boolean)
+                            .map((r) => r.user?.email),
+                    ),
+                );
+
+                await createEmailJob('goalStateUpdated', {
+                    to: recipients,
+                    shortId: _shortId,
+                    stateTitleBefore: actualGoal.state?.title,
+                    stateTitleAfter: updatedGoal.state?.title,
+                    title: actualGoal.title,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
+                });
+
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
     createComment: protectedProcedure.input(goalCommentCreateSchema).mutation(async ({ ctx, input }) => {
         if (!input.goalId) return null;
 
@@ -861,118 +859,57 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
-    updateComment: protectedProcedure.input(commentEditSchema).mutation(async ({ input: { id, description } }) => {
-        try {
-            const newComment = await prisma.comment.update({
-                where: {
-                    id,
-                },
-                data: {
-                    description,
-                },
-            });
-
-            return newComment;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    deleteComment: protectedProcedure.input(z.string()).mutation(async ({ input: id }) => {
-        try {
-            const deletedComment = await prisma.comment.delete({
-                where: {
-                    id,
-                },
-            });
-
-            const actualGoal = await prisma.goal.findUnique({ where: { id: deletedComment.goalId } });
-            await updateProjectUpdatedAt(actualGoal?.projectId);
-
-            return deletedComment;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    addCriteria: protectedProcedure.input(criteriaSchema).mutation(async ({ input, ctx }) => {
-        const actualGoal = await prisma.goal.findUnique({
-            where: { id: input.goalId },
-        });
-
-        if (!actualGoal) {
-            return null;
-        }
-
-        let isDoneByConnect = false;
-
-        if (input.goalAsGriteria?.id) {
-            const connectedGoal = await prisma.goal.findUnique({
-                where: { id: input.goalAsGriteria.id },
-                include: { state: true },
-            });
-
-            isDoneByConnect = connectedGoal?.state?.type === StateType.Completed;
-        }
-
-        try {
-            const newCriteria = await prisma.goalAchieveCriteria.create({
-                data: {
-                    title: input.title,
-                    weight: Number(input.weight),
-                    isDone: isDoneByConnect,
-                    activity: {
-                        connect: {
-                            id: ctx.session.user.activityId,
-                        },
+    updateComment: protectedProcedure
+        .input(commentEditSchema)
+        .use(commentAccessMiddleware)
+        .mutation(async ({ input: { id, description } }) => {
+            try {
+                const newComment = await prisma.comment.update({
+                    where: {
+                        id,
                     },
-                    goal: {
-                        connect: { id: input.goalId },
+                    data: {
+                        description,
                     },
-                    goalAsCriteria: input.goalAsGriteria?.id
-                        ? {
-                              connect: { id: input.goalAsGriteria.id },
-                          }
-                        : undefined,
-                },
+                });
+
+                return newComment;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    deleteComment: protectedProcedure
+        .input(z.string())
+        .use(commentAccessMiddleware)
+        .mutation(async ({ input: id }) => {
+            try {
+                const deletedComment = await prisma.comment.delete({
+                    where: {
+                        id,
+                    },
+                });
+
+                const actualGoal = await prisma.goal.findUnique({ where: { id: deletedComment.goalId } });
+                await updateProjectUpdatedAt(actualGoal?.projectId);
+
+                return deletedComment;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    addCriteria: protectedProcedure
+        .input(criteriaSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            const actualGoal = await prisma.goal.findUnique({
+                where: { id: input.goalId },
             });
 
-            await prisma.goalHistory.create({
-                data: {
-                    previousValue: null,
-                    nextValue: newCriteria.id,
-                    action: 'add',
-                    subject: 'criteria',
-                    goal: {
-                        connect: {
-                            id: input.goalId,
-                        },
-                    },
-                    activity: {
-                        connect: {
-                            id: ctx.session.user.activityId,
-                        },
-                    },
-                },
-            });
-
-            await updateGoalWithCalculatedWeight(newCriteria.goalId);
-            await updateProjectUpdatedAt(actualGoal.projectId);
-
-            return newCriteria;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    updateCriteria: protectedProcedure.input(updateCriteriaSchema).mutation(async ({ input, ctx }) => {
-        const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
-            where: { id: input.id },
-        });
-
-        try {
-            if (!currentCriteria) {
-                throw Error('No current criteria');
+            if (!actualGoal) {
+                return null;
             }
 
-            let isDoneByConnect: boolean | null = null;
+            let isDoneByConnect = false;
 
             if (input.goalAsGriteria?.id) {
                 const connectedGoal = await prisma.goal.findUnique({
@@ -983,40 +920,33 @@ export const goal = router({
                 isDoneByConnect = connectedGoal?.state?.type === StateType.Completed;
             }
 
-            const updatedCriteria = await prisma.goalAchieveCriteria.create({
-                data: {
-                    title: input.title,
-                    weight: Number(input.weight),
-                    isDone: isDoneByConnect == null ? currentCriteria.isDone : isDoneByConnect,
-                    activity: {
-                        connect: {
-                            id: ctx.session.user.activityId,
+            try {
+                const newCriteria = await prisma.goalAchieveCriteria.create({
+                    data: {
+                        title: input.title,
+                        weight: Number(input.weight),
+                        isDone: isDoneByConnect,
+                        activity: {
+                            connect: {
+                                id: ctx.session.user.activityId,
+                            },
                         },
+                        goal: {
+                            connect: { id: input.goalId },
+                        },
+                        goalAsCriteria: input.goalAsGriteria?.id
+                            ? {
+                                  connect: { id: input.goalAsGriteria.id },
+                              }
+                            : undefined,
                     },
-                    goal: {
-                        connect: { id: input.goalId },
-                    },
-                    goalAsCriteria: input.goalAsGriteria?.id
-                        ? {
-                              connect: { id: input.goalAsGriteria.id },
-                          }
-                        : undefined,
-                    createdAt: currentCriteria.createdAt,
-                },
-            });
+                });
 
-            const [, , actualGoal] = await Promise.all([
-                prisma.goalAchieveCriteria.update({
-                    where: { id: currentCriteria.id },
+                await prisma.goalHistory.create({
                     data: {
-                        deleted: true,
-                    },
-                }),
-                prisma.goalHistory.create({
-                    data: {
-                        previousValue: currentCriteria.id,
-                        nextValue: updatedCriteria.id,
-                        action: 'change',
+                        previousValue: null,
+                        nextValue: newCriteria.id,
+                        action: 'add',
                         subject: 'criteria',
                         goal: {
                             connect: {
@@ -1029,226 +959,327 @@ export const goal = router({
                             },
                         },
                     },
-                }),
-                prisma.goal.findUnique({ where: { id: input.goalId } }),
-            ]);
+                });
 
-            await updateProjectUpdatedAt(actualGoal?.projectId);
+                await updateGoalWithCalculatedWeight(newCriteria.goalId);
+                await updateProjectUpdatedAt(actualGoal.projectId);
 
-            if (updatedCriteria) {
-                await updateGoalWithCalculatedWeight(updatedCriteria.goalId);
+                return newCriteria;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    updateCriteriaState: protectedProcedure.input(updateCriteriaState).mutation(async ({ input, ctx }) => {
-        const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
-            where: { id: input.id },
-        });
+        }),
+    updateCriteria: protectedProcedure
+        .input(updateCriteriaSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
+                where: { id: input.id },
+            });
 
-        try {
-            if (!currentCriteria) {
-                throw Error('No current criteria');
-            }
+            try {
+                if (!currentCriteria) {
+                    throw Error('No current criteria');
+                }
 
-            const [, , actualGoal] = await Promise.all([
-                prisma.goalAchieveCriteria.update({
-                    where: { id: input.id },
-                    data: { isDone: input.isDone },
-                }),
-                prisma.goalHistory.create({
+                let isDoneByConnect: boolean | null = null;
+
+                if (input.goalAsGriteria?.id) {
+                    const connectedGoal = await prisma.goal.findUnique({
+                        where: { id: input.goalAsGriteria.id },
+                        include: { state: true },
+                    });
+
+                    isDoneByConnect = connectedGoal?.state?.type === StateType.Completed;
+                }
+
+                const updatedCriteria = await prisma.goalAchieveCriteria.create({
                     data: {
-                        nextValue: currentCriteria.id,
-                        subject: 'criteria',
-                        action: input.isDone ? 'complete' : 'uncomplete',
-                        goal: {
-                            connect: { id: currentCriteria.goalId },
-                        },
+                        title: input.title,
+                        weight: Number(input.weight),
+                        isDone: isDoneByConnect == null ? currentCriteria.isDone : isDoneByConnect,
                         activity: {
-                            connect: { id: ctx.session.user.activityId },
+                            connect: {
+                                id: ctx.session.user.activityId,
+                            },
                         },
+                        goal: {
+                            connect: { id: input.goalId },
+                        },
+                        goalAsCriteria: input.goalAsGriteria?.id
+                            ? {
+                                  connect: { id: input.goalAsGriteria.id },
+                              }
+                            : undefined,
+                        createdAt: currentCriteria.createdAt,
                     },
-                }),
-                prisma.goal.findUnique({ where: { id: currentCriteria.goalId } }),
-            ]);
+                });
 
-            await updateProjectUpdatedAt(actualGoal?.projectId);
-
-            // update goal criteria weight
-            await updateGoalWithCalculatedWeight(currentCriteria.goalId);
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    removeCriteria: protectedProcedure.input(removeCriteria).mutation(async ({ input, ctx }) => {
-        const current = await prisma.goalAchieveCriteria.findUnique({
-            where: { id: input.id },
-        });
-
-        try {
-            if (current) {
                 const [, , actualGoal] = await Promise.all([
                     prisma.goalAchieveCriteria.update({
-                        where: { id: input.id },
+                        where: { id: currentCriteria.id },
                         data: {
                             deleted: true,
                         },
                     }),
                     prisma.goalHistory.create({
                         data: {
-                            nextValue: current.id,
+                            previousValue: currentCriteria.id,
+                            nextValue: updatedCriteria.id,
+                            action: 'change',
                             subject: 'criteria',
-                            action: 'remove',
-                            activity: {
-                                connect: { id: ctx.session.user.activityId },
-                            },
                             goal: {
-                                connect: { id: input.goalId },
+                                connect: {
+                                    id: input.goalId,
+                                },
+                            },
+                            activity: {
+                                connect: {
+                                    id: ctx.session.user.activityId,
+                                },
                             },
                         },
                     }),
                     prisma.goal.findUnique({ where: { id: input.goalId } }),
                 ]);
 
-                await updateGoalWithCalculatedWeight(current.goalId);
                 await updateProjectUpdatedAt(actualGoal?.projectId);
+
+                if (updatedCriteria) {
+                    await updateGoalWithCalculatedWeight(updatedCriteria.goalId);
+                }
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    convertCriteriaToGoal: protectedProcedure.input(convertCriteriaToGoalSchema).mutation(async ({ input }) => {
-        try {
-            const actualCriteria = await prisma.goalAchieveCriteria.findUnique({
+        }),
+    updateCriteriaState: protectedProcedure
+        .input(updateCriteriaState)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
                 where: { id: input.id },
             });
 
-            if (!actualCriteria) {
-                return null;
-            }
+            try {
+                if (!currentCriteria) {
+                    throw Error('No current criteria');
+                }
 
-            const [, actualGoal] = await Promise.all([
-                prisma.goalAchieveCriteria.update({
+                const [, , actualGoal] = await Promise.all([
+                    prisma.goalAchieveCriteria.update({
+                        where: { id: input.id },
+                        data: { isDone: input.isDone },
+                    }),
+                    prisma.goalHistory.create({
+                        data: {
+                            nextValue: currentCriteria.id,
+                            subject: 'criteria',
+                            action: input.isDone ? 'complete' : 'uncomplete',
+                            goal: {
+                                connect: { id: currentCriteria.goalId },
+                            },
+                            activity: {
+                                connect: { id: ctx.session.user.activityId },
+                            },
+                        },
+                    }),
+                    prisma.goal.findUnique({ where: { id: currentCriteria.goalId } }),
+                ]);
+
+                await updateProjectUpdatedAt(actualGoal?.projectId);
+
+                // update goal criteria weight
+                await updateGoalWithCalculatedWeight(currentCriteria.goalId);
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    removeCriteria: protectedProcedure
+        .input(removeCriteria)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            const current = await prisma.goalAchieveCriteria.findUnique({
+                where: { id: input.id },
+            });
+
+            try {
+                if (current) {
+                    const [, , actualGoal] = await Promise.all([
+                        prisma.goalAchieveCriteria.update({
+                            where: { id: input.id },
+                            data: {
+                                deleted: true,
+                            },
+                        }),
+                        prisma.goalHistory.create({
+                            data: {
+                                nextValue: current.id,
+                                subject: 'criteria',
+                                action: 'remove',
+                                activity: {
+                                    connect: { id: ctx.session.user.activityId },
+                                },
+                                goal: {
+                                    connect: { id: input.goalId },
+                                },
+                            },
+                        }),
+                        prisma.goal.findUnique({ where: { id: input.goalId } }),
+                    ]);
+
+                    await updateGoalWithCalculatedWeight(current.goalId);
+                    await updateProjectUpdatedAt(actualGoal?.projectId);
+                }
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    convertCriteriaToGoal: protectedProcedure
+        .input(convertCriteriaToGoalSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input }) => {
+            try {
+                const actualCriteria = await prisma.goalAchieveCriteria.findUnique({
+                    where: { id: input.id },
+                });
+
+                if (!actualCriteria) {
+                    return null;
+                }
+
+                const [, actualGoal] = await Promise.all([
+                    prisma.goalAchieveCriteria.update({
+                        where: { id: input.id },
+                        data: {
+                            title: input.title,
+                            goalAsCriteria: {
+                                connect: { id: input.goalAsCriteria.id },
+                            },
+                        },
+                    }),
+                    prisma.goal.findUnique({ where: { id: actualCriteria.goalId } }),
+                ]);
+                await updateProjectUpdatedAt(actualGoal?.projectId);
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    addParticipant: protectedProcedure
+        .input(toggleParticipantsSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            try {
+                const updatedGoal = await prisma.goal.update({
                     where: { id: input.id },
                     data: {
-                        title: input.title,
-                        goalAsCriteria: {
-                            connect: { id: input.goalAsCriteria.id },
+                        participants: {
+                            connect: [{ id: input.activityId }],
+                        },
+                        history: {
+                            create: {
+                                subject: 'participants',
+                                action: 'add',
+                                nextValue: input.activityId,
+                                activityId: ctx.session.user.activityId,
+                            },
                         },
                     },
-                }),
-                prisma.goal.findUnique({ where: { id: actualCriteria.goalId } }),
-            ]);
-            await updateProjectUpdatedAt(actualGoal?.projectId);
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    addParticipant: protectedProcedure.input(toggleParticipantsSchema).mutation(async ({ input, ctx }) => {
-        try {
-            const updatedGoal = await prisma.goal.update({
-                where: { id: input.id },
-                data: {
-                    participants: {
-                        connect: [{ id: input.activityId }],
-                    },
-                    history: {
-                        create: {
-                            subject: 'participants',
-                            action: 'add',
-                            nextValue: input.activityId,
-                            activityId: ctx.session.user.activityId,
+                });
+
+                await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    removeParticipant: protectedProcedure
+        .input(toggleParticipantsSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            try {
+                const updatedGoal = await prisma.goal.update({
+                    where: { id: input.id },
+                    data: {
+                        participants: {
+                            disconnect: [{ id: input.activityId }],
+                        },
+                        history: {
+                            create: {
+                                subject: 'participants',
+                                action: 'remove',
+                                nextValue: input.activityId,
+                                activityId: ctx.session.user.activityId,
+                            },
                         },
                     },
-                },
-            });
+                });
 
-            await updateProjectUpdatedAt(updatedGoal.projectId);
+                await updateProjectUpdatedAt(updatedGoal.projectId);
 
-            return updatedGoal;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    removeParticipant: protectedProcedure.input(toggleParticipantsSchema).mutation(async ({ input, ctx }) => {
-        try {
-            const updatedGoal = await prisma.goal.update({
-                where: { id: input.id },
-                data: {
-                    participants: {
-                        disconnect: [{ id: input.activityId }],
-                    },
-                    history: {
-                        create: {
-                            subject: 'participants',
-                            action: 'remove',
-                            nextValue: input.activityId,
-                            activityId: ctx.session.user.activityId,
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    addDependency: protectedProcedure
+        .input(toggleGoalDependencySchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            try {
+                const updatedGoal = await prisma.goal.update({
+                    where: { id: input.id },
+                    data: {
+                        [input.kind]: {
+                            connect: { id: input.relation?.id },
+                        },
+                        history: {
+                            create: {
+                                subject: 'dependencies',
+                                action: 'add',
+                                nextValue: input.relation.id,
+                                activityId: ctx.session.user.activityId,
+                            },
                         },
                     },
-                },
-            });
+                });
 
-            await updateProjectUpdatedAt(updatedGoal.projectId);
+                await updateProjectUpdatedAt(updatedGoal.projectId);
 
-            return updatedGoal;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    addDependency: protectedProcedure.input(toggleGoalDependencySchema).mutation(async ({ input, ctx }) => {
-        try {
-            const updatedGoal = await prisma.goal.update({
-                where: { id: input.id },
-                data: {
-                    [input.kind]: {
-                        connect: { id: input.relation?.id },
-                    },
-                    history: {
-                        create: {
-                            subject: 'dependencies',
-                            action: 'add',
-                            nextValue: input.relation.id,
-                            activityId: ctx.session.user.activityId,
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    removeDependency: protectedProcedure
+        .input(toggleGoalDependencySchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            try {
+                const updatedGoal = await prisma.goal.update({
+                    where: { id: input.id },
+                    data: {
+                        [input.kind]: {
+                            disconnect: { id: input.relation?.id },
+                        },
+                        history: {
+                            create: {
+                                subject: 'dependencies',
+                                action: 'remove',
+                                nextValue: input.relation.id,
+                                activityId: ctx.session.user.activityId,
+                            },
                         },
                     },
-                },
-            });
+                });
 
-            await updateProjectUpdatedAt(updatedGoal.projectId);
+                await updateProjectUpdatedAt(updatedGoal.projectId);
 
-            return updatedGoal;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
-    removeDependency: protectedProcedure.input(toggleGoalDependencySchema).mutation(async ({ input, ctx }) => {
-        try {
-            const updatedGoal = await prisma.goal.update({
-                where: { id: input.id },
-                data: {
-                    [input.kind]: {
-                        disconnect: { id: input.relation?.id },
-                    },
-                    history: {
-                        create: {
-                            subject: 'dependencies',
-                            action: 'remove',
-                            nextValue: input.relation.id,
-                            activityId: ctx.session.user.activityId,
-                        },
-                    },
-                },
-            });
-
-            await updateProjectUpdatedAt(updatedGoal.projectId);
-
-            return updatedGoal;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
     getListByProjectId: protectedProcedure.input(batchGoalByProjectIdSchema).query(async ({ input }) => {
         try {
             return prisma.goal.findMany({
@@ -1329,6 +1360,7 @@ export const goal = router({
                 ownerId: z.string(),
             }),
         )
+        .use(goalAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             const actualGoal = await prisma.goal.findUnique({
                 where: { id: input.id },
