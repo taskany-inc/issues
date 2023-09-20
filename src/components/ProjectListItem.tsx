@@ -53,11 +53,20 @@ export const ProjectListItem: React.FC<ProjectListItemProps & TableRowProps> = (
     align = 'center',
     justify = 'start',
     deep,
+    ...attrs
 }) => {
     const titleColumnWidth = maxTitleColumnWidth - (deep ?? 0) * collapseOffset;
 
     return (
-        <StyledTableRow className={className} gap={gap} align={align} justify={justify} onClick={onClick} interactive>
+        <StyledTableRow
+            className={className}
+            gap={gap}
+            align={align}
+            justify={justify}
+            onClick={onClick}
+            interactive
+            {...attrs}
+        >
             <TableCell width={titleColumnWidth} align="center" justify="between">
                 <Text size="l" weight="bold">
                     {title}

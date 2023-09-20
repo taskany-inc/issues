@@ -27,6 +27,7 @@ import { useProjectResource } from '../../hooks/useProjectResource';
 import { WatchButton } from '../WatchButton/WatchButton';
 import { StarButton } from '../StarButton/StarButton';
 import { routes } from '../../hooks/router';
+import { pageActiveTabItem, pageTabs } from '../../utils/domObjects';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -238,13 +239,20 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
                     </>
                 ))}
             >
-                <TabsMenu>
+                <TabsMenu {...pageTabs.attr}>
                     {tabsMenuOptions.map(([title, href, ownerOnly]) =>
-                        nullable(ownerOnly ? project?._isOwner : true, () => (
-                            <NextLink key={title} href={href} passHref legacyBehavior>
-                                <TabsMenuItem active={nextRouter.asPath.split('?')[0] === href}>{title}</TabsMenuItem>
-                            </NextLink>
-                        )),
+                        nullable(ownerOnly ? project?._isOwner : true, () => {
+                            const isActive = nextRouter.asPath.split('?')[0] === href;
+                            const activeAttrs = isActive ? pageActiveTabItem.attr : null;
+
+                            return (
+                                <NextLink key={title} href={href} passHref legacyBehavior>
+                                    <TabsMenuItem active={isActive} {...activeAttrs}>
+                                        {title}
+                                    </TabsMenuItem>
+                                </NextLink>
+                            );
+                        }),
                     )}
                 </TabsMenu>
             </CommonHeader>

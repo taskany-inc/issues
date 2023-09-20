@@ -159,17 +159,31 @@ export const CollapsableContentItem: FC<{
     className?: string;
 }> = ({ children, className }) => <StyledCollapsableItem className={className}>{children}</StyledCollapsableItem>;
 
-export const CollapsableItem: FC<{
-    children?: ReactNode;
-    onClick?: () => void;
+/**
+ * HTMLDivElement has `content` property with `string` type definition
+ * Its conflicted with custom type annotation of sane property
+ */
+interface CollapsableItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'> {
     header: ReactNode;
     content: ReactNode;
     deep?: number;
     collapsed: boolean;
     hasChild: boolean;
-}> = ({ onClick, children, header, collapsed, deep = 0, hasChild, content }) => {
+    onClick?: () => void;
+}
+
+export const CollapsableItem: FC<React.PropsWithChildren<CollapsableItemProps>> = ({
+    onClick,
+    children,
+    header,
+    collapsed,
+    deep = 0,
+    hasChild,
+    content,
+    ...attrs
+}) => {
     return (
-        <StyledCollapsableContainer collapsed={collapsed} deep={deep} hasChild={hasChild}>
+        <StyledCollapsableContainer collapsed={collapsed} deep={deep} hasChild={hasChild} {...attrs}>
             <StyledCollapsableHeader onClick={onClick}>
                 <StyledParentDot />
                 <StyledDot />

@@ -9,6 +9,7 @@ import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { CollapsableItem, CollapsableContentItem } from '../CollapsableItem';
 import { ProjectListItem } from '../ProjectListItem';
 import { WrappedRowLink } from '../WrappedRowLink';
+import { projectListItem, projectListItemTitle } from '../../utils/domObjects';
 
 const StyledGoalsListContainer = styled(Table)<{ children?: React.ReactNode }>`
     background-color: ${gray4};
@@ -75,6 +76,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
             onClick={onProjectClickHandler}
             disabled={disabled}
             deep={calculatedDeep}
+            {...projectListItemTitle.attr}
         >
             {nullable(projectChidlsLen, (c) => (
                 <StyledProjectIcons>
@@ -110,6 +112,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                 </>
             }
             deep={deep}
+            {...projectListItem.attr}
         />
     );
 };

@@ -14,6 +14,7 @@ import { trpc } from '../../utils/trpcClient';
 import { GoalCommon, goalCommonSchema } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalCreateReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
+import { goalCreateForm } from '../../utils/domObjects';
 
 import { tr } from './GoalCreateForm.i18n';
 
@@ -178,6 +179,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
                     })}
                 </Tip>
             }
+            {...goalCreateForm.attr}
         />
     );
 };
