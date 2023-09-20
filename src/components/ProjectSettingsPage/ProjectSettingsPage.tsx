@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import { ChangeEvent, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useForm, Controller } from 'react-hook-form';
@@ -25,7 +24,6 @@ import { PageSep } from '../PageSep';
 import { useRouter } from '../../hooks/router';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
-import { ProjectPageLayout } from '../ProjectPageLayout/ProjectPageLayout';
 import { Page } from '../Page';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { errorsProvider } from '../../utils/forms';
@@ -36,6 +34,8 @@ import { ProjectUpdate, projectUpdateSchema } from '../../schema/project';
 import { ActivityByIdReturnType, ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
 import { Tip } from '../Tip';
 import { TextList, TextListItem } from '../TextList';
+import { CommonHeader } from '../CommonHeader';
+import { ProjectTabsMenu } from '../ProjectTabsMenu/ProjectTabsMenu';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -182,268 +182,259 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
-            <ProjectPageLayout
-                id={project.data.id}
-                title={project.data.title}
-                description={project.data.description}
-                starred={project.data._isStarred}
-                watching={project.data._isWatching}
-                stargizers={project.data._count.stargizers}
-                owned={project.data._isOwner}
-                parent={project.data.parent}
-            >
-                <PageSep />
+            <CommonHeader title={project.data.title} description={project.data.description}>
+                <ProjectTabsMenu id={id} />
+            </CommonHeader>
 
-                <SettingsContent>
-                    <SettingsCard>
-                        <Form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
-                            <Fieldset title={tr('General')}>
-                                <FormInput
-                                    {...register('id')}
-                                    disabled
-                                    defaultValue={project.data.id}
-                                    label={tr('key')}
-                                    autoComplete="off"
-                                    flat="bottom"
-                                />
+            <PageSep />
 
-                                <FormInput
-                                    {...register('title')}
-                                    defaultValue={project.data.title}
-                                    label={tr('Title')}
-                                    autoComplete="off"
-                                    flat="bottom"
-                                    error={errorsResolver('title')}
-                                />
-
-                                <FormInput
-                                    {...register('description')}
-                                    defaultValue={project.data?.description ?? undefined}
-                                    label={tr('Description')}
-                                    flat="both"
-                                    error={errorsResolver('description')}
-                                />
-
-                                <Controller
-                                    name="parent"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <FormMultiInput
-                                            label={tr('Parent')}
-                                            query={parentQuery}
-                                            // FIXME: move filter to server
-                                            items={suggestions.data?.filter((p) => !projectParentIds.includes(p.id))}
-                                            onInput={(q) => setParentQuery(q)}
-                                            {...field}
-                                        />
-                                    )}
-                                />
-                            </Fieldset>
-
-                            <FormActions flat="top">
-                                <FormAction left />
-                                <FormAction right inline>
-                                    <Button
-                                        size="m"
-                                        view="primary"
-                                        type="submit"
-                                        disabled={!isDirty}
-                                        text={tr('Save')}
-                                        outline
-                                    />
-                                </FormAction>
-                            </FormActions>
-                        </Form>
-                    </SettingsCard>
-
-                    <SettingsCard view="warning">
-                        <Form>
-                            <Fieldset title={tr('Danger zone')} view="warning">
-                                <FormActions flat="top">
-                                    <FormAction left inline>
-                                        <Text color={gray9} style={{ paddingLeft: gapS }}>
-                                            {tr('Be careful — all data will be lost')}
-                                        </Text>
-                                    </FormAction>
-                                    <FormAction right inline>
-                                        <Button
-                                            onClick={handleDeleteProjectBtnClick}
-                                            size="m"
-                                            view="warning"
-                                            text={tr('Delete project')}
-                                        />
-                                    </FormAction>
-                                </FormActions>
-
-                                <FormActions flat="top">
-                                    <FormAction left>
-                                        <Text color={gray9} style={{ paddingLeft: gapS }}>
-                                            {tr('Transfer project to other person')}
-                                        </Text>
-                                    </FormAction>
-                                    <FormAction right inline>
-                                        <Button
-                                            onClick={dispatchModalEvent(ModalEvent.ProjectTransferModal)}
-                                            size="m"
-                                            view="warning"
-                                            text={tr('Transfer ownership')}
-                                        />
-                                    </FormAction>
-                                </FormActions>
-                            </Fieldset>
-                        </Form>
-                    </SettingsCard>
-                </SettingsContent>
-
-                <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
-                    <ModalHeader>
-                        <FormTitle color={warn0}>{tr('You are trying to delete project')}</FormTitle>
-                    </ModalHeader>
-
-                    <ModalContent>
-                        <SettingsCard view="warning">
-                            <TextList
-                                type="unordered"
-                                heading={
-                                    <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} noWrap />}>
-                                        <Text weight="bold" size="s" color={warn0}>
-                                            {tr('What happens when you delete a project')}
-                                        </Text>
-                                    </StyledTip>
-                                }
-                            >
-                                <TextListItem>
-                                    <Text size="s">{tr('All active goals will be archived')}</Text>
-                                </TextListItem>
-                                <TextListItem>
-                                    <Text size="s">{tr('Criteria as project goals will be removed')}</Text>
-                                </TextListItem>
-                                <TextListItem>
-                                    <Text size="s">
-                                        {tr(
-                                            'Criteria-affected goals will be recalculated as progress towards meeting the criteria',
-                                        )}
-                                    </Text>
-                                </TextListItem>
-                                <TextListItem>
-                                    <Text size="s">
-                                        {tr(
-                                            'For affected projects, average progress across all goals will be recalculated',
-                                        )}
-                                    </Text>
-                                </TextListItem>
-                            </TextList>
-                        </SettingsCard>
-                        <br />
-                        <Text>
-                            {tr.raw('To confirm deleting project {project} please type project key {key} below.', {
-                                project: <b key={project.data.title}>{project.data.title}</b>,
-                                key: <b key={project.data.id}>{project.data.id}</b>,
-                            })}
-                        </Text>
-
-                        <br />
-
-                        <Form>
+            <SettingsContent>
+                <SettingsCard>
+                    <Form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
+                        <Fieldset title={tr('General')}>
                             <FormInput
-                                flat="bottom"
-                                placeholder={tr('Project key')}
+                                {...register('id')}
+                                disabled
+                                defaultValue={project.data.id}
+                                label={tr('key')}
                                 autoComplete="off"
-                                onChange={onConfirmationInputChange}
+                                flat="bottom"
                             />
 
+                            <FormInput
+                                {...register('title')}
+                                defaultValue={project.data.title}
+                                label={tr('Title')}
+                                autoComplete="off"
+                                flat="bottom"
+                                error={errorsResolver('title')}
+                            />
+
+                            <FormInput
+                                {...register('description')}
+                                defaultValue={project.data?.description ?? undefined}
+                                label={tr('Description')}
+                                flat="both"
+                                error={errorsResolver('description')}
+                            />
+
+                            <Controller
+                                name="parent"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormMultiInput
+                                        label={tr('Parent')}
+                                        query={parentQuery}
+                                        // FIXME: move filter to server
+                                        items={suggestions.data?.filter((p) => !projectParentIds.includes(p.id))}
+                                        onInput={(q) => setParentQuery(q)}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </Fieldset>
+
+                        <FormActions flat="top">
+                            <FormAction left />
+                            <FormAction right inline>
+                                <Button
+                                    size="m"
+                                    view="primary"
+                                    type="submit"
+                                    disabled={!isDirty}
+                                    text={tr('Save')}
+                                    outline
+                                />
+                            </FormAction>
+                        </FormActions>
+                    </Form>
+                </SettingsCard>
+
+                <SettingsCard view="warning">
+                    <Form>
+                        <Fieldset title={tr('Danger zone')} view="warning">
                             <FormActions flat="top">
-                                <FormAction left />
+                                <FormAction left inline>
+                                    <Text color={gray9} style={{ paddingLeft: gapS }}>
+                                        {tr('Be careful — all data will be lost')}
+                                    </Text>
+                                </FormAction>
                                 <FormAction right inline>
-                                    <Button size="m" text={tr('Cancel')} onClick={onDeleteCancel} />
                                     <Button
+                                        onClick={handleDeleteProjectBtnClick}
                                         size="m"
                                         view="warning"
-                                        disabled={keyConfirmation !== project.data.id}
-                                        onClick={deleteProject(onProjectDelete)}
-                                        text={tr('Yes, delete it')}
+                                        text={tr('Delete project')}
                                     />
                                 </FormAction>
                             </FormActions>
-                        </Form>
-                    </ModalContent>
-                </ModalOnEvent>
 
-                <ModalOnEvent view="warn" event={ModalEvent.ProjectTransferModal}>
-                    <ModalHeader>
-                        <FormTitle color={warn0}>{tr('You are trying to transfer project ownership')}</FormTitle>
-                    </ModalHeader>
-
-                    <ModalContent>
-                        <Text>
-                            {tr.raw(
-                                'To confirm transfering {project} ownership please type project key {key} and select new owner below.',
-                                {
-                                    project: <b key={project.data.title}>{project.data.title}</b>,
-                                    key: <b key={project.data.id}>{project.data.id}</b>,
-                                },
-                            )}
-                        </Text>
-
-                        <br />
-
-                        <Form>
-                            <FormInput
-                                flat="bottom"
-                                placeholder={tr('Project key')}
-                                autoComplete="off"
-                                onChange={onConfirmationInputChange}
-                            />
                             <FormActions flat="top">
                                 <FormAction left>
-                                    <UserComboBox
-                                        text={tr('New project owner')}
-                                        placeholder={tr('Enter name or email')}
-                                        value={transferTo}
-                                        onChange={onTransferToChange}
-                                    />
+                                    <Text color={gray9} style={{ paddingLeft: gapS }}>
+                                        {tr('Transfer project to other person')}
+                                    </Text>
                                 </FormAction>
                                 <FormAction right inline>
-                                    <Button size="m" text={tr('Cancel')} onClick={onTransferCancel} />
                                     <Button
+                                        onClick={dispatchModalEvent(ModalEvent.ProjectTransferModal)}
                                         size="m"
                                         view="warning"
-                                        disabled={!transferTo || keyConfirmation !== project.data.id}
-                                        onClick={
-                                            transferTo
-                                                ? transferOwnership(onProjectTransferOwnership, transferTo.id)
-                                                : undefined
-                                        }
                                         text={tr('Transfer ownership')}
                                     />
                                 </FormAction>
                             </FormActions>
-                        </Form>
-                    </ModalContent>
-                </ModalOnEvent>
+                        </Fieldset>
+                    </Form>
+                </SettingsCard>
+            </SettingsContent>
 
-                <ModalOnEvent view="warn" event={ModalEvent.ProjectCannotDeleteModal}>
-                    <ModalHeader>
-                        <FormTitle color={warn0}>{tr('Cannot delete project now')}</FormTitle>
-                    </ModalHeader>
-                    <ModalContent>
-                        <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} noWrap />}>
-                            {tr('The project has child projects')}
-                        </StyledTip>
-                        <Text size="s">
-                            {tr('Before delete a project, you must move it to another project or delete')}
-                        </Text>
-                        <StyledModalActions>
-                            <Button
-                                size="m"
-                                view="warning"
-                                text={tr('Ok, got it')}
-                                onClick={dispatchModalEvent(ModalEvent.ProjectCannotDeleteModal)}
-                            />
-                        </StyledModalActions>
-                    </ModalContent>
-                </ModalOnEvent>
-            </ProjectPageLayout>
+            <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
+                <ModalHeader>
+                    <FormTitle color={warn0}>{tr('You are trying to delete project')}</FormTitle>
+                </ModalHeader>
+
+                <ModalContent>
+                    <SettingsCard view="warning">
+                        <TextList
+                            type="unordered"
+                            heading={
+                                <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} noWrap />}>
+                                    <Text weight="bold" size="s" color={warn0}>
+                                        {tr('What happens when you delete a project')}
+                                    </Text>
+                                </StyledTip>
+                            }
+                        >
+                            <TextListItem>
+                                <Text size="s">{tr('All active goals will be archived')}</Text>
+                            </TextListItem>
+                            <TextListItem>
+                                <Text size="s">{tr('Criteria as project goals will be removed')}</Text>
+                            </TextListItem>
+                            <TextListItem>
+                                <Text size="s">
+                                    {tr(
+                                        'Criteria-affected goals will be recalculated as progress towards meeting the criteria',
+                                    )}
+                                </Text>
+                            </TextListItem>
+                            <TextListItem>
+                                <Text size="s">
+                                    {tr(
+                                        'For affected projects, average progress across all goals will be recalculated',
+                                    )}
+                                </Text>
+                            </TextListItem>
+                        </TextList>
+                    </SettingsCard>
+                    <br />
+                    <Text>
+                        {tr.raw('To confirm deleting project {project} please type project key {key} below.', {
+                            project: <b key={project.data.title}>{project.data.title}</b>,
+                            key: <b key={project.data.id}>{project.data.id}</b>,
+                        })}
+                    </Text>
+
+                    <br />
+
+                    <Form>
+                        <FormInput
+                            flat="bottom"
+                            placeholder={tr('Project key')}
+                            autoComplete="off"
+                            onChange={onConfirmationInputChange}
+                        />
+
+                        <FormActions flat="top">
+                            <FormAction left />
+                            <FormAction right inline>
+                                <Button size="m" text={tr('Cancel')} onClick={onDeleteCancel} />
+                                <Button
+                                    size="m"
+                                    view="warning"
+                                    disabled={keyConfirmation !== project.data.id}
+                                    onClick={deleteProject(onProjectDelete)}
+                                    text={tr('Yes, delete it')}
+                                />
+                            </FormAction>
+                        </FormActions>
+                    </Form>
+                </ModalContent>
+            </ModalOnEvent>
+
+            <ModalOnEvent view="warn" event={ModalEvent.ProjectTransferModal}>
+                <ModalHeader>
+                    <FormTitle color={warn0}>{tr('You are trying to transfer project ownership')}</FormTitle>
+                </ModalHeader>
+
+                <ModalContent>
+                    <Text>
+                        {tr.raw(
+                            'To confirm transfering {project} ownership please type project key {key} and select new owner below.',
+                            {
+                                project: <b key={project.data.title}>{project.data.title}</b>,
+                                key: <b key={project.data.id}>{project.data.id}</b>,
+                            },
+                        )}
+                    </Text>
+
+                    <br />
+
+                    <Form>
+                        <FormInput
+                            flat="bottom"
+                            placeholder={tr('Project key')}
+                            autoComplete="off"
+                            onChange={onConfirmationInputChange}
+                        />
+                        <FormActions flat="top">
+                            <FormAction left>
+                                <UserComboBox
+                                    text={tr('New project owner')}
+                                    placeholder={tr('Enter name or email')}
+                                    value={transferTo}
+                                    onChange={onTransferToChange}
+                                />
+                            </FormAction>
+                            <FormAction right inline>
+                                <Button size="m" text={tr('Cancel')} onClick={onTransferCancel} />
+                                <Button
+                                    size="m"
+                                    view="warning"
+                                    disabled={!transferTo || keyConfirmation !== project.data.id}
+                                    onClick={
+                                        transferTo
+                                            ? transferOwnership(onProjectTransferOwnership, transferTo.id)
+                                            : undefined
+                                    }
+                                    text={tr('Transfer ownership')}
+                                />
+                            </FormAction>
+                        </FormActions>
+                    </Form>
+                </ModalContent>
+            </ModalOnEvent>
+
+            <ModalOnEvent view="warn" event={ModalEvent.ProjectCannotDeleteModal}>
+                <ModalHeader>
+                    <FormTitle color={warn0}>{tr('Cannot delete project now')}</FormTitle>
+                </ModalHeader>
+                <ModalContent>
+                    <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} noWrap />}>
+                        {tr('The project has child projects')}
+                    </StyledTip>
+                    <Text size="s">{tr('Before delete a project, you must move it to another project or delete')}</Text>
+                    <StyledModalActions>
+                        <Button
+                            size="m"
+                            view="warning"
+                            text={tr('Ok, got it')}
+                            onClick={dispatchModalEvent(ModalEvent.ProjectCannotDeleteModal)}
+                        />
+                    </StyledModalActions>
+                </ModalContent>
+            </ModalOnEvent>
         </Page>
     );
 };

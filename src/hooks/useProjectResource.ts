@@ -49,7 +49,6 @@ export const useProjectResource = (id: string) => {
     );
 
     const deleteProject = useCallback(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (cb: Callback) => async () => {
             const promise = deleteMutation.mutateAsync({ id });
 

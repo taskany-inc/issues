@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { gapM, gapS, gray6 } from '@taskany/colors';
 import { Text, nullable } from '@taskany/bricks';
 
-import { PageContent } from './Page';
+import { PageActions, PageContent } from './Page';
 
 interface CommonHeaderProps {
     title: React.ReactNode;
@@ -57,7 +57,7 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({ preTitle, title, des
                 ))}
             </StyledCommonHeaderInfo>
 
-            <div>{actions}</div>
+            <PageActions>{actions}</PageActions>
 
             {children}
         </StyledCommonHeader>

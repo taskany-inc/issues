@@ -1,28 +1,31 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-import { MouseEventHandler, useCallback, useMemo } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import NextLink from 'next/link';
-import { Button, TabsMenu, TabsMenuItem, nullable } from '@taskany/bricks';
+import { Button, nullable } from '@taskany/bricks';
 
+import { PageContent, Page } from '../Page';
+import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useFilterResource } from '../../hooks/useFilterResource';
-import { Page, PageContent } from '../Page';
-import { PageTitle } from '../PageTitle';
+import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { CommonHeader } from '../CommonHeader';
-import { ProjectListItemConnected } from '../ProjectListItemConnected';
-import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { routes } from '../../hooks/router';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
-import { refreshInterval } from '../../utils/config';
+import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { ProjectListItemConnected } from '../ProjectListItemConnected';
+import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
+import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
+import { CommonHeader } from '../CommonHeader';
+import { useProjectResource } from '../../hooks/useProjectResource';
+import { WatchButton } from '../WatchButton/WatchButton';
+import { StarButton } from '../StarButton/StarButton';
+import { ProjectTabsMenu } from '../ProjectTabsMenu/ProjectTabsMenu';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -32,8 +35,10 @@ const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteF
 
 export const projectsSize = 20;
 
-export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
+export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallback }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
+    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
+    const setCurrentProjectCacheRef = useRef(setCurrentProjectCache);
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
@@ -64,9 +69,32 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
         preset,
     });
 
-    const { setPreview, preview } = useGoalPreview();
+    const { data: project } = trpc.project.getById.useQuery(
+        {
+            id,
+            goalsQuery: queryState,
+        },
+        { enabled: Boolean(id) },
+    );
 
-    const { data, isLoading, fetchNextPage, hasNextPage } = trpc.project.getAll.useInfiniteQuery(
+    const { data: projectDeepInfo, isLoading: isLoadingDeepInfoProject } = trpc.project.getDeepInfo.useQuery(
+        {
+            id,
+            goalsQuery: queryState,
+        },
+        {
+            keepPreviousData: true,
+            staleTime: refreshInterval,
+            enabled: Boolean(id),
+        },
+    );
+
+    const {
+        data,
+        isLoading: isLoadingAllProjects,
+        fetchNextPage,
+        hasNextPage,
+    } = trpc.project.getAll.useInfiniteQuery(
         {
             limit: projectsSize,
             firstLevel: true,
@@ -76,22 +104,27 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
             getNextPageParam: (p) => p.nextCursor,
             keepPreviousData: true,
             staleTime: refreshInterval,
+            enabled: !id,
         },
     );
 
-    const pages = useMemo(() => data?.pages || [], [data?.pages]);
-    const projects = pages?.[0]?.projects;
+    const [pages, projects] = useMemo(() => {
+        const pgs = data?.pages || [];
+        return [pgs, pgs[0]?.projects];
+    }, [data?.pages]);
 
     const projectsOnScreen = useMemo(
         () =>
-            pages.reduce<typeof projects>((acc, cur) => {
-                acc.push(...cur.projects);
-                return acc;
-            }, []),
-        [pages],
+            project
+                ? [project]
+                : pages.reduce<typeof projects>((acc, cur) => {
+                      acc.push(...cur.projects);
+                      return acc;
+                  }, []),
+        [pages, project],
     );
 
-    const tabsMenuOptions: Array<[string, string]> = [[tr('Goals'), routes.projects()]];
+    const { preview, setPreview } = useGoalPreview();
 
     const onGoalPrewiewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
@@ -105,6 +138,21 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
     );
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
+
+    useEffect(() => {
+        if (!project) return;
+
+        setCurrentProjectCacheRef.current({
+            id: project.id,
+            title: project.title,
+            description: project.description ?? undefined,
+            flowId: project.flowId,
+        });
+    }, [project]);
+
+    useWillUnmount(() => {
+        setCurrentProjectCache(null);
+    });
 
     const onFilterStar = useCallback(async () => {
         if (currentPreset) {
@@ -141,48 +189,58 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
         [nextRouter],
     );
 
-    const defaultTitle = <PageTitle title={tr('Projects')} />;
-    const presetInfo =
-        user.activityId !== currentPreset?.activityId && currentPreset?.activityId
-            ? `${tr('created by')} ${currentPreset?.activity?.user?.name}`
-            : undefined;
-    const presetTitle = <PageTitle title={tr('Projects')} subtitle={currentPreset?.title} info={presetInfo} />;
+    const pageTitle = project?.title
+        ? tr
+              .raw('title', {
+                  project: project?.title,
+              })
+              .join('')
+        : tr('projects title');
 
-    const onShadowPresetTitleClick = useCallback(() => {
-        if (shadowPreset) setPreset(shadowPreset.id);
-    }, [setPreset, shadowPreset]);
-
-    const shadowPresetInfo =
-        user.activityId !== shadowPreset?.activityId && shadowPreset?.activityId
-            ? `${tr('created by')} ${shadowPreset?.activity?.user?.name}`
-            : undefined;
-    const shadowPresetTitle = (
-        <PageTitle
-            title={tr('Projects')}
-            subtitle={shadowPreset?.title}
-            info={shadowPresetInfo}
-            onClick={onShadowPresetTitleClick}
+    const title = (
+        <PageTitlePreset
+            activityId={user.activityId}
+            currentPresetActivityId={currentPreset?.activityId}
+            currentPresetActivityUserName={currentPreset?.activity?.user?.name}
+            currentPresetTitle={currentPreset?.title}
+            shadowPresetActivityId={shadowPreset?.activityId}
+            shadowPresetActivityUserName={shadowPreset?.activity?.user?.name}
+            shadowPresetId={shadowPreset?.id}
+            shadowPresetTitle={shadowPreset?.title}
+            title={project?.title || tr('Projects')}
+            setPreset={setPreset}
         />
     );
+    const description =
+        currentPreset && currentPreset.description
+            ? currentPreset.description
+            : project?.description || tr('description');
 
-    // eslint-disable-next-line no-nested-ternary
-    const title = currentPreset ? presetTitle : shadowPreset ? shadowPresetTitle : defaultTitle;
-    const description = currentPreset && currentPreset.description ? currentPreset.description : tr('description');
+    const { toggleProjectWatching, toggleProjectStar } = useProjectResource(id);
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={tr('title')}>
-            <CommonHeader title={title} description={description}>
-                <TabsMenu>
-                    {tabsMenuOptions.map(([title, href]) => (
-                        <NextLink key={title} href={href} passHref legacyBehavior>
-                            <TabsMenuItem active={nextRouter.asPath.split('?')[0] === href}>{title}</TabsMenuItem>
-                        </NextLink>
-                    ))}
-                </TabsMenu>
+        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
+            <CommonHeader
+                title={title}
+                description={description}
+                actions={nullable(id, () => (
+                    <>
+                        <WatchButton watcher={project?._isWatching} onToggle={toggleProjectWatching} />
+                        <StarButton
+                            stargizer={project?._isStarred}
+                            count={project?._count.stargizers}
+                            onToggle={toggleProjectStar}
+                        />
+                    </>
+                ))}
+            >
+                <ProjectTabsMenu id={id} />
             </CommonHeader>
 
             <FiltersPanel
-                loading={isLoading}
+                total={projectDeepInfo?.meta?.count}
+                counter={projectDeepInfo?.goals?.length}
+                loading={id ? isLoadingDeepInfoProject : isLoadingAllProjects}
                 queryState={queryState}
                 queryString={queryString}
                 preset={currentPreset}
@@ -215,8 +273,8 @@ export const ProjectsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalP
                         onClickProvider={onGoalPrewiewShow}
                         selectedResolver={selectedGoalResolver}
                         queryState={queryState}
-                        collapsed
-                        hasLink
+                        collapsed={!id}
+                        hasLink={!id}
                     />
                 ))}
 
