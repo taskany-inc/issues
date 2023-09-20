@@ -1,4 +1,5 @@
 import { FC, MouseEventHandler, useState, useMemo, useCallback } from 'react';
+import { nullable } from '@taskany/bricks';
 
 import { GoalByIdReturnType, ProjectByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';
@@ -8,6 +9,7 @@ import { routes } from '../hooks/router';
 
 import { ProjectListItemCollapsable } from './ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { GoalListItem } from './GoalListItem';
+import { InlineCreateGoalControl } from './InlineCreateGoalControl/InlineCreateGoalControl';
 
 export const ProjectListItemConnected: FC<{
     project: NonNullable<ProjectByIdReturnType>;
@@ -93,6 +95,9 @@ export const ProjectListItemConnected: FC<{
             deep={deep}
             contentHidden={contentHidden}
         >
+            {nullable(!projectDeepInfo?.goals.length, () => (
+                <InlineCreateGoalControl projectId={project.id} />
+            ))}
             {childrenProjects.map((p) => (
                 <ProjectListItemConnected
                     key={p.id}
