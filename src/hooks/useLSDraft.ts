@@ -25,7 +25,10 @@ function useLSDraft<KDG extends DraftGoalCommentKey>(storageKey: KDG, initialVal
     const removeDraft = useCallback(
         (id: string) => {
             setDraft((prev) => {
-                delete prev[id];
+                if (prev[id]) {
+                    delete prev[id];
+                    return { ...prev };
+                }
                 return prev;
             });
         },

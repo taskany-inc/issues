@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { gapM, gray7 } from '@taskany/colors';
@@ -19,16 +19,11 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { WatchButton } from '../WatchButton/WatchButton';
 import { useGoalResource } from '../../hooks/useGoalResource';
-import { useGoalCommentsActions } from '../../hooks/useGoalCommentsActions';
-import { useCriteriaResource } from '../../hooks/useCriteriaResource';
-import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
 import { useRouter } from '../../hooks/router';
 import { StarButton } from '../StarButton/StarButton';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { trpc } from '../../utils/trpcClient';
-import { GoalStateChangeSchema, GoalUpdate } from '../../schema/goal';
 import { refreshInterval } from '../../utils/config';
-import { notifyPromise } from '../../utils/notifyPromise';
 import { ActivityByIdReturnType, GoalAchiveCriteria, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { GoalActivity } from '../GoalActivity';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
@@ -47,8 +42,8 @@ import { CommentView } from '../CommentView/CommentView';
 import { ModalContext } from '../ModalOnEvent';
 import { useFMPMetric } from '../../utils/telemetry';
 import { TagComboBox } from '../TagComboBox';
-import { useGoalUpdate } from '../../hooks/useGoalUpdate';
 import { AddCriteriaForm } from '../CriteriaForm/CriteriaForm';
+import { GoalUpdate } from '../../schema/goal';
 
 import { tr } from './GoalPage.i18n';
 
@@ -125,8 +120,6 @@ const tagsLimit = 5;
 export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
 
-    const utils = trpc.useContext();
-
     const { data: goal } = trpc.goal.getById.useQuery(id, {
         staleTime: refreshInterval,
     });
@@ -134,8 +127,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     useFMPMetric(!!goal);
 
     const { project, activity: issuer, owner } = goal || {};
-
-    const [currentOwner, setCurrentOwner] = useState(owner?.user);
 
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     useEffect(() => {
@@ -146,116 +137,91 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         setCurrentProjectCache(null);
     });
 
-    const { toggleGoalWatching, toggleGoalStar } = useGoalResource(goal?.id, goal?._shortId);
-
-    const invalidateFn = useCallback(() => {
-        return utils.goal.getById.invalidate(id);
-    }, [id, utils.goal.getById]);
-
-    const stateMutation = trpc.goal.switchState.useMutation();
-    const onGoalStateChange = useCallback(
-        async (nextState: GoalStateChangeSchema['state']) => {
-            if (goal) {
-                await stateMutation.mutateAsync({
-                    state: nextState,
-                    id: goal.id,
-                });
-                invalidateFn();
-            }
+    const {
+        goalProjectChange,
+        onGoalDelete,
+        onGoalStateChange,
+        onGoalWatchingToggle,
+        onGoalStarToggle,
+        goalUpdate,
+        invalidate,
+        onGoalCriteriaAdd,
+        onGoalCriteriaToggle,
+        onGoalCriteriaUpdate,
+        onGoalCriteriaRemove,
+        onGoalCriteriaConvert,
+        resolveGoalCommentDraft,
+        onGoalCommentChange,
+        onGoalCommentCreate,
+        onGoalCommentUpdate,
+        onGoalCommentCancel,
+        onGoalCommentReactionToggle,
+        onGoalCommentDelete,
+        onGoalParticipantAdd,
+        onGoalParticipantRemove,
+        onGoalDependencyAdd,
+        onGoalDependencyRemove,
+        lastStateComment,
+        highlightCommentId,
+    } = useGoalResource(
+        {
+            id: goal?.id,
+            stateId: goal?.stateId,
+            reactions: goal?.reactions,
+            comments: goal?.comments,
         },
-        [goal, invalidateFn, stateMutation],
+        {
+            invalidate: {
+                getById: id,
+            },
+        },
     );
-    const update = useGoalUpdate(goal?.id);
+
     const onTagAdd = useCallback(
         async (value: TagObject[]) => {
-            if (goal && goal.project) {
-                await update({
-                    ...(goal as unknown as GoalUpdate),
-                    parent: goal.project,
-                    tags: [...goal.tags, ...value],
-                });
-                invalidateFn();
-            }
-        },
-        [goal, invalidateFn, update],
-    );
+            if (!goal || !goal.project) return;
 
-    const addParticipantMutation = trpc.goal.addParticipant.useMutation();
-    const onParticipantAdd = useCallback(
-        async (activity?: ActivityByIdReturnType) => {
-            if (activity && goal) {
-                await addParticipantMutation.mutateAsync({ id: goal.id, activityId: activity.id });
-                invalidateFn();
-            }
-        },
-        [goal, invalidateFn, addParticipantMutation],
-    );
+            // FIXME: https://github.com/taskany-inc/issues/issues/1635
+            await goalUpdate({
+                ...(goal as unknown as GoalUpdate),
+                parent: goal.project,
+                tags: [...goal.tags, ...value],
+            });
 
+            invalidate();
+        },
+        [goal, invalidate, goalUpdate],
+    );
     const onAssigneeChange = useCallback(
         async (activity?: NonNullable<ActivityByIdReturnType>) => {
-            if (goal && activity?.user && goal.project) {
-                setCurrentOwner(activity.user);
-                try {
-                    await update({
-                        ...(goal as unknown as GoalUpdate),
-                        parent: goal.project,
-                    });
-                    invalidateFn();
-                } catch (error: any) {
-                    setCurrentOwner(currentOwner);
-                }
-            }
+            if (!goal || !activity?.user || !goal.project) return;
+
+            // FIXME: https://github.com/taskany-inc/issues/issues/1635
+            await goalUpdate({
+                ...(goal as unknown as GoalUpdate),
+                parent: goal.project,
+            });
+
+            invalidate();
         },
-        [currentOwner, goal, invalidateFn, update],
+        [goal, invalidate, goalUpdate],
     );
 
-    const removeParticipantMutation = trpc.goal.removeParticipant.useMutation();
-    const onParticipantRemove = useCallback(
-        (activityId?: string | null) => async () => {
-            if (goal && activityId) {
-                await removeParticipantMutation.mutateAsync({ id: goal.id, activityId });
-                invalidateFn();
-            }
-        },
-        [goal, invalidateFn, removeParticipantMutation],
-    );
-
-    const onGoalEdit = useCallback(() => {
-        dispatchModalEvent(ModalEvent.GoalEditModal)();
-        invalidateFn();
-    }, [invalidateFn]);
-
-    const toggleArchiveMutation = trpc.goal.toggleArchive.useMutation();
     const onGoalDeleteConfirm = useCallback(async () => {
-        const promise = toggleArchiveMutation.mutateAsync({
-            id,
-            archived: true,
-        });
-
-        notifyPromise(promise, 'goalsDelete');
-
-        await promise;
-
+        onGoalDelete();
         router.goals();
-    }, [id, router, toggleArchiveMutation]);
+    }, [onGoalDelete, router]);
 
-    const changeProjectMutation = trpc.goal.changeProject.useMutation();
     const onGoalTransfer = useCallback(
         async (project?: { id: string }) => {
-            if (project && goal) {
-                const promise = changeProjectMutation.mutateAsync({
-                    id: goal?.id,
-                    projectId: project.id,
-                });
+            if (!project) return;
 
-                await notifyPromise(promise, 'goalsUpdate');
-
-                const transferedGoal = await promise;
-
-                if (transferedGoal) router.goal(transferedGoal._shortId);
+            const transferedGoal = await goalProjectChange(project.id);
+            if (transferedGoal) {
+                router.goal(transferedGoal._shortId);
             }
         },
-        [goal, changeProjectMutation, router],
+        [goalProjectChange, router],
     );
 
     const pageTitle = tr
@@ -263,9 +229,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
             goal: goal?.title,
         })
         .join('');
-
-    const criteria = useCriteriaResource(invalidateFn);
-    const dependency = useGoalDependencyResource(invalidateFn);
 
     const { setPreview } = useGoalPreview();
 
@@ -298,26 +261,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         [setPreview],
     );
 
-    const {
-        highlightCommentId,
-        lastStateComment,
-        resolveCommentDraft,
-        onCommentChange,
-        onCommentCreate,
-        onCommentUpdate,
-        onCommentDelete,
-        onCommentCancel,
-        onCommentReactionToggle,
-    } = useGoalCommentsActions({
-        id: goal?.id,
-        shortId: goal?._shortId,
-        stateId: goal?.stateId,
-        reactions: goal?.reactions,
-        comments: goal?.comments,
-        cb: invalidateFn,
-    });
-
-    const commentDraft = resolveCommentDraft();
+    const commentDraft = resolveGoalCommentDraft(goal?.id);
     const commentsRef = useRef<HTMLDivElement>(null);
     const onCommentsClick = useCallback(() => {
         commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -359,11 +303,11 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                 <StyledIssueInfo align="right">
                     <PageActions>
-                        <WatchButton watcher={!!goal._isWatching} onToggle={toggleGoalWatching} />
+                        <WatchButton watcher={!!goal._isWatching} onToggle={onGoalWatchingToggle} />
                         <StarButton
                             stargizer={!!goal._isStarred}
                             count={goal._count?.stargizers}
-                            onToggle={toggleGoalStar}
+                            onToggle={onGoalStarToggle}
                         />
                     </PageActions>
 
@@ -412,12 +356,12 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                         <GoalCriteria
                                             goalId={id}
                                             criteriaList={goalAchiveCriteria}
-                                            onAddCriteria={criteria.onAddHandler}
-                                            onToggleCriteria={criteria.onToggleHandler}
-                                            onRemoveCriteria={criteria.onRemoveHandler}
-                                            onConvertToGoal={criteria.onConvertCriteria}
+                                            onAddCriteria={onGoalCriteriaAdd}
+                                            onToggleCriteria={onGoalCriteriaToggle}
+                                            onRemoveCriteria={onGoalCriteriaRemove}
+                                            onConvertToGoal={onGoalCriteriaConvert}
+                                            onUpdateCriteria={onGoalCriteriaUpdate}
                                             onClick={onGoalCriteriaClick}
-                                            onUpdateCriteria={criteria.onUpdateHandler}
                                             canEdit={_isEditable}
                                             renderTrigger={(props) =>
                                                 nullable(_isEditable, () => (
@@ -440,12 +384,12 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                                 kind={deps.kind}
                                                 items={deps.goals}
                                                 canEdit={_isEditable}
-                                                onRemove={dependency.onRemoveHandler}
+                                                onRemove={onGoalDependencyRemove}
                                                 onClick={onGoalDependencyClick}
                                             >
                                                 {nullable(_isEditable, () => (
                                                     <GoalDependencyAddForm
-                                                        onSubmit={dependency.onAddHandler}
+                                                        onSubmit={onGoalDependencyAdd}
                                                         kind={deps.kind}
                                                         goalId={id}
                                                         isEmpty={deps.goals.length === 0}
@@ -466,11 +410,11 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                             reactions={value.reactions}
                                             onSubmit={
                                                 value.activity?.id === user?.activityId
-                                                    ? onCommentUpdate(value.id)
+                                                    ? onGoalCommentUpdate(value.id)
                                                     : undefined
                                             }
-                                            onReactionToggle={onCommentReactionToggle(value.id)}
-                                            onDelete={onCommentDelete(value.id)}
+                                            onReactionToggle={onGoalCommentReactionToggle(value.id)}
+                                            onDelete={onGoalCommentDelete(value.id)}
                                         />
                                     ))}
                                 </>
@@ -480,9 +424,9 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     states={_isEditable ? project?.flow.states : undefined}
                                     stateId={commentDraft?.stateId}
                                     description={commentDraft?.description}
-                                    onSubmit={onCommentCreate}
-                                    onCancel={onCommentCancel}
-                                    onChange={onCommentChange}
+                                    onSubmit={onGoalCommentCreate}
+                                    onCancel={onGoalCommentCancel}
+                                    onChange={onGoalCommentChange}
                                 />
                             }
                             renderCommentItem={(value) => (
@@ -495,10 +439,12 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     highlight={value.id === highlightCommentId}
                                     reactions={value.reactions}
                                     onSubmit={
-                                        value.activity?.id === user?.activityId ? onCommentUpdate(value.id) : undefined
+                                        value.activity?.id === user?.activityId
+                                            ? onGoalCommentUpdate(value.id)
+                                            : undefined
                                     }
-                                    onReactionToggle={onCommentReactionToggle(value.id)}
-                                    onDelete={onCommentDelete(value.id)}
+                                    onReactionToggle={onGoalCommentReactionToggle(value.id)}
+                                    onDelete={onGoalCommentDelete(value.id)}
                                 />
                             )}
                         />
@@ -519,7 +465,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                 onChange={onAssigneeChange}
                                 renderTrigger={(props) => (
                                     <StyledInlineUserInput>
-                                        <UserBadge user={currentOwner} />
+                                        <UserBadge user={owner?.user} />
                                         <StyledIconEditOutline size="xxs" onClick={props.onClick} />
                                     </StyledInlineUserInput>
                                 )}
@@ -535,7 +481,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                 key={user?.activityId}
                                 user={user}
                                 onCleanButtonClick={
-                                    goal._isEditable ? onParticipantRemove(user?.activityId) : undefined
+                                    goal._isEditable ? onGoalParticipantRemove(user?.activityId) : undefined
                                 }
                             />
                         ))}
@@ -546,7 +492,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     placement="bottom-start"
                                     placeholder={tr('Type user name or email')}
                                     filter={participantsFilter}
-                                    onChange={onParticipantAdd}
+                                    onChange={onGoalParticipantAdd}
                                     renderTrigger={(props) => (
                                         <StyledInlineTrigger
                                             icon={<IconPlusCircleOutline noWrap size="xs" />}
@@ -614,7 +560,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
             {nullable(goal._isEditable, () => (
                 <ModalOnEvent event={ModalEvent.GoalEditModal} hotkeys={editGoalKeys}>
-                    <GoalEditForm goal={goal} onSubmit={onGoalEdit} />
+                    <GoalEditForm goal={goal} onSubmit={dispatchModalEvent(ModalEvent.GoalEditModal)} />
                 </ModalOnEvent>
             ))}
 
