@@ -141,4 +141,7 @@ export const user = router({
 
         return prisma.settings.update({ where: { id: activity?.settingsId }, data: input });
     }),
+    getUserByNickname: protectedProcedure.input(z.string()).mutation(async ({ input }) => {
+        return prisma.user.findFirst({ where: { nickname: input } });
+    }),
 });

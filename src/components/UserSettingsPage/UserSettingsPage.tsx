@@ -8,6 +8,7 @@ import { signOut } from 'next-auth/react';
 import { gray10 } from '@taskany/colors';
 import { Button, Fieldset, Form, FormInput, FormAction, FormActions, FormRadio, FormRadioInput } from '@taskany/bricks';
 import { IconBulbOnOutline } from '@taskany/icons';
+import { z } from 'zod';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { shallowEqual } from '../../utils/shallowEqual';
@@ -30,10 +31,31 @@ const StyledLabel = styled.label`
     background-color: transparent;
 `;
 
+const patchUserSchemeWithAsyncValidate = (validityFn: (val: string) => Promise<boolean>) => {
+    return updateUserSchema.merge(
+        z.object({
+            nickname: updateUserSchema.shape.nickname.refine(
+                async (val: string | null) => {
+                    if (!val) {
+                        return true;
+                    }
+
+                    const res = await validityFn(val.trim());
+
+                    return !!res;
+                },
+                {
+                    message: tr('Nickname already exists'),
+                },
+            ),
+        }),
+    );
+};
 export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const settings = trpc.user.settings.useQuery();
     const updateMutation = trpc.user.update.useMutation();
     const updateSettingsMutation = trpc.user.updateSettings.useMutation();
+    const getUserByNicknameMutation = trpc.user.getUserByNickname.useMutation();
     const utils = trpc.useContext();
 
     const [actualUserFields, setActualUserFields] = useState({
@@ -42,8 +64,16 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
     });
     const [generalFormChanged, setGeneralFormChanged] = useState(false);
 
+    const validateNicknameAsync = useCallback(
+        async (val: string) => {
+            const result = await getUserByNicknameMutation.mutateAsync(val);
+            return !result;
+        },
+        [getUserByNicknameMutation],
+    );
+
     const generalForm = useForm<UpdateUser>({
-        resolver: zodResolver(updateUserSchema),
+        resolver: zodResolver(patchUserSchemeWithAsyncValidate(validateNicknameAsync)),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
