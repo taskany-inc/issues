@@ -1,11 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { nullable, Button, Table } from '@taskany/bricks';
-import { gapSm } from '@taskany/colors';
-import { IconPlusCircleOutline } from '@taskany/icons';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -23,19 +20,15 @@ import { trpc } from '../../utils/trpcClient';
 import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { InlineTrigger } from '../InlineTrigger';
 import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
+import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
 
 import { tr } from './DashboardPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
-
-const StyledInlineTriggerWrapper = styled.div`
-    padding-left: ${gapSm};
-`;
 
 export const projectsLimit = 5;
 
@@ -204,17 +197,9 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                                         onTagClick={setTagsFilterOutside}
                                         project={group.project}
                                     />
-                                    {!group.goals.length && (
-                                        <StyledInlineTriggerWrapper>
-                                            <InlineTrigger
-                                                text={tr('Create goal')}
-                                                onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, {
-                                                    id: group.project.id,
-                                                })}
-                                                icon={<IconPlusCircleOutline noWrap size="s" />}
-                                            />
-                                        </StyledInlineTriggerWrapper>
-                                    )}
+                                    {nullable(!group.goals.length, () => (
+                                        <InlineCreateGoalControl projectId={group.project.id} />
+                                    ))}
                                 </React.Fragment>
                             ),
                     )}
