@@ -19,6 +19,7 @@
     "build:worker": "tsc -p ./src/utils/worker",
     "build:analyze": "ANALYZE=true next build",
     "test": "jest",
+    "cy:open": "ELECTRON_EXTRA_LAUNCH_ARGS=--lang=en npx cypress open",
     "test:e2e": "./scripts/e2eRun.sh",
     "test:e2e:env": "./scripts/e2eEnv.sh",
     "i18n": "generate-i18n --func=tr --langs=ru,en --path='./src/{components,hooks,i18n,schema}/**/*' --getLang='./src/utils/getLang'"
