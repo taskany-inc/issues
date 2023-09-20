@@ -13,7 +13,7 @@ import {
 } from '@taskany/bricks';
 import { gapM } from '@taskany/colors';
 
-import { header } from '../../utils/domObjects';
+import { header, headerMenu, headerMenuExplore, headerMenuGoals, headerMenuProjects } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
 import { routes, useRouter } from '../../hooks/router';
 import { PageHeaderActionButton } from '../PageHeaderActionButton/PageHeaderActionButton';
@@ -36,10 +36,11 @@ export const PageHeader: FC = () => {
     const { userSettings, signIn } = useRouter();
     const { user } = usePageContext();
 
-    const links: [{ href: string; title: string; beta?: boolean }] = [
+    const links: [{ href: string; title: string; beta?: boolean; attr?: { 'data-cy': string } }] = [
         {
             href: routes.exploreTopProjects(),
             title: tr('Explore'),
+            attr: headerMenuExplore.attr,
         },
     ];
 
@@ -48,12 +49,14 @@ export const PageHeader: FC = () => {
             {
                 href: routes.goals(),
                 title: tr('Goals'),
+                attr: headerMenuGoals.attr,
                 beta: true,
             },
             {
                 href: routes.projects(),
                 title: tr('Projects'),
                 beta: true,
+                attr: headerMenuProjects.attr,
             },
         );
     }
@@ -73,10 +76,10 @@ export const PageHeader: FC = () => {
                 </HeaderMenu>
             }
             nav={
-                <StyledHeaderNav>
-                    {links.map(({ href, title, beta }) => (
+                <StyledHeaderNav {...headerMenu.attr}>
+                    {links.map(({ href, title, beta, attr }) => (
                         <NextLink href={href} passHref key={href} legacyBehavior>
-                            <HeaderNavLink>
+                            <HeaderNavLink {...attr}>
                                 {title}{' '}
                                 {nullable(beta, () => (
                                     <BetaBadge />

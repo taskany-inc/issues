@@ -29,12 +29,13 @@ import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { HelpButton } from '../HelpButton/HelpButton';
+import { goalProjectSelectControl } from '../../utils/domObjects';
 
 import { GoalFormEstimate } from './GoalFormEstimate';
 import { tr } from './GoalForm.i18n';
 
 const tagsLimit = 5;
-interface GoalFormProps {
+interface GoalFormProps extends React.HTMLAttributes<HTMLDivElement> {
     actionButton: React.ReactNode;
     owner?: ActivityByIdReturnType;
     title?: string;
@@ -70,6 +71,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     actionButton,
     tip,
     onSumbit,
+    ...attrs
 }) => {
     const locale = useLocale();
     const {
@@ -115,7 +117,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     );
 
     return (
-        <ModalContent>
+        <ModalContent {...attrs}>
             <Form onSubmit={handleSubmit(onSumbit)}>
                 <FormInput
                     {...register('title')}
@@ -141,7 +143,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                 />
 
                 <FormActions flat="top">
-                    <FormAction left inline>
+                    <FormAction left inline {...goalProjectSelectControl.attr}>
                         {nullable(!id, () => (
                             <Controller
                                 name="parent"

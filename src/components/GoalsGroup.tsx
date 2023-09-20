@@ -7,6 +7,7 @@ import NextLink from 'next/link';
 
 import { ActivityByIdReturnType, GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { routes } from '../hooks/router';
+import { projectListItem, projectListItemTitle } from '../utils/domObjects';
 
 import { GoalListItem } from './GoalListItem';
 import { PageSep } from './PageSep';
@@ -52,10 +53,10 @@ export const GoalsGroup = React.memo<GoalGroupProps>(function GoalsGroup({
 }) {
     return (
         <>
-            <GoalsGroupContainer>
+            <GoalsGroupContainer {...projectListItem.attr}>
                 <Table>
                     <NextLink href={routes.project(project.id)} passHref legacyBehavior>
-                        <WrappedRowLink>
+                        <WrappedRowLink {...projectListItemTitle.attr}>
                             <ProjectListItem
                                 title={project.title}
                                 owner={project.activity}
