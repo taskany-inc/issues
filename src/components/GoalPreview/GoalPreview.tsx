@@ -21,10 +21,7 @@ import { IconMoreVerticalOutline, IconBinOutline, IconEditOutline } from '@taska
 
 import { routes } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
-import { useCriteriaResource } from '../../hooks/useCriteriaResource';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
-import { useGoalDependencyResource } from '../../hooks/useGoalDependencyResource';
-import { useGoalCommentsActions } from '../../hooks/useGoalCommentsActions';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { editGoalKeys } from '../../utils/hotkeys';
@@ -33,9 +30,6 @@ import { IssueParent } from '../IssueParent';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { IssueStats } from '../IssueStats/IssueStats';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
-import { trpc } from '../../utils/trpcClient';
-import { notifyPromise } from '../../utils/notifyPromise';
-import { GoalStateChangeSchema } from '../../schema/goal';
 import { GoalActivity } from '../GoalActivity';
 import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
 import { State } from '../State';
@@ -44,6 +38,7 @@ import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyLi
 import { CommentView } from '../CommentView/CommentView';
 import { ModalContext } from '../ModalOnEvent';
 import { AddCriteriaForm } from '../CriteriaForm/CriteriaForm';
+import { useGoalResource } from '../../hooks/useGoalResource';
 
 import { useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
@@ -100,33 +95,6 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
     const { user } = usePageContext();
     const [isRelative, onDateViewTypeChange] = useClickSwitch();
 
-    const archiveMutation = trpc.goal.toggleArchive.useMutation();
-    const utils = trpc.useContext();
-
-    const invalidateFn = useCallback(() => {
-        return utils.goal.getById.invalidate(shortId);
-    }, [utils.goal.getById, shortId]);
-
-    const onGoalEdit = useCallback(() => {
-        dispatchModalEvent(ModalEvent.GoalEditModal)();
-        invalidateFn();
-    }, [invalidateFn]);
-
-    const stateChangeMutations = trpc.goal.switchState.useMutation();
-    const onGoalStateChange = useCallback(
-        async (nextState: GoalStateChangeSchema['state']) => {
-            if (goal?.id) {
-                await stateChangeMutations.mutateAsync({
-                    id: goal.id,
-                    state: nextState,
-                });
-            }
-
-            invalidateFn();
-        },
-        [goal, invalidateFn, stateChangeMutations],
-    );
-
     const onPreviewClose = useCallback(() => {
         onClose?.();
     }, [onClose]);
@@ -135,24 +103,43 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         item.onClick?.();
     }, []);
 
-    const onGoalDeleteConfirm = useCallback(async () => {
-        if (!goal?.id) {
-            return;
-        }
+    const {
+        onGoalDelete,
+        onGoalStateChange,
+        onGoalCriteriaAdd,
+        onGoalCriteriaToggle,
+        onGoalCriteriaUpdate,
+        onGoalCriteriaRemove,
+        onGoalCriteriaConvert,
+        resolveGoalCommentDraft,
+        onGoalCommentChange,
+        onGoalCommentCreate,
+        onGoalCommentUpdate,
+        onGoalCommentCancel,
+        onGoalCommentReactionToggle,
+        onGoalCommentDelete,
+        onGoalDependencyAdd,
+        onGoalDependencyRemove,
+        lastStateComment,
+        highlightCommentId,
+    } = useGoalResource(
+        {
+            id: goal?.id,
+            stateId: goal?.stateId,
+            reactions: goal?.reactions,
+            comments: goal?.comments,
+        },
+        {
+            invalidate: {
+                getById: shortId,
+            },
+        },
+    );
 
+    const onGoalDeleteConfirm = useCallback(() => {
         onDelete?.();
-        const promise = archiveMutation.mutateAsync({
-            id: goal.id,
-            archived: true,
-        });
-
-        await notifyPromise(promise, 'goalsDelete');
-
-        invalidateFn();
-    }, [onDelete, archiveMutation, goal, invalidateFn]);
-
-    const criteria = useCriteriaResource(invalidateFn);
-    const dependency = useGoalDependencyResource(invalidateFn);
+        onGoalDelete();
+    }, [onDelete, onGoalDelete]);
 
     const { title, description, updatedAt } = goal || defaults;
     const goalEditMenuItems = useMemo(
@@ -172,26 +159,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         [],
     );
 
-    const {
-        highlightCommentId,
-        lastStateComment,
-        resolveCommentDraft,
-        onCommentChange,
-        onCommentCreate,
-        onCommentUpdate,
-        onCommentDelete,
-        onCommentCancel,
-        onCommentReactionToggle,
-    } = useGoalCommentsActions({
-        id: goal?.id,
-        shortId: goal?._shortId,
-        stateId: goal?.stateId,
-        reactions: goal?.reactions,
-        comments: goal?.comments,
-        cb: invalidateFn,
-    });
-
-    const commentDraft = resolveCommentDraft();
+    const commentDraft = resolveGoalCommentDraft(goal?.id);
     const commentsRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
@@ -308,11 +276,11 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                         <GoalCriteria
                                             goalId={id}
                                             criteriaList={goalAchiveCriteria}
-                                            onAddCriteria={criteria.onAddHandler}
-                                            onToggleCriteria={criteria.onToggleHandler}
-                                            onRemoveCriteria={criteria.onRemoveHandler}
-                                            onConvertToGoal={criteria.onConvertCriteria}
-                                            onUpdateCriteria={criteria.onUpdateHandler}
+                                            onAddCriteria={onGoalCriteriaAdd}
+                                            onToggleCriteria={onGoalCriteriaToggle}
+                                            onRemoveCriteria={onGoalCriteriaRemove}
+                                            onConvertToGoal={onGoalCriteriaConvert}
+                                            onUpdateCriteria={onGoalCriteriaUpdate}
                                             canEdit={_isEditable}
                                             renderTrigger={(props) =>
                                                 nullable(_isEditable, () => (
@@ -334,11 +302,11 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                                 kind={deps.kind}
                                                 items={deps.goals}
                                                 canEdit={_isEditable}
-                                                onRemove={dependency.onRemoveHandler}
+                                                onRemove={onGoalDependencyRemove}
                                             >
                                                 {nullable(_isEditable, () => (
                                                     <GoalDependencyAddForm
-                                                        onSubmit={dependency.onAddHandler}
+                                                        onSubmit={onGoalDependencyAdd}
                                                         kind={deps.kind}
                                                         goalId={id}
                                                         isEmpty={deps.goals.length === 0}
@@ -359,11 +327,11 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                             reactions={value.reactions}
                                             onSubmit={
                                                 value.activity?.id === user?.activityId
-                                                    ? onCommentUpdate(value.id)
+                                                    ? onGoalCommentUpdate(value.id)
                                                     : undefined
                                             }
-                                            onReactionToggle={onCommentReactionToggle(value.id)}
-                                            onDelete={onCommentDelete(value.id)}
+                                            onReactionToggle={onGoalCommentReactionToggle(value.id)}
+                                            onDelete={onGoalCommentDelete(value.id)}
                                         />
                                     ))}
                                 </>
@@ -373,9 +341,9 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                     states={_isEditable ? project?.flow.states : undefined}
                                     stateId={commentDraft?.stateId}
                                     description={commentDraft?.description}
-                                    onSubmit={onCommentCreate}
-                                    onCancel={onCommentCancel}
-                                    onChange={onCommentChange}
+                                    onSubmit={onGoalCommentCreate}
+                                    onCancel={onGoalCommentCancel}
+                                    onChange={onGoalCommentChange}
                                 />
                             }
                             renderCommentItem={(value) => (
@@ -388,10 +356,12 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                     highlight={value.id === highlightCommentId}
                                     reactions={value.reactions}
                                     onSubmit={
-                                        value.activity?.id === user?.activityId ? onCommentUpdate(value.id) : undefined
+                                        value.activity?.id === user?.activityId
+                                            ? onGoalCommentUpdate(value.id)
+                                            : undefined
                                     }
-                                    onReactionToggle={onCommentReactionToggle(value.id)}
-                                    onDelete={onCommentDelete(value.id)}
+                                    onReactionToggle={onGoalCommentReactionToggle(value.id)}
+                                    onDelete={onGoalCommentDelete(value.id)}
                                 />
                             )}
                         />
@@ -403,7 +373,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                 nullable(g._isEditable, () => (
                     <>
                         <ModalOnEvent event={ModalEvent.GoalEditModal} hotkeys={editGoalKeys}>
-                            <GoalEditForm goal={g} onSubmit={onGoalEdit} />
+                            <GoalEditForm goal={g} onSubmit={dispatchModalEvent(ModalEvent.GoalEditModal)} />
                         </ModalOnEvent>
 
                         <GoalDeleteModal shortId={g._shortId} onConfirm={onGoalDeleteConfirm} />
