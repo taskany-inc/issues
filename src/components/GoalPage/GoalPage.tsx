@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { gapM, gray7 } from '@taskany/colors';
-import { Button, Card, CardInfo, CardContent, nullable, Text, Tag } from '@taskany/bricks';
+import { Button, Card, CardInfo, CardContent, nullable, Text, Tag, TagCleanButton } from '@taskany/bricks';
 import { IconEditOutline, IconBinOutline, IconPlusCircleOutline, IconArrowRightOutline } from '@taskany/icons';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -182,6 +182,18 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
             if (!goal) return;
 
             await goalTagsUpdate([...goal.tags, ...value]);
+
+            invalidate();
+        },
+        [goal, invalidate, goalTagsUpdate],
+    );
+
+    const onGoalTagRemove = useCallback(
+        (value: TagObject) => async () => {
+            if (!goal) return;
+
+            const tags = goal.tags.filter((tag) => tag.id !== value.id);
+            await goalTagsUpdate(tags);
 
             invalidate();
         },
@@ -500,7 +512,10 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         <>
                             <IssueMeta title={tr('Tags')}>
                                 {goal.tags?.map((tag) => (
-                                    <Tag key={tag.id}>{tag.title}</Tag>
+                                    <Tag key={tag.id}>
+                                        <TagCleanButton onClick={onGoalTagRemove(tag)} />
+                                        {tag.title}
+                                    </Tag>
                                 ))}
                             </IssueMeta>
                             {nullable(goal._isEditable, () => (
