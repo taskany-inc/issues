@@ -28,5 +28,7 @@
     "Before delete a project, you must move it to another project or delete": "Перед удалением проект необходимо перенести в другой проект или удалить",
     "Cannot delete project now": "Невозможно сейчас удалить проект",
     "Ok, got it": "Хорошо, сделаю",
-    "Project key": "Ключ проекта"
+    "Project key": "Ключ проекта",
+    "Goals": "Цели",
+    "Settings": "Настройки"
 }

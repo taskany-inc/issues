@@ -1,8 +1,10 @@
-import { ChangeEvent, useCallback, useState } from 'react';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import NextLink from 'next/link';
 import { gapS, gray9, warn0 } from '@taskany/colors';
 import {
     Button,
@@ -16,12 +18,14 @@ import {
     FormMultiInput,
     ModalHeader,
     ModalContent,
+    TabsMenuItem,
+    TabsMenu,
 } from '@taskany/bricks';
 import { IconExclamationCircleSolid } from '@taskany/icons';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { PageSep } from '../PageSep';
-import { useRouter } from '../../hooks/router';
+import { routes, useRouter } from '../../hooks/router';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Page } from '../Page';
@@ -35,7 +39,6 @@ import { ActivityByIdReturnType, ProjectUpdateReturnType } from '../../../trpc/i
 import { Tip } from '../Tip';
 import { TextList, TextListItem } from '../TextList';
 import { CommonHeader } from '../CommonHeader';
-import { ProjectTabsMenu } from '../ProjectTabsMenu/ProjectTabsMenu';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -60,6 +63,7 @@ const StyledModalActions = styled.div`
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
+    const nextRouter = useNextRouter();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
@@ -178,12 +182,26 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         })
         .join('');
 
+    const tabsMenuOptions: Array<[string, string]> = useMemo(
+        () => [
+            [tr('Goals'), routes.project(id)],
+            [tr('Settings'), routes.projectSettings(id)],
+        ],
+        [id],
+    );
+
     if (!project.data) return null;
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <CommonHeader title={project.data.title} description={project.data.description}>
-                <ProjectTabsMenu id={id} />
+                <TabsMenu>
+                    {tabsMenuOptions.map(([title, href]) => (
+                        <NextLink key={title} href={href} passHref legacyBehavior>
+                            <TabsMenuItem active={nextRouter.asPath.split('?')[0] === href}>{title}</TabsMenuItem>
+                        </NextLink>
+                    ))}
+                </TabsMenu>
             </CommonHeader>
 
             <PageSep />

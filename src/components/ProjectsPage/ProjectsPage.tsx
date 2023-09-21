@@ -1,7 +1,8 @@
 import { MouseEventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import { Button, nullable } from '@taskany/bricks';
+import NextLink from 'next/link';
+import { Button, TabsMenu, TabsMenuItem, nullable } from '@taskany/bricks';
 
 import { PageContent, Page } from '../Page';
 import { refreshInterval } from '../../utils/config';
@@ -25,7 +26,7 @@ import { CommonHeader } from '../CommonHeader';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { WatchButton } from '../WatchButton/WatchButton';
 import { StarButton } from '../StarButton/StarButton';
-import { ProjectTabsMenu } from '../ProjectTabsMenu/ProjectTabsMenu';
+import { routes } from '../../hooks/router';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -218,6 +219,17 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
 
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(id);
 
+    const tabsMenuOptions: Array<[string, string, boolean]> = useMemo(
+        () =>
+            id
+                ? [
+                      [tr('Goals'), routes.project(id), false],
+                      [tr('Settings'), routes.projectSettings(id), true],
+                  ]
+                : [[tr('Goals'), routes.projects(), false]],
+        [id],
+    );
+
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <CommonHeader
@@ -234,7 +246,15 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
                     </>
                 ))}
             >
-                <ProjectTabsMenu id={id} />
+                <TabsMenu>
+                    {tabsMenuOptions.map(([title, href, ownerOnly]) =>
+                        nullable(ownerOnly ? project?._isOwner : true, () => (
+                            <NextLink key={title} href={href} passHref legacyBehavior>
+                                <TabsMenuItem active={nextRouter.asPath.split('?')[0] === href}>{title}</TabsMenuItem>
+                            </NextLink>
+                        )),
+                    )}
+                </TabsMenu>
             </CommonHeader>
 
             <FiltersPanel
