@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.30.0](https://github.com/taskany-inc/issues/compare/v1.29.0...v1.30.0) (2023-09-21)
+
+
+### Features
+
+* doesn't send email for action author ([f97b279](https://github.com/taskany-inc/issues/commit/f97b27913d0e15ac05a713d4742745c92e9499cf))
+* **GoalPage:** user can remove tags from GoalPage ([5cffea1](https://github.com/taskany-inc/issues/commit/5cffea1f067f85073cdaf37bb4fac610d1a4da99))
+* **IssueStats:** header improvements ([a331042](https://github.com/taskany-inc/issues/commit/a3310425950d1a151c27315a0a0ab101bf164b38))
+* **UserSettingsPage:** validate unique nickname ([36d3e4d](https://github.com/taskany-inc/issues/commit/36d3e4d346e1dfb112595e5204aede4dc10df607))
+
+
+### Bug Fixes
+
+* **GoalForm:** invalidate Project Page after goal list update ([9413ad4](https://github.com/taskany-inc/issues/commit/9413ad4e14904df8a26b0c266c888e1d21acb838))
+* **Tag:** remove unreachable `descrition` prop ([fb39f55](https://github.com/taskany-inc/issues/commit/fb39f5596a1d641e75156e6f249b64de34915e47))
+* **UserBadge:** use `IconX` instead of `CleanButton` ([9f7694f](https://github.com/taskany-inc/issues/commit/9f7694f826c8e97250a5a15c1001129935067373))
+
+
+### Performance Improvements
+
+* drop redundant data refetch on the client ([1a1d715](https://github.com/taskany-inc/issues/commit/1a1d715d2ef203878091c81cae01e86ed9b9e93e))
+
 ## [1.29.0](https://github.com/taskany-inc/issues/compare/v1.28.0...v1.29.0) (2023-09-07)
 
 
