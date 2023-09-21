@@ -48,7 +48,7 @@ export const createGoal = async (input: GoalCommon, activityId: string, role: Ro
                       connect: input.tags.map(({ id }) => ({ id })),
                   }
                 : undefined,
-            estimate: input.estimate?.date,
+            estimate: input.estimate ? new Date(input.estimate.date) : null,
             estimateType: input.estimate?.type,
             watchers: {
                 connect: [{ id: activityId }, { id: input.owner.id }],

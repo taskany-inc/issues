@@ -45,18 +45,6 @@ export const parseLocaleDate = (date: string | Date, { locale }: LocaleArg): Dat
     return parsers[resolvedLocale](date);
 };
 
-export const convertDateToUTC = (date: Date): Date =>
-    new Date(
-        Date.UTC(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate(),
-            date.getHours(),
-            date.getMinutes(),
-            date.getSeconds(),
-        ),
-    );
-
 export const createQuarterRange = (q: QuartersKeys, year?: number): DateRange => {
     const qToM = {
         [Quarters.Q1]: 2,
@@ -188,7 +176,13 @@ export const incYearIfDateHasPassed = (date: Date): Date => {
     return date;
 };
 
-export const urlDateFormat = (date: Date) => {
+// Return string in format yyyy-mm-dd from Estimate value (in UTC timezone)
+
+export const getDateStringFromEstimate = (date: Date) => date.toISOString().split('T')[0];
+
+// Return string in format yyyy-mm-dd from local Date
+
+export const getDateString = (date: Date) => {
     const pad = (num: number) => (num < 10 ? '0' : '') + num;
 
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -197,7 +191,7 @@ export const urlDateFormat = (date: Date) => {
 const urlDateRangeSeparator = '~';
 
 export const encodeUrlDateRange = ({ start, end }: DateRange): string =>
-    [start ? urlDateFormat(start) : '', urlDateFormat(end)].join(urlDateRangeSeparator);
+    [start ? getDateString(start) : '', getDateString(end)].join(urlDateRangeSeparator);
 
 export const decodeUrlDateRange = (data: string): null | DateRange => {
     const [start = null, end] = data.split(urlDateRangeSeparator);
@@ -214,7 +208,7 @@ export const decodeUrlDateRange = (data: string): null | DateRange => {
 
 export const encodeHistoryEstimate = (date: Date, type: DateType) =>
     JSON.stringify({
-        date: urlDateFormat(date),
+        date: getDateString(date),
         type,
     });
 
