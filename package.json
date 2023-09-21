@@ -1,6 +1,6 @@
 {
   "name": "@taskany/issues",
-  "version": "1.30.0",
+  "version": "1.31.0",
   "private": true,
   "scripts": {
     "prepare": "husky install",
