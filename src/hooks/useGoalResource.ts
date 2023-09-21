@@ -3,7 +3,7 @@ import { Activity, GoalAchieveCriteria } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
-import { GoalStateChangeSchema, GoalUpdate, ToggleGoalDependency } from '../schema/goal';
+import { GoalCommon, GoalStateChangeSchema, GoalUpdate, ToggleGoalDependency } from '../schema/goal';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import {
     AddCriteriaScheme,
@@ -83,6 +83,9 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
     const addParticipantMutation = trpc.goal.addParticipant.useMutation();
     const removeParticipantMutation = trpc.goal.removeParticipant.useMutation();
     const changeProjectMutation = trpc.goal.changeProject.useMutation();
+    const updateGoalTagMutation = trpc.goal.updateTag.useMutation();
+    const updateGoalOwnerMutation = trpc.goal.updateOwner.useMutation();
+    const createGoalMutation = trpc.goal.create.useMutation();
 
     const {
         saveDraft: saveGoalCommentDraft,
@@ -140,6 +143,17 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
             return promise;
         },
         [id, updateGoalMutation],
+    );
+
+    const goalCreate = useCallback(
+        async (form: GoalCommon) => {
+            const promise = createGoalMutation.mutateAsync(form);
+
+            notifyPromise(promise, 'goalsCreate');
+
+            return promise;
+        },
+        [createGoalMutation],
     );
 
     const onGoalDependencyAdd = useCallback(
@@ -382,6 +396,38 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         [changeProjectMutation, id],
     );
 
+    const goalTagsUpdate = useCallback(
+        async (tags: { title: string; id: string }[]) => {
+            if (!id) return;
+
+            const promise = updateGoalTagMutation.mutateAsync({
+                id,
+                tags,
+            });
+
+            await notifyPromise(promise, 'goalsUpdate');
+
+            return promise;
+        },
+        [id, updateGoalTagMutation],
+    );
+
+    const goalOwnerUpdate = useCallback(
+        async (ownerId: string) => {
+            if (!id) return;
+
+            const promise = updateGoalOwnerMutation.mutateAsync({
+                id,
+                ownerId,
+            });
+
+            await notifyPromise(promise, 'goalsUpdate');
+
+            return promise;
+        },
+        [id, updateGoalOwnerMutation],
+    );
+
     return {
         highlightCommentId,
         lastStateComment,
@@ -389,8 +435,11 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         invalidate,
         resolveGoalCommentDraft,
 
+        goalCreate,
         goalUpdate,
         goalProjectChange,
+        goalTagsUpdate,
+        goalOwnerUpdate,
 
         onGoalStateChange,
         onGoalDelete,

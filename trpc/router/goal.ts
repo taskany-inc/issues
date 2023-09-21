@@ -1289,4 +1289,110 @@ export const goal = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
         }
     }),
+    updateTag: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                tags: z.array(
+                    z.object({
+                        id: z.string(),
+                        title: z.string(),
+                    }),
+                ),
+            }),
+        )
+        .mutation(async ({ input, ctx }) => {
+            const actualGoal = await prisma.goal.findUnique({
+                where: { id: input.id },
+                include: { tags: true },
+            });
+
+            if (!actualGoal) return null;
+
+            const tagsToDisconnect = calculateDiffBetweenArrays(actualGoal.tags, input.tags);
+            const tagsToConnect = calculateDiffBetweenArrays(input.tags, actualGoal.tags);
+
+            if (!tagsToConnect.length && !tagsToDisconnect.length) return null;
+
+            const prevIds = actualGoal.tags.map(({ id }) => id).join(goalHistorySeparator);
+            const nextIds = input.tags.map(({ id }) => id).join(goalHistorySeparator);
+
+            const history = {
+                subject: 'tags',
+                action: 'change',
+                previousValue: prevIds.length ? prevIds : null,
+                nextValue: nextIds.length ? nextIds : null,
+                activityId: ctx.session.user.activityId,
+            };
+
+            try {
+                const updatedGoal = await prisma.goal.update({
+                    where: { id: input.id },
+                    data: {
+                        tags: {
+                            connect: tagsToConnect.map(({ id }) => ({ id })),
+                            disconnect: tagsToDisconnect.map(({ id }) => ({ id })),
+                        },
+                        history: {
+                            create: history,
+                        },
+                    },
+                });
+
+                await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                    message: String(error.message),
+                    cause: error,
+                });
+            }
+        }),
+    updateOwner: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                ownerId: z.string(),
+            }),
+        )
+        .mutation(async ({ input, ctx }) => {
+            const actualGoal = await prisma.goal.findUnique({
+                where: { id: input.id },
+            });
+
+            if (!actualGoal) return null;
+            if (actualGoal.ownerId === input.ownerId) return null;
+
+            const history = {
+                subject: 'owner',
+                action: 'change',
+                previousValue: actualGoal.ownerId,
+                nextValue: input.ownerId,
+                activityId: ctx.session.user.activityId,
+            };
+
+            try {
+                const updatedGoal = await prisma.goal.update({
+                    where: { id: input.id },
+                    data: {
+                        ownerId: input.ownerId,
+                        history: {
+                            create: history,
+                        },
+                    },
+                });
+
+                await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                    message: String(error.message),
+                    cause: error,
+                });
+            }
+        }),
 });

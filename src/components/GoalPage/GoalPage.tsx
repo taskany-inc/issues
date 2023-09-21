@@ -43,7 +43,6 @@ import { ModalContext } from '../ModalOnEvent';
 import { useFMPMetric } from '../../utils/telemetry';
 import { TagComboBox } from '../TagComboBox';
 import { AddCriteriaForm } from '../CriteriaForm/CriteriaForm';
-import { GoalUpdate } from '../../schema/goal';
 
 import { tr } from './GoalPage.i18n';
 
@@ -143,7 +142,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         onGoalStateChange,
         onGoalWatchingToggle,
         onGoalStarToggle,
-        goalUpdate,
+        goalTagsUpdate,
+        goalOwnerUpdate,
         invalidate,
         onGoalCriteriaAdd,
         onGoalCriteriaToggle,
@@ -177,34 +177,26 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         },
     );
 
-    const onTagAdd = useCallback(
+    const onGoalTagAdd = useCallback(
         async (value: TagObject[]) => {
-            if (!goal || !goal.project) return;
+            if (!goal) return;
 
-            // FIXME: https://github.com/taskany-inc/issues/issues/1635
-            await goalUpdate({
-                ...(goal as unknown as GoalUpdate),
-                parent: goal.project,
-                tags: [...goal.tags, ...value],
-            });
+            await goalTagsUpdate([...goal.tags, ...value]);
 
             invalidate();
         },
-        [goal, invalidate, goalUpdate],
+        [goal, invalidate, goalTagsUpdate],
     );
-    const onAssigneeChange = useCallback(
-        async (activity?: NonNullable<ActivityByIdReturnType>) => {
-            if (!goal || !activity?.user || !goal.project) return;
 
-            // FIXME: https://github.com/taskany-inc/issues/issues/1635
-            await goalUpdate({
-                ...(goal as unknown as GoalUpdate),
-                parent: goal.project,
-            });
+    const onGoalAssigneeChange = useCallback(
+        async (activity?: NonNullable<ActivityByIdReturnType>) => {
+            if (!activity?.user?.activityId) return;
+
+            await goalOwnerUpdate(activity.user.activityId);
 
             invalidate();
         },
-        [goal, invalidate, goalUpdate],
+        [invalidate, goalOwnerUpdate],
     );
 
     const onGoalDeleteConfirm = useCallback(async () => {
@@ -462,7 +454,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                 placement="bottom-start"
                                 placeholder={tr('Name/Email')}
                                 filter={participantsFilter}
-                                onChange={onAssigneeChange}
+                                onChange={onGoalAssigneeChange}
                                 renderTrigger={(props) => (
                                     <StyledInlineUserInput>
                                         <UserBadge user={owner?.user} />
@@ -516,7 +508,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     <TagComboBox
                                         disabled={(goal.tags || []).length >= tagsLimit}
                                         placeholder={tr('Enter tag title')}
-                                        onChange={onTagAdd}
+                                        onChange={onGoalTagAdd}
                                         renderTrigger={(props) => (
                                             <StyledInlineTrigger
                                                 icon={<IconPlusCircleOutline noWrap size="xs" />}

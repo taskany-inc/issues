@@ -14,7 +14,7 @@ import { GoalForm } from '../GoalForm/GoalForm';
 import { trpc } from '../../utils/trpcClient';
 import { GoalCommon, goalCommonSchema } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalCreateReturnType } from '../../../trpc/inferredTypes';
-import { notifyPromise } from '../../utils/notifyPromise';
+import { useGoalResource } from '../../hooks/useGoalResource';
 
 import { tr } from './GoalCreateForm.i18n';
 
@@ -48,6 +48,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
     const [busy, setBusy] = useState(false);
     const [createGoalType, setСreateGoalType] = useState<number>(goalCreateFormActionCache || 3);
     const utils = trpc.useContext();
+    const { goalCreate } = useGoalResource({});
 
     const createOptions = [
         {
@@ -71,11 +72,11 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
     const onCreateTypeChange = useCallback((item: CreateOptions[number]) => {
         setСreateGoalType(item.value);
     }, []);
-    const createMutation = trpc.goal.create.useMutation();
+
     const createGoal = async (form: GoalCommon) => {
         setBusy(true);
 
-        const [res] = await notifyPromise(createMutation.mutateAsync(form), 'goalsCreate');
+        const res = await goalCreate(form);
 
         if (res && res._shortId) {
             const newRecentProjectsCache = { ...recentProjectsCache };
