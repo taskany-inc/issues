@@ -16,12 +16,12 @@ import {
     Tag,
     KeyCode,
     TagCleanButton,
+    Keyboard,
 } from '@taskany/bricks';
 import { IconBulbOnOutline } from '@taskany/icons';
 
 import { trpc } from '../../utils/trpcClient';
 import { Tip } from '../Tip';
-import { Keyboard } from '../Keyboard';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { HelpButton } from '../HelpButton/HelpButton';
 
