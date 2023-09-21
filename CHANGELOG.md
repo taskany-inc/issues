@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.31.0](https://github.com/taskany-inc/issues/compare/v1.30.0...v1.31.0) (2023-09-21)
+
+
+### Features
+
+* **Estimates:** estimate as a date ([1c16115](https://github.com/taskany-inc/issues/commit/1c161153170257766a362cfcd6bee3587aba7590))
+* **Estimates:** timezone issue ([bc718fa](https://github.com/taskany-inc/issues/commit/bc718fa617918af2ef15d50f1f5a67ee2f32ab03))
+
 ## [1.30.0](https://github.com/taskany-inc/issues/compare/v1.29.0...v1.30.0) (2023-09-21)
 
 
