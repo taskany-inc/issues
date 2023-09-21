@@ -1,10 +1,9 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { gray8, gapM, gray9, gapS } from '@taskany/colors';
-import { Modal, ModalContent, Text } from '@taskany/bricks';
+import { Modal, ModalContent, Text, Keyboard } from '@taskany/bricks';
 
 import { isEventTargetInputOrTextArea } from '../../utils/hotkeys';
-import { Keyboard } from '../Keyboard';
 
 import { tr } from './HotkeysModal.i18n';
 

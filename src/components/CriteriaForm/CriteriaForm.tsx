@@ -1,7 +1,7 @@
 import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, FormInput, TableRow, TableCell, Popup } from '@taskany/bricks';
+import { Button, FormInput, TableRow, TableCell, Popup, Keyboard } from '@taskany/bricks';
 import { IconPlusCircleOutline, IconTargetOutline } from '@taskany/icons';
 import { gray7, gray8 } from '@taskany/colors';
 import { Controller, useForm } from 'react-hook-form';
@@ -12,7 +12,6 @@ import { InlineTrigger } from '../InlineTrigger';
 import { criteriaSchema, updateCriteriaSchema } from '../../schema/criteria';
 import { GoalSuggest } from '../GoalSuggest';
 import { InlineForm } from '../InlineForm';
-import { Keyboard } from '../Keyboard';
 import { Tip } from '../Tip';
 
 import { tr } from './CriteriaForm.i18n';

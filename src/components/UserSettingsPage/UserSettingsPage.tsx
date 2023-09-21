@@ -6,7 +6,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { gray10 } from '@taskany/colors';
-import { Button, Fieldset, Form, FormInput, FormAction, FormActions, FormRadio, FormRadioInput } from '@taskany/bricks';
+import {
+    Button,
+    Fieldset,
+    Form,
+    FormInput,
+    FormAction,
+    FormActions,
+    FormRadio,
+    FormRadioInput,
+    Keyboard,
+} from '@taskany/bricks';
 import { IconBulbOnOutline } from '@taskany/icons';
 import { z } from 'zod';
 
@@ -16,7 +26,6 @@ import { trpc } from '../../utils/trpcClient';
 import { Page } from '../Page';
 import { PageSep } from '../PageSep';
 import { Tip } from '../Tip';
-import { Keyboard } from '../Keyboard';
 import { CommonHeader } from '../CommonHeader';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { UpdateUser, updateUserSchema } from '../../schema/user';
