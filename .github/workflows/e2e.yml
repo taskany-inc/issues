@@ -23,3 +23,10 @@ jobs:
         env:
           CYPRESS_ADMIN_EMAIL: test@taskany.org
           CYPRESS_ADMIN_PASSWORD: test
+      - name: Store Artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
