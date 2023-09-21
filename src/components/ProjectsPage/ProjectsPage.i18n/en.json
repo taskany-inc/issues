@@ -4,5 +4,7 @@
     "Reset": "Reset",
     "created by": "created by",
     "Projects": "Projects",
-    "description": "This is page with all projects hierarchy. You can open goals and issues for any project right here. "
+    "description": "This is page with all projects hierarchy. You can open goals and issues for any project right here. ",
+    "Goals": "Goals",
+    "Settings": "Settings"
 }
