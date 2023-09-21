@@ -1,11 +1,11 @@
-import { ComponentProps, FC, useCallback, useEffect, useState } from 'react';
+import { ComponentProps, FC, useEffect, useState } from 'react';
 
 import { DateType } from '../../types/date';
-import { convertDateToUTC } from '../../utils/dateTime';
+import { getDateString } from '../../utils/dateTime';
 import { Estimate as EstimateComponent } from '../Estimate/Estimate';
 
 type Estimate = {
-    date: Date;
+    date: string;
     type: DateType;
 };
 
@@ -18,7 +18,7 @@ export const GoalFormEstimate: FC<GoalFormEstimateProps> = ({ onChange, value, .
     const [estimate, setEstimate] = useState<ComponentProps<typeof EstimateComponent>['value']>(
         value
             ? {
-                  range: { end: value.date },
+                  range: { end: new Date(value.date) },
                   type: value.type,
               }
             : undefined,
@@ -30,26 +30,15 @@ export const GoalFormEstimate: FC<GoalFormEstimateProps> = ({ onChange, value, .
             return;
         }
 
-        if (Number(estimate.range.end) !== Number(value?.date) || estimate.type !== value?.type) {
+        const date = getDateString(estimate.range.end);
+
+        if (date !== value?.date || estimate.type !== value?.type) {
             onChange({
-                date: estimate.range.end,
+                date,
                 type: estimate.type,
             });
         }
     }, [value, estimate, onChange]);
 
-    const onChangeHandler = useCallback((e: ComponentProps<typeof EstimateComponent>['value']) => {
-        if (e) {
-            setEstimate({
-                type: e.type,
-                range: {
-                    end: convertDateToUTC(e.range.end),
-                },
-            });
-        } else {
-            setEstimate(e);
-        }
-    }, []);
-
-    return <EstimateComponent value={estimate} onChange={onChangeHandler} {...props} />;
+    return <EstimateComponent value={estimate} onChange={setEstimate} {...props} />;
 };

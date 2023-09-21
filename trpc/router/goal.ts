@@ -321,6 +321,7 @@ export const goal = router({
     }),
     update: protectedProcedure.input(goalUpdateSchema).mutation(async ({ ctx, input }) => {
         const { activityId, role } = ctx.session.user;
+        const [estimate, estimateType] = input.estimate ? [new Date(input.estimate.date), input.estimate.type] : [];
 
         const actualGoal = await prisma.goal.findUnique({
             where: { id: input.id },
@@ -408,13 +409,11 @@ export const goal = router({
             });
         }
 
-        if (Number(input.estimate?.date) !== Number(actualGoal.estimate)) {
+        if (Number(estimate) !== Number(actualGoal.estimate) || estimateType !== actualGoal.estimateType) {
             const prevHistoryEstimate = actualGoal.estimate
                 ? encodeHistoryEstimate(actualGoal.estimate, actualGoal.estimateType ?? 'Strict')
                 : null;
-            const nextHistoryEstimate = input.estimate
-                ? encodeHistoryEstimate(input.estimate.date, input.estimate.type)
-                : null;
+            const nextHistoryEstimate = estimate ? encodeHistoryEstimate(estimate, estimateType ?? 'Strict') : null;
 
             history.push({
                 subject: 'estimate',
@@ -426,8 +425,8 @@ export const goal = router({
             const prevFormatedEstimate = actualGoal.estimate
                 ? formateEstimate(actualGoal.estimate, { locale: 'en', type: actualGoal.estimateType ?? 'Strict' })
                 : null;
-            const nextFormatedEstimate = input.estimate
-                ? formateEstimate(input.estimate.date, { locale: 'en', type: input.estimate.type })
+            const nextFormatedEstimate = estimate
+                ? formateEstimate(estimate, { locale: 'en', type: estimateType ?? 'Strict' })
                 : null;
 
             // FIXME: https://github.com/taskany-inc/issues/issues/1359
@@ -443,8 +442,8 @@ export const goal = router({
                     description: input.description,
                     stateId: input.state?.id,
                     priority: input.priority,
-                    estimate: input.estimate?.date,
-                    estimateType: input.estimate?.type,
+                    estimate,
+                    estimateType,
                     tags: {
                         connect: tagsToConnect.map(({ id }) => ({ id })),
                         disconnect: tagsToDisconnect.map(({ id }) => ({ id })),

@@ -11,6 +11,7 @@ import { Tip } from '../Tip';
 import { Keyboard } from '../Keyboard';
 import { trpc } from '../../utils/trpcClient';
 import { useGoalResource } from '../../hooks/useGoalResource';
+import { getDateStringFromEstimate } from '../../utils/dateTime';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -49,7 +50,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         () =>
             goal.estimate
                 ? {
-                      date: goal.estimate,
+                      date: getDateStringFromEstimate(goal.estimate),
                       type: goal.estimateType || 'Strict',
                   }
                 : undefined,

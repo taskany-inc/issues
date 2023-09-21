@@ -73,7 +73,7 @@ export const goalCommonSchema = z.object({
     priority: z.string().nullable().optional(),
     estimate: z
         .object({
-            date: z.date(),
+            date: z.string(),
             type: z.enum([DateType.Quarter, DateType.Strict, DateType.Year]),
         })
         .nullable()
@@ -145,7 +145,7 @@ export const goalUpdateSchema = z.object({
     priority: z.string().nullable(),
     estimate: z
         .object({
-            date: z.date(),
+            date: z.string(),
             type: z.enum([DateType.Quarter, DateType.Strict, DateType.Year]),
         })
         .nullable()

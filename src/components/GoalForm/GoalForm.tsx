@@ -44,7 +44,7 @@ interface GoalFormProps {
     state?: State;
     priority?: Priority | string;
     estimate?: {
-        date: Date;
+        date: string;
         type: DateType;
     };
     busy?: boolean;
@@ -200,7 +200,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                                 disabled={busy}
                                                 text={
                                                     field.value
-                                                        ? formateEstimate(field.value.date, {
+                                                        ? formateEstimate(new Date(field.value.date), {
                                                               locale,
                                                               type: field.value.type,
                                                           })
