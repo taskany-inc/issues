@@ -117,7 +117,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
     return (
         <GoalForm
             busy={busy}
-            validityScheme={goalCommonSchema}
+            validitySchema={goalCommonSchema}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
             parent={currentProjectCache || lastProjectCache || undefined}
             priority="Medium"

@@ -17,7 +17,7 @@ import {
     toggleParticipantsSchema,
     batchGoalByProjectIdSchema,
 } from '../../src/schema/goal';
-import { ToggleSubscriptionSchema, suggestionsQueryScheme, queryWithFiltersSchema } from '../../src/schema/common';
+import { ToggleSubscriptionSchema, suggestionsQuerySchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import {
     createGoal,
@@ -52,7 +52,7 @@ const updateProjectUpdatedAt = async (id?: string | null) => {
 };
 export const goal = router({
     suggestions: protectedProcedure
-        .input(suggestionsQueryScheme)
+        .input(suggestionsQuerySchema)
         .query(async ({ ctx, input: { input, limit = 5 } }) => {
             const { activityId } = ctx.session.user || {};
 

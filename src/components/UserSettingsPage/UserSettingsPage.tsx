@@ -31,7 +31,7 @@ const StyledLabel = styled.label`
     background-color: transparent;
 `;
 
-const patchUserSchemeWithAsyncValidate = (validityFn: (val: string) => Promise<boolean>) => {
+const patchUserSchemaWithAsyncValidate = (validityFn: (val: string) => Promise<boolean>) => {
     return updateUserSchema.merge(
         z.object({
             nickname: updateUserSchema.shape.nickname.refine(
@@ -73,7 +73,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
     );
 
     const generalForm = useForm<UpdateUser>({
-        resolver: zodResolver(patchUserSchemeWithAsyncValidate(validateNicknameAsync)),
+        resolver: zodResolver(patchUserSchemaWithAsyncValidate(validateNicknameAsync)),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,

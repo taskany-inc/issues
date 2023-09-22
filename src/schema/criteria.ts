@@ -47,8 +47,8 @@ export const convertCriteriaToGoalSchema = z.object({
     }),
 });
 
-export type AddCriteriaScheme = z.infer<typeof criteriaSchema>;
-export type UpdateCriteriaStateScheme = z.infer<typeof updateCriteriaState>;
-export type UpdateCriteriaScheme = z.infer<typeof updateCriteriaSchema>;
-export type RemoveCriteriaScheme = z.infer<typeof removeCriteria>;
-export type ConvertCriteriaToGoalScheme = z.infer<typeof convertCriteriaToGoalSchema>;
+export type AddCriteriaSchema = z.infer<typeof criteriaSchema>;
+export type UpdateCriteriaStateSchema = z.infer<typeof updateCriteriaState>;
+export type UpdateCriteriaSchema = z.infer<typeof updateCriteriaSchema>;
+export type RemoveCriteriaSchema = z.infer<typeof removeCriteria>;
+export type ConvertCriteriaToGoalSchema = z.infer<typeof convertCriteriaToGoalSchema>;
