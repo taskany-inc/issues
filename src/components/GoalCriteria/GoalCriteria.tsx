@@ -14,10 +14,10 @@ import { backgroundColor, brandColor, gray10, danger0, gray8, gray9, gray4, text
 import NextLink from 'next/link';
 
 import {
-    AddCriteriaScheme,
-    RemoveCriteriaScheme,
-    UpdateCriteriaScheme,
-    UpdateCriteriaStateScheme,
+    AddCriteriaSchema,
+    RemoveCriteriaSchema,
+    UpdateCriteriaSchema,
+    UpdateCriteriaStateSchema,
 } from '../../schema/criteria';
 import { Title } from '../Table';
 import { GoalAchiveCriteria } from '../../../trpc/inferredTypes';
@@ -295,14 +295,14 @@ interface GoalCriteriaProps {
     criteriaList?: GoalAchiveCriteria[];
     canEdit: boolean;
     onClick?: (item: GoalAchiveCriteria) => void;
-    onAddCriteria: (val: AddCriteriaScheme) => void;
-    onToggleCriteria: (val: UpdateCriteriaStateScheme) => void;
-    onRemoveCriteria: (val: RemoveCriteriaScheme) => void;
+    onAddCriteria: (val: AddCriteriaSchema) => void;
+    onToggleCriteria: (val: UpdateCriteriaStateSchema) => void;
+    onRemoveCriteria: (val: RemoveCriteriaSchema) => void;
     onConvertToGoal: (val: GoalAchiveCriteria) => void;
-    onUpdateCriteria: (val: UpdateCriteriaScheme) => void;
+    onUpdateCriteria: (val: UpdateCriteriaSchema) => void;
     renderTrigger?: (obj: {
         goalId: string;
-        onSubmit: (val: AddCriteriaScheme) => void;
+        onSubmit: (val: AddCriteriaSchema) => void;
         validityData: { sum: number; title: string[] };
     }) => ReactNode;
 }
@@ -326,7 +326,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
         criteriaId: null,
     });
     const onAddHandler = useCallback(
-        (val: AddCriteriaScheme) => {
+        (val: AddCriteriaSchema) => {
             if (goalId) {
                 onAddCriteria({ ...val, goalId });
             }

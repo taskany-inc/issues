@@ -59,7 +59,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
     // FIXME: nullable values are conflicting with undefined
     return (
         <GoalForm
-            validityScheme={goalUpdateSchema}
+            validitySchema={goalUpdateSchema}
             id={goal.id}
             busy={busy}
             title={goal.title}

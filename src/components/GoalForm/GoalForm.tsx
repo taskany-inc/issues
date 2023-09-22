@@ -48,11 +48,11 @@ interface GoalFormProps {
         type: DateType;
     };
     busy?: boolean;
-    validityScheme: Schema;
+    validitySchema: Schema;
     id?: string;
     tip?: React.ReactNode;
 
-    onSumbit: (fields: z.infer<GoalFormProps['validityScheme']>) => void;
+    onSumbit: (fields: z.infer<GoalFormProps['validitySchema']>) => void;
 }
 
 export const GoalForm: React.FC<GoalFormProps> = ({
@@ -66,7 +66,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     priority,
     estimate,
     busy,
-    validityScheme,
+    validitySchema,
     actionButton,
     tip,
     onSumbit,
@@ -80,8 +80,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         setFocus,
         setValue,
         formState: { errors, isSubmitted },
-    } = useForm<z.infer<typeof validityScheme>>({
-        resolver: zodResolver(validityScheme),
+    } = useForm<z.infer<typeof validitySchema>>({
+        resolver: zodResolver(validitySchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,

@@ -6,10 +6,10 @@ import { notifyPromise } from '../utils/notifyPromise';
 import { GoalCommon, GoalStateChangeSchema, GoalUpdate, ToggleGoalDependency } from '../schema/goal';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import {
-    AddCriteriaScheme,
-    RemoveCriteriaScheme,
-    UpdateCriteriaScheme,
-    UpdateCriteriaStateScheme,
+    AddCriteriaSchema,
+    RemoveCriteriaSchema,
+    UpdateCriteriaSchema,
+    UpdateCriteriaStateSchema,
 } from '../schema/criteria';
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 
@@ -268,7 +268,7 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
     }, [fields.comments, fields.stateId]);
 
     const onGoalCriteriaAdd = useCallback(
-        async (val: AddCriteriaScheme, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
+        async (val: AddCriteriaSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
             await addGoalCriteria.mutateAsync(val);
 
             invalidate(invalidateKey);
@@ -277,7 +277,7 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
     );
 
     const onGoalCriteriaToggle = useCallback(
-        async (val: UpdateCriteriaStateScheme, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
+        async (val: UpdateCriteriaStateSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
             await toggleGoalCriteria.mutateAsync(val);
 
             invalidate(invalidateKey);
@@ -286,7 +286,7 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
     );
 
     const onGoalCriteriaUpdate = useCallback(
-        async (val: UpdateCriteriaScheme, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
+        async (val: UpdateCriteriaSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
             await updateGoalCriteria.mutateAsync(val);
 
             invalidate(invalidateKey);
@@ -295,7 +295,7 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
     );
 
     const onGoalCriteriaRemove = useCallback(
-        async (val: RemoveCriteriaScheme, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
+        async (val: RemoveCriteriaSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
             await removeGoalCriteria.mutateAsync(val);
 
             invalidate(invalidateKey);
