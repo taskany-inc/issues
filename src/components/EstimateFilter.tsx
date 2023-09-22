@@ -2,8 +2,8 @@ import { FiltersDropdown } from '@taskany/bricks';
 import { FC, useMemo } from 'react';
 import { Estimate as EstimateType } from '@prisma/client';
 
-import { createDateRange, encodeUrlDateRange } from '../utils/dateTime';
 import { DateRange, QuartersKeys } from '../types/date';
+import { createDateRange, encodeUrlDateRange, getRelativeQuarterRange } from '../utils/dateTime';
 
 type Estimate = { q: EstimateType['q']; y: EstimateType['y'] };
 
@@ -16,18 +16,37 @@ const estimateTitle = (estimate: Estimate) => {
     return `${estimate.q}/${estimate.y}`;
 };
 
+const getEstimateAliases = (): { data: string; id: string }[] => {
+    return [
+        {
+            id: encodeUrlDateRange(getRelativeQuarterRange('current')),
+            data: '@current',
+        },
+        {
+            id: encodeUrlDateRange(getRelativeQuarterRange('prev')),
+            data: '@previous',
+        },
+        {
+            id: encodeUrlDateRange(getRelativeQuarterRange('next')),
+            data: '@next',
+        },
+    ];
+};
+
 export const EstimateFilter: FC<{
     text: string;
     value: string[];
-    estimates: Estimate[];
+    estimates?: Estimate[];
     onChange: (value: string[]) => void;
 }> = ({ text, value, estimates, onChange }) => {
     const items = useMemo(
-        () =>
-            estimates.map((estimate) => ({
+        () => [
+            ...getEstimateAliases(),
+            ...(estimates?.map((estimate) => ({
                 id: encodeUrlDateRange(getDateRangeFrom(estimate)),
                 data: estimateTitle(estimate),
-            })),
+            })) ?? []),
+        ],
         [estimates],
     );
 
