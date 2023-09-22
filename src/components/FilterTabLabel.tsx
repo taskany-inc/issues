@@ -14,8 +14,6 @@ const StyledLabelWrapper = styled.div`
     flex-wrap: nowrap;
     gap: ${gapXs};
     width: 100%;
-    // FIXME: drop after update @taskany/bricks to 4.0.2+
-    pointer-events: all;
 `;
 
 const StyledBreakText = styled(Text)`
