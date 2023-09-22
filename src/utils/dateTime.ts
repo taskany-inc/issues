@@ -45,6 +45,16 @@ export const parseLocaleDate = (date: string | Date, { locale }: LocaleArg): Dat
     return parsers[resolvedLocale](date);
 };
 
+export const getYearFromDate = (date: Date): number => date.getFullYear();
+
+export const getQuarterFromDate = (date: Date): QuartersKeys =>
+    `Q${Math.floor(date.getMonth() / 3 + 1)}` as QuartersKeys;
+
+export const getAvailableYears = (n = 5, currY = new Date().getFullYear()): number[] =>
+    Array(n)
+        .fill(0)
+        .map((_, i) => currY + i);
+
 export const createQuarterRange = (q: QuartersKeys, year?: number): DateRange => {
     const qToM = {
         [Quarters.Q1]: 2,
@@ -93,15 +103,31 @@ export const createDateRange = (year: number, quarter?: QuartersKeys | null): Da
     return createYearRange(year);
 };
 
-export const getYearFromDate = (date: Date): number => date.getFullYear();
+const createQuarterRangeFromDate = (value: Date): DateRange => {
+    return createDateRange(getYearFromDate(value), getQuarterFromDate(value));
+};
 
-export const getQuarterFromDate = (date: Date): QuartersKeys =>
-    `Q${Math.floor(date.getMonth() / 3 + 1)}` as QuartersKeys;
+export const getRelativeQuarterRange = (target: 'current' | 'next' | 'prev'): DateRange => {
+    const current = createQuarterRangeFromDate(new Date());
 
-export const getAvailableYears = (n = 5, currY = new Date().getFullYear()): number[] =>
-    Array(n)
-        .fill(0)
-        .map((_, i) => currY + i);
+    if (target === 'current') {
+        return current;
+    }
+
+    const endOfQuarter = current.end;
+
+    if (target === 'next') {
+        endOfQuarter.setMonth(endOfQuarter.getMonth() + 1);
+
+        return createQuarterRangeFromDate(endOfQuarter);
+    }
+
+    const startOfQuarter = current.start ?? current.end;
+
+    startOfQuarter.setMonth(startOfQuarter.getMonth() - 1);
+
+    return createQuarterRangeFromDate(startOfQuarter);
+};
 
 const getMonthDifference = (start: Date, end: Date): number =>
     end.getMonth() - start.getMonth() + 12 * (end.getFullYear() - start.getFullYear());

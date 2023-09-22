@@ -210,14 +210,12 @@ export const FiltersPanel: FC<{
                             />
                         )}
 
-                        {Boolean(estimates.length) && (
-                            <EstimateFilter
-                                text={tr('Estimate')}
-                                value={queryState.estimate}
-                                estimates={estimates}
-                                onChange={onEstimateChange}
-                            />
-                        )}
+                        <EstimateFilter
+                            text={tr('Estimate')}
+                            value={queryState.estimate}
+                            estimates={estimates}
+                            onChange={onEstimateChange}
+                        />
 
                         {(Boolean(tags.length) || tagsQuery) && (
                             <TagFilter
