@@ -77,5 +77,6 @@ module.exports = {
             'error',
             { argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_', varsIgnorePattern: '^_' },
         ],
+        'prefer-destructuring': 'error',
     },
 };
