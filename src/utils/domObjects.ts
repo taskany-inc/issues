@@ -38,3 +38,27 @@ export const createGoalInlineControl = DO('createGoalInlineControl');
 
 export const goalCreateForm = DO('goalCreateForm');
 export const goalProjectSelectControl = goalCreateForm.add('project');
+
+export const projectSettingsContent = DO('projectSettingsContent');
+export const projectSettingsTitleInput = projectSettingsContent.add('titleInput');
+export const projectSettingsDescriptionInput = projectSettingsContent.add('descriptionInput');
+export const projectSettingsParentMultiInput = projectSettingsContent.add('parentMultiInput');
+export const projectSettingsParentMultiInputTrigger = projectSettingsContent.add('parentMultiInputTrigger');
+export const projectSettingsParentMultiInputTagClean = projectSettingsContent.add('parentMultiInputTagClean');
+export const projectSettingsSaveButton = projectSettingsContent.add('saveButton');
+export const projectSettingsTitleError = projectSettingsContent.add('titleError');
+export const projectSettingsDeleteProjectButton = projectSettingsContent.add('deleteProjectButton');
+export const projectSettingsTransferProjectButton = projectSettingsContent.add('transferProjectButton');
+
+export const projectSettingsDeleteForm = DO('projectSettingsDeleteForm');
+export const projectSettingsDeleteProjectInput = projectSettingsDeleteForm.add('confirmDeleteInput');
+export const projectSettingsConfirmDeleteProjectButton = projectSettingsDeleteForm.add('confirmDeleteProjectButton');
+export const projectSettingsCancelDeleteProjectButton = projectSettingsDeleteForm.add('cancelDeleteProjectButton');
+
+export const projectSettingsTransferForm = DO('projectSettingsTransferForm');
+export const projectSettingsTransferProjectKeyInput = projectSettingsTransferForm.add('transferProjectKeyInput');
+export const projectSettingsTransferProjectOwnerButton = projectSettingsTransferForm.add('transferProjectOwnerButton');
+export const projectSettingsConfirmTransferProjectButton =
+    projectSettingsTransferForm.add('confirmTransferProjectButton');
+export const projectSettingsCancelTransferProjectButton =
+    projectSettingsTransferForm.add('cancelTransferProjectButton');

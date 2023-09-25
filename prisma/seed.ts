@@ -6,6 +6,9 @@ import { prisma } from '../src/utils/prisma';
 const adminEmail = process.env.ADMIN_EMAIL || 'tony@taskany.org';
 const adminPassword = process.env.ADMIN_PASSWORD || 'taskany';
 
+const userEmail = 'user@taskany.org';
+const userPassword = 'taskany';
+
 (async () => {
     assert(adminEmail, "Admin's email isn't provided. Check your environment variables: ADMIN_EMAIL.");
     assert(adminPassword, "Admin's password isn't provided. Check your environment variables: ADMIN_PASSWORD.");
@@ -100,6 +103,27 @@ const adminPassword = process.env.ADMIN_PASSWORD || 'taskany';
                         provider: 'email',
                         providerAccountId: 'credentials',
                         password: adminPassword,
+                    },
+                },
+                activity: {
+                    create: {
+                        settings: {
+                            create: {},
+                        },
+                    },
+                },
+            },
+        }),
+        prisma.user.create({
+            data: {
+                email: userEmail,
+                role: 'USER',
+                accounts: {
+                    create: {
+                        type: 'credentials',
+                        provider: 'email',
+                        providerAccountId: 'userCredentials',
+                        password: userPassword,
                     },
                 },
                 activity: {
