@@ -25,9 +25,9 @@ export const SettingsCard = styled(FormCard)<{ view?: SettingsCardViewType }>`
     border-color: ${({ view = 'default' }) => colorsMap[view]};
 `;
 
-export const SettingsContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SettingsContent: React.FC<{ children: React.ReactNode }> = ({ children, ...attrs }) => {
     return (
-        <StyledSettingsContent>
+        <StyledSettingsContent {...attrs}>
             <div>{children}</div>
         </StyledSettingsContent>
     );

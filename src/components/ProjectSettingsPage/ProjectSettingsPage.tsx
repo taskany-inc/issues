@@ -20,8 +20,11 @@ import {
     ModalContent,
     TabsMenuItem,
     TabsMenu,
+    nullable,
+    UserPic,
+    Tag,
 } from '@taskany/bricks';
-import { IconExclamationCircleSolid } from '@taskany/icons';
+import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { PageSep } from '../PageSep';
@@ -39,6 +42,28 @@ import { ActivityByIdReturnType, ProjectUpdateReturnType } from '../../../trpc/i
 import { Tip } from '../Tip';
 import { TextList, TextListItem } from '../TextList';
 import { CommonHeader } from '../CommonHeader';
+import {
+    projectSettingsCancelDeleteProjectButton,
+    projectSettingsConfirmDeleteProjectButton,
+    projectSettingsDeleteProjectInput,
+    projectSettingsContent,
+    projectSettingsDeleteProjectButton,
+    projectSettingsDescriptionInput,
+    projectSettingsParentMultiInput,
+    projectSettingsSaveButton,
+    projectSettingsTitleInput,
+    projectSettingsDeleteForm,
+    projectSettingsTransferForm,
+    projectSettingsTransferProjectKeyInput,
+    projectSettingsTransferProjectOwnerButton,
+    projectSettingsConfirmTransferProjectButton,
+    projectSettingsCancelTransferProjectButton,
+    projectSettingsTransferProjectButton,
+    projectSettingsParentMultiInputTrigger,
+    projectSettingsParentMultiInputTagClean,
+    pageTabs,
+    pageHeader,
+} from '../../utils/domObjects';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -59,6 +84,11 @@ const StyledModalActions = styled.div`
     width: 100%;
     align-items: center;
     justify-content: flex-end;
+`;
+
+const StyledTag = styled(Tag)`
+    display: flex;
+    gap: ${gapS};
 `;
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
@@ -194,8 +224,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
-            <CommonHeader title={project.data.title} description={project.data.description}>
-                <TabsMenu>
+            <CommonHeader title={project.data.title} description={project.data.description} {...pageHeader.attr}>
+                <TabsMenu {...pageTabs.attr}>
                     {tabsMenuOptions.map(([title, href]) => (
                         <NextLink key={title} href={href} passHref legacyBehavior>
                             <TabsMenuItem active={nextRouter.asPath.split('?')[0] === href}>{title}</TabsMenuItem>
@@ -206,7 +236,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
             <PageSep />
 
-            <SettingsContent>
+            <SettingsContent {...projectSettingsContent.attr}>
                 <SettingsCard>
                     <Form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
                         <Fieldset title={tr('General')}>
@@ -226,6 +256,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 autoComplete="off"
                                 flat="bottom"
                                 error={errorsResolver('title')}
+                                {...projectSettingsTitleInput.attr}
                             />
 
                             <FormInput
@@ -234,6 +265,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 label={tr('Description')}
                                 flat="both"
                                 error={errorsResolver('description')}
+                                {...projectSettingsDescriptionInput.attr}
                             />
 
                             <Controller
@@ -246,7 +278,25 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                         // FIXME: move filter to server
                                         items={suggestions.data?.filter((p) => !projectParentIds.includes(p.id))}
                                         onInput={(q) => setParentQuery(q)}
+                                        renderTrigger={(props) => (
+                                            <IconPlusCircleOutline
+                                                size="xs"
+                                                onClick={props.onClick}
+                                                {...projectSettingsParentMultiInputTrigger.attr}
+                                            />
+                                        )}
+                                        renderItem={(item) => (
+                                            <StyledTag key={item.id}>
+                                                {item.title}
+                                                <IconXSolid
+                                                    size="xxs"
+                                                    onClick={item.onClick}
+                                                    {...projectSettingsParentMultiInputTagClean.attr}
+                                                />
+                                            </StyledTag>
+                                        )}
                                         {...field}
+                                        {...projectSettingsParentMultiInput.attr}
                                     />
                                 )}
                             />
@@ -262,6 +312,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                     disabled={!isDirty}
                                     text={tr('Save')}
                                     outline
+                                    {...projectSettingsSaveButton.attr}
                                 />
                             </FormAction>
                         </FormActions>
@@ -283,6 +334,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                         size="m"
                                         view="warning"
                                         text={tr('Delete project')}
+                                        {...projectSettingsDeleteProjectButton.attr}
                                     />
                                 </FormAction>
                             </FormActions>
@@ -299,6 +351,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                         size="m"
                                         view="warning"
                                         text={tr('Transfer ownership')}
+                                        {...projectSettingsTransferProjectButton.attr}
                                     />
                                 </FormAction>
                             </FormActions>
@@ -356,24 +409,31 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                     <br />
 
-                    <Form>
+                    <Form {...projectSettingsDeleteForm.attr}>
                         <FormInput
                             flat="bottom"
                             placeholder={tr('Project key')}
                             autoComplete="off"
                             onChange={onConfirmationInputChange}
+                            {...projectSettingsDeleteProjectInput.attr}
                         />
 
                         <FormActions flat="top">
                             <FormAction left />
                             <FormAction right inline>
-                                <Button size="m" text={tr('Cancel')} onClick={onDeleteCancel} />
+                                <Button
+                                    size="m"
+                                    text={tr('Cancel')}
+                                    onClick={onDeleteCancel}
+                                    {...projectSettingsCancelDeleteProjectButton.attr}
+                                />
                                 <Button
                                     size="m"
                                     view="warning"
                                     disabled={keyConfirmation !== project.data.id}
                                     onClick={deleteProject(onProjectDelete)}
                                     text={tr('Yes, delete it')}
+                                    {...projectSettingsConfirmDeleteProjectButton.attr}
                                 />
                             </FormAction>
                         </FormActions>
@@ -399,12 +459,13 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                     <br />
 
-                    <Form>
+                    <Form {...projectSettingsTransferForm.attr}>
                         <FormInput
                             flat="bottom"
                             placeholder={tr('Project key')}
                             autoComplete="off"
                             onChange={onConfirmationInputChange}
+                            {...projectSettingsTransferProjectKeyInput.attr}
                         />
                         <FormActions flat="top">
                             <FormAction left>
@@ -413,10 +474,30 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                     placeholder={tr('Enter name or email')}
                                     value={transferTo}
                                     onChange={onTransferToChange}
+                                    renderTrigger={(props) => (
+                                        <Button
+                                            text={props.text}
+                                            disabled={props.disabled}
+                                            onClick={props.onClick}
+                                            iconLeft={nullable(transferTo, (v) => (
+                                                <UserPic
+                                                    src={v.user?.image}
+                                                    email={v.user?.email || v.ghost?.email}
+                                                    size={16}
+                                                />
+                                            ))}
+                                            {...projectSettingsTransferProjectOwnerButton.attr}
+                                        />
+                                    )}
                                 />
                             </FormAction>
                             <FormAction right inline>
-                                <Button size="m" text={tr('Cancel')} onClick={onTransferCancel} />
+                                <Button
+                                    size="m"
+                                    text={tr('Cancel')}
+                                    onClick={onTransferCancel}
+                                    {...projectSettingsCancelTransferProjectButton.attr}
+                                />
                                 <Button
                                     size="m"
                                     view="warning"
@@ -427,6 +508,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                             : undefined
                                     }
                                     text={tr('Transfer ownership')}
+                                    {...projectSettingsConfirmTransferProjectButton.attr}
                                 />
                             </FormAction>
                         </FormActions>
