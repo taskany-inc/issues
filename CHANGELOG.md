@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.32.0](https://github.com/taskany-inc/issues/compare/v1.31.0...v1.32.0) (2023-09-25)
+
+
+### Features
+
+* ***Page:** apply new component api ([fe2a228](https://github.com/taskany-inc/issues/commit/fe2a22802541621a2c9b213c3b13e52aeac2e106))
+* component GlobalSearch imported from bricks ([a500b27](https://github.com/taskany-inc/issues/commit/a500b2708aae4028a5d6395bb183aff521ffed54))
+* component Keyboard imported from bricks ([76068ec](https://github.com/taskany-inc/issues/commit/76068ec480b098e202c6e5e05fe74a6b34421edd))
+* **EstimateFilter:** [@previous](https://github.com/previous), [@current](https://github.com/current), [@next](https://github.com/next) aliases ([536f0bf](https://github.com/taskany-inc/issues/commit/536f0bf8c0f358225abe36c803667093f63d93c8))
+* **FilterPanel:** add new components ([a53c17f](https://github.com/taskany-inc/issues/commit/a53c17fd53ea5b507c7f368d5d52f1ad220df5c4))
+* **FilterPanel:** apply new components for panel ([2c59253](https://github.com/taskany-inc/issues/commit/2c59253f4f72aa5d0353716b9cf4f2dec56ddfce))
+* **FilterPanel:** replace Dropdown components to Tab and AutoComplete components ([0320995](https://github.com/taskany-inc/issues/commit/0320995cdae533bbf547ad851a7409116673b873))
+* **SortFilter:** rewrite filter with AutoComplete usage ([0f9e37b](https://github.com/taskany-inc/issues/commit/0f9e37bf59b58dd09687d0ed2d2c6714cdb71185))
+* **useUrlFilterParams:** append batch method update for state ([b7b87a0](https://github.com/taskany-inc/issues/commit/b7b87a09e2e67dce348fbf826d16c75b8fd60a85))
+
+
+### Bug Fixes
+
+* corrected a spelling mistake in word Schema ([57f83d0](https://github.com/taskany-inc/issues/commit/57f83d08f9640339db6eb2775eee12cc2e5546fe))
+* **FilterPanel:** apply visual styles ([3a93f31](https://github.com/taskany-inc/issues/commit/3a93f31de1253b61dcd255a7425040c71aca9e5a))
+* **FilterPanel:** visual changes ([654dfe0](https://github.com/taskany-inc/issues/commit/654dfe0f2521a5958bcb02f43b7d4ffe7e2f60e0))
+* **FilterTabLabel:** drop unnecassery code ([8abc4bc](https://github.com/taskany-inc/issues/commit/8abc4bcd61e499c48ad094f77c0542d0316ed375))
+* tab settings must be visible only for project owners ([83edb3e](https://github.com/taskany-inc/issues/commit/83edb3ea1a9f77827279cc1ec3d55ad497bb7ba5))
+
 ## [1.31.0](https://github.com/taskany-inc/issues/compare/v1.30.0...v1.31.0) (2023-09-21)
 
 
