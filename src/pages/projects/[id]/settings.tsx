@@ -3,7 +3,7 @@ import { routes } from '../../../hooks/router';
 import { declareSsrProps } from '../../../utils/declareSsrProps';
 
 export const getServerSideProps = declareSsrProps(
-    async ({ ssrHelpers, user, params: { id } }) => {
+    async ({ ssrHelpers, params: { id } }) => {
         const data = await ssrHelpers.project.getById.fetch({ id });
 
         if (!data) {
@@ -12,7 +12,7 @@ export const getServerSideProps = declareSsrProps(
             };
         }
 
-        if (user.role === 'USER' && !data._isOwner) {
+        if (!data._isEditable) {
             return {
                 redirect: {
                     permanent: false,

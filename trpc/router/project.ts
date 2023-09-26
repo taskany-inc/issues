@@ -27,20 +27,18 @@ export const addCalculatedProjectFields = <
     project: T,
     activityId: string,
     role: Role,
-): T & {
-    _isWatching?: boolean;
-    _isStarred?: boolean;
-    _isOwner: boolean;
-} => {
+) => {
     const _isWatching = project.watchers?.some((watcher: any) => watcher.id === activityId);
     const _isStarred = project.stargizers?.some((stargizer: any) => stargizer.id === activityId);
-    const _isOwner = project.activityId === activityId || role === 'ADMIN';
+    const _isOwner = project.activityId === activityId;
+    const _isEditable = _isOwner || role === 'ADMIN';
 
     return {
         ...project,
         _isWatching,
         _isStarred,
         _isOwner,
+        _isEditable,
     };
 };
 
