@@ -241,7 +241,7 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
             >
                 <TabsMenu {...pageTabs.attr}>
                     {tabsMenuOptions.map(([title, href, ownerOnly]) =>
-                        nullable(ownerOnly ? project?._isOwner : true, () => {
+                        nullable(ownerOnly ? project?._isEditable : true, () => {
                             const isActive = nextRouter.asPath.split('?')[0] === href;
                             const activeAttrs = isActive ? pageActiveTabItem.attr : null;
 
