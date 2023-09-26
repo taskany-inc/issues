@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormInput, Button } from '@taskany/bricks';
+import { FormInput, Button, InlineForm } from '@taskany/bricks';
 import { gray7 } from '@taskany/colors';
 import { IconTargetOutline, IconPlusCircleOutline } from '@taskany/icons';
 import { useCallback, useMemo, useState } from 'react';
@@ -9,7 +9,6 @@ import styled from 'styled-components';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { dependencyKind, ToggleGoalDependency, toggleGoalDependencySchema } from '../../schema/goal';
 import { GoalSuggest } from '../GoalSuggest';
-import { InlineForm } from '../InlineForm';
 import { InlineTrigger } from '../InlineTrigger';
 
 import { tr } from './GoalDependencyForm.i18n';
@@ -49,7 +48,7 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
         setValue,
         reset,
         watch,
-        formState: { isSubmitSuccessful, errors },
+        formState: { errors },
     } = useForm({
         resolver: zodResolver(toggleGoalDependencySchema),
         mode: 'onChange',
@@ -112,7 +111,6 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
                     {...props}
                 />
             )}
-            isSubmitted={isSubmitSuccessful}
             onSubmit={handleSubmit(onSubmit)}
             onReset={resetFormHandler}
         >

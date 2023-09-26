@@ -1,7 +1,7 @@
 import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, FormInput, TableRow, TableCell, Popup, Keyboard } from '@taskany/bricks';
+import { Button, FormInput, TableRow, TableCell, Popup, InlineForm } from '@taskany/bricks';
 import { IconPlusCircleOutline, IconTargetOutline } from '@taskany/icons';
 import { gray7, gray8 } from '@taskany/colors';
 import { Controller, useForm } from 'react-hook-form';
@@ -11,7 +11,6 @@ import { z } from 'zod';
 import { InlineTrigger } from '../InlineTrigger';
 import { criteriaSchema, updateCriteriaSchema } from '../../schema/criteria';
 import { GoalSuggest } from '../GoalSuggest';
-import { InlineForm } from '../InlineForm';
 import { Tip } from '../Tip';
 
 import { tr } from './CriteriaForm.i18n';
@@ -155,7 +154,7 @@ interface CriteriaFormProps {
         sum: number;
         title: string[];
     };
-    renderTrigger?: React.ComponentProps<typeof InlineForm>['renderTrigger'];
+    renderTrigger: React.ComponentProps<typeof InlineForm>['renderTrigger'];
 }
 interface CriteriaFormPropsWithSchema extends CriteriaFormProps {
     schema: Zod.Schema;
@@ -174,15 +173,7 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
     onReset,
     renderTrigger,
 }) => {
-    const {
-        handleSubmit,
-        control,
-        register,
-        reset,
-        setValue,
-        watch,
-        formState: { isSubmitSuccessful },
-    } = useForm<z.infer<typeof schema>>({
+    const { handleSubmit, control, register, reset, setValue, watch } = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -226,20 +217,8 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
     );
 
     return (
-        <TableRow align="center">
-            <InlineForm
-                renderTrigger={renderTrigger}
-                onSubmit={handleSubmit(onSubmit)}
-                onReset={onResetHandler}
-                isSubmitted={isSubmitSuccessful}
-                tip={
-                    <Tip>
-                        {tr.raw('Press key to add criteria', {
-                            key: <Keyboard key="cmd/enter" size="s" command enter />,
-                        })}
-                    </Tip>
-                }
-            >
+        <InlineForm renderTrigger={renderTrigger} onSubmit={handleSubmit(onSubmit)} onReset={onResetHandler}>
+            <TableRow align="center">
                 <StyledTableCell col={5} align="center">
                     <Controller
                         name="title"
@@ -273,10 +252,10 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
                         outline
                     />
                 </StyledTableCell>
-                <input type="hidden" {...register('goalId')} />
-                <input type="hidden" {...register('goalAsGriteria.id')} />
-            </InlineForm>
-        </TableRow>
+            </TableRow>
+            <input type="hidden" {...register('goalId')} />
+            <input type="hidden" {...register('goalAsGriteria.id')} />
+        </InlineForm>
     );
 };
 
@@ -324,7 +303,7 @@ function patchZodSchema<T extends typeof criteriaSchema | typeof updateCriteriaS
 }
 
 export const AddCriteriaForm: React.FC<
-    CriteriaFormProps & { onSubmit: (val: z.infer<typeof criteriaSchema>) => void }
+    Omit<CriteriaFormProps, 'renderTrigger'> & { onSubmit: (val: z.infer<typeof criteriaSchema>) => void }
 > = ({ validityData, onSubmit, goalId, onReset }) => {
     return (
         <CriteriaForm
@@ -346,7 +325,7 @@ export const AddCriteriaForm: React.FC<
 };
 
 export const EditCriteriaForm: React.FC<
-    CriteriaFormProps & {
+    Omit<CriteriaFormProps, 'renderTrigger'> & {
         values: z.infer<typeof updateCriteriaSchema>;
         onSubmit: (val: z.infer<typeof updateCriteriaSchema>) => void;
     }
@@ -360,6 +339,7 @@ export const EditCriteriaForm: React.FC<
             onReset={onReset}
             validityData={validityData}
             values={values}
+            renderTrigger={() => null}
         />
     );
 };
