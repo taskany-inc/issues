@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useMounted } from '@taskany/bricks';
+import styled from 'styled-components';
+import { nullable, useMounted } from '@taskany/bricks';
+import { gapXs } from '@taskany/colors';
 
 import { dateAgo, createLocaleDate, parseLocaleDate } from '../../utils/dateTime';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -17,6 +19,15 @@ interface RelativeTimeProps {
     isRelativeTime?: boolean;
     hover?: boolean;
 }
+
+const StyledTimeValue = styled.span`
+    padding-left: ${gapXs};
+`;
+
+const StyledRelativeTime = styled.span`
+    display: flex;
+    align-items: center;
+`;
 
 export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true, hover = false }) => {
     const { ssrTime } = usePageContext();
@@ -47,13 +58,17 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelati
     const timeValue = isRelativeTime ? dateAgo(localeDate, time, { locale }) : createLocaleDate(localeDate, { locale });
 
     return (
-        <>
-            {kind ? `${map[kind]} ` : ''}
+        <StyledRelativeTime>
+            {nullable(kind, (k) => (
+                <span>{map[k]}</span>
+            ))}
             {hover ? (
-                <Light title={createLocaleDate(localeDate, { locale })}>{timeValue}</Light>
+                <Light title={createLocaleDate(localeDate, { locale })}>
+                    <StyledTimeValue>{timeValue}</StyledTimeValue>
+                </Light>
             ) : (
-                <span>{timeValue}</span>
+                <StyledTimeValue>{timeValue}</StyledTimeValue>
             )}
-        </>
+        </StyledRelativeTime>
     );
 };

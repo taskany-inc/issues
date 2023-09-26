@@ -63,6 +63,11 @@ const IssueContent = styled(PageContent)`
     gap: ${gapM};
 `;
 
+const StyledPublicActions = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
 const StyledCardInfo = styled(CardInfo)`
     display: grid;
     grid-template-columns: 6fr 6fr;
@@ -287,23 +292,27 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                     <IssueTitle title={goal.title} />
 
-                    {nullable(goal?.state, (s) =>
-                        goal._isEditable && project?.flowId ? (
-                            <StateSwitch state={s} flowId={project.flowId} onClick={onGoalStateChange} />
-                        ) : (
-                            <State title={s.title} hue={s.hue} />
-                        ),
-                    )}
+                    <StyledPublicActions>
+                        {nullable(goal?.state, (s) =>
+                            goal._isEditable && project?.flowId ? (
+                                <StateSwitch state={s} flowId={project.flowId} onClick={onGoalStateChange} />
+                            ) : (
+                                <State title={s.title} hue={s.hue} />
+                            ),
+                        )}
 
-                    <IssueStats
-                        estimate={goal.estimate}
-                        estimateType={goal.estimateType}
-                        priority={goal.priority}
-                        achivedCriteriaWeight={goal._hasAchievementCriteria ? goal._achivedCriteriaWeight : undefined}
-                        comments={goal._count?.comments ?? 0}
-                        onCommentsClick={onCommentsClick}
-                        updatedAt={goal.updatedAt}
-                    />
+                        <IssueStats
+                            estimate={goal.estimate}
+                            estimateType={goal.estimateType}
+                            priority={goal.priority}
+                            achivedCriteriaWeight={
+                                goal._hasAchievementCriteria ? goal._achivedCriteriaWeight : undefined
+                            }
+                            comments={goal._count?.comments ?? 0}
+                            onCommentsClick={onCommentsClick}
+                            updatedAt={goal.updatedAt}
+                        />
+                    </StyledPublicActions>
                 </StyledIssueInfo>
 
                 <StyledIssueInfo align="right">

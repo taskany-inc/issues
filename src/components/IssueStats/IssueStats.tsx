@@ -27,6 +27,8 @@ interface IssueStatsProps {
 
 const StyledIssueStats = styled(Text)<Pick<IssueStatsProps, 'mode'>>`
     display: flex;
+    align-items: center;
+
     ${({ mode }) =>
         mode === 'default' &&
         `
@@ -37,17 +39,8 @@ const StyledIssueStats = styled(Text)<Pick<IssueStatsProps, 'mode'>>`
 const StyledDotSep = styled.span`
     display: flex;
     align-items: center;
-}
 `;
 
-const StyledCircleProgressBar = styled(CircleProgressBar)`
-    vertical-align: middle;
-`;
-
-const StyledUserGroupContainer = styled.span`
-    display: flex;
-    vertical-align: middle;
-`;
 const CommentsCountIcon = styled(IconMessageOutline)`
     display: inline-block;
     vertical-align: middle;
@@ -86,11 +79,10 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
         <StyledIssueStats mode={mode} as="span" size="m" color={gray8}>
             {nullable(issuers.length, () => (
                 <DotSep>
-                    <StyledUserGroupContainer>
-                        <UserGroup users={issuers} />
-                    </StyledUserGroupContainer>
+                    <UserGroup users={issuers} />
                 </DotSep>
             ))}
+
             {nullable(estimate, (e) => (
                 <DotSep>
                     {formateEstimate(e, {
@@ -99,21 +91,25 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
                     })}
                 </DotSep>
             ))}
+
             {nullable(priority, (p) => (
                 <DotSep>{getPriorityText(p)}</DotSep>
             ))}
+
             {achivedCriteriaWeight != null && (
                 <DotSep>
-                    <StyledCircleProgressBar value={achivedCriteriaWeight} />
+                    <CircleProgressBar value={achivedCriteriaWeight} />
                 </DotSep>
             )}
+
             <DotSep>
-                <RelativeTime key={Date.now()} kind={mode === 'compact' ? undefined : 'updated'} date={updatedAt} />
+                <RelativeTime kind={mode === 'compact' ? undefined : 'updated'} date={updatedAt} />
             </DotSep>
+
             {nullable(comments, () => (
                 <DotSep>
                     <Link inline onClick={onCommentsClick}>
-                        {comments} <CommentsCountIcon size="s" />
+                        <CommentsCountIcon size="s" /> {comments}
                     </Link>
                 </DotSep>
             ))}
