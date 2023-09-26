@@ -93,8 +93,8 @@ const CommentsCountContainer = styled.div`
 
 const CommentsCount = styled(Text)`
     display: inline-block;
-    margin-left: ${gapXs};
-    vertical-align: middle;
+    margin-right: ${gapXs};
+    vertical-align: top;
 `;
 
 const CommentsCountIcon = styled(IconMessageOutline)`
@@ -324,10 +324,10 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                         <TableCell width="6ch">
                             {comments !== 0 && (
                                 <CommentsCountContainer>
-                                    <CommentsCountIcon size="s" />
                                     <CommentsCount size="xs" weight="bold">
                                         {comments}
                                     </CommentsCount>
+                                    <CommentsCountIcon size="s" />
                                 </CommentsCountContainer>
                             )}
                         </TableCell>
