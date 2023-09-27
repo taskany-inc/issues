@@ -1,14 +1,13 @@
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { gray9, gray10 } from '@taskany/colors';
-import { Button, Dropdown, MenuItem, Text, Keyboard } from '@taskany/bricks';
+import { Button, Dropdown, MenuItem, Text, Keyboard, Tip } from '@taskany/bricks';
 import { IconBulbOnOutline, IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 
 import { useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
-import { Tip } from '../Tip';
 import { GoalForm } from '../GoalForm/GoalForm';
 import { trpc } from '../../utils/trpcClient';
 import { GoalCommon, goalCommonSchema } from '../../schema/goal';

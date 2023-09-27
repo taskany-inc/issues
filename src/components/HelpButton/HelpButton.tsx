@@ -1,6 +1,7 @@
 import React from 'react';
+import styled from 'styled-components';
 import NextLink from 'next/link';
-import { Link } from '@taskany/bricks';
+import { Link, Text } from '@taskany/bricks';
 import { gray9 } from '@taskany/colors';
 import { IconQuestionCircleOutline, iconSizesMap } from '@taskany/icons';
 
@@ -13,10 +14,16 @@ interface HelpButtonProps {
     color?: string;
 }
 
+const StyledIconQuestionCircleOutline = styled(IconQuestionCircleOutline)`
+    display: flex;
+`;
+
 export const HelpButton = React.memo(({ slug, size = 's', color = gray9 }: HelpButtonProps) => (
-    <NextLink passHref href={routes.help(slug)} legacyBehavior>
-        <Link>
-            <IconQuestionCircleOutline size={size} color={color} />
-        </Link>
-    </NextLink>
+    <Text color={color}>
+        <NextLink passHref href={routes.help(slug)} legacyBehavior>
+            <Link inline>
+                <StyledIconQuestionCircleOutline size={size} />
+            </Link>
+        </NextLink>
+    </Text>
 ));

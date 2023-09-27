@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button, Keyboard } from '@taskany/bricks';
+import { Button, Keyboard, Tip } from '@taskany/bricks';
 import { gray10 } from '@taskany/colors';
 import { IconBulbOnOutline } from '@taskany/icons';
 
@@ -7,7 +7,6 @@ import { GoalForm } from '../GoalForm/GoalForm';
 import { GoalUpdateReturnType, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { GoalUpdate, goalUpdateSchema } from '../../schema/goal';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { Tip } from '../Tip';
 import { trpc } from '../../utils/trpcClient';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { getDateStringFromEstimate } from '../../utils/dateTime';
