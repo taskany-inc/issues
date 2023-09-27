@@ -119,7 +119,6 @@ model Activity {
   comments           Comment[]
   reactions          Reaction[]
   projects           Project[]
-  estimates          Estimate[]
   projectParticipant Project[]             @relation("projectParticipants")
   goalParticipant    Goal[]                @relation("goalParticipants")
   goalWatchers       Goal[]                @relation("goalWatchers")
@@ -165,35 +164,6 @@ model Project {
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
 
-model Estimate {
-  id         Int              @id @default(autoincrement())
-  q          String?
-  y          String
-  date       String?
-  goal       EstimateToGoal[]
-  goalId     String
-  activity   Activity         @relation(fields: [activityId], references: [id])
-  activityId String
-
-  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
-
-  @@index([date])
-}
-
-model EstimateToGoal {
-  id         Int      @id @default(autoincrement())
-  goal       Goal     @relation(fields: [goalId], references: [id])
-  goalId     String
-  estimate   Estimate @relation(fields: [estimateId], references: [id])
-  estimateId Int
-
-  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
-
-  @@index([goalId])
-  @@index([estimateId])
-}
-
 model Priority {
   id    Int    @id @default(autoincrement())
   title String
@@ -216,7 +186,6 @@ model Goal {
   priorityId              Int?
   estimate                DateTime?
   estimateType            DateType?
-  legacyEstimate          EstimateToGoal[]
   project                 Project?              @relation("projectGoals", fields: [projectId], references: [id])
   projectId               String?
   teamId                  String?
