@@ -24,6 +24,7 @@ import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
 import { getUserName, tryGetName } from '../../utils/getUserName';
+import { filtersPanelResetButton } from '../../utils/domObjects';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -180,7 +181,9 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 onFilterApply={batchQueryState}
                 onLimitChange={setLimitFilter}
             >
-                {(Boolean(queryString) || preset) && <Button text={tr('Reset')} onClick={resetQueryState} />}
+                {(Boolean(queryString) || preset) && (
+                    <Button text={tr('Reset')} onClick={resetQueryState} {...filtersPanelResetButton.attr} />
+                )}
             </FiltersPanel>
 
             <PageContent>

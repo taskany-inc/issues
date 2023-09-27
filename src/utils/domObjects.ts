@@ -12,6 +12,9 @@ export const createSelectButton = header.add('createSelectButton');
 export const createProjectItem = header.add('createProjectItem');
 export const createGoalItem = header.add('createGoalItem');
 
+export const filtersPanel = DO('filtersPanel');
+export const filtersPanelResetButton = filtersPanel.add('resetButton');
+
 export const projectCreateForm = DO('projectCreateForm');
 export const projectTitleInput = projectCreateForm.add('titleInput');
 export const projectDescriptionInput = projectCreateForm.add('descriptionInput');
