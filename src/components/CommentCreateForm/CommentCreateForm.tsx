@@ -142,9 +142,9 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                         brick="left"
                                         iconRight={
                                             props.visible ? (
-                                                <IconUpSmallSolid size="s" noWrap />
+                                                <IconUpSmallSolid size="s" />
                                             ) : (
-                                                <IconDownSmallSolid size="s" noWrap />
+                                                <IconDownSmallSolid size="s" />
                                             )
                                         }
                                         ref={props.ref}

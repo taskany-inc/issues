@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import { gapXs, gray8 } from '@taskany/colors';
 import { Dot, Text, Link, nullable, CircleProgressBar } from '@taskany/bricks';
-import { IconMessageOutline } from '@taskany/icons';
 
 import { formateEstimate } from '../../utils/dateTime';
 import { DateType } from '../../types/date';
@@ -11,6 +10,7 @@ import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { UserGroup } from '../UserGroup';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
+import { CommentsCountBadge } from '../CommentsCountBadge';
 
 interface IssueStatsProps {
     updatedAt: Date;
@@ -39,11 +39,6 @@ const StyledIssueStats = styled(Text)<Pick<IssueStatsProps, 'mode'>>`
 const StyledDotSep = styled.span`
     display: flex;
     align-items: center;
-`;
-
-const CommentsCountIcon = styled(IconMessageOutline)`
-    display: inline-block;
-    vertical-align: middle;
 `;
 
 const DotSep: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -109,7 +104,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
             {nullable(comments, () => (
                 <DotSep>
                     <Link inline onClick={onCommentsClick}>
-                        <CommentsCountIcon size="s" /> {comments}
+                        <CommentsCountBadge count={comments} />
                     </Link>
                 </DotSep>
             ))}

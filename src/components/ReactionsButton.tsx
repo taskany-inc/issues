@@ -37,7 +37,7 @@ export const ReactionsButton = React.memo(
                     emoji ? (
                         <StyledEmoji dangerouslySetInnerHTML={{ __html: emoji }} />
                     ) : (
-                        <IconMoodTongueOutline noWrap size="xs" />
+                        <IconMoodTongueOutline size="xs" />
                     )
                 }
                 onClick={onButtonClick(emoji)}

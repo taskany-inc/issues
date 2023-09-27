@@ -330,7 +330,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         {nullable(goal._isEditable, () => (
                             <Button
                                 text={tr('Edit')}
-                                iconLeft={<IconEditOutline noWrap size="xs" />}
+                                iconLeft={<IconEditOutline size="xs" />}
                                 onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
                             />
                         ))}
@@ -509,7 +509,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onChange={onGoalParticipantAdd}
                                     renderTrigger={(props) => (
                                         <StyledInlineTrigger
-                                            icon={<IconPlusCircleOutline noWrap size="xs" />}
+                                            icon={<IconPlusCircleOutline size="xs" />}
                                             text={tr('Add participant')}
                                             onClick={props.onClick}
                                         />
@@ -536,7 +536,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                         onChange={onGoalTagAdd}
                                         renderTrigger={(props) => (
                                             <StyledInlineTrigger
-                                                icon={<IconPlusCircleOutline noWrap size="xs" />}
+                                                icon={<IconPlusCircleOutline size="xs" />}
                                                 text={tr('Add tag')}
                                                 onClick={props.onClick}
                                             />
@@ -555,7 +555,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                     onChange={onGoalTransfer}
                                     renderTrigger={(props) => (
                                         <StyledInlineTrigger
-                                            icon={<IconArrowRightOutline noWrap size="xs" />}
+                                            icon={<IconArrowRightOutline size="xs" />}
                                             text={tr('Transfer goal')}
                                             onClick={props.onClick}
                                         />
@@ -565,7 +565,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
                             <StyledInlineInput>
                                 <StyledInlineTrigger
-                                    icon={<IconBinOutline noWrap size="xs" />}
+                                    icon={<IconBinOutline size="xs" />}
                                     text={tr('Archive goal')}
                                     onClick={dispatchModalEvent(ModalEvent.GoalDeleteModal)}
                                 />

@@ -23,7 +23,7 @@ export const InlineCreateGoalControl: React.FC<InlineCreateGoalControl> = ({ pro
             onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, {
                 id: projectId,
             })}
-            icon={<IconPlusCircleOutline noWrap size="s" />}
+            icon={<IconPlusCircleOutline size="s" />}
         />
     </StyledInlineTriggerWrapper>
 );

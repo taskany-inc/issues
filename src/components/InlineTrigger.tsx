@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 interface InlineTriggerProps {
     text: React.ReactNode;
-    /** recommended props: noWrap size="xs" */
+    /** recommended props: size="xs" */
     icon: React.ReactNode;
     className?: string;
     onClick?: () => void;

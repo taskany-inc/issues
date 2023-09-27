@@ -100,7 +100,7 @@ const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>
                     view={type === 'search' ? 'primary' : 'default'}
                     brick="right"
                     outline
-                    iconLeft={<IconTargetOutline size="xs" noWrap />}
+                    iconLeft={<IconTargetOutline size="xs" />}
                     onClick={() => setType((prev) => (prev === 'search' ? 'plain' : 'search'))}
                     onMouseEnter={() => setPopupVisible(true)}
                     onMouseLeave={() => setPopupVisible(false)}
@@ -316,7 +316,7 @@ export const AddCriteriaForm: React.FC<
             renderTrigger={({ onClick }) => (
                 <StyledInlineTrigger
                     text={tr('Add achievement criteria')}
-                    icon={<IconPlusCircleOutline noWrap size="s" />}
+                    icon={<IconPlusCircleOutline size="s" />}
                     onClick={onClick}
                 />
             )}

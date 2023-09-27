@@ -55,7 +55,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                         text={props.text}
                         onClick={props.onClick}
                         disabled={props.disabled}
-                        iconLeft={state ? <StateDot hue={state.hue} /> : <IconGitPullOutline noWrap size="xs" />}
+                        iconLeft={state ? <StateDot hue={state.hue} /> : <IconGitPullOutline size="xs" />}
                     />
                 )}
                 renderItem={(props) => (

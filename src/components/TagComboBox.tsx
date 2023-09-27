@@ -108,7 +108,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                             text={props.text}
                             disabled={props.disabled}
                             onClick={props.onClick}
-                            iconLeft={<IconTagOutline noWrap size="xs" />}
+                            iconLeft={<IconTagOutline size="xs" />}
                         />
                     )
                 }

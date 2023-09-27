@@ -17,7 +17,7 @@ interface IconProps {
 const Icon: React.FC<IconProps> = ({ watching }) => {
     const Comp = watching ? IconEyeOutline : IconEyeClosedSolid;
 
-    return <Comp size="s" noWrap />;
+    return <Comp size="s" />;
 };
 
 export const WatchButton: React.FC<WatchButtonProps> = ({ watcher, onToggle }) => {

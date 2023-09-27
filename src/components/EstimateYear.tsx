@@ -108,11 +108,7 @@ export const EstimateYear: React.FC<EstimateYearProps> = ({ option, value, readO
                                 view="default"
                                 brick="left"
                                 iconRight={
-                                    props.visible ? (
-                                        <IconUpSmallSolid size="s" noWrap />
-                                    ) : (
-                                        <IconDownSmallSolid size="s" noWrap />
-                                    )
+                                    props.visible ? <IconUpSmallSolid size="s" /> : <IconDownSmallSolid size="s" />
                                 }
                                 ref={props.ref}
                                 onClick={props.onClick}

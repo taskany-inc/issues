@@ -148,11 +148,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
                                     outline
                                     brick="left"
                                     iconRight={
-                                        props.visible ? (
-                                            <IconUpSmallSolid size="s" noWrap />
-                                        ) : (
-                                            <IconDownSmallSolid size="s" noWrap />
-                                        )
+                                        props.visible ? <IconUpSmallSolid size="s" /> : <IconDownSmallSolid size="s" />
                                     }
                                     ref={props.ref}
                                     onClick={props.onClick}

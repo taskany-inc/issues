@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import NextLink from 'next/link';
 import { textColor, gapS, gapXs, gray9, radiusM } from '@taskany/colors';
 import { Text, Tag as TagItem, nullable, CircleProgressBar, TableRow, TableCell } from '@taskany/bricks';
-import { IconEyeOutline, IconStarSolid, IconMessageOutline } from '@taskany/icons';
+import { IconEyeOutline, IconStarSolid } from '@taskany/icons';
 import type { State as StateType, Tag } from '@prisma/client';
 
 import { routes } from '../hooks/router';
@@ -19,6 +19,7 @@ import { State } from './State';
 import { RelativeTime } from './RelativeTime/RelativeTime';
 import { WrappedRowLink } from './WrappedRowLink';
 import { collapseOffset } from './CollapsableItem';
+import { CommentsCountBadge } from './CommentsCountBadge';
 
 interface GoalListItemProps {
     id: string;
@@ -85,21 +86,6 @@ const StyledGoalTag = styled(TagItem)`
     &:last-child {
         margin-right: 0;
     }
-`;
-
-const CommentsCountContainer = styled.div`
-    white-space: nowrap;
-`;
-
-const CommentsCount = styled(Text)`
-    display: inline-block;
-    margin-right: ${gapXs};
-    vertical-align: top;
-`;
-
-const CommentsCountIcon = styled(IconMessageOutline)`
-    display: inline-block;
-    vertical-align: middle;
 `;
 
 const GoalTextItem = styled(Text).attrs({
@@ -322,14 +308,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                         </TableCell>
 
                         <TableCell width="6ch">
-                            {comments !== 0 && (
-                                <CommentsCountContainer>
-                                    <CommentsCount size="xs" weight="bold">
-                                        {comments}
-                                    </CommentsCount>
-                                    <CommentsCountIcon size="s" />
-                                </CommentsCountContainer>
-                            )}
+                            {comments && comments !== 0 && <CommentsCountBadge count={comments} />}
                         </TableCell>
 
                         <TableCell col={1} justify="end">

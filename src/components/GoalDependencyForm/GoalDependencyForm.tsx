@@ -107,7 +107,7 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
             renderTrigger={(props) => (
                 <StyledInlineTrigger
                     text={isEmpty ? translate[kind] : translate.default}
-                    icon={<IconPlusCircleOutline noWrap size="s" />}
+                    icon={<IconPlusCircleOutline size="s" />}
                     {...props}
                 />
             )}
@@ -115,13 +115,7 @@ export const GoalDependencyAddForm: React.FC<GoalDependencyAddFormProps> = ({ go
             onReset={resetFormHandler}
         >
             <StyledTableRow>
-                <Button
-                    type="button"
-                    view="primary"
-                    brick="right"
-                    outline
-                    iconLeft={<IconTargetOutline size="xs" noWrap />}
-                />
+                <Button type="button" view="primary" brick="right" outline iconLeft={<IconTargetOutline size="xs" />} />
                 <GoalSuggest
                     value={selectedGoalId ? undefined : query}
                     showSuggest={!selectedGoalId}
