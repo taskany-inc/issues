@@ -1,55 +1,94 @@
-import React, { ComponentProps, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import styled from 'styled-components';
+import { gapXs, gapS, warn0 } from '@taskany/colors';
+import { nullable, Text } from '@taskany/bricks';
+import { IconExclamationSmallOutline } from '@taskany/icons';
 
-import { createDateRange, isPastDate, getQuarterFromDate, getYearFromDate } from '../../utils/dateTime';
+import {
+    createDateRange,
+    isPastDate,
+    getQuarterFromDate,
+    getYearFromDate,
+    getDateString,
+    getRelativeQuarterRange,
+    createLocaleDate,
+    createYearRange,
+} from '../../utils/dateTime';
+import { useLocale } from '../../hooks/useLocale';
 import { DateType, DateRange } from '../../types/date';
-import { EstimateDate } from '../EstimateDate';
+import { EstimateDate } from '../EstimateDate/EstimateDate';
 import { EstimateQuarter } from '../EstimateQuarter';
 import { EstimateYear } from '../EstimateYear';
-import { Option } from '../../types/estimate';
-import { EstimatePopup } from '../EstimatePopup';
 
 import { tr } from './Estimate.i18n';
 
-type EstimateValue = {
+const StyledWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: ${gapS};
+`;
+
+const StyledWarningWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    gap: ${gapXs};
+`;
+
+const StyledIconExclamationSmallOutline = styled(IconExclamationSmallOutline)`
+    border-radius: 100%;
+    align-items: center;
+    display: block;
+    background: ${warn0};
+    font-size: 0;
+`;
+
+export type EstimateValue = {
     type: DateType;
     range: DateRange;
 };
 
 export interface EstimateProps {
-    mask: string;
-    placeholder: string;
     value?: EstimateValue;
-    placement?: ComponentProps<typeof EstimatePopup>['placement'];
-    error?: { message?: string };
-    renderTrigger: (values: { onClick: () => void }) => ReactNode;
     onChange?: (value?: EstimateValue) => void;
-    onClose?: () => void;
 }
 
-export const Estimate: React.FC<EstimateProps> = ({
-    mask,
-    placeholder,
-    value,
-    placement,
-    error,
-    renderTrigger,
-    onChange,
-    onClose,
-}) => {
-    const [readOnly, setReadOnly] = useState({ year: true, quarter: true, date: true });
+export const getReadOnlyFields = (type: EstimateValue['type']) => {
+    if (type === 'Strict') {
+        return { year: true, quarter: true, date: false };
+    }
+    if (type === 'Quarter') {
+        return { year: false, quarter: false, date: true };
+    }
+    return { year: false, quarter: true, date: true };
+};
+
+const currentQuarterRange = getRelativeQuarterRange('current');
+const currentQuarter = getQuarterFromDate(currentQuarterRange.end);
+const currentYearRange = createYearRange(getYearFromDate(new Date()));
+
+export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value, onChange }, ref) => {
+    const locale = useLocale();
+    const [readOnly, setReadOnly] = useState(
+        value ? getReadOnlyFields(value.type) : { year: true, quarter: true, date: true },
+    );
     const [year, setYear] = useState(value ? getYearFromDate(value.range.end) : undefined);
     const [quarter, setQuarter] = useState(value ? getQuarterFromDate(value.range.end) : undefined);
     const [date, setDate] = useState(value ? value.range.end : undefined);
 
-    const onOpen = useCallback(() => {
-        if (value?.type === 'Strict') {
-            setReadOnly({ year: true, quarter: true, date: false });
-        } else if (value?.type === 'Quarter') {
-            setReadOnly({ year: false, quarter: false, date: true });
-        } else {
-            setReadOnly({ year: false, quarter: true, date: true });
-        }
-    }, [value]);
+    const onChangeHandler = useCallback(
+        (newValue?: EstimateValue) => {
+            const oldStartDate = value && value.range.start ? getDateString(value.range.start) : null;
+            const newStartDate = newValue && newValue.range.start ? getDateString(newValue.range.start) : null;
+
+            const oldEndDate = value ? getDateString(value.range.end) : null;
+            const newEndDate = newValue ? getDateString(newValue.range.end) : null;
+
+            if (value?.type !== newValue?.type || oldStartDate !== newStartDate || oldEndDate !== newEndDate) {
+                onChange?.(newValue);
+            }
+        },
+        [value, onChange],
+    );
 
     useEffect(() => {
         if (readOnly.quarter && readOnly.year && readOnly.date) {
@@ -57,7 +96,7 @@ export const Estimate: React.FC<EstimateProps> = ({
         }
 
         if (!readOnly.quarter) {
-            onChange?.(
+            onChangeHandler?.(
                 year
                     ? {
                           range: createDateRange(year, quarter),
@@ -66,7 +105,7 @@ export const Estimate: React.FC<EstimateProps> = ({
                     : undefined,
             );
         } else if (!readOnly.year) {
-            onChange?.(
+            onChangeHandler?.(
                 year
                     ? {
                           range: createDateRange(year),
@@ -75,7 +114,7 @@ export const Estimate: React.FC<EstimateProps> = ({
                     : undefined,
             );
         } else {
-            onChange?.(
+            onChangeHandler?.(
                 date
                     ? {
                           range: { end: date },
@@ -84,57 +123,7 @@ export const Estimate: React.FC<EstimateProps> = ({
                     : undefined,
             );
         }
-    }, [year, quarter, date, onChange, readOnly]);
-
-    const options = useMemo(
-        () => [
-            {
-                title: tr('Year title'),
-                clue: tr('Year clue'),
-                renderItem: (option: Option) => (
-                    <EstimateYear
-                        key={option.title}
-                        option={option}
-                        value={year}
-                        readOnly={readOnly.year}
-                        onChange={setYear}
-                        setReadOnly={setReadOnly}
-                    />
-                ),
-            },
-            {
-                title: tr('Quarter title'),
-                clue: `${tr('Quarter clue')} ${getQuarterFromDate(new Date())}.`,
-                renderItem: (option: Option) => (
-                    <EstimateQuarter
-                        key={option.title}
-                        option={option}
-                        value={quarter}
-                        readOnly={readOnly.quarter}
-                        onChange={setQuarter}
-                        setReadOnly={setReadOnly}
-                    />
-                ),
-            },
-            {
-                title: tr('Date title'),
-                clue: null,
-                renderItem: (option: Option) => (
-                    <EstimateDate
-                        key={option.title}
-                        mask={mask}
-                        placeholder={placeholder}
-                        option={option}
-                        value={date}
-                        readOnly={readOnly.date}
-                        onChange={setDate}
-                        setReadOnly={setReadOnly}
-                    />
-                ),
-            },
-        ],
-        [date, quarter, year, mask, placeholder, readOnly],
-    );
+    }, [year, quarter, date, onChangeHandler, readOnly]);
 
     const warning = useMemo(
         () => (value && isPastDate(value.range.end) ? { message: tr('Date is past') } : undefined),
@@ -142,15 +131,48 @@ export const Estimate: React.FC<EstimateProps> = ({
     );
 
     return (
-        <EstimatePopup
-            items={options}
-            placement={placement}
-            error={error}
-            warning={warning}
-            renderItem={({ renderItem, ...option }) => renderItem?.(option)}
-            renderTrigger={renderTrigger}
-            onClose={onClose}
-            onOpen={onOpen}
-        />
+        <StyledWrapper ref={ref}>
+            {nullable(warning, (warn) => (
+                <StyledWarningWrapper>
+                    <StyledIconExclamationSmallOutline size="xs" />
+                    <Text color={warn0} size="xs">
+                        {warn.message}
+                    </Text>
+                </StyledWarningWrapper>
+            ))}
+            <EstimateYear
+                title={tr('Year title')}
+                clue={tr
+                    .raw('Year clue', {
+                        end: createLocaleDate(currentYearRange.end, { locale }),
+                    })
+                    .join('')}
+                value={year}
+                readOnly={readOnly.year}
+                onChange={setYear}
+                setReadOnly={setReadOnly}
+            />
+            <EstimateQuarter
+                title={tr('Quarter title')}
+                clue={`${tr
+                    .raw('Quarter clue', {
+                        quarter: currentQuarter,
+                        end: createLocaleDate(currentQuarterRange.end, { locale }),
+                    })
+                    .join('')}`}
+                value={quarter}
+                readOnly={readOnly.quarter}
+                onChange={setQuarter}
+                setReadOnly={setReadOnly}
+            />
+            <EstimateDate
+                title={tr('Date title')}
+                clue={tr('Date clue')}
+                value={date}
+                readOnly={readOnly.date}
+                onChange={setDate}
+                setReadOnly={setReadOnly}
+            />
+        </StyledWrapper>
     );
-};
+});

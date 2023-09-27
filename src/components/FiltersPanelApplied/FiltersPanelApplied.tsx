@@ -7,9 +7,10 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateFilter } from '../StateFilter';
 import { UserFilter } from '../UserFilter/UserFilter';
 import { ProjectFilter } from '../ProjectFilter';
+import { decodeEstimateFromUrl } from '../EstimateFilter';
 import { TagFilter } from '../TagFilter';
 import { SortableProps, sortFilterTr } from '../SortFilter/SortFilter';
-import { decodeUrlDateRange, formateEstimate, getDateTypeFromRange } from '../../utils/dateTime';
+import { formateEstimate } from '../../utils/dateTime';
 import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './FiltersPanelApplied.i18n';
@@ -100,12 +101,12 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     if (queryState.estimate.length) {
         appliedMap[tr('Estimate')] = queryState.estimate
             .map((e) => {
-                const dateRange = decodeUrlDateRange(e);
+                const dateRange = decodeEstimateFromUrl(e);
 
                 if (dateRange) {
-                    return formateEstimate(dateRange.end, {
+                    return formateEstimate(dateRange.range.end, {
                         locale,
-                        type: getDateTypeFromRange(dateRange),
+                        type: dateRange.type,
                     });
                 }
 

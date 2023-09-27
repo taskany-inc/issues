@@ -14,8 +14,12 @@ const StyledQuarters = styled.div`
     gap: ${gapXs};
 `;
 
-interface EstimateQuarterProps {
-    option: Option;
+const StyledButton = styled(Button)`
+    display: flex;
+    justify-content: center;
+`;
+
+interface EstimateQuarterProps extends Option {
     value?: QuartersKeys;
     readOnly?: boolean;
     onChange?: (value?: QuartersKeys) => void;
@@ -31,7 +35,8 @@ interface EstimateQuarterProps {
 const quartersList = Object.values(Quarters);
 
 export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({
-    option,
+    title,
+    clue,
     value = null,
     readOnly,
     onChange,
@@ -72,15 +77,15 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({
 
     return (
         <EstimateOption
-            title={option.title}
-            clue={option.clue}
+            title={title}
+            clue={clue}
             readOnly={readOnly}
             onClick={onClick}
             renderTrigger={() => (
                 <StyledQuarters ref={ref}>
                     {quartersList.map((quarter) => {
                         return (
-                            <Button
+                            <StyledButton
                                 key={quarter}
                                 size="s"
                                 text={quarter}

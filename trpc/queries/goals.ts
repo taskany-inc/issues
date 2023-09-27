@@ -44,10 +44,14 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
             AND: {
                 OR: data.estimate.reduce<
                     {
-                        estimate: {
-                            lte: Date | undefined;
-                            gte: Date | undefined;
-                        };
+                        estimate:
+                            | {
+                                  lte: Date | undefined;
+                                  gte: Date | undefined;
+                              }
+                            | {
+                                  in: Date;
+                              };
                     }[]
                 >((acum, e) => {
                     const estimate = decodeUrlDateRange(e);
@@ -56,10 +60,14 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
                         const { start, end } = estimate;
 
                         acum.push({
-                            estimate: {
-                                gte: start || undefined,
-                                lte: end,
-                            },
+                            estimate: start
+                                ? {
+                                      gte: start,
+                                      lte: end,
+                                  }
+                                : {
+                                      in: end,
+                                  },
                         });
                     }
 

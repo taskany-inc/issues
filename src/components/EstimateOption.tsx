@@ -12,7 +12,7 @@ const StyledWrapper = styled.div`
 
 const StyledContent = styled.div`
     display: flex;
-    align-items: end;
+    align-items: center;
     gap: ${gapS};
 `;
 
@@ -38,7 +38,7 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({ title, clue, rea
             </StyledContent>
 
             {nullable(clue, (c) => (
-                <Text size="xxs" color={gray7}>
+                <Text size="xs" color={gray7}>
                     {c}
                 </Text>
             ))}

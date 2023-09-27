@@ -3,16 +3,14 @@ import { IconXSolid } from '@taskany/icons';
 import { useState, useRef, useCallback, Dispatch, SetStateAction, useEffect } from 'react';
 import InputMask from 'react-input-mask';
 
-import { useLocale } from '../hooks/useLocale';
-import { currentLocaleDate, parseLocaleDate, createLocaleDate } from '../utils/dateTime';
-import { Option } from '../types/estimate';
+import { useLocale } from '../../hooks/useLocale';
+import { currentLocaleDate, parseLocaleDate, createLocaleDate } from '../../utils/dateTime';
+import { Option } from '../../types/estimate';
+import { EstimateOption } from '../EstimateOption';
 
-import { EstimateOption } from './EstimateOption';
+import { tr } from './EstimateDate.i18n';
 
-interface EstimateDateProps {
-    mask: string;
-    placeholder: string;
-    option: Omit<Option, 'clue'>;
+interface EstimateDateProps extends Option {
     value?: Date;
     readOnly?: boolean;
     onChange?: (value?: Date) => void;
@@ -31,14 +29,7 @@ const isDateFullyFilled = (date: string) => {
     return cleanedDate.length === expectedLength;
 };
 
-export const EstimateDate: React.FC<EstimateDateProps> = ({
-    mask,
-    placeholder,
-    option,
-    readOnly,
-    onChange,
-    setReadOnly,
-}) => {
+export const EstimateDate: React.FC<EstimateDateProps> = ({ title, clue, readOnly, onChange, setReadOnly }) => {
     const locale = useLocale();
     const currentDate = currentLocaleDate({ locale });
     const [fullDate, setFullDate] = useState<string>(currentDate);
@@ -104,11 +95,17 @@ export const EstimateDate: React.FC<EstimateDateProps> = ({
 
     return (
         <EstimateOption
-            title={option.title}
+            title={title}
+            clue={clue}
             readOnly={readOnly}
             onClick={onClick}
             renderTrigger={() => (
-                <InputMask mask={mask} placeholder={placeholder} onChange={onChangeDate} value={fullDate}>
+                <InputMask
+                    mask={tr('Date input mask')}
+                    placeholder={tr('Date input mask placeholder')}
+                    onChange={onChangeDate}
+                    value={fullDate}
+                >
                     {/* @ts-ignore incorrect type in react-input-mask */}
                     {(props) => (
                         <Input ref={ref} iconRight={<IconXSolid size="xxs" onClick={onRemoveDate} />} {...props} />

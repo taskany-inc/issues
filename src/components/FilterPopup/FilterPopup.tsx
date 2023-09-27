@@ -45,6 +45,7 @@ const StyledFilterPanelPopupFooter = styled.div`
     padding: ${gapXs} ${gapS};
     margin-top: ${gapXs};
     align-items: center;
+    gap: ${gapS};
 `;
 
 const StyledActionWrapper = styled.div`

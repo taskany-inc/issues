@@ -47,7 +47,6 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         queryState,
         queryString,
         setTagsFilterOutside,
-        setEstimateFilter,
         setStarredFilter,
         setWatchingFilter,
         setFulltextFilter,
@@ -174,7 +173,6 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 preset={currentPreset}
                 presets={userFilters}
                 onSearchChange={setFulltextFilter}
-                onEstimateChange={setEstimateFilter}
                 onStarredChange={setStarredFilter}
                 onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}

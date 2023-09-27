@@ -53,7 +53,6 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
         queryState,
         queryString,
         setTagsFilterOutside,
-        setEstimateFilter,
         setStarredFilter,
         setWatchingFilter,
         setFulltextFilter,
@@ -267,7 +266,6 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
                 preset={currentPreset}
                 presets={userFilters}
                 onSearchChange={setFulltextFilter}
-                onEstimateChange={setEstimateFilter}
                 onStarredChange={setStarredFilter}
                 onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}
