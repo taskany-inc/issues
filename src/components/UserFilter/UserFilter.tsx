@@ -8,12 +8,13 @@ import { FilterBase } from '../FilterBase/FilterBase';
 import { FilterCheckbox } from '../FilterCheckbox';
 import { FilterTabLabel } from '../FilterTabLabel';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
+import { getUserName } from '../../utils/getUserName';
 
 import { tr } from './UserFilter.i18n';
 
 interface User {
     id: string;
-    name: string | null;
+    name: string;
     email: string;
     image?: string | null;
 }
@@ -31,8 +32,6 @@ interface UserFilterProps {
 }
 
 const getId = (item: User) => item.id;
-
-const pickUserName = (user: User) => user.name ?? user.email ?? 'Unknonw';
 
 export const UserFilter: React.FC<UserFilterProps> = ({
     text,
@@ -56,7 +55,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
         const nextUserList: User[] = [
             {
                 id: authorizedUser.id,
-                name: authorizedUser.name,
+                name: getUserName(authorizedUser),
                 email: authorizedUser.email,
                 image: authorizedUser.email,
             },
@@ -76,7 +75,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
     }, [value, users]);
 
     return (
-        <Tab name={tabName} label={<FilterTabLabel text={text} selected={values.map(pickUserName)} />}>
+        <Tab name={tabName} label={<FilterTabLabel text={text} selected={values.map(getUserName)} />}>
             <FilterBase
                 key={tabName}
                 mode="multiple"
@@ -86,7 +85,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
                 value={values}
                 onChange={onChange}
                 renderItem={({ item, checked, onItemClick }) => {
-                    let label = pickUserName(item);
+                    let label = item.name;
 
                     if (item.id === authorizedUser.activityId) {
                         label += ` (${tr('You')})`;

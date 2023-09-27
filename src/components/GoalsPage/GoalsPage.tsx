@@ -22,6 +22,7 @@ import { Nullish } from '../../types/void';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
+import { getUserName } from '../../utils/getUserName';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -144,10 +145,10 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         <PageTitlePreset
             activityId={user.activityId}
             currentPresetActivityId={currentPreset?.activityId}
-            currentPresetActivityUserName={currentPreset?.activity?.user?.name}
+            currentPresetActivityUserName={getUserName(currentPreset?.activity?.user)}
             currentPresetTitle={currentPreset?.title}
             shadowPresetActivityId={shadowPreset?.activityId}
-            shadowPresetActivityUserName={shadowPreset?.activity?.user?.name}
+            shadowPresetActivityUserName={getUserName(shadowPreset?.activity?.user)}
             shadowPresetId={shadowPreset?.id}
             shadowPresetTitle={shadowPreset?.title}
             title={tr('Goals')}
