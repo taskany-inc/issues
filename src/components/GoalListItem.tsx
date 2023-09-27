@@ -308,7 +308,9 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                         </TableCell>
 
                         <TableCell width="6ch">
-                            {comments && comments !== 0 && <CommentsCountBadge count={comments} />}
+                            {nullable(comments, (c) => (
+                                <CommentsCountBadge count={c} />
+                            ))}
                         </TableCell>
 
                         <TableCell col={1} justify="end">

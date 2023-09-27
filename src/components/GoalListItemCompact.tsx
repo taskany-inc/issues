@@ -87,9 +87,6 @@ const StyledCell = styled(({ forIcon, ...props }: TableCellProps & { forIcon?: b
     ${({ forIcon }) =>
         forIcon &&
         css`
-            /* align icon be center of first line in title */
-            transform: translateY(2px);
-
             &:last-child {
                 margin-left: auto;
             }
@@ -142,9 +139,7 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             content = nullable(state, (s) => <StateDot size="m" title={s?.title} hue={s?.hue} />);
             break;
         case 'priority':
-            content = nullable(priority as Priority | null, (p) => (
-                <TextItem weight="regular">{getPriorityText(p)}</TextItem>
-            ));
+            content = nullable(priority as Priority | null, (p) => <TextItem>{getPriorityText(p)}</TextItem>);
             break;
         case 'projectId':
             content = nullable(projectId, (id) => <TextItem>{id}</TextItem>);

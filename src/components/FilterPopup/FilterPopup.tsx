@@ -1,10 +1,8 @@
 import { useRef } from 'react';
 import styled from 'styled-components';
-import { useClickOutside, useKeyboard, KeyCode, Popup, Button, Tabs, TabContent, TabsMenu } from '@taskany/bricks';
+import { useClickOutside, useKeyboard, KeyCode, Popup, Button, Tabs, TabContent, TabsMenu, Tip } from '@taskany/bricks';
 import { gray10, gapS, gapXs, textColor, gapM, radiusM } from '@taskany/colors';
 import { IconBulbOnOutline } from '@taskany/icons';
-
-import { Tip } from '../Tip';
 
 import { tr } from './FilterPopup.i18n';
 
@@ -58,8 +56,6 @@ const StyledActionWrapper = styled.div`
 
 const StyledTip = styled(Tip)`
     color: ${gray10};
-    font-size: 0.75rem;
-    padding: 0;
 `;
 
 export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = ({
@@ -98,7 +94,11 @@ export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = 
                     {children}
                 </StyledTabs>
                 <StyledFilterPanelPopupFooter>
-                    <StyledTip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={textColor} />}>
+                    <StyledTip
+                        title={tr('Pro tip!')}
+                        size="xs"
+                        icon={<IconBulbOnOutline size="xs" color={textColor} />}
+                    >
                         {tr('You can apply and save filters as preset.')}
                     </StyledTip>
                     <StyledActionWrapper>

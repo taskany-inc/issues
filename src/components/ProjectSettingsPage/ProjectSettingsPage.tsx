@@ -23,6 +23,7 @@ import {
     nullable,
     UserPic,
     Tag,
+    Tip,
 } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
 
@@ -39,7 +40,6 @@ import { UserComboBox } from '../UserComboBox';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectUpdate, projectUpdateSchema } from '../../schema/project';
 import { ActivityByIdReturnType, ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
-import { Tip } from '../Tip';
 import { TextList, TextListItem } from '../TextList';
 import { CommonHeader } from '../CommonHeader';
 import {

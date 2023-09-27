@@ -16,10 +16,6 @@ const StyledLabelWrapper = styled.div`
     width: 100%;
 `;
 
-const StyledBreakText = styled(Text)`
-    word-break: break-all;
-`;
-
 export const FilterTabLabel: React.FC<TabLabelProps> = ({ text, selected }) => (
     <StyledLabelWrapper>
         <Text color={gray9}>
@@ -27,9 +23,9 @@ export const FilterTabLabel: React.FC<TabLabelProps> = ({ text, selected }) => (
             {nullable(selected, () => ': ')}
         </Text>
         {nullable(selected, (list) => (
-            <StyledBreakText ellipsis lines={1} title={list.join(', ')}>
+            <Text ellipsis wordBreak="break-all" lines={1} title={list.join(', ')}>
                 {list.join(', ')}
-            </StyledBreakText>
+            </Text>
         ))}
     </StyledLabelWrapper>
 );

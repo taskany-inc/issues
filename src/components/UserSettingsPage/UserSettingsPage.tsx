@@ -15,6 +15,7 @@ import {
     FormRadio,
     FormRadioInput,
     Keyboard,
+    Tip,
 } from '@taskany/bricks';
 import { IconBulbOnOutline } from '@taskany/icons';
 import { z } from 'zod';
@@ -23,7 +24,6 @@ import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
 import { Page } from '../Page';
 import { PageSep } from '../PageSep';
-import { Tip } from '../Tip';
 import { CommonHeader } from '../CommonHeader';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { UpdateUser, updateUserSchema } from '../../schema/user';

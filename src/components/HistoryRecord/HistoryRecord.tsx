@@ -87,7 +87,10 @@ const StyledIssueListItem = styled(IssueListItem)<{ strike?: boolean }>`
     }
 `;
 
-const StyledText = styled(Text)<{ strike?: boolean }>`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledText = styled(({ strike, ...props }: React.ComponentProps<typeof Text> & { strike?: boolean }) => (
+    <Text {...props} />
+))<React.ComponentProps<typeof Text> & { strike?: boolean }>`
     ${({ strike }) =>
         strike &&
         css`

@@ -1,5 +1,5 @@
 import { Text } from '@taskany/bricks';
-import { gray8, textColor } from '@taskany/colors';
+import { gapS, gray8, textColor } from '@taskany/colors';
 import { forwardRef } from 'react';
 import styled from 'styled-components';
 
@@ -28,15 +28,24 @@ const StyledInlineTrigger = styled(Text)`
 `;
 
 const StyledInlineTriggerText = styled.span`
-    display: inline-block;
-    padding-left: 0.7rem;
+    display: flex;
+    padding-left: ${gapS};
+`;
+
+const StyledIconContainer = styled.span`
+    /** @awinogradov: I'm not sure this is the best decision.
+     *  Maybe would be better get icon as component via prop and add flex styles.
+     */
+    & > span {
+        display: flex;
+    }
 `;
 
 export const InlineTrigger = forwardRef<HTMLDivElement, InlineTriggerProps>(
     ({ text, icon, className, onClick }, ref) => {
         return (
-            <StyledInlineTrigger ref={ref} size="s" className={className} onClick={onClick}>
-                {icon}
+            <StyledInlineTrigger forwardRef={ref} size="s" className={className} onClick={onClick}>
+                <StyledIconContainer>{icon}</StyledIconContainer>
                 <StyledInlineTriggerText>{text}</StyledInlineTriggerText>
             </StyledInlineTrigger>
         );

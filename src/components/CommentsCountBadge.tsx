@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Text } from '@taskany/bricks';
-import { IconMessageOutline } from '@taskany/icons';
+import { IconChatTypingAltOutline } from '@taskany/icons';
 import { gapXs, gray9 } from '@taskany/colors';
 
 export interface CommentsCountBadgeProps {
@@ -20,14 +20,14 @@ const CommentsCount = styled(Text)`
     padding-left: ${gapXs};
 `;
 
-const StyledIconMessageOutline = styled(IconMessageOutline)`
+const StyledIconChatTypingAltOutline = styled(IconChatTypingAltOutline)`
     display: flex;
 `;
 
 export const CommentsCountBadge: React.FC<CommentsCountBadgeProps> = ({ count, color = gray9 }) => {
     return (
         <StyledCommentsCountBadge>
-            <StyledIconMessageOutline size="xs" color={color} />
+            <StyledIconChatTypingAltOutline size="xs" color={color} />
             <CommentsCount as="span" size="s" color={color}>
                 {count}
             </CommentsCount>

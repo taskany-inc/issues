@@ -16,6 +16,7 @@ import {
     ModalContent,
     nullable,
     Keyboard,
+    Tip,
 } from '@taskany/bricks';
 import { IconBulbOnSolid } from '@taskany/icons';
 
@@ -24,7 +25,6 @@ import { errorsProvider } from '../../utils/forms';
 import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
 import { useRouter } from '../../hooks/router';
 import { useProjectResource } from '../../hooks/useProjectResource';
-import { Tip } from '../Tip';
 import { FlowComboBox } from '../FlowComboBox';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectCreate, projectCreateSchema } from '../../schema/project';
