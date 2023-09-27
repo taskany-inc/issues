@@ -1,9 +1,10 @@
-import React, { useState, ChangeEvent, useCallback } from 'react';
+import React, { useState, ChangeEvent, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { Button, ComboBox, UserPic, Input, UserMenuItem, nullable } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
+import { getUserName, prepareUserDataFromActivity } from '../utils/getUserName';
 
 interface UserComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -42,9 +43,20 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
         ref,
     ) => {
         const [completionVisible, setCompletionVisibility] = useState(false);
-        const [inputState, setInputState] = useState(
-            value?.user?.name || value?.user?.email || value?.ghost?.email || query,
-        );
+        const [inputState, setInputState] = useState(() => {
+            if (value == null) {
+                return query;
+            }
+
+            const current = prepareUserDataFromActivity(value);
+            if (current != null) {
+                const existingName = getUserName(current);
+
+                return existingName;
+            }
+
+            return query;
+        });
 
         const suggestions = trpc.user.suggestions.useQuery(
             {
@@ -62,10 +74,20 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
             cb();
         }, []);
 
+        const textValue = useMemo(() => {
+            if (value) {
+                const current = prepareUserDataFromActivity(value);
+
+                return current?.name || current?.email || text;
+            }
+
+            return text;
+        }, [value, text]);
+
         return (
             <ComboBox
                 ref={ref}
-                text={value?.user?.name || value?.user?.email || value?.ghost?.email || text}
+                text={textValue}
                 value={inputState}
                 visible={completionVisible}
                 disabled={disabled}
@@ -83,9 +105,11 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                             text={props.text}
                             disabled={props.disabled}
                             onClick={props.onClick}
-                            iconLeft={nullable(value, (v) => (
-                                <UserPic src={v.user?.image} email={v.user?.email || v.ghost?.email} size={16} />
-                            ))}
+                            iconLeft={nullable(value, (v) =>
+                                nullable(prepareUserDataFromActivity(v), (user) => (
+                                    <UserPic src={user?.image} email={user?.email} size={16} />
+                                )),
+                            )}
                         />
                     )
                 }
@@ -104,7 +128,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                 renderItem={(props) => (
                     <UserMenuItem
                         key={props.item.id}
-                        name={props.item.user?.name}
+                        name={getUserName(props.item.user)}
                         email={props.item.user?.email || props.item.ghost?.email}
                         image={props.item.user?.image}
                         focused={props.cursor === props.index}

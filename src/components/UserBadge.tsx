@@ -4,6 +4,7 @@ import { IconXCircleSolid } from '@taskany/icons';
 import { gapS, gapXs, gray8, gray9 } from '@taskany/colors';
 
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
+import { getUserName } from '../utils/getUserName';
 
 interface UserBadgeProps {
     user?: ActivityByIdReturnType['user'];
@@ -48,9 +49,11 @@ export const UserBadge: React.FC<UserBadgeProps> = ({ user, onCleanButtonClick }
     return (
         <StyledIssuer>
             <StyledUserPick src={user?.image} email={user?.email} size={24} />
-            <Text color={gray9} size="s">
-                {user?.nickname || user?.name || user?.email}
-            </Text>
+            {nullable(user, (data) => (
+                <Text color={gray9} size="s">
+                    {getUserName(data)}
+                </Text>
+            ))}
             {nullable(onCleanButtonClick, (onClick) => (
                 <StyledCleanButton onClick={onClick} />
             ))}

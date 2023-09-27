@@ -16,6 +16,7 @@ import { HistoryAction, HistoryRecordSubject } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { Circle, CircledIcon } from '../Circle';
 import { useLocale } from '../../hooks/useLocale';
+import { getUserName } from '../../utils/getUserName';
 
 import { tr } from './HistoryRecord.i18n';
 
@@ -234,9 +235,11 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
                 <StyledHistoryRecordWrapper>
                     <UserPic size={18} src={author?.image} email={author?.email} />
                     <StyledTextWrapper multiline={subject.toString() === 'description'}>
-                        <Text size="xs" weight="bold">
-                            {author?.nickname ?? author?.name ?? author?.email}
-                        </Text>
+                        {nullable(author, (data) => (
+                            <Text size="xs" weight="bold">
+                                {getUserName(data)}
+                            </Text>
+                        ))}
 
                         <Text size="xs">
                             {translates[actionText]} {translates[subjectText]}
@@ -436,24 +439,12 @@ export const HistoryRecordParticipant: React.FC<HistoryChangeProps<Activity & { 
 }) => (
     <HistorySimplifyRecord
         withPretext={false}
-        from={
-            from ? (
-                <HistoryParticipant
-                    name={from.user?.nickname ?? from.user?.name ?? from.user?.email}
-                    email={from.user?.email}
-                    pic={from.user?.image}
-                />
-            ) : null
-        }
-        to={
-            to ? (
-                <HistoryParticipant
-                    name={to.user?.nickname ?? to.user?.name ?? to.user?.email}
-                    pic={to.user?.image}
-                    email={to.user?.email}
-                />
-            ) : null
-        }
+        from={nullable(from?.user, (data) => (
+            <HistoryParticipant name={getUserName(data)} email={data.email} pic={data.image} />
+        ))}
+        to={nullable(to?.user, (data) => (
+            <HistoryParticipant name={getUserName(data)} email={data.email} pic={data.image} />
+        ))}
     />
 );
 

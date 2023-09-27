@@ -1,13 +1,34 @@
 import { ComponentProps, useMemo } from 'react';
 import { UserGroup as UserGroupBricks } from '@taskany/bricks';
 
-import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
+import { getUserName, prepareUserDataFromActivity } from '../utils/getUserName';
+
+type User = ComponentProps<typeof UserGroupBricks>['users'][number];
 
 interface UserGroupProps extends ComponentProps<typeof UserGroupBricks> {
-    users: NonNullable<ActivityByIdReturnType>[];
+    users: Array<{
+        user?: User | null;
+        ghost?: User | null;
+    }>;
 }
 
 export const UserGroup = ({ users, ...rest }: UserGroupProps) => {
-    const extractedUsers = useMemo(() => users.map((a) => a.user || a.ghost).filter(Boolean) ?? [], [users]);
+    const extractedUsers = useMemo(
+        () =>
+            users.reduce<User>((acc, activity) => {
+                const target = prepareUserDataFromActivity(activity);
+
+                if (target != null) {
+                    acc.push({
+                        email: target.email,
+                        name: getUserName(target),
+                        image: target.image,
+                    });
+                }
+
+                return acc;
+            }, []),
+        [users],
+    );
     return <UserGroupBricks users={extractedUsers} {...rest} />;
 };
