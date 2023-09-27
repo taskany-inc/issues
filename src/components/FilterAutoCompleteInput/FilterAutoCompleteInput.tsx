@@ -14,11 +14,6 @@ const StyledAutoCompleteInput = styled(AutoCompleteInput)`
     display: inline-block;
 `;
 
-const StyledSearchIcon = styled(IconSearchOutline)`
-    position: relative;
-    top: 2px;
-`;
-
 interface FilterAutoCompleteInputProps extends React.ComponentProps<typeof AutoCompleteInput> {
     placeholder?: never;
     iconLeft?: never;
@@ -29,7 +24,7 @@ export const FilterAutoCompleteInput: React.FC<FilterAutoCompleteInputProps> = (
         <StyledInputWrapper>
             <StyledAutoCompleteInput
                 placeholder={tr('Search...')}
-                iconLeft={<StyledSearchIcon size="s" />}
+                iconLeft={<IconSearchOutline size="s" />}
                 {...props}
             />
         </StyledInputWrapper>

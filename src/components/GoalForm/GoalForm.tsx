@@ -208,7 +208,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                                           })
                                                         : ''
                                                 }
-                                                iconLeft={<IconCalendarTickOutline noWrap size="xs" />}
+                                                iconLeft={<IconCalendarTickOutline size="xs" />}
                                             />
                                         )}
                                         error={errorsResolver(field.name)}
@@ -233,7 +233,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 )}
                             />
                         ) : (
-                            <Button text={tr('State')} iconLeft={<IconGitPullOutline noWrap size="xs" />} disabled />
+                            <Button text={tr('State')} iconLeft={<IconGitPullOutline size="xs" />} disabled />
                         )}
 
                         <Controller

@@ -370,7 +370,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                         <TextList
                             type="unordered"
                             heading={
-                                <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} noWrap />}>
+                                <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
                                     <Text weight="bold" size="s" color={warn0}>
                                         {tr('What happens when you delete a project')}
                                     </Text>
@@ -521,7 +521,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <FormTitle color={warn0}>{tr('Cannot delete project now')}</FormTitle>
                 </ModalHeader>
                 <ModalContent>
-                    <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} noWrap />}>
+                    <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
                         {tr('The project has child projects')}
                     </StyledTip>
                     <Text size="s">{tr('Before delete a project, you must move it to another project or delete')}</Text>

@@ -227,7 +227,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                     <Button
                                         ref={ref}
                                         ghost
-                                        iconLeft={<IconMoreVerticalOutline noWrap size="xs" />}
+                                        iconLeft={<IconMoreVerticalOutline size="xs" />}
                                         onClick={onClick}
                                     />
                                 )}

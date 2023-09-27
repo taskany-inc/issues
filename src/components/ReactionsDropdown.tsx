@@ -100,7 +100,7 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
 
     const viewModeMap: Record<'button' | 'icon', React.ReactNode> = {
         button: <ReactionsButton ref={buttonRef} onClick={onButtonClick} />,
-        icon: <IconMoodTongueOutline ref={buttonRef} noWrap size="xs" onClick={onButtonClick} />,
+        icon: <IconMoodTongueOutline ref={buttonRef} size="xs" onClick={onButtonClick} />,
     };
 
     return (

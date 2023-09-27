@@ -45,7 +45,7 @@ export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
                         text={props.text}
                         disabled={props.disabled}
                         onClick={props.onClick}
-                        iconLeft={<IconGitPullOutline noWrap size="s" />}
+                        iconLeft={<IconGitPullOutline size="s" />}
                     />
                 )}
                 renderInput={(props) => (

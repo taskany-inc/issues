@@ -162,7 +162,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
         const actions: CriteriaActionItem[] = [
             {
                 label: 'Edit',
-                icon: <IconEdit1Outline size="xxs" noWrap />,
+                icon: <IconEdit1Outline size="xxs" />,
                 handler: onUpdateClick,
             },
         ];
@@ -170,14 +170,14 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
         if (!goalAsCriteria && onConvertToGoal) {
             actions.push({
                 label: tr('Create as goal'),
-                icon: <IconTargetOutline size="xxs" noWrap />,
+                icon: <IconTargetOutline size="xxs" />,
                 handler: onConvertToGoal,
             });
         }
 
         actions.push({
             label: tr('Delete'),
-            icon: <IconBinOutline size="xxs" noWrap />,
+            icon: <IconBinOutline size="xxs" />,
             color: danger0,
             handler: onRemove,
         });

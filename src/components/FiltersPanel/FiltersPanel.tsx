@@ -216,13 +216,13 @@ export const FiltersPanel: FC<{
                                 (preset && !preset._isOwner && !preset._isStarred)) &&
                                 !preset?.default && (
                                     <FiltersAction onClick={onFilterStar}>
-                                        <IconStarOutline size="s" noWrap />
+                                        <IconStarOutline size="s" />
                                     </FiltersAction>
                                 )}
 
                             {preset && (preset._isOwner || preset._isStarred) && (
                                 <FiltersAction onClick={onFilterStar}>
-                                    <IconStarSolid size="s" noWrap />
+                                    <IconStarSolid size="s" />
                                 </FiltersAction>
                             )}
                         </FiltersMenuContainer>
