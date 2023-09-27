@@ -34,6 +34,12 @@ export const user = router({
                                         mode: 'insensitive',
                                     },
                                 },
+                                {
+                                    nickname: {
+                                        contains: query,
+                                        mode: 'insensitive',
+                                    },
+                                },
                             ],
                         },
                     },
