@@ -46,7 +46,6 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         queryState,
         queryString,
         setTagsFilterOutside,
-        setEstimateFilter,
         setStarredFilter,
         setWatchingFilter,
         setFulltextFilter,
@@ -174,7 +173,6 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 preset={currentPreset}
                 presets={userFilters}
                 onSearchChange={setFulltextFilter}
-                onEstimateChange={setEstimateFilter}
                 onStarredChange={setStarredFilter}
                 onWatchingChange={setWatchingFilter}
                 onPresetChange={setPreset}

@@ -16,8 +16,7 @@ const StyledInput = styled(Input)`
     padding: 2px 8px;
 `;
 
-interface EstimateYearProps {
-    option: Option;
+interface EstimateYearProps extends Option {
     value?: number;
     readOnly?: boolean;
     onChange?: (value?: number) => void;
@@ -47,7 +46,7 @@ const getValidYear = (year: number): number => {
     return year;
 };
 
-export const EstimateYear: React.FC<EstimateYearProps> = ({ option, value, readOnly, onChange, setReadOnly }) => {
+export const EstimateYear: React.FC<EstimateYearProps> = ({ title, clue, value, readOnly, onChange, setReadOnly }) => {
     const yearValue = value ? getValidYear(value) : null;
     const [selectedYear, setSelectedYear] = useState(yearValue || currentYear);
     const inputRef = useRef(null);
@@ -83,8 +82,8 @@ export const EstimateYear: React.FC<EstimateYearProps> = ({ option, value, readO
 
     return (
         <EstimateOption
-            title={option.title}
-            clue={option.clue}
+            title={title}
+            clue={clue}
             readOnly={readOnly}
             onClick={onClick}
             renderTrigger={() => (

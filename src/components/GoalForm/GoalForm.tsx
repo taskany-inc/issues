@@ -193,8 +193,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             render={({ field }) => {
                                 return (
                                     <GoalFormEstimate
-                                        placeholder={tr('Date input mask placeholder')}
-                                        mask={tr('Date input mask')}
                                         placement="top"
                                         renderTrigger={(props) => (
                                             <Button

@@ -84,7 +84,7 @@ export const createQuarterRange = (q: QuartersKeys, year?: number): DateRange =>
     return qEndDate(+abstractDate);
 };
 
-const createYearRange = (year: number): DateRange => {
+export const createYearRange = (year: number): DateRange => {
     const date = new Date();
 
     date.setFullYear(year);

@@ -1,54 +1,61 @@
-import { FiltersDropdown } from '@taskany/bricks';
-import { FC, useMemo } from 'react';
-import { Estimate as EstimateType } from '@prisma/client';
+import { Tab } from '@taskany/bricks';
+import { ComponentProps, FC, useCallback, useMemo } from 'react';
 
-import { DateRange, QuartersKeys } from '../types/date';
-import { createDateRange, encodeUrlDateRange, getRelativeQuarterRange } from '../utils/dateTime';
+import { useLocale } from '../hooks/useLocale';
+import { encodeUrlDateRange, decodeUrlDateRange, getDateTypeFromRange, formateEstimate } from '../utils/dateTime';
 
-type Estimate = { q: EstimateType['q']; y: EstimateType['y'] };
+import { FilterTabLabel } from './FilterTabLabel';
+import { Estimate, EstimateValue } from './Estimate/Estimate';
 
-const getDateRangeFrom = ({ q, y }: Estimate): DateRange => createDateRange(Number(y), q as QuartersKeys);
-
-const estimateTitle = (estimate: Estimate) => {
-    if (!estimate.q) {
-        return estimate.y;
+export const decodeEstimateFromUrl = (value: string): EstimateValue | undefined => {
+    if (!value) {
+        return undefined;
     }
-    return `${estimate.q}/${estimate.y}`;
-};
 
-const getEstimateAliases = (): { data: string; id: string }[] => {
-    return [
-        {
-            id: encodeUrlDateRange(getRelativeQuarterRange('current')),
-            data: '@current',
-        },
-        {
-            id: encodeUrlDateRange(getRelativeQuarterRange('prev')),
-            data: '@previous',
-        },
-        {
-            id: encodeUrlDateRange(getRelativeQuarterRange('next')),
-            data: '@next',
-        },
-    ];
+    const range = decodeUrlDateRange(value);
+
+    if (!range) {
+        return undefined;
+    }
+
+    return {
+        range,
+        type: getDateTypeFromRange(range),
+    };
 };
 
 export const EstimateFilter: FC<{
     text: string;
-    value: string[];
-    estimates?: Estimate[];
+    value?: string[];
     onChange: (value: string[]) => void;
-}> = ({ text, value, estimates, onChange }) => {
-    const items = useMemo(
-        () => [
-            ...getEstimateAliases(),
-            ...(estimates?.map((estimate) => ({
-                id: encodeUrlDateRange(getDateRangeFrom(estimate)),
-                data: estimateTitle(estimate),
-            })) ?? []),
-        ],
-        [estimates],
+}> = ({ text, value = [], onChange }) => {
+    const locale = useLocale();
+
+    const onChangeHandler = useCallback(
+        (value?: ComponentProps<typeof Estimate>['value']) => {
+            onChange(value ? [encodeUrlDateRange(value.range)] : []);
+        },
+        [onChange],
     );
 
-    return <FiltersDropdown text={text} value={value} items={items} onChange={onChange} />;
+    const { estiamteValue, estiamteLabel } = useMemo(() => {
+        const estiamteValue = decodeEstimateFromUrl(value[0]);
+        return {
+            estiamteValue,
+            estiamteLabel: estiamteValue
+                ? [
+                      formateEstimate(estiamteValue.range.end, {
+                          locale,
+                          type: estiamteValue.type,
+                      }),
+                  ]
+                : [],
+        };
+    }, [value, locale]);
+
+    return (
+        <Tab name="estimate" label={<FilterTabLabel text={text} selected={estiamteLabel} />}>
+            <Estimate onChange={onChangeHandler} value={estiamteValue} />
+        </Tab>
+    );
 };

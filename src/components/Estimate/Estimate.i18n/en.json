@@ -1,8 +1,9 @@
 {
     "Year title": "Year",
-    "Year clue": "If you are selecting only year it means goal will be full year long",
+    "Year clue": "If you are selecting only year it means the deadline will be the end of the year. For example: {end}.",
     "Quarter title": "Quarter",
-    "Quarter clue": "This is the date shortcut: Q1, Q2, Q3, Q4. Currently is",
+    "Quarter clue": "This is the date shortcut: Q1, Q2, Q3, Q4. Currently is {quarter}. End is {end}.",
     "Date title": "Strict date",
+    "Date clue": "Or you can choose a date if you have strict deadline.",
     "Date is past": "Selected date is past"
 }

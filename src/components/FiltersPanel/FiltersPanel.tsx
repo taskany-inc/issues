@@ -67,7 +67,6 @@ export const FiltersPanel: FC<{
     presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
 
     onSearchChange: (search: string) => void;
-    onEstimateChange: React.ComponentProps<typeof EstimateFilter>['onChange'];
     onPresetChange: React.ComponentProps<typeof PresetDropdown>['onChange'];
     onStarredChange: React.ComponentProps<typeof StarredFilter>['onChange'];
     onWatchingChange: React.ComponentProps<typeof WatchingFilter>['onChange'];
@@ -85,7 +84,6 @@ export const FiltersPanel: FC<{
         preset,
         presets = [],
         onSearchChange,
-        onEstimateChange,
         onPresetChange,
         onLimitChange,
         onFilterStar,
@@ -151,7 +149,6 @@ export const FiltersPanel: FC<{
             useQueryOptions,
         );
         const { data: states = [] } = trpc.state.all.useQuery();
-        const { data: estimates = [] } = trpc.estimates.ranges.useQuery();
 
         const setPartialQueryByKey = useCallback(<K extends keyof QueryState>(key: K) => {
             return (value: QueryState[K]) => {
@@ -185,15 +182,8 @@ export const FiltersPanel: FC<{
                         </FiltersCounterContainer>
                         <FiltersMenuContainer>
                             <FiltersMenuItem ref={filterNodeRef} onClick={() => setFilterVisible((p) => !p)}>
-                                Filter
+                                {tr('Filter')}
                             </FiltersMenuItem>
-
-                            <EstimateFilter
-                                text={tr('Estimate')}
-                                value={queryState.estimate}
-                                estimates={estimates}
-                                onChange={onEstimateChange}
-                            />
 
                             <StarredFilter value={queryState.starred} onChange={onStarredChange} />
 
@@ -259,6 +249,13 @@ export const FiltersPanel: FC<{
                         value={filterQuery?.priority}
                         onChange={setPartialQueryByKey('priority')}
                     />
+
+                    <EstimateFilter
+                        text={tr('Estimate')}
+                        value={filterQuery?.estimate}
+                        onChange={setPartialQueryByKey('estimate')}
+                    />
+
                     <ProjectFilter
                         text={tr('Project')}
                         value={filterQuery?.project}
