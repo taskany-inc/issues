@@ -19,6 +19,7 @@ import {
     createGoalInlineControl,
     goalProjectSelectControl,
     goalCreateForm,
+    filtersPanelResetButton,
 } from '../../src/utils/domObjects';
 import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
@@ -145,6 +146,7 @@ describe('Projects', () => {
 
     describe('project page', () => {
         beforeEach(() => {
+            cy.get(filtersPanelResetButton.query).should('exist').click();
             cy.get(projectListItem.query).should('exist').and('have.length.greaterThan', 1);
             cy.get(projectListItemTitle.query).should('contain.text', testProjectTitle);
             cy.get(projectListItemTitle.query).filter(`:contains(${testProjectTitle})`).last().click({ force: true });

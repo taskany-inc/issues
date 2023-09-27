@@ -31,6 +31,7 @@ import { StarredFilter } from '../StarredFilter/StarredFilter';
 import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 import { FilterPopup } from '../FilterPopup/FilterPopup';
 import { getUserName } from '../../utils/getUserName';
+import { filtersPanel } from '../../utils/domObjects';
 
 import { tr } from './FiltersPanel.i18n';
 
@@ -168,7 +169,7 @@ export const FiltersPanel: FC<{
 
         return (
             <>
-                <FiltersPanelContainer loading={loading}>
+                <FiltersPanelContainer loading={loading} {...filtersPanel.attr}>
                     <FiltersPanelContent>
                         <FiltersSearchContainer>
                             <SearchFilter
