@@ -3,18 +3,7 @@ import dynamic from 'next/dynamic';
 import { Reaction, State, User } from '@prisma/client';
 import styled from 'styled-components';
 import { brandColor, danger0, gapM, gapS, gray4, gray9, backgroundColor } from '@taskany/colors';
-import {
-    Card,
-    CardComment,
-    CardInfo,
-    Dropdown,
-    Link,
-    MenuItem,
-    Text,
-    UserPic,
-    nullable,
-    Button,
-} from '@taskany/bricks';
+import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, UserPic, nullable, Button } from '@taskany/bricks';
 import { IconBinOutline, IconEditOutline, IconMoreVerticalOutline, IconPinAltOutline } from '@taskany/icons';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
@@ -28,6 +17,8 @@ import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Circle, CircledIcon } from '../Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { StateDot } from '../StateDot';
+import { getUserName } from '../../utils/getUserName';
+import { CardHeader } from '../CardHeader';
 
 import { tr } from './CommentView.i18n';
 
@@ -234,12 +225,13 @@ export const CommentView: FC<CommentViewProps> = ({
             ) : (
                 <StyledCommentCard highlight={highlight} onClick={onSubmit ? onCommentDoubleClick : undefined}>
                     <StyledCardInfo onClick={onDateViewTypeChange}>
-                        <div>
-                            <Link inline>{author?.name}</Link> —{' '}
-                            <Link inline href={`#comment-${id}`}>
-                                <RelativeTime isRelativeTime={isRelative} date={createdAt} hover />
-                            </Link>
-                        </div>
+                        {nullable(author, (data) => (
+                            <CardHeader
+                                name={getUserName(data)}
+                                timeAgo={<RelativeTime isRelativeTime={isRelative} date={createdAt} hover />}
+                                href={`#comment-${id}`}
+                            />
+                        ))}
                         <StyledCommentActions>
                             {nullable(!reactionsProps.limited, () => (
                                 <ReactionsDropdown view="icon" onClick={onReactionToggle} />

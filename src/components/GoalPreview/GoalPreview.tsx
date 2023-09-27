@@ -9,7 +9,6 @@ import {
     CardComment,
     CardInfo,
     Dropdown,
-    Link,
     MenuItem,
     ModalContent,
     ModalHeader,
@@ -39,6 +38,8 @@ import { CommentView } from '../CommentView/CommentView';
 import { ModalContext } from '../ModalOnEvent';
 import { AddCriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { useGoalResource } from '../../hooks/useGoalResource';
+import { getUserName } from '../../utils/getUserName';
+import { CardHeader } from '../CardHeader';
 
 import { useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
@@ -250,10 +251,12 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                 <StyledModalContent ref={contentRef}>
                     <StyledCard>
                         <CardInfo onClick={onDateViewTypeChange}>
-                            <Link inline>{goal?.activity?.user?.name}</Link> —{' '}
-                            {nullable(goal?.createdAt, (date) => (
-                                <RelativeTime isRelativeTime={isRelative} date={date} />
-                            ))}
+                            <CardHeader
+                                name={getUserName(goal?.activity?.user)}
+                                timeAgo={nullable(goal?.createdAt, (date) => (
+                                    <RelativeTime isRelativeTime={isRelative} date={date} />
+                                ))}
+                            />
                         </CardInfo>
 
                         <CardComment>
