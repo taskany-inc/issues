@@ -1,16 +1,21 @@
 type UserData = {
-    email?: string | null;
+    email: string;
     name?: string | null;
     nickname?: string | null;
     image?: string | null;
     [key: string]: unknown;
 };
 
-export const getUserName = <T extends UserData>(user?: T | null): string | null | undefined => {
-    if (user) {
-        return user.nickname || user.name || user.email;
+export const getUserName = <T extends UserData>(user: T): string => {
+    return user.nickname || user.name || user.email;
+};
+
+export const tryGetName = <T extends UserData>(user: T | null | undefined, cb: (val: T) => string) => {
+    if (!user) {
+        return null;
     }
-    return null;
+
+    return cb(user);
 };
 
 export const prepareUserDataFromActivity = <T extends UserData, V extends { user?: T | null; ghost?: T | null }>(

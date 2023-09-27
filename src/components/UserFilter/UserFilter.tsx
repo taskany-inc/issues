@@ -17,6 +17,7 @@ interface User {
     name: string;
     email: string;
     image?: string | null;
+    [key: string]: unknown;
 }
 interface UserFilterProps {
     tabName: string;
@@ -75,7 +76,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
     }, [value, users]);
 
     return (
-        <Tab name={tabName} label={<FilterTabLabel text={text} selected={values.map(getUserName)} />}>
+        <Tab name={tabName} label={<FilterTabLabel text={text} selected={values.map((user) => getUserName(user))} />}>
             <FilterBase
                 key={tabName}
                 mode="multiple"

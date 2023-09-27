@@ -38,7 +38,7 @@ import { CommentView } from '../CommentView/CommentView';
 import { ModalContext } from '../ModalOnEvent';
 import { AddCriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { useGoalResource } from '../../hooks/useGoalResource';
-import { getUserName } from '../../utils/getUserName';
+import { getUserName, tryGetName } from '../../utils/getUserName';
 import { CardHeader } from '../CardHeader';
 
 import { useGoalPreview } from './GoalPreviewProvider';
@@ -252,7 +252,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                     <StyledCard>
                         <CardInfo onClick={onDateViewTypeChange}>
                             <CardHeader
-                                name={getUserName(goal?.activity?.user)}
+                                name={tryGetName(goal?.activity?.user, getUserName)}
                                 timeAgo={nullable(goal?.createdAt, (date) => (
                                     <RelativeTime isRelativeTime={isRelative} date={date} />
                                 ))}
