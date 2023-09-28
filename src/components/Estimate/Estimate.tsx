@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { gapXs, gapS, warn0 } from '@taskany/colors';
 import { nullable, Text } from '@taskany/bricks';
-import { IconExclamationSmallOutline } from '@taskany/icons';
+import { IconExclamationCircleSolid } from '@taskany/icons';
 
 import {
     createDateRange,
@@ -30,16 +30,12 @@ const StyledWrapper = styled.div`
 
 const StyledWarningWrapper = styled.div`
     display: flex;
-    align-items: center;
     gap: ${gapXs};
+    align-items: center;
 `;
 
-const StyledIconExclamationSmallOutline = styled(IconExclamationSmallOutline)`
-    border-radius: 100%;
-    align-items: center;
-    display: block;
-    background: ${warn0};
-    font-size: 0;
+const StyledIconExclamationCircleSolid = styled(IconExclamationCircleSolid)`
+    display: flex;
 `;
 
 export type EstimateValue = {
@@ -134,7 +130,7 @@ export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value
         <StyledWrapper ref={ref}>
             {nullable(warning, (warn) => (
                 <StyledWarningWrapper>
-                    <StyledIconExclamationSmallOutline size="xs" />
+                    <StyledIconExclamationCircleSolid size="xs" color={warn0} />
                     <Text color={warn0} size="xs">
                         {warn.message}
                     </Text>
