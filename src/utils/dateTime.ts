@@ -64,6 +64,7 @@ export const estimatedMeta = ({ locale }: LocaleArg) => {
 };
 
 export const dateAgo = (date: Date, pastDate: number, { locale }: LocaleArg) => {
+    date = new Date(0);
     const formatter = new Intl.RelativeTimeFormat(locale, { style: 'long', numeric: 'auto' });
 
     const divisions: Array<{ amount: number; name: Intl.RelativeTimeFormatUnit }> = [

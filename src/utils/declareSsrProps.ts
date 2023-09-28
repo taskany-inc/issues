@@ -2,11 +2,29 @@ import { GetServerSidePropsContext } from 'next';
 import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import { createServerSideHelpers, DecoratedProcedureSSGRecord } from '@trpc/react-query/server';
-import superjson from 'superjson';
+// import superjson from 'superjson';
 
 import { routes } from '../hooks/router';
 import { trpcRouter } from '../../trpc/router';
 import type { TrpcRouter } from '../../trpc/router';
+
+export function nullifyUndefined(obj: any) {
+    if (typeof obj === 'object') {
+        if (Array.isArray(obj)) {
+            for (let i = 0; i < obj.length; i++) {
+                obj[i] = nullifyUndefined(obj[i]);
+            }
+        } else {
+            // eslint-disable-next-line guard-for-in
+            for (const key in obj) {
+                obj[key] = nullifyUndefined(obj[key]);
+            }
+        }
+    } else if (typeof obj === 'undefined') {
+        obj = null;
+    }
+    return obj;
+}
 
 export interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];
@@ -45,7 +63,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                 session,
                 headers: req.headers,
             },
-            transformer: superjson,
+            // transformer: superjson,
         });
 
         const ssrTime = Date.now();
@@ -76,7 +94,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                 cookies: req.cookies,
                 user: session ? session.user : null,
                 ssrTime,
-                trpcState: ssrHelpers.dehydrate(),
+                trpcState: nullifyUndefined(ssrHelpers.dehydrate()),
             },
         };
     };

@@ -1,6 +1,6 @@
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCNext } from '@trpc/next';
-import superjson from 'superjson';
+// import superjson from 'superjson';
 
 import type { TrpcRouter } from '../../trpc/router';
 
@@ -15,7 +15,7 @@ function getBaseUrl() {
 export const trpc = createTRPCNext<TrpcRouter>({
     config: ({ ctx }) => {
         return {
-            transformer: superjson,
+            // transformer: superjson,
 
             queryClientConfig: {
                 defaultOptions: {
