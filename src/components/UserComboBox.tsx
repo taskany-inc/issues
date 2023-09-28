@@ -49,10 +49,9 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
             }
 
             const current = prepareUserDataFromActivity(value);
-            if (current != null) {
-                const existingName = getUserName(current);
 
-                return existingName;
+            if (current != null) {
+                return getUserName(current);
             }
 
             return query;
@@ -78,7 +77,9 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
             if (value) {
                 const current = prepareUserDataFromActivity(value);
 
-                return current?.name || current?.email || text;
+                if (current) {
+                    return getUserName(current);
+                }
             }
 
             return text;
