@@ -7,10 +7,9 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateFilter } from '../StateFilter';
 import { UserFilter } from '../UserFilter/UserFilter';
 import { ProjectFilter } from '../ProjectFilter';
-import { decodeEstimateFromUrl } from '../EstimateFilter';
+import { decodeEstimateFromUrl, getEstimateLabel } from '../EstimateFilter';
 import { TagFilter } from '../TagFilter';
 import { SortableProps, sortFilterTr } from '../SortFilter/SortFilter';
-import { formateEstimate } from '../../utils/dateTime';
 import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './FiltersPanelApplied.i18n';
@@ -114,10 +113,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
                 const dateRange = decodeEstimateFromUrl(e);
 
                 if (dateRange) {
-                    return formateEstimate(dateRange.range.end, {
-                        locale,
-                        type: dateRange.type,
-                    });
+                    return getEstimateLabel(dateRange, locale);
                 }
 
                 return null;

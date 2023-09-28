@@ -10,3 +10,9 @@ export enum Quarters {
 }
 
 export type QuartersKeys = keyof typeof Quarters;
+
+export enum QuartersAliases {
+    '@previous' = '@previous',
+    '@current' = '@current',
+    '@next' = '@next',
+}

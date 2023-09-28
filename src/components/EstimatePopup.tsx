@@ -4,6 +4,9 @@ import { useClickOutside, Popup, nullable } from '@taskany/bricks';
 import { gapS, danger10, radiusM } from '@taskany/colors';
 
 import { EstimateProps, Estimate } from './Estimate/Estimate';
+import { EstimateYear } from './EstimateYear/EstimateYear';
+import { EstimateQuarter } from './EstimateQuarter/EstimateQuarter';
+import { EstimateDate } from './EstimateDate/EstimateDate';
 
 const StyledErrorTrigger = styled.div`
     position: absolute;
@@ -21,7 +24,7 @@ const StyledPopup = styled(Popup)`
     padding: ${gapS};
 `;
 
-export interface EstimatePopupProps extends EstimateProps {
+export interface EstimatePopupProps extends Omit<EstimateProps, 'children'> {
     error?: { message?: string };
     renderTrigger: (values: { onClick: () => void }) => ReactNode;
     placement?: ComponentProps<typeof Popup>['placement'];
@@ -80,7 +83,11 @@ export const EstimatePopup = React.forwardRef<HTMLDivElement, EstimatePopupProps
                     minWidth={180}
                     maxWidth={180}
                 >
-                    <Estimate value={value} onChange={onChange} ref={popupContentRef} />
+                    <Estimate value={value} onChange={onChange} ref={popupContentRef}>
+                        <EstimateYear />
+                        <EstimateQuarter />
+                        <EstimateDate />
+                    </Estimate>
                 </StyledPopup>
             </div>
         );

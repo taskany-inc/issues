@@ -7,13 +7,17 @@ import styled from 'styled-components';
 const StyledWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    gap: ${gapXs};
+    padding-top: ${gapXs};
 `;
 
 const StyledContent = styled.div`
     display: flex;
     align-items: center;
     gap: ${gapS};
+`;
+
+const StyledClue = styled(Text)`
+    padding-bottom: ${gapS};
 `;
 
 interface EstimateOptionProps {
@@ -38,9 +42,9 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({ title, clue, rea
             </StyledContent>
 
             {nullable(clue, (c) => (
-                <Text size="xs" color={gray7}>
+                <StyledClue size="xs" color={gray7}>
                     {c}
-                </Text>
+                </StyledClue>
             ))}
 
             {nullable(!readOnly, () => renderTrigger?.())}

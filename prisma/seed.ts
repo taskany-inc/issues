@@ -89,7 +89,7 @@ const userPassword = 'taskany';
             data: {
                 mode: 'Global',
                 title: 'Active',
-                params: 'stateType=InProgress,NotStarted',
+                params: 'stateType=InProgress,NotStarted&estimate=@current',
                 default: true,
             },
         }),

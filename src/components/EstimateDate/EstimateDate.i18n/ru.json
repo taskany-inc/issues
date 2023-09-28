@@ -1,4 +1,6 @@
 {
     "Date input mask": "99.99.9999",
-    "Date input mask placeholder": "dd.mm.yyyy"
+    "Date input mask placeholder": "dd.mm.yyyy",
+    "Date title": "Дата",
+    "Date clue": "Или можно указать точную дату вручную, если есть строгий дедлайн."
 }
