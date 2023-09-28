@@ -22,7 +22,6 @@ import { IconBulbOnSolid } from '@taskany/icons';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
-import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
 import { useRouter } from '../../hooks/router';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { FlowComboBox } from '../FlowComboBox';
@@ -86,16 +85,6 @@ const ProjectCreateForm: React.FC = () => {
     const titleWatcher = watch('title');
     const keyWatcher = watch('id');
 
-    useDebouncedEffect(
-        () => {
-            if (!dirtyKey && titleWatcher && titleWatcher !== '') {
-                setValue('id', keyPredictor(titleWatcher));
-            }
-        },
-        300,
-        [setValue, titleWatcher],
-    );
-
     const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
     const flowRecomendations = trpc.flow.recommedations.useQuery();
     const existingProject = trpc.project.getById.useQuery(
@@ -132,6 +121,16 @@ const ProjectCreateForm: React.FC = () => {
         setDirtyKey(true);
     }, []);
 
+    const titleChangeHandler = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        (event) => {
+            setValue('title', event.target.value);
+            if (!dirtyKey && !!event.target.value) {
+                setValue('id', keyPredictor(event.target.value));
+            }
+        },
+        [setValue, dirtyKey],
+    );
+
     // eslint-disable-next-line no-nested-ternary
     const tooltip = isKeyEnoughLength
         ? isKeyUnique
@@ -166,6 +165,7 @@ const ProjectCreateForm: React.FC = () => {
                     <StyledProjectTitleContainer>
                         <FormInput
                             {...register('title')}
+                            onChange={titleChangeHandler}
                             placeholder={tr('Project title')}
                             flat="bottom"
                             brick="right"

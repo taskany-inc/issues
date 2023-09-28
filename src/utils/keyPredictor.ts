@@ -1,12 +1,26 @@
+const allowedSymbols = {
+    consonantsAndNumbers: new Set('qwrtpsdfghjklzxcvbnm1234567890'),
+    vowels: new Set('aeiouy'),
+};
+
 export const keyPredictor = (str: string, { allowVowels } = { allowVowels: false }) => {
-    // eslint-disable-next-line no-control-regex
-    let key = str.trim().replace(/[^\x00-\x7F]/g, '');
+    const allowedChars = new Set(allowedSymbols.consonantsAndNumbers);
 
-    key = allowVowels
-        ? // eslint-disable-next-line no-useless-escape
-          key.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]|/gi, '')
-        : // eslint-disable-next-line no-useless-escape
-          key.replace(/[aeiouy `~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]|/gi, '');
+    if (allowVowels) {
+        allowedSymbols.vowels.forEach((ch) => allowedChars.add(ch));
+    }
 
-    return key.toUpperCase().slice(0, 10);
+    const result = [];
+
+    for (const ch of str.toLowerCase()) {
+        if (allowedChars.has(ch)) {
+            result.push(ch);
+        }
+
+        if (result.length >= 10) {
+            break;
+        }
+    }
+
+    return result.join('').toUpperCase();
 };

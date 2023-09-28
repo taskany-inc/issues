@@ -34,4 +34,8 @@ describe('keyPredictor', () => {
     test('do not remove vowels', () => {
         expect(keyPredictor('AEOIUYW', { allowVowels: true })).toBe('AEOIUYW');
     });
+
+    test('correct with numbers', () => {
+        expect(keyPredictor('front1234end')).toBe('FRNT1234ND');
+    });
 });
