@@ -1,4 +1,4 @@
-import { DateRange, DateType, Quarters, QuartersKeys } from '../types/date';
+import { DateRange, DateType, Quarters, QuartersAliases, QuartersKeys } from '../types/date';
 
 import { TLocale } from './getLang';
 
@@ -107,16 +107,16 @@ const createQuarterRangeFromDate = (value: Date): DateRange => {
     return createDateRange(getYearFromDate(value), getQuarterFromDate(value));
 };
 
-export const getRelativeQuarterRange = (target: 'current' | 'next' | 'prev'): DateRange => {
+export const getRelativeQuarterRange = (target: QuartersAliases): DateRange => {
     const current = createQuarterRangeFromDate(new Date());
 
-    if (target === 'current') {
+    if (target === QuartersAliases['@current']) {
         return current;
     }
 
     const endOfQuarter = current.end;
 
-    if (target === 'next') {
+    if (target === QuartersAliases['@next']) {
         endOfQuarter.setMonth(endOfQuarter.getMonth() + 1);
 
         return createQuarterRangeFromDate(endOfQuarter);
@@ -219,7 +219,21 @@ const urlDateRangeSeparator = '~';
 export const encodeUrlDateRange = ({ start, end }: DateRange): string =>
     [start ? getDateString(start) : '', getDateString(end)].join(urlDateRangeSeparator);
 
+export const decodeUrlQuarterAlias = (data: string): QuartersAliases | null => {
+    if (Object.keys(QuartersAliases).includes(data)) {
+        return data as QuartersAliases;
+    }
+
+    return null;
+};
+
 export const decodeUrlDateRange = (data: string): null | DateRange => {
+    const alias = decodeUrlQuarterAlias(data);
+
+    if (alias) {
+        return getRelativeQuarterRange(alias);
+    }
+
     const [start = null, end] = data.split(urlDateRangeSeparator);
 
     if (!end) {

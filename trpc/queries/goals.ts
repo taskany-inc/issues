@@ -1,7 +1,7 @@
 import { Goal, GoalAchieveCriteria, Prisma, Role, State, StateType } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
-import { decodeUrlDateRange } from '../../src/utils/dateTime';
+import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
 const defaultOrderBy = {
     updatedAt: 'desc',
@@ -57,7 +57,8 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
                     const estimate = decodeUrlDateRange(e);
 
                     if (estimate) {
-                        const { start, end } = estimate;
+                        const end = new Date(getDateString(estimate.end));
+                        const start = estimate.start ? new Date(getDateString(estimate.start)) : null;
 
                         acum.push({
                             estimate: start

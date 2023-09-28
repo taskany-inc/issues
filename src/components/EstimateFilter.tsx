@@ -2,10 +2,21 @@ import { Tab } from '@taskany/bricks';
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
 
 import { useLocale } from '../hooks/useLocale';
-import { encodeUrlDateRange, decodeUrlDateRange, getDateTypeFromRange, formateEstimate } from '../utils/dateTime';
+import {
+    encodeUrlDateRange,
+    decodeUrlDateRange,
+    getDateTypeFromRange,
+    formateEstimate,
+    decodeUrlQuarterAlias,
+} from '../utils/dateTime';
+import { TLocale } from '../utils/getLang';
+import { QuartersAliases } from '../types/date';
 
 import { FilterTabLabel } from './FilterTabLabel';
 import { Estimate, EstimateValue } from './Estimate/Estimate';
+import { EstimateYear } from './EstimateYear/EstimateYear';
+import { EstimateQuarter } from './EstimateQuarter/EstimateQuarter';
+import { EstimateDate } from './EstimateDate/EstimateDate';
 
 export const decodeEstimateFromUrl = (value: string): EstimateValue | undefined => {
     if (!value) {
@@ -21,8 +32,19 @@ export const decodeEstimateFromUrl = (value: string): EstimateValue | undefined 
     return {
         range,
         type: getDateTypeFromRange(range),
+        alias: decodeUrlQuarterAlias(value) || undefined,
     };
 };
+
+export const getEstimateLabel = (estimate: EstimateValue, locale: TLocale): string =>
+    estimate.alias
+        ? estimate.alias
+        : formateEstimate(estimate.range.end, {
+              locale,
+              type: estimate.type,
+          });
+
+const quartersAliasesList = Object.values(QuartersAliases);
 
 export const EstimateFilter: FC<{
     text: string;
@@ -33,29 +55,31 @@ export const EstimateFilter: FC<{
 
     const onChangeHandler = useCallback(
         (value?: ComponentProps<typeof Estimate>['value']) => {
-            onChange(value ? [encodeUrlDateRange(value.range)] : []);
+            if (value) {
+                onChange([value.alias ? value.alias : encodeUrlDateRange(value.range)]);
+            } else {
+                onChange([]);
+            }
         },
         [onChange],
     );
 
-    const { estiamteValue, estiamteLabel } = useMemo(() => {
-        const estiamteValue = decodeEstimateFromUrl(value[0]);
+    const { estimateValue, estiamteLabel } = useMemo(() => {
+        const estimateValue = value.map((v) => decodeEstimateFromUrl(v)).filter(Boolean);
+
         return {
-            estiamteValue,
-            estiamteLabel: estiamteValue
-                ? [
-                      formateEstimate(estiamteValue.range.end, {
-                          locale,
-                          type: estiamteValue.type,
-                      }),
-                  ]
-                : [],
+            estimateValue: estimateValue[0],
+            estiamteLabel: estimateValue.map((v) => getEstimateLabel(v, locale)) ?? [],
         };
     }, [value, locale]);
 
     return (
         <Tab name="estimate" label={<FilterTabLabel text={text} selected={estiamteLabel} />}>
-            <Estimate onChange={onChangeHandler} value={estiamteValue} />
+            <Estimate onChange={onChangeHandler} value={estimateValue}>
+                <EstimateYear />
+                <EstimateQuarter aliases={quartersAliasesList} />
+                <EstimateDate />
+            </Estimate>
         </Tab>
     );
 };

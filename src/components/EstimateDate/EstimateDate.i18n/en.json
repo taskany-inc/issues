@@ -1,4 +1,6 @@
 {
     "Date input mask": "99/99/9999",
-    "Date input mask placeholder": "mm/dd/yyyy"
+    "Date input mask placeholder": "mm/dd/yyyy",
+    "Date title": "Strict date",
+    "Date clue": "Or you can choose a date if you have strict deadline."
 }

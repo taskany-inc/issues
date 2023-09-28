@@ -1,31 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { gapXs, gapS, warn0 } from '@taskany/colors';
+import { gapXs, warn0 } from '@taskany/colors';
 import { nullable, Text } from '@taskany/bricks';
 import { IconExclamationCircleSolid } from '@taskany/icons';
 
-import {
-    createDateRange,
-    isPastDate,
-    getQuarterFromDate,
-    getYearFromDate,
-    getDateString,
-    getRelativeQuarterRange,
-    createLocaleDate,
-    createYearRange,
-} from '../../utils/dateTime';
-import { useLocale } from '../../hooks/useLocale';
-import { DateType, DateRange } from '../../types/date';
-import { EstimateDate } from '../EstimateDate/EstimateDate';
-import { EstimateQuarter } from '../EstimateQuarter';
-import { EstimateYear } from '../EstimateYear';
+import { createDateRange, isPastDate, getQuarterFromDate, getYearFromDate, getDateString } from '../../utils/dateTime';
+import { DateType, DateRange, QuartersAliases } from '../../types/date';
 
 import { tr } from './Estimate.i18n';
+import { EstimateContextProvider } from './EstimateProvider';
 
 const StyledWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    gap: ${gapS};
+    gap: ${gapXs};
 `;
 
 const StyledWarningWrapper = styled.div`
@@ -41,11 +29,13 @@ const StyledIconExclamationCircleSolid = styled(IconExclamationCircleSolid)`
 export type EstimateValue = {
     type: DateType;
     range: DateRange;
+    alias?: QuartersAliases;
 };
 
 export interface EstimateProps {
     value?: EstimateValue;
     onChange?: (value?: EstimateValue) => void;
+    children: ReactNode;
 }
 
 export const getReadOnlyFields = (type: EstimateValue['type']) => {
@@ -58,72 +48,81 @@ export const getReadOnlyFields = (type: EstimateValue['type']) => {
     return { year: false, quarter: true, date: true };
 };
 
-const currentQuarterRange = getRelativeQuarterRange('current');
-const currentQuarter = getQuarterFromDate(currentQuarterRange.end);
-const currentYearRange = createYearRange(getYearFromDate(new Date()));
-
-export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value, onChange }, ref) => {
-    const locale = useLocale();
+export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value, onChange, children }, ref) => {
     const [readOnly, setReadOnly] = useState(
         value ? getReadOnlyFields(value.type) : { year: true, quarter: true, date: true },
     );
     const [year, setYear] = useState(value ? getYearFromDate(value.range.end) : undefined);
     const [quarter, setQuarter] = useState(value ? getQuarterFromDate(value.range.end) : undefined);
+    const [quarterAlias, setQuarterAlias] = useState(value?.alias);
     const [date, setDate] = useState(value ? value.range.end : undefined);
 
-    const onChangeHandler = useCallback(
-        (newValue?: EstimateValue) => {
-            const oldStartDate = value && value.range.start ? getDateString(value.range.start) : null;
-            const newStartDate = newValue && newValue.range.start ? getDateString(newValue.range.start) : null;
-
-            const oldEndDate = value ? getDateString(value.range.end) : null;
-            const newEndDate = newValue ? getDateString(newValue.range.end) : null;
-
-            if (value?.type !== newValue?.type || oldStartDate !== newStartDate || oldEndDate !== newEndDate) {
-                onChange?.(newValue);
-            }
-        },
-        [value, onChange],
-    );
-
-    useEffect(() => {
+    const countedValue = useMemo(() => {
         if (readOnly.quarter && readOnly.year && readOnly.date) {
-            return;
+            return value;
         }
 
         if (!readOnly.quarter) {
-            onChangeHandler?.(
-                year
-                    ? {
-                          range: createDateRange(year, quarter),
-                          type: quarter ? 'Quarter' : 'Year',
-                      }
-                    : undefined,
-            );
-        } else if (!readOnly.year) {
-            onChangeHandler?.(
-                year
-                    ? {
-                          range: createDateRange(year),
-                          type: 'Year',
-                      }
-                    : undefined,
-            );
-        } else {
-            onChangeHandler?.(
-                date
-                    ? {
-                          range: { end: date },
-                          type: 'Strict',
-                      }
-                    : undefined,
-            );
+            return year
+                ? {
+                      range: createDateRange(year, quarter),
+                      type: quarter ? DateType.Quarter : DateType.Year,
+                      alias: quarter ? quarterAlias : undefined,
+                  }
+                : undefined;
         }
-    }, [year, quarter, date, onChangeHandler, readOnly]);
+        if (!readOnly.year) {
+            return year
+                ? {
+                      range: createDateRange(year),
+                      type: DateType.Quarter,
+                  }
+                : undefined;
+        }
+        return date
+            ? {
+                  range: { end: date },
+                  type: DateType.Strict,
+              }
+            : undefined;
+    }, [year, quarter, date, quarterAlias, readOnly, value]);
+
+    useEffect(() => {
+        const oldStartDate = value && value.range.start ? getDateString(value.range.start) : null;
+        const newStartDate = countedValue && countedValue.range.start ? getDateString(countedValue.range.start) : null;
+
+        const oldEndDate = value ? getDateString(value.range.end) : null;
+        const newEndDate = countedValue ? getDateString(countedValue.range.end) : null;
+
+        if (
+            value?.type !== countedValue?.type ||
+            value?.alias !== countedValue?.alias ||
+            oldStartDate !== newStartDate ||
+            oldEndDate !== newEndDate
+        ) {
+            onChange?.(countedValue);
+        }
+    }, [countedValue, value, onChange]);
 
     const warning = useMemo(
-        () => (value && isPastDate(value.range.end) ? { message: tr('Date is past') } : undefined),
-        [value],
+        () => (countedValue && isPastDate(countedValue.range.end) ? { message: tr('Date is past') } : undefined),
+        [countedValue],
+    );
+
+    const context = useMemo(
+        () => ({
+            readOnly,
+            setReadOnly,
+            year,
+            setYear,
+            quarter,
+            setQuarter,
+            quarterAlias,
+            setQuarterAlias,
+            date,
+            setDate,
+        }),
+        [readOnly, year, quarter, quarterAlias, date],
     );
 
     return (
@@ -136,39 +135,8 @@ export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value
                     </Text>
                 </StyledWarningWrapper>
             ))}
-            <EstimateYear
-                title={tr('Year title')}
-                clue={tr
-                    .raw('Year clue', {
-                        end: createLocaleDate(currentYearRange.end, { locale }),
-                    })
-                    .join('')}
-                value={year}
-                readOnly={readOnly.year}
-                onChange={setYear}
-                setReadOnly={setReadOnly}
-            />
-            <EstimateQuarter
-                title={tr('Quarter title')}
-                clue={`${tr
-                    .raw('Quarter clue', {
-                        quarter: currentQuarter,
-                        end: createLocaleDate(currentQuarterRange.end, { locale }),
-                    })
-                    .join('')}`}
-                value={quarter}
-                readOnly={readOnly.quarter}
-                onChange={setQuarter}
-                setReadOnly={setReadOnly}
-            />
-            <EstimateDate
-                title={tr('Date title')}
-                clue={tr('Date clue')}
-                value={date}
-                readOnly={readOnly.date}
-                onChange={setDate}
-                setReadOnly={setReadOnly}
-            />
+
+            <EstimateContextProvider value={context}>{children}</EstimateContextProvider>
         </StyledWrapper>
     );
 });
