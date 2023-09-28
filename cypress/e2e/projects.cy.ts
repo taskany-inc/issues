@@ -129,10 +129,9 @@ describe('Projects', () => {
 
             it('not allows to create project with existing key', () => {
                 cy.get(projectTitleInput.query).type(testProjectTitle);
-                cy.get(projectKeyPredictor.query).trigger('mouseover');
+                cy.get(projectKeyPredictor.query).contains(testProjectKey).trigger('mouseover');
 
                 cy.get(projectKeyPredictorError.query).should('exist');
-                // incorrect info in error
                 // screenshot
 
                 cy.get(projectSubmitButton.query).click();
