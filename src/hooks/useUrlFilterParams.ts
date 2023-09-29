@@ -45,21 +45,21 @@ const stringifySortQueryParam = (param: QueryState['sort']) =>
         .join(',');
 
 const buildURLSearchParams = ({
-    priority,
-    state,
-    stateType,
-    tag,
-    estimate,
-    issuer,
-    owner,
-    participant,
-    project,
-    query,
+    priority = [],
+    state = [],
+    stateType = [],
+    tag = [],
+    estimate = [],
+    owner = [],
+    issuer = [],
+    participant = [],
+    project = [],
+    query = '',
     starred,
     watching,
-    sort,
+    sort = {},
     limit,
-}: QueryState): URLSearchParams => {
+}: Partial<QueryState>): URLSearchParams => {
     const urlParams = new URLSearchParams();
 
     priority.length > 0 ? urlParams.set('priority', Array.from(priority).toString()) : urlParams.delete('priority');
@@ -118,9 +118,9 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
-    const queryState = useMemo<QueryState>(() => {
+    const queryState = useMemo<QueryState | undefined>(() => {
         const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
-        return parseFilterValues(query);
+        return Object.keys(query).length ? parseFilterValues(query) : undefined;
     }, [router.query, currentPreset]);
     const queryString = router.asPath.split('?')[1];
 
@@ -130,7 +130,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     }
 
     const pushStateToRouter = useCallback(
-        (queryState: QueryState) => {
+        (queryState: Partial<QueryState>) => {
             const newurl = router.asPath.split('?')[0];
             const urlParams = buildURLSearchParams(queryState);
             const isEmptySearch = !Array.from(urlParams.keys()).length;
@@ -150,7 +150,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         const state = { ...queryState };
         let queued = false;
 
-        const push = (nextState: QueryState) => {
+        const push = (nextState: Partial<QueryState>) => {
             if (!queued) {
                 queued = true;
                 // we batch state changes due current call stack
@@ -208,7 +208,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const newTagsFilterValue = new Set(queryState.tag);
+                const newTagsFilterValue = new Set(queryState?.tag);
 
                 newTagsFilterValue.has(t.id) ? newTagsFilterValue.delete(t.id) : newTagsFilterValue.add(t.id);
 

@@ -185,23 +185,20 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
             <PageContent>
                 <Table>
-                    {groupsOnScreen?.map(
-                        (group) =>
-                            (queryString ? Boolean(group.goals.length) : true) && (
-                                <React.Fragment key={group.project.id}>
-                                    <GoalsGroup
-                                        goals={group.goals as NonNullable<GoalByIdReturnType>[]}
-                                        selectedResolver={selectedGoalResolver}
-                                        onClickProvider={onGoalPrewiewShow}
-                                        onTagClick={setTagsFilterOutside}
-                                        project={group.project}
-                                    />
-                                    {nullable(!group.goals.length, () => (
-                                        <InlineCreateGoalControl projectId={group.project.id} />
-                                    ))}
-                                </React.Fragment>
-                            ),
-                    )}
+                    {groupsOnScreen?.map((group) => (
+                        <React.Fragment key={group.project.id}>
+                            <GoalsGroup
+                                goals={group.goals as NonNullable<GoalByIdReturnType>[]}
+                                selectedResolver={selectedGoalResolver}
+                                onClickProvider={onGoalPrewiewShow}
+                                onTagClick={setTagsFilterOutside}
+                                project={group.project}
+                            />
+                            {nullable(!group.goals.length, () => (
+                                <InlineCreateGoalControl projectId={group.project.id} />
+                            ))}
+                        </React.Fragment>
+                    ))}
                 </Table>
 
                 {nullable(hasNextPage, () => (
