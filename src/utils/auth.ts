@@ -65,6 +65,7 @@ if (process.env.KEYCLOAK_ID && process.env.KEYCLOAK_SECRET && process.env.KEYCLO
     providers.push(
         // https://next-auth.js.org/providers/keycloak
         KeycloakProvider({
+            allowDangerousEmailAccountLinking: true,
             clientId: process.env.KEYCLOAK_ID,
             clientSecret: process.env.KEYCLOAK_SECRET,
             issuer: process.env.KEYCLOAK_ISSUER,
