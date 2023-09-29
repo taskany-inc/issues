@@ -16,7 +16,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { tr } from './FiltersPanelApplied.i18n';
 
 interface FiltersPanelAppliedProps {
-    queryState: QueryState;
+    queryState?: QueryState;
     states?: React.ComponentProps<typeof StateFilter>['states'];
     issuers?: React.ComponentProps<typeof UserFilter>['users'];
     owners?: React.ComponentProps<typeof UserFilter>['users'];
@@ -45,6 +45,18 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
 }) => {
     let infoString = '';
     const locale = useLocale();
+    const {
+        priority = [],
+        state = [],
+        stateType = [],
+        issuer = [],
+        owner = [],
+        participant = [],
+        project = [],
+        tag = [],
+        estimate = [],
+        sort = {},
+    } = queryState || {};
 
     const { statesMap, issuersMap, ownersMap, participantsMap, projectsMap, tagsMap } = useMemo(() => {
         return {
@@ -59,47 +71,45 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
 
     const appliedMap: Record<string, string[]> = {};
 
-    if (queryState.priority.length) {
-        appliedMap[tr('Priority')] = queryState.priority.map((p) => getPriorityText(p)).filter(Boolean);
+    if (priority.length) {
+        appliedMap[tr('Priority')] = priority.map((p) => getPriorityText(p)).filter(Boolean);
     }
 
-    if (queryState.state.length && states?.length) {
-        appliedMap[tr('State')] = queryState.state.map((s) => statesMap[s]?.title).filter(Boolean);
+    if (state.length && states?.length) {
+        appliedMap[tr('State')] = state.map((s) => statesMap[s]?.title).filter(Boolean);
     }
 
-    if (queryState.stateType.length && states?.length) {
+    if (stateType.length && states?.length) {
         appliedMap[tr('State')] = states.reduce((acum, { type, title }) => {
-            if (queryState.stateType.includes(type) && !acum.includes(title)) {
+            if (stateType?.includes(type) && !acum.includes(title)) {
                 acum.push(title);
             }
             return acum;
         }, appliedMap[tr('State')] || []);
     }
 
-    if (queryState.issuer.length && issuers?.length) {
-        appliedMap[tr('Issuer')] = queryState.issuer.map((u) => issuersMap[u]?.name).filter(Boolean) as string[];
+    if (issuer.length && issuers?.length) {
+        appliedMap[tr('Issuer')] = issuer.map((u) => issuersMap[u]?.name).filter(Boolean) as string[];
     }
 
-    if (queryState.owner.length && owners?.length) {
-        appliedMap[tr('Owner')] = queryState.owner.map((u) => ownersMap[u]?.name).filter(Boolean) as string[];
+    if (owner.length && owners?.length) {
+        appliedMap[tr('Owner')] = owner.map((u) => ownersMap[u]?.name).filter(Boolean) as string[];
     }
 
-    if (queryState.participant.length && participants?.length) {
-        appliedMap[tr('Participant')] = queryState.participant
-            .map((u) => participantsMap[u]?.name)
-            .filter(Boolean) as string[];
+    if (participant.length && participants?.length) {
+        appliedMap[tr('Participant')] = participant.map((u) => participantsMap[u]?.name).filter(Boolean) as string[];
     }
 
-    if (queryState.project.length && projects?.length) {
-        appliedMap[tr('Project')] = queryState.project.map((p) => projectsMap[p]?.title).filter(Boolean);
+    if (project.length && projects?.length) {
+        appliedMap[tr('Project')] = project.map((p) => projectsMap[p]?.title).filter(Boolean);
     }
 
-    if (queryState.tag.length && tags?.length) {
-        appliedMap[tr('Tag')] = queryState.tag.map((t) => tagsMap[t]?.title).filter(Boolean);
+    if (tag.length && tags?.length) {
+        appliedMap[tr('Tag')] = tag.map((t) => tagsMap[t]?.title).filter(Boolean);
     }
 
-    if (queryState.estimate.length) {
-        appliedMap[tr('Estimate')] = queryState.estimate
+    if (estimate.length) {
+        appliedMap[tr('Estimate')] = estimate
             .map((e) => {
                 const dateRange = decodeEstimateFromUrl(e);
 
@@ -119,9 +129,9 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
         if (v.length) infoString += `${k}: ${v.join(', ')}. `;
     });
 
-    if (Object.keys(queryState.sort).length) {
+    if (Object.keys(sort).length) {
         infoString += `${tr('Sorted')}: `;
-        const items = Object.entries(queryState.sort);
+        const items = Object.entries(sort);
 
         items.forEach(([k, v], i) => {
             const delimeter = items.length - 1 === i ? '.' : ', ';

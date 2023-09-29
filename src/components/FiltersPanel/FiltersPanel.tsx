@@ -60,7 +60,7 @@ export const FiltersPanel: FC<{
     loading?: boolean;
     total?: number;
     counter?: number;
-    queryState: QueryState;
+    queryState?: QueryState;
     queryString?: string;
 
     preset?: FilterById;
@@ -98,7 +98,7 @@ export const FiltersPanel: FC<{
         const [projectsQuery, setProjectsQuery] = useState('');
         const [tagsQuery, setTagsQuery] = useState('');
         const [filterVisible, setFilterVisible] = useState(false);
-        const [filterQuery, setFilterQuery] = useState<Partial<QueryState>>(() => queryState);
+        const [filterQuery, setFilterQuery] = useState<Partial<QueryState> | undefined>(queryState);
 
         useEffect(() => {
             setFilterQuery(queryState);
@@ -107,7 +107,7 @@ export const FiltersPanel: FC<{
         const { data: owners = [] } = trpc.user.suggestions.useQuery(
             {
                 query: ownersQuery,
-                include: queryState.owner,
+                include: queryState?.owner,
                 take: filtersTakeCount,
             },
             useQueryOptions,
@@ -116,7 +116,7 @@ export const FiltersPanel: FC<{
         const { data: issuers = [] } = trpc.user.suggestions.useQuery(
             {
                 query: issuersQuery,
-                include: queryState.issuer,
+                include: queryState?.issuer,
                 take: filtersTakeCount,
             },
             useQueryOptions,
@@ -125,7 +125,7 @@ export const FiltersPanel: FC<{
         const { data: participants = [] } = trpc.user.suggestions.useQuery(
             {
                 query: participantsQuery,
-                include: queryState.participant,
+                include: queryState?.participant,
                 take: filtersTakeCount,
             },
             useQueryOptions,
@@ -134,7 +134,7 @@ export const FiltersPanel: FC<{
         const { data: projects = [] } = trpc.project.suggestions.useQuery(
             {
                 query: projectsQuery,
-                include: queryState.project,
+                include: queryState?.project,
                 take: filtersTakeCount,
             },
             useQueryOptions,
@@ -143,7 +143,7 @@ export const FiltersPanel: FC<{
         const { data: tags = [] } = trpc.tag.suggestions.useQuery(
             {
                 query: tagsQuery,
-                include: queryState.tag,
+                include: queryState?.tag,
                 take: filtersTakeCount,
             },
             useQueryOptions,
@@ -163,7 +163,7 @@ export const FiltersPanel: FC<{
 
         const onApplyClick = useCallback(() => {
             setFilterVisible(false);
-            onFilterApply?.(filterQuery);
+            onFilterApply?.({ ...filterQuery });
         }, [filterQuery, onFilterApply]);
 
         return (
@@ -173,7 +173,7 @@ export const FiltersPanel: FC<{
                         <FiltersSearchContainer>
                             <SearchFilter
                                 placeholder={tr('Search')}
-                                defaultValue={queryState.query}
+                                defaultValue={queryState?.query}
                                 onChange={onSearchChange}
                             />
                         </FiltersSearchContainer>
@@ -185,9 +185,9 @@ export const FiltersPanel: FC<{
                                 {tr('Filter')}
                             </FiltersMenuItem>
 
-                            <StarredFilter value={queryState.starred} onChange={onStarredChange} />
+                            <StarredFilter value={queryState?.starred} onChange={onStarredChange} />
 
-                            <WatchingFilter value={queryState.watching} onChange={onWatchingChange} />
+                            <WatchingFilter value={queryState?.watching} onChange={onWatchingChange} />
 
                             {Boolean(presets.length) && (
                                 <PresetDropdown
@@ -199,7 +199,7 @@ export const FiltersPanel: FC<{
                             )}
 
                             {onLimitChange &&
-                                nullable(queryState.limit, (lf) => (
+                                nullable(queryState?.limit, (lf) => (
                                     <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={onLimitChange} />
                                 ))}
 
@@ -294,7 +294,7 @@ export const FiltersPanel: FC<{
                         onChange={setPartialQueryByKey('participant')}
                         onSearchChange={setParticipantsQuery}
                     />
-                    <SortFilter text={tr('Sort')} value={filterQuery.sort} onChange={setPartialQueryByKey('sort')} />
+                    <SortFilter text={tr('Sort')} value={filterQuery?.sort} onChange={setPartialQueryByKey('sort')} />
                 </FilterPopup>
             </>
         );

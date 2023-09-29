@@ -184,6 +184,7 @@ export const project = router({
                 },
             });
             const projectIdsArray = projectIds.map(({ id }) => id);
+            const goalsFilters = goalsQuery ? { ...goalsFilter(goalsQuery, activityId).where } : {};
 
             const { groups, totalGoalsCount } = await prisma.project
                 .findMany({
@@ -199,7 +200,7 @@ export const project = router({
                             //  all goals with filters
                             where: {
                                 AND: [
-                                    goalsQuery ? { ...goalsFilter(goalsQuery, activityId).where } : {},
+                                    goalsFilters,
                                     {
                                         OR: [
                                             ...requestSchema({ withOwner: true }),
@@ -231,7 +232,18 @@ export const project = router({
                                 id: {
                                     in: projectIdsArray,
                                 },
-                                AND: nonArchivedPartialQuery,
+                                AND: [
+                                    nonArchivedPartialQuery,
+                                    goalsQuery
+                                        ? {
+                                              goals: {
+                                                  some: {
+                                                      AND: goalsFilters,
+                                                  },
+                                              },
+                                          }
+                                        : {},
+                                ],
                             },
                             {
                                 goals: {
@@ -240,6 +252,7 @@ export const project = router({
                                             {
                                                 OR: requestSchema({ withOwner: true }),
                                             },
+                                            goalsFilters,
                                             nonArchivedPartialQuery,
                                         ],
                                     },
@@ -422,10 +435,10 @@ export const project = router({
         .input(
             z.object({
                 id: z.string(),
-                goalsQuery: queryWithFiltersSchema,
+                goalsQuery: queryWithFiltersSchema.optional(),
             }),
         )
-        .query(async ({ ctx, input: { id, goalsQuery } }) => {
+        .query(async ({ ctx, input: { id, goalsQuery = {} } }) => {
             const { activityId, role } = ctx.session.user;
 
             const [allProjectGoals, filtredProjectGoals] = await Promise.all([

@@ -13,7 +13,7 @@ import { InlineCreateGoalControl } from './InlineCreateGoalControl/InlineCreateG
 
 export const ProjectListItemConnected: FC<{
     project: NonNullable<ProjectByIdReturnType>;
-    queryState: QueryState;
+    queryState?: Partial<QueryState>;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
     onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
     selectedResolver?: (id: string) => boolean;
