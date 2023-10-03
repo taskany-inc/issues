@@ -489,35 +489,37 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         )}
                     </IssueMeta>
 
-                    <IssueMeta title={tr('Participants')}>
-                        {goal.participants?.map(({ user }) => (
-                            <UserBadge
-                                key={user?.activityId}
-                                user={user}
-                                onCleanButtonClick={
-                                    goal._isEditable ? onGoalParticipantRemove(user?.activityId) : undefined
-                                }
-                            />
-                        ))}
-
-                        {nullable(goal._isEditable, () => (
-                            <StyledInlineInput>
-                                <UserComboBox
-                                    placement="bottom-start"
-                                    placeholder={tr('Type user name or email')}
-                                    filter={participantsFilter}
-                                    onChange={onGoalParticipantAdd}
-                                    renderTrigger={(props) => (
-                                        <StyledInlineTrigger
-                                            icon={<IconPlusCircleOutline size="xs" />}
-                                            text={tr('Add participant')}
-                                            onClick={props.onClick}
-                                        />
-                                    )}
+                    {nullable(goal._isEditable || goal.participants.length, () => (
+                        <IssueMeta title={tr('Participants')}>
+                            {goal.participants?.map(({ user }) => (
+                                <UserBadge
+                                    key={user?.activityId}
+                                    user={user}
+                                    onCleanButtonClick={
+                                        goal._isEditable ? onGoalParticipantRemove(user?.activityId) : undefined
+                                    }
                                 />
-                            </StyledInlineInput>
-                        ))}
-                    </IssueMeta>
+                            ))}
+
+                            {nullable(goal._isEditable, () => (
+                                <StyledInlineInput>
+                                    <UserComboBox
+                                        placement="bottom-start"
+                                        placeholder={tr('Type user name or email')}
+                                        filter={participantsFilter}
+                                        onChange={onGoalParticipantAdd}
+                                        renderTrigger={(props) => (
+                                            <StyledInlineTrigger
+                                                icon={<IconPlusCircleOutline size="xs" />}
+                                                text={tr('Add participant')}
+                                                onClick={props.onClick}
+                                            />
+                                        )}
+                                    />
+                                </StyledInlineInput>
+                            ))}
+                        </IssueMeta>
+                    ))}
                     {nullable(!(!goal.tags.length && !goal._isEditable), () => (
                         <>
                             <IssueMeta title={tr('Tags')}>
