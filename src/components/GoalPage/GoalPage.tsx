@@ -525,7 +525,9 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                             <IssueMeta title={tr('Tags')}>
                                 {goal.tags?.map((tag) => (
                                     <Tag key={tag.id}>
-                                        <TagCleanButton onClick={onGoalTagRemove(tag)} />
+                                        {nullable(goal._isEditable, () => (
+                                            <TagCleanButton onClick={onGoalTagRemove(tag)} />
+                                        ))}
                                         {tag.title}
                                     </Tag>
                                 ))}
