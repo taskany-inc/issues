@@ -1,10 +1,11 @@
 import { TRPCError, initTRPC } from '@trpc/server';
-import superjson from 'superjson';
+
+import { transformer } from '../src/utils/transformer';
 
 import type { TrpcContext } from './context';
 
 const t = initTRPC.context<TrpcContext>().create({
-    transformer: superjson,
+    transformer,
 });
 
 const sessionCheck = t.middleware(({ next, ctx }) => {
