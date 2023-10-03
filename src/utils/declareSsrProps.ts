@@ -2,11 +2,12 @@ import { GetServerSidePropsContext } from 'next';
 import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import { createServerSideHelpers, DecoratedProcedureSSGRecord } from '@trpc/react-query/server';
-import superjson from 'superjson';
 
 import { routes } from '../hooks/router';
 import { trpcRouter } from '../../trpc/router';
 import type { TrpcRouter } from '../../trpc/router';
+
+import { transformer } from './transformer';
 
 export interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];
@@ -45,7 +46,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                 session,
                 headers: req.headers,
             },
-            transformer: superjson,
+            transformer,
         });
 
         const ssrTime = Date.now();
