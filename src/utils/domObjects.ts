@@ -82,13 +82,11 @@ export const issuePageHeaderParent = issuePageHeader.add('parent');
 
 export const combobox = DO('combobox');
 export const comboboxItem = combobox.add('item');
+export const comboboxInput = combobox.add('input');
 export const usersCombobox = combobox.add('users');
-export const usersCompboxInput = combobox.add('input');
 export const projectsCombobox = combobox.add('projects');
-export const projectsComboboxInput = combobox.add('input');
 export const priorityCombobox = combobox.add('priority');
 export const stateCombobox = combobox.add('state');
 export const estimateCombobox = combobox.add('estimate');
 export const tagsCombobox = combobox.add('tags');
-export const tagsComboboxInput = combobox.add('input');
 export const createActionToggle = combobox.add('actionToggle');

@@ -12,12 +12,11 @@ import {
     estimateCombobox,
     stateCombobox,
     goalActionCreateOnly,
-    projectsComboboxInput,
     comboboxItem,
     projectListItemTitle,
     pageTitle,
     createFastButton,
-    usersCompboxInput,
+    comboboxInput,
     createActionToggle,
     goalActionCreateAndGo,
     issuePageHeaderParent,
@@ -123,8 +122,8 @@ describe('Goals', () => {
 
             it('state control is enabled after choose project', () => {
                 cy.get(projectsCombobox.query).should('have.value', '').click();
-                cy.get(projectsComboboxInput.query).should('have.value', '');
-                cy.get(projectsComboboxInput.query).type(testProjectForGoals);
+                cy.get(comboboxInput.query).should('have.value', '');
+                cy.get(comboboxInput.query).type(testProjectForGoals);
                 cy.get(comboboxItem.query).click();
                 cy.get(projectsCombobox.query).contains(projectKey);
                 cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');
@@ -149,7 +148,7 @@ describe('Goals', () => {
 
             it('can choose the other user', (done) => {
                 cy.get(usersCombobox.query).should('exist').click();
-                cy.get(usersCompboxInput.query).clear().type(testUser.name);
+                cy.get(comboboxInput.query).clear().type(testUser.name);
                 cy.get(comboboxItem.query)
                     .should('contain.text', testUser.name)
                     .and('contain.text', testUser.email)
@@ -199,7 +198,7 @@ describe('Goals', () => {
                 cy.get(goalTitleInput.query).type(testGoalTitle);
                 cy.get(goalDescriptionInput.query).type(testGoalDescription);
                 cy.get(projectsCombobox.query).click();
-                cy.get(projectsComboboxInput.query).type(testProjectForGoals.slice(0, 4));
+                cy.get(comboboxInput.query).type(testProjectForGoals.slice(0, 4));
                 cy.get(comboboxItem.query).click();
                 cy.get(projectsCombobox.query).contains(projectKey);
                 cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');

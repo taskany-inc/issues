@@ -5,7 +5,7 @@ import { Button, UserPic, Input, UserMenuItem, nullable } from '@taskany/bricks'
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { safeGetUserEmail, safeGetUserImage, safeGetUserName } from '../utils/getUserName';
-import { comboboxItem, usersCombobox, usersCompboxInput } from '../utils/domObjects';
+import { comboboxItem, usersCombobox, comboboxInput } from '../utils/domObjects';
 
 import { CommonCombobox } from './CommonCombobox';
 
@@ -109,7 +109,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                             setCompletionVisibility(true);
                         }}
                         {...props}
-                        {...usersCompboxInput.attr}
+                        {...comboboxInput.attr}
                     />
                 )}
                 renderItem={(props) => (

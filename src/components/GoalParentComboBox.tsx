@@ -4,7 +4,7 @@ import { Button, Input, ComboBox } from '@taskany/bricks';
 
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';
-import { projectsCombobox, projectsComboboxInput } from '../utils/domObjects';
+import { projectsCombobox, comboboxInput } from '../utils/domObjects';
 
 import { ProjectMenuItem } from './ProjectMenuItem';
 import { CommonCombobox } from './CommonCombobox';
@@ -110,7 +110,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                             setCompletionVisibility(true);
                         }}
                         {...props}
-                        {...projectsComboboxInput.attr}
+                        {...comboboxInput.attr}
                     />
                 )}
                 renderItem={(props) => (
