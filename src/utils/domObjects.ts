@@ -40,6 +40,8 @@ export const projectGoalListItem = projectListItem.add('goalItem');
 export const createGoalInlineControl = DO('createGoalInlineControl');
 
 export const goalCreateForm = DO('goalCreateForm');
+export const goalTitleInput = goalCreateForm.add('title');
+export const goalDescriptionInput = goalCreateForm.add('description');
 export const goalProjectSelectControl = goalCreateForm.add('project');
 
 export const projectSettingsContent = DO('projectSettingsContent');
@@ -65,3 +67,28 @@ export const projectSettingsConfirmTransferProjectButton =
     projectSettingsTransferForm.add('confirmTransferProjectButton');
 export const projectSettingsCancelTransferProjectButton =
     projectSettingsTransferForm.add('cancelTransferProjectButton');
+export const goalPrioritySelectControl = goalCreateForm.add('priority');
+export const goalOwnerSelectControl = goalCreateForm.add('owner');
+export const goalActionCreateAndGo = goalCreateForm.add('create&go');
+export const goalActionCreateOneMore = goalCreateForm.add('createOneMore');
+export const goalActionCreateOnly = goalCreateForm.add('createOnly');
+export const goalSaveButton = goalCreateForm.add('saveButton');
+export const goalCancelButton = goalCreateForm.add('cancelButton');
+
+export const issuePage = DO('issuePage');
+export const issuePageHeader = issuePage.add('header');
+export const issuePageHeaderTitle = issuePageHeader.add('title');
+export const issuePageHeaderParent = issuePageHeader.add('parent');
+
+export const combobox = DO('combobox');
+export const comboboxItem = combobox.add('item');
+export const usersCombobox = combobox.add('users');
+export const usersCompboxInput = combobox.add('input');
+export const projectsCombobox = combobox.add('projects');
+export const projectsComboboxInput = combobox.add('input');
+export const priorityCombobox = combobox.add('priority');
+export const stateCombobox = combobox.add('state');
+export const estimateCombobox = combobox.add('estimate');
+export const tagsCombobox = combobox.add('tags');
+export const tagsComboboxInput = combobox.add('input');
+export const createActionToggle = combobox.add('actionToggle');
