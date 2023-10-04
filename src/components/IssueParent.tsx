@@ -5,6 +5,7 @@ import { gapM, gapS, gray9 } from '@taskany/colors';
 import { Text, Link, nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
+import { issuePageHeaderParent } from '../utils/domObjects';
 
 interface Parent {
     id?: string;
@@ -45,7 +46,7 @@ export const IssueParent: React.FC<IssueParentProps> = ({ parent, as, mode = 'de
         <StyledIssueParentTitle as={as} size={size} weight="bold" color={gray9} mode={mode}>
             {normalizedParent.map((p, i) =>
                 nullable(p.id, (id) => (
-                    <span key={id}>
+                    <span key={id} {...issuePageHeaderParent.attr}>
                         <NextLink passHref href={routes.project(id)} legacyBehavior>
                             <Link inline>{p.title}</Link>
                         </NextLink>

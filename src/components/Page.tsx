@@ -32,7 +32,7 @@ const FeedbackCreateForm = dynamic(() => import('./FeedbackCreateForm/FeedbackCr
 const WhatsNew = dynamic(() => import('./WhatsNew/WhatsNew'));
 const ImageFullScreen = dynamic(() => import('./ImageFullScreen'));
 
-interface PageProps {
+interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     user: Session['user'];
     ssrTime: number;
     title?: string;
@@ -60,7 +60,7 @@ export const PageActions = styled.div`
 
 const mapThemeOnId = { light: 0, dark: 1 } as const;
 
-export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children }) => {
+export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, ...attrs }) => {
     const { setPreview } = useGoalPreview();
 
     useHotkeys();
@@ -98,7 +98,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
 
             <PageHeader />
 
-            <StyledContent>{children}</StyledContent>
+            <StyledContent {...attrs}>{children}</StyledContent>
 
             <ModalOnEvent event={ModalEvent.ProjectCreateModal} hotkeys={createProjectKeys}>
                 <ProjectCreateForm />

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { gray9, gray10 } from '@taskany/colors';
-import { Button, Dropdown, MenuItem, Text, Keyboard, Tip } from '@taskany/bricks';
+import { Button, MenuItem, Text, Keyboard, Tip } from '@taskany/bricks';
 import { IconBulbOnOutline, IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 
 import { useRouter } from '../../hooks/router';
@@ -13,7 +13,15 @@ import { trpc } from '../../utils/trpcClient';
 import { GoalCommon, goalCommonSchema } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalCreateReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
-import { goalCreateForm } from '../../utils/domObjects';
+import {
+    createActionToggle,
+    goalActionCreateAndGo,
+    goalActionCreateOneMore,
+    goalActionCreateOnly,
+    goalCancelButton,
+    goalCreateForm,
+} from '../../utils/domObjects';
+import { CommonDropdown } from '../CommonDropdown';
 
 import { tr } from './GoalCreateForm.i18n';
 
@@ -54,16 +62,19 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
             title: tr('Create & Go'),
             clue: tr('Create and go to the goal page'),
             value: 1,
+            attr: goalActionCreateAndGo.attr,
         },
         {
             title: tr('Create one more'),
             clue: tr('Create and open new form for the next goal'),
             value: 2,
+            attr: goalActionCreateOneMore.attr,
         },
         {
             title: tr('Create only'),
             clue: tr('Create goal and close form'),
             value: 3,
+            attr: goalActionCreateOnly.attr,
         },
     ];
 
@@ -124,7 +135,12 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
             title={title}
             actionButton={
                 <>
-                    <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)} />
+                    <Button
+                        outline
+                        text={tr('Cancel')}
+                        onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
+                        {...goalCancelButton.attr}
+                    />
                     <StyledButtonWithDropdown>
                         <Button
                             view="primary"
@@ -133,8 +149,9 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
                             type="submit"
                             brick="right"
                             text={createOptions[createGoalType - 1].title}
+                            {...createOptions[createGoalType - 1].attr}
                         />
-                        <Dropdown
+                        <CommonDropdown
                             placement="top-end"
                             arrow
                             items={createOptions}
@@ -151,10 +168,17 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
                                     }
                                     ref={props.ref}
                                     onClick={props.onClick}
+                                    {...createActionToggle.attr}
                                 />
                             )}
                             renderItem={(props) => (
-                                <StyledMenuItem view="primary" key={props.item.id} ghost onClick={props.onClick}>
+                                <StyledMenuItem
+                                    view="primary"
+                                    key={props.item.id}
+                                    ghost
+                                    onClick={props.onClick}
+                                    {...props.item.attr}
+                                >
                                     <Text>{props.item.title}</Text>
                                     {props.item.clue && (
                                         <Text size="xs" color={gray9}>

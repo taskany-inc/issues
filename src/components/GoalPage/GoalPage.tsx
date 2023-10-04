@@ -25,6 +25,7 @@ import { GoalHeader } from '../GoalHeader';
 import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
 import { GoalActivityFeed } from '../GoalActivityFeed';
 import { IssueParent } from '../IssueParent';
+import { issuePage } from '../../utils/domObjects';
 
 import { tr } from './GoalPage.i18n';
 
@@ -164,7 +165,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     if (!goal) return null;
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
+        <Page user={user} ssrTime={ssrTime} title={pageTitle} {...issuePage.attr}>
             <PageContent>
                 <GoalHeader
                     goal={goal}

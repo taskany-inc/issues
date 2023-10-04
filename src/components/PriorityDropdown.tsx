@@ -2,8 +2,10 @@ import React from 'react';
 import { Button, Dropdown, MenuItem } from '@taskany/bricks';
 
 import { Priority, priorityVariants } from '../types/priority';
+import { comboboxItem, priorityCombobox } from '../utils/domObjects';
 
 import { getPriorityText } from './PriorityText/PriorityText';
+import { CommonDropdown } from './CommonDropdown';
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -17,7 +19,7 @@ interface PriorityDropdownProps {
 export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
     ({ text, value, disabled, error, onChange }, ref) => {
         return (
-            <Dropdown
+            <CommonDropdown
                 ref={ref}
                 error={error}
                 text={value || text}
@@ -31,10 +33,17 @@ export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdow
                         onClick={props.onClick}
                         disabled={props.disabled}
                         text={getPriorityText(props.value)}
+                        {...priorityCombobox.attr}
                     />
                 )}
                 renderItem={(props) => (
-                    <MenuItem ghost key={props.item} focused={props.cursor === props.index} onClick={props.onClick}>
+                    <MenuItem
+                        ghost
+                        key={props.item}
+                        focused={props.cursor === props.index}
+                        onClick={props.onClick}
+                        {...comboboxItem.attr}
+                    >
                         {getPriorityText(props.item)}
                     </MenuItem>
                 )}

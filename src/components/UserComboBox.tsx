@@ -1,10 +1,13 @@
 import React, { useState, ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components';
-import { Button, ComboBox, UserPic, Input, UserMenuItem, nullable } from '@taskany/bricks';
+import { Button, UserPic, Input, UserMenuItem, nullable } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { safeGetUserEmail, safeGetUserImage, safeGetUserName } from '../utils/getUserName';
+import { comboboxItem, usersCombobox, usersCompboxInput } from '../utils/domObjects';
+
+import { CommonCombobox } from './CommonCombobox';
 
 interface UserComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -13,10 +16,10 @@ interface UserComboBoxProps {
     disabled?: boolean;
     placeholder?: string;
     filter?: string[];
-    error?: React.ComponentProps<typeof ComboBox>['error'];
-    placement?: React.ComponentProps<typeof ComboBox>['placement'];
-    offset?: React.ComponentProps<typeof ComboBox>['offset'];
-    renderTrigger?: React.ComponentProps<typeof ComboBox>['renderTrigger'];
+    error?: React.ComponentProps<typeof CommonCombobox>['error'];
+    placement?: React.ComponentProps<typeof CommonCombobox>['placement'];
+    offset?: React.ComponentProps<typeof CommonCombobox>['offset'];
+    renderTrigger?: React.ComponentProps<typeof CommonCombobox>['renderTrigger'] & React.HTMLAttributes<HTMLElement>;
 
     onChange?: (activity: NonNullable<ActivityByIdReturnType>) => void;
 }
@@ -64,7 +67,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
         }, []);
 
         return (
-            <ComboBox
+            <CommonCombobox
                 ref={ref}
                 text={safeGetUserName(value) || text}
                 value={inputState}
@@ -78,7 +81,10 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                 onChange={onChange}
                 renderTrigger={(props) =>
                     renderTrigger ? (
-                        renderTrigger(props)
+                        renderTrigger({
+                            ...props,
+                            ...usersCombobox.attr,
+                        })
                     ) : (
                         <Button
                             text={props.text}
@@ -89,6 +95,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                                     <UserPic src={safeGetUserEmail(user)} email={safeGetUserEmail(user)} size={16} />
                                 )),
                             )}
+                            {...usersCombobox.attr}
                         />
                     )
                 }
@@ -102,6 +109,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                             setCompletionVisibility(true);
                         }}
                         {...props}
+                        {...usersCompboxInput.attr}
                     />
                 )}
                 renderItem={(props) => (
@@ -112,6 +120,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                         image={safeGetUserImage(props.item)}
                         focused={props.cursor === props.index}
                         onClick={props.onClick}
+                        {...comboboxItem.attr}
                     />
                 )}
             />
