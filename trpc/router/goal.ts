@@ -39,7 +39,7 @@ import {
 } from '../../src/schema/criteria';
 import type { FieldDiff } from '../../src/types/common';
 import { encodeHistoryEstimate, formateEstimate } from '../../src/utils/dateTime';
-import { goalAccessMiddleware, commentAccessMiddleware } from '../access/accessMiddlewares';
+import { goalAccessMiddleware, commentAccessMiddleware, criteriaAccessMiddleware } from '../access/accessMiddlewares';
 import { addCalculatedProjectFields } from '../queries/project';
 
 const updateProjectUpdatedAt = async (id?: string | null) => {
@@ -971,7 +971,7 @@ export const goal = router({
         }),
     updateCriteria: protectedProcedure
         .input(updateCriteriaSchema)
-        .use(goalAccessMiddleware)
+        .use(criteriaAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
                 where: { id: input.id },
@@ -1054,7 +1054,7 @@ export const goal = router({
         }),
     updateCriteriaState: protectedProcedure
         .input(updateCriteriaState)
-        .use(goalAccessMiddleware)
+        .use(criteriaAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
                 where: { id: input.id },
@@ -1096,7 +1096,7 @@ export const goal = router({
         }),
     removeCriteria: protectedProcedure
         .input(removeCriteria)
-        .use(goalAccessMiddleware)
+        .use(criteriaAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             const current = await prisma.goalAchieveCriteria.findUnique({
                 where: { id: input.id },
@@ -1136,7 +1136,7 @@ export const goal = router({
         }),
     convertCriteriaToGoal: protectedProcedure
         .input(convertCriteriaToGoalSchema)
-        .use(goalAccessMiddleware)
+        .use(criteriaAccessMiddleware)
         .mutation(async ({ input }) => {
             try {
                 const actualCriteria = await prisma.goalAchieveCriteria.findUnique({
