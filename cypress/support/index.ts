@@ -24,11 +24,19 @@ type CreateProjectFields = {
 
 Cypress.Commands.addAll({
     signInViaEmail: (fields?: SignIn) => {
+        cy.intercept('/api/auth/session', (req) => {
+            req.on('after:response', (res) => {
+                Cypress.env('currentUser', res.body);
+            });
+        }).as('session');
+
         cy.visit(routes.index());
         cy.url().should('equal', exactUrl(routes.signIn()));
         cy.get('input[name=email]').type(fields?.email || Cypress.env('ADMIN_EMAIL'));
         cy.get('input[name=password]').type(`${fields?.password || Cypress.env('ADMIN_PASSWORD')}{enter}`);
         cy.url().should('equal', exactUrl(routes.index()));
+
+        cy.wait('@session');
     },
 
     createProject: (fields: CreateProjectFields) => {
