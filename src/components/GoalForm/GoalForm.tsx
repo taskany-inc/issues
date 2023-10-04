@@ -14,7 +14,7 @@ import {
     nullable,
     Button,
 } from '@taskany/bricks';
-import { IconGitPullOutline, IconCalendarTickOutline } from '@taskany/icons';
+import { IconCalendarTickOutline } from '@taskany/icons';
 
 import { FormEditor } from '../FormEditor/FormEditor';
 import { errorsProvider } from '../../utils/forms';
@@ -229,23 +229,19 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             }}
                         />
 
-                        {parentWatcher?.flowId ? (
-                            <Controller
-                                name="state"
-                                control={control}
-                                render={({ field }) => (
-                                    <StateDropdown
-                                        text={tr('State')}
-                                        flowId={parentWatcher.flowId}
-                                        error={errorsResolver(field.name)}
-                                        disabled={busy}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        ) : (
-                            <Button text={tr('State')} iconLeft={<IconGitPullOutline size="xs" />} disabled />
-                        )}
+                        <Controller
+                            name="state"
+                            control={control}
+                            render={({ field }) => (
+                                <StateDropdown
+                                    text={tr('State')}
+                                    flowId={parentWatcher?.flowId}
+                                    error={errorsResolver(field.name)}
+                                    disabled={!parentWatcher?.flowId || busy}
+                                    {...field}
+                                />
+                            )}
+                        />
 
                         <Controller
                             name="tags"

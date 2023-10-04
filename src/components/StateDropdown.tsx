@@ -14,7 +14,7 @@ interface StateDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
     disabled?: boolean;
     value?: Partial<State>;
-    flowId: string;
+    flowId?: string;
     error?: React.ComponentProps<typeof Dropdown>['error'];
 
     onChange?: (state: State) => void;
@@ -24,7 +24,9 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
     ({ text, value, flowId, error, disabled, onChange }, ref) => {
         const [state, setState] = useState(value);
 
-        const flowById = trpc.flow.getById.useQuery(flowId);
+        const flowById = trpc.flow.getById.useQuery(flowId, {
+            enabled: !!flowId,
+        });
 
         useEffect(() => {
             const defaultState = flowById?.data?.states?.filter((s) => s?.default)[0];

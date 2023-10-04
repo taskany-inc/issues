@@ -41,7 +41,7 @@ export const flow = router({
             },
         });
     }),
-    getById: protectedProcedure.input(z.string()).query(async ({ input }) => {
+    getById: protectedProcedure.input(z.string().optional()).query(async ({ input }) => {
         return prisma.flow.findUnique({
             where: {
                 id: input,
