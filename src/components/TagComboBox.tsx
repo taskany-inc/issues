@@ -6,6 +6,9 @@ import { IconTagOutline } from '@taskany/icons';
 
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
+import { tagsCombobox } from '../utils/domObjects';
+
+import { CommonCombobox } from './CommonCombobox';
 
 interface TagObject {
     id: string;
@@ -22,7 +25,7 @@ interface TagComboBoxProps {
     error?: React.ComponentProps<typeof ComboBox>['error'];
 
     onChange?: (value: TagObject[]) => void;
-    renderTrigger?: React.ComponentProps<typeof ComboBox>['renderTrigger'];
+    renderTrigger?: React.ComponentProps<typeof ComboBox>['renderTrigger'] & React.HTMLAttributes<HTMLElement>;
 }
 
 const StyledInput = styled(Input)`
@@ -90,7 +93,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
         const onClickOutside = useCallback((cb: () => void) => cb(), []);
 
         return (
-            <ComboBox
+            <CommonCombobox
                 ref={ref}
                 text={text}
                 value={inputState}
@@ -102,13 +105,14 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                 items={items}
                 renderTrigger={(props) =>
                     renderTrigger ? (
-                        renderTrigger(props)
+                        renderTrigger({ ...props, ...tagsCombobox.attr })
                     ) : (
                         <Button
                             text={props.text}
                             disabled={props.disabled}
                             onClick={props.onClick}
                             iconLeft={<IconTagOutline size="xs" />}
+                            {...tagsCombobox.attr}
                         />
                     )
                 }

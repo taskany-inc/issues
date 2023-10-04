@@ -4,9 +4,11 @@ import { IconGitPullOutline } from '@taskany/icons';
 import { State } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
+import { stateCombobox } from '../utils/domObjects';
 
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
+import { CommonDropdown } from './CommonDropdown';
 
 interface StateDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -41,7 +43,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
         );
 
         return (
-            <Dropdown
+            <CommonDropdown
                 ref={ref}
                 error={error}
                 text={state?.title || text}
@@ -56,6 +58,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                         onClick={props.onClick}
                         disabled={props.disabled}
                         iconLeft={state ? <StateDot hue={state.hue} /> : <IconGitPullOutline size="xs" />}
+                        {...stateCombobox.attr}
                     />
                 )}
                 renderItem={(props) => (

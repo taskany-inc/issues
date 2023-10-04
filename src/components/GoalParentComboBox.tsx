@@ -4,8 +4,10 @@ import { Button, Input, ComboBox } from '@taskany/bricks';
 
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';
+import { projectsCombobox, projectsComboboxInput } from '../utils/domObjects';
 
 import { ProjectMenuItem } from './ProjectMenuItem';
+import { CommonCombobox } from './CommonCombobox';
 
 interface GoalParentComboBoxProps {
     text?: React.ComponentProps<typeof ComboBox>['text'];
@@ -16,7 +18,7 @@ interface GoalParentComboBoxProps {
     error?: React.ComponentProps<typeof ComboBox>['error'];
     placement?: React.ComponentProps<typeof ComboBox>['placement'];
     offset?: React.ComponentProps<typeof ComboBox>['offset'];
-    renderTrigger?: React.ComponentProps<typeof ComboBox>['renderTrigger'];
+    renderTrigger?: React.ComponentProps<typeof ComboBox>['renderTrigger'] & React.HTMLAttributes<HTMLElement>;
 
     onChange?: (project: { id: string; title: string }) => void;
 }
@@ -72,7 +74,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
         }, []);
 
         return (
-            <ComboBox
+            <CommonCombobox
                 ref={ref}
                 text={value ? `#${value?.id}` : text}
                 value={inputState}
@@ -86,9 +88,17 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                 onChange={onChange}
                 renderTrigger={(props) =>
                     renderTrigger ? (
-                        renderTrigger(props)
+                        renderTrigger({
+                            ...props,
+                            ...projectsCombobox.attr,
+                        })
                     ) : (
-                        <Button disabled={props.disabled} text={props.text} onClick={props.onClick} />
+                        <Button
+                            disabled={props.disabled}
+                            text={props.text}
+                            onClick={props.onClick}
+                            {...projectsCombobox.attr}
+                        />
                     )
                 }
                 renderInput={(props) => (
@@ -100,6 +110,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                             setCompletionVisibility(true);
                         }}
                         {...props}
+                        {...projectsComboboxInput.attr}
                     />
                 )}
                 renderItem={(props) => (

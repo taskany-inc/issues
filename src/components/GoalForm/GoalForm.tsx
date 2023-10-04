@@ -29,7 +29,14 @@ import { StateDropdown } from '../StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { HelpButton } from '../HelpButton/HelpButton';
-import { goalProjectSelectControl } from '../../utils/domObjects';
+import {
+    estimateCombobox,
+    goalDescriptionInput,
+    goalOwnerSelectControl,
+    goalPrioritySelectControl,
+    goalProjectSelectControl,
+    goalTitleInput,
+} from '../../utils/domObjects';
 
 import { GoalFormEstimate } from './GoalFormEstimate';
 import { tr } from './GoalForm.i18n';
@@ -126,6 +133,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                     autoFocus
                     flat="bottom"
                     disabled={busy}
+                    {...goalTitleInput.attr}
                 />
 
                 <Controller
@@ -138,12 +146,13 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             error={errorsResolver(field.name)}
                             disabled={busy}
                             {...field}
+                            {...goalDescriptionInput.attr}
                         />
                     )}
                 />
 
                 <FormActions flat="top">
-                    <FormAction left inline {...goalProjectSelectControl.attr}>
+                    <FormAction left inline>
                         {nullable(!id, () => (
                             <Controller
                                 name="parent"
@@ -155,6 +164,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
                                         {...field}
+                                        {...goalProjectSelectControl.attr}
                                     />
                                 )}
                             />
@@ -169,6 +179,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     error={errorsResolver(field.name)}
                                     disabled={busy}
                                     {...field}
+                                    {...goalPrioritySelectControl.attr}
                                 />
                             )}
                         />
@@ -183,6 +194,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     error={errorsResolver(field.name)}
                                     disabled={busy}
                                     {...field}
+                                    {...goalOwnerSelectControl.attr}
                                 />
                             )}
                         />
@@ -207,6 +219,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                                         : ''
                                                 }
                                                 iconLeft={<IconCalendarTickOutline size="xs" />}
+                                                {...estimateCombobox.attr}
                                             />
                                         )}
                                         error={errorsResolver(field.name)}

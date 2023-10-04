@@ -4,6 +4,8 @@ import NextLink from 'next/link';
 import { gapS } from '@taskany/colors';
 import { Text, Link } from '@taskany/bricks';
 
+import { issuePageHeaderTitle } from '../utils/domObjects';
+
 interface IssueTitleProps {
     title: string;
     href?: string;
@@ -17,7 +19,7 @@ const StyledIssueTitleText = styled(({ forwardRef, ...props }) => <Text forwardR
 
 export const IssueTitle = React.forwardRef<HTMLDivElement, IssueTitleProps>(({ title, href, size = 'xxl' }, ref) => {
     return (
-        <StyledIssueTitleText forwardRef={ref} size={size} weight="bolder">
+        <StyledIssueTitleText forwardRef={ref} size={size} weight="bolder" {...issuePageHeaderTitle.attr}>
             {href ? (
                 <NextLink href={href} passHref legacyBehavior>
                     <Link inline>{title}</Link>
