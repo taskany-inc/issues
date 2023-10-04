@@ -17,9 +17,9 @@ import {
     projectListItem,
     pageActiveTabItem,
     createGoalInlineControl,
-    goalProjectSelectControl,
     goalCreateForm,
     filtersPanelResetButton,
+    projectsCombobox,
 } from '../../src/utils/domObjects';
 import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
@@ -163,7 +163,7 @@ describe('Projects', () => {
         it('should visible create goal control', () => {
             cy.get(createGoalInlineControl.query).should('exist').click();
             cy.get(goalCreateForm.query).should('exist').and('be.visible');
-            cy.get(goalProjectSelectControl.query).contains(testProjectKey);
+            cy.get(projectsCombobox.query).contains(testProjectKey);
         });
     });
 });

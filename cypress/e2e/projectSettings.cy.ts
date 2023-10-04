@@ -36,15 +36,32 @@ const popupAttribute = '[data-tippy-root]';
 
 describe('ProjectSettings', () => {
     before(() => {
-        cy.signInViaEmail();
-        cy.createProject({ title, description });
-        cy.createProject({ title: titleParentOne });
-        cy.createProject({ title: titleParentTwo });
-        cy.clearCookies();
-        cy.visit(routes.signIn());
+        cy.task('db:create:project', {
+            title,
+            description,
+            ownerEmail: Cypress.env('ADMIN_EMAIL'),
+            key: keyPredictor(title),
+        });
+        cy.task('db:create:project', {
+            title: titleParentOne,
+            ownerEmail: Cypress.env('ADMIN_EMAIL'),
+            key: keyPredictor(titleParentOne),
+        });
+        cy.task('db:create:project', {
+            title: titleParentTwo,
+            ownerEmail: Cypress.env('ADMIN_EMAIL'),
+            key: keyPredictor(titleParentTwo),
+        });
+    });
+
+    after(() => {
+        cy.task('db:remove:project', { id: keyPredictor(title) });
+        cy.task('db:remove:project', { id: keyPredictor(titleParentOne) });
+        cy.task('db:remove:project', { id: keyPredictor(titleParentTwo) });
     });
 
     beforeEach(() => {
+        cy.intercept('/api/trpc/project.update*').as('updateProject');
         cy.signInViaEmail();
         cy.visit(routes.projectSettings(id));
     });
@@ -152,6 +169,7 @@ describe('ProjectSettings', () => {
             cy.get(popupAttribute).contains(titleParentOne).click();
 
             cy.get(projectSettingsSaveButton.query).click();
+            cy.wait('@updateProject');
             cy.visit(routes.projectSettings(id));
 
             cy.get(projectSettingsParentMultiInput.query).should('contain.text', titleParentOne);
@@ -161,6 +179,7 @@ describe('ProjectSettings', () => {
             cy.get(projectSettingsParentMultiInputTagClean.query).click();
 
             cy.get(projectSettingsSaveButton.query).click();
+            cy.wait('@updateProject');
             cy.visit(routes.projectSettings(id));
 
             cy.get(projectSettingsParentMultiInput.query).should('not.contain.text', titleParentOne);
@@ -176,6 +195,7 @@ describe('ProjectSettings', () => {
             cy.get(popupAttribute).contains(titleParentTwo).click();
 
             cy.get(projectSettingsSaveButton.query).click();
+            cy.wait('@updateProject');
             cy.visit(routes.projectSettings(id));
 
             cy.get(projectSettingsParentMultiInput.query)
@@ -189,6 +209,7 @@ describe('ProjectSettings', () => {
                 .each(($element) => cy.wrap($element).trigger('click'));
 
             cy.get(projectSettingsSaveButton.query).click();
+            cy.wait('@updateProject');
             cy.visit(routes.projectSettings(id));
 
             cy.get(projectSettingsParentMultiInput.query)

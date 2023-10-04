@@ -1,15 +1,16 @@
 import '../support';
-import { routes } from '../../src/hooks/router';
 import { createGoalInlineControl, filtersPanelResetButton, projectListItem } from '../../src/utils/domObjects';
+import { keyPredictor } from '../../src/utils/keyPredictor';
 
 const projectOne = 'Dashboard project';
 
 describe('Dashboard', () => {
     before(() => {
-        cy.signInViaEmail();
-        cy.createProject({ title: projectOne });
-        cy.clearCookies();
-        cy.visit(routes.signIn());
+        cy.task('db:create:project', {
+            title: projectOne,
+            key: keyPredictor(projectOne),
+            ownerEmail: Cypress.env('ADMIN_EMAIL'),
+        });
     });
 
     beforeEach(() => {
