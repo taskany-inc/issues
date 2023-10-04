@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { middleware } from '../trpcBackend';
 
 import { EntityAccessChecker, commentAccessChecker, projectAccessChecker, goalAccessChecker } from './accessCheckers';
-import { getComment, getGoal, getProject } from './accessEntityGetters';
+import { getComment, getGoal, getGoalByCriteria, getProject } from './accessEntityGetters';
 
 const accessErrorCode = 'FORBIDDEN';
 
@@ -39,8 +39,14 @@ const createEntityCheckMiddleware = <TInput, TId, TEntity>(
     });
 
 export const goalAccessMiddleware = createEntityCheckMiddleware(
-    (input: { id: string }) => input.id,
+    (input: { id: string; goalId: string }) => input.id ?? input.goalId,
     getGoal,
+    goalAccessChecker,
+);
+
+export const criteriaAccessMiddleware = createEntityCheckMiddleware(
+    (input: { id: string }) => input.id,
+    getGoalByCriteria,
     goalAccessChecker,
 );
 
