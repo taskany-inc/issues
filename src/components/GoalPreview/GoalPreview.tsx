@@ -1,78 +1,28 @@
 import React, { FC, useCallback, useMemo, useRef } from 'react';
-import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import { danger0, gapM, gapS, gray7 } from '@taskany/colors';
-import {
-    Dot,
-    Button,
-    Card,
-    CardComment,
-    CardInfo,
-    Dropdown,
-    MenuItem,
-    ModalContent,
-    ModalHeader,
-    ModalPreview,
-    nullable,
-    Text,
-} from '@taskany/bricks';
+import { danger0 } from '@taskany/colors';
+import { Button, Dot, Dropdown, MenuItem, ModalContent, ModalHeader, ModalPreview, nullable } from '@taskany/bricks';
 import { IconMoreVerticalOutline, IconBinOutline, IconEditOutline } from '@taskany/icons';
 
 import { routes } from '../../hooks/router';
-import { usePageContext } from '../../hooks/usePageContext';
-import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { editGoalKeys } from '../../utils/hotkeys';
-import { IssueTitle } from '../IssueTitle';
-import { IssueParent } from '../IssueParent';
-import { RelativeTime } from '../RelativeTime/RelativeTime';
-import { IssueStats } from '../IssueStats/IssueStats';
-import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
-import { GoalActivity } from '../GoalActivity';
-import { GoalCriteria } from '../GoalCriteria/GoalCriteria';
-import { State } from '../State';
-import { GoalDependencyAddForm } from '../GoalDependencyForm/GoalDependencyForm';
-import { GoalDependencyListByKind } from '../GoalDependencyList/GoalDependencyList';
-import { CommentView } from '../CommentView/CommentView';
-import { ModalContext } from '../ModalOnEvent';
-import { AddCriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { useGoalResource } from '../../hooks/useGoalResource';
-import { getUserName, tryGetName } from '../../utils/getUserName';
-import { CardHeader } from '../CardHeader';
+import { GoalHeader } from '../GoalHeader';
+import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
+import { GoalActivityFeed } from '../GoalActivityFeed';
+import { IssueParent } from '../IssueParent';
 
 import { useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
 
-const Md = dynamic(() => import('../Md'));
-const StateSwitch = dynamic(() => import('../StateSwitch'));
-const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
-const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
-const CommentCreateForm = dynamic(() => import('../CommentCreateForm/CommentCreateForm'));
-const ImageFullScreen = dynamic(() => import('../ImageFullScreen'));
-
 interface GoalPreviewProps {
     shortId: string;
     goal: GoalByIdReturnType;
-    defaults: Partial<NonNullable<GoalByIdReturnType>>;
+    defaults: Partial<GoalByIdReturnType>;
     onClose?: () => void;
     onDelete?: () => void;
 }
-
-const StyledImportantActions = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-`;
-
-const StyledPublicActions = styled.div`
-    display: flex;
-    align-items: center;
-
-    & > * {
-        margin-right: ${gapS};
-    }
-`;
 
 const StyledModalHeader = styled(ModalHeader)`
     top: 0;
@@ -83,19 +33,14 @@ const StyledModalHeader = styled(ModalHeader)`
 
 const StyledModalContent = styled(ModalContent)`
     overflow: auto;
-    height: 100%;
-
-    padding-top: ${gapM};
 `;
 
-const StyledCard = styled(Card)`
-    min-height: 60px;
+const StyledModalPreview = styled(ModalPreview)`
+    display: flex;
+    flex-direction: column;
 `;
 
 const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults, onClose, onDelete }) => {
-    const { user } = usePageContext();
-    const [isRelative, onDateViewTypeChange] = useClickSwitch();
-
     const onPreviewClose = useCallback(() => {
         onClose?.();
     }, [onClose]);
@@ -104,45 +49,8 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         item.onClick?.();
     }, []);
 
-    const {
-        onGoalDelete,
-        onGoalStateChange,
-        onGoalCriteriaAdd,
-        onGoalCriteriaToggle,
-        onGoalCriteriaUpdate,
-        onGoalCriteriaRemove,
-        onGoalCriteriaConvert,
-        resolveGoalCommentDraft,
-        onGoalCommentChange,
-        onGoalCommentCreate,
-        onGoalCommentUpdate,
-        onGoalCommentCancel,
-        onGoalCommentReactionToggle,
-        onGoalCommentDelete,
-        onGoalDependencyAdd,
-        onGoalDependencyRemove,
-        lastStateComment,
-        highlightCommentId,
-    } = useGoalResource(
-        {
-            id: goal?.id,
-            stateId: goal?.stateId,
-            reactions: goal?.reactions,
-            comments: goal?.comments,
-        },
-        {
-            invalidate: {
-                getById: shortId,
-            },
-        },
-    );
+    const { onGoalStateChange } = useGoalResource({ id: goal?.id }, { invalidate: { getById: shortId } });
 
-    const onGoalDeleteConfirm = useCallback(() => {
-        onDelete?.();
-        onGoalDelete();
-    }, [onDelete, onGoalDelete]);
-
-    const { title, description, updatedAt } = goal || defaults;
     const goalEditMenuItems = useMemo(
         () => [
             {
@@ -160,67 +68,24 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         [],
     );
 
-    const commentDraft = resolveGoalCommentDraft(goal?.id);
     const commentsRef = useRef<HTMLDivElement>(null);
-    const contentRef = useRef<HTMLDivElement>(null);
-    const headerRef = useRef<HTMLDivElement>(null);
+
     const onCommentsClick = useCallback(() => {
-        commentsRef.current &&
-            contentRef.current &&
-            headerRef.current &&
-            contentRef.current.scrollTo({
-                behavior: 'smooth',
-                top: commentsRef.current.offsetTop - headerRef.current.offsetHeight,
-            });
+        commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
 
     return (
-        <>
-            <ModalPreview visible onClose={onPreviewClose}>
-                <StyledModalHeader ref={headerRef}>
-                    {Boolean(goal?.project?.parent?.length) &&
-                        nullable(goal?.project?.parent, (parent) => (
-                            <>
-                                <IssueParent as="span" mode="compact" parent={parent} size="m" />
-                                <Dot />
-                            </>
-                        ))}
-
-                    {nullable(goal?.project, (project) => (
-                        <IssueParent as="span" mode="compact" parent={project} size="m" />
-                    ))}
-
-                    {nullable(title, (t) => (
-                        <IssueTitle title={t} href={routes.goal(shortId)} size="xl" />
-                    ))}
-
-                    <StyledImportantActions>
-                        <StyledPublicActions>
-                            {nullable(goal?.state, (s) =>
-                                goal?._isEditable && goal.project?.flowId ? (
-                                    <StateSwitch state={s} flowId={goal.project?.flowId} onClick={onGoalStateChange} />
-                                ) : (
-                                    <State title={s.title} hue={s.hue} />
-                                ),
-                            )}
-
-                            {nullable(updatedAt, (u) => (
-                                <IssueStats
-                                    mode="compact"
-                                    issuer={goal?.activity}
-                                    owner={goal?.owner}
-                                    estimate={goal?.estimate}
-                                    estimateType={goal?.estimateType}
-                                    priority={goal?.priority}
-                                    achivedCriteriaWeight={goal?._achivedCriteriaWeight}
-                                    comments={goal?._count?.comments ?? 0}
-                                    onCommentsClick={onCommentsClick}
-                                    updatedAt={u}
-                                />
-                            ))}
-                        </StyledPublicActions>
-
-                        {nullable(goal?._isEditable, () => (
+        <StyledModalPreview visible onClose={onPreviewClose}>
+            <StyledModalHeader>
+                <GoalHeader
+                    goal={goal || defaults}
+                    size="xl"
+                    href={routes.goal(shortId)}
+                    onCommentsClick={onCommentsClick}
+                    onGoalStateChange={onGoalStateChange}
+                    actions={nullable(goal?._isEditable, () => (
+                        <>
+                            <div />
                             <Dropdown
                                 onChange={onEditMenuChange}
                                 items={goalEditMenuItems}
@@ -245,152 +110,32 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                     </MenuItem>
                                 )}
                             />
-                        ))}
-                    </StyledImportantActions>
-                </StyledModalHeader>
-                <StyledModalContent ref={contentRef}>
-                    <StyledCard>
-                        <CardInfo onClick={onDateViewTypeChange}>
-                            <CardHeader
-                                name={tryGetName(goal?.activity?.user, getUserName)}
-                                timeAgo={nullable(goal?.createdAt, (date) => (
-                                    <RelativeTime isRelativeTime={isRelative} date={date} />
-                                ))}
-                            />
-                        </CardInfo>
-
-                        <CardComment>
-                            {description ? (
-                                <Md>{description}</Md>
-                            ) : (
-                                <Text size="s" color={gray7} weight="thin">
-                                    {tr('No description provided')}
-                                </Text>
-                            )}
-                        </CardComment>
-                    </StyledCard>
-
-                    {nullable(goal, ({ _activityFeed, id, goalAchiveCriteria, _relations, project, _isEditable }) => (
-                        <GoalActivity
-                            ref={commentsRef}
-                            feed={_activityFeed}
-                            header={
-                                <>
-                                    {nullable(goalAchiveCriteria.length || _isEditable, () => (
-                                        <GoalCriteria
-                                            goalId={id}
-                                            criteriaList={goalAchiveCriteria}
-                                            onAddCriteria={onGoalCriteriaAdd}
-                                            onToggleCriteria={onGoalCriteriaToggle}
-                                            onRemoveCriteria={onGoalCriteriaRemove}
-                                            onConvertToGoal={onGoalCriteriaConvert}
-                                            onUpdateCriteria={onGoalCriteriaUpdate}
-                                            canEdit={_isEditable}
-                                            renderTrigger={(props) =>
-                                                nullable(_isEditable, () => (
-                                                    <AddCriteriaForm
-                                                        goalId={props.goalId}
-                                                        onSubmit={props.onSubmit}
-                                                        validityData={props.validityData}
-                                                    />
-                                                ))
-                                            }
-                                        />
-                                    ))}
-
-                                    {_relations.map((deps) =>
-                                        nullable(deps.goals.length || _isEditable, () => (
-                                            <GoalDependencyListByKind
-                                                goalId={id}
-                                                key={deps.kind}
-                                                kind={deps.kind}
-                                                items={deps.goals}
-                                                canEdit={_isEditable}
-                                                onRemove={onGoalDependencyRemove}
-                                            >
-                                                {nullable(_isEditable, () => (
-                                                    <GoalDependencyAddForm
-                                                        onSubmit={onGoalDependencyAdd}
-                                                        kind={deps.kind}
-                                                        goalId={id}
-                                                        isEmpty={deps.goals.length === 0}
-                                                    />
-                                                ))}
-                                            </GoalDependencyListByKind>
-                                        )),
-                                    )}
-
-                                    {nullable(lastStateComment, (value) => (
-                                        <CommentView
-                                            pin
-                                            id={value.id}
-                                            author={value.activity?.user}
-                                            description={value.description}
-                                            state={value.state}
-                                            createdAt={value.createdAt}
-                                            reactions={value.reactions}
-                                            onSubmit={
-                                                value.activity?.id === user?.activityId
-                                                    ? onGoalCommentUpdate(value.id)
-                                                    : undefined
-                                            }
-                                            onReactionToggle={onGoalCommentReactionToggle(value.id)}
-                                            onDelete={onGoalCommentDelete(value.id)}
-                                        />
-                                    ))}
-                                </>
-                            }
-                            footer={
-                                <CommentCreateForm
-                                    states={_isEditable ? project?.flow.states : undefined}
-                                    stateId={commentDraft?.stateId}
-                                    description={commentDraft?.description}
-                                    onSubmit={onGoalCommentCreate}
-                                    onCancel={onGoalCommentCancel}
-                                    onChange={onGoalCommentChange}
-                                />
-                            }
-                            renderCommentItem={(value) => (
-                                <CommentView
-                                    id={value.id}
-                                    author={value.activity?.user}
-                                    description={value.description}
-                                    state={value.state}
-                                    createdAt={value.createdAt}
-                                    highlight={value.id === highlightCommentId}
-                                    reactions={value.reactions}
-                                    onSubmit={
-                                        value.activity?.id === user?.activityId
-                                            ? onGoalCommentUpdate(value.id)
-                                            : undefined
-                                    }
-                                    onReactionToggle={onGoalCommentReactionToggle(value.id)}
-                                    onDelete={onGoalCommentDelete(value.id)}
-                                />
-                            )}
-                        />
+                        </>
                     ))}
-                </StyledModalContent>
-            </ModalPreview>
+                >
+                    {Boolean(goal?.project?.parent?.length) &&
+                        nullable(goal?.project?.parent, (parent) => (
+                            <>
+                                <IssueParent as="span" mode="compact" parent={parent} size="m" />
+                                <Dot />
+                            </>
+                        ))}
 
-            {nullable(goal, (g) =>
-                nullable(g._isEditable, () => (
-                    <>
-                        <ModalOnEvent event={ModalEvent.GoalEditModal} hotkeys={editGoalKeys}>
-                            <GoalEditForm goal={g} onSubmit={dispatchModalEvent(ModalEvent.GoalEditModal)} />
-                        </ModalOnEvent>
+                    {nullable(goal?.project, (project) => (
+                        <IssueParent as="span" mode="compact" parent={project} size="m" />
+                    ))}
+                </GoalHeader>
+            </StyledModalHeader>
+            <StyledModalContent>
+                {nullable(goal, (g) => (
+                    <GoalContentHeader date={g.createdAt} description={g.description} />
+                ))}
 
-                        <GoalDeleteModal shortId={g._shortId} onConfirm={onGoalDeleteConfirm} />
-                    </>
-                )),
-            )}
-
-            <ModalOnEvent event={ModalEvent.ImageFullScreen}>
-                <ModalContext.Consumer>
-                    {(ctx) => <ImageFullScreen {...ctx[ModalEvent.ImageFullScreen]} />}
-                </ModalContext.Consumer>
-            </ModalOnEvent>
-        </>
+                {nullable(goal, (g) => (
+                    <GoalActivityFeed ref={commentsRef} goal={g} shortId={shortId} onGoalDeleteConfirm={onDelete} />
+                ))}
+            </StyledModalContent>
+        </StyledModalPreview>
     );
 };
 

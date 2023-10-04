@@ -1,0 +1,14 @@
+{
+    "Issuer": "Автор",
+    "Assignee": "Ответственный",
+    "Name/Email": "Имя/Почта",
+    "Participants": "В главных ролях",
+    "Type user name or email": "Введите имя или email",
+    "Add participant": "Добавить участника",
+    "Tags": "Теги",
+    "Enter tag title": "Название тега",
+    "Add tag": "Добавить тег",
+    "Type project title": "Введите название проекта",
+    "Transfer goal": "Перенести цель",
+    "Archive goal": "Удалить цель"
+}
