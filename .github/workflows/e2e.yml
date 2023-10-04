@@ -23,6 +23,9 @@ jobs:
         env:
           CYPRESS_ADMIN_EMAIL: test@taskany.org
           CYPRESS_ADMIN_PASSWORD: test
+          DATABASE_URL: postgresql://prisma:hilly-sand-pit@localhost:5432/e2e
+        with:
+          build: npx prisma generate
       - name: Store Artifacts
         if: failure()
         uses: actions/upload-artifact@v3
