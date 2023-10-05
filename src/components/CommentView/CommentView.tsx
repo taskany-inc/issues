@@ -114,6 +114,10 @@ const StyledTimestamp = styled.div`
     gap: ${gapS};
 `;
 
+const StyledMd = styled(Md)`
+    overflow-x: auto;
+`;
+
 export const CommentView: FC<CommentViewProps> = ({
     id,
     author,
@@ -269,7 +273,7 @@ export const CommentView: FC<CommentViewProps> = ({
                             </StyledTimestamp>
                         ))}
 
-                        <Md>{commentDescription.description}</Md>
+                        <StyledMd>{commentDescription.description}</StyledMd>
 
                         {nullable(reactions?.length, () => (
                             <Reactions reactions={reactionsProps.reactions} onClick={onReactionToggle} />
