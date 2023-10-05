@@ -43,6 +43,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
     const { preset, shadowPreset, userFilters } = useFiltersPreset({ defaultPresetFallback });
 
     const {
+        queryFilterState,
         currentPreset,
         queryState,
         queryString,
@@ -169,6 +170,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 loading={isLoading}
                 total={totalGoalsCount}
                 counter={goals?.length}
+                queryFilterState={queryFilterState}
                 queryState={queryState}
                 queryString={queryString}
                 preset={currentPreset}

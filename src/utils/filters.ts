@@ -1,24 +1,24 @@
-import { parseFilterValues, filtersNoSearchPresetCookie, isFilterStateEmpty } from '../hooks/useUrlFilterParams';
+import { filtersNoSearchPresetCookie, buildURLSearchParams, parseQueryState } from '../hooks/useUrlFilterParams';
 
 import { SSRProps } from './declareSsrProps';
 
 export const filtersTakeCount = 5;
 
-export const filtersPanelSsrInit = async ({ query: browserQuery, ssrHelpers, req }: SSRProps) => {
-    const browserQueryState = parseFilterValues(browserQuery);
+export const filtersPanelSsrInit = async ({ query, ssrHelpers, req }: SSRProps) => {
+    const { queryState: browserQueryState } = parseQueryState(query);
     const isDefaultPreset =
-        isFilterStateEmpty(browserQueryState) && !browserQuery.filter && !req.cookies[filtersNoSearchPresetCookie];
+        !Object.entries(buildURLSearchParams(browserQueryState)).length &&
+        !query.filter &&
+        !req.cookies[filtersNoSearchPresetCookie];
 
     const defaultPreset = isDefaultPreset ? await ssrHelpers.filter.getDefaultFilter.fetch() : undefined;
     const selectedPreset =
-        typeof browserQuery.filter === 'string'
-            ? await ssrHelpers.filter.getById.fetch(browserQuery.filter)
-            : undefined;
+        typeof query.filter === 'string' ? await ssrHelpers.filter.getById.fetch(query.filter) : undefined;
 
     const preset = isDefaultPreset ? defaultPreset : selectedPreset;
 
     const queryState = preset
-        ? parseFilterValues(Object.fromEntries(new URLSearchParams(preset.params)))
+        ? parseQueryState(Object.fromEntries(new URLSearchParams(preset.params))).queryState
         : browserQueryState;
 
     await Promise.all([
