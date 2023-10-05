@@ -7,7 +7,7 @@ export const filtersTakeCount = 5;
 export const filtersPanelSsrInit = async ({ query, ssrHelpers, req }: SSRProps) => {
     const { queryState: browserQueryState } = parseQueryState(query);
     const isDefaultPreset =
-        !Object.entries(buildURLSearchParams(browserQueryState)).length &&
+        !Array.from(buildURLSearchParams(browserQueryState)).length &&
         !query.filter &&
         !req.cookies[filtersNoSearchPresetCookie];
 

@@ -170,7 +170,7 @@ export const FiltersPanel: FC<{
         }, [filterQuery, onFilterApply]);
 
         const isFiltersEmpty = useMemo(
-            () => (queryFilterState ? !Object.entries(buildURLSearchParams(queryFilterState)).length : false),
+            () => !queryFilterState || !Array.from(buildURLSearchParams(queryFilterState)).length,
             [queryFilterState],
         );
 
@@ -191,7 +191,7 @@ export const FiltersPanel: FC<{
                         <FiltersMenuContainer>
                             <FiltersMenuItem
                                 ref={filterNodeRef}
-                                active={isFiltersEmpty}
+                                active={!isFiltersEmpty}
                                 onClick={() => setFilterVisible((p) => !p)}
                             >
                                 {tr('Filter')}
