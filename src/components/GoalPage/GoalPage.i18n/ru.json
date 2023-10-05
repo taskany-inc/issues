@@ -1,17 +1,4 @@
 {
     "title": "Taskany — Цели — {goal}",
-    "Edit": "Редактировать",
-    "No description provided": "Описание отсутствует",
-    "Issuer": "Автор",
-    "Assignee": "Ответственный",
-    "Participants": "В главных ролях",
-    "Add participant": "Добавить участника",
-    "Archive goal": "Удалить цель",
-    "Type user name or email": "Введите имя или email",
-    "Type project title": "Введите название проекта",
-    "Transfer goal": "Перенести цель",
-    "Tags": "Теги",
-    "Add tag": "Добавить тег",
-    "Enter tag title": "Название тега",
-    "Name/Email": "Имя/Почта"
+    "Edit": "Редактировать"
 }

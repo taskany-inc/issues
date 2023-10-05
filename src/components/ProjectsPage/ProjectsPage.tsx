@@ -49,6 +49,7 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
     const { preset, shadowPreset, userFilters } = useFiltersPreset({ defaultPresetFallback });
 
     const {
+        queryFilterState,
         currentPreset,
         queryState,
         queryString,
@@ -261,6 +262,7 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
                 total={projectDeepInfo?.meta?.count}
                 counter={projectDeepInfo?.goals?.length}
                 loading={id ? isLoadingDeepInfoProject : isLoadingAllProjects}
+                queryFilterState={queryFilterState}
                 queryState={queryState}
                 queryString={queryString}
                 preset={currentPreset}

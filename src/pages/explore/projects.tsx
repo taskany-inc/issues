@@ -1,6 +1,6 @@
 import { ExploreProjectsPage } from '../../components/ExploreProjectsPage/ExploreProjectsPage';
 import { declareSsrProps } from '../../utils/declareSsrProps';
-import { parseFilterValues } from '../../hooks/useUrlFilterParams';
+import { parseQueryState } from '../../hooks/useUrlFilterParams';
 
 export const getServerSideProps = declareSsrProps(
     async ({ ssrHelpers, query }) => {
@@ -9,7 +9,8 @@ export const getServerSideProps = declareSsrProps(
 
         await ssrHelpers.project.getAll.fetch({
             firstLevel: true,
-            goalsQuery: parseFilterValues(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query),
+            goalsQuery: parseQueryState(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query)
+                .queryState,
         });
     },
     {

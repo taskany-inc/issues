@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, memo, useRef, useState, useEffect } from 'react';
+import { FC, ReactNode, useCallback, memo, useRef, useState, useEffect, useMemo } from 'react';
 import {
     FiltersAction,
     FiltersCounter,
@@ -13,7 +13,7 @@ import {
 import { IconStarOutline, IconStarSolid } from '@taskany/icons';
 
 import { filtersTakeCount } from '../../utils/filters';
-import { QueryState } from '../../hooks/useUrlFilterParams';
+import { FilterQueryState, QueryState, buildURLSearchParams } from '../../hooks/useUrlFilterParams';
 import { SearchFilter } from '../SearchFilter';
 import { ProjectFilter } from '../ProjectFilter';
 import { TagFilter } from '../TagFilter';
@@ -62,6 +62,7 @@ export const FiltersPanel: FC<{
     total?: number;
     counter?: number;
     queryState?: QueryState;
+    queryFilterState?: FilterQueryState;
     queryString?: string;
 
     preset?: FilterById;
@@ -81,6 +82,7 @@ export const FiltersPanel: FC<{
         total = 0,
         counter = 0,
         queryState,
+        queryFilterState,
         queryString,
         preset,
         presets = [],
@@ -99,7 +101,7 @@ export const FiltersPanel: FC<{
         const [projectsQuery, setProjectsQuery] = useState('');
         const [tagsQuery, setTagsQuery] = useState('');
         const [filterVisible, setFilterVisible] = useState(false);
-        const [filterQuery, setFilterQuery] = useState<Partial<QueryState> | undefined>(queryState);
+        const [filterQuery, setFilterQuery] = useState<Partial<FilterQueryState> | undefined>(queryFilterState);
 
         useEffect(() => {
             setFilterQuery(queryState);
@@ -167,6 +169,11 @@ export const FiltersPanel: FC<{
             onFilterApply?.({ ...filterQuery });
         }, [filterQuery, onFilterApply]);
 
+        const isFiltersEmpty = useMemo(
+            () => (queryFilterState ? !Object.entries(buildURLSearchParams(queryFilterState)).length : false),
+            [queryFilterState],
+        );
+
         return (
             <>
                 <FiltersPanelContainer loading={loading} {...filtersPanel.attr}>
@@ -182,7 +189,11 @@ export const FiltersPanel: FC<{
                             <FiltersCounter total={total} counter={counter} />
                         </FiltersCounterContainer>
                         <FiltersMenuContainer>
-                            <FiltersMenuItem ref={filterNodeRef} onClick={() => setFilterVisible((p) => !p)}>
+                            <FiltersMenuItem
+                                ref={filterNodeRef}
+                                active={isFiltersEmpty}
+                                onClick={() => setFilterVisible((p) => !p)}
+                            >
                                 {tr('Filter')}
                             </FiltersMenuItem>
 

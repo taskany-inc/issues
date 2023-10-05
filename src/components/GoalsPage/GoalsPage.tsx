@@ -43,6 +43,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
     });
 
     const {
+        queryFilterState,
         currentPreset,
         queryState,
         queryString,
@@ -168,6 +169,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 loading={isLoading}
                 total={meta?.count}
                 counter={goalsOnScreen?.length}
+                queryFilterState={queryFilterState}
                 queryState={queryState}
                 queryString={queryString}
                 preset={currentPreset}

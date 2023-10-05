@@ -11,7 +11,7 @@ import { setCookie } from '../utils/cookies';
 export const filtersNoSearchPresetCookie = 'taskany.NoSearchPreset';
 
 // TODO: replace it with QueryWithFilters from schema/common
-export interface QueryState {
+export interface FilterQueryState {
     priority: string[];
     state: string[];
     stateType: StateType[];
@@ -22,11 +22,16 @@ export interface QueryState {
     participant: string[];
     project: string[];
     query: string;
+    sort: { [K in SortableProps]?: SortDirection };
+}
+
+interface BaseQueryState {
     starred: boolean;
     watching: boolean;
-    sort: { [K in SortableProps]?: SortDirection };
     limit?: number;
 }
+
+export interface QueryState extends BaseQueryState, FilterQueryState {}
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
@@ -44,7 +49,7 @@ const stringifySortQueryParam = (param: QueryState['sort']) =>
         .map(([id, direction]) => `${id}:${direction}`)
         .join(',');
 
-const buildURLSearchParams = ({
+export const buildURLSearchParams = ({
     priority = [],
     state = [],
     stateType = [],
@@ -95,9 +100,13 @@ const buildURLSearchParams = ({
     return urlParams;
 };
 
-export const isFilterStateEmpty = (state: QueryState): boolean => !Array.from(buildURLSearchParams(state)).length;
+export const parseBaseValues = (query: ParsedUrlQuery): BaseQueryState => ({
+    starred: Boolean(parseInt(parseQueryParam(query.starred?.toString()).toString(), 10)),
+    watching: Boolean(parseInt(parseQueryParam(query.watching?.toString()).toString(), 10)),
+    limit: query.limit ? Number(query.limit) : undefined,
+});
 
-export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
+export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => ({
     priority: parseQueryParam(query.priority?.toString()),
     state: parseQueryParam(query.state?.toString()),
     stateType: parseQueryParam(query.stateType?.toString()).map((type) => StateTypeEnum.parse(type)),
@@ -108,20 +117,38 @@ export const parseFilterValues = (query: ParsedUrlQuery): QueryState => ({
     participant: parseQueryParam(query.participant?.toString()),
     project: parseQueryParam(query.project?.toString()),
     query: parseQueryParam(query.query?.toString()).toString(),
-    starred: Boolean(parseInt(parseQueryParam(query.starred?.toString()).toString(), 10)),
-    watching: Boolean(parseInt(parseQueryParam(query.watching?.toString()).toString(), 10)),
     sort: parseSortQueryParam(query.sort?.toString()),
-    limit: query.limit ? Number(query.limit) : undefined,
 });
+
+export const parseQueryState = (query: ParsedUrlQuery) => {
+    const queryBaseState = parseBaseValues(query);
+    const queryFilterState = parseFilterValues(query);
+    const queryState = { ...queryBaseState, ...queryFilterState };
+
+    return {
+        queryBaseState,
+        queryFilterState,
+        queryState,
+    };
+};
 
 export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
-    const queryState = useMemo<QueryState | undefined>(() => {
+    const { queryState, queryFilterState } = useMemo(() => {
         const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
-        return Object.keys(query).length ? parseFilterValues(query) : undefined;
+
+        const { queryState = undefined, queryFilterState = undefined } = Object.keys(query).length
+            ? parseQueryState(query)
+            : {};
+
+        return {
+            queryFilterState,
+            queryState,
+        };
     }, [router.query, currentPreset]);
+
     const queryString = router.asPath.split('?')[1];
 
     if (prevPreset?.id !== preset?.id || prevPreset?._isStarred !== preset?._isStarred) {
@@ -259,6 +286,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
 
     return {
         queryState,
+        queryFilterState,
         queryString,
         currentPreset,
         setTagsFilterOutside,
