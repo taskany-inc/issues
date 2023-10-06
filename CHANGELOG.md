@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.32.1](https://github.com/taskany-inc/issues/compare/v1.32.0...v1.32.1) (2023-10-06)
+
+
+### Bug Fixes
+
+* **CriteriaForm:** edit criteria form shouldnt have render trigger prop ([717331d](https://github.com/taskany-inc/issues/commit/717331d5769fdf03f08d37de9c2ff6b3a6e637b5))
+* estimate unexpected update ([83f5206](https://github.com/taskany-inc/issues/commit/83f520618bbd0a673f5a19bd495407a6d23b4753))
+* **FiltersPanel:** user can change default preset to custom query ([97b8a0a](https://github.com/taskany-inc/issues/commit/97b8a0a9dee1324b83277e7583ac508a885d42e7))
+* getting user name ([27a78d1](https://github.com/taskany-inc/issues/commit/27a78d107f65126e3d77b70c1753d9bb63298e89))
+* goal comment can be deleted ([395b8a4](https://github.com/taskany-inc/issues/commit/395b8a47fc951a83e89a575543a9563ee123bd28))
+* spelling note mistake ([359c0b7](https://github.com/taskany-inc/issues/commit/359c0b7ddb35cf3a1efaace5644ea96735afbcb0))
+
 ## [1.32.0](https://github.com/taskany-inc/issues/compare/v1.31.0...v1.32.0) (2023-10-05)
 
 
