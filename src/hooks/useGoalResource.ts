@@ -249,7 +249,7 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
 
     const onGoalCommentDelete = useCallback(
         (id: string, invalidateKey?: RefetchKeys | RefetchKeys[]) => async () => {
-            const [data] = await notifyPromise(deleteGoalComment.mutateAsync(id), 'commentDelete');
+            const [data] = await notifyPromise(deleteGoalComment.mutateAsync({ id }), 'commentDelete');
 
             if (data) {
                 invalidate(invalidateKey);

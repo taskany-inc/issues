@@ -23,8 +23,6 @@ export const getGoalByCriteria = async (id: string) => {
     return getGoal(actualCriteria.goalId);
 };
 
-export type CriteriaEntity = NonNullable<Awaited<ReturnType<typeof getGoalByCriteria>>>;
-
 export const getComment = (id: string) =>
     prisma.comment.findUnique({
         where: { id },

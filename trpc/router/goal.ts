@@ -879,9 +879,13 @@ export const goal = router({
             }
         }),
     deleteComment: protectedProcedure
-        .input(z.string())
+        .input(
+            z.object({
+                id: z.string(),
+            }),
+        )
         .use(commentAccessMiddleware)
-        .mutation(async ({ input: id }) => {
+        .mutation(async ({ input: { id } }) => {
             try {
                 const deletedComment = await prisma.comment.delete({
                     where: {
