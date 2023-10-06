@@ -138,6 +138,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                             where: query.where,
                             include: {
                                 user: true,
+                                ghost: true,
                             },
                         });
                     case 'state':

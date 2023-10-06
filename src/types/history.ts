@@ -1,4 +1,4 @@
-import { Goal, State, Project, Tag, Activity, GoalHistory, User, GoalAchieveCriteria } from '@prisma/client';
+import { Goal, State, Project, Tag, Activity, GoalHistory, User, GoalAchieveCriteria, Ghost } from '@prisma/client';
 
 export const subjectToTableNameMap = {
     dependencies: true,
@@ -16,8 +16,8 @@ export interface HistoryRecordMeta {
     dependencies: Goal & { state: State | null };
     project: Project;
     tags: Tag;
-    owner: Activity & { user: User | null };
-    participants: Activity & { user: User | null };
+    owner: Activity & { user: User | null; ghost: Ghost | null };
+    participants: Activity & { user: User | null; ghost: Ghost | null };
     state: State;
     criteria: GoalAchieveCriteria & { goalAsCriteria: Goal & { state: State | null } };
 }

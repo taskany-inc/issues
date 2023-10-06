@@ -30,7 +30,7 @@ import { SortFilter } from '../SortFilter/SortFilter';
 import { StarredFilter } from '../StarredFilter/StarredFilter';
 import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 import { FilterPopup } from '../FilterPopup/FilterPopup';
-import { getUserName } from '../../utils/getUserName';
+import { getUserName, prepareUserDataFromActivity } from '../../utils/getUserName';
 import { filtersPanel } from '../../utils/domObjects';
 
 import { tr } from './FiltersPanel.i18n';
@@ -38,13 +38,14 @@ import { tr } from './FiltersPanel.i18n';
 type Users = React.ComponentProps<typeof UserFilter>['users'];
 
 function mapUserToView(list: ActivityByIdReturnType[]): Users {
-    return list.reduce<Users>((acc, { user }) => {
-        if (user != null && user.activityId) {
+    return list.reduce<Users>((acc, activity) => {
+        const data = prepareUserDataFromActivity(activity);
+        if (data && data.activityId) {
             acc.push({
-                id: user.activityId,
-                name: getUserName(user),
-                email: user.email,
-                image: user.image,
+                id: data.activityId,
+                name: getUserName(data),
+                email: data.email,
+                image: data.image,
             });
         }
 

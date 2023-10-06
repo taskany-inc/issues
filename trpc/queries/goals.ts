@@ -490,6 +490,7 @@ export const goalDeepQuery = {
             activity: {
                 include: {
                     user: true,
+                    ghost: true,
                 },
             },
         },
