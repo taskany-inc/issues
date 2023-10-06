@@ -23,7 +23,7 @@ import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
-import { getUserName, tryGetName } from '../../utils/getUserName';
+import { safeGetUserName } from '../../utils/getUserName';
 import { filtersPanelResetButton } from '../../utils/domObjects';
 
 import { tr } from './DashboardPage.i18n';
@@ -146,10 +146,10 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         <PageTitlePreset
             activityId={user.activityId}
             currentPresetActivityId={currentPreset?.activityId}
-            currentPresetActivityUserName={tryGetName(currentPreset?.activity?.user, getUserName)}
+            currentPresetActivityUserName={safeGetUserName(currentPreset?.activity)}
             currentPresetTitle={currentPreset?.title}
             shadowPresetActivityId={shadowPreset?.activityId}
-            shadowPresetActivityUserName={tryGetName(shadowPreset?.activity?.user, getUserName)}
+            shadowPresetActivityUserName={safeGetUserName(shadowPreset?.activity)}
             shadowPresetId={shadowPreset?.id}
             shadowPresetTitle={shadowPreset?.title}
             title={tr('Dashboard')}

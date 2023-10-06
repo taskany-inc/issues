@@ -1,5 +1,14 @@
 import { createContext, useContext, useState, SetStateAction, useMemo } from 'react';
-import { User, Tag as TagData, State as StateData, Activity, Project, GoalAchieveCriteria, Goal } from '@prisma/client';
+import {
+    User,
+    Tag as TagData,
+    State as StateData,
+    Activity,
+    Project,
+    GoalAchieveCriteria,
+    Goal,
+    Ghost,
+} from '@prisma/client';
 import styled, { css } from 'styled-components';
 import { UserPic, Text, Tag, nullable, Button } from '@taskany/bricks';
 import { IconDoubleCaretRightCircleSolid, IconDividerLineOutline } from '@taskany/icons';
@@ -16,7 +25,7 @@ import { HistoryAction, HistoryRecordSubject } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { Circle, CircledIcon } from '../Circle';
 import { useLocale } from '../../hooks/useLocale';
-import { getUserName } from '../../utils/getUserName';
+import { getUserName, prepareUserDataFromActivity } from '../../utils/getUserName';
 
 import { tr } from './HistoryRecord.i18n';
 
@@ -433,16 +442,15 @@ const HistoryParticipant: React.FC<{ name?: string | null; pic?: string | null; 
     </>
 );
 
-export const HistoryRecordParticipant: React.FC<HistoryChangeProps<Activity & { user: User | null }>> = ({
-    from,
-    to,
-}) => (
+export const HistoryRecordParticipant: React.FC<
+    HistoryChangeProps<Activity & { user: User | null; ghost: Ghost | null }>
+> = ({ from, to }) => (
     <HistorySimplifyRecord
         withPretext={false}
-        from={nullable(from?.user, (data) => (
+        from={nullable(prepareUserDataFromActivity(from), (data) => (
             <HistoryParticipant name={getUserName(data)} email={data.email} pic={data.image} />
         ))}
-        to={nullable(to?.user, (data) => (
+        to={nullable(prepareUserDataFromActivity(to), (data) => (
             <HistoryParticipant name={getUserName(data)} email={data.email} pic={data.image} />
         ))}
     />

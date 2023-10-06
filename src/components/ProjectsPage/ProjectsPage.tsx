@@ -28,7 +28,7 @@ import { WatchButton } from '../WatchButton/WatchButton';
 import { StarButton } from '../StarButton/StarButton';
 import { routes } from '../../hooks/router';
 import { pageActiveTabItem, pageTabs } from '../../utils/domObjects';
-import { getUserName, tryGetName } from '../../utils/getUserName';
+import { safeGetUserName } from '../../utils/getUserName';
 
 import { tr } from './ProjectsPage.i18n';
 
@@ -196,10 +196,10 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
         <PageTitlePreset
             activityId={user.activityId}
             currentPresetActivityId={currentPreset?.activityId}
-            currentPresetActivityUserName={tryGetName(currentPreset?.activity?.user, getUserName)}
+            currentPresetActivityUserName={safeGetUserName(currentPreset?.activity)}
             currentPresetTitle={currentPreset?.title}
             shadowPresetActivityId={shadowPreset?.activityId}
-            shadowPresetActivityUserName={tryGetName(shadowPreset?.activity?.user, getUserName)}
+            shadowPresetActivityUserName={safeGetUserName(shadowPreset?.activity)}
             shadowPresetId={shadowPreset?.id}
             shadowPresetTitle={shadowPreset?.title}
             title={project?.title || tr('Projects')}
