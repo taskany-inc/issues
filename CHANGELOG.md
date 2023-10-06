@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.32.2](https://github.com/taskany-inc/issues/compare/v1.32.1...v1.32.2) (2023-10-06)
+
+
+### Bug Fixes
+
+* **StateDropdown:** simplify usage ([9b5b773](https://github.com/taskany-inc/issues/commit/9b5b773297711d6f5e1434d2f31575f710000320))
+
 ## [1.32.1](https://github.com/taskany-inc/issues/compare/v1.32.0...v1.32.1) (2023-10-06)
 
 
