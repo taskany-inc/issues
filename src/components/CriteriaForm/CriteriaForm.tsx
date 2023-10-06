@@ -153,7 +153,7 @@ interface CriteriaFormProps {
         sum: number;
         title: string[];
     };
-    renderTrigger: React.ComponentProps<typeof InlineForm>['renderTrigger'];
+    renderTrigger?: React.ComponentProps<typeof InlineForm>['renderTrigger'];
 }
 interface CriteriaFormPropsWithSchema extends CriteriaFormProps {
     schema: Zod.Schema;
@@ -324,7 +324,7 @@ export const AddCriteriaForm: React.FC<
 };
 
 export const EditCriteriaForm: React.FC<
-    Omit<CriteriaFormProps, 'renderTrigger'> & {
+    CriteriaFormProps & {
         values: z.infer<typeof updateCriteriaSchema>;
         onSubmit: (val: z.infer<typeof updateCriteriaSchema>) => void;
     }
@@ -338,7 +338,6 @@ export const EditCriteriaForm: React.FC<
             onReset={onReset}
             validityData={validityData}
             values={values}
-            renderTrigger={() => null}
         />
     );
 };
