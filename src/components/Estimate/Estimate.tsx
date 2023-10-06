@@ -75,7 +75,7 @@ export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value
             return year
                 ? {
                       range: createDateRange(year),
-                      type: DateType.Quarter,
+                      type: DateType.Year,
                   }
                 : undefined;
         }

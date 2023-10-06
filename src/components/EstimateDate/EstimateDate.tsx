@@ -20,23 +20,23 @@ export const EstimateDate: React.FC = () => {
     const locale = useLocale();
     const currentDate = currentLocaleDate({ locale });
 
-    const { readOnly, setReadOnly, setDate } = useEstimateContext();
+    const { readOnly, setReadOnly, setDate, date } = useEstimateContext();
 
-    const [fullDate, setFullDate] = useState<string>(currentDate);
+    const valueString = date ? createLocaleDate(date, { locale }) : undefined;
+
+    const [fullDate, setFullDate] = useState<string>(valueString ?? currentDate);
 
     useEffect(() => {
         if (!readOnly.date) {
             setFullDate((oldDate) => (isDateFullyFilled(oldDate) ? oldDate : currentDate));
-        } else {
-            setFullDate(currentDate);
         }
     }, [readOnly.date, currentDate]);
 
     useEffect(() => {
-        if (isDateFullyFilled(fullDate)) {
+        if (isDateFullyFilled(fullDate) && valueString !== fullDate) {
             setDate(parseLocaleDate(fullDate, { locale }));
         }
-    }, [fullDate, setDate, locale]);
+    }, [fullDate, setDate, locale, valueString]);
 
     const onInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,8 +69,7 @@ export const EstimateDate: React.FC = () => {
             year: true,
             quarter: true,
         });
-        setFullDate(currentDate);
-    }, [currentDate, setReadOnly]);
+    }, [setReadOnly]);
 
     return (
         <EstimateOption

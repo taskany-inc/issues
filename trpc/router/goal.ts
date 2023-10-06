@@ -327,7 +327,9 @@ export const goal = router({
         .use(goalAccessMiddleware)
         .mutation(async ({ ctx, input }) => {
             const { activityId, role } = ctx.session.user;
-            const [estimate, estimateType] = input.estimate ? [new Date(input.estimate.date), input.estimate.type] : [];
+            const [estimate, estimateType = null] = input.estimate
+                ? [new Date(input.estimate.date), input.estimate.type]
+                : [];
 
             const actualGoal = await prisma.goal.findUnique({
                 where: { id: input.id },
@@ -411,7 +413,10 @@ export const goal = router({
                 });
             }
 
-            if (Number(estimate) !== Number(actualGoal.estimate) || estimateType !== actualGoal.estimateType) {
+            const isDateChanged = (Number(estimate) || 0) !== (Number(actualGoal.estimate) || 0);
+            const isTypeChanged = estimateType !== actualGoal.estimateType;
+
+            if (isDateChanged || isTypeChanged) {
                 const prevHistoryEstimate = actualGoal.estimate
                     ? encodeHistoryEstimate(actualGoal.estimate, actualGoal.estimateType ?? 'Strict')
                     : null;
