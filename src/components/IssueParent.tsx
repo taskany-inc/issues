@@ -47,9 +47,9 @@ export const IssueParent: React.FC<IssueParentProps> = ({ parent, as, mode = 'de
             {normalizedParent.map((p, i) =>
                 nullable(p.id, (id) => (
                     <span key={id} {...issuePageHeaderParent.attr}>
-                        <NextLink passHref href={routes.project(id)} legacyBehavior>
-                            <Link inline>{p.title}</Link>
-                        </NextLink>
+                        <Link as={NextLink} href={routes.project(id)} inline>
+                            {p.title}
+                        </Link>
                         {i < normalizedParent.length - 1 ? ', ' : ''}
                     </span>
                 )),
