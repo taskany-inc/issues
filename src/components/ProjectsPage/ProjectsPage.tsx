@@ -1,4 +1,4 @@
-import { MouseEventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
@@ -41,7 +41,6 @@ export const projectsSize = 20;
 export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallback }: ExternalPageProps) => {
     const nextRouter = useNextRouter();
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
-    const setCurrentProjectCacheRef = useRef(setCurrentProjectCache);
     const { toggleFilterStar } = useFilterResource();
 
     const utils = trpc.useContext();
@@ -137,13 +136,13 @@ export const ProjectsPage = ({ user, ssrTime, params: { id }, defaultPresetFallb
     useEffect(() => {
         if (!project) return;
 
-        setCurrentProjectCacheRef.current({
+        setCurrentProjectCache({
             id: project.id,
             title: project.title,
             description: project.description ?? undefined,
             flowId: project.flowId,
         });
-    }, [project]);
+    }, [project, setCurrentProjectCache]);
 
     useWillUnmount(() => {
         setCurrentProjectCache(null);

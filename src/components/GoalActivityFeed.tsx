@@ -18,7 +18,7 @@ import { AddCriteriaForm } from './CriteriaForm/CriteriaForm';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('./GoalEditForm/GoalEditForm'));
-const CommentCreateForm = dynamic(() => import('./CommentCreateForm/CommentCreateForm'));
+const GoalCommentCreateForm = dynamic(() => import('./GoalCommentCreateForm'));
 
 interface GoalActivityFeedProps {
     goal: NonNullable<GoalByIdReturnType>;
@@ -40,10 +40,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             onGoalCriteriaUpdate,
             onGoalCriteriaRemove,
             onGoalCriteriaConvert,
-            resolveGoalCommentDraft,
-            onGoalCommentChange,
             onGoalCommentCreate,
-            onGoalCommentCancel,
             onGoalCommentReactionToggle,
             onGoalCommentDelete,
             onGoalDependencyAdd,
@@ -63,8 +60,6 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                 },
             },
         );
-
-        const commentDraft = resolveGoalCommentDraft(goal?.id);
 
         const onConfirmDeletingGoal = useCallback(() => {
             onGoalDelete();
@@ -148,13 +143,10 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                         </>
                     }
                     footer={
-                        <CommentCreateForm
+                        <GoalCommentCreateForm
+                            goalId={goal.id}
                             states={goal._isEditable ? goal.project?.flow.states : undefined}
-                            stateId={commentDraft?.stateId}
-                            description={commentDraft?.description}
                             onSubmit={onGoalCommentCreate}
-                            onCancel={onGoalCommentCancel}
-                            onChange={onGoalCommentChange}
                         />
                     }
                     renderCommentItem={(value) => (

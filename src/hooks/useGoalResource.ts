@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { Activity, GoalAchieveCriteria } from '@prisma/client';
+import type { Activity, GoalAchieveCriteria } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
@@ -13,7 +13,6 @@ import {
 } from '../schema/criteria';
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 
-import { useLSDraft } from './useLSDraft';
 import { useHighlightedComment } from './useHighlightedComment';
 import { useReactionsResource } from './useReactionsResource';
 
@@ -87,11 +86,6 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
     const updateGoalOwnerMutation = trpc.goal.updateOwner.useMutation();
     const createGoalMutation = trpc.goal.create.useMutation();
 
-    const {
-        saveDraft: saveGoalCommentDraft,
-        resolveDraft: resolveGoalCommentDraft,
-        removeDraft: removeGoalCommentDraft,
-    } = useLSDraft('draftGoalComment', {});
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const { commentReaction } = useReactionsResource(fields.reactions);
 
@@ -178,20 +172,6 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         [removeGoalDependency, invalidate],
     );
 
-    const onGoalCommentChange = useCallback(
-        (comment?: { stateId?: string; description?: string }) => {
-            if (!id) return;
-
-            if (!comment?.description) {
-                removeGoalCommentDraft(id);
-                return;
-            }
-
-            saveGoalCommentDraft(id, comment);
-        },
-        [id, removeGoalCommentDraft, saveGoalCommentDraft],
-    );
-
     const onGoalCommentCreate = useCallback(
         async (comment?: { description: string; stateId?: string }, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
             if (!comment || !id) return;
@@ -204,7 +184,6 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
             const [data] = await notifyPromise(promise, 'commentCreate');
 
             if (data) {
-                removeGoalCommentDraft(data.id);
                 setHighlightCommentId(data.id);
 
                 invalidate(invalidateKey);
@@ -212,7 +191,7 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
 
             return data;
         },
-        [createGoalComment, id, invalidate, removeGoalCommentDraft, setHighlightCommentId],
+        [createGoalComment, id, invalidate, setHighlightCommentId],
     );
 
     const onGoalCommentUpdate = useCallback(
@@ -233,12 +212,6 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
             },
         [invalidate, updateGoalComment],
     );
-
-    const onGoalCommentCancel = useCallback(() => {
-        if (id) {
-            removeGoalCommentDraft(id);
-        }
-    }, [id, removeGoalCommentDraft]);
 
     const onGoalCommentReactionToggle = useCallback(
         (id: string, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
@@ -433,7 +406,6 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         lastStateComment,
 
         invalidate,
-        resolveGoalCommentDraft,
 
         goalCreate,
         goalUpdate,
@@ -459,10 +431,8 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         onGoalCriteriaRemove,
         onGoalCriteriaConvert,
 
-        onGoalCommentChange,
         onGoalCommentCreate,
         onGoalCommentUpdate,
-        onGoalCommentCancel,
         onGoalCommentReactionToggle,
         onGoalCommentDelete,
     };
