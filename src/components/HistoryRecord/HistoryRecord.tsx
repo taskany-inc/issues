@@ -127,10 +127,6 @@ const StyledCircledIcon = styled(CircledIcon)`
     background-color: ${backgroundColor};
 `;
 
-const StyledDescriptionIcon = styled(IconDividerLineOutline)`
-    margin-top: 5px;
-`;
-
 const StyledButton = styled(Button)`
     bottom: 5px;
 `;
@@ -359,7 +355,7 @@ export const HistoryRecordLongTextChange: React.FC<HistoryChangeProps<string>> =
             <StyledButton
                 ghost={!viewDestiption}
                 outline={viewDestiption}
-                iconRight={<StyledDescriptionIcon size="xs" />}
+                iconRight={<IconDividerLineOutline size="xs" />}
                 onClick={handlerViewDescription}
             />
 
