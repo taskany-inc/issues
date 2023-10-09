@@ -1,10 +1,4 @@
-type UserData = {
-    email: string;
-    name?: string | null;
-    nickname?: string | null;
-    image?: string | null;
-    [key: string]: unknown;
-};
+import { UserData } from '../types/common';
 
 export const getUserName = <T extends UserData>(user: T): string => {
     return user.nickname || user.name || user.email;

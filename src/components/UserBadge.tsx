@@ -1,43 +1,28 @@
+import React from 'react';
 import styled from 'styled-components';
-import { Text, UserPic, nullable } from '@taskany/bricks';
-import { IconXCircleSolid } from '@taskany/icons';
-import { gapS, gapXs, gray8, gray9 } from '@taskany/colors';
+import { Text, UserPic } from '@taskany/bricks';
+import { gapS, gapXs, gray9 } from '@taskany/colors';
 
-import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { getUserName } from '../utils/getUserName';
+import { UserData } from '../types/common';
+
+import { BadgeCleanButton } from './BadgeCleanButton';
 
 interface UserBadgeProps {
-    user?: ActivityByIdReturnType['user'];
-    onCleanButtonClick?: () => void;
+    user: UserData;
+    children?: React.ReactNode;
+    className?: string;
 }
 
-const StyledUserPick = styled(UserPic)`
-    margin-right: ${gapS};
-`;
-
-const StyledCleanButton = styled(IconXCircleSolid).attrs({
-    size: 'xs',
-})`
-    color: ${gray8};
-    margin-left: ${gapXs};
-    visibility: hidden;
-
-    transition: color 100ms ease-in-out;
-
-    &:hover {
-        color: ${gray9};
-    }
-`;
-
-const StyledIssuer = styled.span`
+const StyledUserBadge = styled.span`
     position: relative;
     display: flex;
     align-items: center;
-    margin: ${gapS} 0;
+    padding: ${gapXs} 0;
     width: fit-content;
 
     &:hover {
-        ${StyledCleanButton} {
+        ${BadgeCleanButton} {
             visibility: visible;
 
             cursor: pointer;
@@ -45,18 +30,22 @@ const StyledIssuer = styled.span`
     }
 `;
 
-export const UserBadge: React.FC<UserBadgeProps> = ({ user, onCleanButtonClick }) => {
+const StyledText = styled(Text).attrs({
+    color: gray9,
+    size: 's',
+    ellipsis: true,
+})`
+    padding: 0 ${gapXs} 0 ${gapS};
+`;
+
+export const UserBadge: React.FC<UserBadgeProps> = ({ user, children, className }) => {
     return (
-        <StyledIssuer>
-            <StyledUserPick src={user?.image} email={user?.email} size={24} />
-            {nullable(user, (data) => (
-                <Text color={gray9} size="s">
-                    {getUserName(data)}
-                </Text>
-            ))}
-            {nullable(onCleanButtonClick, (onClick) => (
-                <StyledCleanButton onClick={onClick} />
-            ))}
-        </StyledIssuer>
+        <StyledUserBadge className={className}>
+            <UserPic src={user?.image} email={user?.email} size={24} />
+
+            <StyledText>{getUserName(user)}</StyledText>
+
+            {children}
+        </StyledUserBadge>
     );
 };
