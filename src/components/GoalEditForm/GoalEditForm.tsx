@@ -10,6 +10,7 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { trpc } from '../../utils/trpcClient';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { getDateStringFromEstimate } from '../../utils/dateTime';
+import { goalForm, goalUpdateButton } from '../../utils/domObjects';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -73,7 +74,14 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             actionButton={
                 <>
                     <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
-                    <Button view="primary" disabled={busy} outline type="submit" text={tr('Submit')} />
+                    <Button
+                        view="primary"
+                        disabled={busy}
+                        outline
+                        type="submit"
+                        text={tr('Submit')}
+                        {...goalUpdateButton.attr}
+                    />
                 </>
             }
             tip={
@@ -83,6 +91,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
                     })}
                 </Tip>
             }
+            {...goalForm.attr}
         />
     );
 };

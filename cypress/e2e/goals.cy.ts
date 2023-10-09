@@ -2,7 +2,7 @@ import '../support';
 import {
     createSelectButton,
     createGoalItem,
-    goalCreateForm,
+    goalForm,
     goalCancelButton,
     goalTitleInput,
     goalDescriptionInput,
@@ -19,14 +19,17 @@ import {
     comboboxInput,
     createActionToggle,
     goalActionCreateAndGo,
-    issuePageHeaderParent,
-    issuePageHeaderTitle,
+    goalPageHeaderParent,
+    goalPageHeaderTitle,
     goalActionCreateOneMore,
     filtersPanelResetButton,
+    goalPageEditButton,
+    goalPageDeleteButton,
 } from '../../src/utils/domObjects';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
+import { CommonGoal } from '..';
 
 const testUser = {
     name: 'Test user 1',
@@ -59,44 +62,44 @@ after(() => {
 });
 
 describe('Goals', () => {
-    beforeEach(() => {
-        cy.signInViaEmail();
-    });
-
     describe('create', () => {
+        beforeEach(() => {
+            cy.signInViaEmail();
+        });
+
         describe('ways to open dialog', () => {
             it('should open then close by hotkeys', () => {
                 cy.wait(50).realPress('C').realPress('G');
 
-                cy.get(goalCreateForm.query).should('exist').and('be.visible');
+                cy.get(goalForm.query).should('exist').and('be.visible');
 
                 cy.realPress('Escape');
 
-                cy.get(goalCreateForm.query).should('not.exist');
+                cy.get(goalForm.query).should('not.exist');
             });
 
             it('should open then close dialog via create menu', () => {
                 cy.get(createSelectButton.query).click();
                 cy.get(createGoalItem.query).click();
 
-                cy.get(goalCreateForm.query).should('exist').and('be.visible');
+                cy.get(goalForm.query).should('exist').and('be.visible');
 
                 cy.get(goalCancelButton.query).should('be.visible').click();
-                cy.get(goalCreateForm.query).should('not.exist');
+                cy.get(goalForm.query).should('not.exist');
             });
 
             it('should open via fast button', () => {
                 cy.get(createFastButton.query).click();
-                cy.get(goalCreateForm.query).should('exist').and('be.visible');
+                cy.get(goalForm.query).should('exist').and('be.visible');
                 cy.get(goalCancelButton.query).should('be.visible').click();
-                cy.get(goalCreateForm.query).should('not.exist');
+                cy.get(goalForm.query).should('not.exist');
             });
         });
 
         describe('form manipulation data', () => {
             beforeEach(() => {
                 cy.get(createFastButton.query).click();
-                cy.get(goalCreateForm.query).should('exist').and('be.visible');
+                cy.get(goalForm.query).should('exist').and('be.visible');
             });
 
             it('should have clean fields', (done) => {
@@ -178,7 +181,7 @@ describe('Goals', () => {
                 cy.url().should('equal', exactUrl(routes.project(projectKey)));
                 cy.get(createSelectButton.query).click();
                 cy.get(createGoalItem.query).click();
-                cy.get(goalCreateForm.query).should('exist').and('be.visible');
+                cy.get(goalForm.query).should('exist').and('be.visible');
                 cy.get(projectsCombobox.query).contains(projectKey);
                 cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');
                 cy.get(priorityCombobox.query).contains(Cypress.env('defaultPriority'));
@@ -194,7 +197,7 @@ describe('Goals', () => {
                 }).as('lastCreatedGoal');
                 cy.intercept('/_next/data/**/*.json?*').as('goalPage');
                 cy.get(createFastButton.query).click();
-                cy.get(goalCreateForm.query).should('exist').and('be.visible');
+                cy.get(goalForm.query).should('exist').and('be.visible');
                 cy.get(goalTitleInput.query).type(testGoalTitle);
                 cy.get(goalDescriptionInput.query).type(testGoalDescription);
                 cy.get(projectsCombobox.query).click();
@@ -215,7 +218,7 @@ describe('Goals', () => {
 
                 cy.wait('@lastCreatedGoal');
 
-                cy.get(goalCreateForm.query).should('exist').and('be.visible');
+                cy.get(goalForm.query).should('exist').and('be.visible');
                 cy.get(projectsCombobox.query).contains(projectKey);
                 cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');
                 cy.get(priorityCombobox.query).contains(Cypress.env('defaultPriority'));
@@ -229,7 +232,7 @@ describe('Goals', () => {
 
                 cy.wait('@lastCreatedGoal');
 
-                cy.get(goalCreateForm.query).should('not.exist');
+                cy.get(goalForm.query).should('not.exist');
 
                 cy.getAllLocalStorage().then((res) => {
                     expect(res[Cypress.config('baseUrl')]).have.property('goalCreateFormAction', '3');
@@ -259,12 +262,102 @@ describe('Goals', () => {
 
                 cy.wait(['@lastCreatedGoal', '@goalPage']);
 
-                cy.get(issuePageHeaderParent.query, { timeout: 5000 }).contains(testProjectForGoals);
-                cy.get(issuePageHeaderTitle.query).contains(testGoalTitle);
+                cy.get(goalPageHeaderParent.query, { timeout: 5000 }).contains(testProjectForGoals);
+                cy.get(goalPageHeaderTitle.query).contains(testGoalTitle);
             });
         });
 
         // TODO: https://github.com/taskany-inc/issues/issues/1746
         describe.skip('correct data on goal page after create', () => {});
+    });
+
+    describe('modify access', () => {
+        afterEach(() => {
+            const createdGoal = Cypress.env('createdGoal');
+
+            if (createdGoal) {
+                cy.task('db:remove:goal', createdGoal);
+            }
+        });
+        describe('admin', () => {
+            it('can create, edit and delete own goal', () => {
+                cy.signInViaEmail();
+
+                cy.createGoal({
+                    title: testGoalTitle,
+                    description: testGoalDescription,
+                    projectTitle: testProjectForGoals,
+                }).then((goal) => {
+                    const updatedGoalTitle = `${testGoalTitle}_new_title`;
+
+                    cy.updateGoal(goal._shortId, { title: updatedGoalTitle });
+                    cy.get(goalPageHeaderTitle.query).contains(updatedGoalTitle);
+                    cy.deleteGoal(goal._shortId);
+                });
+            });
+
+            it('can edit and delete other user`s goals', () => {
+                cy.signInViaEmail({ email: testUser.email, password: testUser.password });
+
+                cy.createGoal({
+                    title: testGoalTitle,
+                    description: testGoalDescription,
+                    projectTitle: testProjectForGoals,
+                });
+
+                cy.clearCookies();
+                cy.visit(routes.signIn());
+
+                cy.signInViaEmail();
+
+                cy.get<CommonGoal>('@createdGoal').then((goal) => {
+                    const updatedGoalTitle = `${testGoalTitle}_new_title_2`;
+
+                    cy.updateGoal(goal._shortId, { title: updatedGoalTitle });
+                    cy.get(goalPageHeaderTitle.query).contains(updatedGoalTitle);
+                    cy.deleteGoal(goal._shortId);
+                });
+            });
+        });
+
+        describe('user', () => {
+            it('can create, edit and delete own goals', () => {
+                cy.signInViaEmail();
+
+                cy.createGoal({
+                    title: testGoalTitle,
+                    description: testGoalDescription,
+                    projectTitle: testProjectForGoals,
+                }).then((goal) => {
+                    const updatedGoalTitle = `${testGoalTitle}_new_title_3`;
+
+                    cy.updateGoal(goal._shortId, { title: updatedGoalTitle });
+                    cy.get(goalPageHeaderTitle.query).contains(updatedGoalTitle);
+                    cy.deleteGoal(goal._shortId);
+                });
+            });
+
+            it('can`t edit or delete other user`s goals', () => {
+                cy.signInViaEmail();
+
+                cy.createGoal({
+                    title: testGoalTitle,
+                    description: testGoalDescription,
+                    projectTitle: testProjectForGoals,
+                });
+
+                cy.clearCookies();
+                cy.visit(routes.signIn());
+
+                cy.signInViaEmail({ email: testUser.email, password: testUser.password });
+
+                cy.get<CommonGoal>('@createdGoal').then((goal) => {
+                    cy.visit(routes.goal(goal._shortId));
+                    cy.get(goalPageHeaderTitle.query).contains(goal.title);
+                    cy.get(goalPageEditButton.query).should('not.exist');
+                    cy.get(goalPageDeleteButton.query).should('not.exist');
+                });
+            });
+        });
     });
 });

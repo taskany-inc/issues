@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { gapS } from '@taskany/colors';
 import { Text, Link } from '@taskany/bricks';
 
-import { issuePageHeaderTitle } from '../utils/domObjects';
+import { goalPageHeaderTitle } from '../utils/domObjects';
 
 import { NextLink } from './NextLink';
 
@@ -20,7 +20,7 @@ const StyledIssueTitleText = styled(({ forwardRef, ...props }) => <Text forwardR
 
 export const IssueTitle = React.forwardRef<HTMLDivElement, IssueTitleProps>(({ title, href, size = 'xxl' }, ref) => {
     return (
-        <StyledIssueTitleText forwardRef={ref} size={size} weight="bolder" {...issuePageHeaderTitle.attr}>
+        <StyledIssueTitleText forwardRef={ref} size={size} weight="bolder" {...goalPageHeaderTitle.attr}>
             {href ? (
                 <Link as={NextLink} href={href} inline>
                     {title}

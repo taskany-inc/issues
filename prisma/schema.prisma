@@ -239,7 +239,7 @@ model Comment {
   description String
   activity    Activity   @relation(fields: [activityId], references: [id])
   activityId  String
-  goal        Goal       @relation(fields: [goalId], references: [id])
+  goal        Goal       @relation(fields: [goalId], references: [id], onDelete: Cascade)
   goalId      String
   state       State?     @relation(fields: [stateId], references: [id])
   stateId     String?
@@ -257,7 +257,7 @@ model Reaction {
   emoji      String
   activity   Activity @relation(fields: [activityId], references: [id])
   activityId String
-  goal       Goal?    @relation(fields: [goalId], references: [id])
+  goal       Goal?    @relation(fields: [goalId], references: [id], onDelete: Cascade)
   goalId     String?
   comment    Comment? @relation(fields: [commentId], references: [id])
   commentId  String?
@@ -339,7 +339,7 @@ model Job {
 
 model GoalHistory {
   id            String   @id @default(cuid())
-  goal          Goal     @relation(fields: [goalId], references: [id])
+  goal          Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
   goalId        String
   subject       String
   action        String
@@ -356,9 +356,9 @@ model GoalHistory {
 
 model GoalAchieveCriteria {
   id               String   @id @default(cuid())
-  goal             Goal     @relation("GoalCriterion", fields: [goalId], references: [id])
+  goal             Goal     @relation("GoalCriterion", fields: [goalId], references: [id], onDelete: Cascade)
   goalId           String
-  goalAsCriteria   Goal?    @relation("GoalAsCriteria", fields: [goalIdAsCriteria], references: [id])
+  goalAsCriteria   Goal?    @relation("GoalAsCriteria", fields: [goalIdAsCriteria], references: [id], onDelete: Cascade)
   goalIdAsCriteria String?  @unique
   title            String
   weight           Int

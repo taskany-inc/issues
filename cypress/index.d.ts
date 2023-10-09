@@ -1,14 +1,31 @@
 export {};
 
-type SignIn = {
+export interface SignIn {
     email: string;
     password: string;
-};
+}
 
-type CreateProjectFields = {
+export interface CreateProjectFields {
     title: string;
     description?: string;
-};
+}
+
+export interface GoalFields {
+    title?: string;
+    description?: string;
+}
+
+export interface CreateGoalFields extends GoalFields {
+    projectTitle: string;
+}
+
+export interface CommonGoal {
+    id: string;
+    _shortId: string;
+    title: string;
+    description: string;
+}
+
 interface UserData {
     user: {
         name: string;
@@ -34,6 +51,9 @@ declare global {
         interface Chainable {
             signInViaEmail(fields?: SignIn): Chainable<void>;
             createProject(fields: CreateProjectFields): Chainable<void>;
+            createGoal(fields: CreateGoalFields): Chainable<CommonGoal>;
+            updateGoal(shortId: string, filelds: GoalFields): Chainable<CommonGoal>;
+            deleteGoal(shortId: string): Chainable<CommonGoal>;
             task(
                 event: 'db:create:project',
                 data: { title: string; key: string; description?: string; ownerEmail: string },

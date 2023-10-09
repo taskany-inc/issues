@@ -16,6 +16,7 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
 import { TextList, TextListItem } from '../TextList';
 import { safeUserData } from '../../utils/getUserName';
+import { goalPageDeleteButton } from '../../utils/domObjects';
 
 import { tr } from './GoalSidebar.i18n';
 
@@ -217,7 +218,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoa
                     </StyledInlineInput>
 
                     <AddInlineTrigger
-                        icon={<IconBinOutline size="xs" />}
+                        icon={<IconBinOutline size="xs" {...goalPageDeleteButton.attr} />}
                         text={tr('Archive goal')}
                         onClick={dispatchModalEvent(ModalEvent.GoalDeleteModal)}
                     />
