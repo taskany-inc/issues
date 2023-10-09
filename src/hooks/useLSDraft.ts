@@ -8,7 +8,7 @@ type DraftComment = DraftGoalComment[keyof DraftGoalComment];
 type DraftGoalCommentKey = 'draftGoalComment';
 
 function useLSDraft<KDG extends DraftGoalCommentKey>(storageKey: KDG, initialValue: Record<string, LSParams[1]>) {
-    const [draft, setDraft] = useLocalStorage(storageKey, initialValue);
+    const [, setDraft, draftRef] = useLocalStorage(storageKey, initialValue);
 
     const saveDraft = useCallback(
         (id: string, draft: DraftComment) => {
@@ -20,7 +20,7 @@ function useLSDraft<KDG extends DraftGoalCommentKey>(storageKey: KDG, initialVal
         [setDraft],
     );
 
-    const resolveDraft = useCallback((id?: string) => (id ? draft[id] : undefined), [draft]);
+    const resolveDraft = useCallback((id?: string) => (id ? draftRef.current[id] : undefined), [draftRef]);
 
     const removeDraft = useCallback(
         (id: string) => {

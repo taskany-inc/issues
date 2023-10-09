@@ -1,6 +1,8 @@
-import { useCallback, useState } from 'react';
+import { MutableRefObject, useCallback, useState } from 'react';
 
 import { safelyParseJson } from '../utils/safelyParseJson';
+
+import { useLatest } from './useLatest';
 
 export type LastOrCurrentProject = { id: string; title: string; flowId: string; description?: string | null } | null;
 export type RecentProjectsCache = Record<
@@ -22,7 +24,7 @@ export function useLocalStorage<T extends keyof StorageKey>(
     storageKey: T,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     defaultValue?: any,
-): [StorageKey[T], SetValue<StorageKey[T]>] {
+): [StorageKey[T], SetValue<StorageKey[T]>, MutableRefObject<StorageKey[T]>] {
     const safelySetStorage = useCallback(
         (valueToStore: string) => {
             try {
@@ -45,14 +47,15 @@ export function useLocalStorage<T extends keyof StorageKey>(
         return safelyParseJson(valueToStore);
     });
 
+    const storedValueRef = useLatest(storedValue);
     const setValue: SetValue<StorageKey[T]> = useCallback(
         (value) => {
-            const valueToStore = value instanceof Function ? value(storedValue) : value;
+            const valueToStore = value instanceof Function ? value(storedValueRef.current) : value;
             safelySetStorage(JSON.stringify(valueToStore));
             setStoredValue(valueToStore);
         },
-        [safelySetStorage, storedValue],
+        [safelySetStorage, storedValueRef],
     );
 
-    return [storedValue, setValue];
+    return [storedValue, setValue, storedValueRef];
 }
