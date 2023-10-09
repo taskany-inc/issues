@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
-import { gapS, gray9, warn0 } from '@taskany/colors';
+import { gapM, gapS, gapXs, gray9, warn0 } from '@taskany/colors';
 import {
     Button,
     Text,
@@ -70,13 +70,8 @@ import { tr } from './ProjectSettingsPage.i18n';
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 const StyledTip = styled(Tip)`
-    display: flex;
-    align-items: center;
     color: ${warn0};
     padding: ${gapS} 0;
-    & span {
-        display: inline-flex;
-    }
 `;
 
 const StyledModalActions = styled.div`
@@ -89,6 +84,14 @@ const StyledModalActions = styled.div`
 const StyledTag = styled(Tag)`
     display: flex;
     gap: ${gapS};
+`;
+
+const StyledTextList = styled(TextList)`
+    margin-left: ${gapM};
+`;
+
+const StyledTextListItem = styled(TextListItem)`
+    margin-left: ${gapXs};
 `;
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
@@ -367,37 +370,36 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                 <ModalContent>
                     <SettingsCard view="warning">
-                        <TextList
-                            type="unordered"
-                            heading={
-                                <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
-                                    <Text weight="bold" size="s" color={warn0}>
-                                        {tr('What happens when you delete a project')}
-                                    </Text>
-                                </StyledTip>
-                            }
-                        >
-                            <TextListItem>
-                                <Text size="s">{tr('All active goals will be archived')}</Text>
-                            </TextListItem>
-                            <TextListItem>
-                                <Text size="s">{tr('Criteria as project goals will be removed')}</Text>
-                            </TextListItem>
-                            <TextListItem>
+                        <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
+                            <Text as="span" weight="bold" size="s" color={warn0}>
+                                {tr('What happens when you delete a project')}:
+                            </Text>
+                        </StyledTip>
+
+                        <StyledTextList type="unordered">
+                            <StyledTextListItem>
+                                <Text size="s">{tr('All active goals will be archived')};</Text>
+                            </StyledTextListItem>
+                            <StyledTextListItem>
+                                <Text size="s">{tr('Criteria as project goals will be removed')};</Text>
+                            </StyledTextListItem>
+                            <StyledTextListItem>
                                 <Text size="s">
                                     {tr(
                                         'Criteria-affected goals will be recalculated as progress towards meeting the criteria',
                                     )}
+                                    ;
                                 </Text>
-                            </TextListItem>
-                            <TextListItem>
+                            </StyledTextListItem>
+                            <StyledTextListItem>
                                 <Text size="s">
                                     {tr(
                                         'For affected projects, average progress across all goals will be recalculated',
                                     )}
+                                    .
                                 </Text>
-                            </TextListItem>
-                        </TextList>
+                            </StyledTextListItem>
+                        </StyledTextList>
                     </SettingsCard>
                     <br />
                     <Text>

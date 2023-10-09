@@ -1,45 +1,40 @@
-import { gapM, gapS, gapXs, gray3 } from '@taskany/colors';
 import React from 'react';
 import styled from 'styled-components';
 
-type ListType = 'ordered' | 'unordered';
-
 interface TextListProps {
-    type?: ListType;
+    type?: 'ordered' | 'unordered';
+    listStyle?: React.CSSProperties['listStyle'];
     className?: string;
     children?: React.ReactNode;
-    heading?: React.ReactNode;
 }
 
-const StyledList = styled.ul`
-    margin: ${gapXs} 0;
-    padding-left: ${gapM};
-    list-style: none;
+const StyledList = styled.ul<{ listStyle?: TextListProps['listStyle'] }>`
+    margin: 0;
+    padding: 0;
+
+    line-height: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+
+    ${({ listStyle }) =>
+        listStyle &&
+        `
+        list-style: ${listStyle};
+    `}
 `;
 
-const StyledWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    background-color: ${gray3};
-    padding: ${gapS};
-`;
-
-const tag = {
-    ordered: 'ol',
-    unordered: 'ul',
-} as const;
-
-export const TextList: React.FC<TextListProps> = ({ type = 'unordered', className, children, heading }) => {
-    const asProp = tag[type];
-
+export const TextList: React.FC<TextListProps> = ({ type = 'unordered', listStyle, className, children }) => {
     return (
-        <StyledWrapper className={className}>
-            {heading}
-            <StyledList as={asProp}>{children}</StyledList>
-        </StyledWrapper>
+        <StyledList as={type === 'ordered' ? 'ol' : 'ul'} listStyle={listStyle} className={className}>
+            {children}
+        </StyledList>
     );
 };
 
 export const TextListItem = styled.li`
-    padding-left: ${gapS};
+    padding: 0;
+
+    line-height: inherit;
+    font-size: inherit;
+    font-weight: inherit;
 `;
