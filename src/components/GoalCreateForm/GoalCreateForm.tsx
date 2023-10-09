@@ -19,7 +19,7 @@ import {
     goalActionCreateOneMore,
     goalActionCreateOnly,
     goalCancelButton,
-    goalCreateForm,
+    goalForm,
 } from '../../utils/domObjects';
 import { CommonDropdown } from '../CommonDropdown';
 
@@ -200,7 +200,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
                     })}
                 </Tip>
             }
-            {...goalCreateForm.attr}
+            {...goalForm.attr}
         />
     );
 };

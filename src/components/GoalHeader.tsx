@@ -3,7 +3,7 @@ import { ComponentProps, FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
-import { issuePageHeader } from '../utils/domObjects';
+import { goalPageHeader } from '../utils/domObjects';
 
 import StateSwitch from './StateSwitch';
 import { State } from './State';
@@ -54,7 +54,7 @@ export const GoalHeader: FC<GoalHeaderProps> = ({
     onCommentsClick,
 }) => {
     return (
-        <StyledGoalHeader {...issuePageHeader.attr}>
+        <StyledGoalHeader {...goalPageHeader.attr}>
             <StyledGoalInfo align="left">
                 {children}
 

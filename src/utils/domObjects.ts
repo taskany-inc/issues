@@ -39,10 +39,22 @@ export const projectGoalListItem = projectListItem.add('goalItem');
 
 export const createGoalInlineControl = DO('createGoalInlineControl');
 
-export const goalCreateForm = DO('goalCreateForm');
-export const goalTitleInput = goalCreateForm.add('title');
-export const goalDescriptionInput = goalCreateForm.add('description');
-export const goalProjectSelectControl = goalCreateForm.add('project');
+export const goalForm = DO('goalForm');
+export const goalTitleInput = goalForm.add('title');
+export const goalDescriptionInput = goalForm.add('description');
+export const goalProjectSelectControl = goalForm.add('project');
+export const goalPrioritySelectControl = goalForm.add('priority');
+export const goalOwnerSelectControl = goalForm.add('owner');
+export const goalActionCreateAndGo = goalForm.add('create&go');
+export const goalActionCreateOneMore = goalForm.add('createOneMore');
+export const goalActionCreateOnly = goalForm.add('createOnly');
+export const goalSaveButton = goalForm.add('saveButton');
+export const goalCancelButton = goalForm.add('cancelButton');
+export const goalUpdateButton = goalForm.add('updateButton');
+
+export const goalDeleteForm = DO('goalDeleteForm');
+export const goalDeleteShortIdInput = goalDeleteForm.add('shortIdInput');
+export const goalDeleteSubmitButton = goalDeleteForm.add('goalDeleteForm');
 
 export const projectSettingsContent = DO('projectSettingsContent');
 export const projectSettingsTitleInput = projectSettingsContent.add('titleInput');
@@ -67,18 +79,13 @@ export const projectSettingsConfirmTransferProjectButton =
     projectSettingsTransferForm.add('confirmTransferProjectButton');
 export const projectSettingsCancelTransferProjectButton =
     projectSettingsTransferForm.add('cancelTransferProjectButton');
-export const goalPrioritySelectControl = goalCreateForm.add('priority');
-export const goalOwnerSelectControl = goalCreateForm.add('owner');
-export const goalActionCreateAndGo = goalCreateForm.add('create&go');
-export const goalActionCreateOneMore = goalCreateForm.add('createOneMore');
-export const goalActionCreateOnly = goalCreateForm.add('createOnly');
-export const goalSaveButton = goalCreateForm.add('saveButton');
-export const goalCancelButton = goalCreateForm.add('cancelButton');
 
-export const issuePage = DO('issuePage');
-export const issuePageHeader = issuePage.add('header');
-export const issuePageHeaderTitle = issuePageHeader.add('title');
-export const issuePageHeaderParent = issuePageHeader.add('parent');
+export const goalPage = DO('goalPage');
+export const goalPageHeader = goalPage.add('header');
+export const goalPageHeaderTitle = goalPageHeader.add('title');
+export const goalPageHeaderParent = goalPageHeader.add('parent');
+export const goalPageEditButton = goalPage.add('edit');
+export const goalPageDeleteButton = goalPage.add('delete');
 
 export const combobox = DO('combobox');
 export const comboboxItem = combobox.add('item');

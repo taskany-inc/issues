@@ -42,9 +42,9 @@ const StyledIconContainer = styled.span`
 `;
 
 export const InlineTrigger = forwardRef<HTMLDivElement, InlineTriggerProps>(
-    ({ text, icon, className, onClick }, ref) => {
+    ({ text, icon, className, onClick, ...attrs }, ref) => {
         return (
-            <StyledInlineTrigger forwardRef={ref} size="s" className={className} onClick={onClick}>
+            <StyledInlineTrigger forwardRef={ref} size="s" className={className} onClick={onClick} {...attrs}>
                 <StyledIconContainer>{icon}</StyledIconContainer>
                 <StyledInlineTriggerText>{text}</StyledInlineTriggerText>
             </StyledInlineTrigger>
