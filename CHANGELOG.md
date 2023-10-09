@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.32.3](https://github.com/taskany-inc/issues/compare/v1.32.2...v1.32.3) (2023-10-09)
+
+
+### Bug Fixes
+
+* on new comment input re-renders only comment form ([b24bfae](https://github.com/taskany-inc/issues/commit/b24bfae3e03748d78212445925384cdb3d6860f3))
+
 ## [1.32.2](https://github.com/taskany-inc/issues/compare/v1.32.1...v1.32.2) (2023-10-06)
 
 
