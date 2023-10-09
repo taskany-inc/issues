@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.32.4](https://github.com/taskany-inc/issues/compare/v1.32.3...v1.32.4) (2023-10-09)
+
+
+### Bug Fixes
+
+* **GoalPage:** pass NextLink via Link prop ([7c95fb8](https://github.com/taskany-inc/issues/commit/7c95fb85e8e238f48e63c90580aa521173232c1a))
+* **HistoryRecord:** remove CSS overrides ([f353188](https://github.com/taskany-inc/issues/commit/f353188a88e7b5b11d14557a09747f29dcc76635))
+
 ## [1.32.3](https://github.com/taskany-inc/issues/compare/v1.32.2...v1.32.3) (2023-10-09)
 
 
