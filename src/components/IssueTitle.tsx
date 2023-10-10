@@ -21,9 +21,9 @@ export const IssueTitle = React.forwardRef<HTMLDivElement, IssueTitleProps>(({ t
     return (
         <StyledIssueTitleText forwardRef={ref} size={size} weight="bolder" {...issuePageHeaderTitle.attr}>
             {href ? (
-                <NextLink href={href} passHref legacyBehavior>
-                    <Link inline>{title}</Link>
-                </NextLink>
+                <Link as={NextLink} href={href} inline>
+                    {title}
+                </Link>
             ) : (
                 title
             )}
