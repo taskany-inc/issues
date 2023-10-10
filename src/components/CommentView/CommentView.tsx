@@ -4,7 +4,13 @@ import { Reaction, State, User } from '@prisma/client';
 import styled from 'styled-components';
 import { brandColor, danger0, gapM, gapS, gray4, gray9, backgroundColor } from '@taskany/colors';
 import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, UserPic, nullable, Button } from '@taskany/bricks';
-import { IconBinOutline, IconEditOutline, IconMoreVerticalOutline, IconPinAltOutline } from '@taskany/icons';
+import {
+    IconBinOutline,
+    IconClipboardOutline,
+    IconEditOutline,
+    IconMoreVerticalOutline,
+    IconPinAltOutline,
+} from '@taskany/icons';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useLocale } from '../../hooks/useLocale';
@@ -19,6 +25,9 @@ import { CommentForm } from '../CommentForm/CommentForm';
 import { StateDot } from '../StateDot';
 import { getUserName } from '../../utils/getUserName';
 import { CardHeader } from '../CardHeader';
+import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
+import { useLatest } from '../../hooks/useLatest';
+import { notifyPromise } from '../../utils/notifyPromise';
 
 import { tr } from './CommentView.i18n';
 
@@ -118,6 +127,15 @@ const StyledMd = styled(Md)`
     overflow-x: auto;
 `;
 
+const StyledMenuItem = styled(MenuItem)`
+    display: flex;
+    justify-content: start;
+`;
+
+const StyledIconClipboardOutline = styled(IconClipboardOutline)`
+    display: flex;
+`;
+
 export const CommentView: FC<CommentViewProps> = ({
     id,
     author,
@@ -140,6 +158,10 @@ export const CommentView: FC<CommentViewProps> = ({
     const [commentDescription, setCommentDescription] = useState({ description });
     const { reactionsProps } = useReactionsResource(reactions);
     const [isRelative, onDateViewTypeChange] = useClickSwitch();
+    const [, copyValue] = useCopyToClipboard();
+    const descriptionRef = useLatest(commentDescription.description);
+
+    const canEdit = Boolean(onSubmit);
 
     const onCommentDoubleClick = useCallback<React.MouseEventHandler>((e) => {
         if (e.detail === 2) {
@@ -176,25 +198,38 @@ export const CommentView: FC<CommentViewProps> = ({
         onCancel?.();
     }, [description, onCancel]);
 
-    const dropdownItems = useMemo(
-        () => [
-            {
-                label: tr('Edit'),
-                icon: <IconEditOutline size="xxs" />,
-                onClick: () => {
-                    setEditMode(true);
-                    setFocused(true);
+    const dropdownItems = useMemo(() => {
+        const items = navigator?.clipboard
+            ? [
+                  {
+                      label: tr('Copy raw'),
+                      icon: <StyledIconClipboardOutline size="xxs" />,
+                      onClick: () => notifyPromise(copyValue(descriptionRef.current), 'copy'),
+                  },
+              ]
+            : [];
+
+        if (canEdit) {
+            return [
+                {
+                    label: tr('Edit'),
+                    icon: <IconEditOutline size="xxs" />,
+                    onClick: () => {
+                        setEditMode(true);
+                        setFocused(true);
+                    },
                 },
-            },
-            {
-                label: tr('Delete'),
-                color: danger0,
-                icon: <IconBinOutline size="xxs" />,
-                onClick: onDelete,
-            },
-        ],
-        [onDelete],
-    );
+                {
+                    label: tr('Delete'),
+                    color: danger0,
+                    icon: <IconBinOutline size="xxs" />,
+                    onClick: onDelete,
+                },
+            ].concat(items);
+        }
+
+        return items;
+    }, [canEdit, copyValue, descriptionRef, onDelete]);
 
     return (
         <ActivityFeedItem id={pin ? '' : `comment-${id}`}>
@@ -227,7 +262,7 @@ export const CommentView: FC<CommentViewProps> = ({
                     }
                 />
             ) : (
-                <StyledCommentCard highlight={highlight} onClick={onSubmit ? onCommentDoubleClick : undefined}>
+                <StyledCommentCard highlight={highlight} onClick={canEdit ? onCommentDoubleClick : undefined}>
                     <StyledCardInfo onClick={onDateViewTypeChange}>
                         {nullable(author, (data) => (
                             <CardHeader
@@ -240,26 +275,24 @@ export const CommentView: FC<CommentViewProps> = ({
                             {nullable(!reactionsProps.limited, () => (
                                 <ReactionsDropdown view="icon" onClick={onReactionToggle} />
                             ))}
-                            {nullable(onSubmit, () => (
-                                <Dropdown
-                                    items={dropdownItems}
-                                    renderTrigger={({ ref, onClick }) => (
-                                        <IconMoreVerticalOutline size="xs" ref={ref} onClick={onClick} />
-                                    )}
-                                    renderItem={({ item, cursor, index }) => (
-                                        <MenuItem
-                                            key={item.label}
-                                            ghost
-                                            color={item.color}
-                                            focused={cursor === index}
-                                            icon={item.icon}
-                                            onClick={item.onClick}
-                                        >
-                                            {item.label}
-                                        </MenuItem>
-                                    )}
-                                />
-                            ))}
+                            <Dropdown
+                                items={dropdownItems}
+                                renderTrigger={({ ref, onClick }) => (
+                                    <IconMoreVerticalOutline size="xs" ref={ref} onClick={onClick} />
+                                )}
+                                renderItem={({ item, cursor, index }) => (
+                                    <StyledMenuItem
+                                        key={item.label}
+                                        ghost
+                                        color={item.color}
+                                        focused={cursor === index}
+                                        icon={item.icon}
+                                        onClick={item.onClick}
+                                    >
+                                        {item.label}
+                                    </StyledMenuItem>
+                                )}
+                            />
                         </StyledCommentActions>
                     </StyledCardInfo>
 

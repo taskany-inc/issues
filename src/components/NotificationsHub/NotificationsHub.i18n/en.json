@@ -34,5 +34,8 @@
     "Feedback sent 🎉": "Feedback sent 🎉",
     "Feedback is formed": "Feedback is formed",
     "We are deleting project": "We are deleting project",
-    "Project removed": "Project removed"
+    "Project removed": "Project removed",
+    "Successfully copied": "Successfully copied",
+    "An error occurred while copying": "An error occurred while copying",
+    "Copying...": "Copying..."
 }
