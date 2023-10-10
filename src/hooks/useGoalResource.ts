@@ -85,6 +85,8 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
     const updateGoalTagMutation = trpc.goal.updateTag.useMutation();
     const updateGoalOwnerMutation = trpc.goal.updateOwner.useMutation();
     const createGoalMutation = trpc.goal.create.useMutation();
+    const addPartnerProjectMutation = trpc.goal.addPartnerProject.useMutation();
+    const removePartnerProjectMutation = trpc.goal.removePartnerProject.useMutation();
 
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const { commentReaction } = useReactionsResource(fields.reactions);
@@ -335,9 +337,9 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         async (activity?: NonNullable<Activity>, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
             if (!id || !activity) return;
 
-            await addParticipantMutation.mutateAsync({ id, activityId: activity.id });
+            await notifyPromise(addParticipantMutation.mutateAsync({ id, activityId: activity.id }), 'goalsUpdate');
 
-            invalidate(invalidateKey);
+            await invalidate(invalidateKey);
         },
         [addParticipantMutation, id, invalidate],
     );
@@ -346,9 +348,9 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         (activityId?: string | null, invalidateKey?: RefetchKeys | RefetchKeys[]) => async () => {
             if (!id || !activityId) return;
 
-            await removeParticipantMutation.mutateAsync({ id, activityId });
+            await notifyPromise(removeParticipantMutation.mutateAsync({ id, activityId }), 'goalsUpdate');
 
-            invalidate(invalidateKey);
+            await invalidate(invalidateKey);
         },
         [id, invalidate, removeParticipantMutation],
     );
@@ -403,6 +405,42 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         [id, updateGoalOwnerMutation, invalidate],
     );
 
+    const addPartnerProject = useCallback(
+        async (projectId: string) => {
+            if (!id) return;
+
+            const promise = addPartnerProjectMutation.mutateAsync({
+                id,
+                projectId,
+            });
+
+            await notifyPromise(promise, 'goalsUpdate');
+
+            await invalidate();
+
+            return promise;
+        },
+        [id, addPartnerProjectMutation, invalidate],
+    );
+
+    const removePartnerProject = useCallback(
+        async (projectId: string) => {
+            if (!id) return;
+
+            const promise = removePartnerProjectMutation.mutateAsync({
+                id,
+                projectId,
+            });
+
+            await notifyPromise(promise, 'goalsUpdate');
+
+            await invalidate();
+
+            return promise;
+        },
+        [id, removePartnerProjectMutation, invalidate],
+    );
+
     return {
         highlightCommentId,
         lastStateComment,
@@ -437,5 +475,8 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
         onGoalCommentUpdate,
         onGoalCommentReactionToggle,
         onGoalCommentDelete,
+
+        addPartnerProject,
+        removePartnerProject,
     };
 };

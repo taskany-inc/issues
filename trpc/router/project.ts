@@ -194,10 +194,34 @@ export const project = router({
                             },
                             include: goalDeepQuery,
                         },
+                        sharedGoals: {
+                            //  all shared goals with filters
+                            where: {
+                                AND: [
+                                    goalsFilters,
+                                    {
+                                        OR: [
+                                            ...requestSchema({ withOwner: true }),
+                                            {
+                                                projectId: {
+                                                    in: projectIdsArray,
+                                                },
+                                            },
+                                        ],
+                                    },
+                                    nonArchivedPartialQuery,
+                                ],
+                            },
+                            include: goalDeepQuery,
+                        },
                         _count: {
                             select: {
                                 // all goals without filters to count the total goals
                                 goals: {
+                                    where: nonArchivedPartialQuery,
+                                },
+                                // all shared goals without filters to count the total goals
+                                sharedGoals: {
                                     where: nonArchivedPartialQuery,
                                 },
                             },

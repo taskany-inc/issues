@@ -206,3 +206,10 @@ export const batchGoalByProjectIdSchema = z.object({
 });
 
 export type BatchGoalsByProjectIdSchema = z.infer<typeof batchGoalByProjectIdSchema>;
+
+export const togglePartnerProjectSchema = z.object({
+    id: z.string(),
+    projectId: z.string(),
+});
+
+export type TogglePartnerProjectSchema = z.infer<typeof togglePartnerProjectSchema>;
