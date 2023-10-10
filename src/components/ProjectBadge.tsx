@@ -1,17 +1,27 @@
 import React from 'react';
 import styled from 'styled-components';
-import { gapS, gapXs, gray9 } from '@taskany/colors';
-import { IconUsersOutline } from '@taskany/icons';
-import { Link, Text } from '@taskany/bricks';
 import NextLink from 'next/link';
-
-import { BadgeCleanButton } from './BadgeCleanButton';
+import { gapS, gapXs, gray8, gray9 } from '@taskany/colors';
+import { IconUsersOutline } from '@taskany/icons';
+import { Link, Text, nullable } from '@taskany/bricks';
 
 interface ProjectBadgeProps {
     title: string;
     children?: React.ReactNode;
     className?: string;
 }
+
+const StyledProjectBadgeIconContainer = styled.span`
+    display: flex;
+    align-items: center;
+    visibility: hidden;
+
+    color: ${gray8};
+
+    &:hover {
+        color: ${gray9};
+    }
+`;
 
 const StyledProjectBadge = styled.div`
     position: relative;
@@ -23,7 +33,7 @@ const StyledProjectBadge = styled.div`
     width: fit-content;
 
     &:hover {
-        ${BadgeCleanButton} {
+        ${StyledProjectBadgeIconContainer} {
             visibility: visible;
 
             cursor: pointer;
@@ -50,7 +60,9 @@ export const ProjectBadge: React.FC<ProjectBadgeProps> = ({ title, children, cla
                 </Link>
             </StyledText>
 
-            {children}
+            {nullable(children, (ch) => (
+                <StyledProjectBadgeIconContainer>{ch}</StyledProjectBadgeIconContainer>
+            ))}
         </StyledProjectBadge>
     );
 };
