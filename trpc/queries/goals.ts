@@ -348,6 +348,32 @@ export const goalDeepQuery = {
             },
         },
     },
+    partnershipProjects: {
+        include: {
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            participants: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            _count: {
+                select: {
+                    stargizers: true,
+                    watchers: true,
+                    participants: true,
+                    children: true,
+                    goals: true,
+                    parent: true,
+                },
+            },
+        },
+    },
     goalAchiveCriteria: {
         include: {
             goalAsCriteria: {

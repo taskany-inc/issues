@@ -1,7 +1,6 @@
 {
     "Issuer": "Автор",
     "Assignee": "Ответственный",
-    "Name/Email": "Имя/Почта",
     "Participants": "В главных ролях",
     "Type user name or email": "Введите имя или email",
     "Add participant": "Добавить участника",
@@ -11,5 +10,8 @@
     "Type project title": "Введите название проекта",
     "Transfer goal": "Перенести цель",
     "Archive goal": "Удалить цель",
-    "Not assigned yet": "Никого не назначили"
+    "Not assigned yet": "Никого не назначили",
+    "Assign": "Назначить",
+    "Partnership projects": "Партнёрские проекты",
+    "Add project": "Добавить проект"
 }

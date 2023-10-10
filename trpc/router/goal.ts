@@ -16,6 +16,7 @@ import {
     goalCommentCreateSchema,
     toggleParticipantsSchema,
     batchGoalByProjectIdSchema,
+    togglePartnerProjectSchema,
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema, suggestionsQuerySchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
@@ -1276,6 +1277,64 @@ export const goal = router({
                                 subject: 'dependencies',
                                 action: 'remove',
                                 nextValue: input.relation.id,
+                                activityId: ctx.session.user.activityId,
+                            },
+                        },
+                    },
+                });
+
+                await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    addPartnerProject: protectedProcedure
+        .input(togglePartnerProjectSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            try {
+                const updatedGoal = await prisma.goal.update({
+                    where: { id: input.id },
+                    data: {
+                        partnershipProjects: {
+                            connect: { id: input.projectId },
+                        },
+                        history: {
+                            create: {
+                                subject: 'partner project',
+                                action: 'add',
+                                nextValue: input.projectId,
+                                activityId: ctx.session.user.activityId,
+                            },
+                        },
+                    },
+                });
+
+                await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                return updatedGoal;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    removePartnerProject: protectedProcedure
+        .input(togglePartnerProjectSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            try {
+                const updatedGoal = await prisma.goal.update({
+                    where: { id: input.id },
+                    data: {
+                        partnershipProjects: {
+                            disconnect: { id: input.projectId },
+                        },
+                        history: {
+                            create: {
+                                subject: 'partner project',
+                                action: 'remove',
+                                previousValue: input.projectId,
                                 activityId: ctx.session.user.activityId,
                             },
                         },
