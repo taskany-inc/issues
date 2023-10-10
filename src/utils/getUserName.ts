@@ -1,4 +1,10 @@
-import { UserData } from '../types/common';
+export interface UserData {
+    email: string;
+    name?: string | null;
+    nickname?: string | null;
+    image?: string;
+    [key: string]: unknown;
+}
 
 export const getUserName = <T extends UserData>(user: T): string => {
     return user.nickname || user.name || user.email;
@@ -77,4 +83,18 @@ export const safeGetUserImage = <T extends UserData, V extends { user?: T | null
     }
 
     return undefined;
+};
+
+export const safeUserData = <T extends { [key: string]: any }, V extends { user?: T | null; ghost?: T | null }>(
+    value?: V | null,
+) => {
+    const data = prepareUserDataFromActivity(value);
+
+    if (!data) return undefined;
+
+    return {
+        name: getUserName(data),
+        email: data.email,
+        image: data.image ?? undefined,
+    };
 };
