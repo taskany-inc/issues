@@ -21,7 +21,13 @@ interface RelativeTimeProps {
 }
 
 const StyledTimeValue = styled.span`
-    padding-left: ${gapXs};
+    &::first-letter {
+        text-transform: capitalize;
+    }
+`;
+
+const StyledKind = styled.span`
+    padding-right: ${gapXs};
 `;
 
 const StyledRelativeTime = styled.span`
@@ -60,7 +66,7 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelati
     return (
         <StyledRelativeTime>
             {nullable(kind, (k) => (
-                <span>{map[k]}</span>
+                <StyledKind>{map[k]}</StyledKind>
             ))}
             {hover ? (
                 <Light title={createLocaleDate(localeDate, { locale })}>
