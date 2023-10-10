@@ -14,7 +14,8 @@ type Namespaces =
     | 'userInvite'
     | 'sentFeedback'
     | 'clearLSCache'
-    | 'error';
+    | 'error'
+    | 'copy';
 
 export type { Namespaces as NotificationNamespaces };
 
@@ -138,6 +139,11 @@ export const getNotificicationKeyMap = (key: keyof NotificationMap) => {
         },
         error: {
             onError: 'Something went wrong 😿',
+        },
+        copy: {
+            onSuccess: 'Successfully copied',
+            onPending: 'Copying...',
+            onError: 'An error occurred while copying',
         },
     };
 
