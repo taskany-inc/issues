@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, SetStateAction, useMemo } from 'react';
+import { createContext, useContext, useState, SetStateAction, useMemo, useEffect } from 'react';
 import {
     User,
     Tag as TagData,
@@ -297,17 +297,19 @@ export const HistoryRecordTags: React.FC<HistoryChangeProps<TagData[]>> = ({ fro
     const added = calculateDiffBetweenArrays(to, from);
     const removed = calculateDiffBetweenArrays(from, to);
 
-    recordCtx.setActionText(() => {
-        if (added.length && !removed.length) {
-            return 'add';
-        }
+    useEffect(() => {
+        recordCtx.setActionText(() => {
+            if (added.length && !removed.length) {
+                return 'add';
+            }
 
-        if (!added.length && removed.length) {
-            return 'remove';
-        }
+            if (!added.length && removed.length) {
+                return 'remove';
+            }
 
-        return 'change';
-    });
+            return 'change';
+        });
+    }, [added.length, recordCtx, removed.length]);
 
     return (
         <HistorySimplifyRecord
@@ -493,24 +495,26 @@ export const HistoryRecordCriteria: React.FC<
 
     const isChangeAction = ['complete', 'uncomplete'].includes(action);
 
-    recordCtx.setSubjectText((prev) => {
-        const target = from || to;
-        if (target?.goalAsCriteria != null) {
-            if (isChangeAction) {
-                if (action === 'complete') {
-                    return 'goalComplete';
+    useEffect(() => {
+        recordCtx.setSubjectText((prev) => {
+            const target = from || to;
+            if (target?.goalAsCriteria != null) {
+                if (isChangeAction) {
+                    if (action === 'complete') {
+                        return 'goalComplete';
+                    }
+                    return 'goalInProgress';
                 }
-                return 'goalInProgress';
+                return 'goalAsCriteria';
             }
-            return 'goalAsCriteria';
-        }
 
-        if (isChangeAction) {
-            return 'criteriaState';
-        }
+            if (isChangeAction) {
+                return 'criteriaState';
+            }
 
-        return prev;
-    });
+            return prev;
+        });
+    }, [action, from, isChangeAction, recordCtx, to]);
 
     return (
         <HistorySimplifyRecord
