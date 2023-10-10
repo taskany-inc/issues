@@ -13,7 +13,7 @@ const StyledCardHeader = styled.div`
 `;
 
 const StyledSeparator = styled.span`
-    margin-left: ${gapXs};
+    margin: 0 ${gapXs};
 `;
 
 export const CardHeader: React.FC<CardHeaderProps> = ({ name, timeAgo, href, ...attrs }) => {
