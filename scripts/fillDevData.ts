@@ -31,56 +31,56 @@ const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
             [
                 faker.internet.email(),
                 faker.internet.password(),
-                faker.name.fullName(),
-                faker.lorem.word() + faker.datatype.number(),
+                faker.person.fullName(),
+                faker.lorem.word() + faker.number.int(),
             ],
         ].map(([email, password, name, provider]) =>
             prisma.user.create({
@@ -178,7 +178,7 @@ const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
                             activityId,
                             ownerId: activityId,
                             priority: p.title,
-                            priorityId: p.id,
+                            priorityId: p.value,
                             participants: {
                                 connect:
                                     Math.random() > 0.5
