@@ -18,6 +18,7 @@ interface IssueListItemProps {
         } | null;
     };
     size?: React.ComponentProps<typeof Text>['size'];
+    strike?: boolean;
     className?: string;
 }
 
@@ -41,7 +42,7 @@ const StyledDotWrapper = styled.div<{ size: IssueListItemProps['size'] }>`
     padding-right: ${({ size }) => (size === 'xs' ? gapXs : gapS)};
 `;
 
-export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, size = 's' }) => {
+export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, size = 's', strike }) => {
     return (
         <NextLink passHref href={routes.goal(issue._shortId)} legacyBehavior>
             <StyledLink inline>
@@ -51,7 +52,7 @@ export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, 
                             <StateDot title={state.title} hue={state.hue} size={size !== 'xs' ? 'm' : 's'} />
                         </StyledDotWrapper>
                     ))}
-                    <StyledIssueListItemTitle size={size} weight="bold" color="inherit">
+                    <StyledIssueListItemTitle size={size} weight="bold" color="inherit" strike={strike}>
                         {issue.title}
                     </StyledIssueListItemTitle>
                 </StyledIssueListItem>
