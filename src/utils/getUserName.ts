@@ -6,7 +6,9 @@ export interface UserData {
     [key: string]: unknown;
 }
 
-export const getUserName = <T extends UserData>(user: T): string => {
+type UserDataName = Pick<UserData, 'nickname' | 'name' | 'email'>;
+
+export const getUserName = <T extends UserDataName>(user: T): string => {
     return user.nickname || user.name || user.email;
 };
 
@@ -42,7 +44,7 @@ export const prepareUserDataFromActivity = <
     };
 };
 
-export const safeGetUserName = <T extends UserData, V extends { user?: T | null; ghost?: T | null }>(
+export const safeGetUserName = <T extends UserDataName, V extends { user?: T | null; ghost?: T | null }>(
     value?: V | null,
 ): string | undefined => {
     const data = prepareUserDataFromActivity(value);
@@ -54,7 +56,7 @@ export const safeGetUserName = <T extends UserData, V extends { user?: T | null;
     return undefined;
 };
 
-export const safeGetUserEmail = <T extends UserData, V extends { user?: T | null; ghost?: T | null }>(
+export const safeGetUserEmail = <T extends UserDataName, V extends { user?: T | null; ghost?: T | null }>(
     value: V | null | undefined,
     compareWithName = true,
 ) => {
