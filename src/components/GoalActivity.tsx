@@ -18,6 +18,7 @@ import {
     HistoryRecordProject,
     HistoryRecordLongTextChange,
     HistoryRecordCriteria,
+    HistoryRecordPartnerProject,
 } from './HistoryRecord/HistoryRecord';
 
 interface GoalActivityProps {
@@ -102,6 +103,12 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                                     )}
                                     {value.subject === 'project' && (
                                         <HistoryRecordProject
+                                            from={excludeString(value.previousValue)}
+                                            to={excludeString(value.nextValue)}
+                                        />
+                                    )}
+                                    {value.subject === 'partnerProject' && (
+                                        <HistoryRecordPartnerProject
                                             from={excludeString(value.previousValue)}
                                             to={excludeString(value.nextValue)}
                                         />

@@ -206,6 +206,7 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
             goalInProgress: tr('goal in progress'),
             complete: '',
             uncomplete: '',
+            partnerProject: tr('partner project'),
         };
     }, []);
 
@@ -219,6 +220,7 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
                     <StyledCircledIcon as={IconDoubleCaretRightCircleSolid} size="m" color={gray7} />
                 </Circle>
                 <StyledHistoryRecordWrapper>
+                    {/* FIXME: it must be UserBadge */}
                     <UserPic size={18} src={author?.image} email={author?.email} />
                     <StyledTextWrapper multiline={subject.toString() === 'description'}>
                         {nullable(author, (data) => (
@@ -291,8 +293,12 @@ export const HistoryRecordTags: React.FC<HistoryChangeProps<TagData[]>> = ({ fro
     return (
         <HistorySimplifyRecord
             withPretext={added.length > 0 && removed.length > 0}
-            from={removed.length ? <HistoryTags tags={removed} /> : null}
-            to={added.length ? <HistoryTags tags={added} /> : null}
+            from={nullable(removed, (rem) => (
+                <HistoryTags tags={rem} />
+            ))}
+            to={nullable(added, (add) => (
+                <HistoryTags tags={add} />
+            ))}
         />
     );
 };
@@ -300,29 +306,41 @@ export const HistoryRecordTags: React.FC<HistoryChangeProps<TagData[]>> = ({ fro
 export const HistoryRecordEstimate: React.FC<HistoryChangeProps<string>> = ({ from, to }) => {
     const locale = useLocale();
 
-    const fromEstimate = from ? decodeHistoryEstimate(from) : null;
-    const toEstimate = to ? decodeHistoryEstimate(to) : null;
-
     return (
+        // FIXME: it must be EstimateBadge
         <HistorySimplifyRecord
-            from={
-                fromEstimate ? (
-                    <Tag size="s">{formateEstimate(fromEstimate.date, { locale, type: fromEstimate?.type })}</Tag>
-                ) : null
-            }
-            to={
-                toEstimate ? (
-                    <Tag size="s">{formateEstimate(toEstimate.date, { locale, type: toEstimate?.type })}</Tag>
-                ) : null
-            }
+            from={nullable(from ? decodeHistoryEstimate(from) : null, (fe) => (
+                <Tag size="s">{formateEstimate(fe.date, { locale, type: fe.type })}</Tag>
+            ))}
+            to={nullable(to ? decodeHistoryEstimate(to) : null, (te) => (
+                <Tag size="s">{formateEstimate(te.date, { locale, type: te.type })}</Tag>
+            ))}
         />
     );
 };
 
 export const HistoryRecordProject: React.FC<HistoryChangeProps<Project>> = ({ from, to }) => (
+    // FIXME: it must be ProjectBadge
     <HistorySimplifyRecord
-        from={from ? <Tag size="s">{from.id}</Tag> : null}
-        to={to ? <Tag size="s">{to.id}</Tag> : null}
+        from={nullable(from, (f) => (
+            <Tag size="s">{f.id}</Tag>
+        ))}
+        to={nullable(to, (t) => (
+            <Tag size="s">{t.id}</Tag>
+        ))}
+    />
+);
+
+export const HistoryRecordPartnerProject: React.FC<HistoryChangeProps<Project>> = ({ from, to }) => (
+    // FIXME: it must be ProjectBadge
+    <HistorySimplifyRecord
+        withPretext={false}
+        from={nullable(from, (f) => (
+            <Tag size="s">{f.id}</Tag>
+        ))}
+        to={nullable(to, (t) => (
+            <Tag size="s">{t.id}</Tag>
+        ))}
     />
 );
 
@@ -377,20 +395,16 @@ export const HistoryRecordTextChange: React.FC<HistoryChangeProps<string>> = ({ 
 
 export const HistoryRecordPriority: React.FC<HistoryChangeProps<Priority>> = ({ from, to }) => (
     <HistorySimplifyRecord
-        from={
-            from ? (
-                <Text size="xs" weight="bold">
-                    {getPriorityText(from)}
-                </Text>
-            ) : null
-        }
-        to={
-            to ? (
-                <Text size="xs" weight="bold">
-                    {getPriorityText(to)}
-                </Text>
-            ) : null
-        }
+        from={nullable(from, (f) => (
+            <Text size="xs" weight="bold">
+                {getPriorityText(f)}
+            </Text>
+        ))}
+        to={nullable(to, (t) => (
+            <Text size="xs" weight="bold">
+                {getPriorityText(t)}
+            </Text>
+        ))}
     />
 );
 
@@ -403,8 +417,12 @@ const HistoryDottedState: React.FC<{ title: string; hue: number }> = ({ title, h
 
 export const HistoryRecordState: React.FC<HistoryChangeProps<StateData>> = ({ from, to }) => (
     <HistorySimplifyRecord
-        from={from ? <HistoryDottedState title={from.title} hue={from.hue} /> : null}
-        to={to ? <HistoryDottedState title={to.title} hue={to.hue} /> : null}
+        from={nullable(from, (f) => (
+            <HistoryDottedState title={f.title} hue={f.hue} />
+        ))}
+        to={nullable(to, (t) => (
+            <HistoryDottedState title={t.title} hue={t.hue} />
+        ))}
     />
 );
 

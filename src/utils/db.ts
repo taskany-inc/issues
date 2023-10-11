@@ -145,6 +145,8 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                         return prisma.state.findMany({ where: query.where });
                     case 'project':
                         return prisma.project.findMany({ where: query.where });
+                    case 'partnerProject':
+                        return prisma.project.findMany({ where: query.where });
                     case 'criteria':
                         return prisma.goalAchieveCriteria.findMany({
                             where: query.where,
