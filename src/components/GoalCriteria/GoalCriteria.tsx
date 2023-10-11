@@ -218,6 +218,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
             actions={availableActions}
             onActionClick={handleChange}
             item={itemToRender}
+            align="center"
             rawIcon={
                 goalAsCriteria ? undefined : (
                     <GoalCriteriaCheckBox onClick={onToggle} checked={item.isDone} canEdit={canEdit} />
