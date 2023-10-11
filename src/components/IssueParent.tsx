@@ -1,11 +1,12 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import NextLink from 'next/link';
 import { gapM, gapS, gray9 } from '@taskany/colors';
 import { Text, Link, nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 import { issuePageHeaderParent } from '../utils/domObjects';
+
+import { NextLink } from './NextLink';
 
 interface Parent {
     id?: string;
