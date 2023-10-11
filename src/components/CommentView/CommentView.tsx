@@ -199,15 +199,13 @@ export const CommentView: FC<CommentViewProps> = ({
     }, [description, onCancel]);
 
     const dropdownItems = useMemo(() => {
-        const items = navigator?.clipboard
-            ? [
-                  {
-                      label: tr('Copy raw'),
-                      icon: <StyledIconClipboardOutline size="xxs" />,
-                      onClick: () => notifyPromise(copyValue(descriptionRef.current), 'copy'),
-                  },
-              ]
-            : [];
+        const items = [
+            {
+                label: tr('Copy raw'),
+                icon: <StyledIconClipboardOutline size="xxs" />,
+                onClick: () => notifyPromise(copyValue(descriptionRef.current), 'copy'),
+            },
+        ];
 
         if (canEdit) {
             return [
