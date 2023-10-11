@@ -10,10 +10,6 @@ const StyledInputWrapper = styled.div`
     margin-bottom: ${gapS};
 `;
 
-const StyledAutoCompleteInput = styled(AutoCompleteInput)`
-    display: inline-block;
-`;
-
 interface FilterAutoCompleteInputProps extends React.ComponentProps<typeof AutoCompleteInput> {
     placeholder?: never;
     iconLeft?: never;
@@ -22,11 +18,7 @@ interface FilterAutoCompleteInputProps extends React.ComponentProps<typeof AutoC
 export const FilterAutoCompleteInput: React.FC<FilterAutoCompleteInputProps> = (props) => {
     return (
         <StyledInputWrapper>
-            <StyledAutoCompleteInput
-                placeholder={tr('Search...')}
-                iconLeft={<IconSearchOutline size="s" />}
-                {...props}
-            />
+            <AutoCompleteInput placeholder={tr('Search...')} iconLeft={<IconSearchOutline size="s" />} {...props} />
         </StyledInputWrapper>
     );
 };
