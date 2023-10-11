@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import NextLink from 'next/link';
 import { gapS } from '@taskany/colors';
 import { Text, Link } from '@taskany/bricks';
 
 import { issuePageHeaderTitle } from '../utils/domObjects';
+
+import { NextLink } from './NextLink';
 
 interface IssueTitleProps {
     title: string;
