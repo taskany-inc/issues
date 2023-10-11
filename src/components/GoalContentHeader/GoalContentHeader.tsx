@@ -45,19 +45,15 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
         notifyPromise(copyValue(description), 'copy');
     }, [copyValue, description]);
 
-    const dropdownItems = useMemo(
-        () =>
-            navigator?.clipboard
-                ? [
-                      {
-                          label: tr('Copy raw'),
-                          icon: <StyledIconClipboardOutline size="xxs" />,
-                          onClick: onCopyDescription,
-                      },
-                  ]
-                : [],
-        [onCopyDescription],
-    );
+    const dropdownItems = useMemo(() => {
+        return [
+            {
+                label: tr('Copy raw'),
+                icon: <StyledIconClipboardOutline size="xxs" />,
+                onClick: onCopyDescription,
+            },
+        ];
+    }, [onCopyDescription]);
 
     return (
         <Card>
