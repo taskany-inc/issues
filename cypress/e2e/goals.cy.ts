@@ -189,7 +189,7 @@ describe('Goals', () => {
             beforeEach(() => {
                 cy.intercept('/api/trpc/goal.create?*', (req) => {
                     req.on('after:response', (res) => {
-                        Cypress.env('createdGoal', res.body[0].result.data.json);
+                        Cypress.env('createdGoal', res.body[0].result.data);
                     });
                 }).as('lastCreatedGoal');
                 cy.intercept('/_next/data/**/*.json?*').as('goalPage');

@@ -90,7 +90,7 @@ export const initDb = (on: DbPluginEvents) => {
         },
 
         'db:remove:goal': async ({ id }) => {
-            await prisma.goal.deleteMany({ where: { id } });
+            await prisma.goal.delete({ where: { id } });
             return null;
         },
     });
