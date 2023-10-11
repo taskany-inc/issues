@@ -76,16 +76,9 @@ const StyledHistoryRecordWrapper = styled.div`
     flex-wrap: nowrap;
 `;
 
-const StyledIssueListItem = styled(IssueListItem)<{ strike?: boolean }>`
+const StyledIssueListItem = styled(IssueListItem)`
     padding: 0;
     font-size: 12px;
-
-    ${({ strike }) =>
-        strike &&
-        css`
-            text-decoration: line-through;
-            opacity: 0.7;
-        `}
 
     & + &::before {
         content: ',';
@@ -95,18 +88,6 @@ const StyledIssueListItem = styled(IssueListItem)<{ strike?: boolean }>`
     a {
         display: inline-flex;
     }
-`;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledText = styled(({ strike, ...props }: React.ComponentProps<typeof Text> & { strike?: boolean }) => (
-    <Text {...props} />
-))<React.ComponentProps<typeof Text> & { strike?: boolean }>`
-    ${({ strike }) =>
-        strike &&
-        css`
-            text-decoration: line-through;
-            opacity: 0.7;
-        `}
 `;
 
 const StyledTextWrapper = styled.div<{ multiline?: boolean }>`
@@ -364,14 +345,14 @@ export const HistoryRecordLongTextChange: React.FC<HistoryChangeProps<string>> =
             {viewDestiption && (
                 <HistoryMultilineRecord
                     from={nullable(from, () => (
-                        <StyledText as="span" size="xs" strike>
+                        <Text as="span" size="xs" strike>
                             {from}
-                        </StyledText>
+                        </Text>
                     ))}
                     to={nullable(to, () => (
-                        <StyledText as="span" size="xs">
+                        <Text as="span" size="xs">
                             {to}
-                        </StyledText>
+                        </Text>
                     ))}
                 />
             )}
@@ -383,12 +364,12 @@ export const HistoryRecordTextChange: React.FC<HistoryChangeProps<string>> = ({ 
     return (
         <HistorySimplifyRecord
             from={nullable(from, () => (
-                <StyledText size="xs" strike>
+                <Text size="xs" strike>
                     {from}
-                </StyledText>
+                </Text>
             ))}
             to={nullable(to, () => (
-                <StyledText size="xs">{to}</StyledText>
+                <Text size="xs">{to}</Text>
             ))}
         />
     );
@@ -475,9 +456,9 @@ const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ goalAsCriteria, tit
     }
 
     return (
-        <StyledText size="xs" weight="bold" strike={strike}>
+        <Text size="xs" weight="bold" strike={strike}>
             {title}
-        </StyledText>
+        </Text>
     );
 };
 
@@ -523,9 +504,7 @@ export const HistoryRecordCriteria: React.FC<
                     <HistoryRecordCriteriaItem {...val} strike={action === 'remove'} />
                     {val?.goalAsCriteria && <Text size="xs">{tr('as criteria')}</Text>}
                     {nullable(isChangeAction, () => (
-                        <StyledText size="xs">
-                            {tr(action === 'complete' ? 'as completed' : 'as uncompleted')}
-                        </StyledText>
+                        <Text size="xs">{tr(action === 'complete' ? 'as completed' : 'as uncompleted')}</Text>
                     ))}
                 </>
             ))}
