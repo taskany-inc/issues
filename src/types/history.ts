@@ -8,6 +8,7 @@ export const subjectToTableNameMap = {
     participants: true,
     state: true,
     criteria: true,
+    partnerProject: true,
 };
 
 export type HistoryRecordSubject = { [K in keyof typeof subjectToTableNameMap]: string };
@@ -20,6 +21,7 @@ export interface HistoryRecordMeta {
     participants: Activity & { user: User | null; ghost: Ghost | null };
     state: State;
     criteria: GoalAchieveCriteria & { goalAsCriteria: Goal & { state: State | null } };
+    partnerProject: Project;
 }
 
 export type HistoryAction = 'add' | 'change' | 'remove' | 'delete' | 'edit' | 'complete' | 'uncomplete';
@@ -49,6 +51,7 @@ type HistoryRecord =
                 previousValue?: string;
                 nextValue?: string;
             }
+          | HistoryValuesBySubject<'partnerProject'>
       ));
 
 export type HistoryRecordWithActivity = HistoryRecord & { activity: Activity & { user: User | null } };

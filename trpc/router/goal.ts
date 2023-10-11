@@ -1303,7 +1303,7 @@ export const goal = router({
                         },
                         history: {
                             create: {
-                                subject: 'partner project',
+                                subject: 'partnerProject',
                                 action: 'add',
                                 nextValue: input.projectId,
                                 activityId: ctx.session.user.activityId,
@@ -1332,7 +1332,7 @@ export const goal = router({
                         },
                         history: {
                             create: {
-                                subject: 'partner project',
+                                subject: 'partnerProject',
                                 action: 'remove',
                                 previousValue: input.projectId,
                                 activityId: ctx.session.user.activityId,

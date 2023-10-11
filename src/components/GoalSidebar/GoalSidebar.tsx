@@ -138,7 +138,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoa
                                 placement="bottom-start"
                                 placeholder={tr('Type user name or email')}
                                 filter={participantsFilter}
-                                onChange={(activity) => onGoalParticipantAdd(activity)}
+                                onChange={onGoalParticipantAdd}
                                 renderTrigger={(props) => (
                                     <AddInlineTrigger text={tr('Add participant')} onClick={props.onClick} />
                                 )}
