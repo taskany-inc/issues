@@ -166,7 +166,7 @@ model Project {
 }
 
 model Priority {
-  id    Int    @id @default(autoincrement())
+  id    String @id @default(cuid())
   title String
   value Int
   Goal  Goal[]
@@ -182,9 +182,8 @@ model Goal {
   personal                Boolean?
   private                 Boolean?
   archived                Boolean?              @default(false)
-  priority                String?
-  priorityExact           Priority?             @relation(fields: [priorityId], references: [id])
-  priorityId              Int?
+  priority                Priority?             @relation(fields: [priorityId], references: [id])
+  priorityId              String?
   estimate                DateTime?
   estimateType            DateType?
   project                 Project?              @relation("projectGoals", fields: [projectId], references: [id])
