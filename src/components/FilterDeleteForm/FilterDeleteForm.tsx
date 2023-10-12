@@ -11,7 +11,7 @@ import { tr } from './FilterDeleteForm.i18n';
 interface FilterDeleteFormProps {
     preset: FilterById;
 
-    onSubmit: (preset: FilterById) => void;
+    onSubmit: (params: string) => void;
     onCancel: () => void;
 }
 
@@ -23,7 +23,7 @@ const FilterDeleteForm: React.FC<FilterDeleteFormProps> = ({ preset, onSubmit, o
             const [data, err] = await deleteFilter(preset.id);
 
             if (data) {
-                onSubmit(preset);
+                onSubmit(preset.params);
             } else if (err) {
                 Sentry.captureException(err);
             }

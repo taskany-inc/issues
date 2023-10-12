@@ -6,8 +6,6 @@ import * as Sentry from '@sentry/nextjs';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFilterSchema, CreateFilter } from '../../schema/filter';
-import { Nullish, Void } from '../../types/void';
-import { FilterById } from '../../../trpc/inferredTypes';
 import { useFilterResource } from '../../hooks/useFilterResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 
@@ -17,7 +15,7 @@ interface FilterCreateFormProps {
     mode: CreateFilter['mode'];
     params: CreateFilter['params'];
 
-    onSubmit?: Void<Nullish<FilterById>>;
+    onSubmit?: (id: string) => void;
 }
 
 const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSubmit }) => {
@@ -48,7 +46,7 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
             const [data, err] = await createFilter(form);
 
             if (data && !err) {
-                onSubmit?.(data);
+                onSubmit?.(data.id);
             }
         },
         [createFilter, onSubmit],
