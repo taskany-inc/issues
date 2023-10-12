@@ -1,8 +1,7 @@
-import React, { FC, useCallback, useMemo, useRef } from 'react';
+import React, { FC, useCallback, useRef } from 'react';
 import styled from 'styled-components';
-import { danger0 } from '@taskany/colors';
-import { Button, Dot, Dropdown, MenuItem, ModalContent, ModalHeader, ModalPreview, nullable } from '@taskany/bricks';
-import { IconMoreVerticalOutline, IconBinOutline, IconEditOutline } from '@taskany/icons';
+import { Button, Dot, ModalContent, ModalHeader, ModalPreview, nullable } from '@taskany/bricks';
+import { IconEditOutline } from '@taskany/icons';
 
 import { routes } from '../../hooks/router';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
@@ -12,6 +11,8 @@ import { GoalHeader } from '../GoalHeader';
 import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
 import { GoalActivityFeed } from '../GoalActivityFeed';
 import { IssueParent } from '../IssueParent';
+import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
+import { TagObject } from '../../types/tag';
 
 import { useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
@@ -24,6 +25,12 @@ interface GoalPreviewProps {
     onDelete?: () => void;
 }
 
+const StyledModalWrapper = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    overflow: auto;
+`;
+
 const StyledModalHeader = styled(ModalHeader)`
     top: 0;
     position: sticky;
@@ -32,40 +39,67 @@ const StyledModalHeader = styled(ModalHeader)`
 `;
 
 const StyledModalContent = styled(ModalContent)`
-    overflow: auto;
+    z-index: 2; // needed that dropdowns will be upper than sidebar
+`;
+
+const StyledStickyModalContent = styled(ModalContent)`
+    position: sticky;
+    top: 0;
+    height: fit-content;
 `;
 
 const StyledModalPreview = styled(ModalPreview)`
+    width: 850px;
     display: flex;
     flex-direction: column;
 `;
 
 const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults, onClose, onDelete }) => {
+    const { setPreview } = useGoalPreview();
     const onPreviewClose = useCallback(() => {
         onClose?.();
     }, [onClose]);
 
-    const onEditMenuChange = useCallback((item: { onClick: () => void }) => {
-        item.onClick?.();
-    }, []);
+    const { goalProjectChange, onGoalStateChange, goalTagsUpdate, invalidate } = useGoalResource(
+        { id: goal?.id },
+        { invalidate: { getById: shortId } },
+    );
 
-    const { onGoalStateChange } = useGoalResource({ id: goal?.id }, { invalidate: { getById: shortId } });
+    // FIXME https://github.com/taskany-inc/issues/issues/1853
+    const onGoalTagAdd = useCallback(
+        async (value: TagObject[]) => {
+            if (!goal) return;
 
-    const goalEditMenuItems = useMemo(
-        () => [
-            {
-                label: tr('Edit'),
-                icon: <IconEditOutline size="xxs" />,
-                onClick: dispatchModalEvent(ModalEvent.GoalEditModal),
-            },
-            {
-                label: tr('Delete'),
-                color: danger0,
-                icon: <IconBinOutline size="xxs" />,
-                onClick: dispatchModalEvent(ModalEvent.GoalDeleteModal),
-            },
-        ],
-        [],
+            await goalTagsUpdate([...goal.tags, ...value]);
+
+            invalidate();
+        },
+        [goal, invalidate, goalTagsUpdate],
+    );
+
+    const onGoalTagRemove = useCallback(
+        (value: TagObject) => async () => {
+            if (!goal) return;
+
+            const tags = goal.tags.filter((tag) => tag.id !== value.id);
+            await goalTagsUpdate(tags);
+
+            invalidate();
+        },
+        [goal, invalidate, goalTagsUpdate],
+    );
+
+    const onGoalTransfer = useCallback(
+        async (project?: { id: string }) => {
+            if (!project) return;
+
+            const transferedGoal = await goalProjectChange(project.id);
+
+            if (transferedGoal) {
+                setPreview(transferedGoal._shortId, transferedGoal);
+            }
+        },
+        [goalProjectChange, setPreview],
     );
 
     const commentsRef = useRef<HTMLDivElement>(null);
@@ -86,29 +120,10 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                     actions={nullable(goal?._isEditable, () => (
                         <>
                             <div />
-                            <Dropdown
-                                onChange={onEditMenuChange}
-                                items={goalEditMenuItems}
-                                renderTrigger={({ ref, onClick }) => (
-                                    <Button
-                                        ref={ref}
-                                        ghost
-                                        iconLeft={<IconMoreVerticalOutline size="xs" />}
-                                        onClick={onClick}
-                                    />
-                                )}
-                                renderItem={({ item, cursor, index, onClick }) => (
-                                    <MenuItem
-                                        key={item.label}
-                                        ghost
-                                        color={item.color}
-                                        focused={cursor === index}
-                                        icon={item.icon}
-                                        onClick={onClick}
-                                    >
-                                        {item.label}
-                                    </MenuItem>
-                                )}
+                            <Button
+                                text={tr('Edit')}
+                                iconLeft={<IconEditOutline size="xs" />}
+                                onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
                             />
                         </>
                     ))}
@@ -126,15 +141,27 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                     ))}
                 </GoalHeader>
             </StyledModalHeader>
-            <StyledModalContent>
-                {nullable(goal, (g) => (
-                    <GoalContentHeader date={g.createdAt} description={g.description} />
-                ))}
+            <StyledModalWrapper>
+                <StyledModalContent>
+                    {nullable(goal, (g) => (
+                        <GoalContentHeader date={g.createdAt} description={g.description} />
+                    ))}
 
-                {nullable(goal, (g) => (
-                    <GoalActivityFeed ref={commentsRef} goal={g} shortId={shortId} onGoalDeleteConfirm={onDelete} />
-                ))}
-            </StyledModalContent>
+                    {nullable(goal, (g) => (
+                        <GoalActivityFeed ref={commentsRef} goal={g} shortId={shortId} onGoalDeleteConfirm={onDelete} />
+                    ))}
+                </StyledModalContent>
+                <StyledStickyModalContent>
+                    {nullable(goal, (g) => (
+                        <GoalSidebar
+                            goal={g}
+                            onGoalTagRemove={onGoalTagRemove}
+                            onGoalTagAdd={onGoalTagAdd}
+                            onGoalTransfer={onGoalTransfer}
+                        />
+                    ))}
+                </StyledStickyModalContent>
+            </StyledModalWrapper>
         </StyledModalPreview>
     );
 };

@@ -7,14 +7,9 @@ import { IconTagOutline } from '@taskany/icons';
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
 import { tagsCombobox } from '../utils/domObjects';
+import { TagObject } from '../types/tag';
 
 import { CommonCombobox } from './CommonCombobox';
-
-interface TagObject {
-    id: string;
-    title: string;
-    description?: string | null;
-}
 
 interface TagComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
