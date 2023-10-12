@@ -53,8 +53,6 @@ export const filter = router({
             _isOwner: false,
             _isStarred: filter.stargizers.some((stargizer) => stargizer.id === ctx.session.user.activityId),
         };
-
-        return;
     }),
     getUserFilters: protectedProcedure.query(({ ctx }) => {
         const { activityId } = ctx.session.user;

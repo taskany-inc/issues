@@ -18,7 +18,12 @@ import {
     batchGoalByProjectIdSchema,
     togglePartnerProjectSchema,
 } from '../../src/schema/goal';
-import { ToggleSubscriptionSchema, suggestionsQuerySchema, queryWithFiltersSchema } from '../../src/schema/common';
+import {
+    ToggleSubscriptionSchema,
+    suggestionsQuerySchema,
+    queryWithFiltersSchema,
+    batchGoalsSchema,
+} from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import {
     createGoal,
@@ -41,7 +46,7 @@ import {
 import type { FieldDiff } from '../../src/types/common';
 import { encodeHistoryEstimate, formateEstimate } from '../../src/utils/dateTime';
 import { goalAccessMiddleware, commentAccessMiddleware, criteriaAccessMiddleware } from '../access/accessMiddlewares';
-import { addCalculatedProjectFields } from '../queries/project';
+import { addCalculatedProjectFields, nonArchivedPartialQuery } from '../queries/project';
 
 const updateProjectUpdatedAt = async (id?: string | null) => {
     if (!id) return;
@@ -99,15 +104,28 @@ export const goal = router({
                 },
             });
         }),
-    getBatch: protectedProcedure
-        .input(
-            z.object({
-                query: queryWithFiltersSchema.optional(),
-                limit: z.number(),
-                cursor: z.string().nullish(),
-                skip: z.number().optional(),
+    getGoalsCount: protectedProcedure.input(batchGoalsSchema.pick({ query: true })).query(async ({ input, ctx }) => {
+        const { query } = input;
+        const { activityId } = ctx.session.user;
+        const [count, filtered] = await Promise.all([
+            prisma.goal.count({
+                where: {
+                    archived: {
+                        not: true,
+                    },
+                },
             }),
-        )
+            prisma.goal.count({
+                where: query ? goalsFilter(query, activityId).where : nonArchivedPartialQuery,
+            }),
+        ]);
+        return {
+            count,
+            filtered,
+        };
+    }),
+    getBatch: protectedProcedure
+        .input(batchGoalsSchema)
         .query(async ({ ctx, input: { query, limit, skip, cursor } }) => {
             const { activityId, role } = ctx.session.user;
 
@@ -1467,5 +1485,79 @@ export const goal = router({
                     cause: error,
                 });
             }
+        }),
+    getGoalList: protectedProcedure
+        .input(
+            z.object({
+                query: queryWithFiltersSchema.optional(),
+                limit: z.number(),
+                cursor: z.string().nullish(),
+                skip: z.number().optional(),
+                grouped: z.boolean().optional(),
+            }),
+        )
+        .query(async ({ input, ctx }) => {
+            const { cursor, limit, query, skip, grouped: _ } = input;
+            const { activityId, role } = ctx.session.user;
+
+            const countGetter = prisma.goal.count();
+            const projectsGetter = prisma.project.findMany({
+                select: { id: true, parent: { select: { id: true } }, children: { select: { id: true } } },
+            });
+            const goalsGetter = prisma.goal.findMany({
+                take: limit + 1,
+                skip,
+                cursor: cursor ? { id: cursor } : undefined,
+                ...(query ? goalsFilter(query, activityId) : {}),
+                orderBy: {
+                    id: 'asc',
+                },
+                include: {
+                    ...goalDeepQuery,
+                },
+            });
+
+            const [goals, projects, count] = await Promise.all([goalsGetter, projectsGetter, countGetter]);
+
+            let nextCursor: typeof cursor | undefined;
+
+            if (goals.length > limit) {
+                const nextItem = goals.pop(); // return the last item from the array
+                nextCursor = nextItem?.id;
+            }
+
+            const _projectsMap = projects.reduce<Record<string, { parent?: string[]; children?: string[] }>>(
+                (acc, project) => {
+                    acc[project.id] = {
+                        parent: project.parent.map(({ id }) => id),
+                        children: project.children.map(({ id }) => id),
+                    };
+
+                    for (const p of project.parent) {
+                        acc[p.id] = {
+                            children: [project.id],
+                        };
+                    }
+
+                    for (const p of project.children) {
+                        acc[p.id] = {
+                            parent: [project.id],
+                        };
+                    }
+
+                    return acc;
+                },
+                {},
+            );
+
+            return {
+                items: goals.map((g) => ({
+                    ...g,
+                    ...addCalclulatedGoalsFields(g, activityId, role),
+                    _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
+                })),
+                nextCursor,
+                meta: { count },
+            };
         }),
 });
