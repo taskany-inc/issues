@@ -26,6 +26,7 @@ import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
 import { GoalActivityFeed } from '../GoalActivityFeed';
 import { IssueParent } from '../IssueParent';
 import { issuePage } from '../../utils/domObjects';
+import { TagObject } from '../../types/tag';
 
 import { tr } from './GoalPage.i18n';
 
@@ -34,12 +35,6 @@ const GoalContent = styled(PageContent)`
     grid-template-columns: 7fr 5fr;
     gap: ${gapM};
 `;
-
-interface TagObject {
-    id: string;
-    title: string;
-    description?: string | null;
-}
 
 export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
