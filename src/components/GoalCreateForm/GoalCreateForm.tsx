@@ -56,6 +56,9 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
     const [createGoalType, setСreateGoalType] = useState<number>(goalCreateFormActionCache || 3);
     const utils = trpc.useContext();
     const { goalCreate } = useGoalResource({});
+    // FIXME https://github.com/taskany-inc/issues/issues/1834
+    const { data: priorities } = trpc.priority.getAll.useQuery();
+    const defaultPriority = priorities?.at(-2);
 
     const createOptions = [
         {
@@ -130,8 +133,8 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
             validitySchema={goalCommonSchema}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
             parent={currentProjectCache || lastProjectCache || undefined}
-            priority="Medium"
-            onSumbit={createGoal}
+            priority={defaultPriority ?? undefined}
+            onSubmit={createGoal}
             title={title}
             actionButton={
                 <>

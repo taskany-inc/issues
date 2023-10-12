@@ -70,7 +70,11 @@ export const goalCommonSchema = z.object({
         hue: z.number().optional(),
         title: z.string().optional(),
     }),
-    priority: z.string().nullable().optional(),
+    priority: z.object({
+        id: z.string(),
+        title: z.string(),
+        value: z.number(),
+    }),
     estimate: z
         .object({
             date: z.string(),
@@ -142,7 +146,11 @@ export const goalUpdateSchema = z.object({
             StateType.NotStarted,
         ]),
     }),
-    priority: z.string().nullable(),
+    priority: z.object({
+        id: z.string(),
+        title: z.string(),
+        value: z.number(),
+    }),
     estimate: z
         .object({
             date: z.string(),

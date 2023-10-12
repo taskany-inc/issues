@@ -69,7 +69,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             priority={goal.priority ?? undefined}
             tags={goal.tags}
             estimate={estimateValue}
-            onSumbit={updateGoal}
+            onSubmit={updateGoal}
             actionButton={
                 <>
                     <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />

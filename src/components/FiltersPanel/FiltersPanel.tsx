@@ -153,6 +153,7 @@ export const FiltersPanel: FC<{
             useQueryOptions,
         );
         const { data: states = [] } = trpc.state.all.useQuery();
+        const { data: priorities = [] } = trpc.priority.getAll.useQuery();
 
         const setPartialQueryByKey = useCallback(<K extends keyof QueryState>(key: K) => {
             return (value: QueryState[K]) => {
@@ -260,6 +261,7 @@ export const FiltersPanel: FC<{
                     <PriorityFilter
                         text={tr('Priority')}
                         value={filterQuery?.priority}
+                        priorities={priorities}
                         onChange={setPartialQueryByKey('priority')}
                     />
 

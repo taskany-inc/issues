@@ -89,7 +89,13 @@ export const goalsFilter = (
     where: Prisma.GoalFindManyArgs['where'];
     orderBy: Prisma.GoalFindManyArgs['orderBy'];
 } => {
-    const priorityFilter = data.priority?.length ? { priority: { in: data.priority } } : {};
+    const priorityFilter = data.priority?.length
+        ? {
+              priority: {
+                  id: { in: data.priority },
+              },
+          }
+        : {};
 
     const statesFilter: Prisma.GoalFindManyArgs['where'] = getStateFilter(data);
 
@@ -184,7 +190,9 @@ export const goalsFilter = (
 
     if (data.sort?.priority) {
         orderBy.push({
-            priorityId: data.sort.priority,
+            priority: {
+                value: data.sort.priority,
+            },
         });
     }
 
@@ -308,6 +316,7 @@ export const goalDeepQuery = {
     },
     tags: true,
     state: true,
+    priority: true,
     project: {
         include: {
             parent: true,
@@ -609,13 +618,13 @@ export const calcGoalsMeta = (goals: any[]) => {
     const uniqOwners = new Map();
     const uniqParticipants = new Map();
     const uniqIssuers = new Map();
-    const uniqPriority = new Set<string>();
+    const uniqPriority = new Map();
     const uniqStates = new Map();
     const uniqProjects = new Map();
 
     goals.forEach((goal: any) => {
         goal.state && uniqStates.set(goal.state?.id, goal.state);
-        goal.priority && uniqPriority.add(goal.priority);
+        goal.priority && uniqPriority.set(goal.priority.id, goal.priority);
 
         goal.tags?.forEach((t: any) => {
             t && uniqTags.set(t.id, t);

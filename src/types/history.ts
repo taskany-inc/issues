@@ -1,4 +1,15 @@
-import { Goal, State, Project, Tag, Activity, GoalHistory, User, GoalAchieveCriteria, Ghost } from '@prisma/client';
+import {
+    Goal,
+    State,
+    Project,
+    Tag,
+    Activity,
+    GoalHistory,
+    User,
+    GoalAchieveCriteria,
+    Ghost,
+    Priority,
+} from '@prisma/client';
 
 export const subjectToTableNameMap = {
     dependencies: true,
@@ -9,6 +20,7 @@ export const subjectToTableNameMap = {
     state: true,
     criteria: true,
     partnerProject: true,
+    priority: true,
 };
 
 export type HistoryRecordSubject = { [K in keyof typeof subjectToTableNameMap]: string };
@@ -22,6 +34,7 @@ export interface HistoryRecordMeta {
     state: State;
     criteria: GoalAchieveCriteria & { goalAsCriteria: Goal & { state: State | null } };
     partnerProject: Project;
+    priority: Priority;
 }
 
 export type HistoryAction = 'add' | 'change' | 'remove' | 'delete' | 'edit' | 'complete' | 'uncomplete';
@@ -46,6 +59,7 @@ type HistoryRecord =
           | HistoryValuesBySubject<'state'>
           | HistoryValuesBySubject<'owner'>
           | HistoryValuesBySubject<'criteria'>
+          | HistoryValuesBySubject<'priority'>
           | {
                 subject: 'title' | 'description' | 'estimate';
                 previousValue?: string;

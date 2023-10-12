@@ -1,5 +1,6 @@
 import { router } from '../trpcBackend';
 
+import { priority } from './priority';
 import { filter } from './filter';
 import { flow } from './flow';
 import { user } from './user';
@@ -24,6 +25,7 @@ export const trpcRouter = router({
     state,
     feedback,
     whatsnew,
+    priority,
 });
 
 export type TrpcRouter = typeof trpcRouter;

@@ -8,6 +8,7 @@ import {
     GoalAchieveCriteria,
     Goal,
     Ghost,
+    Priority,
 } from '@prisma/client';
 import styled, { css } from 'styled-components';
 import { UserPic, Text, Tag, nullable, Button } from '@taskany/bricks';
@@ -17,7 +18,6 @@ import { backgroundColor, gray7 } from '@taskany/colors';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { IssueListItem } from '../IssueListItem';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
-import { Priority } from '../../types/priority';
 import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
@@ -395,16 +395,20 @@ export const HistoryRecordTextChange: React.FC<HistoryChangeProps<string>> = ({ 
 
 export const HistoryRecordPriority: React.FC<HistoryChangeProps<Priority>> = ({ from, to }) => (
     <HistorySimplifyRecord
-        from={nullable(from, (f) => (
-            <Text size="xs" weight="bold">
-                {getPriorityText(f)}
-            </Text>
-        ))}
-        to={nullable(to, (t) => (
-            <Text size="xs" weight="bold">
-                {getPriorityText(t)}
-            </Text>
-        ))}
+        from={
+            from ? (
+                <Text size="xs" weight="bold">
+                    {getPriorityText(from.title)}
+                </Text>
+            ) : null
+        }
+        to={
+            to ? (
+                <Text size="xs" weight="bold">
+                    {getPriorityText(to.title)}
+                </Text>
+            ) : null
+        }
     />
 );
 

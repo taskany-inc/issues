@@ -342,6 +342,7 @@ export const goal = router({
                     project: true,
                     tags: true,
                     goalAsCriteria: true,
+                    priority: true,
                 },
             });
 
@@ -394,15 +395,15 @@ export const goal = router({
                 });
             }
 
-            if (actualGoal.priority !== input.priority) {
+            if (actualGoal.priority?.id !== input.priority.id) {
                 history.push({
                     subject: 'priority',
                     action: 'change',
-                    previousValue: actualGoal.priority,
-                    nextValue: input.priority,
+                    previousValue: actualGoal.priority?.id || null,
+                    nextValue: input.priority.id,
                 });
 
-                updatedFields.priority = [actualGoal.priority, input.priority];
+                updatedFields.priority = [actualGoal.priority?.title, input.priority.title];
             }
 
             if (actualGoal.ownerId !== input.owner.id) {
@@ -449,7 +450,7 @@ export const goal = router({
                         title: input.title,
                         description: input.description,
                         stateId: input.state?.id,
-                        priority: input.priority,
+                        priorityId: input.priority.id,
                         estimate,
                         estimateType,
                         tags: {
