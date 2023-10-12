@@ -17,7 +17,7 @@ import { useRouter } from '../../hooks/router';
 import { StarButton } from '../StarButton/StarButton';
 import { trpc } from '../../utils/trpcClient';
 import { refreshInterval } from '../../utils/config';
-import { ActivityByIdReturnType, GoalAchiveCriteria, GoalDependencyItem } from '../../../trpc/inferredTypes';
+import { GoalAchiveCriteria, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
 import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
@@ -61,17 +61,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         setCurrentProjectCache(null);
     });
 
-    const {
-        goalProjectChange,
-        onGoalStateChange,
-        onGoalWatchingToggle,
-        onGoalStarToggle,
-        goalTagsUpdate,
-        goalOwnerUpdate,
-        invalidate,
-        onGoalParticipantAdd,
-        onGoalParticipantRemove,
-    } = useGoalResource({ id: goal?.id }, { invalidate: { getById: id } });
+    const { goalProjectChange, onGoalStateChange, onGoalWatchingToggle, onGoalStarToggle, goalTagsUpdate, invalidate } =
+        useGoalResource({ id: goal?.id }, { invalidate: { getById: id } });
 
     const onGoalTagAdd = useCallback(
         async (value: TagObject[]) => {
@@ -94,17 +85,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
             invalidate();
         },
         [goal, invalidate, goalTagsUpdate],
-    );
-
-    const onGoalAssigneeChange = useCallback(
-        async (activity?: NonNullable<ActivityByIdReturnType>) => {
-            if (!activity?.user?.activityId) return;
-
-            await goalOwnerUpdate(activity.user.activityId);
-
-            invalidate();
-        },
-        [invalidate, goalOwnerUpdate],
     );
 
     const onGoalTransfer = useCallback(
@@ -227,9 +207,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                 <div>
                     <GoalSidebar
                         goal={goal}
-                        onGoalAssigneeChange={onGoalAssigneeChange}
-                        onGoalParticipantRemove={onGoalParticipantRemove}
-                        onGoalParticipantAdd={onGoalParticipantAdd}
                         onGoalTagRemove={onGoalTagRemove}
                         onGoalTagAdd={onGoalTagAdd}
                         onGoalTransfer={onGoalTransfer}

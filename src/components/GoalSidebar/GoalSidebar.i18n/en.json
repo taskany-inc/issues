@@ -1,14 +1,14 @@
 {
-    "Issuer": "Issuer",
-    "Assignee": "Assignee",
-    "Name/Email": "Name/Email",
-    "Participants": "Participants",
+    "Issuer": "",
+    "Assignee": "",
+    "Participants": "",
     "Type user name or email": "",
-    "Add participant": "Add participant",
-    "Tags": "Tags",
-    "Enter tag title": "Enter tag title",
-    "Add tag": "Add tag",
+    "Add participant": "",
+    "Tags": "",
+    "Enter tag title": "",
+    "Add tag": "",
     "Type project title": "",
     "Transfer goal": "",
-    "Archive goal": "Archive goal"
+    "Archive goal": "",
+    "Not assigned yet": ""
 }

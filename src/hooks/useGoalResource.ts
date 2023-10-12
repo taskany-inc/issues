@@ -386,19 +386,21 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
     );
 
     const goalOwnerUpdate = useCallback(
-        async (ownerId: string) => {
-            if (!id) return;
+        async (activity?: NonNullable<Activity>) => {
+            if (!id || !activity?.id) return;
 
             const promise = updateGoalOwnerMutation.mutateAsync({
                 id,
-                ownerId,
+                ownerId: activity?.id,
             });
 
             await notifyPromise(promise, 'goalsUpdate');
 
+            await invalidate();
+
             return promise;
         },
-        [id, updateGoalOwnerMutation],
+        [id, updateGoalOwnerMutation, invalidate],
     );
 
     return {
