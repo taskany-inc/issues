@@ -11,7 +11,7 @@ import {
     projectSuggestionsSchema,
     projectDeleteSchema,
 } from '../../src/schema/project';
-import { addCalclulatedGoalsFields, calcGoalsMeta, goalDeepQuery, goalsFilter } from '../queries/goals';
+import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
@@ -444,23 +444,9 @@ export const project = router({
             const { activityId, role } = ctx.session.user;
 
             const [allProjectGoals, filtredProjectGoals] = await Promise.all([
-                prisma.goal.findMany({
-                    ...goalsFilter(
-                        {
-                            priority: [],
-                            state: [],
-                            stateType: [],
-                            tag: [],
-                            estimate: [],
-                            owner: [],
-                            project: [],
-                            query: '',
-                        },
-                        activityId,
-                        { projectId: id },
-                    ),
-                    include: {
-                        ...goalDeepQuery,
+                prisma.goal.count({
+                    where: {
+                        projectId: id,
                     },
                 }),
                 prisma.goal.findMany({
@@ -477,7 +463,9 @@ export const project = router({
                     _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
                     ...addCalclulatedGoalsFields(g, activityId, role),
                 })),
-                meta: calcGoalsMeta(allProjectGoals),
+                meta: {
+                    count: allProjectGoals,
+                },
             };
         }),
     create: protectedProcedure
