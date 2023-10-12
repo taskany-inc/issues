@@ -76,7 +76,7 @@ export const GoalHeader: FC<GoalHeaderProps> = ({
                             <IssueStats
                                 estimate={g.estimate}
                                 estimateType={g.estimateType}
-                                priority={g.priority}
+                                priority={g.priority?.title}
                                 achivedCriteriaWeight={g._hasAchievementCriteria ? g._achivedCriteriaWeight : undefined}
                                 comments={g._count?.comments ?? 0}
                                 onCommentsClick={onCommentsClick}

@@ -167,8 +167,6 @@ const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
                     [faker.lorem.words(2), faker.lorem.sentence(5), sample(users).activityId],
                     // eslint-disable-next-line no-loop-func
                 ].map(([title, description, activityId]: string[], index) => {
-                    const p = sample(priority);
-
                     return prisma.goal.create({
                         data: {
                             scopeId: index + 1,
@@ -177,8 +175,7 @@ const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
                             projectId: project.id,
                             activityId,
                             ownerId: activityId,
-                            priority: p.title,
-                            priorityId: p.value,
+                            priorityId: sample(priority).id,
                             participants: {
                                 connect:
                                     Math.random() > 0.5

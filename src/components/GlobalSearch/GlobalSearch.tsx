@@ -162,7 +162,7 @@ export const GlobalSearch = () => {
                                                     gap={10}
                                                     item={{
                                                         title: item.title,
-                                                        priority: item.priority,
+                                                        priority: item.priority?.title,
                                                         state: item.state,
                                                         owner: item.owner,
                                                         issuer: item.activity,
