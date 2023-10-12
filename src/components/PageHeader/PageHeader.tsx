@@ -13,7 +13,7 @@ import {
 } from '@taskany/bricks';
 import { gapM } from '@taskany/colors';
 
-import { header, headerMenu, headerMenuExplore, headerMenuGoals, headerMenuProjects } from '../../utils/domObjects';
+import { header, headerMenu, headerMenuExplore, headerMenuGoals } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
 import { routes, useRouter } from '../../hooks/router';
 import { PageHeaderActionButton } from '../PageHeaderActionButton/PageHeaderActionButton';
@@ -45,20 +45,12 @@ export const PageHeader: FC = () => {
     ];
 
     if (user?.settings?.beta) {
-        links.unshift(
-            {
-                href: routes.goals(),
-                title: tr('Goals'),
-                attr: headerMenuGoals.attr,
-                beta: true,
-            },
-            {
-                href: routes.projects(),
-                title: tr('Projects'),
-                beta: true,
-                attr: headerMenuProjects.attr,
-            },
-        );
+        links.unshift({
+            href: routes.goals(),
+            title: tr('Goals'),
+            attr: headerMenuGoals.attr,
+            beta: true,
+        });
     }
 
     const onUserMenuClick = useCallback(() => (user ? userSettings() : signIn()), [user, userSettings, signIn]);

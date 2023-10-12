@@ -25,11 +25,30 @@ export interface FilterQueryState {
     sort: { [K in SortableProps]?: SortDirection };
 }
 
+const groupByValue = {
+    project: true,
+};
+
+type GroupByParam = keyof typeof groupByValue;
+
 interface BaseQueryState {
     starred: boolean;
     watching: boolean;
+    groupBy?: GroupByParam;
     limit?: number;
 }
+
+const valueIsGroupByParam = (value: string): value is GroupByParam => {
+    return value in groupByValue;
+};
+
+const parseGroupByParam = (value?: string): GroupByParam | undefined => {
+    if (!value) {
+        return undefined;
+    }
+
+    return valueIsGroupByParam(value) ? value : undefined;
+};
 
 export interface QueryState extends BaseQueryState, FilterQueryState {}
 
@@ -63,6 +82,7 @@ export const buildURLSearchParams = ({
     starred,
     watching,
     sort = {},
+    groupBy,
     limit,
 }: Partial<QueryState>): URLSearchParams => {
     const urlParams = new URLSearchParams();
@@ -95,6 +115,8 @@ export const buildURLSearchParams = ({
 
     watching ? urlParams.set('watching', '1') : urlParams.delete('watching');
 
+    groupBy != null ? urlParams.set('groupBy', groupBy) : urlParams.delete('groupBy');
+
     limit ? urlParams.set('limit', limit.toString()) : urlParams.delete('limit');
 
     return urlParams;
@@ -103,6 +125,7 @@ export const buildURLSearchParams = ({
 export const parseBaseValues = (query: ParsedUrlQuery): BaseQueryState => ({
     starred: Boolean(parseInt(parseQueryParam(query.starred?.toString()).toString(), 10)),
     watching: Boolean(parseInt(parseQueryParam(query.watching?.toString()).toString(), 10)),
+    groupBy: parseGroupByParam(query.groupBy?.toString()),
     limit: query.limit ? Number(query.limit) : undefined,
 });
 
@@ -197,7 +220,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         return {
             key:
                 <T extends keyof QueryState>(key: T) =>
-                (value: QueryState[T]) => {
+                (value?: QueryState[T]) => {
                     state[key] = value;
 
                     push(state);
@@ -279,6 +302,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setSortFilter: pushStateProvider.key('sort'),
             setFulltextFilter: pushStateProvider.key('query'),
             setLimitFilter: pushStateProvider.key('limit'),
+            setGroupedView: pushStateProvider.key('groupBy'),
             batchQueryState: pushStateProvider.batch(),
         }),
         [pushStateProvider],

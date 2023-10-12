@@ -1,61 +1,34 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import { nullable, Button, Table } from '@taskany/bricks';
+import { nullable, Table } from '@taskany/bricks';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
-import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { createFilterKeys } from '../../utils/hotkeys';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
-import { useFilterResource } from '../../hooks/useFilterResource';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
-import { Page, PageContent } from '../Page';
+import { Page } from '../Page';
 import { CommonHeader } from '../CommonHeader';
-import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { GoalsGroup } from '../GoalsGroup';
-import { Nullish } from '../../types/void';
 import { trpc } from '../../utils/trpcClient';
-import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
 import { safeGetUserName } from '../../utils/getUserName';
-import { filtersPanelResetButton } from '../../utils/domObjects';
+import { FilteredPage } from '../FilteredPage';
 
 import { tr } from './DashboardPage.i18n';
-
-const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
-const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
-const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
 export const projectsLimit = 5;
 
 export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
-    const router = useRouter();
-    const { toggleFilterStar } = useFilterResource();
-
     const utils = trpc.useContext();
 
     const { preset, shadowPreset, userFilters } = useFiltersPreset({ defaultPresetFallback });
 
-    const {
-        queryFilterState,
-        currentPreset,
-        queryState,
-        queryString,
-        setTagsFilterOutside,
-        setStarredFilter,
-        setWatchingFilter,
-        setFulltextFilter,
-        setLimitFilter,
-        resetQueryState,
-        setPreset,
-        batchQueryState,
-    } = useUrlFilterParams({
+    const { currentPreset, queryState, setTagsFilterOutside, setPreset } = useUrlFilterParams({
         preset,
     });
 
@@ -81,7 +54,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             return acc;
         }, []);
 
-        return [gr, gr?.flatMap((group) => group.goals), pages?.[0]?.totalGoalsCount];
+        return [gr, gr.flatMap((group) => group.goals), pages?.[0]?.totalGoalsCount];
     }, [pages]);
 
     useFMPMetric(!!data);
@@ -108,39 +81,8 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
     const onFilterStar = useCallback(async () => {
-        if (currentPreset) {
-            if (currentPreset._isOwner) {
-                dispatchModalEvent(ModalEvent.FilterDeleteModal)();
-            } else {
-                await toggleFilterStar({
-                    id: currentPreset.id,
-                    direction: !currentPreset._isStarred,
-                });
-                await utils.filter.getById.invalidate();
-            }
-        } else {
-            dispatchModalEvent(ModalEvent.FilterCreateModal)();
-        }
-    }, [currentPreset, toggleFilterStar, utils]);
-
-    const onFilterCreated = useCallback(
-        (data: Nullish<FilterById>) => {
-            dispatchModalEvent(ModalEvent.FilterCreateModal)();
-            setPreset(data.id);
-        },
-        [setPreset],
-    );
-
-    const onFilterDeleteCanceled = useCallback(() => {
-        dispatchModalEvent(ModalEvent.FilterDeleteModal)();
-    }, []);
-
-    const onFilterDeleted = useCallback(
-        (filter: FilterById) => {
-            router.push(`${router.route}?${filter.params}`);
-        },
-        [router],
-    );
+        await utils.filter.getById.invalidate();
+    }, [utils]);
 
     const title = (
         <PageTitlePreset
@@ -165,30 +107,14 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <CommonHeader title={title} description={description} />
-
-            <FiltersPanel
-                loading={isLoading}
+            <FilteredPage
                 total={totalGoalsCount}
                 counter={goals?.length}
-                queryFilterState={queryFilterState}
-                queryState={queryState}
-                queryString={queryString}
-                preset={currentPreset}
-                presets={userFilters}
-                onSearchChange={setFulltextFilter}
-                onStarredChange={setStarredFilter}
-                onWatchingChange={setWatchingFilter}
-                onPresetChange={setPreset}
+                filterPreset={currentPreset}
+                userFilters={userFilters}
                 onFilterStar={onFilterStar}
-                onFilterApply={batchQueryState}
-                onLimitChange={setLimitFilter}
+                isLoading={isLoading}
             >
-                {(Boolean(queryString) || preset) && (
-                    <Button text={tr('Reset')} onClick={resetQueryState} {...filtersPanelResetButton.attr} />
-                )}
-            </FiltersPanel>
-
-            <PageContent>
                 <Table>
                     {groupsOnScreen?.map((group) => (
                         <React.Fragment key={group.project.id}>
@@ -209,19 +135,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 {nullable(hasNextPage, () => (
                     <LoadMoreButton onClick={() => fetchNextPage()} />
                 ))}
-            </PageContent>
-
-            {nullable(queryString, (params) => (
-                <ModalOnEvent event={ModalEvent.FilterCreateModal} hotkeys={createFilterKeys}>
-                    <FilterCreateForm mode="User" params={params} onSubmit={onFilterCreated} />
-                </ModalOnEvent>
-            ))}
-
-            {nullable(currentPreset, (cP) => (
-                <ModalOnEvent view="warn" event={ModalEvent.FilterDeleteModal}>
-                    <FilterDeleteForm preset={cP} onSubmit={onFilterDeleted} onCancel={onFilterDeleteCanceled} />
-                </ModalOnEvent>
-            ))}
+            </FilteredPage>
         </Page>
     );
 };

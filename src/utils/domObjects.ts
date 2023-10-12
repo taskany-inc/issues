@@ -5,7 +5,6 @@ const DO = configureDomObjects({ attributeName: 'cy' });
 export const header = DO('header');
 export const headerMenu = header.add('menu');
 export const headerMenuGoals = headerMenu.add('goals');
-export const headerMenuProjects = headerMenu.add('projects');
 export const headerMenuExplore = headerMenu.add('explore');
 export const createFastButton = header.add('createFastButton');
 export const createSelectButton = header.add('createSelectButton');
