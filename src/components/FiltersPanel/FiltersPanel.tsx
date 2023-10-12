@@ -11,6 +11,7 @@ import {
     nullable,
 } from '@taskany/bricks';
 import { IconStarOutline, IconStarSolid } from '@taskany/icons';
+import styled from 'styled-components';
 
 import { filtersTakeCount } from '../../utils/filters';
 import { FilterQueryState, QueryState, buildURLSearchParams } from '../../hooks/useUrlFilterParams';
@@ -36,6 +37,11 @@ import { filtersPanel } from '../../utils/domObjects';
 import { tr } from './FiltersPanel.i18n';
 
 type Users = React.ComponentProps<typeof UserFilter>['users'];
+
+const StyledFiltersMenuContainer = styled(FiltersMenuContainer)`
+    display: flex;
+    align-items: center;
+`;
 
 function mapUserToView(list: ActivityByIdReturnType[]): Users {
     return list.reduce<Users>((acc, activity) => {
@@ -190,7 +196,7 @@ export const FiltersPanel: FC<{
                         <FiltersCounterContainer>
                             <FiltersCounter total={total} counter={counter} />
                         </FiltersCounterContainer>
-                        <FiltersMenuContainer>
+                        <StyledFiltersMenuContainer>
                             <FiltersMenuItem
                                 ref={filterNodeRef}
                                 active={!isFiltersEmpty}
@@ -230,8 +236,8 @@ export const FiltersPanel: FC<{
                                     <IconStarSolid size="s" />
                                 </FiltersAction>
                             )}
-                        </FiltersMenuContainer>
-                        {children}
+                            {children}
+                        </StyledFiltersMenuContainer>
                     </FiltersPanelContent>
                 </FiltersPanelContainer>
                 <FiltersPanelApplied

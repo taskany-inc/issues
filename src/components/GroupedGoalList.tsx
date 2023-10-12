@@ -23,6 +23,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, se
     const { data, fetchNextPage, hasNextPage } = trpc.project.getAll.useInfiniteQuery(
         {
             limit: projectsSize,
+            firstLevel: !queryState?.project.length,
             goalsQuery: queryState,
         },
         {

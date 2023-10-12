@@ -6,7 +6,6 @@ import { TLocale } from '../utils/getLang';
 export const routes = {
     index: () => '/',
 
-    projects: () => '/projects',
     project: (id: string) => `/projects/${id}`,
     projectSettings: (id: string) => `/projects/${id}/settings`,
 
@@ -32,7 +31,6 @@ export const useRouter = () => {
         index: () => router.push(routes.index()),
 
         project: (id: string) => router.push(routes.project(id)),
-        projects: () => router.push(routes.projects()),
         projectSettings: (id: string) => router.push(routes.projectSettings(id)),
 
         goals: () => router.push(routes.goals()),

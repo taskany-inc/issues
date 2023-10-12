@@ -1,4 +1,4 @@
-import { ProjectsPage } from '../../../components/ProjectsPage/ProjectsPage';
+import { ProjectPage } from '../../../components/ProjectPage/ProjectPage';
 import { declareSsrProps } from '../../../utils/declareSsrProps';
 import { filtersPanelSsrInit } from '../../../utils/filters';
 
@@ -33,4 +33,4 @@ export const getServerSideProps = declareSsrProps(
     },
 );
 
-export default ProjectsPage;
+export default ProjectPage;
