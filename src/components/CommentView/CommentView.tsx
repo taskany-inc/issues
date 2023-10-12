@@ -2,15 +2,9 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Reaction, State, User } from '@prisma/client';
 import styled from 'styled-components';
-import { brandColor, danger0, gapM, gapS, gray4, gray9, backgroundColor } from '@taskany/colors';
+import { brandColor, danger0, gapM, gapS, gray4, gray9 } from '@taskany/colors';
 import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, UserPic, nullable, Button } from '@taskany/bricks';
-import {
-    IconBinOutline,
-    IconClipboardOutline,
-    IconEditOutline,
-    IconMoreVerticalOutline,
-    IconPinAltOutline,
-} from '@taskany/icons';
+import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import { useLocale } from '../../hooks/useLocale';
@@ -20,7 +14,7 @@ import { CommentSchema } from '../../schema/comment';
 import { Reactions } from '../Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
-import { Circle, CircledIcon } from '../Circle';
+import { Circle } from '../Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { StateDot } from '../StateDot';
 import { getUserName } from '../../utils/getUserName';
@@ -136,6 +130,11 @@ const StyledIconClipboardOutline = styled(IconClipboardOutline)`
     display: flex;
 `;
 
+const StyledStateDot = styled(StateDot)`
+    width: 32px;
+    height: 32px;
+`;
+
 export const CommentView: FC<CommentViewProps> = ({
     id,
     author,
@@ -233,7 +232,7 @@ export const CommentView: FC<CommentViewProps> = ({
         <ActivityFeedItem id={pin ? '' : `comment-${id}`}>
             <Circle size={32}>
                 {pin ? (
-                    <CircledIcon as={IconPinAltOutline} size="s" color={backgroundColor} />
+                    <StyledStateDot hue={state?.hue} />
                 ) : (
                     <UserPic size={32} src={author?.image} email={author?.email} />
                 )}
@@ -297,7 +296,9 @@ export const CommentView: FC<CommentViewProps> = ({
                     <StyledCardComment>
                         {nullable(state, (s) => (
                             <StyledTimestamp>
-                                <StateDot hue={s.hue} />
+                                {nullable(!pin, () => (
+                                    <StateDot hue={s.hue} />
+                                ))}
                                 <Text size="m" weight="bolder" color={gray9}>
                                     {createLocaleDate(createdAt, { locale })}
                                 </Text>
