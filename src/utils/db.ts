@@ -22,9 +22,10 @@ import { subjectToEnumValue } from './goalHistory';
  */
 export const createGoal = async (input: GoalCommon, activityId: string, role: Role) => {
     const id = nanoid();
+    const priorityId = input.priority.id;
 
     await prisma.$executeRaw`
-        INSERT INTO "Goal" ("id", "title", "description", "projectId", "ownerId", "activityId", "stateId", "priority", "scopeId")
+        INSERT INTO "Goal" ("id", "title", "description", "projectId", "ownerId", "activityId", "stateId", "priorityId", "scopeId")
         SELECT
             ${id},
             ${input.title},
@@ -33,7 +34,7 @@ export const createGoal = async (input: GoalCommon, activityId: string, role: Ro
             ${input.owner.id},
             ${activityId},
             ${input.state.id},
-            ${input.priority},
+            ${priorityId},
             coalesce(max("scopeId"), 0) + 1
         FROM "Goal" WHERE "projectId" = ${input.parent.id};
     `;
@@ -43,6 +44,11 @@ export const createGoal = async (input: GoalCommon, activityId: string, role: Ro
             id,
         },
         data: {
+            priority: {
+                connect: {
+                    id: priorityId,
+                },
+            },
             tags: input.tags?.length
                 ? {
                       connect: input.tags.map(({ id }) => ({ id })),
@@ -112,12 +118,12 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
     if (needRequestForSubject.length) {
         const results = await Promise.all(
             needRequestForSubject.map((subject) => {
-                const data = requestParamsBySubjects[subject];
+                const { ids } = requestParamsBySubjects[subject] || {};
 
                 const query = {
                     where: {
                         id: {
-                            in: (data || {}).ids?.map((id) => id.trim()),
+                            in: ids,
                         },
                     },
                 };
@@ -158,6 +164,8 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                                 },
                             },
                         });
+                    case 'priority':
+                        return prisma.priority.findMany({ where: query.where });
                     default:
                         throw new Error('query for history record is undefined');
                 }

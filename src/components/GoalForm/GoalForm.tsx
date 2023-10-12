@@ -21,7 +21,6 @@ import { errorsProvider } from '../../utils/forms';
 import { formateEstimate } from '../../utils/dateTime';
 import { DateType } from '../../types/date';
 import { useLocale } from '../../hooks/useLocale';
-import { Priority } from '../../types/priority';
 import { UserComboBox } from '../UserComboBox';
 import { GoalParentComboBox } from '../GoalParentComboBox';
 import { TagComboBox } from '../TagComboBox';
@@ -50,7 +49,11 @@ interface GoalFormProps extends React.HTMLAttributes<HTMLDivElement> {
     parent?: { id: string; title: string; flowId: string; description?: string | null };
     tags?: TagModel[];
     state?: State;
-    priority?: Priority | string;
+    priority?: {
+        id: string;
+        title: string;
+        value: number;
+    };
     estimate?: {
         date: string;
         type: DateType;
@@ -60,7 +63,7 @@ interface GoalFormProps extends React.HTMLAttributes<HTMLDivElement> {
     id?: string;
     tip?: React.ReactNode;
 
-    onSumbit: (fields: z.infer<GoalFormProps['validitySchema']>) => void;
+    onSubmit: (fields: z.infer<GoalFormProps['validitySchema']>) => void;
 }
 
 export const GoalForm: React.FC<GoalFormProps> = ({
@@ -77,7 +80,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     validitySchema,
     actionButton,
     tip,
-    onSumbit,
+    onSubmit,
     ...attrs
 }) => {
     const locale = useLocale();
@@ -94,7 +97,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,
-        defaultValues: {
+        values: {
             title,
             description,
             owner,
@@ -125,7 +128,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
     return (
         <ModalContent {...attrs}>
-            <Form onSubmit={handleSubmit(onSumbit)}>
+            <Form onSubmit={handleSubmit(onSubmit)}>
                 <FormInput
                     {...register('title')}
                     error={errorsResolver('title')}

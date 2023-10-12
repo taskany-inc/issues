@@ -1,7 +1,6 @@
 import React, { forwardRef } from 'react';
 import { nullable } from '@taskany/bricks';
 
-import { Priority } from '../types/priority';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { HistoryAction } from '../types/history';
 
@@ -85,8 +84,8 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                                     )}
                                     {value.subject === 'priority' && (
                                         <HistoryRecordPriority
-                                            from={value.previousValue as Priority}
-                                            to={value.nextValue as Priority}
+                                            from={excludeString(value.previousValue)}
+                                            to={excludeString(value.nextValue)}
                                         />
                                     )}
                                     {value.subject === 'state' && (

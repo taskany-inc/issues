@@ -14,3 +14,4 @@ export type GoalAchiveCriteria = NonNullable<GoalByIdReturnType>['goalAchiveCrit
 export type GoalDependencyItem = NonNullable<NonNullable<GoalByIdReturnType>['_relations']>[number]['goals'][number];
 export type GoalUpdateReturnType = RouterOutputs['goal']['update'];
 export type GoalCreateReturnType = RouterOutputs['goal']['create'];
+export type PriorityReturnType = RouterOutputs['priority']['getAll'][number];

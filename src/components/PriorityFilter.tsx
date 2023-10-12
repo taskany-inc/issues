@@ -1,40 +1,36 @@
 import { FC, useMemo } from 'react';
 import { Tab } from '@taskany/bricks';
 
-import { Priority as PriorityName, priorityVariants } from '../types/priority';
-
 import { getPriorityText } from './PriorityText/PriorityText';
 import { FilterCheckbox } from './FilterCheckbox';
 import { FilterBase } from './FilterBase/FilterBase';
 import { FilterTabLabel } from './FilterTabLabel';
 
-type Variant = keyof typeof priorityVariants;
-
-type Priority = {
-    id: Variant;
-    data: string;
-};
-
-const priorities: Priority[] = (Object.keys(priorityVariants) as Variant[]).map((p) => ({
-    id: p,
-    data: getPriorityText(p as PriorityName),
-}));
-
-function getKey(item: Priority) {
-    return item.id;
+interface Priority {
+    id: string;
+    title: string;
+    value: number;
 }
 
-export const PriorityFilter: FC<{
+interface PriorityFilterProps {
     text: string;
     value?: string[];
+    priorities: Priority[];
     onChange: (value: string[]) => void;
-}> = ({ value = [], onChange, text }) => {
+}
+
+const getKey = (priority: Priority) => priority.id;
+
+export const PriorityFilter: FC<PriorityFilterProps> = ({ text, value = [], priorities, onChange }) => {
     const values = useMemo(() => {
         return priorities.filter((p) => value.includes(getKey(p)));
-    }, [value]);
+    }, [value, priorities]);
 
     return (
-        <Tab name="priority" label={<FilterTabLabel text={text} selected={values.map(({ data }) => data)} />}>
+        <Tab
+            name="priority"
+            label={<FilterTabLabel text={text} selected={values.map(({ title }) => getPriorityText(title))} />}
+        >
             <FilterBase
                 key="priority"
                 mode="multiple"
@@ -46,10 +42,10 @@ export const PriorityFilter: FC<{
                 renderItem={({ item, checked, onItemClick }) => (
                     <FilterCheckbox
                         name="priority"
-                        value={item.id}
+                        value={getKey(item)}
                         checked={checked}
                         onClick={onItemClick}
-                        label={item.data}
+                        label={getPriorityText(item.title)}
                     />
                 )}
             />
