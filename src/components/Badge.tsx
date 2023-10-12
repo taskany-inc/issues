@@ -5,7 +5,7 @@ import { gapS, gapXs, gray8, gray9 } from '@taskany/colors';
 
 interface BadgeProps {
     icon: React.ReactNode;
-    text?: React.ReactNode;
+    text: React.ReactNode;
     action?: React.ReactNode;
     className?: string;
 }

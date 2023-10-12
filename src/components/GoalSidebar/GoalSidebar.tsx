@@ -1,5 +1,11 @@
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
-import { IconArrowRightOutline, IconBinOutline, IconEditOutline, IconPlusCircleOutline } from '@taskany/icons';
+import {
+    IconArrowRightOutline,
+    IconBinOutline,
+    IconEditOutline,
+    IconPlusCircleOutline,
+    IconXCircleSolid,
+} from '@taskany/icons';
 import styled from 'styled-components';
 import { ComponentProps, FC, MouseEvent, useMemo } from 'react';
 
@@ -11,6 +17,8 @@ import { GoalParentComboBox } from '../GoalParentComboBox';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { InlineTrigger } from '../InlineTrigger';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { safeUserData } from '../../utils/getUserName';
+import { useGoalResource } from '../../hooks/useGoalResource';
 
 import { tr } from './GoalSidebar.i18n';
 
@@ -44,23 +52,12 @@ const tagsLimit = 5;
 
 interface GoalSidebarProps {
     goal: NonNullable<GoalByIdReturnType>;
-    onGoalParticipantRemove: (id?: string | null) => ComponentProps<typeof UserBadge>['onCleanButtonClick'];
-    onGoalParticipantAdd: ComponentProps<typeof UserComboBox>['onChange'];
-    onGoalAssigneeChange: ComponentProps<typeof UserComboBox>['onChange'];
     onGoalTagRemove: (tag: NonNullable<GoalByIdReturnType>['tags'][number]) => (e: MouseEvent<Element>) => void;
     onGoalTagAdd: ComponentProps<typeof TagComboBox>['onChange'];
     onGoalTransfer: ComponentProps<typeof GoalParentComboBox>['onChange'];
 }
 
-export const GoalSidebar: FC<GoalSidebarProps> = ({
-    goal,
-    onGoalAssigneeChange,
-    onGoalParticipantRemove,
-    onGoalParticipantAdd,
-    onGoalTagRemove,
-    onGoalTagAdd,
-    onGoalTransfer,
-}) => {
+export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoalTagAdd, onGoalTransfer }) => {
     const participantsFilter = useMemo(() => {
         const participantsIds = goal.participants.map(({ id }) => id);
         const { owner, activity: issuer } = goal;
@@ -71,42 +68,58 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({
         return participantsIds;
     }, [goal]);
 
+    const { onGoalParticipantAdd, onGoalParticipantRemove, goalOwnerUpdate } = useGoalResource(
+        {
+            id: goal.id,
+        },
+        {
+            invalidate: {
+                getById: goal._shortId,
+            },
+        },
+    );
+
     return (
         <>
             <IssueMeta title={tr('Issuer')}>
-                <UserBadge user={goal.activity?.user} />
+                {nullable(safeUserData(goal.activity), (props) => (
+                    <UserBadge {...props} />
+                ))}
             </IssueMeta>
 
             <IssueMeta title={tr('Assignee')}>
                 {goal._isEditable ? (
                     <UserComboBox
                         placement="bottom-start"
-                        placeholder={tr('Name/Email')}
+                        placeholder={tr('Type user name or email')}
                         filter={participantsFilter}
-                        onChange={onGoalAssigneeChange}
-                        renderTrigger={(props) => (
-                            <StyledInlineUserInput>
-                                <UserBadge user={goal.owner?.user} />
-                                <StyledIconEditOutline size="xxs" onClick={props.onClick} />
-                            </StyledInlineUserInput>
-                        )}
+                        onChange={goalOwnerUpdate}
+                        renderTrigger={({ onClick }) =>
+                            nullable(safeUserData(goal.owner), (props) => (
+                                <StyledInlineUserInput>
+                                    <UserBadge {...props}>
+                                        <IconXCircleSolid size="xs" onClick={onClick} />
+                                    </UserBadge>
+                                </StyledInlineUserInput>
+                            ))
+                        }
                     />
                 ) : (
-                    <UserBadge user={goal.owner?.user} />
+                    nullable(safeUserData(goal.owner), (props) => <UserBadge {...props} />, tr('Not assigned yet'))
                 )}
             </IssueMeta>
 
             {nullable(goal._isEditable || goal.participants.length, () => (
                 <IssueMeta title={tr('Participants')}>
-                    {goal.participants?.map(({ user }) => (
-                        <UserBadge
-                            key={user?.activityId}
-                            user={user}
-                            onCleanButtonClick={
-                                goal._isEditable ? onGoalParticipantRemove(user?.activityId) : undefined
-                            }
-                        />
-                    ))}
+                    {goal.participants?.map((activity) =>
+                        nullable(safeUserData(activity), (props) => (
+                            <UserBadge key={activity.id} {...props}>
+                                {nullable(goal._isEditable, () => (
+                                    <IconXCircleSolid size="xs" onClick={onGoalParticipantRemove(activity.id)} />
+                                ))}
+                            </UserBadge>
+                        )),
+                    )}
 
                     {nullable(goal._isEditable, () => (
                         <StyledInlineInput>
