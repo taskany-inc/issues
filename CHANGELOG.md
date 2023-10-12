@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [1.33.0](https://github.com/taskany-inc/issues/compare/v1.32.4...v1.33.0) (2023-10-12)
+
+
+### Features
+
+* added ability to copy raw content from comment or goal description ([d8fdd7c](https://github.com/taskany-inc/issues/commit/d8fdd7c4c46ba3f403642c336d5ad61ad2cc7f7c))
+* custom trpc transformer ([0ccdd75](https://github.com/taskany-inc/issues/commit/0ccdd75df87ebf64a39508035bdb90d4f4bdae21))
+
+
+### Bug Fixes
+
+* **CardHeader:** align time with description ([8611fdd](https://github.com/taskany-inc/issues/commit/8611fddf6702c6649d30d463cd0fc8cfb72b9719))
+* **FilterAutoCompleteInput:** correct align icon ([39c3de5](https://github.com/taskany-inc/issues/commit/39c3de513778fd0af6385778efc20c5e30cac1ce))
+* **GoalCriteria:** correct align in criteria list item ([eaffa2a](https://github.com/taskany-inc/issues/commit/eaffa2a007d08f91759196dc5ed3961daedf1b71))
+* **GoalHeader:** pass NextLink via Link prop ([8dcd9ba](https://github.com/taskany-inc/issues/commit/8dcd9ba8ee15afb7f6bc267769bbd743ddb0c68f))
+* **History:** call ctx in useEffect ([ace62ba](https://github.com/taskany-inc/issues/commit/ace62ba1a7c7ce8d3d071918d63e7a36532abd58))
+* removed navigator check ([4166cab](https://github.com/taskany-inc/issues/commit/4166cabd7a5c65b1b862e2c41598ba5acb18d1fb))
+
 ## [1.32.4](https://github.com/taskany-inc/issues/compare/v1.32.3...v1.32.4) (2023-10-09)
 
 
