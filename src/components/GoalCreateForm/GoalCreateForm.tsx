@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { gray9, gray10 } from '@taskany/colors';
 import { Button, MenuItem, Text, Keyboard, Tip } from '@taskany/bricks';
@@ -56,9 +56,8 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
     const [createGoalType, setСreateGoalType] = useState<number>(goalCreateFormActionCache || 3);
     const utils = trpc.useContext();
     const { goalCreate } = useGoalResource({});
-    // FIXME https://github.com/taskany-inc/issues/issues/1834
     const { data: priorities } = trpc.priority.getAll.useQuery();
-    const defaultPriority = priorities?.at(-2);
+    const defaultPriority = useMemo(() => priorities?.filter((priority) => priority.default)[0], [priorities]);
 
     const createOptions = [
         {

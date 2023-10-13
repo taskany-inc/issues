@@ -74,6 +74,7 @@ export const goalCommonSchema = z.object({
         id: z.string(),
         title: z.string(),
         value: z.number(),
+        default: z.boolean(),
     }),
     estimate: z
         .object({
@@ -150,6 +151,7 @@ export const goalUpdateSchema = z.object({
         id: z.string(),
         title: z.string(),
         value: z.number(),
+        default: z.boolean(),
     }),
     estimate: z
         .object({

@@ -29,6 +29,7 @@ const userPassword = 'taskany';
                 {
                     title: 'Medium',
                     value: 2,
+                    default: true,
                 },
                 {
                     title: 'Low',

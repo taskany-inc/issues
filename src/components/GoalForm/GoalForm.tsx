@@ -53,6 +53,7 @@ interface GoalFormProps extends React.HTMLAttributes<HTMLDivElement> {
         id: string;
         title: string;
         value: number;
+        default: boolean;
     };
     estimate?: {
         date: string;

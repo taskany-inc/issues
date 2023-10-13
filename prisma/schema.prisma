@@ -166,10 +166,11 @@ model Project {
 }
 
 model Priority {
-  id    String @id @default(cuid())
-  title String
-  value Int
-  Goal  Goal[]
+  id      String  @id @default(cuid())
+  title   String
+  value   Int
+  default Boolean @default(false)
+  Goal    Goal[]
 }
 
 model Goal {
