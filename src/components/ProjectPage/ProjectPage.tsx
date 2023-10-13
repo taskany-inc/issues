@@ -61,7 +61,23 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         },
     );
 
-    const { preview, setPreview } = useGoalPreview();
+    const { preview, setPreview, on } = useGoalPreview();
+
+    useEffect(() => {
+        const unsubUpdate = on('on:goal:update', () => {
+            utils.project.getById.invalidate();
+            utils.project.getDeepInfo.invalidate();
+        });
+        const unsubDelete = on('on:goal:delete', () => {
+            utils.project.getById.invalidate();
+            utils.project.getDeepInfo.invalidate();
+        });
+
+        return () => {
+            unsubUpdate();
+            unsubDelete();
+        };
+    }, [on, utils.project.getDeepInfo, utils.project.getById]);
 
     const onGoalPrewiewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>

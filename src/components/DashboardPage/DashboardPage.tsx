@@ -59,7 +59,22 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
     useFMPMetric(!!data);
 
-    const { setPreview, preview } = useGoalPreview();
+    const { setPreview, preview, on } = useGoalPreview();
+
+    useEffect(() => {
+        const unsubUpdate = on('on:goal:update', () => {
+            utils.project.getUserProjectsWithGoals.invalidate();
+        });
+
+        const unsubDelete = on('on:goal:delete', () => {
+            utils.project.getUserProjectsWithGoals.invalidate();
+        });
+
+        return () => {
+            unsubUpdate();
+            unsubDelete();
+        };
+    }, [on, utils.project.getUserProjectsWithGoals]);
 
     useEffect(() => {
         const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);

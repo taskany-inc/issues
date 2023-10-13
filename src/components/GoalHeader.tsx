@@ -1,9 +1,10 @@
 import { nullable } from '@taskany/bricks';
-import { ComponentProps, FC, ReactNode } from 'react';
+import { ComponentProps, FC, ReactNode, useCallback } from 'react';
 import styled from 'styled-components';
 
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { goalPageHeader } from '../utils/domObjects';
+import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 
 import StateSwitch from './StateSwitch';
 import { State } from './State';
@@ -53,6 +54,15 @@ export const GoalHeader: FC<GoalHeaderProps> = ({
     onGoalStateChange,
     onCommentsClick,
 }) => {
+    const onStateChangeHandler = useCallback<NonNullable<GoalHeaderProps['onGoalStateChange']>>(
+        (val) => {
+            onGoalStateChange?.(val);
+            dispatchModalEvent(ModalEvent.GoalPreviewModal, {
+                type: 'on:goal:update',
+            });
+        },
+        [onGoalStateChange],
+    );
     return (
         <StyledGoalHeader {...goalPageHeader.attr}>
             <StyledGoalInfo align="left">
@@ -66,7 +76,7 @@ export const GoalHeader: FC<GoalHeaderProps> = ({
                     <StyledPublicActions>
                         {nullable(g?.state, (s) =>
                             g._isEditable && g.project?.flowId ? (
-                                <StateSwitch state={s} flowId={g.project.flowId} onClick={onGoalStateChange} />
+                                <StateSwitch state={s} flowId={g.project.flowId} onClick={onStateChangeHandler} />
                             ) : (
                                 <State title={s.title} hue={s.hue} />
                             ),

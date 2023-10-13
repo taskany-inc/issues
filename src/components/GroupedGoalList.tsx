@@ -1,4 +1,4 @@
-import { MouseEventHandler, useCallback, useMemo } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 
 import { QueryState, useUrlFilterParams } from '../hooks/useUrlFilterParams';
@@ -19,7 +19,8 @@ interface GroupedGoalListProps {
 export const projectsSize = 20;
 
 export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, setTagFilterOutside }) => {
-    const { preview, setPreview } = useGoalPreview();
+    const { preview, setPreview, on } = useGoalPreview();
+    const utils = trpc.useContext();
     const { data, fetchNextPage, hasNextPage } = trpc.project.getAll.useInfiniteQuery(
         {
             limit: projectsSize,
@@ -32,6 +33,20 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, se
             staleTime: refreshInterval,
         },
     );
+
+    useEffect(() => {
+        const unsubUpdate = on('on:goal:update', () => {
+            utils.project.getAll.invalidate();
+        });
+        const unsubDelete = on('on:goal:delete', () => {
+            utils.project.getAll.invalidate();
+        });
+
+        return () => {
+            unsubUpdate();
+            unsubDelete();
+        };
+    }, [on, utils.project.getAll]);
 
     useFMPMetric(!!data);
 

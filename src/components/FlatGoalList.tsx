@@ -19,7 +19,8 @@ interface GoalListProps {
 const pageSize = 20;
 
 export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilterOutside }) => {
-    const { preview, setPreview } = useGoalPreview();
+    const utils = trpc.useContext();
+    const { preview, setPreview, on } = useGoalPreview();
 
     const [, setPage] = useState(0);
     const { data, fetchNextPage, hasNextPage } = trpc.goal.getBatch.useInfiniteQuery(
@@ -33,6 +34,20 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilter
             staleTime: refreshInterval,
         },
     );
+
+    useEffect(() => {
+        const unsubUpdate = on('on:goal:update', () => {
+            utils.goal.getBatch.invalidate();
+        });
+        const unsubDelete = on('on:goal:delete', () => {
+            utils.goal.getBatch.invalidate();
+        });
+
+        return () => {
+            unsubUpdate();
+            unsubDelete();
+        };
+    }, [on, utils.goal.getBatch]);
 
     useFMPMetric(!!data);
 

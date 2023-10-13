@@ -1,4 +1,4 @@
-import { FC, MouseEventHandler, useState, useMemo, useCallback } from 'react';
+import { FC, MouseEventHandler, useState, useMemo, useCallback, useEffect } from 'react';
 import { nullable } from '@taskany/bricks';
 
 import { GoalByIdReturnType, ProjectByIdReturnType } from '../../trpc/inferredTypes';
@@ -10,6 +10,7 @@ import { routes } from '../hooks/router';
 import { ProjectListItemCollapsable } from './ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { GoalListItem } from './GoalListItem';
 import { InlineCreateGoalControl } from './InlineCreateGoalControl/InlineCreateGoalControl';
+import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
 
 export const ProjectListItemConnected: FC<{
     project: NonNullable<ProjectByIdReturnType>;
@@ -31,6 +32,8 @@ export const ProjectListItemConnected: FC<{
     collapsed: defaultCollapsed = false,
 }) => {
     const [collapsed, setIsCollapsed] = useState(() => defaultCollapsed);
+    const { on } = useGoalPreview();
+    const utils = trpc.useContext();
 
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
@@ -51,6 +54,28 @@ export const ProjectListItemConnected: FC<{
             enabled: !collapsed,
         },
     );
+
+    useEffect(() => {
+        const unsubUpdate = on('on:goal:update', (updatedId) => {
+            const idInList = projectDeepInfo?.goals.find(({ _shortId }) => _shortId === updatedId);
+            if (idInList) {
+                utils.project.getDeepInfo.invalidate();
+                utils.project.getByIds.invalidate();
+            }
+        });
+
+        const unsubDelete = on('on:goal:update', (updatedId) => {
+            const idInList = projectDeepInfo?.goals.find(({ _shortId }) => _shortId === updatedId);
+            if (idInList) {
+                utils.project.getDeepInfo.invalidate();
+            }
+        });
+
+        return () => {
+            unsubDelete();
+            unsubUpdate();
+        };
+    }, [on, projectDeepInfo?.goals, utils.project.getByIds, utils.project.getDeepInfo]);
 
     const onClick = useCallback(() => {
         setIsCollapsed((value) => !value);
