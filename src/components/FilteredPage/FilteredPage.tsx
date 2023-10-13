@@ -1,23 +1,28 @@
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { Button, nullable } from '@taskany/bricks';
+import { Button, FiltersAction, nullable } from '@taskany/bricks';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { IconStarOutline, IconStarSolid } from '@taskany/icons';
 
-import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
-import { useFilterResource } from '../hooks/useFilterResource';
-import { dispatchModalEvent, ModalEvent } from '../utils/dispatchModal';
-import { createFilterKeys } from '../utils/hotkeys';
-import { filtersPanelResetButton } from '../utils/domObjects';
-import { FilterById } from '../../trpc/inferredTypes';
+import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import { useFilterResource } from '../../hooks/useFilterResource';
+import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
+import { createFilterKeys } from '../../utils/hotkeys';
+import { filtersPanelResetButton } from '../../utils/domObjects';
+import { FilterById } from '../../../trpc/inferredTypes';
+import { PageContent } from '../Page';
+import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
+import { PresetDropdown } from '../PresetDropdown';
+import { LimitDropdown } from '../LimitDropdown';
+import { StarredFilter } from '../StarredFilter/StarredFilter';
+import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 
-import { PageContent } from './Page';
-import { FiltersPanel } from './FiltersPanel/FiltersPanel';
-import { PresetDropdown } from './PresetDropdown';
+import { tr } from './FilteredPage.i18n';
 
-const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
-const FilterCreateForm = dynamic(() => import('./FilterCreateForm/FilterCreateForm'));
-const FilterDeleteForm = dynamic(() => import('./FilterDeleteForm/FilterDeleteForm'));
+const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
+const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
+const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
 interface FilteredPageProps {
     isLoading: boolean;
@@ -63,6 +68,7 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
         resetQueryState,
         setPreset,
         batchQueryState,
+        setLimitFilter,
     } = useUrlFilterParams({
         preset: filterPreset,
     });
@@ -110,17 +116,42 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                 counter={counter}
                 queryState={queryState}
                 queryString={queryString}
-                preset={currentPreset}
-                presets={userFilters}
                 onSearchChange={setFulltextFilter}
-                onStarredChange={setStarredFilter}
-                onWatchingChange={setWatchingFilter}
-                onPresetChange={setPreset}
-                onFilterStar={filterStarHandler}
                 onFilterApply={batchQueryState}
             >
                 <StyledFilterControls>
                     {filterControls}
+
+                    <StarredFilter value={queryState?.starred} onChange={setStarredFilter} />
+
+                    <WatchingFilter value={queryState?.watching} onChange={setWatchingFilter} />
+
+                    {nullable(userFilters, (presets) => (
+                        <PresetDropdown
+                            text={tr('Preset')}
+                            value={filterPreset}
+                            presets={presets}
+                            onChange={setPreset}
+                        />
+                    ))}
+
+                    {nullable(queryState?.limit, (lf) => (
+                        <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={setLimitFilter} />
+                    ))}
+
+                    {((Boolean(queryString) && !filterPreset) ||
+                        (filterPreset && !filterPreset._isOwner && !filterPreset._isStarred)) &&
+                        !filterPreset?.default && (
+                            <FiltersAction onClick={filterStarHandler}>
+                                <IconStarOutline size="s" />
+                            </FiltersAction>
+                        )}
+
+                    {filterPreset && (filterPreset._isOwner || filterPreset._isStarred) && (
+                        <FiltersAction onClick={filterStarHandler}>
+                            <IconStarSolid size="s" />
+                        </FiltersAction>
+                    )}
                     {nullable(queryString || filterPreset, () => (
                         <StyledResetButton text="Reset" onClick={resetQueryState} {...filtersPanelResetButton.attr} />
                     ))}

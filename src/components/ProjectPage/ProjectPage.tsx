@@ -22,7 +22,7 @@ import { StarButton } from '../StarButton/StarButton';
 import { routes } from '../../hooks/router';
 import { pageActiveTabItem, pageTabs } from '../../utils/domObjects';
 import { safeGetUserName } from '../../utils/getUserName';
-import { FilteredPage } from '../FilteredPage';
+import { FilteredPage } from '../FilteredPage/FilteredPage';
 
 import { tr } from './ProjectPage.i18n';
 

@@ -1,6 +1,5 @@
 import { FC, ReactNode, useCallback, memo, useRef, useState, useEffect, useMemo } from 'react';
 import {
-    FiltersAction,
     FiltersCounter,
     FiltersCounterContainer,
     FiltersMenuContainer,
@@ -8,9 +7,7 @@ import {
     FiltersPanelContainer,
     FiltersPanelContent,
     FiltersSearchContainer,
-    nullable,
 } from '@taskany/bricks';
-import { IconStarOutline, IconStarSolid } from '@taskany/icons';
 import styled from 'styled-components';
 
 import { filtersTakeCount } from '../../utils/filters';
@@ -19,17 +16,13 @@ import { SearchFilter } from '../SearchFilter';
 import { ProjectFilter } from '../ProjectFilter';
 import { TagFilter } from '../TagFilter';
 import { EstimateFilter } from '../EstimateFilter';
-import { PresetDropdown } from '../PresetDropdown';
-import { LimitDropdown } from '../LimitDropdown';
 import { UserFilter } from '../UserFilter/UserFilter';
 import { PriorityFilter } from '../PriorityFilter';
 import { StateFilter } from '../StateFilter';
 import { FiltersPanelApplied } from '../FiltersPanelApplied/FiltersPanelApplied';
-import { ActivityByIdReturnType, FilterById } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
 import { SortFilter } from '../SortFilter/SortFilter';
-import { StarredFilter } from '../StarredFilter/StarredFilter';
-import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 import { FilterPopup } from '../FilterPopup/FilterPopup';
 import { getUserName, prepareUserDataFromActivity } from '../../utils/getUserName';
 import { filtersPanel } from '../../utils/domObjects';
@@ -71,36 +64,10 @@ export const FiltersPanel: FC<{
     queryState?: QueryState;
     queryFilterState?: FilterQueryState;
     queryString?: string;
-
-    preset?: FilterById;
-    presets?: React.ComponentProps<typeof PresetDropdown>['presets'];
-
     onSearchChange: (search: string) => void;
-    onPresetChange: React.ComponentProps<typeof PresetDropdown>['onChange'];
-    onStarredChange: React.ComponentProps<typeof StarredFilter>['onChange'];
-    onWatchingChange: React.ComponentProps<typeof WatchingFilter>['onChange'];
-    onLimitChange?: React.ComponentProps<typeof LimitDropdown>['onChange'];
-    onFilterStar?: () => void;
     onFilterApply?: (state: Partial<QueryState>) => void;
 }> = memo(
-    ({
-        children,
-        loading,
-        total = 0,
-        counter = 0,
-        queryState,
-        queryFilterState,
-        queryString,
-        preset,
-        presets = [],
-        onSearchChange,
-        onPresetChange,
-        onLimitChange,
-        onFilterStar,
-        onStarredChange,
-        onWatchingChange,
-        onFilterApply,
-    }) => {
+    ({ children, loading, total = 0, counter = 0, queryState, queryFilterState, onSearchChange, onFilterApply }) => {
         const filterNodeRef = useRef<HTMLSpanElement>(null);
         const [ownersQuery, setOwnersQuery] = useState('');
         const [issuersQuery, setIssuersQuery] = useState('');
@@ -205,37 +172,6 @@ export const FiltersPanel: FC<{
                                 {tr('Filter')}
                             </FiltersMenuItem>
 
-                            <StarredFilter value={queryState?.starred} onChange={onStarredChange} />
-
-                            <WatchingFilter value={queryState?.watching} onChange={onWatchingChange} />
-
-                            {Boolean(presets.length) && (
-                                <PresetDropdown
-                                    text={tr('Preset')}
-                                    value={preset}
-                                    presets={presets}
-                                    onChange={onPresetChange}
-                                />
-                            )}
-
-                            {onLimitChange &&
-                                nullable(queryState?.limit, (lf) => (
-                                    <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={onLimitChange} />
-                                ))}
-
-                            {((Boolean(queryString) && !preset) ||
-                                (preset && !preset._isOwner && !preset._isStarred)) &&
-                                !preset?.default && (
-                                    <FiltersAction onClick={onFilterStar}>
-                                        <IconStarOutline size="s" />
-                                    </FiltersAction>
-                                )}
-
-                            {preset && (preset._isOwner || preset._isStarred) && (
-                                <FiltersAction onClick={onFilterStar}>
-                                    <IconStarSolid size="s" />
-                                </FiltersAction>
-                            )}
                             {children}
                         </StyledFiltersMenuContainer>
                     </FiltersPanelContent>
