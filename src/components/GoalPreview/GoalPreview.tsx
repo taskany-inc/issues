@@ -14,7 +14,7 @@ import { IssueParent } from '../IssueParent';
 import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
 import { TagObject } from '../../types/tag';
 
-import { useGoalPreview } from './GoalPreviewProvider';
+import { dispatchPreviewDeleteEvent, dispatchPreviewUpdateEvent, useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
 
 interface GoalPreviewProps {
@@ -62,7 +62,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
 
     const { goalProjectChange, onGoalStateChange, goalTagsUpdate, invalidate } = useGoalResource(
         { id: goal?.id },
-        { invalidate: { getById: shortId } },
+        { invalidate: { getById: shortId }, afterInvalidate: dispatchPreviewUpdateEvent },
     );
 
     // FIXME https://github.com/taskany-inc/issues/issues/1853
@@ -108,6 +108,16 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
 
+    const handleGoalDelete = useCallback<NonNullable<typeof onDelete>>(
+        (...args) => {
+            if (onDelete) {
+                onDelete(...args);
+            }
+            dispatchPreviewDeleteEvent();
+        },
+        [onDelete],
+    );
+
     return (
         <StyledModalPreview visible onClose={onPreviewClose}>
             <StyledModalHeader>
@@ -148,7 +158,13 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                     ))}
 
                     {nullable(goal, (g) => (
-                        <GoalActivityFeed ref={commentsRef} goal={g} shortId={shortId} onGoalDeleteConfirm={onDelete} />
+                        <GoalActivityFeed
+                            ref={commentsRef}
+                            goal={g}
+                            shortId={shortId}
+                            onGoalDeleteConfirm={handleGoalDelete}
+                            onInvalidate={dispatchPreviewUpdateEvent}
+                        />
                     ))}
                 </StyledModalContent>
                 <StyledStickyModalContent>

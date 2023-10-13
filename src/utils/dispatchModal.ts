@@ -14,6 +14,7 @@ export enum ModalEvent {
     FeedbackCreateModal = 'FeedbackCreateModal',
     WhatsNewModal = 'WhatsNewModal',
     ImageFullScreen = 'ImageFullScreen',
+    GoalPreviewModal = 'GoalPreviewModal',
 }
 
 export interface MapModalToComponentProps {
@@ -36,6 +37,9 @@ export interface MapModalToComponentProps {
     [ModalEvent.ImageFullScreen]: {
         src: string;
         alt?: string;
+    };
+    [ModalEvent.GoalPreviewModal]: {
+        type: 'on:goal:update' | 'on:goal:delete';
     };
 }
 

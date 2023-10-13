@@ -17,6 +17,7 @@ import { ProjectBadge } from '../ProjectBadge';
 import { TextList, TextListItem } from '../TextList';
 import { safeUserData } from '../../utils/getUserName';
 import { goalPageDeleteButton } from '../../utils/domObjects';
+import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
 
 import { tr } from './GoalSidebar.i18n';
 
@@ -75,6 +76,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoa
                 invalidate: {
                     getById: goal._shortId,
                 },
+                afterInvalidate: dispatchPreviewUpdateEvent,
             },
         );
 

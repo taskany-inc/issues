@@ -11,6 +11,7 @@ import { trpc } from '../../utils/trpcClient';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { getDateStringFromEstimate } from '../../utils/dateTime';
 import { goalForm, goalUpdateButton } from '../../utils/domObjects';
+import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -30,6 +31,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             invalidate: {
                 getById: goal._shortId,
             },
+            afterInvalidate: dispatchPreviewUpdateEvent,
         },
     );
 
@@ -42,7 +44,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
 
         onSubmit(updatedGoal);
         utils.project.getDeepInfo.invalidate({ id: form.parent.id });
-        invalidate();
+        await invalidate();
     };
 
     const estimateValue = useMemo(

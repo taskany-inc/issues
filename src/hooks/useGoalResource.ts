@@ -24,7 +24,7 @@ type Functions = {
     [K in RefetchKeys]?: Parameters<TRPCContextGoal[K]['invalidate']>[0];
 };
 
-type InvalidateConfiguration = { invalidate: Functions };
+type Configuration = { invalidate: Functions; afterInvalidate?: () => void };
 type GoalFields = {
     id?: string;
     stateId?: string | null;
@@ -32,14 +32,15 @@ type GoalFields = {
     comments?: NonNullable<GoalByIdReturnType>['comments'];
 };
 
-export const useGoalResource = (fields: GoalFields, config?: InvalidateConfiguration) => {
+export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     const utils = trpc.useContext();
     const id = useMemo(() => fields.id, [fields.id]);
-    const invalidates = useMemo(() => config?.invalidate, [config?.invalidate]);
 
     const invalidate = useCallback(
         async (invalidateKey?: RefetchKeys | RefetchKeys[]) => {
-            if (!invalidates) return;
+            if (!config?.invalidate) return;
+
+            const { invalidate: invalidates, afterInvalidate } = config;
 
             let keys = null;
             if (invalidateKey) {
@@ -50,18 +51,20 @@ export const useGoalResource = (fields: GoalFields, config?: InvalidateConfigura
 
             await Promise.all(
                 keys.map((key) => {
-                    const { invalidate } = utils.goal[key];
+                    const { invalidate: invalidateFn } = utils.goal[key];
                     const args = invalidates[key] as UnionToIntersection<ArgsByRefetchKey>;
 
                     if (args) {
-                        return invalidate(args);
+                        return invalidateFn(args);
                     }
 
                     return true;
                 }),
             );
+
+            afterInvalidate?.();
         },
-        [invalidates, utils.goal],
+        [config, utils.goal],
     );
 
     const toggleGoalWatcher = trpc.goal.toggleWatcher.useMutation();

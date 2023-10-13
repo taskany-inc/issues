@@ -27,10 +27,11 @@ interface GoalActivityFeedProps {
     onGoalCriteriaClick?: ComponentProps<typeof GoalCriteria>['onClick'];
     onGoalDependencyClick?: ComponentProps<typeof GoalDependencyListByKind>['onClick'];
     onGoalDeleteConfirm?: () => void;
+    onInvalidate?: () => void;
 }
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
-    ({ goal, shortId, onGoalCriteriaClick, onGoalDependencyClick, onGoalDeleteConfirm }, ref) => {
+    ({ goal, shortId, onGoalCriteriaClick, onGoalDependencyClick, onGoalDeleteConfirm, onInvalidate }, ref) => {
         const { user } = usePageContext();
         const {
             onGoalCommentUpdate,
@@ -58,11 +59,12 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                 invalidate: {
                     getById: shortId,
                 },
+                afterInvalidate: onInvalidate,
             },
         );
 
-        const onConfirmDeletingGoal = useCallback(() => {
-            onGoalDelete();
+        const onConfirmDeletingGoal = useCallback(async () => {
+            await onGoalDelete();
             onGoalDeleteConfirm?.();
         }, [onGoalDelete, onGoalDeleteConfirm]);
 

@@ -100,7 +100,22 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         })
         .join('');
 
-    const { setPreview } = useGoalPreview();
+    const { setPreview, on } = useGoalPreview();
+
+    useEffect(() => {
+        const unsubUpdate = on('on:goal:update', () => {
+            invalidate();
+        });
+
+        const unsubDelete = on('on:goal:delete', () => {
+            invalidate();
+        });
+
+        return () => {
+            unsubUpdate();
+            unsubDelete();
+        };
+    }, [on, invalidate]);
 
     const onGoalCriteriaClick = useCallback(
         (item: GoalAchiveCriteria) => {
