@@ -17,7 +17,7 @@ import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
 import { safeGetUserName } from '../../utils/getUserName';
-import { FilteredPage } from '../FilteredPage';
+import { FilteredPage } from '../FilteredPage/FilteredPage';
 
 import { tr } from './DashboardPage.i18n';
 

@@ -9,7 +9,7 @@ import { Page } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { safeGetUserName } from '../../utils/getUserName';
-import { FilteredPage } from '../FilteredPage';
+import { FilteredPage } from '../FilteredPage/FilteredPage';
 import { FlatGoalList } from '../FlatGoalList';
 import { GroupedGoalList } from '../GroupedGoalList';
 
@@ -68,11 +68,11 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 filterControls={nullable(
                     !queryState?.groupBy,
                     () => (
-                        <FiltersMenuItem onClick={() => setGroupedView('project')}>
-                            {tr('Group by project')}
-                        </FiltersMenuItem>
+                        <FiltersMenuItem onClick={() => setGroupedView('project')}>{tr('Group')}</FiltersMenuItem>
                     ),
-                    <FiltersMenuItem onClick={() => setGroupedView()}>{tr('Reset grouping')}</FiltersMenuItem>,
+                    <FiltersMenuItem active onClick={() => setGroupedView()}>
+                        {tr('Ungroup')}
+                    </FiltersMenuItem>,
                 )}
             >
                 {nullable(
