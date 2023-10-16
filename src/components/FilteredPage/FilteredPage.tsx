@@ -69,6 +69,7 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
         setPreset,
         batchQueryState,
         setLimitFilter,
+        queryFilterState,
     } = useUrlFilterParams({
         preset: filterPreset,
     });
@@ -115,6 +116,7 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                 total={total}
                 counter={counter}
                 queryState={queryState}
+                queryFilterState={queryFilterState}
                 queryString={queryString}
                 onSearchChange={setFulltextFilter}
                 onFilterApply={batchQueryState}
