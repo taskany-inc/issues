@@ -36,22 +36,20 @@ export const PageHeader: FC = () => {
     const { userSettings, signIn } = useRouter();
     const { user } = usePageContext();
 
-    const links: [{ href: string; title: string; beta?: boolean; attr?: { 'data-cy': string } }] = [
+    const links = [
+        {
+            href: routes.goals(),
+            title: tr('Goals'),
+            attr: headerMenuGoals.attr,
+            beta: false,
+        },
         {
             href: routes.exploreTopProjects(),
             title: tr('Explore'),
             attr: headerMenuExplore.attr,
+            beta: false,
         },
     ];
-
-    if (user?.settings?.beta) {
-        links.unshift({
-            href: routes.goals(),
-            title: tr('Goals'),
-            attr: headerMenuGoals.attr,
-            beta: true,
-        });
-    }
 
     const onUserMenuClick = useCallback(() => (user ? userSettings() : signIn()), [user, userSettings, signIn]);
 
