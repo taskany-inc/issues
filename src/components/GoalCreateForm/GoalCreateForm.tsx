@@ -26,11 +26,7 @@ import { CommonDropdown } from '../CommonDropdown';
 import { tr } from './GoalCreateForm.i18n';
 
 const StyledMenuItem = styled(MenuItem)`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
     text-align: left;
-    border: none;
     width: 140px;
     padding: 0;
 `;
