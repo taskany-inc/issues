@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.0.1](https://github.com/taskany-inc/issues/compare/v2.0.0...v2.0.1) (2023-10-16)
+
+
+### Bug Fixes
+
+* **FiltersPanel:** fix filter highlight ([1911009](https://github.com/taskany-inc/issues/commit/19110092576a544e0fe1056bdf722ddf85e94cdd))
+* **GoalsPage:** disable Group filter ([dd30b66](https://github.com/taskany-inc/issues/commit/dd30b66530571314dbd0d492fae3c16ae72d77b8))
+* **PageHeader:** move out goals page from beta ([9be84ad](https://github.com/taskany-inc/issues/commit/9be84ad40b1a369fd90c066214115c84b96d7ab9))
+
 ## [2.0.0](https://github.com/taskany-inc/issues/compare/v1.33.0...v2.0.0) (2023-10-16)
 
 
