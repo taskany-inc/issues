@@ -447,7 +447,7 @@ export const HistoryRecordParticipant: React.FC<
     HistoryChangeProps<Activity & { user: User | null; ghost: Ghost | null }>
 > = ({ from, to }) => (
     <HistorySimplifyRecord
-        withPretext={false}
+        withPretext={Boolean(from) && Boolean(to)}
         from={nullable(prepareUserDataFromActivity(from), (data) => (
             <HistoryParticipant name={getUserName(data)} email={data.email} pic={data.image} />
         ))}
