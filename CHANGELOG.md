@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.0.0](https://github.com/taskany-inc/issues/compare/v1.33.0...v2.0.0) (2023-10-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove field "priority" from goal model
+
+### Features
+
+* cross project goals ([312cf87](https://github.com/taskany-inc/issues/commit/312cf8732f989e84a4733c9c7b32391a5a195a45))
+* **GoalPreview:** added sidebar like on GoalPage ([203bef5](https://github.com/taskany-inc/issues/commit/203bef5cef320f71c498aee69ccc809311ad2669))
+* **GoalsPage,ProjectsPage:** union goals and projects page ([856d1b2](https://github.com/taskany-inc/issues/commit/856d1b275346081c3063b76e27369e67f45df9d9))
+* **GoalsPage:** add new components ([e5b43f9](https://github.com/taskany-inc/issues/commit/e5b43f9bd37758ad1d29cc0358004928ceb9f3e1))
+* state dot for pinned comment ([310071b](https://github.com/taskany-inc/issues/commit/310071b84ffd0ee246e449b997e9c4c8571ef5b2))
+
+
+### Bug Fixes
+
+* added priority model instead of string ([bdeeb35](https://github.com/taskany-inc/issues/commit/bdeeb358f3fb8f1ff6e1384976503f16f734a0e0))
+* **FilterPanel:** move Group control near Filter control ([9ab802a](https://github.com/taskany-inc/issues/commit/9ab802ab0f2088b2252654e0310bf8e5bcf8e533))
+* **FilterPresetForm:** simplify api ([50be538](https://github.com/taskany-inc/issues/commit/50be538878d64f3a0bd54c2fb19b2c53d5c053b8))
+* **GoalList:** drop unused component ([76b86bf](https://github.com/taskany-inc/issues/commit/76b86bf02c9e836011948097d3588ed36477abb1))
+* **HistoryRecord:** add partner projects record ([283add8](https://github.com/taskany-inc/issues/commit/283add8d21c6f3cf38c4259119f32e726b203c15))
+* **HistoryRecord:** show pretext for changed owner ([7ec931a](https://github.com/taskany-inc/issues/commit/7ec931a8b61bfea106bcc83b8c9e1a89388872bb))
+
+
+### Code Refactoring
+
+* remove field "priority" from goal model ([188c4da](https://github.com/taskany-inc/issues/commit/188c4daf29ad236ffae77e47f0234dc6cc23ec2e))
+
 ## [1.33.0](https://github.com/taskany-inc/issues/compare/v1.32.4...v1.33.0) (2023-10-12)
 
 
