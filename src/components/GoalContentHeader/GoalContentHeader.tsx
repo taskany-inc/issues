@@ -21,15 +21,6 @@ const StyledCardInfo = styled(CardInfo)`
     align-items: center;
 `;
 
-const StyledMenuItem = styled(MenuItem)`
-    display: flex;
-    justify-content: start;
-`;
-
-const StyledIconClipboardOutline = styled(IconClipboardOutline)`
-    display: flex;
-`;
-
 interface GoalContentHeaderProps extends Pick<ComponentProps<typeof RelativeTime>, 'date' | 'kind'> {
     name?: string | null;
     description?: string;
@@ -49,7 +40,7 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
         return [
             {
                 label: tr('Copy raw'),
-                icon: <StyledIconClipboardOutline size="xxs" />,
+                icon: <IconClipboardOutline size="xxs" />,
                 onClick: onCopyDescription,
             },
         ];
@@ -69,9 +60,9 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
                             <IconMoreVerticalOutline size="xs" ref={ref} onClick={onClick} />
                         )}
                         renderItem={({ item }) => (
-                            <StyledMenuItem key={item.label} ghost icon={item.icon} onClick={item.onClick}>
+                            <MenuItem key={item.label} ghost icon={item.icon} onClick={item.onClick}>
                                 {item.label}
-                            </StyledMenuItem>
+                            </MenuItem>
                         )}
                     />
                 ))}

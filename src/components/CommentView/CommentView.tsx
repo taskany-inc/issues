@@ -121,15 +121,6 @@ const StyledMd = styled(Md)`
     overflow-x: auto;
 `;
 
-const StyledMenuItem = styled(MenuItem)`
-    display: flex;
-    justify-content: start;
-`;
-
-const StyledIconClipboardOutline = styled(IconClipboardOutline)`
-    display: flex;
-`;
-
 const StyledStateDot = styled(StateDot)`
     width: 32px;
     height: 32px;
@@ -201,7 +192,7 @@ export const CommentView: FC<CommentViewProps> = ({
         const items = [
             {
                 label: tr('Copy raw'),
-                icon: <StyledIconClipboardOutline size="xxs" />,
+                icon: <IconClipboardOutline size="xxs" />,
                 onClick: () => notifyPromise(copyValue(descriptionRef.current), 'copy'),
             },
         ];
@@ -278,7 +269,7 @@ export const CommentView: FC<CommentViewProps> = ({
                                     <IconMoreVerticalOutline size="xs" ref={ref} onClick={onClick} />
                                 )}
                                 renderItem={({ item, cursor, index }) => (
-                                    <StyledMenuItem
+                                    <MenuItem
                                         key={item.label}
                                         ghost
                                         color={item.color}
@@ -287,7 +278,7 @@ export const CommentView: FC<CommentViewProps> = ({
                                         onClick={item.onClick}
                                     >
                                         {item.label}
-                                    </StyledMenuItem>
+                                    </MenuItem>
                                 )}
                             />
                         </StyledCommentActions>
