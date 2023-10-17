@@ -1,7 +1,7 @@
 import React, { ReactNode, useMemo } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import { gapXs, gray4, radiusM } from '@taskany/colors';
+import { gapM, gapS, gapXs, gray4 } from '@taskany/colors';
 import { Table, Text, nullable } from '@taskany/bricks';
 import { IconServersOutline } from '@taskany/icons';
 
@@ -12,10 +12,12 @@ import { WrappedRowLink } from '../WrappedRowLink';
 import { projectListItem, projectListItemTitle } from '../../utils/domObjects';
 
 const StyledGoalsListContainer = styled(Table)<{ children?: React.ReactNode }>`
-    background-color: ${gray4};
-    border-radius: ${radiusM};
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: ${gapS} 0 ${gapM} 0;
+
+    box-sizing: border-box;
+
+    border-top: 1px solid ${gray4};
 `;
 
 const StyledProjectIcons = styled.div`

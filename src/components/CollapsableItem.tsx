@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
-import { gray4, gray7, radiusM } from '@taskany/colors';
+import { gapXs, gray4, gray7, radiusM } from '@taskany/colors';
 import { nullable } from '@taskany/bricks';
 
 export const collapseOffset = 20;
@@ -32,13 +32,10 @@ const StyledDot = styled.div`
 
 const StyledParentDot = styled(StyledDot)``;
 
-const StyledCollapsableHeader = styled.div`
-    padding-bottom: 1px;
-`;
+const StyledCollapsableHeader = styled.div``;
 
 const StyledCollapsableItem = styled.div`
     position: relative;
-    padding-bottom: 1px;
 
     &:before {
         content: '';
@@ -151,6 +148,12 @@ const StyledCollapsableContainer = styled.div<{ collapsed: boolean; deep: number
             > ${StyledCollapsableItem}:not(:last-child):before {
                 display: block;
             }
+        `}
+
+        ${({ collapsed }) =>
+        collapsed &&
+        css`
+            margin-bottom: ${gapXs};
         `}
 `;
 

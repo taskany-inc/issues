@@ -41,7 +41,7 @@ const GoalsGroupContainer = styled(TableFullWidthCell)`
 `;
 
 const GolasGroupSep = styled(PageSep)`
-    margin: ${gapS} 0px;
+    margin: 0 0 ${gapS} 0;
 `;
 
 export const GoalsGroup = React.memo<GoalGroupProps>(function GoalsGroup({

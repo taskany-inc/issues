@@ -196,7 +196,7 @@ const TagsCell: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
 };
 
 // px
-const maxTitleColumnWidth = 400;
+const maxTitleColumnWidth = 420;
 
 export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
     ({
@@ -232,7 +232,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
             return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
         }, [issuer, owner]);
 
-        const titleColumnWidth = maxTitleColumnWidth - (deep ?? 0) * collapseOffset;
+        const titleColumnWidth = maxTitleColumnWidth - (deep && deep > 0 ? deep : 0) * collapseOffset;
 
         return (
             <NextLink href={routes.goal(shortId)} passHref legacyBehavior>

@@ -37,7 +37,7 @@ interface ProjectListItemProps {
 }
 
 // px
-const maxTitleColumnWidth = 400;
+const maxTitleColumnWidth = 420;
 
 export const ProjectListItem: React.FC<ProjectListItemProps & TableRowProps> = ({
     children,
