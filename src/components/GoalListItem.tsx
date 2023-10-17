@@ -313,7 +313,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                             ))}
                         </TableCell>
 
-                        <TableCell col={1} justify="end">
+                        <TableCell col={1}>
                             <RelatedTextItem>
                                 <RelativeTime date={updatedAt} />
                             </RelatedTextItem>
