@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { FiltersMenuItem, nullable } from '@taskany/bricks';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
@@ -11,7 +10,6 @@ import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { safeGetUserName } from '../../utils/getUserName';
 import { FilteredPage } from '../FilteredPage/FilteredPage';
 import { GroupedGoalList } from '../GroupedGoalList';
-import { FlatGoalList } from '../FlatGoalList';
 
 import { tr } from './GoalsPage.i18n';
 
@@ -22,7 +20,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         defaultPresetFallback,
     });
 
-    const { currentPreset, queryState, setTagsFilterOutside, setPreset, setGroupedView } = useUrlFilterParams({
+    const { currentPreset, queryState, setTagsFilterOutside, setPreset } = useUrlFilterParams({
         preset,
     });
 
@@ -38,8 +36,6 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         currentPreset && currentPreset.description
             ? currentPreset.description
             : tr('These are goals across all projects');
-
-    const groupedView = queryState?.groupBy === 'project';
 
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
@@ -60,6 +56,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 }
                 description={description}
             />
+            {/** TODO: https://github.com/taskany-inc/issues/issues/1881 */}
             <FilteredPage
                 total={data?.count || 0}
                 counter={data?.filtered || 0}
@@ -67,26 +64,25 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 userFilters={userFilters}
                 onFilterStar={onFilterStar}
                 isLoading={false}
-                filterControls={nullable(
-                    groupedView,
-                    () => (
-                        <FiltersMenuItem
-                            active
-                            onClick={() => setGroupedView(queryState?.groupBy ? 'none' : undefined)}
-                        >
-                            {tr('Ungroup')}
-                        </FiltersMenuItem>
-                    ),
-                    <FiltersMenuItem onClick={() => setGroupedView('project')}>{tr('Group')}</FiltersMenuItem>,
-                )}
+                // filterControls={nullable(
+                //     !queryState?.groupBy,
+                //     () => (
+                //         <FiltersMenuItem onClick={() => setGroupedView('project')}>{tr('Group')}</FiltersMenuItem>
+                //     ),
+                //     <FiltersMenuItem active onClick={() => setGroupedView()}>
+                //         {tr('Ungroup')}
+                //     </FiltersMenuItem>,
+                // )}
             >
-                {nullable(
-                    groupedView,
+                {/** TODO: https://github.com/taskany-inc/issues/issues/1881 */}
+                {/* {nullable(
+                    !queryState?.groupBy,
                     () => (
-                        <GroupedGoalList queryState={queryState} setTagFilterOutside={setTagsFilterOutside} />
+                        <FlatGoalList queryState={queryState} setTagFilterOutside={setTagsFilterOutside} />
                     ),
-                    <FlatGoalList queryState={queryState} setTagFilterOutside={setTagsFilterOutside} />,
-                )}
+                    <GroupedGoalList queryState={queryState} setTagFilterOutside={setTagsFilterOutside} />,
+                )} */}
+                <GroupedGoalList queryState={queryState} setTagFilterOutside={setTagsFilterOutside} />
             </FilteredPage>
         </Page>
     );
