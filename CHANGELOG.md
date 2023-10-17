@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.1.1](https://github.com/taskany-inc/issues/compare/v2.1.0...v2.1.1) (2023-10-17)
+
+
+### Reverts
+
+* Revert "fix(FilterPanel): correct appling `groupBy` param" ([09b6f3e](https://github.com/taskany-inc/issues/commit/09b6f3e64eb10cb73e03dab6000e74b4180c095e))
+
 ## [2.1.0](https://github.com/taskany-inc/issues/compare/v2.0.1...v2.1.0) (2023-10-17)
 
 
