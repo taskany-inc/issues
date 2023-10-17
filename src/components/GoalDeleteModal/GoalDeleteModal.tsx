@@ -57,12 +57,12 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
     return (
         <ModalOnEvent view="danger" event={ModalEvent.GoalDeleteModal}>
             <ModalHeader>
-                <FormTitle color={danger0}>{tr('You are trying to delete goal')}</FormTitle>
+                <FormTitle color={danger0}>{tr('You are trying to archive goal')}</FormTitle>
             </ModalHeader>
 
             <ModalContent>
                 <Text>
-                    {tr.raw('To confirm deleting goal please type goal key below', {
+                    {tr.raw('To confirm archiving goal please type goal key below', {
                         goal: <b key={shortId}>{shortId}</b>,
                     })}
                 </Text>
@@ -89,7 +89,7 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
                                 view="danger"
                                 disabled={deleteConfirmation !== shortId}
                                 onClick={onConfirm}
-                                text={tr('Yes, delete it')}
+                                text={tr('Yes, archive it')}
                                 {...goalDeleteSubmitButton.attr}
                             />
                         </FormAction>
