@@ -27,7 +27,6 @@ export interface FilterQueryState {
 
 const groupByValue = {
     project: true,
-    none: true,
 };
 
 type GroupByParam = keyof typeof groupByValue;
@@ -116,7 +115,7 @@ export const buildURLSearchParams = ({
 
     watching ? urlParams.set('watching', '1') : urlParams.delete('watching');
 
-    groupBy === 'project' ? urlParams.set('groupBy', groupBy) : urlParams.delete('groupBy');
+    groupBy != null ? urlParams.set('groupBy', groupBy) : urlParams.delete('groupBy');
 
     limit ? urlParams.set('limit', limit.toString()) : urlParams.delete('limit');
 
@@ -156,22 +155,6 @@ export const parseQueryState = (query: ParsedUrlQuery) => {
     };
 };
 
-function makeGroupByParam(queryState?: QueryState, preset?: FilterById) {
-    const parsedPresetParams = preset ? Object.fromEntries(new URLSearchParams(preset.params)) : null;
-    const presetGroupBy = parsedPresetParams?.groupBy;
-    const queryGroupBy = queryState?.groupBy;
-
-    if (presetGroupBy) {
-        return { preset: presetGroupBy };
-    }
-
-    if (queryGroupBy) {
-        return { query: queryGroupBy };
-    }
-
-    return null;
-}
-
 export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
@@ -182,10 +165,6 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         const { queryState = undefined, queryFilterState = undefined } = Object.keys(query).length
             ? parseQueryState(query)
             : {};
-
-        if ('groupBy' in router.query && queryState != null) {
-            queryState.groupBy = router.query.groupBy as BaseQueryState['groupBy'];
-        }
 
         return {
             queryFilterState,
@@ -307,39 +286,6 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         [router],
     );
 
-    const setGroupedView = useCallback(
-        (value?: BaseQueryState['groupBy']) => {
-            const { query } = router;
-
-            const nextQuery = { ...query };
-
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            const currentGroupByValue = makeGroupByParam(queryState, currentPreset);
-
-            if (currentGroupByValue == null) {
-                nextQuery.groupBy = value;
-            } else if (currentGroupByValue.preset) {
-                if (currentGroupByValue.preset === value) {
-                    delete nextQuery.groupBy;
-                } else {
-                    nextQuery.groupBy = value;
-                }
-            } else if (currentGroupByValue.query) {
-                if (currentGroupByValue.query === value || value === 'none') {
-                    delete nextQuery.groupBy;
-                } else {
-                    nextQuery.groupBy = value;
-                }
-            }
-
-            router.push({
-                pathname: router.asPath.split('?')[0],
-                query: nextQuery,
-            });
-        },
-        [currentPreset, queryState, router],
-    );
-
     const setters = useMemo(
         () => ({
             setPriorityFilter: pushStateProvider.key('priority'),
@@ -356,6 +302,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setSortFilter: pushStateProvider.key('sort'),
             setFulltextFilter: pushStateProvider.key('query'),
             setLimitFilter: pushStateProvider.key('limit'),
+            setGroupedView: pushStateProvider.key('groupBy'),
             batchQueryState: pushStateProvider.batch(),
         }),
         [pushStateProvider],
@@ -369,7 +316,6 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         setTagsFilterOutside,
         resetQueryState,
         setPreset,
-        setGroupedView,
         ...setters,
     };
 };

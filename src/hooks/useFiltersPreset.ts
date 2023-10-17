@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { trpc } from '../utils/trpcClient';
@@ -23,20 +23,19 @@ export const useFiltersPreset = ({ defaultPresetFallback = true }: { defaultPres
         staleTime: refreshInterval,
     });
 
+    const shadowPreset = userFilters.data?.filter(
+        (f) => decodeURIComponent(f.params) === decodeURIComponent(queryString),
+    )[0];
+
     useEffect(() => {
         if (!defaultPresetFallback) {
             deleteCookie(filtersNoSearchPresetCookie);
         }
     }, [defaultPresetFallback]);
 
-    return useMemo(
-        () => ({
-            preset: preset.data,
-            shadowPreset: userFilters.data?.find(
-                (f) => decodeURIComponent(f.params) === decodeURIComponent(queryString),
-            ),
-            userFilters: userFilters.data,
-        }),
-        [preset.data, userFilters.data, queryString],
-    );
+    return {
+        preset: preset.data,
+        shadowPreset,
+        userFilters: userFilters.data,
+    };
 };
