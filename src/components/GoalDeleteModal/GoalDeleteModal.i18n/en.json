@@ -1,6 +1,6 @@
 {
-    "You are trying to delete goal": "You are trying to delete goal",
-    "To confirm deleting goal please type goal key below": "To confirm deleting goal {goal} please type goal key below.",
-    "Cancel": "Cancel",
-    "Yes, delete it": "Yes, delete it"
+    "You are trying to archive goal": "",
+    "To confirm archiving goal please type goal key below": "To confirm archiving goal {goal} please type goal key below.",
+    "Cancel": "",
+    "Yes, archive it": ""
 }
