@@ -109,10 +109,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
             setPreset={setPreset}
         />
     );
-    const description =
-        currentPreset && currentPreset.description
-            ? currentPreset.description
-            : project?.description || tr('description');
+    const description = currentPreset && currentPreset.description ? currentPreset.description : project?.description;
 
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(id);
 
