@@ -36,6 +36,7 @@ const StyledModalHeader = styled(ModalHeader)`
     position: sticky;
 
     box-shadow: 0 2px 5px 2px rgb(0 0 0 / 10%);
+    z-index: 3; // modal header must be upper than content
 `;
 
 const StyledModalContent = styled(ModalContent)`
