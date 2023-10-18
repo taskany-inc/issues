@@ -10,10 +10,18 @@ export const getServerSideProps = declareSsrProps(
 
         const { queryState, defaultPresetFallback } = await filtersPanelSsrInit(props);
 
-        await ssrHelpers.goal.getBatch.fetchInfinite({
-            limit: pageSize,
-            query: queryState,
-        });
+        if (queryState.groupBy === 'project') {
+            await ssrHelpers.project.getAll.fetchInfinite({
+                limit: pageSize,
+                goalsQuery: queryState,
+                firstLevel: !!queryState.project.length,
+            });
+        } else {
+            await ssrHelpers.goal.getBatch.fetchInfinite({
+                limit: pageSize,
+                query: queryState,
+            });
+        }
 
         await ssrHelpers.goal.getGoalsCount.fetch({
             query: queryState,
