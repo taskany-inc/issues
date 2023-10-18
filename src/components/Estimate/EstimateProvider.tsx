@@ -2,24 +2,28 @@ import { useContext, createContext, FC, ReactNode } from 'react';
 
 import { QuartersAliases, QuartersKeys } from '../../types/date';
 
-type ReadOnlyConfig = {
+interface ReadOnlyConfig {
     year: boolean;
     quarter: boolean;
     date: boolean;
-};
+}
 
-type EstimateContext = {
+interface SetState<T> {
+    (state: T): T;
+}
+
+interface EstimateContext {
     readOnly: ReadOnlyConfig;
-    setReadOnly: (update: ReadOnlyConfig | ((cfg: ReadOnlyConfig) => ReadOnlyConfig)) => void;
+    setReadOnly: (update: ReadOnlyConfig | SetState<ReadOnlyConfig>) => void;
     year?: number;
-    setYear: (year?: number) => void;
+    setYear: (year?: number | SetState<number | undefined>) => void;
     quarter?: QuartersKeys;
-    setQuarter: (quarter?: QuartersKeys) => void;
+    setQuarter: (quarter?: QuartersKeys | SetState<QuartersKeys | undefined>) => void;
     quarterAlias?: QuartersAliases;
-    setQuarterAlias: (alias?: QuartersAliases) => void;
+    setQuarterAlias: (alias?: QuartersAliases | SetState<QuartersAliases | undefined>) => void;
     date?: Date | undefined;
-    setDate: (date?: Date) => void;
-};
+    setDate: (date?: Date | SetState<Date | undefined>) => void;
+}
 
 const estimateContext = createContext<EstimateContext>({
     readOnly: {

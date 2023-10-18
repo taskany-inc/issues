@@ -67,12 +67,28 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ aliases }) => 
 
     const locale = useLocale();
 
+    const onClick = useCallback(() => {
+        setReadOnly({
+            quarter: false,
+            year: false,
+            date: true,
+        });
+        setQuarter((value) => value || currentQuarter);
+    }, [setReadOnly, setQuarter]);
+
+    const onClose = useCallback(() => {
+        setReadOnly((prev) => ({ ...prev, quarter: true, date: true }));
+    }, [setReadOnly]);
+
     const onQuarterChange = useCallback(
         (value?: QuartersKeys) => {
+            if (!value) {
+                onClose();
+            }
             setQuarter(value);
             setQuarterAlias(undefined);
         },
-        [setQuarter, setQuarterAlias],
+        [setQuarter, setQuarterAlias, onClose],
     );
 
     const onQuarterAliasesChange = useCallback(
@@ -89,14 +105,6 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ aliases }) => 
         [setYear, setQuarter, setQuarterAlias],
     );
 
-    const onClick = useCallback(() => {
-        setReadOnly({
-            quarter: false,
-            year: false,
-            date: true,
-        });
-    }, [setReadOnly]);
-
     return (
         <EstimateOption
             title={tr('Quarter title')}
@@ -108,6 +116,7 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ aliases }) => 
                 .join('')}
             readOnly={readOnly.quarter}
             onClick={onClick}
+            onClose={onClose}
             renderTrigger={() => (
                 <StyledButtonGroupsWrapper>
                     <ButtonGroup items={quartersList} value={quarter} onChange={onQuarterChange} />

@@ -71,12 +71,17 @@ export const EstimateDate: React.FC = () => {
         });
     }, [setReadOnly]);
 
+    const onClose = useCallback(() => {
+        setReadOnly((prev) => ({ ...prev, quarter: true, date: true }));
+    }, [setReadOnly]);
+
     return (
         <EstimateOption
             title={tr('Date title')}
             clue={tr('Date clue')}
             readOnly={readOnly.date}
             onClick={onClick}
+            onClose={onClose}
             renderTrigger={() => (
                 <InputMask
                     mask={tr('Date input mask')}
