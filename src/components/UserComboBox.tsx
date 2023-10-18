@@ -4,7 +4,7 @@ import { Button, UserPic, Input, UserMenuItem, nullable } from '@taskany/bricks'
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
-import { safeGetUserEmail, safeGetUserImage, safeGetUserName } from '../utils/getUserName';
+import { safeGetUserEmail, safeGetUserImage, safeGetUserName, safeUserData } from '../utils/getUserName';
 import { comboboxItem, usersCombobox, comboboxInput } from '../utils/domObjects';
 
 import { CommonCombobox } from './CommonCombobox';
@@ -90,11 +90,9 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                             text={props.text}
                             disabled={props.disabled}
                             onClick={props.onClick}
-                            iconLeft={nullable(value, (v) =>
-                                nullable(v, (user) => (
-                                    <UserPic src={safeGetUserEmail(user)} email={safeGetUserEmail(user)} size={16} />
-                                )),
-                            )}
+                            iconLeft={nullable(safeUserData(value), (props) => (
+                                <UserPic src={props.image} email={props.email} size={16} />
+                            ))}
                             {...usersCombobox.attr}
                         />
                     )
