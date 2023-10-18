@@ -120,7 +120,7 @@ export const ProjectListItemConnected: FC<{
             deep={deep}
             contentHidden={contentHidden}
         >
-            {nullable(!projectDeepInfo?.goals.length, () => (
+            {nullable(!projectDeepInfo?.goals.length && status !== 'loading', () => (
                 <InlineCreateGoalControl projectId={project.id} />
             ))}
             {childrenProjects.map((p) => (

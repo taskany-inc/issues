@@ -79,6 +79,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, se
                     onClickProvider={onGoalPrewiewShow}
                     selectedResolver={selectedGoalResolver}
                     queryState={queryState}
+                    collapsed
                 />
             ))}
 
