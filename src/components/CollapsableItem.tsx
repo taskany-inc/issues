@@ -195,7 +195,7 @@ export const CollapsableItem: FC<React.PropsWithChildren<CollapsableItemProps>> 
             {nullable(children, (ch) => (
                 <StyledCollapsableItem>{ch}</StyledCollapsableItem>
             ))}
-            {!collapsed ? content : null}
+            {nullable(content, (c) => !collapsed && c)}
         </StyledCollapsableContainer>
     );
 };
