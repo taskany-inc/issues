@@ -346,7 +346,7 @@ export const goal = router({
         .use(goalAccessMiddleware)
         .mutation(async ({ ctx, input }) => {
             const { activityId, role } = ctx.session.user;
-            const [estimate, estimateType = null] = input.estimate
+            const [estimate = null, estimateType = null] = input.estimate
                 ? [new Date(input.estimate.date), input.estimate.type]
                 : [];
 
@@ -444,7 +444,7 @@ export const goal = router({
 
                 history.push({
                     subject: 'estimate',
-                    action: 'change',
+                    action: nextHistoryEstimate ? 'change' : 'remove',
                     previousValue: prevHistoryEstimate,
                     nextValue: nextHistoryEstimate,
                 });

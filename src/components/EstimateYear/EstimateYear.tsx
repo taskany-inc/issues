@@ -38,15 +38,22 @@ for (let i = currentYear - 1; i <= currentYear + 4; i++) {
 
 export const EstimateYear: React.FC = () => {
     const { readOnly, setReadOnly, year, setYear, setQuarterAlias } = useEstimateContext();
-
     const locale = useLocale();
+
+    const onClose = useCallback(() => {
+        setReadOnly({ date: true, year: true, quarter: true });
+    }, [setReadOnly]);
 
     const changeHander = useCallback(
         (value?: number) => {
-            setQuarterAlias(undefined);
-            setYear(value);
+            if (!value) {
+                onClose();
+            } else {
+                setQuarterAlias(undefined);
+                setYear(value);
+            }
         },
-        [setQuarterAlias, setYear],
+        [setQuarterAlias, setYear, onClose],
     );
 
     const onClick = useCallback(() => {
@@ -54,10 +61,10 @@ export const EstimateYear: React.FC = () => {
     }, [setReadOnly]);
 
     useEffect(() => {
-        if (!readOnly.year && !year) {
-            changeHander(currentYear);
+        if (!readOnly.year) {
+            setYear((value) => value || currentYear);
         }
-    }, [readOnly.year, year, changeHander]);
+    }, [readOnly.year, setYear]);
 
     return (
         <EstimateOption
@@ -69,6 +76,7 @@ export const EstimateYear: React.FC = () => {
                 .join('')}
             readOnly={readOnly.year}
             onClick={onClick}
+            onClose={onClose}
             renderTrigger={() => (
                 <StyledTriggerWrapper>
                     <StyledItems>
@@ -78,7 +86,7 @@ export const EstimateYear: React.FC = () => {
                                 size="s"
                                 text={String(y)}
                                 checked={year === y}
-                                onClick={() => changeHander(y)}
+                                onClick={() => changeHander(year === y ? undefined : y)}
                             />
                         ))}
                     </StyledItems>

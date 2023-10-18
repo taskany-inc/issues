@@ -305,6 +305,7 @@ export const HistoryRecordEstimate: React.FC<HistoryChangeProps<string>> = ({ fr
     return (
         // FIXME: it must be EstimateBadge
         <HistorySimplifyRecord
+            withPretext={!!to}
             from={nullable(from ? decodeHistoryEstimate(from) : null, (fe) => (
                 <Tag size="s">{formateEstimate(fe.date, { locale, type: fe.type })}</Tag>
             ))}

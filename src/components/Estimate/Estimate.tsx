@@ -59,7 +59,7 @@ export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value
 
     const countedValue = useMemo(() => {
         if (readOnly.quarter && readOnly.year && readOnly.date) {
-            return value;
+            return;
         }
 
         if (!readOnly.quarter) {
@@ -81,11 +81,11 @@ export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value
         }
         return date
             ? {
-                  range: { end: date },
+                  range: { end: date, start: null },
                   type: DateType.Strict,
               }
             : undefined;
-    }, [year, quarter, date, quarterAlias, readOnly, value]);
+    }, [year, quarter, date, quarterAlias, readOnly]);
 
     useEffect(() => {
         const oldStartDate = value && value.range.start ? getDateString(value.range.start) : null;

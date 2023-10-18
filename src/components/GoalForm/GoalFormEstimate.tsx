@@ -10,7 +10,7 @@ type Estimate = {
 };
 
 type GoalFormEstimateProps = Omit<ComponentProps<typeof EstimatePopup>, 'onChange' | 'value'> & {
-    onChange: (date?: Estimate) => void;
+    onChange: (date: Estimate | null) => void;
     value?: Estimate;
 };
 
@@ -33,7 +33,7 @@ export const GoalFormEstimate = React.forwardRef<HTMLDivElement, GoalFormEstimat
                               date: getDateString(value.range.end),
                               type: value.type,
                           }
-                        : undefined,
+                        : null,
                 );
 
                 setEstimate(value);
