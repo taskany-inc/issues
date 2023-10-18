@@ -35,7 +35,7 @@ export const ProjectListItemConnected: FC<{
     const { on } = useGoalPreview();
     const utils = trpc.useContext();
 
-    const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
+    const { data: projectDeepInfo, isLoading: isDeepInfoLoading } = trpc.project.getDeepInfo.useQuery(
         {
             id: project.id,
             goalsQuery: queryState,
@@ -120,9 +120,10 @@ export const ProjectListItemConnected: FC<{
             deep={deep}
             contentHidden={contentHidden}
         >
-            {nullable(!projectDeepInfo?.goals.length && status !== 'loading', () => (
-                <InlineCreateGoalControl projectId={project.id} />
-            ))}
+            {nullable(
+                !projectDeepInfo?.goals.length,
+                () => !isDeepInfoLoading && <InlineCreateGoalControl projectId={project.id} />,
+            )}
             {childrenProjects.map((p) => (
                 <ProjectListItemConnected
                     key={p.id}
