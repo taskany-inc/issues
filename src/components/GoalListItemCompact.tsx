@@ -87,6 +87,7 @@ const StyledCell = styled(({ forIcon, ...props }: TableCellProps & { forIcon?: b
     ${({ forIcon }) =>
         forIcon &&
         css`
+            margin-top: 3px;
             &:last-child {
                 margin-left: auto;
             }
@@ -192,7 +193,7 @@ export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
                         <StyledDropdown
                             onChange={onActionClick}
                             renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
-                            placement="top-end"
+                            placement="right"
                             items={list}
                             renderItem={(props) => (
                                 <MenuItem
