@@ -10,8 +10,8 @@ export const ActivityFeed = styled.div`
 
 export const ActivityFeedItem = styled.div`
     display: grid;
-    grid-template-columns: 35px minmax(0, 1fr);
-    column-gap: 15px;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: ${gapM};
     position: relative;
 
     :first-child {

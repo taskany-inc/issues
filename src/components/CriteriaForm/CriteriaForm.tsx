@@ -21,6 +21,7 @@ const StyledInlineTrigger = styled(InlineTrigger)`
     display: inline-flex;
     color: ${gray8};
     line-height: 28px;
+    width: fit-content;
 `;
 
 const StyledFormInput = styled(FormInput)`
@@ -218,7 +219,7 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
     return (
         <InlineForm renderTrigger={renderTrigger} onSubmit={handleSubmit(onSubmit)} onReset={onResetHandler}>
             <TableRow align="center">
-                <StyledTableCell col={5} align="center">
+                <StyledTableCell col={7} align="center">
                     <Controller
                         name="title"
                         control={control}
@@ -234,7 +235,7 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
                         )}
                     />
                 </StyledTableCell>
-                <StyledTableCell col={4} align="center">
+                <StyledTableCell align="center" width={200}>
                     <Controller
                         name="weight"
                         control={control}

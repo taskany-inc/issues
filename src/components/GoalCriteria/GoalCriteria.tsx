@@ -9,8 +9,7 @@ import {
     IconBinOutline,
     IconEdit1Outline,
 } from '@taskany/icons';
-import { Goal, State } from '@prisma/client';
-import { backgroundColor, brandColor, gray10, danger0, gray8, gray9, gray4, textColor } from '@taskany/colors';
+import { backgroundColor, brandColor, gray10, danger0, gray8, gray9, gray4, gapS } from '@taskany/colors';
 import NextLink from 'next/link';
 
 import {
@@ -23,17 +22,19 @@ import { Title } from '../Table';
 import { GoalAchiveCriteria } from '../../../trpc/inferredTypes';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { Circle, CircledIcon } from '../Circle';
-import { UserGroup } from '../UserGroup';
 import { GoalListItemCompact, CustomCell } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
-import { DateType } from '../../types/date';
 import { EditCriteriaForm } from '../CriteriaForm/CriteriaForm';
+import { StateDot } from '../StateDot';
 
 import { tr } from './GoalCriteria.i18n';
 
 const StyledWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(60%, max-content);
+    grid-template-rows: minmax(32px, 100%);
+    align-items: center;
+    gap: ${gapS};
 `;
 
 const StyledCircleIcon = styled(IconCircleOutline)`
@@ -49,37 +50,20 @@ const StyledTickIcon = styled(IconTickCircleOutline)`
     fill: ${backgroundColor};
 `;
 
-const StyledTable = styled(Table)`
-    width: 100%;
-    margin-bottom: 10px;
-`;
-
 const StyledGoalTitle = styled(Title)`
     text-decoration: none;
-    color: ${textColor};
-
-    &:visited {
-        color: ${textColor};
-    }
 `;
 
 const StyledCheckboxWrapper = styled.span<{ canEdit: boolean }>`
     display: inline-flex;
+    cursor: pointer;
+
     ${({ canEdit }) =>
         !canEdit &&
         css`
             pointer-events: none;
+            cursor: default;
         `}
-
-    ${({ canEdit }) =>
-        canEdit &&
-        css`
-            cursor: pointer;
-        `}
-`;
-
-const StyledGoalListItemCompact = styled(GoalListItemCompact)`
-    padding: 3px 0 4px;
 `;
 
 interface GoalCriteriaCheckBoxProps {
@@ -97,18 +81,8 @@ const GoalCriteriaCheckBox: React.FC<GoalCriteriaCheckBoxProps> = ({ checked, ca
     );
 };
 
-const StyledHeadingWrapper = styled.div`
-    display: flex;
-    align-items: center;
-    height: 35px;
-`;
-
 const StyledTextHeading = styled(Text)`
     border-bottom: 1px solid ${gray4};
-    display: grid;
-    grid-template-columns: minmax(375px, 40%) max-content;
-    width: 100%;
-    max-width: calc(40% + 15px + 10px);
 `;
 
 interface GoalCriteriaItemProps {
@@ -117,15 +91,13 @@ interface GoalCriteriaItemProps {
     onConvertToGoal?: () => void;
     onClick?: () => void;
     onUpdateClick: () => void;
-    item: GoalAchiveCriteria & { goalAsCriteria?: (Goal & { state?: State | null }) | null };
+    item: GoalAchiveCriteria;
     canEdit: boolean;
     goalId: string;
 }
 
 interface CriteriaAsGoalProps extends GoalCriteriaItemProps {
-    item: GoalAchiveCriteria & {
-        goalAsCriteria: (Goal & { state: State | null; estimate: Date | null; estimateType: DateType | null }) | null;
-    };
+    item: GoalAchiveCriteria;
 }
 
 function criteriaGuard(props: unknown): props is CriteriaAsGoalProps['item'] {
@@ -198,29 +170,30 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
         },
         [onClick],
     );
-    const itemToRender = useMemo(() => {
-        if (item.goalAsCriteria) {
-            return {
-                ...item.goalAsCriteria,
-                shortId: `${item.goalAsCriteria.projectId}-${item.goalAsCriteria.scopeId}`,
-                estimate: item.goalAsCriteria.estimate,
-                estimateType: item.goalAsCriteria.estimateType,
-                weight: item.weight,
-            };
-        }
+    const itemToRender: Partial<GoalAchiveCriteria['goalAsCriteria'] & { shortId: string; weight: number }> =
+        useMemo(() => {
+            if (item.goalAsCriteria) {
+                return {
+                    ...item.goalAsCriteria,
+                    shortId: `${item.goalAsCriteria.projectId}-${item.goalAsCriteria.scopeId}`,
+                    weight: item.weight,
+                };
+            }
 
-        return item;
-    }, [item]);
+            return item;
+        }, [item]);
 
     return (
-        <StyledGoalListItemCompact
+        <GoalListItemCompact
             icon
             actions={availableActions}
             onActionClick={handleChange}
             item={itemToRender}
-            align="center"
+            align="start"
             rawIcon={
-                goalAsCriteria ? undefined : (
+                goalAsCriteria ? (
+                    <StateDot size="m" title={itemToRender?.title} hue={itemToRender?.state?.hue} />
+                ) : (
                     <GoalCriteriaCheckBox onClick={onToggle} checked={item.isDone} canEdit={canEdit} />
                 )
             }
@@ -230,16 +203,15 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
                     renderColumn(values) {
                         if (!criteriaGuard(values)) {
                             return (
-                                <CustomCell col={7}>
+                                <CustomCell width="80%">
                                     <Title size="s" weight="thin">
                                         {values.title}
                                     </Title>
                                 </CustomCell>
                             );
                         }
-
                         return (
-                            <CustomCell col={4}>
+                            <CustomCell width="80%">
                                 <NextLink passHref href={routes.goal(values.shortId)} legacyBehavior>
                                     <StyledGoalTitle size="s" weight="bold" onClick={onTitleClickHandler} as="a">
                                         {values.title}
@@ -252,39 +224,12 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
                 {
                     name: 'weight',
                     renderColumn: ({ weight }) => (
-                        <CustomCell justify="end" width="3ch">
+                        <CustomCell justify="end">
                             {nullable(weight, (w) => (
                                 <Text size="s">{w}</Text>
                             ))}
                         </CustomCell>
                     ),
-                },
-                {
-                    name: 'state',
-                    columnProps: {
-                        col: 1,
-                        justify: 'end',
-                    },
-                },
-                {
-                    name: 'projectId',
-                    columnProps: {
-                        col: 2,
-                    },
-                },
-                {
-                    name: 'issuers',
-                    renderColumn: ({ issuers }) => (
-                        <CustomCell align="start" width={45}>
-                            <UserGroup users={issuers} size={18} />
-                        </CustomCell>
-                    ),
-                },
-                {
-                    name: 'estimate',
-                    columnProps: {
-                        width: '7ch',
-                    },
                 },
             ]}
         />
@@ -381,13 +326,11 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             </Circle>
             <StyledWrapper>
                 {nullable(criteriaList.length, () => (
-                    <StyledHeadingWrapper>
-                        <StyledTextHeading size="s" weight="bold" color={gray9}>
-                            {tr('Achievement criteria')}
-                        </StyledTextHeading>
-                    </StyledHeadingWrapper>
+                    <StyledTextHeading size="s" weight="bold" color={gray9}>
+                        {tr('Achievement criteria')}
+                    </StyledTextHeading>
                 ))}
-                <StyledTable gap={5}>
+                <Table gap={5}>
                     {sortedCriteriaItems.map((item) => {
                         if (mode === 'view' || item.id !== criteriaId) {
                             return (
@@ -438,7 +381,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                     })}
 
                     {renderTrigger?.({ goalId, validityData: dataForValidateCriteria, onSubmit: onAddHandler })}
-                </StyledTable>
+                </Table>
             </StyledWrapper>
         </ActivityFeedItem>
     );
