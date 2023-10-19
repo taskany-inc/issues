@@ -9,6 +9,7 @@ import { PageContext } from '../utils/pageContext';
 import { usePageContext } from '../hooks/usePageContext';
 
 import { ReactionsButton } from './ReactionsButton';
+import { Light } from './Light';
 
 interface ReactionsDropdownProps {
     view?: 'button' | 'icon';
@@ -100,7 +101,11 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
 
     const viewModeMap: Record<'button' | 'icon', React.ReactNode> = {
         button: <ReactionsButton ref={buttonRef} onClick={onButtonClick} />,
-        icon: <IconMoodTongueOutline ref={buttonRef} size="xs" onClick={onButtonClick} />,
+        icon: (
+            <Light color={textColor} ref={buttonRef} onClick={onButtonClick}>
+                <IconMoodTongueOutline size="xs" />
+            </Light>
+        ),
     };
 
     return (

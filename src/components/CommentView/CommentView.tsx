@@ -2,7 +2,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Reaction, State, User } from '@prisma/client';
 import styled from 'styled-components';
-import { brandColor, danger0, gapM, gapS, gray4, gray9 } from '@taskany/colors';
+import { brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
 import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, UserPic, nullable, Button } from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 
@@ -22,6 +22,7 @@ import { CardHeader } from '../CardHeader';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { useLatest } from '../../hooks/useLatest';
 import { notifyPromise } from '../../utils/notifyPromise';
+import { Light } from '../Light';
 
 import { tr } from './CommentView.i18n';
 
@@ -255,7 +256,7 @@ export const CommentView: FC<CommentViewProps> = ({
                         {nullable(author, (data) => (
                             <CardHeader
                                 name={getUserName(data)}
-                                timeAgo={<RelativeTime isRelativeTime={isRelative} date={createdAt} hover />}
+                                timeAgo={<RelativeTime isRelativeTime={isRelative} date={createdAt} />}
                                 href={`#comment-${id}`}
                             />
                         ))}
@@ -266,7 +267,9 @@ export const CommentView: FC<CommentViewProps> = ({
                             <Dropdown
                                 items={dropdownItems}
                                 renderTrigger={({ ref, onClick }) => (
-                                    <IconMoreVerticalOutline size="xs" ref={ref} onClick={onClick} />
+                                    <Light color={textColor} ref={ref} onClick={onClick}>
+                                        <IconMoreVerticalOutline size="xs" />
+                                    </Light>
                                 )}
                                 renderItem={({ item, cursor, index }) => (
                                     <MenuItem

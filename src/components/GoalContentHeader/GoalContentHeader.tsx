@@ -1,6 +1,6 @@
 import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, nullable } from '@taskany/bricks';
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
-import { gray7 } from '@taskany/colors';
+import { gray7, textColor } from '@taskany/colors';
 import dynamic from 'next/dynamic';
 import { IconClipboardOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import styled from 'styled-components';
@@ -10,6 +10,7 @@ import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { notifyPromise } from '../../utils/notifyPromise';
+import { Light } from '../Light';
 
 import { tr } from './GoalContentHeader.i18n';
 
@@ -57,7 +58,9 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
                     <Dropdown
                         items={dropdownItems}
                         renderTrigger={({ ref, onClick }) => (
-                            <IconMoreVerticalOutline size="xs" ref={ref} onClick={onClick} />
+                            <Light color={textColor} ref={ref} onClick={onClick}>
+                                <IconMoreVerticalOutline size="xs" />
+                            </Light>
                         )}
                         renderItem={({ item }) => (
                             <MenuItem key={item.label} ghost icon={item.icon} onClick={item.onClick}>
