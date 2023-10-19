@@ -197,8 +197,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                         onClickProvider={onGoalPrewiewShow}
                         selectedResolver={selectedGoalResolver}
                         queryState={queryState}
-                        collapsed={!id}
-                        hasLink={!id}
                     />
                 ))}
             </FilteredPage>
