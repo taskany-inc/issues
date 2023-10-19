@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.1.2](https://github.com/taskany-inc/issues/compare/v2.1.1...v2.1.2) (2023-10-19)
+
+
+### Bug Fixes
+
+* **GroupedGoalList:** `Create Goal` mirage ([a85d69d](https://github.com/taskany-inc/issues/commit/a85d69dd9155aac0967ef5412deb6851a60598e7))
+* **GroupedGoalList:** collapse projects by default ([c05df30](https://github.com/taskany-inc/issues/commit/c05df303a2ebaf148ddfba4a281a33742d1e632a))
+* **ProjectListItemConnected:** correct project links ([93516f8](https://github.com/taskany-inc/issues/commit/93516f8e67432a5c8ab3ab11ee0a0532fb41b7db))
+* **UserComboBox:** provided user image ([2d5d147](https://github.com/taskany-inc/issues/commit/2d5d1471b0a38166b1e2e7a6dd024cfe6e842a5e))
+
 ## [2.1.1](https://github.com/taskany-inc/issues/compare/v2.1.0...v2.1.1) (2023-10-17)
 
 
