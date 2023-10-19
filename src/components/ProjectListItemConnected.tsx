@@ -64,7 +64,7 @@ export const ProjectListItemConnected: FC<{
             }
         });
 
-        const unsubDelete = on('on:goal:update', (updatedId) => {
+        const unsubDelete = on('on:goal:delete', (updatedId) => {
             const idInList = projectDeepInfo?.goals.find(({ _shortId }) => _shortId === updatedId);
             if (idInList) {
                 utils.project.getDeepInfo.invalidate();
