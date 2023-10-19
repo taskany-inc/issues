@@ -120,6 +120,7 @@ export const ProjectListItemConnected: FC<{
             deep={deep}
             contentHidden={contentHidden}
         >
+            {/* FIXME https://github.com/taskany-inc/issues/issues/1927 */}
             {nullable(
                 !projectDeepInfo?.goals.length,
                 () => !isDeepInfoLoading && <InlineCreateGoalControl projectId={project.id} />,

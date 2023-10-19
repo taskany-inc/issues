@@ -424,9 +424,20 @@ export const project = router({
                     activityId,
                     goalsQuery,
                     whereQuery: {
-                        id: {
-                            in: ids,
-                        },
+                        AND: [
+                            {
+                                id: {
+                                    in: ids,
+                                },
+                            },
+                            goalsQuery
+                                ? {
+                                      goals: {
+                                          some: goalsFilter(goalsQuery, activityId).where,
+                                      },
+                                  }
+                                : {},
+                        ],
                     },
                 }),
             });
