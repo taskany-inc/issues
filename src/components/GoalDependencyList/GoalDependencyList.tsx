@@ -10,7 +10,7 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { DateType } from '../../types/date';
 import { ToggleGoalDependency, dependencyKind } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalDependencyItem } from '../../../trpc/inferredTypes';
-import { Circle, CircledIcon as CircleIconInner } from '../Circle';
+import { Circle } from '../Circle';
 import { ContentItem, Title } from '../Table';
 import { CustomCell, GoalListItemCompact } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
@@ -205,7 +205,7 @@ export function GoalDependencyListByKind<T extends GoalDependencyItem>({
     return (
         <ActivityFeedItem>
             <Circle size={32}>
-                <CircleIconInner as={IconMessageTextAltOutline} size="s" color={backgroundColor} />
+                <IconMessageTextAltOutline size="s" color={backgroundColor} />
                 {showBeta && <StyledBetaMark />}
             </Circle>
             <StyledWrapper>

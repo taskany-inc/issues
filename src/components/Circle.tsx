@@ -1,11 +1,18 @@
 import { gray7 } from '@taskany/colors';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-interface CircleProps {
+interface CircleProps extends React.RefAttributes<HTMLSpanElement> {
     size: number;
+    backgroundColor?: string;
 }
 
-export const Circle = styled.span<CircleProps>`
+export const Circle = styled(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    forwardRef<HTMLSpanElement, React.PropsWithChildren<CircleProps>>(({ size, backgroundColor, ...props }, ref) => (
+        <span {...props} ref={ref} />
+    )),
+)`
     display: flex;
     position: relative;
     z-index: 1;
@@ -14,19 +21,12 @@ export const Circle = styled.span<CircleProps>`
         width: ${size}px;
         height: ${size}px;
     `}
-`;
 
-export const CircledIcon = styled.span`
-    display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
 
     text-align: center;
-    background-color: ${gray7};
+    background-color: ${({ backgroundColor = gray7 }) => backgroundColor};
     border-radius: 50%;
-    overflow: hidden;
-
-    width: 100%;
-    height: 100%;
 `;
