@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.2.0](https://github.com/taskany-inc/issues/compare/v2.1.2...v2.2.0) (2023-10-19)
+
+
+### Features
+
+* delete estimates ([234f915](https://github.com/taskany-inc/issues/commit/234f915898971bc353248c44ba3e4e8eab91c328))
+
+
+### Bug Fixes
+
+* **Circle:** remove useless styles ([ea8160f](https://github.com/taskany-inc/issues/commit/ea8160f61bd18b134b876bea48b8154a26ff5dd6))
+* links on hover are blue & actions are textColor ([6aa3b14](https://github.com/taskany-inc/issues/commit/6aa3b140cf94a222e4e2ce4d748fa4b3038c93cc))
+* **ProjectListItemConnected:** subscribe to archive goal from preview ([1cae83e](https://github.com/taskany-inc/issues/commit/1cae83ee0d9372d0e723f791cc1e97bbda77e599))
+
 ## [2.1.2](https://github.com/taskany-inc/issues/compare/v2.1.1...v2.1.2) (2023-10-19)
 
 
