@@ -23,7 +23,7 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
 import { HistoryAction, HistoryRecordSubject } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
-import { Circle, CircledIcon } from '../Circle';
+import { Circle } from '../Circle';
 import { useLocale } from '../../hooks/useLocale';
 import { getUserName, prepareUserDataFromActivity } from '../../utils/getUserName';
 
@@ -102,10 +102,6 @@ const StyledTextWrapper = styled.div<{ multiline?: boolean }>`
         css`
             align-items: flex-start;
         `}
-`;
-
-const StyledCircledIcon = styled(CircledIcon)`
-    background-color: ${backgroundColor};
 `;
 
 const StyledButton = styled(Button)`
@@ -216,8 +212,8 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
     return (
         <StyledActivityFeedItem>
             <RecordCtx.Provider value={{ setActionText, setSubjectText }}>
-                <Circle size={24}>
-                    <StyledCircledIcon as={IconDoubleCaretRightCircleSolid} size="m" color={gray7} />
+                <Circle size={24} backgroundColor={backgroundColor}>
+                    <IconDoubleCaretRightCircleSolid size={24} color={gray7} />
                 </Circle>
                 <StyledHistoryRecordWrapper>
                     {/* FIXME: it must be UserBadge */}

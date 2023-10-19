@@ -21,7 +21,7 @@ import {
 import { Title } from '../Table';
 import { GoalAchiveCriteria } from '../../../trpc/inferredTypes';
 import { ActivityFeedItem } from '../ActivityFeed';
-import { Circle, CircledIcon } from '../Circle';
+import { Circle } from '../Circle';
 import { GoalListItemCompact, CustomCell } from '../GoalListItemCompact';
 import { routes } from '../../hooks/router';
 import { EditCriteriaForm } from '../CriteriaForm/CriteriaForm';
@@ -322,7 +322,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     return (
         <ActivityFeedItem>
             <Circle size={32}>
-                <CircledIcon as={IconMessageTickOutline} size="s" color={backgroundColor} />
+                <IconMessageTickOutline size="s" color={backgroundColor} />
             </Circle>
             <StyledWrapper>
                 {nullable(criteriaList.length, () => (
