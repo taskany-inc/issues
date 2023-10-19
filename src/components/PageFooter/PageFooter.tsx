@@ -1,8 +1,9 @@
 import { FC } from 'react';
 import { Footer, Link, FooterItem } from '@taskany/bricks';
-import { gray9 } from '@taskany/colors';
+import { textColor } from '@taskany/colors';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { Light } from '../Light';
 
 import { tr } from './PageFooter.i18n';
 
@@ -16,15 +17,13 @@ export const PageFooter: FC = () => {
     ];
     return (
         <Footer>
-            <Link inline>
-                <FooterItem color={gray9} onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)}>
-                    {tr('Feedback')}
-                </FooterItem>
-            </Link>
+            <Light color={textColor}>
+                <FooterItem onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)}>{tr('Feedback')}</FooterItem>
+            </Light>
 
             {menuItems.map(({ title, url }) => (
                 <Link key={url} href={url} inline>
-                    <FooterItem color={gray9}>{title}</FooterItem>
+                    <FooterItem>{title}</FooterItem>
                 </Link>
             ))}
         </Footer>
