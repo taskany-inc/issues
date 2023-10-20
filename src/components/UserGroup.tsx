@@ -5,7 +5,7 @@ import { getUserName, prepareUserDataFromActivity } from '../utils/getUserName';
 
 type User = ComponentProps<typeof UserGroupBricks>['users'][number];
 
-interface UserGroupProps extends ComponentProps<typeof UserGroupBricks> {
+interface UserGroupProps extends Omit<ComponentProps<typeof UserGroupBricks>, 'users'> {
     users: Array<{
         user?: User | null;
         ghost?: User | null;
@@ -15,7 +15,7 @@ interface UserGroupProps extends ComponentProps<typeof UserGroupBricks> {
 export const UserGroup = ({ users, ...rest }: UserGroupProps) => {
     const extractedUsers = useMemo(
         () =>
-            users.reduce<User>((acc, activity) => {
+            users.reduce<User[]>((acc, activity) => {
                 const target = prepareUserDataFromActivity(activity);
 
                 if (target != null) {
@@ -30,5 +30,6 @@ export const UserGroup = ({ users, ...rest }: UserGroupProps) => {
             }, []),
         [users],
     );
+
     return <UserGroupBricks users={extractedUsers} {...rest} />;
 };
