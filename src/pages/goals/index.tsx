@@ -15,6 +15,10 @@ export const getServerSideProps = declareSsrProps(
             query: queryState,
         });
 
+        await ssrHelpers.goal.getGoalsCount.fetch({
+            query: queryState,
+        });
+
         return {
             defaultPresetFallback,
         };

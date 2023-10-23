@@ -15,7 +15,6 @@ import {
     toggleGoalDependencySchema,
     goalCommentCreateSchema,
     toggleParticipantsSchema,
-    batchGoalByProjectIdSchema,
     togglePartnerProjectSchema,
 } from '../../src/schema/goal';
 import { ToggleSubscriptionSchema, suggestionsQuerySchema, batchGoalsSchema } from '../../src/schema/common';
@@ -39,9 +38,16 @@ import {
 } from '../../src/schema/criteria';
 import type { FieldDiff } from '../../src/types/common';
 import { encodeHistoryEstimate, formateEstimate } from '../../src/utils/dateTime';
-import { goalAccessMiddleware, commentAccessMiddleware, criteriaAccessMiddleware } from '../access/accessMiddlewares';
+import {
+    goalEditAccessMiddleware,
+    commentAccessMiddleware,
+    criteriaAccessMiddleware,
+    goalAccessMiddleware,
+    goalByShortIdAccessMiddleware,
+} from '../access/accessMiddlewares';
 import { addCalculatedProjectFields, nonArchivedPartialQuery } from '../queries/project';
 import { recalculateCriteriaScore, goalIncludeCriteriaParams } from '../../src/utils/recalculateCriteriaScore';
+import { getProjectAccessFilter } from '../queries/access';
 
 const updateProjectUpdatedAt = async (id?: string | null) => {
     if (!id) return;
@@ -103,6 +109,9 @@ export const goal = router({
                     ...nonArchievedGoalsPartialQuery,
                     AND: {
                         ...selectParams,
+                        project: {
+                            ...getProjectAccessFilter(activityId, role),
+                        },
                     },
                 },
                 include: {
@@ -143,17 +152,21 @@ export const goal = router({
         }),
     getGoalsCount: protectedProcedure.input(batchGoalsSchema.pick({ query: true })).query(async ({ input, ctx }) => {
         const { query } = input;
-        const { activityId } = ctx.session.user;
+        const { activityId, role } = ctx.session.user;
+        const projectAccessFilter = getProjectAccessFilter(activityId, role);
+        const baseWhere = {
+            ...nonArchivedPartialQuery,
+            project: {
+                ...projectAccessFilter,
+            },
+        };
+
         const [count, filtered] = await Promise.all([
             prisma.goal.count({
-                where: {
-                    archived: {
-                        not: true,
-                    },
-                },
+                where: baseWhere,
             }),
             prisma.goal.count({
-                where: query ? goalsFilter(query, activityId).where : nonArchivedPartialQuery,
+                where: query ? goalsFilter(query, activityId, role).where : baseWhere,
             }),
         ]);
         return {
@@ -171,7 +184,7 @@ export const goal = router({
                     take: limit + 1,
                     skip,
                     cursor: cursor ? { id: cursor } : undefined,
-                    ...(query ? goalsFilter(query, activityId) : {}),
+                    ...(query ? goalsFilter(query, activityId, role) : {}),
                     orderBy: {
                         id: 'asc',
                     },
@@ -209,126 +222,129 @@ export const goal = router({
                 },
             };
         }),
-    getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
-        // try to recognize shot id like: FRNTND-23
-        const [projectId, scopeIdStr] = input.split('-');
-        const { activityId, role } = ctx.session.user;
+    getById: protectedProcedure
+        .input(z.string())
+        .use(goalByShortIdAccessMiddleware)
+        .query(async ({ ctx, input }) => {
+            // try to recognize shot id like: FRNTND-23
+            const [projectId, scopeIdStr] = input.split('-');
+            const { activityId, role } = ctx.session.user;
 
-        if (!projectId) return null;
+            if (!projectId) return null;
 
-        const scopeId = parseInt(scopeIdStr, 10);
+            const scopeId = parseInt(scopeIdStr, 10);
 
-        if (!scopeId) return null;
+            if (!scopeId) return null;
 
-        try {
-            const goal = await prisma.goal.findFirst({
-                where: {
-                    projectId,
-                    scopeId,
-                    archived: false,
-                },
-                include: {
-                    ...goalDeepQuery,
-                    goalAchiveCriteria: {
-                        include: {
-                            criteriaGoal: {
-                                include: {
-                                    activity: {
-                                        include: {
-                                            user: true,
-                                            ghost: true,
+            try {
+                const goal = await prisma.goal.findFirst({
+                    where: {
+                        projectId,
+                        scopeId,
+                        archived: false,
+                    },
+                    include: {
+                        ...goalDeepQuery,
+                        goalAchiveCriteria: {
+                            include: {
+                                criteriaGoal: {
+                                    include: {
+                                        activity: {
+                                            include: {
+                                                user: true,
+                                                ghost: true,
+                                            },
                                         },
-                                    },
-                                    owner: {
-                                        include: {
-                                            user: true,
-                                            ghost: true,
+                                        owner: {
+                                            include: {
+                                                user: true,
+                                                ghost: true,
+                                            },
                                         },
+                                        state: true,
                                     },
-                                    state: true,
                                 },
                             },
+                            orderBy: {
+                                createdAt: 'asc',
+                            },
+                            where: {
+                                OR: [{ deleted: false }, { deleted: null }],
+                            },
                         },
-                        orderBy: {
-                            createdAt: 'asc',
-                        },
-                        where: {
+                    },
+                });
+
+                if (!goal) return null;
+
+                const history = await getGoalHistory(goal.history || []);
+
+                const versaCriteriaGoals = await prisma.goalAchieveCriteria.findMany({
+                    where: {
+                        AND: {
+                            criteriaGoalId: goal.id,
                             OR: [{ deleted: false }, { deleted: null }],
                         },
                     },
-                },
-            });
-
-            if (!goal) return null;
-
-            const history = await getGoalHistory(goal.history || []);
-
-            const versaCriteriaGoals = await prisma.goalAchieveCriteria.findMany({
-                where: {
-                    AND: {
-                        criteriaGoalId: goal.id,
-                        OR: [{ deleted: false }, { deleted: null }],
-                    },
-                },
-                include: {
-                    goal: {
-                        include: {
-                            state: true,
-                            activity: {
-                                include: {
-                                    user: true,
-                                    ghost: true,
+                    include: {
+                        goal: {
+                            include: {
+                                state: true,
+                                activity: {
+                                    include: {
+                                        user: true,
+                                        ghost: true,
+                                    },
                                 },
-                            },
-                            owner: {
-                                include: {
-                                    user: true,
-                                    ghost: true,
+                                owner: {
+                                    include: {
+                                        user: true,
+                                        ghost: true,
+                                    },
                                 },
                             },
                         },
                     },
-                },
-            });
+                });
 
-            return {
-                ...goal,
-                ...addCalculatedGoalsFields(goal, activityId, role),
-                ...mixHistoryWithComments(history, goal.comments),
-                _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
-                _relations: makeGoalRelationMap(
-                    {
-                        dependsOn: goal.dependsOn,
-                        blocks: goal.blocks,
-                        relatedTo: goal.relatedTo,
-                        connected: goal.connected,
-                    },
-                    activityId,
-                    role,
-                ),
-                _versaCriteria: versaCriteriaGoals.map(({ goal, ...rest }) => ({
-                    ...rest,
-                    goal: {
-                        ...goal,
-                        _shortId: `${goal.projectId}-${goal.scopeId}`,
-                    },
-                })),
+                return {
+                    ...goal,
+                    ...addCalculatedGoalsFields(goal, activityId, role),
+                    ...mixHistoryWithComments(history, goal.comments),
+                    _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
+                    _relations: makeGoalRelationMap(
+                        {
+                            dependsOn: goal.dependsOn,
+                            blocks: goal.blocks,
+                            relatedTo: goal.relatedTo,
+                            connected: goal.connected,
+                        },
+                        activityId,
+                        role,
+                    ),
+                    _versaCriteria: versaCriteriaGoals.map(({ goal, ...rest }) => ({
+                        ...rest,
+                        goal: {
+                            ...goal,
+                            _shortId: `${goal.projectId}-${goal.scopeId}`,
+                        },
+                    })),
 
-                _criteria: goal.goalAchiveCriteria.map(({ criteriaGoal, ...criteria }) => ({
-                    ...criteria,
-                    criteriaGoal:
-                        criteriaGoal != null
-                            ? {
-                                  ...criteriaGoal,
-                                  _shortId: `${criteriaGoal.projectId}-${criteriaGoal.scopeId}`,
-                              }
-                            : null,
-                })),
-            };
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
+                    _criteria: goal.goalAchiveCriteria.map(({ criteriaGoal, ...criteria }) => ({
+                        ...criteria,
+                        criteriaGoal:
+                            criteriaGoal != null
+                                ? {
+                                      ...criteriaGoal,
+                                      _shortId: `${criteriaGoal.projectId}-${criteriaGoal.scopeId}`,
+                                  }
+                                : null,
+                    })),
+                };
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
     create: protectedProcedure.input(goalCommonSchema).mutation(async ({ ctx, input }) => {
         if (!input.owner.id) return null;
         if (!input.parent.id) return null;
@@ -386,7 +402,7 @@ export const goal = router({
     }),
     changeProject: protectedProcedure
         .input(goalChangeProjectSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ ctx, input }) => {
             const actualGoal = await prisma.goal.findUnique({
                 where: { id: input.id },
@@ -434,7 +450,7 @@ export const goal = router({
         }),
     update: protectedProcedure
         .input(goalUpdateSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ ctx, input }) => {
             const { activityId, role } = ctx.session.user;
             const [estimate = null, estimateType = null] = input.estimate
@@ -641,6 +657,7 @@ export const goal = router({
         }),
     toggleStargizer: protectedProcedure
         .input(ToggleSubscriptionSchema)
+        .use(goalAccessMiddleware)
         .mutation(({ ctx, input: { id, direction } }) => {
             const connection = { id };
 
@@ -655,23 +672,26 @@ export const goal = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
         }),
-    toggleWatcher: protectedProcedure.input(ToggleSubscriptionSchema).mutation(({ ctx, input: { id, direction } }) => {
-        const connection = { id };
+    toggleWatcher: protectedProcedure
+        .input(ToggleSubscriptionSchema)
+        .use(goalAccessMiddleware)
+        .mutation(({ ctx, input: { id, direction } }) => {
+            const connection = { id };
 
-        try {
-            return prisma.activity.update({
-                where: { id: ctx.session.user.activityId },
-                data: {
-                    goalWatchers: { [connectionMap[String(direction)]]: connection },
-                },
-            });
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
+            try {
+                return prisma.activity.update({
+                    where: { id: ctx.session.user.activityId },
+                    data: {
+                        goalWatchers: { [connectionMap[String(direction)]]: connection },
+                    },
+                });
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
     toggleArchive: protectedProcedure
         .input(toggleGoalArchiveSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input: { id, archived }, ctx }) => {
             const { activityId, role } = ctx.session.user;
 
@@ -746,7 +766,7 @@ export const goal = router({
         }),
     switchState: protectedProcedure
         .input(goalStateChangeSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             const { activityId, role } = ctx.session.user;
 
@@ -858,140 +878,144 @@ export const goal = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
         }),
-    createComment: protectedProcedure.input(goalCommentCreateSchema).mutation(async ({ ctx, input }) => {
-        if (!input.goalId) return null;
+    createComment: protectedProcedure
+        .input(goalCommentCreateSchema)
+        .use(goalAccessMiddleware)
+        .mutation(async ({ ctx, input }) => {
+            if (!input.goalId) return null;
 
-        const { activityId, role } = ctx.session.user;
+            const { activityId, role } = ctx.session.user;
 
-        const [commentAuthor, actualGoal, pushState] = await Promise.all([
-            prisma.activity.findUnique({
-                where: { id: ctx.session.user.activityId },
-                include: { user: true, ghost: true },
-            }),
-            prisma.goal.findUnique({
-                where: { id: input.goalId },
-                include: {
-                    participants: { include: { user: true, ghost: true } },
-                    watchers: { include: { user: true, ghost: true } },
-                    activity: { include: { user: true, ghost: true } },
-                    owner: { include: { user: true, ghost: true } },
-                    state: true,
-                    project: true,
-                    goalInCriteria: true,
-                },
-            }),
-            input.stateId ? prisma.state.findUnique({ where: { id: input.stateId } }) : Promise.resolve(undefined),
-        ]);
-
-        if (!commentAuthor) return null;
-        if (!actualGoal) return null;
-
-        const { _isEditable, _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
-
-        try {
-            // We want to see state changes record and comment next in activity feed.
-            const [updatedGoal, newComment] = await prisma.$transaction([
-                // Update goal and push to history first.
-                prisma.goal.update({
+            const [commentAuthor, actualGoal, pushState] = await Promise.all([
+                prisma.activity.findUnique({
+                    where: { id: ctx.session.user.activityId },
+                    include: { user: true, ghost: true },
+                }),
+                prisma.goal.findUnique({
                     where: { id: input.goalId },
-                    data: {
-                        id: input.goalId,
-                        stateId: _isEditable ? pushState?.id : actualGoal.stateId,
-                        goalInCriteria: {
-                            updateMany: {
-                                where: {
-                                    id: { in: actualGoal.goalInCriteria.map(({ id }) => id) },
-                                },
-                                data: {
-                                    isDone: _isEditable && pushState?.type && pushState?.type === StateType.Completed,
-                                },
-                            },
-                        },
-                        history:
-                            _isEditable && input.stateId && input.stateId !== actualGoal.stateId
-                                ? {
-                                      create: {
-                                          subject: 'state',
-                                          action: 'change',
-                                          previousValue: actualGoal.stateId,
-                                          nextValue: input.stateId,
-                                          activityId,
-                                      },
-                                  }
-                                : undefined,
-                        // subscribe comment author
-                        watchers: {
-                            connect: [{ id: commentAuthor.id }],
-                        },
-                    },
                     include: {
-                        goalInCriteria: goalIncludeCriteriaParams,
+                        participants: { include: { user: true, ghost: true } },
+                        watchers: { include: { user: true, ghost: true } },
+                        activity: { include: { user: true, ghost: true } },
+                        owner: { include: { user: true, ghost: true } },
                         state: true,
+                        project: true,
+                        goalInCriteria: true,
                     },
                 }),
-                // Create comment next.
-                prisma.comment.create({
-                    data: {
-                        description: input.description,
-                        activityId: commentAuthor.id,
-                        goalId: input.goalId,
-                        stateId: _isEditable ? input.stateId : undefined,
-                    },
-                    include: {
-                        activity: {
-                            include: {
-                                user: true,
+                input.stateId ? prisma.state.findUnique({ where: { id: input.stateId } }) : Promise.resolve(undefined),
+            ]);
+
+            if (!commentAuthor) return null;
+            if (!actualGoal) return null;
+
+            const { _isEditable, _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
+
+            try {
+                // We want to see state changes record and comment next in activity feed.
+                const [updatedGoal, newComment] = await prisma.$transaction([
+                    // Update goal and push to history first.
+                    prisma.goal.update({
+                        where: { id: input.goalId },
+                        data: {
+                            id: input.goalId,
+                            stateId: _isEditable ? pushState?.id : actualGoal.stateId,
+                            goalInCriteria: {
+                                updateMany: {
+                                    where: {
+                                        id: { in: actualGoal.goalInCriteria.map(({ id }) => id) },
+                                    },
+                                    data: {
+                                        isDone:
+                                            _isEditable && pushState?.type && pushState?.type === StateType.Completed,
+                                    },
+                                },
+                            },
+                            history:
+                                _isEditable && input.stateId && input.stateId !== actualGoal.stateId
+                                    ? {
+                                          create: {
+                                              subject: 'state',
+                                              action: 'change',
+                                              previousValue: actualGoal.stateId,
+                                              nextValue: input.stateId,
+                                              activityId,
+                                          },
+                                      }
+                                    : undefined,
+                            // subscribe comment author
+                            watchers: {
+                                connect: [{ id: commentAuthor.id }],
                             },
                         },
-                    },
-                }),
-            ]);
-            await updateProjectUpdatedAt(updatedGoal.projectId);
+                        include: {
+                            goalInCriteria: goalIncludeCriteriaParams,
+                            state: true,
+                        },
+                    }),
+                    // Create comment next.
+                    prisma.comment.create({
+                        data: {
+                            description: input.description,
+                            activityId: commentAuthor.id,
+                            goalId: input.goalId,
+                            stateId: _isEditable ? input.stateId : undefined,
+                        },
+                        include: {
+                            activity: {
+                                include: {
+                                    user: true,
+                                },
+                            },
+                        },
+                    }),
+                ]);
+                await updateProjectUpdatedAt(updatedGoal.projectId);
 
-            if (_isEditable && input.stateId !== updatedGoal.stateId) {
-                await recalculateCriteriaScore(updatedGoal.id)
-                    .recalcLinkedGoalsScores()
-                    .recalcAverageProjectScore()
-                    .run();
+                if (_isEditable && input.stateId !== updatedGoal.stateId) {
+                    await recalculateCriteriaScore(updatedGoal.id)
+                        .recalcLinkedGoalsScores()
+                        .recalcAverageProjectScore()
+                        .run();
+                }
+
+                const recipients = Array.from(
+                    new Set(
+                        [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
+                            .filter(Boolean)
+                            .map((r) => r.user?.email),
+                    ),
+                );
+
+                if (input.stateId) {
+                    await createEmailJob('goalStateUpdatedWithComment', {
+                        to: recipients,
+                        shortId: _shortId,
+                        stateTitleBefore: actualGoal.state?.title,
+                        stateTitleAfter: updatedGoal.state?.title,
+                        title: actualGoal.title,
+                        commentId: newComment.id,
+                        author: newComment.activity.user?.name || newComment.activity.user?.email,
+                        authorEmail: ctx.session.user.email,
+                        body: newComment.description,
+                    });
+                } else {
+                    await createEmailJob('goalCommented', {
+                        to: recipients,
+                        shortId: _shortId,
+                        title: actualGoal.title,
+                        commentId: newComment.id,
+                        author: newComment.activity.user?.name || newComment.activity.user?.email,
+                        authorEmail: ctx.session.user.email,
+                        body: newComment.description,
+                    });
+                }
+
+                return newComment;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
-
-            const recipients = Array.from(
-                new Set(
-                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
-                        .filter(Boolean)
-                        .map((r) => r.user?.email),
-                ),
-            );
-
-            if (input.stateId) {
-                await createEmailJob('goalStateUpdatedWithComment', {
-                    to: recipients,
-                    shortId: _shortId,
-                    stateTitleBefore: actualGoal.state?.title,
-                    stateTitleAfter: updatedGoal.state?.title,
-                    title: actualGoal.title,
-                    commentId: newComment.id,
-                    author: newComment.activity.user?.name || newComment.activity.user?.email,
-                    authorEmail: ctx.session.user.email,
-                    body: newComment.description,
-                });
-            } else {
-                await createEmailJob('goalCommented', {
-                    to: recipients,
-                    shortId: _shortId,
-                    title: actualGoal.title,
-                    commentId: newComment.id,
-                    author: newComment.activity.user?.name || newComment.activity.user?.email,
-                    authorEmail: ctx.session.user.email,
-                    body: newComment.description,
-                });
-            }
-
-            return newComment;
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
+        }),
     updateComment: protectedProcedure
         .input(commentEditSchema)
         .use(commentAccessMiddleware)
@@ -1036,7 +1060,7 @@ export const goal = router({
         }),
     addCriteria: protectedProcedure
         .input(criteriaSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             const actualGoal = await prisma.goal.findUnique({
                 where: { id: input.goalId },
@@ -1348,7 +1372,7 @@ export const goal = router({
         }),
     addParticipant: protectedProcedure
         .input(toggleParticipantsSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -1377,7 +1401,7 @@ export const goal = router({
         }),
     removeParticipant: protectedProcedure
         .input(toggleParticipantsSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -1406,7 +1430,7 @@ export const goal = router({
         }),
     addDependency: protectedProcedure
         .input(toggleGoalDependencySchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             if (input.id === input.relation.id) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'ids must be different' });
@@ -1454,7 +1478,7 @@ export const goal = router({
         }),
     removeDependency: protectedProcedure
         .input(toggleGoalDependencySchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             try {
                 const [updatedGoal] = await Promise.all([
@@ -1498,7 +1522,7 @@ export const goal = router({
         }),
     addPartnerProject: protectedProcedure
         .input(togglePartnerProjectSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -1527,7 +1551,7 @@ export const goal = router({
         }),
     removePartnerProject: protectedProcedure
         .input(togglePartnerProjectSchema)
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -1554,18 +1578,6 @@ export const goal = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
         }),
-    getListByProjectId: protectedProcedure.input(batchGoalByProjectIdSchema).query(async ({ input }) => {
-        try {
-            return prisma.goal.findMany({
-                where: {
-                    projectId: input.projectId,
-                    ...nonArchievedGoalsPartialQuery,
-                },
-            });
-        } catch (error: any) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
-        }
-    }),
     updateTag: protectedProcedure
         .input(
             z.object({
@@ -1578,6 +1590,7 @@ export const goal = router({
                 ),
             }),
         )
+        .use(goalAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             const actualGoal = await prisma.goal.findUnique({
                 where: { id: input.id },
@@ -1634,7 +1647,7 @@ export const goal = router({
                 ownerId: z.string(),
             }),
         )
-        .use(goalAccessMiddleware)
+        .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             const actualGoal = await prisma.goal.findUnique({
                 where: { id: input.id },

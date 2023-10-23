@@ -1,10 +1,8 @@
-import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import NextLink from 'next/link';
 import { gapM, gapS, gapXs, gray3, gray8, gray9, warn0 } from '@taskany/colors';
 import {
     Button,
@@ -17,8 +15,6 @@ import {
     FormMultiInput,
     ModalHeader,
     ModalContent,
-    TabsMenuItem,
-    TabsMenu,
     nullable,
     UserPic,
     Tag,
@@ -32,7 +28,7 @@ import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { PageSep } from '../PageSep';
-import { routes, useRouter } from '../../hooks/router';
+import { useRouter } from '../../hooks/router';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Page } from '../Page';
@@ -64,10 +60,11 @@ import {
     projectSettingsTransferProjectButton,
     projectSettingsParentMultiInputTrigger,
     projectSettingsParentMultiInputTagClean,
-    pageTabs,
     pageHeader,
 } from '../../utils/domObjects';
 import { safeUserData } from '../../utils/getUserName';
+import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
+import { ProjectParticipants } from '../ProjectParticipants/ProjectParticipants';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -120,7 +117,6 @@ const StyledFormControlLabel = styled(FormControlLabel).attrs({
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
-    const nextRouter = useNextRouter();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
     const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
     const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
@@ -239,26 +235,12 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         })
         .join('');
 
-    const tabsMenuOptions: Array<[string, string]> = useMemo(
-        () => [
-            [tr('Goals'), routes.project(id)],
-            [tr('Settings'), routes.projectSettings(id)],
-        ],
-        [id],
-    );
-
     if (!project.data) return null;
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
             <CommonHeader title={project.data.title} description={project.data.description} {...pageHeader.attr}>
-                <TabsMenu {...pageTabs.attr}>
-                    {tabsMenuOptions.map(([title, href]) => (
-                        <NextLink key={title} href={href} passHref legacyBehavior>
-                            <TabsMenuItem active={nextRouter.asPath.split('?')[0] === href}>{title}</TabsMenuItem>
-                        </NextLink>
-                    ))}
-                </TabsMenu>
+                <ProjectPageTabs id={id} editable />
             </CommonHeader>
 
             <PageSep />
@@ -357,6 +339,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                         </FormActions>
                     </Form>
                 </SettingsCard>
+
+                <ProjectParticipants project={project.data} />
 
                 <SettingsCard view="warning">
                     <Form>

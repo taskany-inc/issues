@@ -407,6 +407,7 @@ interface ProjectUpdatedEmailProps {
     updatedFields: {
         title?: FieldDiff;
         description?: FieldDiff;
+        participants?: FieldDiff;
     };
     authorEmail: string;
     author?: string;
@@ -442,6 +443,18 @@ Description:
 \`\`\` diff
 - ${updatedFields.description[0]}
 + ${updatedFields.description[1]}
+\`\`\`
+`
+        : ''
+}
+
+${
+    updatedFields.participants
+        ? `
+Participants:
+\`\`\` diff
+- ${updatedFields.participants[0]}
++ ${updatedFields.participants[1]}
 \`\`\`
 `
         : ''

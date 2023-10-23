@@ -55,6 +55,13 @@ export const projectUpdateSchema = z.object({
             }),
         )
         .optional(),
+    participants: z
+        .array(
+            z.object({
+                id: z.string(),
+            }),
+        )
+        .optional(),
 });
 
 export type ProjectUpdate = z.infer<typeof projectUpdateSchema>;
