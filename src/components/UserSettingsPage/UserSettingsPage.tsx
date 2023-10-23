@@ -29,6 +29,7 @@ import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { UpdateUser, updateUserSchema } from '../../schema/user';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { dispatchErrorNotification, dispatchSuccessNotification } from '../../utils/dispatchNotification';
+import { userSettings, userSettingsLogoutButton } from '../../utils/domObjects';
 
 import { tr } from './UserSettingsPage.i18n';
 
@@ -174,7 +175,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
         .join('');
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
+        <Page user={user} ssrTime={ssrTime} title={pageTitle} {...userSettings.attr}>
             <CommonHeader preTitle={`Id: ${user.id}`} title={tr('Settings')} />
 
             <PageSep />
@@ -270,7 +271,12 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             </FormActions>
                             <FormActions>
                                 <FormAction left>
-                                    <Button view="warning" text={tr('Sign out')} onClick={() => signOut()} />
+                                    <Button
+                                        view="warning"
+                                        text={tr('Sign out')}
+                                        onClick={() => signOut()}
+                                        {...userSettingsLogoutButton.attr}
+                                    />
                                 </FormAction>
                             </FormActions>
                         </Fieldset>

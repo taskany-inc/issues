@@ -4,6 +4,7 @@ import { backgroundColor, gapM, gray4 } from '@taskany/colors';
 import { Button, Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
 
 import { CommentSchema } from '../../schema/comment';
+import { commentForm, commentFormDescription } from '../../utils/domObjects';
 import { FormEditor } from '../FormEditor/FormEditor';
 import { HelpButton } from '../HelpButton/HelpButton';
 
@@ -92,7 +93,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
     return (
         <StyledCommentForm ref={ref} tabIndex={0}>
-            <Form onSubmit={onCommentSubmit}>
+            <Form onSubmit={onCommentSubmit} {...commentForm.attr}>
                 <FormEditor
                     disabled={busy}
                     placeholder={tr('Leave a comment')}
@@ -102,6 +103,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                     autoFocus={autoFocus}
                     value={newDescription}
                     onChange={onDescriptionChange}
+                    {...commentFormDescription.attr}
                 />
 
                 {nullable(focused, () => (

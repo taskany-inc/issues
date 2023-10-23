@@ -4,6 +4,7 @@ import { State } from '@prisma/client';
 import { Button, Dropdown, UserPic, nullable } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
 
+import { commentFormSubmitButton } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
 import { GoalCommentFormSchema } from '../../schema/goal';
 import { CommentSchema } from '../../schema/comment';
@@ -129,6 +130,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                     brick="right"
                                     text={tr('Update state')}
                                     iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
+                                    {...commentFormSubmitButton.attr}
                                 />
                                 <Dropdown
                                     placement="top-end"

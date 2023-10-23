@@ -8,8 +8,10 @@ interface MdProps {
     className?: string;
 }
 
-const Md: React.FC<MdProps> = ({ children = '', className }) => (
-    <Markdown className={className}>{useMarkdown(children)}</Markdown>
+const Md: React.FC<MdProps> = ({ children = '', className, ...attr }) => (
+    <Markdown className={className} {...attr}>
+        {useMarkdown(children)}
+    </Markdown>
 );
 
 export default Md;

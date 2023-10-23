@@ -1,29 +1,18 @@
+import { CommentEditSchema } from '../src/schema/comment';
+import { GoalCommentCreateSchema, GoalCommon, GoalUpdate } from '../src/schema/goal';
+import { ProjectCreate } from '../src/schema/project';
+import {
+    CommentCreateReturnType,
+    GoalCreateReturnType,
+    GoalUpdateReturnType,
+    ProjectCreateReturnType,
+} from '../trpc/inferredTypes';
+
 export {};
 
-export interface SignIn {
+export interface SignInFields {
     email: string;
     password: string;
-}
-
-export interface CreateProjectFields {
-    title: string;
-    description?: string;
-}
-
-export interface GoalFields {
-    title?: string;
-    description?: string;
-}
-
-export interface CreateGoalFields extends GoalFields {
-    projectTitle: string;
-}
-
-export interface CommonGoal {
-    id: string;
-    _shortId: string;
-    title: string;
-    description: string;
 }
 
 interface UserData {
@@ -49,11 +38,15 @@ interface UserData {
 declare global {
     namespace Cypress {
         interface Chainable {
-            signInViaEmail(fields?: SignIn): Chainable<void>;
-            createProject(fields: CreateProjectFields): Chainable<void>;
-            createGoal(fields: CreateGoalFields): Chainable<CommonGoal>;
-            updateGoal(shortId: string, filelds: GoalFields): Chainable<CommonGoal>;
-            deleteGoal(shortId: string): Chainable<CommonGoal>;
+            logout(): Chainable<void>;
+            signInViaEmail(fields?: SignInFields): Chainable<void>;
+            createProject(fields: ProjectCreate): Chainable<ProjectCreateReturnType>;
+            createGoal(projectTitle: string, fields: GoalCommon): Chainable<GoalCreateReturnType>;
+            updateGoal(shortId: string, filelds: GoalUpdate): Chainable<GoalUpdateReturnType>;
+            deleteGoal(shortId: string): Chainable<void>;
+            createComment(fields: GoalCommentCreateSchema): Chainable<CommentCreateReturnType>;
+            updateComment(fields: CommentEditSchema): Chainable<CommentCreateReturnType>;
+            deleteComment(id: string): Chainable<void>;
             task(
                 event: 'db:create:project',
                 data: { title: string; key: string; description?: string; ownerEmail: string },
@@ -65,6 +58,8 @@ declare global {
             ): Chainable<UserData['user']>;
             task(event: 'db:remove:user', data: { id: string }): Chainable<null>;
             task(event: 'db:remove:user', data?: { ids: string[] }): Chainable<null>;
+            interceptEditor(): Chainable<void>;
+            waitEditor(): Chainable<void>;
         }
         interface Cypress {
             env(): {
@@ -72,7 +67,12 @@ declare global {
                 ADMIN_EMAIL: string;
                 ADMIN_PASSWORD: string;
                 defaultPriority: 'Medium';
+                stubProject?: string;
+                createdGoal?: GoalCreateReturnType;
+                testUser: UserData['user'];
+                createdComment: CommentCreateReturnType;
             };
+
             env(key: 'currentUser'): UserData;
             env(key: 'currentUser', value: UserData): void;
             env(key: 'ADMIN_EMAIL'): string;
@@ -82,8 +82,9 @@ declare global {
             env(key: 'defaultPriority'): 'Medium';
             env(key: 'stubProject'): string;
             env(key: 'stubProject', value: string): void;
-            env(key: 'createdGoal', value: any): void;
-            env(key: 'createdGoal'): any;
+            env(key: 'createdGoal', value: GoalCreateReturnType): void;
+            env(key: 'createdGoal'): GoalCreateReturnType;
+            env(key: 'createdComment'): CommentCreateReturnType;
             env(key: 'testUser', value: UserData['user']): void;
             env(key: 'testUser'): UserData['user'];
         }
