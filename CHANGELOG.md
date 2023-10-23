@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.2.1](https://github.com/taskany-inc/issues/compare/v2.2.0...v2.2.1) (2023-10-23)
+
+
+### Bug Fixes
+
+* empty projects should be hidden when filters are selected ([e2119be](https://github.com/taskany-inc/issues/commit/e2119be7275829b6b582ba5608e0aa1b4c17ed64))
+* **UserGroup:** fix types error ([544f1c5](https://github.com/taskany-inc/issues/commit/544f1c58d63c776e799ce2bef9df5410e987030c))
+
 ## [2.2.0](https://github.com/taskany-inc/issues/compare/v2.1.2...v2.2.0) (2023-10-19)
 
 
