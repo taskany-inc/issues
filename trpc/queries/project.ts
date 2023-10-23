@@ -3,6 +3,7 @@ import { Role } from '@prisma/client';
 import { QueryWithFilters } from '../../src/schema/common';
 
 import { goalsFilter } from './goals';
+import { getProjectAccessFilter } from './access';
 
 export const nonArchivedPartialQuery = {
     OR: [{ archived: null }, { archived: false }],
@@ -31,18 +32,44 @@ export const addCalculatedProjectFields = <
     };
 };
 
+export const checkProjectAccess = <T extends { participants: WithId[]; activityId: string }>(
+    project: T,
+    activityId: string,
+    role: Role,
+) => {
+    if (role === 'ADMIN') {
+        return true;
+    }
+
+    return (
+        project.activityId === activityId ||
+        !project.participants.length ||
+        project.participants.some((p) => p.id === activityId)
+    );
+};
+
 export const getProjectSchema = ({
+    role,
     goalsQuery,
     activityId,
     firstLevel,
     whereQuery,
 }: {
-    activityId?: string;
+    role: Role;
+    activityId: string;
     goalsQuery?: QueryWithFilters;
     firstLevel?: boolean;
     whereQuery?: Record<string, unknown>;
-} = {}) => {
-    let whereFilter: Record<string, unknown> = { ...whereQuery, ...nonArchivedPartialQuery };
+}) => {
+    const projectAccessQuery = getProjectAccessFilter(activityId, role);
+
+    let whereFilter: Record<string, unknown> = {
+        ...whereQuery,
+        AND: {
+            ...projectAccessQuery,
+            ...nonArchivedPartialQuery,
+        },
+    };
 
     if (firstLevel) {
         whereFilter = {
@@ -62,6 +89,7 @@ export const getProjectSchema = ({
                 include: {
                     parent: true,
                 },
+                where: projectAccessQuery,
             },
             participants: {
                 include: {
@@ -80,11 +108,13 @@ export const getProjectSchema = ({
                     stargizers: true,
                     watchers: true,
                     participants: true,
-                    children: true,
+                    children: {
+                        where: projectAccessQuery,
+                    },
                     goals:
                         goalsQuery && activityId
                             ? {
-                                  where: goalsFilter(goalsQuery, activityId).where,
+                                  where: goalsFilter(goalsQuery, activityId, role).where,
                               }
                             : true,
                     parent: true,

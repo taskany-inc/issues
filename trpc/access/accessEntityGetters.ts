@@ -9,6 +9,21 @@ export const getGoal = (id: string) =>
         include: goalDeepQuery,
     });
 
+export const getGoalByShortId = (id: string) => {
+    const [projectId, scopeIdStr] = id.split('-');
+
+    if (!projectId) return null;
+
+    const scopeId = parseInt(scopeIdStr, 10);
+
+    if (!scopeId) return null;
+
+    return prisma.goal.findFirst({
+        where: { projectId, scopeId, archived: false },
+        include: goalDeepQuery,
+    });
+};
+
 export type GoalEntity = NonNullable<Awaited<ReturnType<typeof getGoal>>>;
 
 export const getGoalByCriteria = async (id: string) => {
@@ -33,6 +48,14 @@ export type CommentEntity = NonNullable<Awaited<ReturnType<typeof getComment>>>;
 export const getProject = (id: string) =>
     prisma.project.findUnique({
         where: { id },
+        include: {
+            participants: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+        },
     });
 
 export type ProjectEntity = NonNullable<Awaited<ReturnType<typeof getProject>>>;

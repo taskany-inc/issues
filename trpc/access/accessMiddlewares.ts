@@ -2,8 +2,15 @@ import { TRPCError } from '@trpc/server';
 
 import { middleware } from '../trpcBackend';
 
-import { EntityAccessChecker, commentAccessChecker, projectAccessChecker, goalAccessChecker } from './accessCheckers';
-import { getComment, getGoal, getGoalByCriteria, getProject } from './accessEntityGetters';
+import {
+    EntityAccessChecker,
+    commentAccessChecker,
+    projectEditAccessChecker,
+    goalEditAccessChecker,
+    projectAccessChecker,
+    goalAccessChecker,
+} from './accessCheckers';
+import { getComment, getGoal, getGoalByCriteria, getGoalByShortId, getProject } from './accessEntityGetters';
 
 const accessErrorCode = 'FORBIDDEN';
 
@@ -44,10 +51,22 @@ export const goalAccessMiddleware = createEntityCheckMiddleware(
     goalAccessChecker,
 );
 
+export const goalByShortIdAccessMiddleware = createEntityCheckMiddleware(
+    (input: string) => input,
+    getGoalByShortId,
+    goalAccessChecker,
+);
+
+export const goalEditAccessMiddleware = createEntityCheckMiddleware(
+    (input: { id: string; goalId: string }) => input.id ?? input.goalId,
+    getGoal,
+    goalEditAccessChecker,
+);
+
 export const criteriaAccessMiddleware = createEntityCheckMiddleware(
     (input: { id: string }) => input.id,
     getGoalByCriteria,
-    goalAccessChecker,
+    goalEditAccessChecker,
 );
 
 export const commentAccessMiddleware = createEntityCheckMiddleware(
@@ -60,4 +79,10 @@ export const projectAccessMiddleware = createEntityCheckMiddleware(
     (input: { id: string }) => input.id,
     getProject,
     projectAccessChecker,
+);
+
+export const projectEditAccessMiddleware = createEntityCheckMiddleware(
+    (input: { id: string }) => input.id,
+    getProject,
+    projectEditAccessChecker,
 );

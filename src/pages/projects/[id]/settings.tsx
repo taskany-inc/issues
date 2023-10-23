@@ -1,24 +1,32 @@
+import { TRPCError } from '@trpc/server';
+
 import { ProjectSettingsPage } from '../../../components/ProjectSettingsPage/ProjectSettingsPage';
 import { routes } from '../../../hooks/router';
 import { declareSsrProps } from '../../../utils/declareSsrProps';
 
 export const getServerSideProps = declareSsrProps(
     async ({ ssrHelpers, params: { id } }) => {
-        const data = await ssrHelpers.project.getById.fetch({ id });
+        try {
+            const project = await ssrHelpers.project.getById.fetch({ id });
 
-        if (!data) {
-            return {
-                notFound: true,
-            };
-        }
+            if (!project) {
+                throw new TRPCError({ code: 'NOT_FOUND' });
+            }
 
-        if (!data._isEditable) {
-            return {
-                redirect: {
-                    permanent: false,
-                    destination: routes.project(data.id),
-                },
-            };
+            if (!project._isEditable) {
+                return {
+                    redirect: {
+                        permanent: false,
+                        destination: routes.project(project.id),
+                    },
+                };
+            }
+        } catch (e: unknown) {
+            if (e instanceof TRPCError && (e.code === 'FORBIDDEN' || e.code === 'NOT_FOUND')) {
+                return {
+                    notFound: true,
+                };
+            }
         }
     },
     {

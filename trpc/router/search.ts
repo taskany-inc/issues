@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import { addCalculatedGoalsFields, goalDeepQuery } from '../queries/goals';
+import { getProjectAccessFilter } from '../queries/access';
 
 export const search = router({
     global: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -34,6 +35,11 @@ export const search = router({
                                 not: true,
                             },
                         },
+                        {
+                            project: {
+                                ...getProjectAccessFilter(activityId, role),
+                            },
+                        },
                     ],
                 },
                 include: {
@@ -57,6 +63,7 @@ export const search = router({
                             },
                         },
                     ],
+                    ...getProjectAccessFilter(activityId, role),
                 },
                 include: {
                     activity: {
