@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Activity, Ghost, Prisma, User } from '@prisma/client';
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
 
@@ -19,6 +19,7 @@ import { createEmailJob } from '../../src/utils/worker/create';
 import { FieldDiff } from '../../src/types/common';
 import { updateLinkedGoalsByProject } from '../../src/utils/db';
 import { projectAccessMiddleware } from '../access/accessMiddlewares';
+import { prepareUserDataFromActivity } from '../../src/utils/getUserName';
 
 export const project = router({
     suggestions: protectedProcedure
@@ -504,7 +505,7 @@ export const project = router({
     update: protectedProcedure
         .input(projectUpdateSchema)
         .use(projectAccessMiddleware)
-        .mutation(async ({ input: { id, parent, ...data }, ctx }) => {
+        .mutation(async ({ input: { id, parent, participants, ...data }, ctx }) => {
             const project = await prisma.project.findUnique({
                 where: { id },
                 include: {
@@ -522,11 +523,21 @@ export const project = router({
             const parentsToConnect = parent?.filter((pr) => !project.parent.some((p) => p.id === pr.id));
             const parentsToDisconnect = project.parent.filter((p) => !parent?.some((pr) => p.id === pr.id));
 
+            const participantsToConnect =
+                participants?.filter((pr) => !project.participants.some((p) => p.id === pr.id)) ?? [];
+            const participantsToDisconnect = project.participants.filter(
+                (p) => !participants?.some((pr) => p.id === pr.id),
+            );
+
             try {
                 const updatedProject = await prisma.project.update({
                     where: { id },
                     data: {
                         ...data,
+                        participants: {
+                            connect: participantsToConnect?.map((p) => ({ id: p.id })) || [],
+                            disconnect: participantsToDisconnect.map((p) => ({ id: p.id })),
+                        },
                         parent: {
                             connect: parentsToConnect?.map((p) => ({ id: p.id })) || [],
                             disconnect: parentsToDisconnect?.map((p) => ({ id: p.id })),
@@ -534,6 +545,12 @@ export const project = router({
                     },
                     include: {
                         parent: true,
+                        participants: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
                     },
                 });
 
@@ -616,6 +633,7 @@ export const project = router({
                 const updatedFields: {
                     title?: FieldDiff;
                     description?: FieldDiff;
+                    participants?: FieldDiff;
                 } = {};
 
                 if (updatedProject.title !== project.title) {
@@ -624,6 +642,17 @@ export const project = router({
 
                 if (updatedProject.description !== project.description) {
                     updatedFields.description = [project.description, updatedProject.description];
+                }
+
+                if (participantsToConnect.length || participantsToDisconnect.length) {
+                    const participantsToString = <T extends Activity & { user: User | null; ghost: Ghost | null }>(
+                        participants: T[],
+                    ) => participants.map((participant) => prepareUserDataFromActivity(participant)?.email).join(', ');
+
+                    updatedFields.participants = [
+                        participantsToString(project.participants),
+                        participantsToString(updatedProject.participants),
+                    ];
                 }
 
                 const recipients = Array.from(

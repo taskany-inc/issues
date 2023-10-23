@@ -1,7 +1,5 @@
-import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import { useRouter as useNextRouter } from 'next/router';
-import NextLink from 'next/link';
-import { TabsMenu, TabsMenuItem, nullable } from '@taskany/bricks';
+import { MouseEventHandler, useCallback, useEffect } from 'react';
+import { nullable } from '@taskany/bricks';
 
 import { Page } from '../Page';
 import { refreshInterval } from '../../utils/config';
@@ -19,8 +17,7 @@ import { CommonHeader } from '../CommonHeader';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { WatchButton } from '../WatchButton/WatchButton';
 import { StarButton } from '../StarButton/StarButton';
-import { routes } from '../../hooks/router';
-import { pageActiveTabItem, pageTabs } from '../../utils/domObjects';
+import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { safeGetUserName } from '../../utils/getUserName';
 import { FilteredPage } from '../FilteredPage/FilteredPage';
 import { IssueParent } from '../IssueParent';
@@ -30,7 +27,6 @@ import { tr } from './ProjectPage.i18n';
 export const projectsSize = 20;
 
 export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallback }: ExternalPageProps) => {
-    const nextRouter = useNextRouter();
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
 
     const utils = trpc.useContext();
@@ -129,14 +125,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(id);
 
-    const tabsMenuOptions: Array<[string, string, boolean]> = useMemo(
-        () => [
-            [tr('Goals'), routes.project(id), false],
-            [tr('Settings'), routes.projectSettings(id), true],
-        ],
-        [id],
-    );
-
     return (
         <Page
             user={user}
@@ -164,22 +152,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                     </>
                 ))}
             >
-                <TabsMenu {...pageTabs.attr}>
-                    {tabsMenuOptions.map(([title, href, ownerOnly]) =>
-                        nullable(ownerOnly ? project?._isEditable : true, () => {
-                            const isActive = nextRouter.asPath.split('?')[0] === href;
-                            const activeAttrs = isActive ? pageActiveTabItem.attr : null;
-
-                            return (
-                                <NextLink key={title} href={href} passHref legacyBehavior>
-                                    <TabsMenuItem active={isActive} {...activeAttrs}>
-                                        {title}
-                                    </TabsMenuItem>
-                                </NextLink>
-                            );
-                        }),
-                    )}
-                </TabsMenu>
+                <ProjectPageTabs id={id} editable={project?._isEditable} />
             </CommonHeader>
             <FilteredPage
                 total={projectDeepInfo?.meta?.count}
