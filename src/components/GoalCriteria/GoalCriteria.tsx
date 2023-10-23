@@ -31,7 +31,7 @@ import { tr } from './GoalCriteria.i18n';
 
 const StyledWrapper = styled.div`
     display: grid;
-    grid-template-columns: minmax(60%, max-content);
+    grid-template-columns: 70%;
     grid-template-rows: minmax(32px, 100%);
     align-items: center;
     gap: ${gapS};
@@ -203,7 +203,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
                     renderColumn(values) {
                         if (!criteriaGuard(values)) {
                             return (
-                                <CustomCell width="80%">
+                                <CustomCell width="75%">
                                     <Title size="s" weight="thin">
                                         {values.title}
                                     </Title>
@@ -211,7 +211,7 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
                             );
                         }
                         return (
-                            <CustomCell width="80%">
+                            <CustomCell width="75%">
                                 <NextLink passHref href={routes.goal(values.shortId)} legacyBehavior>
                                     <StyledGoalTitle size="s" weight="bold" onClick={onTitleClickHandler} as="a">
                                         {values.title}
