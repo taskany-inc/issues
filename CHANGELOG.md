@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.2.2](https://github.com/taskany-inc/issues/compare/v2.2.1...v2.2.2) (2023-10-23)
+
+
+### Bug Fixes
+
+* taskany/bricks to deps ([8646063](https://github.com/taskany-inc/issues/commit/86460635b6a0cf2ce717dfeae9d72b841b1edca3))
+
 ## [2.2.1](https://github.com/taskany-inc/issues/compare/v2.2.0...v2.2.1) (2023-10-23)
 
 
