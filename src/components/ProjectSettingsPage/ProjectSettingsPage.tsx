@@ -66,6 +66,7 @@ import {
 } from '../../utils/domObjects';
 import { safeUserData } from '../../utils/getUserName';
 
+import { ParticipantsFormField } from './ParticipantsFormField';
 import { tr } from './ProjectSettingsPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
@@ -126,6 +127,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
             title: project.data?.title,
             description: project.data?.description,
             parent: project.data?.parent,
+            participants: project.data?.participants,
         },
     });
 
@@ -138,6 +140,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 title: data?.title,
                 description: data?.description,
                 parent: data?.parent,
+                participants: data?.participants,
             });
         },
         [reset],
@@ -305,6 +308,17 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                         )}
                                         {...field}
                                         {...projectSettingsParentMultiInput.attr}
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                name="participants"
+                                control={control}
+                                render={({ field }) => (
+                                    <ParticipantsFormField
+                                        value={field.value as ActivityByIdReturnType[]}
+                                        onChange={field.onChange}
                                     />
                                 )}
                             />

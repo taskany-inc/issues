@@ -1,7 +1,7 @@
 import { ComponentProps, FC, forwardRef, useMemo } from 'react';
 import styled from 'styled-components';
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
-import { IconArrowRightOutline, IconBinOutline, IconPlusCircleOutline, IconXCircleSolid } from '@taskany/icons';
+import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
 import { gapXs } from '@taskany/colors';
 
 import { IssueMeta } from '../IssueMeta';
@@ -10,7 +10,6 @@ import { UserComboBox } from '../UserComboBox';
 import { TagComboBox } from '../TagComboBox';
 import { GoalParentComboBox } from '../GoalParentComboBox';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { InlineTrigger } from '../InlineTrigger';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
@@ -23,15 +22,12 @@ import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList';
 import { dependencyKind } from '../../schema/goal';
+import { UserEditableList } from '../UserEditableList/UserEditableList';
+import { AddInlineTrigger } from '../AddInlineTrigger';
 
 import { tr } from './GoalSidebar.i18n';
 
 const tagsLimit = 5;
-
-const StyledInlineTrigger = styled(InlineTrigger)`
-    margin-left: 5px; // 24 / 2 - 7 center of UserPic and center of PlusIcon
-    height: 28px; // Input height
-`;
 
 const StyledInlineInput = styled.div`
     margin-top: ${gapXs};
@@ -49,18 +45,6 @@ interface GoalSidebarProps {
     onGoalTransfer: ComponentProps<typeof GoalParentComboBox>['onChange'];
     onGoalDependencyClick?: ComponentProps<typeof GoalDependencyListByKind>['onClick'];
 }
-
-interface AddInlineTriggerProps {
-    text: string;
-    onClick: ComponentProps<typeof InlineTrigger>['onClick'];
-    icon?: React.ReactNode;
-}
-
-const AddInlineTrigger = forwardRef<HTMLDivElement, AddInlineTriggerProps>(
-    ({ icon = <IconPlusCircleOutline size="xs" />, text, onClick }, ref) => (
-        <StyledInlineTrigger ref={ref} icon={icon} text={text} onClick={onClick} />
-    ),
-);
 
 export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoalDependencyClick }) => {
     const participantsFilter = useMemo(() => {
@@ -143,36 +127,14 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
 
             {nullable(goal._isEditable || goal.participants.length, () => (
                 <IssueMeta title={tr('Participants')}>
-                    <TextList listStyle="none">
-                        {goal.participants?.map((activity) =>
-                            nullable(safeUserData(activity), (props) => (
-                                <TextListItem key={activity.id}>
-                                    <UserBadge {...props}>
-                                        {nullable(goal._isEditable, () => (
-                                            <IconXCircleSolid
-                                                size="xs"
-                                                onClick={onGoalParticipantRemove(activity.id)}
-                                            />
-                                        ))}
-                                    </UserBadge>
-                                </TextListItem>
-                            )),
-                        )}
-                    </TextList>
-
-                    {nullable(goal._isEditable, () => (
-                        <StyledInlineInput>
-                            <UserComboBox
-                                placement="bottom-start"
-                                placeholder={tr('Type user name or email')}
-                                filter={participantsFilter}
-                                onChange={onGoalParticipantAdd}
-                                renderTrigger={(props) => (
-                                    <AddInlineTrigger text={tr('Add participant')} onClick={props.onClick} />
-                                )}
-                            />
-                        </StyledInlineInput>
-                    ))}
+                    <UserEditableList
+                        users={goal.participants}
+                        filterIds={participantsFilter}
+                        editable={goal._isEditable}
+                        onAdd={onGoalParticipantAdd}
+                        onRemove={onGoalParticipantRemove}
+                        triggerText={tr('Add participant')}
+                    />
                 </IssueMeta>
             ))}
 

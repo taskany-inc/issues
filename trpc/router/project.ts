@@ -504,7 +504,7 @@ export const project = router({
     update: protectedProcedure
         .input(projectUpdateSchema)
         .use(projectAccessMiddleware)
-        .mutation(async ({ input: { id, parent, ...data }, ctx }) => {
+        .mutation(async ({ input: { id, parent, participants, ...data }, ctx }) => {
             const project = await prisma.project.findUnique({
                 where: { id },
                 include: {
@@ -522,11 +522,22 @@ export const project = router({
             const parentsToConnect = parent?.filter((pr) => !project.parent.some((p) => p.id === pr.id));
             const parentsToDisconnect = project.parent.filter((p) => !parent?.some((pr) => p.id === pr.id));
 
+            const participantsToConnet = participants?.filter(
+                (pr) => !project.participants.some((p) => p.id === pr.id),
+            );
+            const participantsToDisconnect = project.participants.filter(
+                (p) => !participants?.some((pr) => p.id === pr.id),
+            );
+
             try {
                 const updatedProject = await prisma.project.update({
                     where: { id },
                     data: {
                         ...data,
+                        participants: {
+                            connect: participantsToConnet?.map((p) => ({ id: p.id })) || [],
+                            disconnect: participantsToDisconnect.map((p) => ({ id: p.id })),
+                        },
                         parent: {
                             connect: parentsToConnect?.map((p) => ({ id: p.id })) || [],
                             disconnect: parentsToDisconnect?.map((p) => ({ id: p.id })),
@@ -534,6 +545,12 @@ export const project = router({
                     },
                     include: {
                         parent: true,
+                        participants: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
                     },
                 });
 
