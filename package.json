@@ -50,7 +50,7 @@
     "concurrently": "8.2.1",
     "cors": "2.8.5",
     "cyrillic-to-translit-js": "3.2.1",
-    "dom-objects": "1.0.5",
+    "dom-objects": "1.2.0",
     "easy-typed-intl": "1.0.3",
     "gray-matter": "4.0.3",
     "markdown-it": "13.0.1",

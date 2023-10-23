@@ -96,3 +96,16 @@ export const stateCombobox = combobox.add('state');
 export const estimateCombobox = combobox.add('estimate');
 export const tagsCombobox = combobox.add('tags');
 export const createActionToggle = combobox.add('actionToggle');
+
+export const comment = DO('comment');
+export const commentDescription = comment.add('description');
+export const commentDropdown = comment.add('dropdown');
+export const commentDropdownDelete = comment.add('delete');
+export const commentDropdownEdit = comment.add('edit');
+
+export const commentForm = DO('commentForm');
+export const commentFormDescription = commentForm.add('description', 'textarea');
+export const commentFormSubmitButton = commentForm.add('submitButton');
+
+export const userSettings = DO('userSettings');
+export const userSettingsLogoutButton = userSettings.add('logoutButton');

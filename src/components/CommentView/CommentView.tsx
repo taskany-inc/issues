@@ -7,6 +7,14 @@ import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, UserPic, nullabl
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
+import {
+    comment,
+    commentDescription as commentDescriptionDO,
+    commentDropdown,
+    commentDropdownDelete,
+    commentDropdownEdit,
+    commentFormSubmitButton,
+} from '../../utils/domObjects';
 import { useLocale } from '../../hooks/useLocale';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { createLocaleDate } from '../../utils/dateTime';
@@ -203,7 +211,7 @@ export const CommentView: FC<CommentViewProps> = ({
             return [
                 {
                     label: tr('Edit'),
-                    icon: <IconEditOutline size="xxs" />,
+                    icon: <IconEditOutline size="xxs" {...commentDropdownEdit.attr} />,
                     onClick: () => {
                         setEditMode(true);
                         setFocused(true);
@@ -212,7 +220,7 @@ export const CommentView: FC<CommentViewProps> = ({
                 {
                     label: tr('Delete'),
                     color: danger0,
-                    icon: <IconBinOutline size="xxs" />,
+                    icon: <IconBinOutline size="xxs" {...commentDropdownDelete.attr} />,
                     onClick: onDelete,
                 },
             ].concat(items);
@@ -222,7 +230,7 @@ export const CommentView: FC<CommentViewProps> = ({
     }, [canEdit, copyValue, descriptionRef, onDelete]);
 
     return (
-        <ActivityFeedItem id={pin ? '' : `comment-${id}`}>
+        <ActivityFeedItem id={pin ? '' : `comment-${id}`} {...comment.attr}>
             <Circle size={32}>
                 {pin ? (
                     <StyledStateDot hue={state?.hue} />
@@ -248,6 +256,7 @@ export const CommentView: FC<CommentViewProps> = ({
                             outline
                             type="submit"
                             text={tr('Save')}
+                            {...commentFormSubmitButton.attr}
                         />
                     }
                 />
@@ -268,7 +277,7 @@ export const CommentView: FC<CommentViewProps> = ({
                             <Dropdown
                                 items={dropdownItems}
                                 renderTrigger={({ ref, onClick }) => (
-                                    <Light color={textColor} ref={ref} onClick={onClick}>
+                                    <Light color={textColor} ref={ref} onClick={onClick} {...commentDropdown.attr}>
                                         <IconMoreVerticalOutline size="xs" />
                                     </Light>
                                 )}
@@ -300,7 +309,7 @@ export const CommentView: FC<CommentViewProps> = ({
                             </StyledTimestamp>
                         ))}
 
-                        <StyledMd>{commentDescription.description}</StyledMd>
+                        <StyledMd {...commentDescriptionDO.attr}>{commentDescription.description}</StyledMd>
 
                         {nullable(Object.keys(reactions), () => (
                             <Reactions reactions={reactions} onClick={onReactionToggle} />

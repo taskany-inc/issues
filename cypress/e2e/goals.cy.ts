@@ -29,7 +29,7 @@ import {
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
-import { CommonGoal } from '..';
+import { GoalCreateReturnType } from '../../trpc/inferredTypes';
 
 const testUser = {
     name: 'Test user 1',
@@ -283,10 +283,9 @@ describe('Goals', () => {
             it('can create, edit and delete own goal', () => {
                 cy.signInViaEmail();
 
-                cy.createGoal({
+                cy.createGoal(testProjectForGoals, {
                     title: testGoalTitle,
                     description: testGoalDescription,
-                    projectTitle: testProjectForGoals,
                 }).then((goal) => {
                     const updatedGoalTitle = `${testGoalTitle}_new_title`;
 
@@ -299,10 +298,9 @@ describe('Goals', () => {
             it('can edit and delete other user`s goals', () => {
                 cy.signInViaEmail({ email: testUser.email, password: testUser.password });
 
-                cy.createGoal({
+                cy.createGoal(testProjectForGoals, {
                     title: testGoalTitle,
                     description: testGoalDescription,
-                    projectTitle: testProjectForGoals,
                 });
 
                 cy.clearCookies();
@@ -310,7 +308,7 @@ describe('Goals', () => {
 
                 cy.signInViaEmail();
 
-                cy.get<CommonGoal>('@createdGoal').then((goal) => {
+                cy.get<GoalCreateReturnType>('@createdGoal').then((goal) => {
                     const updatedGoalTitle = `${testGoalTitle}_new_title_2`;
 
                     cy.updateGoal(goal._shortId, { title: updatedGoalTitle });
@@ -324,10 +322,9 @@ describe('Goals', () => {
             it('can create, edit and delete own goals', () => {
                 cy.signInViaEmail();
 
-                cy.createGoal({
+                cy.createGoal(testProjectForGoals, {
                     title: testGoalTitle,
                     description: testGoalDescription,
-                    projectTitle: testProjectForGoals,
                 }).then((goal) => {
                     const updatedGoalTitle = `${testGoalTitle}_new_title_3`;
 
@@ -340,10 +337,9 @@ describe('Goals', () => {
             it('can`t edit or delete other user`s goals', () => {
                 cy.signInViaEmail();
 
-                cy.createGoal({
+                cy.createGoal(testProjectForGoals, {
                     title: testGoalTitle,
                     description: testGoalDescription,
-                    projectTitle: testProjectForGoals,
                 });
 
                 cy.clearCookies();
@@ -351,7 +347,7 @@ describe('Goals', () => {
 
                 cy.signInViaEmail({ email: testUser.email, password: testUser.password });
 
-                cy.get<CommonGoal>('@createdGoal').then((goal) => {
+                cy.get<GoalCreateReturnType>('@createdGoal').then((goal) => {
                     cy.visit(routes.goal(goal._shortId));
                     cy.get(goalPageHeaderTitle.query).contains(goal.title);
                     cy.get(goalPageEditButton.query).should('not.exist');
