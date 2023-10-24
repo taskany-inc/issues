@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { addCalclulatedGoalsFields, goalDeepQuery } from '../queries/goals';
+import { addCalculatedGoalsFields, goalDeepQuery } from '../queries/goals';
 
 export const search = router({
     global: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -72,7 +72,7 @@ export const search = router({
         return {
             goals: goals.map((g) => ({
                 ...g,
-                ...addCalclulatedGoalsFields(g, activityId, role),
+                ...addCalculatedGoalsFields(g, activityId, role),
             })),
             projects,
         };

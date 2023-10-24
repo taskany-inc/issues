@@ -1,6 +1,6 @@
 import { Session } from 'next-auth';
 
-import { addCalclulatedGoalsFields } from '../queries/goals';
+import { addCalculatedGoalsFields } from '../queries/goals';
 import { addCalculatedProjectFields } from '../queries/project';
 
 import { CommentEntity, GoalEntity, ProjectEntity } from './accessEntityGetters';
@@ -17,7 +17,7 @@ const notAllowed = (errorMessage: string): AccessCheckerResult => ({ allowed: fa
 
 export const goalAccessChecker = (session: Session, goal: GoalEntity) => {
     const { activityId, role } = session.user;
-    const { _isEditable } = addCalclulatedGoalsFields(goal, activityId, role);
+    const { _isEditable } = addCalculatedGoalsFields(goal, activityId, role);
 
     return _isEditable ? allowed() : notAllowed('No access to update Goal');
 };

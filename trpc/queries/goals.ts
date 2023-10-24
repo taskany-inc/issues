@@ -571,7 +571,7 @@ export const calcAchievedWeight = (
     );
 };
 
-export const addCalclulatedGoalsFields = (goal: any, activityId: string, role: Role) => {
+export const addCalculatedGoalsFields = (goal: any, activityId: string, role: Role) => {
     const _isOwner = goal.ownerId === activityId;
     const _isParticipant = goal.participants?.some((participant: any) => participant?.id === activityId);
     const _isWatching = goal.watchers?.some((watcher: any) => watcher?.id === activityId);
