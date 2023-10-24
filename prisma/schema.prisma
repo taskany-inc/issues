@@ -135,6 +135,7 @@ model Activity {
   criterion          GoalAchieveCriteria[]
   releasesRead       Release[]             @relation("releasesRead")
   releasesDelayed    Release[]             @relation("releasesDelayed")
+  goalsFilterPresets GoalsFilterPreset[]
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
@@ -220,6 +221,7 @@ model Goal {
   @@index([activityId])
 }
 
+// DEPRECATED
 model Filter {
   id          String     @id @default(cuid())
   mode        FilterMode
@@ -380,6 +382,23 @@ model Release {
   version  String     @unique
   readers  Activity[] @relation("releasesRead")
   delayers Activity[] @relation("releasesDelayed")
+
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
+}
+
+model GoalsFilterPreset {
+  id           String   @id @default(cuid())
+  activity     Activity @relation(fields: [activityId], references: [id])
+  activityId   String
+  issuers      String[]
+  owners       String[]
+  participants String[]
+  states       String[]
+  priorities   String[]
+  estimates    String[]
+  projects     String[]
+  tags         String[]
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
