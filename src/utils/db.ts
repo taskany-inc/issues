@@ -3,7 +3,7 @@ import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma } from '@prism
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, dependencyKind } from '../schema/goal';
-import { addCalclulatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
+import { addCalculatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
 
 import { prisma } from './prisma';
@@ -71,7 +71,7 @@ export const createGoal = async (input: GoalCommon, activityId: string, role: Ro
 
     return {
         ...goal,
-        ...addCalclulatedGoalsFields(goal, activityId, role),
+        ...addCalculatedGoalsFields(goal, activityId, role),
     };
 };
 

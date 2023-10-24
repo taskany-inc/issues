@@ -11,7 +11,7 @@ import {
     projectSuggestionsSchema,
     projectDeleteSchema,
 } from '../../src/schema/project';
-import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter } from '../queries/goals';
+import { addCalculatedGoalsFields, goalDeepQuery, goalsFilter } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
@@ -268,7 +268,7 @@ export const project = router({
                         const goals = project.goals.map((goal) => {
                             return {
                                 ...goal,
-                                ...addCalclulatedGoalsFields(goal, activityId, role),
+                                ...addCalculatedGoalsFields(goal, activityId, role),
                             };
                         });
 
@@ -472,7 +472,7 @@ export const project = router({
                 goals: filtredProjectGoals.map((g) => ({
                     ...g,
                     _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
-                    ...addCalclulatedGoalsFields(g, activityId, role),
+                    ...addCalculatedGoalsFields(g, activityId, role),
                 })),
                 meta: {
                     count: allProjectGoals,

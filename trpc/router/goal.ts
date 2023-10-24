@@ -4,7 +4,7 @@ import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
+import { addCalculatedGoalsFields, goalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
@@ -155,7 +155,7 @@ export const goal = router({
             return {
                 items: items.map((g) => ({
                     ...g,
-                    ...addCalclulatedGoalsFields(g, activityId, role),
+                    ...addCalculatedGoalsFields(g, activityId, role),
                     _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
                 })),
                 nextCursor,
@@ -228,7 +228,7 @@ export const goal = router({
 
             return {
                 ...goal,
-                ...addCalclulatedGoalsFields(goal, activityId, role),
+                ...addCalculatedGoalsFields(goal, activityId, role),
                 _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                 _activityFeed: mixHistoryWithComments(history, goal.comments),
                 _relations: makeGoalRelationMap({
@@ -335,7 +335,7 @@ export const goal = router({
 
                 return {
                     ...goal,
-                    ...addCalclulatedGoalsFields(goal, activityId, role),
+                    ...addCalculatedGoalsFields(goal, activityId, role),
                 };
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -366,7 +366,7 @@ export const goal = router({
 
             if (!actualGoal) return null;
 
-            const { _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
+            const { _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
 
             const tagsToDisconnect = calculateDiffBetweenArrays(actualGoal.tags, input.tags);
             const tagsToConnect = calculateDiffBetweenArrays(input.tags, actualGoal.tags);
@@ -537,7 +537,7 @@ export const goal = router({
 
                 return {
                     ...goal,
-                    ...addCalclulatedGoalsFields(goal, activityId, role),
+                    ...addCalculatedGoalsFields(goal, activityId, role),
                     _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                     _activityFeed: [],
                 };
@@ -600,7 +600,7 @@ export const goal = router({
                 return null;
             }
 
-            const { _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
+            const { _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
 
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -672,7 +672,7 @@ export const goal = router({
 
             await updateProjectUpdatedAt(actualGoal.projectId);
 
-            const { _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
+            const { _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
 
             const promises: Promise<any>[] = [
                 prisma.goal.update({
@@ -784,7 +784,7 @@ export const goal = router({
         if (!commentAuthor) return null;
         if (!actualGoal) return null;
 
-        const { _isEditable, _shortId } = addCalclulatedGoalsFields(actualGoal, activityId, role);
+        const { _isEditable, _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
 
         try {
             // We want to see state changes record and comment next in activity feed.
@@ -1553,7 +1553,7 @@ export const goal = router({
             return {
                 items: goals.map((g) => ({
                     ...g,
-                    ...addCalclulatedGoalsFields(g, activityId, role),
+                    ...addCalculatedGoalsFields(g, activityId, role),
                     _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
                 })),
                 nextCursor,
