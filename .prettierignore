@@ -3,4 +3,5 @@
 /package-lock.json
 /build
 /dist
+/public
 /.next
