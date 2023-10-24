@@ -1,7 +1,13 @@
-import { FormEditor as FormEditorBricks } from '@taskany/bricks';
+import { FormEditor as FormEditorBricks, editorLoader } from '@taskany/bricks';
 import React from 'react';
 
 import { tr } from './FormEditor.i18n';
+
+editorLoader.config({
+    paths: {
+        vs: '/monaco',
+    },
+});
 
 export const FormEditor = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof FormEditorBricks>>(
     ({ ...props }, ref) => (
