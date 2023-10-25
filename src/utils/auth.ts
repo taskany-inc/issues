@@ -102,6 +102,24 @@ export const authOptions: NextAuthOptions = {
                 },
             });
 
+            const dbUserActivity = dbUser?.activityId
+                ? dbUser.activity
+                : await prisma.activity.create({
+                      data: {
+                          user: {
+                              connect: {
+                                  id,
+                              },
+                          },
+                          settings: {
+                              create: {},
+                          },
+                      },
+                      include: {
+                          settings: true,
+                      },
+                  });
+
             return {
                 ...session,
                 user: {
@@ -110,30 +128,13 @@ export const authOptions: NextAuthOptions = {
                     role: token?.role || user.role,
                     name: dbUser?.name,
                     nickname: dbUser?.nickname,
-                    activityId: dbUser?.activityId,
-                    settings: dbUser?.activity?.settings,
+                    activityId: dbUserActivity?.id,
+                    settings: dbUserActivity?.settings,
                 },
             };
         },
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        async jwt({ token, user, account, profile, isNewUser }) {
-            if (user && isNewUser) {
-                await prisma.user.update({
-                    where: {
-                        id: user.id,
-                    },
-                    data: {
-                        activity: {
-                            create: {
-                                settings: {
-                                    create: {},
-                                },
-                            },
-                        },
-                    },
-                });
-            }
-
+        async jwt({ token, user }) {
             return user
                 ? {
                       ...token,
