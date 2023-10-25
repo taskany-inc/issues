@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.2.3](https://github.com/taskany-inc/issues/compare/v2.2.2...v2.2.3) (2023-10-25)
+
+
+### Bug Fixes
+
+* **auth:** do not create activity for existing users ([370427c](https://github.com/taskany-inc/issues/commit/370427c46205774daf8f70e9c985efd330efe86f))
+* **GoalCriteria:** remove layout shift ([20bf417](https://github.com/taskany-inc/issues/commit/20bf417dd531469dde3a12e4fc16dd02db7fe6d3))
+
 ## [2.2.2](https://github.com/taskany-inc/issues/compare/v2.2.1...v2.2.2) (2023-10-23)
 
 
