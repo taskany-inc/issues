@@ -98,7 +98,7 @@ export const ProjectListItemConnected: FC<{
                     issuer={g.activity}
                     owner={g.owner}
                     tags={g.tags}
-                    priority={g.priority?.title}
+                    priority={g.priority}
                     comments={g._count?.comments}
                     estimate={g.estimate}
                     estimateType={g.estimateType}

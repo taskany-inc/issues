@@ -160,16 +160,7 @@ export const GlobalSearch = () => {
                                                     focused={active}
                                                     align="center"
                                                     gap={10}
-                                                    item={{
-                                                        title: item.title,
-                                                        priority: item.priority?.title,
-                                                        state: item.state,
-                                                        owner: item.owner,
-                                                        issuer: item.activity,
-                                                        estimate: item.estimate,
-                                                        estimateType: item.estimateType,
-                                                        projectId: item.projectId,
-                                                    }}
+                                                    item={item}
                                                     columns={[
                                                         { name: 'title', columnProps: { col: 3 } },
                                                         {

@@ -1,8 +1,6 @@
-export const priorityVariants = {
-    Highest: true,
-    High: true,
-    Medium: true,
-    Low: true,
-};
-
-export type Priority = keyof typeof priorityVariants;
+export interface Priority {
+    id: string;
+    title: string;
+    value: number;
+    default: boolean;
+}
