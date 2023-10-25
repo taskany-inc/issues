@@ -4,11 +4,11 @@ import { nullable, Dropdown, MenuItem, TableRow, TableCell, TableRowProps, Table
 import { IconMoreVerticalOutline, IconTargetOutline } from '@taskany/icons';
 import type { State as StateType } from '@prisma/client';
 
-import { Priority } from '../types/priority';
 import { DateType } from '../types/date';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { formateEstimate } from '../utils/dateTime';
 import { useLocale } from '../hooks/useLocale';
+import { Priority } from '../types/priority';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
@@ -25,7 +25,7 @@ interface CommonGoalListItemCompactProps {
     estimate?: Date;
     estimateType?: DateType;
     focused?: boolean;
-    priority?: string;
+    priority?: Priority;
 }
 
 type GoalListItemCompactProps = {
@@ -140,7 +140,7 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             content = nullable(state, (s) => <StateDot size="m" title={s?.title} hue={s?.hue} />);
             break;
         case 'priority':
-            content = nullable(priority as Priority | null, (p) => <TextItem>{getPriorityText(p)}</TextItem>);
+            content = nullable(priority, (p) => <TextItem>{getPriorityText(p.title)}</TextItem>);
             break;
         case 'projectId':
             content = nullable(projectId, (id) => <TextItem>{id}</TextItem>);

@@ -7,11 +7,11 @@ import { IconEyeOutline, IconStarSolid } from '@taskany/icons';
 import type { State as StateType, Tag } from '@prisma/client';
 
 import { routes } from '../hooks/router';
-import { Priority } from '../types/priority';
 import { DateType } from '../types/date';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { formateEstimate } from '../utils/dateTime';
 import { useLocale } from '../hooks/useLocale';
+import { Priority } from '../types/priority';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
@@ -38,7 +38,7 @@ interface GoalListItemProps {
     comments?: number;
     isNotViewed?: boolean;
     focused?: boolean;
-    priority?: string | null;
+    priority?: Priority | null;
     starred?: boolean;
     watching?: boolean;
     className?: string;
@@ -261,7 +261,9 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                         </TableCell>
 
                         <TableCell width="11ch">
-                            <GoalTextItem>{getPriorityText(priority as Priority)}</GoalTextItem>
+                            {nullable(priority?.title, (title) => (
+                                <GoalTextItem>{getPriorityText(title)}</GoalTextItem>
+                            ))}
                         </TableCell>
 
                         {nullable(projectId, (pId) => (

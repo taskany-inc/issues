@@ -3,18 +3,18 @@ import { Button, Dropdown, MenuItem } from '@taskany/bricks';
 
 import { comboboxItem, priorityCombobox } from '../utils/domObjects';
 import { trpc } from '../utils/trpcClient';
-import { PriorityReturnType } from '../../trpc/inferredTypes';
+import { Priority } from '../types/priority';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { CommonDropdown } from './CommonDropdown';
 
 interface PriorityDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
-    value?: PriorityReturnType;
+    value?: Priority;
     disabled?: React.ComponentProps<typeof Dropdown>['disabled'];
     error?: React.ComponentProps<typeof Dropdown>['error'];
 
-    onChange?: (priority: PriorityReturnType) => void;
+    onChange?: (priority: Priority) => void;
 }
 
 export const PriorityDropdown = React.forwardRef<HTMLDivElement, PriorityDropdownProps>(
