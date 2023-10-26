@@ -10,6 +10,7 @@ import { tagsCombobox } from '../utils/domObjects';
 import { TagObject } from '../types/tag';
 
 import { CommonCombobox } from './CommonCombobox';
+import { TagsList } from './TagsList';
 
 interface TagComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -123,6 +124,7 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                         {...props}
                     />
                 )}
+                renderItems={(children) => <TagsList>{children as React.ReactNode}</TagsList>}
                 renderItem={(props) => (
                     <Tag key={props.item.id} onClick={suggestions.data?.length ? props.onClick : createTag}>
                         {props.item.title}

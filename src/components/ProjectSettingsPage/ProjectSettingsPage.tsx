@@ -83,7 +83,11 @@ const StyledModalActions = styled.div`
 
 const StyledTag = styled(Tag)`
     display: flex;
-    gap: ${gapS};
+    gap: ${gapXs};
+
+    :not(:last-of-type) {
+        margin-right: ${gapXs};
+    }
 `;
 
 const StyledTextList = styled(TextList)`
