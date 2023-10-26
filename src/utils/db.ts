@@ -1,13 +1,15 @@
 import { nanoid } from 'nanoid';
-import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma } from '@prisma/client';
+import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, dependencyKind } from '../schema/goal';
 import { addCalculatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
+import { ReactionsMap } from '../types/reactions';
 
 import { prisma } from './prisma';
 import { subjectToEnumValue } from './goalHistory';
+import { safeGetUserName } from './getUserName';
 
 /**
  * Type-safe wrapper in raw SQL query.
@@ -219,25 +221,78 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
     return historyWithMeta;
 };
 
-export const mixHistoryWithComments = <H extends HistoryRecordWithActivity, C extends Comment>(
+type mixHistoryWithCommentsReturnType<H, C> =
+    | { type: 'history'; value: H }
+    | { type: 'comment'; value: Omit<C, 'reactions'> & { reactions: ReactionsMap } };
+export const mixHistoryWithComments = <
+    H extends HistoryRecordWithActivity,
+    C extends Comment & { reactions: (Reaction & Pick<HistoryRecordWithActivity, 'activity'>)[] },
+>(
     history: H[],
     comments: C[],
-): Array<{ type: 'history'; value: H } | { type: 'comment'; value: C }> => {
-    const activity: Array<{ type: 'history'; value: H } | { type: 'comment'; value: C }> = history.map((record) => {
+): {
+    _activityFeed: mixHistoryWithCommentsReturnType<H, C>[];
+    _comments: Extract<mixHistoryWithCommentsReturnType<H, C>, { type: 'comment' }>['value'][];
+    comments: C[];
+} => {
+    const activity: mixHistoryWithCommentsReturnType<H, C>[] = history.map((record) => {
         return {
             type: 'history',
             value: record,
         };
     });
 
-    for (const comment of comments) {
+    const limit = 10;
+    const _comments = comments?.map((comment) => {
+        const reactions = comment?.reactions?.reduce<ReactionsMap>((acc, cur) => {
+            const data = {
+                activityId: cur.activityId,
+                name: safeGetUserName(cur.activity),
+            };
+
+            if (acc[cur.emoji]) {
+                acc[cur.emoji].count += 1;
+                acc[cur.emoji].authors.push(data);
+            } else {
+                acc[cur.emoji] = {
+                    count: 1,
+                    authors: [data],
+                    remains: 0,
+                };
+            }
+
+            return acc;
+        }, {});
+
+        for (const key in reactions) {
+            if (key in reactions) {
+                const { authors } = reactions[key];
+
+                if (authors.length > limit) {
+                    reactions[key].authors = authors.slice(0, limit);
+                    reactions[key].remains = authors.length - limit;
+                }
+            }
+        }
+
+        return {
+            ...comment,
+            reactions,
+        };
+    });
+
+    for (const comment of _comments) {
         activity.push({
             type: 'comment',
             value: comment,
         });
     }
 
-    return activity.sort((a, b) => a.value.createdAt.getTime() - b.value.createdAt.getTime());
+    return {
+        _activityFeed: activity.sort((a, b) => a.value.createdAt.getTime() - b.value.createdAt.getTime()),
+        _comments,
+        comments: [],
+    };
 };
 
 export const makeGoalRelationMap = <T extends Goal>(

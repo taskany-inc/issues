@@ -229,8 +229,8 @@ export const goal = router({
             return {
                 ...goal,
                 ...addCalculatedGoalsFields(goal, activityId, role),
+                ...mixHistoryWithComments(history, goal.comments),
                 _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
-                _activityFeed: mixHistoryWithComments(history, goal.comments),
                 _relations: makeGoalRelationMap({
                     dependsOn: goal.dependsOn,
                     blocks: goal.blocks,

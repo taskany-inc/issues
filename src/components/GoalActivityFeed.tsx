@@ -52,8 +52,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             {
                 id: goal?.id,
                 stateId: goal?.stateId,
-                reactions: goal?.reactions,
-                comments: goal?.comments,
+                comments: goal?._comments,
             },
             {
                 invalidate: {
@@ -69,8 +68,8 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
         }, [onGoalDelete, onGoalDeleteConfirm]);
 
         const onGoalCommentSubmit = useCallback(
-            (value: NonNullable<GoalByIdReturnType>['comments'][number]) => {
-                return value.activity?.id === user?.activityId ? onGoalCommentUpdate(value.id) : undefined;
+            (comment: { activityId: string; id: string }) => {
+                return comment.activityId === user?.activityId ? onGoalCommentUpdate(comment.id) : undefined;
             },
             [onGoalCommentUpdate, user?.activityId],
         );
@@ -161,8 +160,8 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                             highlight={value.id === highlightCommentId}
                             reactions={value.reactions}
                             onSubmit={onGoalCommentSubmit(value)}
-                            onReactionToggle={onGoalCommentReactionToggle?.(value.id)}
-                            onDelete={onGoalCommentDelete?.(value.id)}
+                            onReactionToggle={onGoalCommentReactionToggle(value.id)}
+                            onDelete={onGoalCommentDelete(value.id)}
                         />
                     )}
                 />

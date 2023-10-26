@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Reaction, State, User } from '@prisma/client';
+import { State, User } from '@prisma/client';
 import styled from 'styled-components';
 import { brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
 import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, UserPic, nullable, Button } from '@taskany/bricks';
@@ -11,7 +11,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { createLocaleDate } from '../../utils/dateTime';
 import { CommentSchema } from '../../schema/comment';
-import { Reactions } from '../Reactions';
+import { Reactions } from '../Reactions/Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Circle } from '../Circle';
@@ -23,6 +23,7 @@ import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { useLatest } from '../../hooks/useLatest';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { Light } from '../Light';
+import { ReactionsMap } from '../../types/reactions';
 
 import { tr } from './CommentView.i18n';
 
@@ -34,7 +35,7 @@ interface CommentViewProps {
     description: string;
     createdAt: Date;
     updatedAt?: Date;
-    reactions?: Reaction[];
+    reactions: ReactionsMap;
     author?: User | null;
     highlight?: boolean;
     state?: State | null;
@@ -301,8 +302,8 @@ export const CommentView: FC<CommentViewProps> = ({
 
                         <StyledMd>{commentDescription.description}</StyledMd>
 
-                        {nullable(reactions?.length, () => (
-                            <Reactions reactions={reactionsProps.reactions} onClick={onReactionToggle} />
+                        {nullable(Object.keys(reactions), () => (
+                            <Reactions reactions={reactions} onClick={onReactionToggle} />
                         ))}
                     </StyledCardComment>
                 </StyledCommentCard>
