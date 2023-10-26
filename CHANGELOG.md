@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.3.0](https://github.com/taskany-inc/issues/compare/v2.2.3...v2.3.0) (2023-10-26)
+
+
+### Features
+
+* move monaco loader from CDN to local assets ([c03b034](https://github.com/taskany-inc/issues/commit/c03b034be3486dbb613ae69be0ca870126ae35db))
+
+
+### Bug Fixes
+
+* priority is shown in GlobalSearch ([63099dc](https://github.com/taskany-inc/issues/commit/63099dcce3ace12db906baf647268b9f42524a95))
+
 ## [2.2.3](https://github.com/taskany-inc/issues/compare/v2.2.2...v2.2.3) (2023-10-25)
 
 
