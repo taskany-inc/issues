@@ -18,6 +18,7 @@ import { TextList, TextListItem } from '../TextList';
 import { safeUserData } from '../../utils/getUserName';
 import { goalPageDeleteButton } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
+import { TagsList } from '../TagsList';
 
 import { tr } from './GoalSidebar.i18n';
 
@@ -180,12 +181,14 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoa
 
             {nullable(goal._isEditable || goal.tags.length, () => (
                 <IssueMeta title={tr('Tags')}>
-                    {goal.tags?.map((tag) => (
-                        <Tag key={tag.id}>
-                            <TagCleanButton onClick={onGoalTagRemove(tag)} />
-                            {tag.title}
-                        </Tag>
-                    ))}
+                    <TagsList>
+                        {goal.tags.map((tag) => (
+                            <Tag key={tag.id}>
+                                <TagCleanButton onClick={onGoalTagRemove(tag)} />
+                                {tag.title}
+                            </Tag>
+                        ))}
+                    </TagsList>
 
                     {nullable(goal._isEditable, () => (
                         <StyledInlineInput>

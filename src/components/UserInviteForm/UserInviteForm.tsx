@@ -18,16 +18,18 @@ import {
     TagCleanButton,
     Keyboard,
     Tip,
+    nullable,
 } from '@taskany/bricks';
 import { IconBulbOnOutline } from '@taskany/icons';
 
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { HelpButton } from '../HelpButton/HelpButton';
+import { TagsList } from '../TagsList';
 
 import { tr } from './UserInviteForm.i18n';
 
-const StyledEmails = styled.div`
+const StyledTagsList = styled(TagsList)`
     padding: ${gapM} 0;
 `;
 
@@ -112,25 +114,24 @@ const UserInviteForm: React.FC = () => {
             </ModalHeader>
 
             <ModalContent>
-                <StyledEmails>
-                    {isValid ? (
-                        <>
-                            {emails.map((email) => (
+                <StyledTagsList>
+                    {nullable(
+                        isValid,
+                        () =>
+                            emails.map((email) => (
                                 <Tag key={email}>
                                     <TagCleanButton onClick={onEmailRemove(email)} />
                                     {email}
                                 </Tag>
-                            ))}
-                        </>
-                    ) : (
+                            )),
                         <Text size="s" color={gray7}>
                             {tr.raw('Start typing users emails', {
                                 key1: <Keyboard enter />,
                                 key2: <Keyboard space />,
                             })}
-                        </Text>
+                        </Text>,
                     )}
-                </StyledEmails>
+                </StyledTagsList>
 
                 <Form>
                     <FormInput

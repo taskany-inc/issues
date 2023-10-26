@@ -36,6 +36,7 @@ import {
     goalProjectSelectControl,
     goalTitleInput,
 } from '../../utils/domObjects';
+import { TagsList } from '../TagsList';
 
 import { GoalFormEstimate } from './GoalFormEstimate';
 import { tr } from './GoalForm.i18n';
@@ -265,17 +266,19 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                 </FormActions>
                 <FormActions flat="top">
                     <FormAction left>
-                        {tagsWatcher.length ? (
-                            <>
-                                {tagsWatcher?.map((tag) => (
-                                    <Tag key={tag.id}>
-                                        <TagCleanButton onClick={onTagDeleteProvider(tag)} />
-                                        {tag.title}
-                                    </Tag>
-                                ))}
-                            </>
-                        ) : (
-                            tip
+                        {nullable(
+                            tagsWatcher,
+                            (tags) => (
+                                <TagsList>
+                                    {tags.map((tag) => (
+                                        <Tag key={tag.id}>
+                                            <TagCleanButton onClick={onTagDeleteProvider(tag)} />
+                                            {tag.title}
+                                        </Tag>
+                                    ))}
+                                </TagsList>
+                            ),
+                            tip,
                         )}
                     </FormAction>
                     <FormAction right inline>
