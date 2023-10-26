@@ -4,7 +4,6 @@ import type { Activity, GoalAchieveCriteria } from '@prisma/client';
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
 import { GoalCommon, GoalStateChangeSchema, GoalUpdate, ToggleGoalDependency } from '../schema/goal';
-import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import {
     AddCriteriaSchema,
     RemoveCriteriaSchema,
@@ -12,6 +11,7 @@ import {
     UpdateCriteriaStateSchema,
 } from '../schema/criteria';
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
+import { GoalComment } from '../types/comment';
 
 import { useHighlightedComment } from './useHighlightedComment';
 import { useReactionsResource } from './useReactionsResource';
@@ -28,8 +28,7 @@ type Configuration = { invalidate: Functions; afterInvalidate?: () => void };
 type GoalFields = {
     id?: string;
     stateId?: string | null;
-    reactions?: NonNullable<GoalByIdReturnType>['reactions'];
-    comments?: NonNullable<GoalByIdReturnType>['comments'];
+    comments?: GoalComment[];
 };
 
 export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
@@ -92,7 +91,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     const removePartnerProjectMutation = trpc.goal.removePartnerProject.useMutation();
 
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
-    const { commentReaction } = useReactionsResource(fields.reactions);
+    const { commentReaction } = useReactionsResource();
 
     const onGoalWatchingToggle = useCallback(
         async (watcher?: boolean, invalidateKey?: RefetchKeys | RefetchKeys[]) => {

@@ -3,6 +3,7 @@ import { nullable } from '@taskany/bricks';
 
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { HistoryAction } from '../types/history';
+import { GoalComment } from '../types/comment';
 
 import { ActivityFeed } from './ActivityFeed';
 import {
@@ -25,7 +26,7 @@ interface GoalActivityProps {
     header?: React.ReactNode;
     footer?: React.ReactNode;
 
-    renderCommentItem: (item: NonNullable<GoalByIdReturnType>['comments'][number]) => React.ReactNode;
+    renderCommentItem: (item: GoalComment) => React.ReactNode;
 }
 
 function excludeString<T>(val: T): Exclude<T, string> {
