@@ -18,12 +18,6 @@ interface RelativeTimeProps {
     isRelativeTime?: boolean;
 }
 
-const StyledTimeValue = styled.span`
-    &::first-letter {
-        text-transform: capitalize;
-    }
-`;
-
 const StyledKind = styled.span`
     padding-right: ${gapXs};
 `;
@@ -66,7 +60,7 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelati
             {nullable(kind, (k) => (
                 <StyledKind>{map[k]}</StyledKind>
             ))}
-            <StyledTimeValue title={createLocaleDate(localeDate, { locale })}>{timeValue}</StyledTimeValue>
+            <span title={createLocaleDate(localeDate, { locale })}>{timeValue}</span>
         </StyledRelativeTime>
     );
 };
