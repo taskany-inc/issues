@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.4.0](https://github.com/taskany-inc/issues/compare/v2.3.0...v2.4.0) (2023-10-27)
+
+
+### Features
+
+* reactions have a tooltip with authors ([b1d18f4](https://github.com/taskany-inc/issues/commit/b1d18f420cfe6bba5f317a51b314e63ea5002041))
+
+
+### Bug Fixes
+
+* added line space for tags ([558fcaf](https://github.com/taskany-inc/issues/commit/558fcaf21287f3de9fa66e7b63bc7655027b5077))
+
 ## [2.3.0](https://github.com/taskany-inc/issues/compare/v2.2.3...v2.3.0) (2023-10-26)
 
 
