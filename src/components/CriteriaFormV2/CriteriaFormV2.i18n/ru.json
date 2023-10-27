@@ -1,0 +1,18 @@
+{
+    "Title is required": "Название обязательно",
+    "Goal must be selected": "Выберите цель",
+    "Title must be longer than 1 symbol": "Название должно быть 1 или более символов",
+    "Title must be unique": "Название должно быть уникальным",
+    "Weight must be an integer": "Вес должен быть числом",
+    "Passed weight is not in range": "Вес критерия должен быть от 1 до {upTo}",
+    "Simple": "Критерий",
+    "Goal": "Цель",
+    "Weight": "Вес",
+    "Weight out of": "из {upTo}",
+    "Add weight": "Добавить вес",
+    "Mode": "Тип",
+    "Save": "Сохранить",
+    "Add": "Добавить",
+    "Cancel": "Отменить",
+    "Suggestions": "Предложения"
+}
