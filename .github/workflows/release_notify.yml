@@ -12,15 +12,7 @@ jobs:
     name: Notify
     runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: |
-            New release available for review 🎉:
-
-            Release notes: ${{ github.event.pull_request.body }}
-
-            Repository: ${{ github.repository }}
-
-            See changes: https://github.com/${{ github.repository }}/pulls/${{github.event.number }}
+      - uses: F2had/pr-telegram-action@v1.0.0
+        with: 
+          bot_token: ${{ secrets.TELEGRAM_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_TO }}
