@@ -1,16 +1,15 @@
-name: Release PR
+name: Release notifications
 
 on:
-  pull_request_target:
-    types:
-      - opened
-      - reopened
+  pull_request:
+    branches:
+      - main
     paths:
       - .release_notes/**
 
 jobs:
   tg_notify:
-    name: TG Notify
+    name: Notify
     runs-on: ubuntu-latest
     steps:
       - uses: appleboy/telegram-action@master
@@ -21,7 +20,7 @@ jobs:
             New release available for review 🎉:
 
             Release notes: ${{ github.event.pull_request.body }}
-            
+
             Repository: ${{ github.repository }}
 
             See changes: https://github.com/${{ github.repository }}/pulls/${{github.event.number }}
