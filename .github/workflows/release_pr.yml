@@ -1,0 +1,29 @@
+name: Release PR
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+
+jobs:
+  notify:
+    name: Check labels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker://agilepathway/pull-request-label-checker:latest
+        with:
+          one_of: release
+          repo_token: ${{ github.token }}
+      - name: send telegram message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            New release available for review 🎉:
+
+            Release notes: ${{ github.event.pull_request.body }}
+            
+            Repository: ${{ github.repository }}
+
+            See changes: https://github.com/${{ github.repository }}/pulls/${{github.event.number }}
