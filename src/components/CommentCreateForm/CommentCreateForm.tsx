@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { State } from '@prisma/client';
-import { Button, Dropdown, UserPic } from '@taskany/bricks';
+import { Button, Dropdown, UserPic, nullable } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
 
 import { usePageContext } from '../../hooks/usePageContext';
@@ -16,7 +16,7 @@ import { tr } from './CommentCreateForm.i18n';
 
 interface CommentCreateFormProps extends Omit<React.ComponentProps<typeof CommentForm>, 'actionButton'> {
     states?: State[];
-    stateId?: string;
+    stateId?: string | null;
 
     onSubmit: (comment: GoalCommentFormSchema) => void;
     onChange?: (comment: GoalCommentFormSchema) => void;
@@ -75,21 +75,21 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
             });
 
             setDescription('');
-            setPushState(undefined);
+            setPushState(stateId ? statesMap[stateId] : undefined);
 
             setBusy(false);
             setFocused(true);
         },
-        [onSubmit, pushState?.id],
+        [onSubmit, pushState?.id, stateId, statesMap],
     );
 
     const onCancelCreate = useCallback(() => {
         setBusy(false);
         setFocused(false);
-        setPushState(undefined);
+        setPushState(stateId ? statesMap[stateId] : undefined);
         setDescription('');
         onCancel?.();
-    }, [onCancel]);
+    }, [onCancel, stateId, statesMap]);
 
     const onStateSelect = useCallback(
         (state: State) => {
@@ -116,56 +116,57 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                 onCancel={onCancelCreate}
                 onFocus={onCommentFocus}
                 actionButton={
-                    states ? (
-                        <StyledStateUpdate>
-                            <Button
-                                view="primary"
-                                disabled={busy}
-                                hue={pushState ? [pushState.hue, themeId] : undefined}
-                                outline
-                                type="submit"
-                                brick="right"
-                                text={pushState ? tr('Update state') : tr('Comment')}
-                                iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
-                            />
-                            <Dropdown
-                                placement="top-end"
-                                arrow
-                                items={states}
-                                offset={[-5, 20]}
-                                onChange={onStateSelect}
-                                renderTrigger={(props) => (
-                                    <Button
-                                        view="primary"
-                                        hue={pushState ? [pushState.hue, themeId] : undefined}
-                                        outline
-                                        brick="left"
-                                        iconRight={
-                                            props.visible ? (
-                                                <IconUpSmallSolid size="s" />
-                                            ) : (
-                                                <IconDownSmallSolid size="s" />
-                                            )
-                                        }
-                                        ref={props.ref}
-                                        onClick={props.onClick}
-                                    />
-                                )}
-                                renderItem={(props) => (
-                                    <ColorizedMenuItem
-                                        key={props.item.id}
-                                        hue={props.item.hue}
-                                        checked={props.item.id === pushState?.id}
-                                        onClick={props.onClick}
-                                    >
-                                        {props.item.title}
-                                    </ColorizedMenuItem>
-                                )}
-                            />
-                        </StyledStateUpdate>
-                    ) : (
+                    <>
                         <Button size="m" view="primary" disabled={busy} outline type="submit" text={tr('Comment')} />
-                    )
+                        {nullable(states, () => (
+                            <StyledStateUpdate>
+                                <Button
+                                    view="primary"
+                                    disabled={busy}
+                                    hue={pushState ? [pushState.hue, themeId] : undefined}
+                                    outline
+                                    type="submit"
+                                    brick="right"
+                                    text={tr('Update state')}
+                                    iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
+                                />
+                                <Dropdown
+                                    placement="top-end"
+                                    arrow
+                                    items={states}
+                                    offset={[-5, 20]}
+                                    onChange={onStateSelect}
+                                    renderTrigger={(props) => (
+                                        <Button
+                                            view="primary"
+                                            hue={pushState ? [pushState.hue, themeId] : undefined}
+                                            outline
+                                            brick="left"
+                                            iconRight={
+                                                props.visible ? (
+                                                    <IconUpSmallSolid size="s" />
+                                                ) : (
+                                                    <IconDownSmallSolid size="s" />
+                                                )
+                                            }
+                                            ref={props.ref}
+                                            onClick={props.onClick}
+                                        />
+                                    )}
+                                    renderItem={(props) => (
+                                        <ColorizedMenuItem
+                                            key={props.item.id}
+                                            hue={props.item.hue}
+                                            checked={props.item.id === pushState?.id}
+                                            onClick={props.onClick}
+                                        >
+                                            {props.item.title}
+                                        </ColorizedMenuItem>
+                                    )}
+                                />
+                            </StyledStateUpdate>
+                        ))}
+                    </>
                 }
             />
         </ActivityFeedItem>

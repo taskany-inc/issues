@@ -8,10 +8,11 @@ import CommentCreateForm from './CommentCreateForm/CommentCreateForm';
 interface GoalCommentCreateFormProps {
     states: ComponentProps<typeof CommentCreateForm>['states'];
     goalId: string;
+    stateId?: string | null;
     onSubmit: (comment?: { description: string; stateId?: string }) => Promise<Comment | null | undefined>;
 }
 
-const GoalCommentCreateForm: FC<GoalCommentCreateFormProps> = ({ states, goalId, onSubmit }) => {
+const GoalCommentCreateForm: FC<GoalCommentCreateFormProps> = ({ states, goalId, stateId, onSubmit }) => {
     const {
         saveDraft: saveGoalCommentDraft,
         resolveDraft: resolveGoalCommentDraft,
@@ -49,7 +50,7 @@ const GoalCommentCreateForm: FC<GoalCommentCreateFormProps> = ({ states, goalId,
     return (
         <CommentCreateForm
             states={states}
-            stateId={commentDraft?.stateId}
+            stateId={commentDraft?.stateId || stateId}
             description={commentDraft?.description}
             onSubmit={onGoalCommentSubmit}
             onCancel={onGoalCommentCancel}
