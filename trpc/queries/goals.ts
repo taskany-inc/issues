@@ -3,6 +3,8 @@ import { Goal, GoalAchieveCriteria, Prisma, Role, State, StateType } from '@pris
 import { QueryWithFilters } from '../../src/schema/common';
 import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
+import { getProjectAccessFilter } from './access';
+
 const defaultOrderBy = {
     updatedAt: 'desc',
 };
@@ -84,6 +86,7 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
 export const goalsFilter = (
     data: QueryWithFilters,
     activityId: string,
+    role: Role,
     extra: Prisma.GoalFindManyArgs['where'] = {},
 ): {
     where: Prisma.GoalFindManyArgs['where'];
@@ -145,6 +148,7 @@ export const goalsFilter = (
           }
         : {};
 
+    const projectAccessFilter = getProjectAccessFilter(activityId, role);
     const projectFilter: Prisma.GoalFindManyArgs['where'] = data.project?.length
         ? {
               OR: [
@@ -153,6 +157,7 @@ export const goalsFilter = (
                           id: {
                               in: data.project,
                           },
+                          ...projectAccessFilter,
                       },
                   },
                   {
@@ -162,13 +167,18 @@ export const goalsFilter = (
                                   id: {
                                       in: data.project,
                                   },
+                                  ...projectAccessFilter,
                               },
                           },
                       },
                   },
               ],
           }
-        : {};
+        : {
+              project: {
+                  ...projectAccessFilter,
+              },
+          };
 
     let orderBy: any = [];
 
