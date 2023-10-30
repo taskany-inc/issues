@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.5.0](https://github.com/taskany-inc/issues/compare/v2.4.0...v2.5.0) (2023-10-30)
+
+
+### Features
+
+* **keyPredictor:** supported transliteration ([36c9545](https://github.com/taskany-inc/issues/commit/36c95453fcc1f054d0250e34c9d3d44ca7748826))
+
 ## [2.4.0](https://github.com/taskany-inc/issues/compare/v2.3.0...v2.4.0) (2023-10-30)
 
 
