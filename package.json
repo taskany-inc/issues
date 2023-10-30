@@ -91,7 +91,7 @@
     "@types/cors": "2.8.13",
     "@types/jest": "29.5.3",
     "@types/markdown-it": "12.2.3",
-    "@types/md5": "2.3.2",
+    "@types/md5": "2.3.4",
     "@types/multer": "1.4.8",
     "@types/node": "18.16.3",
     "@types/nodemailer": "6.4.11",
