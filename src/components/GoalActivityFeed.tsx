@@ -146,6 +146,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     footer={
                         <GoalCommentCreateForm
                             goalId={goal.id}
+                            stateId={goal.stateId}
                             states={goal._isEditable ? goal.project?.flow.states : undefined}
                             onSubmit={onGoalCommentCreate}
                         />
