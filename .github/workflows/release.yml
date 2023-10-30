@@ -8,3 +8,4 @@ on:
 jobs:
   scheduled_release:
     uses: taskany-inc/release/.github/workflows/release_pr.yml@main
+    secrets: inherit
