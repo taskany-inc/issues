@@ -30,6 +30,11 @@ const testProjectDescription = 'Test project description in e2e';
 const testProjectKey = keyPredictor(testProjectTitle);
 const customKey = 'CUSTOMKEY';
 
+const testProjectTitleRu = 'Тестовый проект';
+const testProjectKeyRu = keyPredictor(testProjectTitleRu);
+const customKeyRu = 'КАСТОМНЫЙ КЛЮЧ РУ';
+const customKeyRuPredict = keyPredictor(customKeyRu, { allowVowels: true });
+
 describe('Projects', () => {
     beforeEach(() => {
         cy.signInViaEmail();
@@ -140,6 +145,63 @@ describe('Projects', () => {
                 cy.get(projectCreateForm.query).should('exist');
                 cy.url().should('equal', exactUrl(routes.index()));
                 // screenshot
+            });
+
+            describe('create project in Russian', () => {
+                it('should create project with recommended key', () => {
+                    cy.get(projectTitleInput.query).type(testProjectTitleRu);
+                    cy.get(projectKeyPredictor.query).contains(testProjectKeyRu).trigger('mouseover');
+
+                    cy.get(projectKeyPredictorHint.query).should('contain.text', `#${testProjectKeyRu}-42`);
+                    cy.get(projectKeyPredictorHint.query).should('contain.text', `#${testProjectKeyRu}-911`);
+
+                    cy.get(projectSubmitButton.query).click();
+
+                    cy.url().should('equal', exactUrl(routes.project(testProjectKeyRu)));
+                    cy.get(projectCreateForm.query).should('not.exist');
+                });
+
+                it('should create project with custom key', () => {
+                    cy.get(projectTitleInput.query).type(testProjectTitleRu);
+                    cy.get(projectKeyPredictor.query).click();
+
+                    cy.get(projectKeyPredictorError.query).should('exist');
+
+                    cy.get(projectKeyPredictorInput.query).clear();
+                    cy.get(projectKeyPredictorInput.query).type(customKeyRu);
+
+                    cy.get(projectKeyPredictorHint.query).should('contain.text', `#${customKeyRuPredict}-42`);
+                    cy.get(projectKeyPredictorHint.query).should('contain.text', `#${customKeyRuPredict}-911`);
+
+                    cy.get(projectSubmitButton.query).click();
+
+                    cy.url().should('equal', exactUrl(routes.project(customKeyRuPredict)));
+                    cy.get(projectCreateForm.query).should('not.exist');
+                });
+
+                it('not allows to create project with too short title', () => {
+                    cy.get(projectTitleInput.query).type('Тес');
+                    cy.get(projectKeyPredictor.query).trigger('mouseover');
+
+                    cy.get(projectKeyPredictorError.query).should('exist');
+
+                    cy.get(projectSubmitButton.query).click();
+
+                    cy.get(projectCreateForm.query).should('exist');
+                    cy.url().should('equal', exactUrl(routes.index()));
+                });
+
+                it('not allows to create project with existing key', () => {
+                    cy.get(projectTitleInput.query).type(testProjectTitleRu);
+                    cy.get(projectKeyPredictor.query).contains(testProjectKeyRu).trigger('mouseover');
+
+                    cy.get(projectKeyPredictorError.query).should('exist');
+
+                    cy.get(projectSubmitButton.query).click();
+
+                    cy.get(projectCreateForm.query).should('exist');
+                    cy.url().should('equal', exactUrl(routes.index()));
+                });
             });
         });
     });
