@@ -1570,10 +1570,22 @@ export const goal = router({
                         on "Goal"."activityId" = "Activity".id
                     left join "Priority" as "Priority"
                         on "Goal"."priorityId" = "Priority".id
+                    left join "_goalParticipants" 
+                        on "Goal".id = "_goalParticipants"."B"
+                    left join "_GoalToTag" 
+                        on "Goal".id = "_GoalToTag"."A"
+                    left join "_partnershipProjects" 
+                        on "Goal".id = "_partnershipProjects"."A"
                     inner join "GoalsFilterPreset"
-                        on ("Activity".id = any("GoalsFilterPreset".issuers) or "GoalsFilterPreset".issuers is null)
+                        on ("Activity".id = any("GoalsFilterPreset".issuers) or "GoalsFilterPreset".issuers = '{}')
+                            and ("Goal"."ownerId" = any("GoalsFilterPreset".owners) or "GoalsFilterPreset".owners = '{}')
+                            and ("_goalParticipants"."A" = any("GoalsFilterPreset".participants) or "GoalsFilterPreset".participants = '{}')
                             and ("Priority".id = any("GoalsFilterPreset".priorities) or "GoalsFilterPreset".priorities = '{}')
-                        where "GoalsFilterPreset".id = 'cloegif6j0000nqy90gq8y5fd'
+                            and ("Goal"."stateId" = any("GoalsFilterPreset".states) or "GoalsFilterPreset".states = '{}')
+                            and ("_GoalToTag"."A" = any("GoalsFilterPreset".tags) or "GoalsFilterPreset".tags = '{}')
+                            and ("Goal"."projectId" = any("GoalsFilterPreset".projects) or "_partnershipProjects"."B" = any("GoalsFilterPreset".projects) or "GoalsFilterPreset".projects = '{}')
+                        where "GoalsFilterPreset".id = 'cloei26840000swtm4al0zpwy'
+                    group by 1, 2
             `;
 
         return {
