@@ -1562,30 +1562,50 @@ export const goal = router({
         }),
     newGoals: procedure.query(async ({ input, ctx }) => {
         const res = await prisma.$queryRaw`
-                select "Goal".id as "goal.id", "Goal".title as "goal.title"
-                    from "Activity"
-                    left join "User" as "User"
-                        on "User"."activityId" = "Activity".id
-                    left join "Goal" as "Goal"
-                        on "Goal"."activityId" = "Activity".id
-                    left join "Priority" as "Priority"
-                        on "Goal"."priorityId" = "Priority".id
-                    left join "_goalParticipants" 
-                        on "Goal".id = "_goalParticipants"."B"
-                    left join "_GoalToTag" 
-                        on "Goal".id = "_GoalToTag"."A"
-                    left join "_partnershipProjects" 
-                        on "Goal".id = "_partnershipProjects"."A"
-                    inner join "GoalsFilterPreset"
-                        on ("Activity".id = any("GoalsFilterPreset".issuers) or "GoalsFilterPreset".issuers = '{}')
-                            and ("Goal"."ownerId" = any("GoalsFilterPreset".owners) or "GoalsFilterPreset".owners = '{}')
-                            and ("_goalParticipants"."A" = any("GoalsFilterPreset".participants) or "GoalsFilterPreset".participants = '{}')
-                            and ("Priority".id = any("GoalsFilterPreset".priorities) or "GoalsFilterPreset".priorities = '{}')
-                            and ("Goal"."stateId" = any("GoalsFilterPreset".states) or "GoalsFilterPreset".states = '{}')
-                            and ("_GoalToTag"."A" = any("GoalsFilterPreset".tags) or "GoalsFilterPreset".tags = '{}')
-                            and ("Goal"."projectId" = any("GoalsFilterPreset".projects) or "_partnershipProjects"."B" = any("GoalsFilterPreset".projects) or "GoalsFilterPreset".projects = '{}')
-                        where "GoalsFilterPreset".id = 'cloei26840000swtm4al0zpwy'
-                    group by 1, 2
+            select
+                "Goal".id as "goal.id",
+                "Goal".title as "goal.title",
+                "Goal"."estimate"
+                from "Activity"
+                left join "User" as "User"
+                    on "User"."activityId" = "Activity".id
+                left join "Goal" as "Goal"
+                    on "Goal"."activityId" = "Activity".id
+                left join "Priority" as "Priority"
+                    on "Goal"."priorityId" = "Priority".id
+                left join "_goalParticipants" 
+                    on "Goal".id = "_goalParticipants"."B"
+                left join "_GoalToTag" 
+                    on "Goal".id = "_GoalToTag"."A"
+                left join "_partnershipProjects" 
+                    on "Goal".id = "_partnershipProjects"."A"
+                inner join (
+                    SELECT *,
+                    CASE
+                    WHEN filter.estimate = '@previous' THEN date_trunc('quarter', now()) - INTERVAL '3 month'
+                    WHEN filter.estimate = '@current' THEN date_trunc('quarter', now())
+                    WHEN filter.estimate = '@next' THEN date_trunc('quarter', now()) + INTERVAL '3 month'
+                    ELSE split_part(filter.estimate, '~', 1)::date
+                END AS estimate_start,
+                CASE
+                    WHEN filter.estimate = '@previous' THEN date_trunc('quarter', now())
+                    WHEN filter.estimate = '@current' THEN date_trunc('quarter', now()) + INTERVAL '3 month'
+                    WHEN filter.estimate = '@next' THEN date_trunc('quarter', now()) + INTERVAL '6 month'
+                    ELSE split_part(filter.estimate, '~', 2)::date
+                END AS estimate_end
+                    FROM "GoalsFilterPreset"
+                    LEFT JOIN LATERAL UNNEST("GoalsFilterPreset".estimates) filter(estimate) ON TRUE
+                    where "GoalsFilterPreset".id = 'cloei26840000swtm4al0zpwy'
+                ) as filters
+                    on ("Activity".id = any(filters.issuers) or filters.issuers = '{}')
+                        and ("Goal"."ownerId" = any(filters.owners) or filters.owners = '{}')
+                        and ("_goalParticipants"."A" = any(filters.participants) or filters.participants = '{}')
+                        and ("Priority".id = any(filters.priorities) or filters.priorities = '{}')
+                        and ("Goal"."stateId" = any(filters.states) or filters.states = '{}')
+                        and ("_GoalToTag"."A" = any(filters.tags) or filters.tags = '{}')
+                        and ("Goal"."projectId" = any(filters.projects) or "_partnershipProjects"."B" = any(filters.projects) or filters.projects = '{}')    
+                        and (("Goal"."estimate" > filters.estimate_start and "Goal"."estimate" < filters.estimate_end) or filters.estimates = '{}')
+                group by 1, 2, 3
             `;
 
         return {
