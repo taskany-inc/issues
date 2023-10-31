@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
-import { protectedProcedure, router } from '../trpcBackend';
+import { procedure, protectedProcedure, router } from '../trpcBackend';
 import { addCalclulatedGoalsFields, goalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
@@ -1560,4 +1560,26 @@ export const goal = router({
                 meta: { count },
             };
         }),
+    newGoals: procedure.query(async ({ input, ctx }) => {
+        const res = await prisma.$queryRaw`
+                select "Goal".id as "goal.id", "Goal".title as "goal.title"
+                    from "Activity"
+                    left join "User" as "User"
+                        on "User"."activityId" = "Activity".id
+                    left join "Goal" as "Goal"
+                        on "Goal"."activityId" = "Activity".id
+                    left join "Priority" as "Priority"
+                        on "Goal"."priorityId" = "Priority".id
+                    inner join "GoalsFilterPreset"
+                        on ("Activity".id = any("GoalsFilterPreset".issuers) or "GoalsFilterPreset".issuers is null)
+                            and ("Priority".id = any("GoalsFilterPreset".priorities) or "GoalsFilterPreset".priorities = '{}')
+                        where "GoalsFilterPreset".id = 'cloegif6j0000nqy90gq8y5fd'
+            `;
+
+        return {
+            goalsFilterPreset: {},
+            goals: [],
+            res,
+        };
+    }),
 });
