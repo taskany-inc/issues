@@ -158,7 +158,9 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoa
                         {goal.partnershipProjects?.map((project) => (
                             <TextListItem key={project.id}>
                                 <ProjectBadge id={project.id} title={project.title}>
-                                    <IconXCircleSolid size="xs" onClick={() => removePartnerProject(project.id)} />
+                                    {nullable(goal._isEditable, () => (
+                                        <IconXCircleSolid size="xs" onClick={() => removePartnerProject(project.id)} />
+                                    ))}
                                 </ProjectBadge>
                             </TextListItem>
                         ))}
@@ -184,7 +186,9 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoa
                     <TagsList>
                         {goal.tags.map((tag) => (
                             <Tag key={tag.id}>
-                                <TagCleanButton onClick={onGoalTagRemove(tag)} />
+                                {nullable(goal._isEditable, () => (
+                                    <TagCleanButton onClick={onGoalTagRemove(tag)} />
+                                ))}
                                 {tag.title}
                             </Tag>
                         ))}
