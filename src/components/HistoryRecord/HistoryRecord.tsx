@@ -217,7 +217,7 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
                 </Circle>
                 <StyledHistoryRecordWrapper>
                     {/* FIXME: it must be UserBadge */}
-                    <UserPic size={18} src={author?.image} email={author?.email} />
+                    <UserPic size={18} src={author?.image} email={author?.email} name={author?.name} />
                     <StyledTextWrapper multiline={subject.toString() === 'description'}>
                         {nullable(author, (data) => (
                             <Text size="xs" weight="bold">
@@ -433,7 +433,7 @@ const HistoryParticipant: React.FC<{ name?: string | null; pic?: string | null; 
     email,
 }) => (
     <>
-        <UserPic src={pic} size={18} email={email} />
+        <UserPic src={pic} size={18} email={email} name={name} />
         <Text size="xs" weight="bold">
             {name}
         </Text>

@@ -64,6 +64,7 @@ import {
     pageTabs,
     pageHeader,
 } from '../../utils/domObjects';
+import { safeUserData } from '../../utils/getUserName';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -485,12 +486,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                             text={props.text}
                                             disabled={props.disabled}
                                             onClick={props.onClick}
-                                            iconLeft={nullable(transferTo, (v) => (
-                                                <UserPic
-                                                    src={v.user?.image}
-                                                    email={v.user?.email || v.ghost?.email}
-                                                    size={16}
-                                                />
+                                            iconLeft={nullable(safeUserData(transferTo), ({ image, email, name }) => (
+                                                <UserPic src={image} email={email} name={name} size={16} />
                                             ))}
                                             {...projectSettingsTransferProjectOwnerButton.attr}
                                         />

@@ -250,12 +250,12 @@ export const CommentView: FC<CommentViewProps> = ({
                 ) : (
                     nullable(
                         profileUrl && author,
-                        ({ email, image }) => (
+                        ({ email, image, name }) => (
                             <Link as={NextLink} href={`${profileUrl}/${encodeURIComponent(email)}`} inline>
-                                <UserPic size={32} src={image} email={email} />
+                                <UserPic size={32} src={image} email={email} name={name} />
                             </Link>
                         ),
-                        <UserPic size={32} src={author?.image} email={author?.email} />,
+                        <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />,
                     )
                 )}
             </Circle>

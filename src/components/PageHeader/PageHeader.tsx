@@ -62,7 +62,7 @@ export const PageHeader: FC = () => {
             }
             menu={
                 <HeaderMenu>
-                    <UserMenu onClick={onUserMenuClick} avatar={user?.image} email={user?.email} />
+                    <UserMenu onClick={onUserMenuClick} avatar={user?.image} email={user?.email} name={user?.name} />
                 </HeaderMenu>
             }
             nav={

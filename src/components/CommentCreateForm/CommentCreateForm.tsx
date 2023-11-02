@@ -106,7 +106,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
 
     return (
         <ActivityFeedItem>
-            <UserPic size={32} src={user?.image} email={user?.email} />
+            <UserPic size={32} src={user?.image} email={user?.email} name={user?.name} />
 
             <CommentForm
                 description={description}
