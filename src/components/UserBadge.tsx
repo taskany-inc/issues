@@ -15,7 +15,7 @@ export const UserBadge: React.FC<UserBadgeProps> = ({ name, image, email, childr
     return (
         <Badge
             className={className}
-            icon={<UserPic src={image} email={email} size={24} />}
+            icon={<UserPic src={image} email={email} name={name} size={24} />}
             text={name}
             action={children}
         />

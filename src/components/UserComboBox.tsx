@@ -91,7 +91,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                             disabled={props.disabled}
                             onClick={props.onClick}
                             iconLeft={nullable(safeUserData(value), (props) => (
-                                <UserPic src={props.image} email={props.email} size={16} />
+                                <UserPic src={props.image} email={props.email} name={props.name} size={16} />
                             ))}
                             {...usersCombobox.attr}
                         />
