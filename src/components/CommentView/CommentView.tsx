@@ -3,7 +3,18 @@ import dynamic from 'next/dynamic';
 import { State, User } from '@prisma/client';
 import styled from 'styled-components';
 import { brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
-import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, UserPic, nullable, Button } from '@taskany/bricks';
+import {
+    Card,
+    CardComment,
+    CardInfo,
+    Dropdown,
+    MenuItem,
+    Text,
+    UserPic,
+    nullable,
+    Button,
+    Link,
+} from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
@@ -32,6 +43,8 @@ import { useLatest } from '../../hooks/useLatest';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { Light } from '../Light';
 import { ReactionsMap } from '../../types/reactions';
+import { NextLink } from '../NextLink';
+import { profileUrl } from '../../utils/config';
 
 import { tr } from './CommentView.i18n';
 
@@ -235,7 +248,15 @@ export const CommentView: FC<CommentViewProps> = ({
                 {pin ? (
                     <StyledStateDot hue={state?.hue} />
                 ) : (
-                    <UserPic size={32} src={author?.image} email={author?.email} />
+                    nullable(
+                        profileUrl && author,
+                        ({ email, image }) => (
+                            <Link as={NextLink} href={`${profileUrl}/${encodeURIComponent(email)}`} inline>
+                                <UserPic size={32} src={image} email={email} />
+                            </Link>
+                        ),
+                        <UserPic size={32} src={author?.image} email={author?.email} />,
+                    )
                 )}
             </Circle>
 
