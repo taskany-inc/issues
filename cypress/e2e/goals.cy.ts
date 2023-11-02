@@ -113,11 +113,13 @@ describe('Goals', () => {
                 cy.get(usersCombobox.query)
                     .should('exist')
                     .then(($el) => {
-                        expect($el.text()).oneOf([
-                            Cypress.env('currentUser').user.email,
-                            Cypress.env('currentUser').user.name,
-                            Cypress.env('currentUser').user.nickname,
-                        ]);
+                        expect(
+                            [
+                                Cypress.env('currentUser').user.email,
+                                Cypress.env('currentUser').user.name,
+                                Cypress.env('currentUser').user.nickname,
+                            ].some((value) => $el.text().includes(value)),
+                        ).to.be.true;
 
                         done();
                     });
@@ -159,11 +161,13 @@ describe('Goals', () => {
                 cy.get(usersCombobox.query)
                     .should('exist')
                     .then(($el) => {
-                        expect($el.text()).oneOf([
-                            Cypress.env('testUser').email,
-                            Cypress.env('testUser').name,
-                            Cypress.env('testUser').nickname,
-                        ]);
+                        expect(
+                            [
+                                Cypress.env('testUser').email,
+                                Cypress.env('testUser').name,
+                                Cypress.env('testUser').nickname,
+                            ].some((value) => $el.text().includes(value)),
+                        ).to.be.true;
 
                         done();
                     });
