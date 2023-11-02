@@ -11,6 +11,7 @@ jobs:
   gh_release:
     if: github.event.pull_request.merged == true
     uses: taskany-inc/release/.github/workflows/gh_release.yml@main
+    secrets: inherit
   docker:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
