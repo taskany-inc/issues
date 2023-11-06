@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.6.0](https://github.com/taskany-inc/issues/compare/v2.4.0...v2.6.0) (2023-11-06)
+
+
+### Features
+
+* **CommentView:** sended to crew profile when UserPic is clicked ([f2c27c9](https://github.com/taskany-inc/issues/commit/f2c27c9e270d8dce56f15d6c55dfe44570a6b49a))
+* **keyPredictor:** supported transliteration ([36c9545](https://github.com/taskany-inc/issues/commit/36c95453fcc1f054d0250e34c9d3d44ca7748826))
+
+
+### Bug Fixes
+
+* default avatar has initials ([b352fe6](https://github.com/taskany-inc/issues/commit/b352fe653b85a4b0eef4c0fabfc9240a3660a863))
+* **GoalSidebar:** user can not remove partnership projects & tags ([7de4fed](https://github.com/taskany-inc/issues/commit/7de4feddaf3ca450f3e6156009bb6576b8522e99))
+
 ## [2.5.0](https://github.com/taskany-inc/issues/compare/v2.4.0...v2.5.0) (2023-11-02)
 
 
