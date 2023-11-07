@@ -1,6 +1,6 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
-import { GoalHistory, Prisma, StateType } from '@prisma/client';
+import { Goal, GoalHistory, Priority, Prisma, State, StateType, User, GoalsFilterPreset, sql } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { procedure, protectedProcedure, router } from '../trpcBackend';
@@ -1561,23 +1561,103 @@ export const goal = router({
             };
         }),
     newGoals: procedure.query(async ({ input, ctx }) => {
-        const res = await prisma.$queryRaw`
+        const activityId = 'cllvdjlq9000b6e5byssyj1g0';
+        const goalsFilterPresetId = 'cloegif6j0000nqy90gq8y5fd';
+
+        // ??? _hasAchievementCriteria
+
+        // TODO: create preset for dashboard on the fly
+        // TODO: get default preset if any other exist in input
+        // TODO: _isEditable
+        // TODO: pagination
+        // TODO: orderBy
+
+        interface FlatGoal {
+            'goal.id': Goal['id'];
+            'goal.title': Goal['title'];
+            'goal.estimate': Goal['estimate'];
+            'goal.estimateType': Goal['estimateType'];
+            'goal.completedCriteriaWeight': Goal['completedCriteriaWeight'];
+            'goal.state.id': State['id'];
+            'goal.state.title': State['title'];
+            'goal.state.hue': State['hue'];
+            'goal.priority.id': Priority['id'];
+            'goal.priority.title': Priority['title'];
+            'goal.priority.value': Priority['value'];
+            'goal.issuer.name': User['name'];
+            'goal.issuer.email': User['email'];
+            'goal.owner.name': User['name'];
+            'goal.owner.email': User['email'];
+
+            'goal._shortId': string;
+            'goal._isOwner': boolean;
+            'goal._isIssuer': boolean;
+            'goal._isParticipant': boolean | null;
+            'goal._isWatching': boolean | null;
+            'goal._isStarred': boolean | null;
+        }
+
+        interface FlatGoalsFilterPreset {
+            'goalsFilterPreset.states': GoalsFilterPreset['states'];
+            'goalsFilterPreset.priorities': GoalsFilterPreset['states'];
+            'goalsFilterPreset.issuers': GoalsFilterPreset['issuers'];
+            'goalsFilterPreset.owners': GoalsFilterPreset['owners'];
+            'goalsFilterPreset.participants': GoalsFilterPreset['participants'];
+            'goalsFilterPreset.tags': GoalsFilterPreset['tags'];
+            'goalsFilterPreset.projects': GoalsFilterPreset['projects'];
+        }
+
+        const res = await prisma.$queryRaw<Array<FlatGoal & FlatGoalsFilterPreset>>`
             select
                 "Goal".id as "goal.id",
                 "Goal".title as "goal.title",
-                "Goal"."estimate"
+                "Goal"."estimate" as "goal.estimate",
+                "Goal"."estimateType" as "goal.estimateType",
+                "State"."id" as "goal.state.id",
+                "State"."title" as "goal.state.title",
+                "State"."hue" as "goal.state.hue",
+                "Priority"."id" as "goal.priority.id",
+                "Priority"."title" as "goal.priority.title",
+                "Priority"."value" as "goal.priority.value",
+                "GoalOwner"."name" as "goal.owner.name",
+                "GoalOwner"."email" as "goal.owner.email",
+                "User"."name" as "goal.issuer.name",
+                "User"."email" as "goal.issuer.email",
+                "Goal"."completedCriteriaWeight" as "goal.completedCriteriaWeight",
+                filters."states" as "goalsFilterPreset.states",
+                filters."priorities" as "goalsFilterPreset.priorities",
+                filters."issuers" as "goalsFilterPreset.issuers",
+                filters."owners" as "goalsFilterPreset.owners",
+                filters."participants" as "goalsFilterPreset.participants",
+                filters."tags" as "goalsFilterPreset.tags",
+                filters."estimates" as "goalsFilterPreset.estimates",
+                filters."projects" as "goalsFilterPreset.projects",
+                concat("Goal"."projectId", '-', "Goal"."scopeId") as "goal._shortId",
+                "Goal"."ownerId" = ${activityId} as "goal._isOwner",
+                "Goal"."activityId" = ${activityId} as "goal._isIssuer",
+                bool_or("_goalParticipants"."A" = ${activityId}) as "goal._isParticipant",
+                bool_or("_goalWatchers"."A" = ${activityId}) as "goal._isWatching",
+                bool_or("_goalStargizers"."A" = ${activityId}) as "goal._isStarred"
                 from "Activity"
                 left join "User" as "User"
                     on "User"."activityId" = "Activity".id
                 left join "Goal" as "Goal"
                     on "Goal"."activityId" = "Activity".id
+                left join "User" as "GoalOwner"
+                    on "Goal"."ownerId" = "GoalOwner"."activityId"
+                left join "State" as "State"
+                    on "Goal"."stateId" = "State".id
                 left join "Priority" as "Priority"
                     on "Goal"."priorityId" = "Priority".id
-                left join "_goalParticipants" 
+                left join "_goalParticipants"
                     on "Goal".id = "_goalParticipants"."B"
-                left join "_GoalToTag" 
+                left join "_goalWatchers"
+                    on "Goal".id = "_goalWatchers"."B"
+                left join "_goalStargizers"
+                    on "Goal".id = "_goalStargizers"."B"
+                left join "_GoalToTag"
                     on "Goal".id = "_GoalToTag"."A"
-                left join "_partnershipProjects" 
+                left join "_partnershipProjects"
                     on "Goal".id = "_partnershipProjects"."A"
                 inner join (
                     SELECT *,
@@ -1595,7 +1675,7 @@ export const goal = router({
                 END AS estimate_end
                     FROM "GoalsFilterPreset"
                     LEFT JOIN LATERAL UNNEST("GoalsFilterPreset".estimates) filter(estimate) ON TRUE
-                    where "GoalsFilterPreset".id = 'cloei26840000swtm4al0zpwy'
+                    where "GoalsFilterPreset".id = ${goalsFilterPresetId}
                 ) as filters
                     on ("Activity".id = any(filters.issuers) or filters.issuers = '{}')
                         and ("Goal"."ownerId" = any(filters.owners) or filters.owners = '{}')
@@ -1603,15 +1683,11 @@ export const goal = router({
                         and ("Priority".id = any(filters.priorities) or filters.priorities = '{}')
                         and ("Goal"."stateId" = any(filters.states) or filters.states = '{}')
                         and ("_GoalToTag"."A" = any(filters.tags) or filters.tags = '{}')
-                        and ("Goal"."projectId" = any(filters.projects) or "_partnershipProjects"."B" = any(filters.projects) or filters.projects = '{}')    
+                        and ("Goal"."projectId" = any(filters.projects) or "_partnershipProjects"."B" = any(filters.projects) or filters.projects = '{}')
                         and (("Goal"."estimate" > filters.estimate_start and "Goal"."estimate" < filters.estimate_end) or filters.estimates = '{}')
-                group by 1, 2, 3
+                group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25
             `;
 
-        return {
-            goalsFilterPreset: {},
-            goals: [],
-            res,
-        };
+        return res;
     }),
 });
