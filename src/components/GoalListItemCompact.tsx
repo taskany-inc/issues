@@ -41,7 +41,7 @@ type ColumnRenderProps<T extends Record<string, any>> = T &
 type GoalListItemCompactColumnProps<T = any> = {
     name: 'icon' | 'title' | 'state' | 'priority' | 'projectId' | 'issuers' | 'estimate' | string;
     renderColumn?: (props: T) => React.ReactElement<T>;
-    columnProps?: TableCellProps;
+    columnProps?: TableCellProps & { forIcon?: boolean };
 };
 
 interface GoalItemAction {
@@ -187,9 +187,9 @@ export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
             {columns.map((col) => (
                 <Column key={col.name} col={col} componentProps={item} />
             ))}
-            <StyledCell key="actions" forIcon min>
-                <StyledActionsWrapper>
-                    {nullable(actions, (list) => (
+            {nullable(actions, (list) => (
+                <StyledCell key="actions" forIcon min>
+                    <StyledActionsWrapper>
                         <StyledDropdown
                             onChange={onActionClick}
                             renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
@@ -207,9 +207,9 @@ export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
                                 </MenuItem>
                             )}
                         />
-                    ))}
-                </StyledActionsWrapper>
-            </StyledCell>
+                    </StyledActionsWrapper>
+                </StyledCell>
+            ))}
         </TableRow>
     );
 };

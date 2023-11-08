@@ -13,5 +13,10 @@
     "Not assigned yet": "",
     "Assign": "",
     "Partnership projects": "",
-    "Add project": ""
+    "Add project": "",
+    "Add dependency": "",
+    "blocks": "This goal blocked by",
+    "dependsOn": "This goal depends on",
+    "relatedTo": "This goal relates to",
+    "Delete": ""
 }

@@ -40,13 +40,7 @@ const StyledModalHeader = styled(ModalHeader)`
 `;
 
 const StyledModalContent = styled(ModalContent)`
-    z-index: 2; // needed that dropdowns will be upper than sidebar
-`;
-
-const StyledStickyModalContent = styled(ModalContent)`
-    position: sticky;
-    top: 0;
-    height: fit-content;
+    z-index: auto; // needed that popups do not overlap each other
 `;
 
 const StyledModalPreview = styled(ModalPreview)`
@@ -168,7 +162,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                         />
                     ))}
                 </StyledModalContent>
-                <StyledStickyModalContent>
+                <StyledModalContent>
                     {nullable(goal, (g) => (
                         <GoalSidebar
                             goal={g}
@@ -177,7 +171,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                             onGoalTransfer={onGoalTransfer}
                         />
                     ))}
-                </StyledStickyModalContent>
+                </StyledModalContent>
             </StyledModalWrapper>
         </StyledModalPreview>
     );

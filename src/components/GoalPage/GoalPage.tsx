@@ -210,7 +210,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         goal={goal}
                         shortId={id}
                         onGoalCriteriaClick={onGoalCriteriaClick}
-                        onGoalDependencyClick={onGoalDependencyClick}
                         onGoalDeleteConfirm={router.goals}
                     />
                 </div>
@@ -221,6 +220,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         onGoalTagRemove={onGoalTagRemove}
                         onGoalTagAdd={onGoalTagAdd}
                         onGoalTransfer={onGoalTransfer}
+                        onGoalDependencyClick={onGoalDependencyClick}
                     />
                 </div>
             </GoalContent>

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Text, nullable } from '@taskany/bricks';
-import { gapS, gapXs, gray8, gray9 } from '@taskany/colors';
+import { gapM, gapS, gapXs, gray8, gray9 } from '@taskany/colors';
 
 interface BadgeProps {
     icon: React.ReactNode;
@@ -23,9 +23,16 @@ const StyledBadgeIconContainer = styled.span`
     }
 `;
 
+/**
+ * First row has height equal to the height of the first text line.
+ * If the content (like icons) is larger than the first text line, then it expands the first row.
+ * Suitable for text sizes 'xs', 's', 'm', 'l'.
+ */
 const StyledBadge = styled.span`
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: min-content auto min-content;
+    grid-template-rows: minmax(max-content, calc(${gapM} + ${gapXs})) minmax(0, 1fr);
     align-items: center;
 
     padding: ${gapXs} 0;
@@ -47,6 +54,7 @@ const StyledText = styled(Text).attrs({
     ellipsis: true,
 })`
     padding: 0 ${gapXs} 0 ${gapS};
+    grid-row: span 2;
 `;
 
 export const Badge: React.FC<BadgeProps> = ({ icon, text, action, className }) => {

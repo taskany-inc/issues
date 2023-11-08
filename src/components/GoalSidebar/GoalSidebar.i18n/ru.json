@@ -13,5 +13,10 @@
     "Not assigned yet": "Никого не назначили",
     "Assign": "Назначить",
     "Partnership projects": "Партнёрские проекты",
-    "Add project": "Добавить проект"
+    "Add project": "Добавить проект",
+    "Add dependency": "Добавить зависимость",
+    "blocks": "Блокирует",
+    "dependsOn": "Зависит от",
+    "relatedTo": "Связана с",
+    "Delete": "Удалить"
 }

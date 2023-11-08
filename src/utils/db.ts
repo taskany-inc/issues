@@ -297,8 +297,18 @@ export const mixHistoryWithComments = <
 
 export const makeGoalRelationMap = <T extends Goal>(
     values: Record<dependencyKind, T[]>,
-): Array<{ kind: dependencyKind; goals: T[] }> => {
-    return (Object.entries(values) as [dependencyKind, T[]][]).map(([kind, goals]) => ({ kind, goals }));
+    activityId: string,
+    role: Role,
+): Array<{ kind: dependencyKind; goals: (T & ReturnType<typeof addCalculatedGoalsFields>)[] }> => {
+    return (Object.entries(values) as [dependencyKind, T[]][]).map(([kind, goals]) => ({
+        kind,
+        goals: goals.map((goal) => {
+            return {
+                ...goal,
+                ...addCalculatedGoalsFields(goal, activityId, role),
+            };
+        }),
+    }));
 };
 
 export const updateGoalWithCalculatedWeight = async (goalId: string) => {

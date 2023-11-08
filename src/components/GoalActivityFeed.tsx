@@ -10,8 +10,6 @@ import { usePageContext } from '../hooks/usePageContext';
 
 import { GoalDeleteModal } from './GoalDeleteModal/GoalDeleteModal';
 import { CommentView } from './CommentView/CommentView';
-import { GoalDependencyAddForm } from './GoalDependencyForm/GoalDependencyForm';
-import { GoalDependencyListByKind } from './GoalDependencyList/GoalDependencyList';
 import { GoalCriteria } from './GoalCriteria/GoalCriteria';
 import { GoalActivity } from './GoalActivity';
 import { AddCriteriaForm } from './CriteriaForm/CriteriaForm';
@@ -25,13 +23,12 @@ interface GoalActivityFeedProps {
     shortId?: string;
 
     onGoalCriteriaClick?: ComponentProps<typeof GoalCriteria>['onClick'];
-    onGoalDependencyClick?: ComponentProps<typeof GoalDependencyListByKind>['onClick'];
     onGoalDeleteConfirm?: () => void;
     onInvalidate?: () => void;
 }
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
-    ({ goal, shortId, onGoalCriteriaClick, onGoalDependencyClick, onGoalDeleteConfirm, onInvalidate }, ref) => {
+    ({ goal, shortId, onGoalCriteriaClick, onGoalDeleteConfirm, onInvalidate }, ref) => {
         const { user } = usePageContext();
         const {
             onGoalCommentUpdate,
@@ -44,8 +41,6 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             onGoalCommentCreate,
             onGoalCommentReactionToggle,
             onGoalCommentDelete,
-            onGoalDependencyAdd,
-            onGoalDependencyRemove,
             lastStateComment,
             highlightCommentId,
         } = useGoalResource(
@@ -103,30 +98,6 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     }
                                 />
                             ))}
-
-                            {goal._relations.map((deps) =>
-                                nullable(deps.goals.length || goal._isEditable, () => (
-                                    <GoalDependencyListByKind
-                                        goalId={goal.id}
-                                        key={deps.kind}
-                                        kind={deps.kind}
-                                        items={deps.goals}
-                                        canEdit={goal._isEditable}
-                                        onRemove={onGoalDependencyRemove}
-                                        onClick={onGoalDependencyClick}
-                                    >
-                                        {nullable(goal._isEditable, () => (
-                                            <GoalDependencyAddForm
-                                                onSubmit={onGoalDependencyAdd}
-                                                kind={deps.kind}
-                                                goalId={goal.id}
-                                                isEmpty={deps.goals.length === 0}
-                                            />
-                                        ))}
-                                    </GoalDependencyListByKind>
-                                )),
-                            )}
-
                             {nullable(lastStateComment, (value) => (
                                 <CommentView
                                     pin

@@ -1,4 +1,4 @@
-import { ComponentProps, FC, MouseEvent, useMemo } from 'react';
+import { ComponentProps, FC, MouseEvent, forwardRef, useMemo } from 'react';
 import styled from 'styled-components';
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconArrowRightOutline, IconBinOutline, IconPlusCircleOutline, IconXCircleSolid } from '@taskany/icons';
@@ -18,7 +18,11 @@ import { TextList, TextListItem } from '../TextList';
 import { safeUserData } from '../../utils/getUserName';
 import { goalPageDeleteButton } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
+import { GoalDependencyListByKind } from '../GoalDependencyList';
+import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
+import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList';
+import { dependencyKind } from '../../schema/goal';
 
 import { tr } from './GoalSidebar.i18n';
 
@@ -45,6 +49,7 @@ interface GoalSidebarProps {
     onGoalTagRemove: (tag: NonNullable<GoalByIdReturnType>['tags'][number]) => (e: MouseEvent<Element>) => void;
     onGoalTagAdd: ComponentProps<typeof TagComboBox>['onChange'];
     onGoalTransfer: ComponentProps<typeof GoalParentComboBox>['onChange'];
+    onGoalDependencyClick?: ComponentProps<typeof GoalDependencyListByKind>['onClick'];
 }
 
 interface AddInlineTriggerProps {
@@ -53,11 +58,19 @@ interface AddInlineTriggerProps {
     icon?: React.ReactNode;
 }
 
-const AddInlineTrigger = ({ icon = <IconPlusCircleOutline size="xs" />, text, onClick }: AddInlineTriggerProps) => (
-    <StyledInlineTrigger icon={icon} text={text} onClick={onClick} />
+const AddInlineTrigger = forwardRef<HTMLDivElement, AddInlineTriggerProps>(
+    ({ icon = <IconPlusCircleOutline size="xs" />, text, onClick }, ref) => (
+        <StyledInlineTrigger ref={ref} icon={icon} text={text} onClick={onClick} />
+    ),
 );
 
-export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoalTagAdd, onGoalTransfer }) => {
+export const GoalSidebar: FC<GoalSidebarProps> = ({
+    goal,
+    onGoalTagRemove,
+    onGoalTagAdd,
+    onGoalTransfer,
+    onGoalDependencyClick,
+}) => {
     const participantsFilter = useMemo(() => {
         const participantsIds = goal.participants.map(({ id }) => id);
         const { owner, activity: issuer } = goal;
@@ -68,18 +81,35 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoa
         return participantsIds;
     }, [goal]);
 
-    const { addPartnerProject, removePartnerProject, onGoalParticipantAdd, onGoalParticipantRemove, goalOwnerUpdate } =
-        useGoalResource(
-            {
-                id: goal.id,
+    const relationsGoalsLength = useMemo(() => goal._relations.flatMap((deps) => deps.goals).length, [goal._relations]);
+
+    const {
+        addPartnerProject,
+        removePartnerProject,
+        onGoalParticipantAdd,
+        onGoalParticipantRemove,
+        goalOwnerUpdate,
+        onGoalDependencyAdd,
+        onGoalDependencyRemove,
+    } = useGoalResource(
+        {
+            id: goal.id,
+        },
+        {
+            invalidate: {
+                getById: goal._shortId,
             },
-            {
-                invalidate: {
-                    getById: goal._shortId,
-                },
-                afterInvalidate: dispatchPreviewUpdateEvent,
-            },
-        );
+            afterInvalidate: dispatchPreviewUpdateEvent,
+        },
+    );
+
+    const heading = useMemo(() => {
+        return {
+            [dependencyKind.blocks]: tr('blocks'),
+            [dependencyKind.dependsOn]: tr('dependsOn'),
+            [dependencyKind.relatedTo]: tr('relatedTo'),
+        };
+    }, []);
 
     return (
         <>
@@ -179,6 +209,34 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTagRemove, onGoa
                         </StyledInlineInput>
                     ))}
                 </IssueMeta>
+            ))}
+
+            {nullable(relationsGoalsLength || goal._isEditable, () => (
+                <>
+                    {goal._relations.map(({ kind, goals }) => {
+                        return nullable(goals.length, () => (
+                            <IssueMeta title={heading[kind]} key={kind}>
+                                <GoalDependencyListByKind
+                                    id={goal.id}
+                                    kind={kind}
+                                    goals={goals}
+                                    onClick={onGoalDependencyClick}
+                                    onRemove={onGoalDependencyRemove}
+                                />
+                            </IssueMeta>
+                        ));
+                    })}
+
+                    {nullable(goal._isEditable, () => (
+                        <GoalFormPopupTrigger
+                            renderTrigger={(props) => (
+                                <AddInlineTrigger text={tr('Add dependency')} ref={props.ref} onClick={props.onClick} />
+                            )}
+                        >
+                            <GoalDependency id={goal.id} items={goal._relations} onSubmit={onGoalDependencyAdd} />
+                        </GoalFormPopupTrigger>
+                    ))}
+                </>
             ))}
 
             {nullable(goal._isEditable || goal.tags.length, () => (
