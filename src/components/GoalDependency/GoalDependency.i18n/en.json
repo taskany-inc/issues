@@ -1,6 +1,6 @@
 {
     "blocks": "This goal blocked by",
     "dependsOn": "This goal depends on",
-    "relatesTo": "This goal relates to",
-    "Delete": ""
+    "relatedTo": "This goal relates to",
+    "Kind": ""
 }

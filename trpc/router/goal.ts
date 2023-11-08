@@ -231,11 +231,15 @@ export const goal = router({
                 ...addCalculatedGoalsFields(goal, activityId, role),
                 ...mixHistoryWithComments(history, goal.comments),
                 _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
-                _relations: makeGoalRelationMap({
-                    dependsOn: goal.dependsOn,
-                    blocks: goal.blocks,
-                    relatedTo: goal.relatedTo,
-                }),
+                _relations: makeGoalRelationMap(
+                    {
+                        dependsOn: goal.dependsOn,
+                        blocks: goal.blocks,
+                        relatedTo: goal.relatedTo,
+                    },
+                    activityId,
+                    role,
+                ),
             };
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
