@@ -236,6 +236,7 @@ export const goal = router({
                         dependsOn: goal.dependsOn,
                         blocks: goal.blocks,
                         relatedTo: goal.relatedTo,
+                        connected: goal.connected,
                     },
                     activityId,
                     role,
@@ -1259,23 +1260,42 @@ export const goal = router({
         .input(toggleGoalDependencySchema)
         .use(goalAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
+            if (input.id === input.relation.id) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'ids must be different' });
+            }
+
             try {
-                const updatedGoal = await prisma.goal.update({
-                    where: { id: input.id },
-                    data: {
-                        [input.kind]: {
-                            connect: { id: input.relation?.id },
-                        },
-                        history: {
-                            create: {
-                                subject: 'dependencies',
-                                action: 'add',
-                                nextValue: input.relation.id,
-                                activityId: ctx.session.user.activityId,
+                const [updatedGoal] = await Promise.all([
+                    prisma.goal.update({
+                        where: { id: input.id },
+                        data: {
+                            [input.kind]: {
+                                connect: { id: input.relation.id },
+                            },
+                            history: {
+                                create: {
+                                    subject: 'dependencies',
+                                    action: 'add',
+                                    nextValue: input.relation.id,
+                                    activityId: ctx.session.user.activityId,
+                                },
                             },
                         },
-                    },
-                });
+                    }),
+                    prisma.goal.update({
+                        where: { id: input.relation.id },
+                        data: {
+                            history: {
+                                create: {
+                                    subject: 'dependencies',
+                                    action: 'add',
+                                    nextValue: input.id,
+                                    activityId: ctx.session.user.activityId,
+                                },
+                            },
+                        },
+                    }),
+                ]);
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
 
@@ -1289,22 +1309,37 @@ export const goal = router({
         .use(goalAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             try {
-                const updatedGoal = await prisma.goal.update({
-                    where: { id: input.id },
-                    data: {
-                        [input.kind]: {
-                            disconnect: { id: input.relation?.id },
-                        },
-                        history: {
-                            create: {
-                                subject: 'dependencies',
-                                action: 'remove',
-                                nextValue: input.relation.id,
-                                activityId: ctx.session.user.activityId,
+                const [updatedGoal] = await Promise.all([
+                    prisma.goal.update({
+                        where: { id: input.id },
+                        data: {
+                            [input.kind]: {
+                                disconnect: { id: input.relation.id },
+                            },
+                            history: {
+                                create: {
+                                    subject: 'dependencies',
+                                    action: 'remove',
+                                    nextValue: input.relation.id,
+                                    activityId: ctx.session.user.activityId,
+                                },
                             },
                         },
-                    },
-                });
+                    }),
+                    prisma.goal.update({
+                        where: { id: input.relation.id },
+                        data: {
+                            history: {
+                                create: {
+                                    subject: 'dependencies',
+                                    action: 'remove',
+                                    nextValue: input.id,
+                                    activityId: ctx.session.user.activityId,
+                                },
+                            },
+                        },
+                    }),
+                ]);
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
 

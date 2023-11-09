@@ -218,7 +218,6 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({
                             <IssueMeta title={heading[kind]} key={kind}>
                                 <GoalDependencyListByKind
                                     id={goal.id}
-                                    kind={kind}
                                     goals={goals}
                                     onClick={onGoalDependencyClick}
                                     onRemove={onGoalDependencyRemove}
