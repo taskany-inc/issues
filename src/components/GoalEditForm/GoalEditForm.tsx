@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button, Keyboard, Tip } from '@taskany/bricks';
-import { gray10 } from '@taskany/colors';
-import { IconBulbOnOutline } from '@taskany/icons';
+import { Button } from '@taskany/bricks';
 
 import { GoalForm } from '../GoalForm/GoalForm';
 import { GoalUpdateReturnType, GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -12,6 +10,7 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { getDateStringFromEstimate } from '../../utils/dateTime';
 import { goalForm, goalUpdateButton } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
+import RotatableTip from '../RotatableTip/RotatableTip';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -86,13 +85,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
                     />
                 </>
             }
-            tip={
-                <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
-                    {tr.raw('Press key to update goal', {
-                        key: <Keyboard key={'cmd/enter'} command enter />,
-                    })}
-                </Tip>
-            }
+            tip={<RotatableTip context="goal" />}
             {...goalForm.attr}
         />
     );

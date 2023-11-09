@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { gapS, gray10 } from '@taskany/colors';
+import { gapS } from '@taskany/colors';
 import {
     Button,
     Text,
@@ -15,10 +15,7 @@ import {
     FormInput,
     ModalContent,
     nullable,
-    Keyboard,
-    Tip,
 } from '@taskany/bricks';
-import { IconBulbOnSolid } from '@taskany/icons';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
@@ -36,6 +33,7 @@ import {
     projectSubmitButton,
     projectTitleInput,
 } from '../../utils/domObjects';
+import RotatableTip from '../RotatableTip/RotatableTip';
 
 import { tr } from './ProjectCreateForm.i18n';
 
@@ -227,11 +225,7 @@ const ProjectCreateForm: React.FC = () => {
                     </FormActions>
                     <FormActions flat="top">
                         <FormAction left>
-                            <Tip title={tr('Pro tip!')} icon={<IconBulbOnSolid size="s" color={gray10} />}>
-                                {tr.raw('Press key to create project', {
-                                    key: <Keyboard key="command/enter" command enter />,
-                                })}
-                            </Tip>
+                            <RotatableTip context="project" />
                         </FormAction>
                         <FormAction right inline>
                             <Button
