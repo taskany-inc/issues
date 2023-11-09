@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { gray9, gray10 } from '@taskany/colors';
-import { Button, MenuItem, Text, Keyboard, Tip } from '@taskany/bricks';
-import { IconBulbOnOutline, IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
+import { gray9 } from '@taskany/colors';
+import { Button, MenuItem, Text } from '@taskany/bricks';
+import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 
 import { useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -22,6 +22,7 @@ import {
     goalForm,
 } from '../../utils/domObjects';
 import { CommonDropdown } from '../CommonDropdown';
+import RotatableTip from '../RotatableTip/RotatableTip';
 
 import { tr } from './GoalCreateForm.i18n';
 
@@ -189,13 +190,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
                     </StyledButtonWithDropdown>
                 </>
             }
-            tip={
-                <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
-                    {tr.raw('Press key to create the goal', {
-                        key: <Keyboard key={'cmd/enter'} command enter />,
-                    })}
-                </Tip>
-            }
+            tip={<RotatableTip context="goal" />}
             {...goalForm.attr}
         />
     );

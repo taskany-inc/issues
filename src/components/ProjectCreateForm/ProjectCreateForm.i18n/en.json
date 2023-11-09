@@ -3,8 +3,6 @@
     "Cancel": "Cancel",
     "Project title": "Project title",
     "Short description": "Short description",
-    "Pro tip!": "Pro tip!",
-    "Press key to create project": "Press {key} to create project.",
     "Key already exists": "Key {key} already exists. Please, try to use another key.",
     "Perfect! Issues and goals will look like": "{perfect} Issues and goals will look like: {issueKeyOne}, {issueKeyTwo}",
     "Key must be 3 or longer characters": "Key must be 3 or longer characters",

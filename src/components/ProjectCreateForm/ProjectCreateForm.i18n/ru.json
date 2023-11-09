@@ -3,8 +3,6 @@
     "Cancel": "Отмена",
     "Project title": "Название проекта",
     "Short description": "Короткое описание",
-    "Pro tip!": "Держи совет!",
-    "Press key to create project": "Нажми {key} чтобы создать проект.",
     "Key already exists": "Ключ {key} уже существует. Попробуй другой.",
     "Perfect! Issues and goals will look like": "{perfect} Задачи и цели будут выглядеть примерно так: {issueKeyOne}, {issueKeyTwo}.",
     "Key must be 3 or longer characters": "Ключ не может быть короче 3 символов",

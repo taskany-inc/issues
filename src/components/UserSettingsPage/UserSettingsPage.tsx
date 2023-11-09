@@ -4,21 +4,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
-import { gray10 } from '@taskany/colors';
-import {
-    Button,
-    Fieldset,
-    Form,
-    FormInput,
-    FormAction,
-    FormActions,
-    FormRadio,
-    FormRadioInput,
-    Keyboard,
-    Tip,
-} from '@taskany/bricks';
-import { IconBulbOnOutline } from '@taskany/icons';
+import { Button, Fieldset, Form, FormInput, FormAction, FormActions, FormRadio, FormRadioInput } from '@taskany/bricks';
 import { z } from 'zod';
+import dynamic from 'next/dynamic';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
@@ -32,6 +20,8 @@ import { dispatchErrorNotification, dispatchSuccessNotification } from '../../ut
 import { userSettings, userSettingsLogoutButton } from '../../utils/domObjects';
 
 import { tr } from './UserSettingsPage.i18n';
+
+const RotatableTip = dynamic(() => import('../RotatableTip/RotatableTip'), { ssr: false });
 
 const StyledLabel = styled.label`
     padding: 8px 8px 8px 16px;
@@ -283,11 +273,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                     </Form>
                 </SettingsCard>
 
-                <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
-                    {tr.raw('Press {key} to save settings', {
-                        key: <Keyboard key="keyboard" command enter />,
-                    })}
-                </Tip>
+                <RotatableTip context="settings" />
             </SettingsContent>
         </Page>
     );

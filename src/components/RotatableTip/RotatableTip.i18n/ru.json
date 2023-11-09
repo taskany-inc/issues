@@ -1,0 +1,10 @@
+{
+    "Pro tip!": "Держи совет!",
+    "project": "проект",
+    "goal": "цель",
+    "settings": "настройки",
+    "invites": "приглашения",
+    "Press {key} to send {entity}": "Нажми {key}, чтобы отправить {entity}",
+    "Press {key} to save {entity}": "Нажми {key}, чтобы сохранить {entity}",
+    "Hold {key} to see available hotkeys": "Зажми {key}, чтобы увидеть доступные горячие клавиши"
+}

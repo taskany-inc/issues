@@ -2,7 +2,7 @@ import React, { useCallback, useState, useRef } from 'react';
 import z from 'zod';
 import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
-import { gapM, gapS, gray7, gray10 } from '@taskany/colors';
+import { gapM, gapS, gray7 } from '@taskany/colors';
 import {
     Button,
     Text,
@@ -17,15 +17,14 @@ import {
     KeyCode,
     TagCleanButton,
     Keyboard,
-    Tip,
     nullable,
 } from '@taskany/bricks';
-import { IconBulbOnOutline } from '@taskany/icons';
 
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { HelpButton } from '../HelpButton/HelpButton';
 import { TagsList } from '../TagsList';
+import RotatableTip from '../RotatableTip/RotatableTip';
 
 import { tr } from './UserInviteForm.i18n';
 
@@ -161,11 +160,7 @@ const UserInviteForm: React.FC = () => {
                 </Form>
 
                 <StyledFormBottom>
-                    <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" color={gray10} />}>
-                        {tr.raw('Press key to send invites', {
-                            key: <Keyboard command enter />,
-                        })}
-                    </Tip>
+                    <RotatableTip context="invites" />
 
                     <HelpButton slug="users" />
                 </StyledFormBottom>
