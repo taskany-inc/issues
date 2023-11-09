@@ -3,7 +3,7 @@ import { Goal } from '@prisma/client';
 import { IconXCircleSolid } from '@taskany/icons';
 import styled from 'styled-components';
 
-import { ToggleGoalDependency, dependencyKind } from '../schema/goal';
+import { ToggleGoalDependency } from '../schema/goal';
 import { GoalDependencyItem } from '../../trpc/inferredTypes';
 import { routes } from '../hooks/router';
 
@@ -16,19 +16,12 @@ const StyledGoalBadge = styled(GoalBadge)`
 interface GoalDependency extends Goal, GoalDependencyItem {}
 interface GoalDependencyListByKindProps {
     id: string;
-    kind: dependencyKind;
     goals: GoalDependency[];
     onClick?: (item: GoalDependency) => void;
     onRemove?: (values: ToggleGoalDependency) => void;
 }
 
-export const GoalDependencyListByKind = ({
-    id,
-    kind,
-    goals = [],
-    onClick,
-    onRemove,
-}: GoalDependencyListByKindProps) => {
+export const GoalDependencyListByKind = ({ id, goals = [], onClick, onRemove }: GoalDependencyListByKindProps) => {
     const onClickHandler = useCallback(
         (goal: GoalDependency) => (e?: React.MouseEvent) => {
             if (onClick) {
@@ -49,7 +42,7 @@ export const GoalDependencyListByKind = ({
         >
             <IconXCircleSolid
                 size="xs"
-                onClick={onRemove ? () => onRemove({ id, kind, relation: { id: item.id } }) : undefined}
+                onClick={onRemove ? () => onRemove({ id, kind: item._kind, relation: { id: item.id } }) : undefined}
             />
         </StyledGoalBadge>
     ));

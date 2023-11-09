@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
-import { GoalCommon, dependencyKind } from '../schema/goal';
+import { GoalCommon, dependencyKind, exceptionsDependencyKind } from '../schema/goal';
 import { addCalculatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
 import { ReactionsMap } from '../types/reactions';
@@ -295,19 +295,42 @@ export const mixHistoryWithComments = <
     };
 };
 
+type GoalRelation<T> = T & { _kind: dependencyKind | exceptionsDependencyKind } & ReturnType<
+        typeof addCalculatedGoalsFields
+    >;
 export const makeGoalRelationMap = <T extends Goal>(
-    values: Record<dependencyKind, T[]>,
+    values: Record<dependencyKind | exceptionsDependencyKind, T[]>,
     activityId: string,
     role: Role,
-): Array<{ kind: dependencyKind; goals: (T & ReturnType<typeof addCalculatedGoalsFields>)[] }> => {
-    return (Object.entries(values) as [dependencyKind, T[]][]).map(([kind, goals]) => ({
-        kind,
-        goals: goals.map((goal) => {
-            return {
+): Array<{ kind: dependencyKind; goals: GoalRelation<T>[] }> => {
+    const entriesValues = Object.entries(values) as [dependencyKind | exceptionsDependencyKind, T[]][];
+
+    const dependenciesMap = entriesValues.reduce<Record<dependencyKind, GoalRelation<T>[]>>(
+        (acc, [kind, goals]) => {
+            const goalsWithKindByDependency = goals.map((goal) => ({
                 ...goal,
                 ...addCalculatedGoalsFields(goal, activityId, role),
-            };
-        }),
+                _kind: kind,
+            }));
+
+            if (kind === exceptionsDependencyKind.connected) {
+                acc[dependencyKind.relatedTo].push(...goalsWithKindByDependency);
+                return acc;
+            }
+
+            acc[kind].push(...goalsWithKindByDependency);
+            return acc;
+        },
+        {
+            [dependencyKind.blocks]: [],
+            [dependencyKind.dependsOn]: [],
+            [dependencyKind.relatedTo]: [],
+        },
+    );
+
+    return (Object.entries(dependenciesMap) as [dependencyKind, GoalRelation<T>[]][]).map(([kind, goals]) => ({
+        kind,
+        goals,
     }));
 };
 

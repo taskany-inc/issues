@@ -17,9 +17,14 @@ export enum dependencyKind {
     relatedTo = 'relatedTo',
 }
 
+/* based on goals relation schema (relatedTo - connected) */
+export enum exceptionsDependencyKind {
+    connected = 'connected',
+}
+
 export const toggleGoalDependencySchema = z.object({
     id: z.string().optional(),
-    kind: z.nativeEnum(dependencyKind),
+    kind: z.union([z.nativeEnum(dependencyKind), z.nativeEnum(exceptionsDependencyKind)]),
     relation: z.object({
         id: z.string({
             required_error: tr('Choose a dependency'),

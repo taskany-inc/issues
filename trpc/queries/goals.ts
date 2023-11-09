@@ -461,6 +461,24 @@ export const goalDeepQuery = {
         },
         where: nonArchievedGoalsPartialQuery,
     },
+    connected: {
+        include: {
+            state: true,
+            activity: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            owner: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+        },
+        where: nonArchievedGoalsPartialQuery,
+    },
     comments: {
         orderBy: {
             createdAt: 'asc',
