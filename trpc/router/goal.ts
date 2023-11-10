@@ -51,11 +51,12 @@ const updateProjectUpdatedAt = async (id?: string | null) => {
         data: { id },
     });
 };
+
 export const goal = router({
     suggestions: protectedProcedure
         .input(suggestionsQuerySchema)
-        .query(async ({ ctx, input: { input, limit = 5 } }) => {
-            const { activityId } = ctx.session.user || {};
+        .query(async ({ ctx, input: { input, limit = 5, onlyCurrentUser = false } }) => {
+            const { activityId, role } = ctx.session.user || {};
 
             const splittedInput = input.split('-');
             let selectParams: Prisma.GoalFindManyArgs['where'] = {
@@ -82,7 +83,17 @@ export const goal = router({
                 };
             }
 
-            return prisma.goal.findMany({
+            if (role === 'USER' && onlyCurrentUser) {
+                selectParams = {
+                    ...selectParams,
+                    AND: {
+                        ownerId: activityId,
+                        activityId,
+                    },
+                };
+            }
+
+            const data = await prisma.goal.findMany({
                 take: limit,
                 orderBy: {
                     createdAt: 'desc',
@@ -98,6 +109,37 @@ export const goal = router({
                     ...goalDeepQuery,
                 },
             });
+
+            const checkEnableGoalByProjectOwner = (goal: (typeof data)[number]) => {
+                if (goal.activityId === activityId || goal.ownerId === activityId || role === 'ADMIN') {
+                    return true;
+                }
+
+                if (goal.project == null) {
+                    return false;
+                }
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const parents = [goal.project as any];
+
+                while (parents.length) {
+                    const current = parents.pop();
+
+                    if (current?.activityId === activityId) {
+                        return true;
+                    }
+
+                    if (current?.parent.length) {
+                        parents.push(...current.parents);
+                    }
+                }
+
+                return false;
+            };
+
+            const filteredDataByOwnedProjects = data.filter(checkEnableGoalByProjectOwner);
+
+            return filteredDataByOwnedProjects;
         }),
     getGoalsCount: protectedProcedure.input(batchGoalsSchema.pick({ query: true })).query(async ({ input, ctx }) => {
         const { query } = input;
@@ -221,6 +263,34 @@ export const goal = router({
 
             const history = await getGoalHistory(goal.history || []);
 
+            const versaCriteriaGoals = await prisma.goalAchieveCriteria.findMany({
+                where: {
+                    AND: {
+                        criteriaGoalId: goal.id,
+                        OR: [{ deleted: false }, { deleted: null }],
+                    },
+                },
+                include: {
+                    goal: {
+                        include: {
+                            state: true,
+                            activity: {
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
+                            },
+                            owner: {
+                                include: {
+                                    user: true,
+                                    ghost: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
             return {
                 ...goal,
                 ...addCalculatedGoalsFields(goal, activityId, role),
@@ -236,6 +306,13 @@ export const goal = router({
                     activityId,
                     role,
                 ),
+                _versaCriteria: versaCriteriaGoals.map(({ goal, ...rest }) => ({
+                    ...rest,
+                    goal: {
+                        ...goal,
+                        _scopedId: `${goal.projectId}-${goal.scopeId}`,
+                    },
+                })),
             };
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1186,8 +1263,8 @@ export const goal = router({
         .input(removeCriteria)
         .use(criteriaAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
-            const current = await prisma.goalAchieveCriteria.findUnique({
-                where: { id: input.id },
+            const current = await prisma.goalAchieveCriteria.findFirst({
+                where: { id: input.id, OR: [{ deleted: false }, { deleted: null }] },
             });
 
             try {
@@ -1583,6 +1660,75 @@ export const goal = router({
                     message: String(error.message),
                     cause: error,
                 });
+            }
+        }),
+    getConnectedGoalsByCriteria: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
+        try {
+            const criteriaListByGoal = await prisma.goalAchieveCriteria.findMany({
+                where: {
+                    goalIdAsCriteria: input.id,
+                    AND: {
+                        OR: [{ deleted: null }, { deleted: false }],
+                    },
+                },
+                include: {
+                    goal: {
+                        include: {
+                            state: true,
+                        },
+                    },
+                },
+            });
+
+            return criteriaListByGoal;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message, cause: error });
+        }
+    }),
+    getGoalCriteriaList: protectedProcedure.input(z.object({ id: z.string().optional() })).query(async ({ input }) => {
+        if (!input.id) {
+            return;
+        }
+
+        try {
+            const criteriaList = await prisma.goalAchieveCriteria.findMany({
+                where: {
+                    AND: [
+                        { goalId: input.id },
+                        {
+                            OR: [{ deleted: false }, { deleted: null }],
+                        },
+                    ],
+                },
+            });
+
+            return criteriaList;
+        } catch (error: any) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message, cause: error });
+        }
+    }),
+    checkGoalInExistingCriteria: protectedProcedure
+        .input(
+            z.object({
+                currentGoalId: z.string(),
+                selectedGoalId: z.string(),
+            }),
+        )
+        .query(async ({ input }) => {
+            const criteria = await prisma.goalAchieveCriteria.findFirst({
+                where: {
+                    AND: {
+                        goalId: input.selectedGoalId,
+                        criteriaGoalId: input.currentGoalId,
+                        deleted: {
+                            not: true,
+                        },
+                    },
+                },
+            });
+
+            if (criteria != null) {
+                throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'These bindings is already exist' });
             }
         }),
 });

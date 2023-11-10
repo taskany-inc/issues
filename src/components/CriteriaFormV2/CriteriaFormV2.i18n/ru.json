@@ -14,5 +14,6 @@
     "Save": "Сохранить",
     "Add": "Добавить",
     "Cancel": "Отменить",
-    "Suggestions": "Предложения"
+    "Suggestions": "Предложения",
+    "These binding is already exist": "Такая связка уже существует"
 }

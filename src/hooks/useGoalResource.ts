@@ -90,6 +90,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     const createGoalMutation = trpc.goal.create.useMutation();
     const addPartnerProjectMutation = trpc.goal.addPartnerProject.useMutation();
     const removePartnerProjectMutation = trpc.goal.removePartnerProject.useMutation();
+    const validateGoalCriteriaBindings = utils.goal.checkGoalInExistingCriteria.fetch;
 
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const { commentReaction } = useReactionsResource();
@@ -505,6 +506,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         onGoalCriteriaUpdate,
         onGoalCriteriaRemove,
         onGoalCriteriaConvert,
+        validateGoalCriteriaBindings,
 
         onGoalTagAdd,
         onGoalTagRemove,

@@ -23,6 +23,7 @@ import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList';
 import { dependencyKind } from '../../schema/goal';
+import { VersaCriteria } from '../VersaCriteria/VersaCriteria';
 
 import { tr } from './GoalSidebar.i18n';
 
@@ -48,7 +49,10 @@ interface GoalSidebarProps {
     goal: NonNullable<GoalByIdReturnType>;
     onGoalTransfer: ComponentProps<typeof GoalParentComboBox>['onChange'];
     onGoalDependencyClick?: ComponentProps<typeof GoalDependencyListByKind>['onClick'];
+    onGoalOpen?: (shortId: string) => void;
 }
+
+type VersaGoalItem = React.ComponentProps<typeof VersaCriteria>['versaCriterialList'][number];
 
 interface AddInlineTriggerProps {
     text: string;
@@ -62,7 +66,7 @@ const AddInlineTrigger = forwardRef<HTMLDivElement, AddInlineTriggerProps>(
     ),
 );
 
-export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoalDependencyClick }) => {
+export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoalDependencyClick, onGoalOpen }) => {
     const participantsFilter = useMemo(() => {
         const participantsIds = goal.participants.map(({ id }) => id);
         const { owner, activity: issuer } = goal;
@@ -83,8 +87,11 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
         goalOwnerUpdate,
         onGoalDependencyAdd,
         onGoalDependencyRemove,
+        validateGoalCriteriaBindings,
         onGoalTagAdd,
         onGoalTagRemove,
+        onGoalCriteriaAdd,
+        onGoalCriteriaRemove,
     } = useGoalResource(
         {
             id: goal.id,
@@ -230,6 +237,30 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                         </GoalFormPopupTrigger>
                     ))}
                 </>
+            ))}
+
+            {nullable(goal._versaCriteria?.length || goal._isEditable, () => (
+                <VersaCriteria
+                    goalId={goal.id}
+                    canEdit={goal._isEditable}
+                    onSubmit={onGoalCriteriaAdd}
+                    onRemove={onGoalCriteriaRemove}
+                    onGoalClick={onGoalOpen ? (value) => onGoalOpen(value.scopedId) : undefined}
+                    validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                    versaCriterialList={goal._versaCriteria.reduce<VersaGoalItem[]>(
+                        (acc, { goal: { id: goalId, state, _scopedId }, id, title }) => {
+                            acc.push({
+                                id: goalId,
+                                title,
+                                stateColor: state?.hue,
+                                criteriaId: id,
+                                scopedId: _scopedId,
+                            });
+                            return acc;
+                        },
+                        [],
+                    )}
+                />
             ))}
 
             {nullable(goal._isEditable || goal.tags.length, () => (
