@@ -46,6 +46,7 @@ export type QueryWithFilters = z.infer<typeof queryWithFiltersSchema>;
 export const suggestionsQuerySchema = z.object({
     limit: z.number().optional(),
     input: z.string(),
+    onlyCurrentUser: z.boolean().optional(),
 });
 
 export type SuggestionsQuerySchema = z.infer<typeof suggestionsQuerySchema>;

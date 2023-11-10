@@ -58,7 +58,7 @@ const schema = z.object({
 
 type CriteriaFormValues = z.infer<typeof schema>;
 
-function patchZodSchema(data: ValidityData) {
+function patchZodSchema(data: ValidityData, checkBindingsBetweenGoals: (selectedGoalId: string) => Promise<void>) {
     return schema
         .merge(
             z.object({
@@ -80,15 +80,31 @@ function patchZodSchema(data: ValidityData) {
                     if (parsed < minPossibleWeight || data.sumOfCriteria + parsed > maxPossibleWeight) {
                         ctx.addIssue({
                             code: z.ZodIssueCode.custom,
-                            message: tr('Passed weight is not in range'),
+                            message: tr
+                                .raw('Passed weight is not in range', {
+                                    upTo: maxPossibleWeight - data.sumOfCriteria,
+                                })
+                                .join(''),
                         });
                     }
 
                     return z.NEVER;
                 }),
+                selected: schema.shape.selected.refine(async (val) => {
+                    if (!val?.id) {
+                        return true;
+                    }
+
+                    try {
+                        await checkBindingsBetweenGoals(val.id);
+                        return true;
+                    } catch (_error) {
+                        return false;
+                    }
+                }, tr('These binding is already exist')),
             }),
         )
-        .superRefine((val, ctx) => {
+        .superRefine((val, ctx): val is Required<CriteriaFormValues> => {
             if (val.mode === 'simple') {
                 if (!val.title) {
                     ctx.addIssue({
@@ -102,12 +118,6 @@ function patchZodSchema(data: ValidityData) {
                         message: tr('Title must be longer than 1 symbol'),
                         path: ['title'],
                     });
-                } else if (data.title.some((t) => t === val.title)) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: tr('Title must be unique'),
-                        path: ['title'],
-                    });
                 }
             }
             if (val.mode === 'goal' && !val.selected?.id.length) {
@@ -115,6 +125,14 @@ function patchZodSchema(data: ValidityData) {
                     code: z.ZodIssueCode.custom,
                     message: tr('Goal must be selected'),
                     path: ['selected'],
+                });
+            }
+
+            if (data.title.some((t) => t === val.title)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: tr('Title must be unique'),
+                    path: ['title'],
                 });
             }
 
@@ -126,7 +144,7 @@ interface CriteriaFormProps {
     items: SuggestItem[];
     defaultMode?: CriteriaFormMode;
     withModeSwitch?: boolean;
-    values?: Partial<CriteriaFormValues>;
+    values?: CriteriaFormValues;
     validityData: { title: string[]; sumOfCriteria: number };
 
     onModeChange?: (mode: CriteriaFormMode) => void;
@@ -134,6 +152,7 @@ interface CriteriaFormProps {
     onCancel: () => void;
     onItemChange?: (item?: SuggestItem) => void;
     onInputChange?: (value?: string) => void;
+    validateBindingsFor: (selectedId: string) => Promise<void>;
 
     renderItem: React.ComponentProps<typeof AutoComplete<SuggestItem>>['renderItem'];
 }
@@ -164,6 +183,7 @@ const StyledFormRow = styled.div`
     display: flex;
     flex-wrap: nowrap;
     margin-top: ${gapSm};
+    margin-left: calc(${gapS} + 1px); // 'cause input have 1px border
 `;
 
 const StyledFormControlsWrapper = styled.div`
@@ -295,152 +315,172 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
     );
 };
 
-export const CriteriaForm: React.FC<CriteriaFormProps> = ({
-    defaultMode,
-    onInputChange,
-    onItemChange,
-    onModeChange,
-    onSubmit,
-    onCancel,
-    items,
-    withModeSwitch,
-    renderItem,
-    validityData,
-    values,
-}) => {
-    const { control, watch, setValue, register, resetField, handleSubmit, reset, setError } =
-        useForm<CriteriaFormValues>({
-            resolver: zodResolver(patchZodSchema(validityData)),
-            defaultValues: { ...values, mode: defaultMode },
-            mode: 'onChange',
-            reValidateMode: 'onChange',
-        });
+export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
+    (
+        {
+            defaultMode,
+            onInputChange,
+            onItemChange,
+            onModeChange,
+            onSubmit,
+            onCancel,
+            items,
+            withModeSwitch,
+            renderItem,
+            validityData,
+            validateBindingsFor,
+            values,
+        },
+        ref,
+    ) => {
+        const { control, watch, setValue, register, resetField, handleSubmit, reset, setError, trigger } =
+            useForm<CriteriaFormValues>({
+                resolver: zodResolver(patchZodSchema(validityData, validateBindingsFor)),
+                defaultValues: {
+                    mode: defaultMode,
+                    title: '',
+                    weight: '',
+                    selected: undefined,
+                },
+                values,
+                mode: 'onChange',
+                reValidateMode: 'onChange',
+            });
 
-    const isEditMode = values != null;
+        const isEditMode = values != null;
 
-    const radios: Array<{ value: CriteriaFormMode; title: string }> = [
-        { title: tr('Simple'), value: 'simple' },
-        { title: tr('Goal'), value: 'goal' },
-    ];
+        const radios: Array<{ value: CriteriaFormMode; title: string }> = [
+            { title: tr('Simple'), value: 'simple' },
+            { title: tr('Goal'), value: 'goal' },
+        ];
 
-    const title = watch('title');
-    const selected = watch('selected');
-    const mode = watch('mode', defaultMode);
+        const title = watch('title');
+        const selected = watch('selected');
+        const mode = watch('mode', defaultMode);
 
-    useEffect(() => {
-        const sub = watch((currentValues, { name, type }) => {
-            if (type === 'change') {
-                if (name === 'title') {
-                    onInputChange?.(currentValues.title);
+        useEffect(() => {
+            const sub = watch((currentValues, { name, type }) => {
+                if (type === 'change') {
+                    if (name === 'title') {
+                        onInputChange?.(currentValues.title);
 
-                    if (currentValues.selected != null && currentValues.selected.id != null) {
-                        resetField('selected');
-                        resetField('weight');
+                        if (currentValues.selected != null && currentValues.selected.id != null) {
+                            resetField('selected');
+                            resetField('weight', { defaultValue: '' });
+                        }
                     }
                 }
+
+                if (name === 'selected' || name === 'selected.id' || name === 'selected.title') {
+                    onItemChange?.(currentValues.selected as Required<SuggestItem>);
+
+                    trigger('selected');
+                }
+
+                if (name === 'mode') {
+                    onModeChange?.(currentValues.mode as NonNullable<CriteriaFormMode>);
+                    setError('title', { message: undefined });
+                }
+            });
+
+            return () => sub.unsubscribe();
+        }, [watch, onInputChange, onItemChange, onModeChange, resetField, setError, trigger]);
+
+        const handleSelectItem = useCallback(
+            ([item]: SuggestItem[]) => {
+                setValue('selected', item);
+                setValue('title', item.title);
+            },
+            [setValue],
+        );
+
+        const handleCancel = useCallback(() => {
+            reset({
+                selected: null,
+                title: undefined,
+            });
+            onCancel();
+        }, [reset, onCancel]);
+
+        const needShowWeightField = useMemo(() => {
+            if (mode === 'simple') {
+                return !!title;
             }
 
-            if (name === 'selected' || name === 'selected.id' || name === 'selected.title') {
-                onItemChange?.(currentValues.selected as Required<SuggestItem>);
-                setError('selected', { message: undefined });
+            if (mode === 'goal') {
+                return !!(title && selected?.id);
             }
 
-            if (name === 'mode') {
-                onModeChange?.(currentValues.mode as NonNullable<CriteriaFormMode>);
-                setError('title', { message: undefined });
-            }
-        });
+            return false;
+        }, [mode, title, selected?.id]);
 
-        return () => sub.unsubscribe();
-    }, [watch, onInputChange, onItemChange, onModeChange, resetField, setError]);
-
-    const handleSelectItem = useCallback(
-        ([item]: SuggestItem[]) => {
-            setValue('selected', item);
-            setValue('title', item.title);
-        },
-        [setValue],
-    );
-
-    const handleCancel = useCallback(() => {
-        reset({
-            selected: null,
-            title: undefined,
-        });
-        onCancel();
-    }, [reset, onCancel]);
-
-    const needShowWeightField = useMemo(() => {
-        if (mode === 'simple') {
-            return !!title;
-        }
-
-        if (mode === 'goal') {
-            return !!(title && selected?.id);
-        }
-
-        return false;
-    }, [mode, title, selected?.id]);
-
-    return (
-        <Form onSubmit={handleSubmit(onSubmit)}>
-            <AutoComplete
-                mode="single"
-                items={items}
-                onChange={handleSelectItem}
-                renderItem={renderItem}
-                keyGetter={keyGetter}
-            >
-                <Controller
-                    name="title"
-                    control={control}
-                    render={({ field, formState }) => (
-                        <CriteriaTitleField
-                            mode={mode as CriteriaFormMode}
-                            selectedItem={selected}
-                            {...field}
-                            errors={formState.errors}
-                        />
-                    )}
-                />
-
-                {nullable(withModeSwitch, () => (
-                    <Controller
-                        name="mode"
-                        control={control}
-                        render={({ field }) => (
-                            <AutoCompleteRadioGroup
-                                title={tr('Mode')}
-                                items={radios}
-                                {...field}
-                                onChange={(val) => setValue('mode', val.value)}
-                            />
-                        )}
-                    />
-                ))}
-                <StyledFormRow>
-                    {nullable(needShowWeightField, () => (
+        return (
+            <div ref={ref}>
+                <Form onSubmit={handleSubmit(onSubmit)}>
+                    <AutoComplete
+                        mode="single"
+                        items={items}
+                        onChange={handleSelectItem}
+                        renderItem={renderItem}
+                        keyGetter={keyGetter}
+                    >
                         <Controller
-                            name="weight"
+                            name="title"
                             control={control}
-                            render={({ field, fieldState }) => (
-                                <CriteriaWeightField
+                            render={({ field, formState }) => (
+                                <CriteriaTitleField
+                                    mode={mode as CriteriaFormMode}
+                                    selectedItem={selected}
                                     {...field}
-                                    maxValue={validityData.sumOfCriteria}
-                                    error={fieldState.error}
+                                    errors={formState.errors}
                                 />
                             )}
                         />
-                    ))}
-                    <StyledFormControlsWrapper>
-                        <Button type="submit" text={isEditMode ? tr('Save') : tr('Add')} view="primary" outline />
-                        <Button text={tr('Cancel')} view="default" outline onClick={handleCancel} />
-                    </StyledFormControlsWrapper>
-                </StyledFormRow>
-                <AutoCompleteList title={tr('Suggestions')} />
-            </AutoComplete>
-            <input type="hidden" {...register('selected.id')} />
-            <input type="hidden" {...register('selected.title')} />
-        </Form>
-    );
-};
+
+                        {nullable(withModeSwitch, () => (
+                            <Controller
+                                name="mode"
+                                control={control}
+                                render={({ field }) => (
+                                    <AutoCompleteRadioGroup
+                                        title={tr('Mode')}
+                                        items={radios}
+                                        {...field}
+                                        onChange={(val) => setValue('mode', val.value)}
+                                    />
+                                )}
+                            />
+                        ))}
+                        <StyledFormRow>
+                            {nullable(needShowWeightField, () => (
+                                <Controller
+                                    name="weight"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <CriteriaWeightField
+                                            {...field}
+                                            maxValue={validityData.sumOfCriteria}
+                                            error={fieldState.error}
+                                        />
+                                    )}
+                                />
+                            ))}
+                            <StyledFormControlsWrapper>
+                                <Button
+                                    type="submit"
+                                    text={isEditMode ? tr('Save') : tr('Add')}
+                                    view="primary"
+                                    outline
+                                />
+                                <Button text={tr('Cancel')} view="default" outline onClick={handleCancel} />
+                            </StyledFormControlsWrapper>
+                        </StyledFormRow>
+                        <AutoCompleteList title={tr('Suggestions')} />
+                    </AutoComplete>
+                    <input type="hidden" {...register('selected.id')} />
+                    <input type="hidden" {...register('selected.title')} />
+                </Form>
+            </div>
+        );
+    },
+);

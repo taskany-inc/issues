@@ -1,27 +1,35 @@
 import React from 'react';
 import { Link, nullable } from '@taskany/bricks';
+import { IconTargetOutline } from '@taskany/icons';
+import colorLayer from 'color-layer';
 
 import { Badge } from './Badge';
 import { NextLink } from './NextLink';
-import { StateDot } from './StateDot';
 
 interface GoalBadgeProps {
     title: string;
     href?: string;
-    state?: {
-        title?: string;
-        hue?: number;
-    } | null;
+    color?: number;
+    theme: number;
     children?: React.ReactNode;
     className?: string;
-    onClick?: () => void;
+    onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
-export const GoalBadge: React.FC<GoalBadgeProps> = ({ href, title, state, children, className, onClick }) => {
+export const GoalBadge: React.FC<GoalBadgeProps> = ({
+    href,
+    title,
+    color = 1,
+    theme,
+    children,
+    className,
+    onClick,
+}) => {
+    const sat = color === 1 ? 0 : undefined;
     return (
         <Badge
             className={className}
-            icon={<StateDot title={state?.title} hue={state?.hue} />}
+            icon={<IconTargetOutline size="s" color={colorLayer(color, 10, sat)[theme]} />}
             text={nullable(
                 href,
                 () => (

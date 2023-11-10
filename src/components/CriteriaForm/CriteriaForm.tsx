@@ -19,13 +19,17 @@ import { Goal } from '@prisma/client';
 import { z } from 'zod';
 
 import { InlineTrigger } from '../InlineTrigger';
-import { criteriaSchema, updateCriteriaSchema } from '../../schema/criteria';
+import {
+    ValidityData,
+    criteriaSchema,
+    updateCriteriaSchema,
+    maxPossibleWeight,
+    patchZodSchema,
+    ValidityMessage,
+} from '../../schema/criteria';
 import { GoalSuggest } from '../GoalSuggest';
 
 import { tr } from './CriteriaForm.i18n';
-
-const maxPossibleWeigth = 100;
-const minPossibleWeight = 1;
 
 const StyledInlineTrigger = styled(InlineTrigger)`
     width: fit-content;
@@ -58,7 +62,7 @@ const WeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
                 onChange={onChange}
                 placeholder={tr
                     .raw('Weight', {
-                        upTo: maxPossibleWeigth - maxValue,
+                        upTo: maxPossibleWeight - maxValue,
                     })
                     .join('')}
                 ref={ref}
@@ -149,10 +153,7 @@ const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>
 interface CriteriaFormProps {
     onReset?: () => void;
     goalId: string;
-    validityData: {
-        sum: number;
-        title: string[];
-    };
+    validityData: ValidityData;
     renderTrigger?: React.ComponentProps<typeof InlineForm>['renderTrigger'];
 }
 interface CriteriaFormPropsWithSchema extends CriteriaFormProps {
@@ -251,55 +252,22 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
     );
 };
 
-function patchZodSchema<T extends typeof criteriaSchema | typeof updateCriteriaSchema>(
-    schema: T,
-    data: CriteriaFormProps['validityData'],
-) {
-    const patched = schema.merge(
-        z.object({
-            title: schema.shape.title.refine((val) => !data.title.some((t) => t === val), {
-                message: tr('Title must be unique'),
-            }),
-            // INFO: https://github.com/colinhacks/zod#abort-early
-            weight: schema.shape.weight.superRefine((val, ctx): val is string => {
-                if (!val || !val.length) {
-                    return z.NEVER;
-                }
-
-                const parsed = Number(val);
-
-                if (Number.isNaN(parsed)) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: tr('Weight must be integer'),
-                    });
-                }
-
-                if (parsed < minPossibleWeight || data.sum + parsed > maxPossibleWeigth) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: tr
-                            .raw('Weight must be in range', {
-                                upTo: `${maxPossibleWeigth - data.sum}`,
-                            })
-                            .join(''),
-                    });
-                }
-
-                return z.NEVER;
-            }),
-        }),
-    );
-
-    return patched;
-}
+const getErrorMessages = (data: ValidityData): ValidityMessage => ({
+    uniqueTitle: tr('Title must be unique'),
+    weigthIsNan: tr('Weight must be integer'),
+    notInRange: tr
+        .raw('Weight must be in range', {
+            upTo: `${maxPossibleWeight - data.sum}`,
+        })
+        .join(' '),
+});
 
 export const AddCriteriaForm: React.FC<
     Omit<CriteriaFormProps, 'renderTrigger'> & { onSubmit: (val: z.infer<typeof criteriaSchema>) => void }
 > = ({ validityData, onSubmit, goalId, onReset }) => {
     return (
         <CriteriaForm
-            schema={patchZodSchema(criteriaSchema, validityData)}
+            schema={patchZodSchema(criteriaSchema, validityData, getErrorMessages(validityData))}
             actionBtnText={tr('Add')}
             goalId={goalId}
             onSubmit={onSubmit}
@@ -324,7 +292,7 @@ export const EditCriteriaForm: React.FC<
 > = ({ validityData, onSubmit, goalId, onReset, values }) => {
     return (
         <CriteriaForm
-            schema={patchZodSchema(updateCriteriaSchema, validityData)}
+            schema={patchZodSchema(updateCriteriaSchema, validityData, getErrorMessages(validityData))}
             actionBtnText={tr('Save')}
             goalId={goalId}
             onSubmit={onSubmit}

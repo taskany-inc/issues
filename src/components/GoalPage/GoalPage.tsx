@@ -112,6 +112,13 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         [setPreview],
     );
 
+    const onVersaGoalClick = useCallback(
+        (shortId: string) => {
+            setPreview(shortId);
+        },
+        [setPreview],
+    );
+
     const commentsRef = useRef<HTMLDivElement>(null);
 
     const onCommentsClick = useCallback(() => {
@@ -185,6 +192,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         goal={goal}
                         onGoalTransfer={onGoalTransfer((transferredGoal) => router.goal(transferredGoal._shortId))}
                         onGoalDependencyClick={onGoalDependencyClick}
+                        onGoalOpen={onVersaGoalClick}
                     />
                 </div>
             </GoalContent>
