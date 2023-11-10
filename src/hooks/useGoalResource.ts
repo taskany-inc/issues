@@ -12,6 +12,7 @@ import {
 } from '../schema/criteria';
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 import { GoalComment } from '../types/comment';
+import { TagObject } from '../types/tag';
 
 import { useHighlightedComment } from './useHighlightedComment';
 import { useReactionsResource } from './useReactionsResource';
@@ -374,7 +375,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     );
 
     const goalTagsUpdate = useCallback(
-        async (tags: { title: string; id: string }[]) => {
+        async (tags: TagObject[]) => {
             if (!id) return;
 
             const promise = updateGoalTagMutation.mutateAsync({
@@ -443,6 +444,37 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         [id, removePartnerProjectMutation, invalidate],
     );
 
+    const onGoalTagAdd = useCallback(
+        async (tags: TagObject[]) => {
+            await goalTagsUpdate(tags);
+
+            invalidate();
+        },
+        [invalidate, goalTagsUpdate],
+    );
+
+    const onGoalTagRemove = useCallback(
+        (tags: TagObject[], removedTag: TagObject) => async () => {
+            const actualTags = tags.filter((tag) => tag.id !== removedTag.id);
+            await goalTagsUpdate(actualTags);
+
+            invalidate();
+        },
+        [invalidate, goalTagsUpdate],
+    );
+
+    const onGoalTransfer = useCallback(
+        (callback: (transferredGoal: NonNullable<Awaited<ReturnType<typeof goalProjectChange>>>) => void) =>
+            async (project: { id: string }) => {
+                const transferredGoal = await goalProjectChange(project.id);
+
+                if (transferredGoal) {
+                    callback(transferredGoal);
+                }
+            },
+        [goalProjectChange],
+    );
+
     return {
         highlightCommentId,
         lastStateComment,
@@ -457,6 +489,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
 
         onGoalStateChange,
         onGoalDelete,
+        onGoalTransfer,
 
         onGoalWatchingToggle,
         onGoalStarToggle,
@@ -472,6 +505,9 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         onGoalCriteriaUpdate,
         onGoalCriteriaRemove,
         onGoalCriteriaConvert,
+
+        onGoalTagAdd,
+        onGoalTagRemove,
 
         onGoalCommentCreate,
         onGoalCommentUpdate,

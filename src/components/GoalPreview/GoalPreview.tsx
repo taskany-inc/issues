@@ -12,7 +12,6 @@ import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
 import { GoalActivityFeed } from '../GoalActivityFeed';
 import { IssueParent } from '../IssueParent';
 import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
-import { TagObject } from '../../types/tag';
 
 import { dispatchPreviewDeleteEvent, dispatchPreviewUpdateEvent, useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
@@ -55,46 +54,9 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         onClose?.();
     }, [onClose]);
 
-    const { goalProjectChange, onGoalStateChange, goalTagsUpdate, invalidate } = useGoalResource(
+    const { onGoalTransfer, onGoalStateChange } = useGoalResource(
         { id: goal?.id },
         { invalidate: { getById: shortId }, afterInvalidate: dispatchPreviewUpdateEvent },
-    );
-
-    // FIXME https://github.com/taskany-inc/issues/issues/1853
-    const onGoalTagAdd = useCallback(
-        async (value: TagObject[]) => {
-            if (!goal) return;
-
-            await goalTagsUpdate([...goal.tags, ...value]);
-
-            invalidate();
-        },
-        [goal, invalidate, goalTagsUpdate],
-    );
-
-    const onGoalTagRemove = useCallback(
-        (value: TagObject) => async () => {
-            if (!goal) return;
-
-            const tags = goal.tags.filter((tag) => tag.id !== value.id);
-            await goalTagsUpdate(tags);
-
-            invalidate();
-        },
-        [goal, invalidate, goalTagsUpdate],
-    );
-
-    const onGoalTransfer = useCallback(
-        async (project?: { id: string }) => {
-            if (!project) return;
-
-            const transferedGoal = await goalProjectChange(project.id);
-
-            if (transferedGoal) {
-                setPreview(transferedGoal._shortId, transferedGoal);
-            }
-        },
-        [goalProjectChange, setPreview],
     );
 
     const commentsRef = useRef<HTMLDivElement>(null);
@@ -166,9 +128,9 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                     {nullable(goal, (g) => (
                         <GoalSidebar
                             goal={g}
-                            onGoalTagRemove={onGoalTagRemove}
-                            onGoalTagAdd={onGoalTagAdd}
-                            onGoalTransfer={onGoalTransfer}
+                            onGoalTransfer={onGoalTransfer((transferredGoal) => {
+                                setPreview(transferredGoal._shortId, transferredGoal);
+                            })}
                         />
                     ))}
                 </StyledModalContent>

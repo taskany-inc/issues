@@ -25,7 +25,6 @@ import { GoalHeader } from '../GoalHeader';
 import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
 import { GoalActivityFeed } from '../GoalActivityFeed';
 import { IssueParent } from '../IssueParent';
-import { TagObject } from '../../types/tag';
 import { goalPage, goalPageEditButton } from '../../utils/domObjects';
 
 import { tr } from './GoalPage.i18n';
@@ -56,42 +55,9 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         setCurrentProjectCache(null);
     });
 
-    const { goalProjectChange, onGoalStateChange, onGoalWatchingToggle, onGoalStarToggle, goalTagsUpdate, invalidate } =
-        useGoalResource({ id: goal?.id }, { invalidate: { getById: id } });
-
-    const onGoalTagAdd = useCallback(
-        async (value: TagObject[]) => {
-            if (!goal) return;
-
-            await goalTagsUpdate([...goal.tags, ...value]);
-
-            invalidate();
-        },
-        [goal, invalidate, goalTagsUpdate],
-    );
-
-    const onGoalTagRemove = useCallback(
-        (value: TagObject) => async () => {
-            if (!goal) return;
-
-            const tags = goal.tags.filter((tag) => tag.id !== value.id);
-            await goalTagsUpdate(tags);
-
-            invalidate();
-        },
-        [goal, invalidate, goalTagsUpdate],
-    );
-
-    const onGoalTransfer = useCallback(
-        async (project?: { id: string }) => {
-            if (!project) return;
-
-            const transferedGoal = await goalProjectChange(project.id);
-            if (transferedGoal) {
-                router.goal(transferedGoal._shortId);
-            }
-        },
-        [goalProjectChange, router],
+    const { onGoalStateChange, onGoalWatchingToggle, onGoalStarToggle, onGoalTransfer, invalidate } = useGoalResource(
+        { id: goal?.id },
+        { invalidate: { getById: id } },
     );
 
     const pageTitle = tr
@@ -217,9 +183,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                 <div>
                     <GoalSidebar
                         goal={goal}
-                        onGoalTagRemove={onGoalTagRemove}
-                        onGoalTagAdd={onGoalTagAdd}
-                        onGoalTransfer={onGoalTransfer}
+                        onGoalTransfer={onGoalTransfer((transferredGoal) => router.goal(transferredGoal._shortId))}
                         onGoalDependencyClick={onGoalDependencyClick}
                     />
                 </div>
