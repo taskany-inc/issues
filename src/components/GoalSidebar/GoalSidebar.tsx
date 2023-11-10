@@ -1,4 +1,4 @@
-import { ComponentProps, FC, MouseEvent, forwardRef, useMemo } from 'react';
+import { ComponentProps, FC, forwardRef, useMemo } from 'react';
 import styled from 'styled-components';
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconArrowRightOutline, IconBinOutline, IconPlusCircleOutline, IconXCircleSolid } from '@taskany/icons';
@@ -46,8 +46,6 @@ const StyledTextList = styled(TextList).attrs({
 
 interface GoalSidebarProps {
     goal: NonNullable<GoalByIdReturnType>;
-    onGoalTagRemove: (tag: NonNullable<GoalByIdReturnType>['tags'][number]) => (e: MouseEvent<Element>) => void;
-    onGoalTagAdd: ComponentProps<typeof TagComboBox>['onChange'];
     onGoalTransfer: ComponentProps<typeof GoalParentComboBox>['onChange'];
     onGoalDependencyClick?: ComponentProps<typeof GoalDependencyListByKind>['onClick'];
 }
@@ -64,13 +62,7 @@ const AddInlineTrigger = forwardRef<HTMLDivElement, AddInlineTriggerProps>(
     ),
 );
 
-export const GoalSidebar: FC<GoalSidebarProps> = ({
-    goal,
-    onGoalTagRemove,
-    onGoalTagAdd,
-    onGoalTransfer,
-    onGoalDependencyClick,
-}) => {
+export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoalDependencyClick }) => {
     const participantsFilter = useMemo(() => {
         const participantsIds = goal.participants.map(({ id }) => id);
         const { owner, activity: issuer } = goal;
@@ -91,6 +83,8 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({
         goalOwnerUpdate,
         onGoalDependencyAdd,
         onGoalDependencyRemove,
+        onGoalTagAdd,
+        onGoalTagRemove,
     } = useGoalResource(
         {
             id: goal.id,
@@ -244,7 +238,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({
                         {goal.tags.map((tag) => (
                             <Tag key={tag.id}>
                                 {nullable(goal._isEditable, () => (
-                                    <TagCleanButton onClick={onGoalTagRemove(tag)} />
+                                    <TagCleanButton onClick={onGoalTagRemove(goal.tags, tag)} />
                                 ))}
                                 {tag.title}
                             </Tag>
@@ -256,6 +250,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({
                             <TagComboBox
                                 disabled={(goal.tags || []).length >= tagsLimit}
                                 placeholder={tr('Enter tag title')}
+                                value={goal.tags}
                                 onChange={onGoalTagAdd}
                                 renderTrigger={(props) => (
                                     <AddInlineTrigger text={tr('Add tag')} onClick={props.onClick} />
