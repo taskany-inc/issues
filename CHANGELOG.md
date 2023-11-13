@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.7.0](https://github.com/taskany-inc/issues/compare/v2.6.0...v2.7.0) (2023-11-13)
+
+
+### Features
+
+* **CriteriaForm:** a brand new vision ([6c5e138](https://github.com/taskany-inc/issues/commit/6c5e1385288e5cca6acb206c3be7d1b6b479dec0))
+* **RotatableTip:** tips change randomly ([b00dc58](https://github.com/taskany-inc/issues/commit/b00dc589b8155f0ce3424225ec6bc21403b2f735))
+
 ## [2.6.0](https://github.com/taskany-inc/issues/compare/v2.4.0...v2.6.0) (2023-11-09)
 
 
