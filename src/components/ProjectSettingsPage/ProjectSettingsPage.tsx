@@ -65,6 +65,7 @@ import {
 import { safeUserData } from '../../utils/getUserName';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { ProjectParticipants } from '../ProjectParticipants/ProjectParticipants';
+import { ParticipantDeleteErrorModal } from '../ParticipantDeleteErrorModal/ParticipantDeleteErrorModal';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -382,6 +383,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     </Form>
                 </SettingsCard>
             </SettingsContent>
+
+            <ParticipantDeleteErrorModal />
 
             <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
                 <ModalHeader>
