@@ -20,7 +20,7 @@ const StyledInlineTrigger = styled(InlineTrigger)`
     height: ${inputHeight};
 `;
 
-const StyledTriggerContainer = styled.div`
+const StyledInputContainer = styled.div`
     margin-top: ${gapXs};
     height: ${inputHeight};
 `;
@@ -62,7 +62,7 @@ export const UserEditableList: FC<{
         </TextList>
 
         {nullable(editable, () => (
-            <StyledTriggerContainer>
+            <StyledInputContainer>
                 <UserComboBox
                     placement="bottom-start"
                     placeholder={tr('Type user name or email')}
@@ -70,7 +70,7 @@ export const UserEditableList: FC<{
                     onChange={onAdd}
                     renderTrigger={(props) => <UserEditableListTrigger text={triggerText} onClick={props.onClick} />}
                 />
-            </StyledTriggerContainer>
+            </StyledInputContainer>
         ))}
     </div>
 );

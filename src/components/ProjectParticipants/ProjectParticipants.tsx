@@ -1,10 +1,12 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Text } from '@taskany/bricks';
 import { gapS, gapM, gray9, gray3 } from '@taskany/colors';
 
+import { trpc } from '../../utils/trpcClient';
 import { ActivityByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { useProjectResource } from '../../hooks/useProjectResource';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { UserEditableList } from '../UserEditableList/UserEditableList';
 import { SettingsCard } from '../SettingsContent';
 
@@ -24,9 +26,20 @@ const StyledListContianer = styled.div`
 export const ProjectParticipants: FC<{
     project: NonNullable<ProjectByIdReturnType>;
 }> = ({ project }) => {
+    const [userIdToRemove, setUserIdToRemove] = useState<string>('');
     const filterIds = useMemo(() => project.participants.map(({ id }) => id) ?? [], [project]);
 
     const { updateProject } = useProjectResource(project.id);
+
+    const { data: userToRemoveGoals, status } = trpc.project.getActivityGoals.useQuery(
+        {
+            id: project.id,
+            ownerId: userIdToRemove,
+        },
+        {
+            enabled: Boolean(userIdToRemove),
+        },
+    );
 
     const onAdd = useCallback(
         (user: User) => {
@@ -38,15 +51,26 @@ export const ProjectParticipants: FC<{
         [updateProject, project],
     );
 
-    const onRemove = useCallback(
-        (id: string) => {
+    useEffect(() => {
+        if (userToRemoveGoals && userToRemoveGoals.length) {
+            dispatchModalEvent(ModalEvent.ParticipantDeleteError, {
+                goals: userToRemoveGoals,
+            })();
+        }
+
+        if (userToRemoveGoals && !userToRemoveGoals.length) {
             updateProject()({
                 ...project,
-                participants: project.participants.filter((user) => user.id !== id),
+                participants: project.participants.filter((user) => user.id !== userIdToRemove),
             });
-        },
-        [updateProject, project],
-    );
+        }
+    }, [userIdToRemove, userToRemoveGoals, updateProject, project]);
+
+    useEffect(() => {
+        if (status === 'success' || status === 'error') {
+            setUserIdToRemove('');
+        }
+    }, [status]);
 
     return (
         <SettingsCard>
@@ -58,7 +82,7 @@ export const ProjectParticipants: FC<{
                     users={project.participants}
                     filterIds={filterIds}
                     onAdd={onAdd}
-                    onRemove={onRemove}
+                    onRemove={setUserIdToRemove}
                     triggerText={tr('Add participant')}
                     editable
                 />
