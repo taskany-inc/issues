@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Text, Input, KeyCode, useKeyboard, Popup } from '@taskany/bricks';
+import { Button, Text, KeyCode, useKeyboard, Popup, FormControl, FormControlInput } from '@taskany/bricks';
 
 import { keyPredictor } from '../utils/keyPredictor';
 import {
@@ -27,10 +27,6 @@ interface KeyInputProps {
     onDirty?: () => void;
     onBlur?: (key: string) => void;
 }
-
-const StyledInput = styled(Input)`
-    font-weight: 600;
-`;
 
 const StyledButton = styled(Button)`
     font-weight: 600;
@@ -97,17 +93,19 @@ const KeyInput: React.FC<KeyInputProps> = ({
         <>
             <span ref={popupRef} {...onESC}>
                 {editMode ? (
-                    <StyledInput
-                        autoFocus
-                        disabled={disabled}
-                        placeholder={placeholder}
-                        value={value}
-                        onChange={onInputChange}
-                        onBlur={onInputBlur}
-                        tabIndex={tabIndex}
-                        {...onENTER}
-                        {...projectKeyPredictorInput.attr}
-                    />
+                    <FormControl variant="outline">
+                        <FormControlInput
+                            autoFocus
+                            disabled={disabled}
+                            placeholder={placeholder}
+                            value={value}
+                            onChange={onInputChange}
+                            onBlur={onInputBlur}
+                            tabIndex={tabIndex}
+                            {...onENTER}
+                            {...projectKeyPredictorInput.attr}
+                        />
+                    </FormControl>
                 ) : (
                     <StyledButton
                         outline

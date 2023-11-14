@@ -1,9 +1,19 @@
 import React, { useState, useCallback, forwardRef, ReactEventHandler, useRef, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, FormInput, TableRow, TableCell, Popup, InlineForm, Tip } from '@taskany/bricks';
+import {
+    Button,
+    TableRow,
+    TableCell,
+    Popup,
+    InlineForm,
+    Tip,
+    FormControl,
+    FormControlInput,
+    FormControlError,
+    nullable,
+} from '@taskany/bricks';
 import { IconPlusCircleOutline, IconTargetOutline } from '@taskany/icons';
-import { gray7, gray8 } from '@taskany/colors';
 import { Controller, useForm } from 'react-hook-form';
 import { Goal } from '@prisma/client';
 import { z } from 'zod';
@@ -18,36 +28,15 @@ const maxPossibleWeigth = 100;
 const minPossibleWeight = 1;
 
 const StyledInlineTrigger = styled(InlineTrigger)`
-    display: inline-flex;
-    color: ${gray8};
-    line-height: 28px;
     width: fit-content;
 `;
 
-const StyledFormInput = styled(FormInput)`
-    font-size: 14px;
-    font-weight: normal;
-    padding: 5px 10px;
-    flex: 1;
-
-    border: 1px solid ${gray7};
-    box-sizing: border-box;
-`;
-
 const StyledTableCell = styled(TableCell)`
-    flex-wrap: nowrap;
-    display: flex;
-    align-items: center;
+    flex: 0;
 `;
 
-const StyledSubmitButton = styled(Button)`
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-const StyledGoalSuggest = styled(GoalSuggest)`
-    flex: 1;
+const StyledFormControl = styled(FormControl)`
+    height: 28px; // input height
 `;
 
 interface WeightFieldProps {
@@ -60,20 +49,24 @@ interface WeightFieldProps {
 
 const WeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
     ({ error, maxValue, value, onChange, name }, ref) => (
-        <StyledFormInput
-            autoComplete="off"
-            name={name}
-            value={value}
-            error={error?.message != null ? error : undefined}
-            placeholder={tr
-                .raw('Weight', {
-                    upTo: maxPossibleWeigth - maxValue,
-                })
-                .join('')}
-            brick="center"
-            onChange={onChange}
-            ref={ref}
-        />
+        <StyledFormControl brick="center" variant="outline">
+            <FormControlInput
+                autoComplete="off"
+                autoFocus
+                name={name}
+                value={value}
+                onChange={onChange}
+                placeholder={tr
+                    .raw('Weight', {
+                        upTo: maxPossibleWeigth - maxValue,
+                    })
+                    .join('')}
+                ref={ref}
+            />
+            {nullable(error, (err) => (
+                <FormControlError error={err} />
+            ))}
+        </StyledFormControl>
     ),
 );
 
@@ -108,35 +101,41 @@ const CriteriaTitleField = forwardRef<HTMLInputElement, CriteriaTitleFieldProps>
                 />
 
                 {type === 'search' ? (
-                    <StyledGoalSuggest
+                    <GoalSuggest
                         value={isItemSelected ? undefined : value}
                         showSuggest={!isItemSelected}
                         onChange={onSelect}
                         renderInput={(inputProps) => (
-                            <StyledFormInput
-                                autoFocus
-                                brick="center"
-                                name={name}
-                                onChange={onChange}
-                                placeholder={tr('Enter goal name')}
-                                error={error}
-                                {...inputProps}
-                                value={inputProps.value || value}
-                                ref={ref}
-                            />
+                            <StyledFormControl brick="center" variant="outline">
+                                <FormControlInput
+                                    autoFocus
+                                    name={name}
+                                    onChange={onChange}
+                                    placeholder={tr('Enter goal name')}
+                                    {...inputProps}
+                                    value={inputProps.value || value}
+                                    ref={ref}
+                                />
+                                {nullable(error, (err) => (
+                                    <FormControlError error={err} />
+                                ))}
+                            </StyledFormControl>
                         )}
                     />
                 ) : (
-                    <StyledFormInput
-                        autoFocus
-                        brick="center"
-                        value={value}
-                        name={name}
-                        onChange={onChange}
-                        placeholder={tr('Enter criteria')}
-                        error={error}
-                        ref={ref}
-                    />
+                    <StyledFormControl brick="center" variant="outline">
+                        <FormControlInput
+                            autoFocus
+                            value={value}
+                            name={name}
+                            onChange={onChange}
+                            placeholder={tr('Enter criteria')}
+                            ref={ref}
+                        />
+                        {nullable(error, (err) => (
+                            <FormControlError error={err} />
+                        ))}
+                    </StyledFormControl>
                 )}
 
                 <Popup reference={btnRef} visible={popupVisible} placement="top-start">
@@ -243,14 +242,7 @@ const CriteriaForm: React.FC<CriteriaFormPropsWithSchema> = ({
                             <WeightField {...field} error={fieldState.error} maxValue={validityData.sum} />
                         )}
                     />
-                    <StyledSubmitButton
-                        brick="left"
-                        view="primary"
-                        text={actionBtnText}
-                        size="m"
-                        type="submit"
-                        outline
-                    />
+                    <Button brick="left" view="primary" text={actionBtnText} size="m" type="submit" outline />
                 </StyledTableCell>
             </TableRow>
             <input type="hidden" {...register('goalId')} />

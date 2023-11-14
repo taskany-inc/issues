@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { Button, Input, ComboBox } from '@taskany/bricks';
+import { Button, ComboBox, FormControl, FormControlInput } from '@taskany/bricks';
 
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';
@@ -22,10 +21,6 @@ interface GoalParentComboBoxProps {
 
     onChange?: (project: { id: string; title: string }) => void;
 }
-
-const StyledInput = styled(Input)`
-    min-width: 100px;
-`;
 
 export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentComboBoxProps>(
     (
@@ -102,16 +97,18 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                     )
                 }
                 renderInput={(props) => (
-                    <StyledInput
-                        autoFocus
-                        placeholder={placeholder}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            setInputState(e.currentTarget.value);
-                            setCompletionVisibility(true);
-                        }}
-                        {...props}
-                        {...comboboxInput.attr}
-                    />
+                    <FormControl variant="outline">
+                        <FormControlInput
+                            autoFocus
+                            placeholder={placeholder}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                setInputState(e.currentTarget.value);
+                                setCompletionVisibility(true);
+                            }}
+                            {...props}
+                            {...comboboxInput.attr}
+                        />
+                    </FormControl>
                 )}
                 renderItem={(props) => (
                     <ProjectMenuItem

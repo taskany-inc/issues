@@ -4,9 +4,23 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
-import { Button, Fieldset, Form, FormInput, FormAction, FormActions, FormRadio, FormRadioInput } from '@taskany/bricks';
+import {
+    Button,
+    Fieldset,
+    Form,
+    FormAction,
+    FormActions,
+    FormRadio,
+    FormRadioInput,
+    FormControl,
+    FormControlInput,
+    FormControlLabel,
+    FormControlError,
+    nullable,
+} from '@taskany/bricks';
 import { z } from 'zod';
 import dynamic from 'next/dynamic';
+import { gapM, gapS, gray3, gray8 } from '@taskany/colors';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
@@ -23,10 +37,20 @@ import { tr } from './UserSettingsPage.i18n';
 
 const RotatableTip = dynamic(() => import('../RotatableTip/RotatableTip'), { ssr: false });
 
-const StyledLabel = styled.label`
-    padding: 8px 8px 8px 16px;
+const StyledFormControl = styled(FormControl).attrs({ size: 'l' })`
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    background-color: ${gray3};
+`;
 
-    background-color: transparent;
+const StyledFormControlLabel = styled(FormControlLabel).attrs({
+    size: 'm',
+    weight: 'bold',
+    color: gray8,
+})`
+    padding: ${gapS};
+    padding-left: ${gapM};
 `;
 
 const patchUserSchemaWithAsyncValidate = (validityFn: (val: string) => Promise<boolean>) => {
@@ -64,7 +88,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
         [getUserByNicknameMutation],
     );
 
-    const generalForm = useForm<UpdateUser>({
+    const { reset, watch, handleSubmit, register, formState } = useForm<UpdateUser>({
         resolver: zodResolver(patchUserSchemaWithAsyncValidate(validateNicknameAsync)),
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -83,12 +107,12 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
 
             if (!res) return;
 
-            generalForm.reset({
+            reset({
                 name: res.name,
                 nickname: res.nickname,
             });
         },
-        [generalForm, updateMutation],
+        [updateMutation, reset],
     );
 
     const [appearanceTheme, setAppearanceTheme] = useState(settings?.data?.theme);
@@ -160,7 +184,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
 
     const pageTitle = tr
         .raw('title', {
-            user: generalForm.watch('name'),
+            user: watch('name'),
         })
         .join('');
 
@@ -172,36 +196,28 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
 
             <SettingsContent>
                 <SettingsCard>
-                    <Form onSubmit={generalForm.handleSubmit(updateUser)}>
+                    <Form onSubmit={handleSubmit(updateUser)}>
                         <Fieldset title={tr('General')}>
-                            <FormInput
-                                disabled
-                                defaultValue={user.email}
-                                label={tr('Email')}
-                                autoComplete="off"
-                                flat="bottom"
-                            />
+                            <StyledFormControl flat="bottom">
+                                <StyledFormControlLabel>{tr('Email')}:</StyledFormControlLabel>
+                                <FormControlInput autoComplete="off" disabled defaultValue={user.email} />
+                            </StyledFormControl>
 
-                            <FormInput
-                                {...generalForm.register('name')}
-                                label={tr('Name')}
-                                autoComplete="off"
-                                flat="bottom"
-                                error={
-                                    generalForm.formState.isSubmitted ? generalForm.formState.errors.name : undefined
-                                }
-                            />
+                            <StyledFormControl flat="bottom">
+                                <StyledFormControlLabel>{tr('Name')}:</StyledFormControlLabel>
+                                <FormControlInput {...register('name')} autoComplete="off" />
+                                {nullable(formState.isSubmitted, () => (
+                                    <FormControlError error={formState.errors.name} />
+                                ))}
+                            </StyledFormControl>
 
-                            <FormInput
-                                {...generalForm.register('nickname')}
-                                label={tr('Nickname')}
-                                flat="both"
-                                error={
-                                    generalForm.formState.isSubmitted
-                                        ? generalForm.formState.errors.nickname
-                                        : undefined
-                                }
-                            />
+                            <StyledFormControl flat="both">
+                                <StyledFormControlLabel>{tr('Nickname')}:</StyledFormControlLabel>
+                                <FormControlInput {...register('nickname')} autoComplete="off" />
+                                {nullable(formState.isSubmitted, () => (
+                                    <FormControlError error={formState.errors.nickname} />
+                                ))}
+                            </StyledFormControl>
                         </Fieldset>
 
                         <FormActions flat="top">
@@ -211,7 +227,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                     size="m"
                                     view="primary"
                                     type="submit"
-                                    disabled={!generalForm.formState.isDirty}
+                                    disabled={!formState.isDirty}
                                     text={tr('Save')}
                                     outline
                                 />
@@ -240,8 +256,10 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 <SettingsCard>
                     <Form>
                         <Fieldset title={tr('You are hero')}>
-                            <StyledLabel htmlFor="beta">{tr('Beta features')}</StyledLabel>
-                            <input id="beta" type="checkbox" checked={betaUser} onChange={onBetaUserChange} />
+                            <StyledFormControl flat="both">
+                                <StyledFormControlLabel>{tr('Beta features')}:</StyledFormControlLabel>
+                                <FormControlInput type="checkbox" checked={betaUser} onChange={onBetaUserChange} />
+                            </StyledFormControl>
                         </Fieldset>
                     </Form>
                 </SettingsCard>

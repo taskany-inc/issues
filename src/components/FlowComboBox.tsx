@@ -1,8 +1,6 @@
-/* eslint-disable react/display-name */
 import React, { ChangeEvent, useState } from 'react';
-import styled from 'styled-components';
 import { Flow } from '@prisma/client';
-import { Button, Input, ComboBox, MenuItem } from '@taskany/bricks';
+import { Button, ComboBox, MenuItem, FormControl, FormControlInput } from '@taskany/bricks';
 import { IconGitPullOutline } from '@taskany/icons';
 
 import { trpc } from '../utils/trpcClient';
@@ -17,10 +15,6 @@ interface FlowComboBoxProps {
 
     onChange?: (flow: Flow) => void;
 }
-
-const StyledInput = styled(Input)`
-    min-width: 100px;
-`;
 
 export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
     ({ text, value, disabled, query = '', error, placeholder, onChange }, ref) => {
@@ -49,16 +43,18 @@ export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
                     />
                 )}
                 renderInput={(props) => (
-                    <StyledInput
-                        autoFocus
-                        disabled={props.disabled}
-                        placeholder={placeholder}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            setInputState(e.currentTarget.value);
-                            setCompletionVisibility(true);
-                        }}
-                        {...props}
-                    />
+                    <FormControl variant="outline">
+                        <FormControlInput
+                            autoFocus
+                            disabled={props.disabled}
+                            placeholder={placeholder}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                setInputState(e.currentTarget.value);
+                                setCompletionVisibility(true);
+                            }}
+                            {...props}
+                        />
+                    </FormControl>
                 )}
                 renderItem={(props) => (
                     <MenuItem key={props.item.id} focused={props.cursor === props.index} onClick={props.onClick}>

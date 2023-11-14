@@ -1,7 +1,18 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form, FormActions, FormAction, FormTextarea, FormInput, ModalContent } from '@taskany/bricks';
+import {
+    Button,
+    Form,
+    FormActions,
+    FormAction,
+    FormTextarea,
+    ModalContent,
+    FormControl,
+    FormControlInput,
+    nullable,
+    FormControlError,
+} from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
 
 import { errorsProvider } from '../../utils/forms';
@@ -53,13 +64,12 @@ const FeedbackCreateForm: React.FC = () => {
     return (
         <ModalContent>
             <Form disabled={formBusy} onSubmit={handleSubmit(onPending, onError)}>
-                <FormInput
-                    {...register('title')}
-                    placeholder={tr('Feedback title')}
-                    flat="bottom"
-                    brick="right"
-                    error={errorsResolver('title')}
-                />
+                <FormControl flat="bottom" size="l">
+                    <FormControlInput {...register('title')} placeholder={tr('Feedback title')} />
+                    {nullable(errorsResolver('title'), (error) => (
+                        <FormControlError error={error} />
+                    ))}
+                </FormControl>
 
                 <FormTextarea
                     {...register('description')}

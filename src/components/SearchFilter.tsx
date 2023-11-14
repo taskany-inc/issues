@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { debounce } from 'throttle-debounce';
-import { Input } from '@taskany/bricks';
+import { FormControl, FormControlInput } from '@taskany/bricks';
 
 export const SearchFilter: FC<{
     placeholder?: string;
@@ -13,5 +13,9 @@ export const SearchFilter: FC<{
         (e: React.ChangeEvent<HTMLInputElement>) => debouncedSearchHandler(e.currentTarget.value),
         [debouncedSearchHandler],
     );
-    return <Input placeholder={placeholder} defaultValue={defaultValue} onChange={onSearchInputChange} />;
+    return (
+        <FormControl variant="outline">
+            <FormControlInput placeholder={placeholder} defaultValue={defaultValue} onChange={onSearchInputChange} />
+        </FormControl>
+    );
 };

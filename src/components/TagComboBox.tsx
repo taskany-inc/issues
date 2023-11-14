@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, ChangeEvent } from 'react';
-import styled from 'styled-components';
-import { Button, ComboBox, Input, Tag } from '@taskany/bricks';
+import { Button, ComboBox, FormControl, FormControlInput, Tag } from '@taskany/bricks';
 import { IconTagOutline } from '@taskany/icons';
 
 import { trpc } from '../utils/trpcClient';
@@ -23,10 +22,6 @@ interface TagComboBoxProps {
     onChange?: (value: TagObject[]) => void;
     renderTrigger?: React.ComponentProps<typeof ComboBox>['renderTrigger'] & React.HTMLAttributes<HTMLElement>;
 }
-
-const StyledInput = styled(Input)`
-    min-width: 100px;
-`;
 
 export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
     ({ text, value = [], query = '', error, disabled, placeholder, onChange, renderTrigger }, ref) => {
@@ -113,16 +108,18 @@ export const TagComboBox = React.forwardRef<HTMLDivElement, TagComboBoxProps>(
                     )
                 }
                 renderInput={(props) => (
-                    <StyledInput
-                        autoFocus
-                        disabled={props.disabled}
-                        placeholder={placeholder}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            setInputState(e.currentTarget.value);
-                            setCompletionVisibility(true);
-                        }}
-                        {...props}
-                    />
+                    <FormControl variant="outline">
+                        <FormControlInput
+                            autoFocus
+                            disabled={props.disabled}
+                            placeholder={placeholder}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                setInputState(e.currentTarget.value);
+                                setCompletionVisibility(true);
+                            }}
+                            {...props}
+                        />
+                    </FormControl>
                 )}
                 renderItems={(children) => <TagsList>{children as React.ReactNode}</TagsList>}
                 renderItem={(props) => (

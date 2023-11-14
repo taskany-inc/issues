@@ -1,6 +1,5 @@
 import React, { useState, ChangeEvent, useCallback } from 'react';
-import styled from 'styled-components';
-import { Button, UserPic, Input, UserMenuItem, nullable } from '@taskany/bricks';
+import { Button, UserPic, UserMenuItem, nullable, FormControl, FormControlInput } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
@@ -23,10 +22,6 @@ interface UserComboBoxProps {
 
     onChange?: (activity: NonNullable<ActivityByIdReturnType>) => void;
 }
-
-const StyledInput = styled(Input)`
-    min-width: 100px;
-`;
 
 export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
     (
@@ -98,17 +93,19 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                     )
                 }
                 renderInput={(props) => (
-                    <StyledInput
-                        autoFocus
-                        disabled={props.disabled}
-                        placeholder={placeholder}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            setInputState(e.currentTarget.value);
-                            setCompletionVisibility(true);
-                        }}
-                        {...props}
-                        {...comboboxInput.attr}
-                    />
+                    <FormControl variant="outline">
+                        <FormControlInput
+                            autoFocus
+                            disabled={props.disabled}
+                            placeholder={placeholder}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                setInputState(e.currentTarget.value);
+                                setCompletionVisibility(true);
+                            }}
+                            {...props}
+                            {...comboboxInput.attr}
+                        />
+                    </FormControl>
                 )}
                 renderItem={(props) => (
                     <UserMenuItem

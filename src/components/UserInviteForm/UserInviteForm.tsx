@@ -7,7 +7,6 @@ import {
     Button,
     Text,
     Form,
-    FormInput,
     FormAction,
     FormActions,
     FormTitle,
@@ -18,6 +17,9 @@ import {
     TagCleanButton,
     Keyboard,
     nullable,
+    FormControl,
+    FormControlInput,
+    FormControlError,
 } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
@@ -133,16 +135,19 @@ const UserInviteForm: React.FC = () => {
                 </StyledTagsList>
 
                 <Form>
-                    <FormInput
-                        ref={inputRef}
-                        value={inputValue}
-                        error={error}
-                        placeholder={tr('Users emails')}
-                        autoFocus
-                        flat="bottom"
-                        onChange={onInputChange}
-                        onKeyDown={onInputKeyDown}
-                    />
+                    <FormControl flat="bottom" size="l">
+                        <FormControlInput
+                            ref={inputRef}
+                            value={inputValue}
+                            placeholder={tr('Users emails')}
+                            autoFocus
+                            onChange={onInputChange}
+                            onKeyDown={onInputKeyDown}
+                        />
+                        {nullable(error, (err) => (
+                            <FormControlError error={err} />
+                        ))}
+                    </FormControl>
 
                     <FormActions flat="top">
                         <FormAction left />

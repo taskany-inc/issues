@@ -3,18 +3,18 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { gapS } from '@taskany/colors';
 import {
     Button,
     Text,
-    InputContainer,
     Form,
     FormActions,
     FormAction,
     FormTextarea,
-    FormInput,
     ModalContent,
     nullable,
+    FormControl,
+    FormControlInput,
+    FormControlError,
 } from '@taskany/bricks';
 
 import { keyPredictor } from '../../utils/keyPredictor';
@@ -41,17 +41,11 @@ const KeyInput = dynamic(() => import('../KeyInput'));
 
 const StyledProjectTitleContainer = styled.div`
     display: flex;
-    position: relative;
+    align-items: center;
 `;
 
-const StyledProjectKeyContainer = styled.div`
-    position: relative;
-`;
-
-const StyledProjectKeyInputContainer = styled(InputContainer)`
-    box-sizing: border-box;
-    width: fit-content;
-    padding-right: ${gapS};
+const StyledFormControl = styled(FormControl)`
+    flex: 1;
 `;
 
 const ProjectCreateForm: React.FC = () => {
@@ -161,36 +155,34 @@ const ProjectCreateForm: React.FC = () => {
             <ModalContent>
                 <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined} {...projectCreateForm.attr}>
                     <StyledProjectTitleContainer>
-                        <FormInput
-                            {...register('title')}
-                            onChange={titleChangeHandler}
-                            placeholder={tr('Project title')}
-                            flat="bottom"
-                            brick="right"
-                            disabled={busy}
-                            error={errorsResolver('title')}
-                            {...projectTitleInput.attr}
-                        />
+                        <StyledFormControl flat="bottom" brick="right" size="l">
+                            <FormControlInput
+                                {...register('title')}
+                                onChange={titleChangeHandler}
+                                disabled={busy}
+                                placeholder={tr('Project title')}
+                                {...projectTitleInput.attr}
+                            />
+                            {nullable(errorsResolver('title'), (error) => (
+                                <FormControlError error={error} placement="top-start" />
+                            ))}
+                        </StyledFormControl>
 
                         {nullable(titleWatcher, () => (
-                            <StyledProjectKeyContainer>
-                                <Controller
-                                    name="id"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <StyledProjectKeyInputContainer>
-                                            <KeyInput
-                                                disabled={busy}
-                                                available={isKeyUnique && isKeyEnoughLength}
-                                                tooltip={tooltip}
-                                                onDirty={onKeyDirty}
-                                                error={errorsResolver('id')}
-                                                {...field}
-                                            />
-                                        </StyledProjectKeyInputContainer>
-                                    )}
-                                />
-                            </StyledProjectKeyContainer>
+                            <Controller
+                                name="id"
+                                control={control}
+                                render={({ field }) => (
+                                    <KeyInput
+                                        disabled={busy}
+                                        available={isKeyUnique && isKeyEnoughLength}
+                                        tooltip={tooltip}
+                                        onDirty={onKeyDirty}
+                                        error={errorsResolver('id')}
+                                        {...field}
+                                    />
+                                )}
+                            />
                         ))}
                     </StyledProjectTitleContainer>
 
