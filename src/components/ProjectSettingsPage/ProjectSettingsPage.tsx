@@ -5,13 +5,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter as useNextRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
-import { gapM, gapS, gapXs, gray9, warn0 } from '@taskany/colors';
+import { gapM, gapS, gapXs, gray3, gray8, gray9, warn0 } from '@taskany/colors';
 import {
     Button,
     Text,
     Fieldset,
     Form,
-    FormInput,
     FormAction,
     FormActions,
     FormTitle,
@@ -24,6 +23,10 @@ import {
     UserPic,
     Tag,
     Tip,
+    FormControl,
+    FormControlInput,
+    FormControlLabel,
+    FormControlError,
 } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
 
@@ -97,6 +100,22 @@ const StyledTextList = styled(TextList)`
 
 const StyledTextListItem = styled(TextListItem)`
     margin-left: ${gapXs};
+`;
+
+const StyledFormControl = styled(FormControl).attrs({ size: 'l' })`
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    background-color: ${gray3};
+`;
+
+const StyledFormControlLabel = styled(FormControlLabel).attrs({
+    size: 'm',
+    weight: 'bold',
+    color: gray8,
+})`
+    padding: ${gapS};
+    padding-left: ${gapM};
 `;
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
@@ -248,33 +267,40 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 <SettingsCard>
                     <Form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
                         <Fieldset title={tr('General')}>
-                            <FormInput
-                                {...register('id')}
-                                disabled
-                                defaultValue={project.data.id}
-                                label={tr('key')}
-                                autoComplete="off"
-                                flat="bottom"
-                            />
+                            <StyledFormControl flat="bottom">
+                                <StyledFormControlLabel>{tr('key')}:</StyledFormControlLabel>
+                                <FormControlInput
+                                    {...register('id')}
+                                    disabled
+                                    defaultValue={project.data.id}
+                                    autoComplete="off"
+                                />
+                            </StyledFormControl>
 
-                            <FormInput
-                                {...register('title')}
-                                defaultValue={project.data.title}
-                                label={tr('Title')}
-                                autoComplete="off"
-                                flat="bottom"
-                                error={errorsResolver('title')}
-                                {...projectSettingsTitleInput.attr}
-                            />
+                            <StyledFormControl flat="bottom">
+                                <StyledFormControlLabel>{tr('Title')}:</StyledFormControlLabel>
+                                <FormControlInput
+                                    {...register('title')}
+                                    defaultValue={project.data.title}
+                                    autoComplete="off"
+                                    {...projectSettingsTitleInput.attr}
+                                />
+                                {nullable(errorsResolver('title'), (error) => (
+                                    <FormControlError error={error} />
+                                ))}
+                            </StyledFormControl>
 
-                            <FormInput
-                                {...register('description')}
-                                defaultValue={project.data?.description ?? undefined}
-                                label={tr('Description')}
-                                flat="both"
-                                error={errorsResolver('description')}
-                                {...projectSettingsDescriptionInput.attr}
-                            />
+                            <StyledFormControl flat="both">
+                                <StyledFormControlLabel>{tr('Description')}:</StyledFormControlLabel>
+                                <FormControlInput
+                                    {...register('description')}
+                                    defaultValue={project.data?.description ?? undefined}
+                                    {...projectSettingsDescriptionInput.attr}
+                                />
+                                {nullable(errorsResolver('description'), (error) => (
+                                    <FormControlError error={error} />
+                                ))}
+                            </StyledFormControl>
 
                             <Controller
                                 name="parent"
@@ -292,6 +318,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                                 onClick={props.onClick}
                                                 {...projectSettingsParentMultiInputTrigger.attr}
                                             />
+                                        )}
+                                        renderInput={(props) => (
+                                            <FormControl variant="outline">
+                                                <FormControlInput autoFocus {...props} />
+                                            </FormControl>
                                         )}
                                         renderItem={(item) => (
                                             <StyledTag key={item.id}>
@@ -417,13 +448,14 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <br />
 
                     <Form {...projectSettingsDeleteForm.attr}>
-                        <FormInput
-                            flat="bottom"
-                            placeholder={tr('Project key')}
-                            autoComplete="off"
-                            onChange={onConfirmationInputChange}
-                            {...projectSettingsDeleteProjectInput.attr}
-                        />
+                        <FormControl flat="bottom" size="l">
+                            <FormControlInput
+                                placeholder={tr('Project key')}
+                                autoComplete="off"
+                                onChange={onConfirmationInputChange}
+                                {...projectSettingsDeleteProjectInput.attr}
+                            />
+                        </FormControl>
 
                         <FormActions flat="top">
                             <FormAction left />
@@ -467,13 +499,14 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <br />
 
                     <Form {...projectSettingsTransferForm.attr}>
-                        <FormInput
-                            flat="bottom"
-                            placeholder={tr('Project key')}
-                            autoComplete="off"
-                            onChange={onConfirmationInputChange}
-                            {...projectSettingsTransferProjectKeyInput.attr}
-                        />
+                        <FormControl flat="bottom" size="l">
+                            <FormControlInput
+                                placeholder={tr('Project key')}
+                                autoComplete="off"
+                                onChange={onConfirmationInputChange}
+                                {...projectSettingsTransferProjectKeyInput.attr}
+                            />
+                        </FormControl>
                         <FormActions flat="top">
                             <FormAction left>
                                 <UserComboBox

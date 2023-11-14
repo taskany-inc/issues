@@ -1,4 +1,4 @@
-import { Input } from '@taskany/bricks';
+import { FormControl, FormControlInput } from '@taskany/bricks';
 import { IconXSolid } from '@taskany/icons';
 import { useState, useCallback, useEffect } from 'react';
 import InputMask from 'react-input-mask';
@@ -90,7 +90,11 @@ export const EstimateDate: React.FC = () => {
                     value={fullDate}
                 >
                     {/* @ts-ignore incorrect type in react-input-mask */}
-                    {(props) => <Input iconRight={<IconXSolid size="xxs" onClick={onRemoveDate} />} {...props} />}
+                    {(props) => (
+                        <FormControl variant="outline">
+                            <FormControlInput iconRight={<IconXSolid size="xxs" onClick={onRemoveDate} />} {...props} />
+                        </FormControl>
+                    )}
                 </InputMask>
             )}
         />

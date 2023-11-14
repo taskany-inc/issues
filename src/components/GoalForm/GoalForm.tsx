@@ -5,7 +5,6 @@ import { Schema, z } from 'zod';
 import { State, Tag as TagModel } from '@prisma/client';
 import {
     Form,
-    FormInput,
     FormActions,
     FormAction,
     ModalContent,
@@ -13,6 +12,9 @@ import {
     TagCleanButton,
     nullable,
     Button,
+    FormControl,
+    FormControlInput,
+    FormControlError,
 } from '@taskany/bricks';
 import { IconCalendarTickOutline } from '@taskany/icons';
 
@@ -131,15 +133,18 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     return (
         <ModalContent {...attrs}>
             <Form onSubmit={handleSubmit(onSubmit)}>
-                <FormInput
-                    {...register('title')}
-                    error={errorsResolver('title')}
-                    placeholder={tr("Goal's title")}
-                    autoFocus
-                    flat="bottom"
-                    disabled={busy}
-                    {...goalTitleInput.attr}
-                />
+                <FormControl flat="bottom" size="l">
+                    <FormControlInput
+                        {...register('title')}
+                        disabled={busy}
+                        autoFocus
+                        placeholder={tr("Goal's title")}
+                        {...goalTitleInput.attr}
+                    />
+                    {nullable(errorsResolver('title'), (error) => (
+                        <FormControlError error={error} placement="top-start" />
+                    ))}
+                </FormControl>
 
                 <Controller
                     name="description"

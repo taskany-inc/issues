@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components';
-import { AutoCompleteInput } from '@taskany/bricks';
+import { FormControl, FormControlInput } from '@taskany/bricks';
 import { IconSearchOutline } from '@taskany/icons';
 import { gapS } from '@taskany/colors';
 
@@ -10,15 +10,29 @@ const StyledInputWrapper = styled.div`
     margin-bottom: ${gapS};
 `;
 
-interface FilterAutoCompleteInputProps extends React.ComponentProps<typeof AutoCompleteInput> {
-    placeholder?: never;
-    iconLeft?: never;
+interface FilterAutoCompleteInputProps extends Omit<React.ComponentProps<typeof FormControlInput>, 'onChange'> {
+    onChange: (value: string) => void;
 }
 
-export const FilterAutoCompleteInput: React.FC<FilterAutoCompleteInputProps> = (props) => {
+export const FilterAutoCompleteInput: React.FC<FilterAutoCompleteInputProps> = ({ onChange, ...props }) => {
+    const onChangeHandler = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => {
+            onChange(e.target.value);
+        },
+        [onChange],
+    );
+
     return (
         <StyledInputWrapper>
-            <AutoCompleteInput placeholder={tr('Search...')} iconLeft={<IconSearchOutline size="s" />} {...props} />
+            <FormControl variant="outline">
+                <FormControlInput
+                    autoFocus
+                    placeholder={tr('Search...')}
+                    iconLeft={<IconSearchOutline size="s" />}
+                    onChange={onChangeHandler}
+                    {...props}
+                />
+            </FormControl>
         </StyledInputWrapper>
     );
 };

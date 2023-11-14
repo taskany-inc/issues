@@ -5,12 +5,13 @@ import {
     Button,
     Text,
     Form,
-    FormInput,
     FormAction,
     FormActions,
     FormTitle,
     ModalContent,
     ModalHeader,
+    FormControl,
+    FormControlInput,
 } from '@taskany/bricks';
 
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
@@ -70,15 +71,16 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
                 <br />
 
                 <Form {...goalDeleteForm.attr}>
-                    <FormInput
-                        ref={ref}
-                        flat="bottom"
-                        placeholder={shortId}
-                        autoComplete="off"
-                        autoFocus
-                        onChange={onConfirmationInputChange}
-                        {...goalDeleteShortIdInput.attr}
-                    />
+                    <FormControl flat="bottom" size="l">
+                        <FormControlInput
+                            placeholder={shortId}
+                            autoComplete="off"
+                            autoFocus
+                            onChange={onConfirmationInputChange}
+                            ref={ref}
+                            {...goalDeleteShortIdInput.attr}
+                        />
+                    </FormControl>
 
                     <FormActions flat="top">
                         <FormAction left />

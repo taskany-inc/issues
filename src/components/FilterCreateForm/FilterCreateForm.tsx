@@ -1,7 +1,18 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form, FormActions, FormAction, FormTextarea, FormInput, ModalContent } from '@taskany/bricks';
+import {
+    Button,
+    Form,
+    FormActions,
+    FormAction,
+    FormTextarea,
+    ModalContent,
+    FormControl,
+    FormControlInput,
+    FormControlError,
+    nullable,
+} from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
 
 import { errorsProvider } from '../../utils/forms';
@@ -60,13 +71,12 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
         <>
             <ModalContent>
                 <Form disabled={formBusy} onSubmit={handleSubmit(onPending, onError)}>
-                    <FormInput
-                        {...register('title')}
-                        placeholder={tr('Preset title')}
-                        flat="bottom"
-                        brick="right"
-                        error={errorsResolver('title')}
-                    />
+                    <FormControl brick="right" flat="bottom" size="l">
+                        <FormControlInput {...register('title')} placeholder={tr('Preset title')} />
+                        {nullable(errorsResolver('title'), (error) => (
+                            <FormControlError error={error} />
+                        ))}
+                    </FormControl>
 
                     <FormTextarea
                         {...register('description')}
