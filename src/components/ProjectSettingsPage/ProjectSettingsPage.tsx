@@ -65,6 +65,7 @@ import {
     pageHeader,
 } from '../../utils/domObjects';
 import { safeUserData } from '../../utils/getUserName';
+import { ModalContext } from '../ModalOnEvent';
 
 import { ParticipantsFormField } from './ParticipantsFormField';
 import { tr } from './ProjectSettingsPage.i18n';
@@ -100,6 +101,11 @@ const StyledTextListItem = styled(TextListItem)`
     margin-left: ${gapXs};
 `;
 
+const StyledGoalList = styled.div`
+    margin-top: ${gapS};
+    display: flex;
+    flex-direction: column;
+`;
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
     const nextRouter = useNextRouter();
@@ -318,6 +324,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 render={({ field }) => (
                                     <ParticipantsFormField
                                         value={field.value as ActivityByIdReturnType[]}
+                                        projectId={project.data?.id}
                                         onChange={field.onChange}
                                     />
                                 )}
@@ -548,6 +555,44 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                             view="warning"
                             text={tr('Ok, got it')}
                             onClick={dispatchModalEvent(ModalEvent.ProjectCannotDeleteModal)}
+                        />
+                    </StyledModalActions>
+                </ModalContent>
+            </ModalOnEvent>
+
+            <ModalOnEvent view="warn" event={ModalEvent.ParticipantDeleteError}>
+                <ModalHeader>
+                    <FormTitle color={warn0}>{tr('Cannot delete participant now')}</FormTitle>
+                </ModalHeader>
+                <ModalContent>
+                    <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
+                        {tr('The user has actual goals')}
+                    </StyledTip>
+                    <Text size="s">{tr('Before delete a participant, you must move it`s goals to other person:')}</Text>
+                    <ModalContext.Consumer>
+                        {(ctx) => (
+                            <StyledGoalList>
+                                {ctx?.[ModalEvent.ParticipantDeleteError]?.goals.map((goal) => (
+                                    <NextLink
+                                        key={goal._shortId}
+                                        href={routes.goal(goal._shortId)}
+                                        passHref
+                                        legacyBehavior
+                                    >
+                                        <Text size="s" weight="bolder" as="a">
+                                            {goal.title}
+                                        </Text>
+                                    </NextLink>
+                                ))}
+                            </StyledGoalList>
+                        )}
+                    </ModalContext.Consumer>
+                    <StyledModalActions>
+                        <Button
+                            size="m"
+                            view="warning"
+                            text={tr('Ok, got it')}
+                            onClick={dispatchModalEvent(ModalEvent.ParticipantDeleteError)}
                         />
                     </StyledModalActions>
                 </ModalContent>

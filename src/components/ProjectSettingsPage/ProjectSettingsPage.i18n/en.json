@@ -31,5 +31,9 @@
     "Project key": "Project key",
     "Goals": "Goals",
     "Settings": "Settings",
-    "Add participant": "Add participant"
+    "Add participant": "Add participant",
+    "Cannot delete participant now": "Cannot delete participant now",
+    "The user has actual goals": "The participant has goals",
+    "Before delete a participant, you must move it`s goals to other person:": "Before delete a participant, you must move it`s goals to other person:",
+    "Participants": "Participants"
 }

@@ -31,5 +31,9 @@
     "Project key": "Ключ проекта",
     "Goals": "Цели",
     "Settings": "Настройки",
-    "Add participant": "Добавить участника"
+    "Add participant": "Добавить участника",
+    "Cannot delete participant now": "Невозможно удалить участника",
+    "The user has actual goals": "На пользователя назначены цели",
+    "Before delete a participant, you must move it`s goals to other person:": "Перед удалением участника из списка назначте его цели другим пользователям:",
+    "Participants": "Участники"
 }
