@@ -1,4 +1,4 @@
-import { Activity, Ghost, User } from '@prisma/client';
+import { Activity, Ghost, User, StateType } from '@prisma/client';
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
 
@@ -11,7 +11,7 @@ import {
     projectSuggestionsSchema,
     projectDeleteSchema,
 } from '../../src/schema/project';
-import { addCalculatedGoalsFields, goalDeepQuery, goalsFilter } from '../queries/goals';
+import { addCalculatedGoalsFields, goalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
@@ -794,5 +794,36 @@ export const project = router({
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
+        }),
+    getActivityGoals: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                ownerId: z.string(),
+            }),
+        )
+        .use(projectAccessMiddleware)
+        .query(async ({ input: { ownerId, id }, ctx }) => {
+            const { activityId, role } = ctx.session.user;
+
+            return prisma.goal
+                .findMany({
+                    where: {
+                        ownerId,
+                        projectId: id,
+                        state: {
+                            type: {
+                                in: [StateType.InProgress, StateType.NotStarted],
+                            },
+                        },
+                        ...nonArchievedGoalsPartialQuery,
+                    },
+                })
+                .then((goals) =>
+                    goals.map((g) => ({
+                        ...g,
+                        ...addCalculatedGoalsFields(g, activityId, role),
+                    })),
+                );
         }),
 });
