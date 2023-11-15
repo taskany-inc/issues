@@ -125,6 +125,16 @@ services:
             retries: 3
 ```
 
+## Monitoring
+
+### OpenTelemetry
+
+Taskany can send request traces to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector). To use this feature specify the collector endpoint with `OTEL_EXPORTER_OTLP_ENDPOINT`.
+
+⚠️ GRPC protocol is not supported
+
+_(optional)_ Set the `TASKANY_OPEN_TELEMETRY_SERVICE_NAME` environment variable to be the declared service name.
+
 ## Contributing
 
 Please follow [code of conduct](https://github.com/taskany-inc/issues/blob/main/CODE_OF_CONDUCT.md) first. Than use instructions in [contributing guide](https://github.com/taskany-inc/issues/blob/main/CONTRIBUTING.md) to create your first PR.
