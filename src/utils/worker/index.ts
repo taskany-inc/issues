@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import * as Sentry from '@sentry/nextjs';
+import parser from 'cron-parser';
 
-import { JobDataMap, JobKind, jobKind, jobState } from './create';
+import { jobKind, jobState } from './create';
 import * as resolve from './resolve';
 
 const prisma = new PrismaClient();
@@ -28,18 +29,37 @@ console.log('Worker started successfully');
             jobs.forEach(async (job) => {
                 if (job.state === jobState.completed) {
                     setTimeout(async () => {
-                        await prisma.job.delete({ where: { id: job.id } });
+                        if (job.cron) {
+                            await prisma.job.update({
+                                where: { id: job.id },
+                                data: {
+                                    state: jobState.scheduled,
+                                },
+                            });
+                        } else {
+                            await prisma.job.delete({ where: { id: job.id } });
+                        }
                     }, 0);
                 }
 
                 if (job.state === jobState.scheduled) {
+                    if (job.cron) {
+                        const interval = parser.parseExpression(job.cron, {
+                            currentDate: new Date(job.updatedAt),
+                        });
+
+                        if (Number(interval.next().toDate()) > Date.now()) {
+                            return;
+                        }
+                    }
+
                     setTimeout(async () => {
                         await prisma.job.update({ where: { id: job.id }, data: { state: jobState.pending } });
                     }, 0);
 
                     setTimeout(async () => {
                         try {
-                            await resolve[job.kind as jobKind](job.data as JobDataMap[JobKind]);
+                            await resolve[job.kind as jobKind](job.data as any);
                             await prisma.job.update({ where: { id: job.id }, data: { state: jobState.completed } });
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         } catch (error: any) {

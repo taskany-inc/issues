@@ -49,6 +49,7 @@
     "color-layer": "1.0.3",
     "concurrently": "8.2.1",
     "cors": "2.8.5",
+    "cron-parser": "4.9.0",
     "cyrillic-to-translit-js": "3.2.1",
     "dom-objects": "1.2.0",
     "easy-typed-intl": "1.0.3",
