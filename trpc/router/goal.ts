@@ -1214,26 +1214,10 @@ export const goal = router({
                         }),
                     ]);
 
-                    const actualGoal = await prisma.goal.findUnique({
-                        where: { id: input.goalId },
-                        include: {
-                            state: true,
-                            goalAchiveCriteria: {
-                                include: {
-                                    criteriaGoal: {
-                                        include: { state: true },
-                                    },
-                                },
-                            },
-                        },
-                    });
-
-                    if (actualGoal) {
-                        await recalculateCriteriaScore(actualGoal.id)
-                            .recalcCurrentGoalScore()
-                            .recalcAverageProjectScore()
-                            .run();
-                    }
+                    await recalculateCriteriaScore(input.goalId)
+                        .recalcCurrentGoalScore()
+                        .recalcAverageProjectScore()
+                        .run();
                 }
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1266,26 +1250,10 @@ export const goal = router({
                     },
                 });
 
-                const actualGoal = await prisma.goal.findUnique({
-                    where: { id: actualCriteria.goalId },
-                    include: {
-                        state: true,
-                        goalAchiveCriteria: {
-                            include: {
-                                criteriaGoal: {
-                                    include: { state: true },
-                                },
-                            },
-                        },
-                    },
-                });
-
-                if (actualGoal) {
-                    await recalculateCriteriaScore(actualGoal.id)
-                        .recalcCurrentGoalScore()
-                        .recalcAverageProjectScore()
-                        .run();
-                }
+                await recalculateCriteriaScore(actualCriteria.goalId)
+                    .recalcCurrentGoalScore()
+                    .recalcAverageProjectScore()
+                    .run();
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
