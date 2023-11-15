@@ -38,11 +38,16 @@ const StyledButtonWithDropdown = styled.div`
 `;
 
 interface GoalCreateFormProps {
+    project?: {
+        id: string;
+        title: string;
+        flowId: string;
+    };
     title?: string;
     onGoalCreate?: (val: GoalCreateReturnType) => void;
 }
 
-const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) => {
+const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, project }) => {
     const router = useRouter();
     const { user } = usePageContext();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
@@ -128,7 +133,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate }) 
             busy={busy}
             validitySchema={goalCommonSchema}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
-            parent={currentProjectCache || lastProjectCache || undefined}
+            parent={project || currentProjectCache || lastProjectCache || undefined}
             priority={defaultPriority ?? undefined}
             onSubmit={createGoal}
             title={title}

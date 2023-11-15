@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { gapSm } from '@taskany/colors';
+import { gapS } from '@taskany/colors';
 import { IconPlusCircleOutline } from '@taskany/icons';
 
 import { InlineTrigger } from '../InlineTrigger';
@@ -9,20 +9,23 @@ import { createGoalInlineControl } from '../../utils/domObjects';
 import { tr } from './InlineCreateGoalControl.i18n';
 
 interface InlineCreateGoalControl extends React.HTMLAttributes<HTMLDivElement> {
-    projectId: string;
+    project: {
+        id: string;
+        title: string;
+        flowId: string;
+    };
 }
 
 const StyledInlineTriggerWrapper = styled.div`
-    padding-left: ${gapSm};
+    padding: ${gapS};
+    width: fit-content;
 `;
 
-export const InlineCreateGoalControl: React.FC<InlineCreateGoalControl> = ({ projectId, ...attrs }) => (
+export const InlineCreateGoalControl: React.FC<InlineCreateGoalControl> = ({ project, ...attrs }) => (
     <StyledInlineTriggerWrapper {...attrs} {...createGoalInlineControl.attr}>
         <InlineTrigger
             text={tr('Create goal')}
-            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, {
-                id: projectId,
-            })}
+            onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, { project })}
             icon={<IconPlusCircleOutline size="s" />}
         />
     </StyledInlineTriggerWrapper>
