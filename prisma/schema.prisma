@@ -174,43 +174,45 @@ model Priority {
 }
 
 model Goal {
-  id                      String                @id @default(cuid())
-  scopeId                 Int                   @default(1)
-  title                   String
-  description             String
-  kind                    String?
-  key                     Boolean?
-  personal                Boolean?
-  private                 Boolean?
-  archived                Boolean?              @default(false)
-  priority                Priority?             @relation(fields: [priorityId], references: [id])
-  priorityId              String?
-  estimate                DateTime?
-  estimateType            DateType?
-  project                 Project?              @relation("projectGoals", fields: [projectId], references: [id])
-  projectId               String?
-  teamId                  String?
-  state                   State?                @relation("goalState", fields: [stateId], references: [id])
-  stateId                 String?
-  activity                Activity?             @relation("goalIssuer", fields: [activityId], references: [id])
-  activityId              String?
-  owner                   Activity?             @relation("goalOwner", fields: [ownerId], references: [id])
-  ownerId                 String?
-  participants            Activity[]            @relation("goalParticipants")
-  watchers                Activity[]            @relation("goalWatchers")
-  stargizers              Activity[]            @relation("goalStargizers")
-  comments                Comment[]
-  reactions               Reaction[]
-  tags                    Tag[]
-  dependsOn               Goal[]                @relation("dependsOn")
-  blocks                  Goal[]                @relation("dependsOn")
-  relatedTo               Goal[]                @relation("connected")
-  connected               Goal[]                @relation("connected")
-  history                 GoalHistory[]
-  goalAchiveCriteria      GoalAchieveCriteria[] @relation("GoalCriterion")
-  goalAsCriteria          GoalAchieveCriteria?  @relation("GoalAsCriteria")
+  id                 String                @id @default(cuid())
+  scopeId            Int                   @default(1)
+  title              String
+  description        String
+  kind               String?
+  key                Boolean?
+  personal           Boolean?
+  private            Boolean?
+  archived           Boolean?              @default(false)
+  priority           Priority?             @relation(fields: [priorityId], references: [id])
+  priorityId         String?
+  estimate           DateTime?
+  estimateType       DateType?
+  project            Project?              @relation("projectGoals", fields: [projectId], references: [id])
+  projectId          String?
+  teamId             String?
+  state              State?                @relation("goalState", fields: [stateId], references: [id])
+  stateId            String?
+  activity           Activity?             @relation("goalIssuer", fields: [activityId], references: [id])
+  activityId         String?
+  owner              Activity?             @relation("goalOwner", fields: [ownerId], references: [id])
+  ownerId            String?
+  participants       Activity[]            @relation("goalParticipants")
+  watchers           Activity[]            @relation("goalWatchers")
+  stargizers         Activity[]            @relation("goalStargizers")
+  comments           Comment[]
+  reactions          Reaction[]
+  tags               Tag[]
+  dependsOn          Goal[]                @relation("dependsOn")
+  blocks             Goal[]                @relation("dependsOn")
+  relatedTo          Goal[]                @relation("connected")
+  connected          Goal[]                @relation("connected")
+  history            GoalHistory[]
+  goalAchiveCriteria GoalAchieveCriteria[] @relation("GoalCriterion")
+  goalAsCriteria     GoalAchieveCriteria?  @relation("GoalAsCriteria") // drop in next release
+  goalInCriteria     GoalAchieveCriteria[] @relation("GoalInCriteria")
+
   completedCriteriaWeight Int?
-  partnershipProjects     Project[]             @relation("partnershipProjects")
+  partnershipProjects     Project[] @relation("partnershipProjects")
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
@@ -359,14 +361,16 @@ model GoalAchieveCriteria {
   id               String   @id @default(cuid())
   goal             Goal     @relation("GoalCriterion", fields: [goalId], references: [id], onDelete: Cascade)
   goalId           String
-  goalAsCriteria   Goal?    @relation("GoalAsCriteria", fields: [goalIdAsCriteria], references: [id], onDelete: Cascade)
-  goalIdAsCriteria String?  @unique
+  goalAsCriteria   Goal?    @relation("GoalAsCriteria", fields: [goalIdAsCriteria], references: [id], onDelete: Cascade) // drop in next release
+  goalIdAsCriteria String?  @unique // drop in next release
   title            String
   weight           Int
   isDone           Boolean  @default(false)
   activity         Activity @relation(fields: [activityId], references: [id])
   activityId       String
   deleted          Boolean?
+  criteriaGoalId   String? // fill from goalIdAsCriteria column
+  criteriaGoal     Goal?    @relation("GoalInCriteria", fields: [criteriaGoalId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt

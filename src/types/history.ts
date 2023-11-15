@@ -32,7 +32,7 @@ export interface HistoryRecordMeta {
     owner: Activity & { user: User | null; ghost: Ghost | null };
     participants: Activity & { user: User | null; ghost: Ghost | null };
     state: State;
-    criteria: GoalAchieveCriteria & { goalAsCriteria: Goal & { state: State | null } };
+    criteria: GoalAchieveCriteria & { criteriaGoal: Goal & { state: State | null } };
     partnerProject: Project;
     priority: Priority;
 }

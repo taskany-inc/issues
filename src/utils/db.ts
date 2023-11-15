@@ -1,15 +1,16 @@
 import { nanoid } from 'nanoid';
-import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction } from '@prisma/client';
+import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction, StateType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, dependencyKind, exceptionsDependencyKind } from '../schema/goal';
-import { addCalculatedGoalsFields, calcAchievedWeight } from '../../trpc/queries/goals';
+import { addCalculatedGoalsFields } from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
 import { ReactionsMap } from '../types/reactions';
 
 import { prisma } from './prisma';
 import { subjectToEnumValue } from './goalHistory';
 import { safeGetUserName } from './getUserName';
+import { calcAchievedWeight } from './recalculateCriteriaScore';
 
 /**
  * Type-safe wrapper in raw SQL query.
@@ -159,7 +160,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
                         return prisma.goalAchieveCriteria.findMany({
                             where: query.where,
                             include: {
-                                goalAsCriteria: {
+                                criteriaGoal: {
                                     include: {
                                         state: true,
                                     },
@@ -334,57 +335,6 @@ export const makeGoalRelationMap = <T extends Goal>(
     }));
 };
 
-export const updateGoalWithCalculatedWeight = async (goalId: string) => {
-    const criteriaList = await prisma.goalAchieveCriteria.findMany({
-        where: {
-            goalId,
-            OR: [
-                {
-                    deleted: false,
-                },
-                {
-                    deleted: null,
-                },
-            ],
-        },
-        include: {
-            goalAsCriteria: {
-                include: {
-                    state: true,
-                },
-            },
-        },
-    });
-
-    try {
-        await prisma.$transaction(async (ctx) => {
-            // update goal score by criteria list
-            const updatedGoal = await ctx.goal.update({
-                where: { id: goalId },
-                data: {
-                    completedCriteriaWeight: criteriaList.length ? calcAchievedWeight(criteriaList) : null,
-                },
-            });
-
-            if (!updatedGoal) {
-                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
-            }
-
-            // update project score after goal score update
-            if (updatedGoal.projectId) {
-                await ctx.$executeRaw`
-                    UPDATE "Project"
-                    SET "averageScore" = (SELECT AVG("completedCriteriaWeight") FROM "Goal"
-                        WHERE "projectId" = ${updatedGoal.projectId} AND "archived" IS NOT true)
-                    WHERE "id" = ${updatedGoal.projectId};
-                `;
-            }
-        });
-    } catch (error: any) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', cause: error, message: error?.message });
-    }
-};
-
 export const updateLinkedGoalsByProject = async (projectId: string, activityId: string) => {
     // current projects's goals
     const goalIds = await prisma.goal.findMany({
@@ -429,9 +379,14 @@ export const updateLinkedGoalsByProject = async (projectId: string, activityId: 
                 // mark criterias with these goals as deleted
                 const updateCriterias = ctx.goalAchieveCriteria.updateMany({
                     where: {
-                        goalIdAsCriteria: {
-                            in: goalIds.map(({ id }) => id),
-                        },
+                        OR: [
+                            {
+                                criteriaGoalId: { in: goalIds.map(({ id }) => id) },
+                            },
+                            {
+                                goalIdAsCriteria: { in: goalIds.map(({ id }) => id) },
+                            },
+                        ],
                     },
                     data: { deleted: true },
                 });
@@ -439,41 +394,46 @@ export const updateLinkedGoalsByProject = async (projectId: string, activityId: 
                 await Promise.all([archiveGoals, createHistoryRecords, updateCriterias]);
 
                 // get all goals which current project's goals as criteria
-                const linkedGoalsWithCriteria = await ctx.goal.findMany({
+                const res = await ctx.goalAchieveCriteria.findMany({
                     where: {
-                        goalAchiveCriteria: {
-                            some: {
+                        OR: [
+                            {
+                                criteriaGoalId: { in: goalIds.map(({ id }) => id) },
+                            },
+                            {
                                 goalIdAsCriteria: { in: goalIds.map(({ id }) => id) },
                             },
-                        },
+                        ],
                     },
-                    select: {
-                        id: true,
-                        goalAchiveCriteria: {
-                            include: {
-                                goalAsCriteria: {
-                                    include: { state: true },
-                                },
-                            },
+                    include: {
+                        criteriaGoal: {
+                            include: { state: true },
+                        },
+                        goal: {
+                            include: { state: true },
                         },
                     },
                 });
 
-                if (linkedGoalsWithCriteria.length) {
-                    const inFilter = Prisma.join(linkedGoalsWithCriteria.map(({ id }) => id));
+                const linkedGoals = res.reduce<Record<string, Array<(typeof res)[number]>>>((acc, criteria) => {
+                    if (!acc[criteria.goalId]) {
+                        acc[criteria.goalId] = [];
+                    }
+
+                    acc[criteria.goalId].push(criteria);
+
+                    return acc;
+                }, {});
+
+                if (Object.keys(linkedGoals).length) {
+                    const inFilter = Prisma.join(Object.keys(linkedGoals));
                     const values = Prisma.join(
-                        linkedGoalsWithCriteria.map((value) =>
-                            Prisma.join([value.id, calcAchievedWeight(value.goalAchiveCriteria)], ',', '(', ')'),
+                        Object.entries(linkedGoals).map(([id, list]) =>
+                            Prisma.join([id, calcAchievedWeight(list)], ',', '(', ')'),
                         ),
                     );
 
                     const tempTableValues = Prisma.sql`(VALUES${values}) AS criteria(goalId, score)`;
-                    const tempSelectScoreGoals = Prisma.sql`
-                        SELECT avg(g."completedCriteriaWeight") AS score, g."projectId" AS "projectId"
-                            FROM "Goal" AS g
-                            WHERE g.id IN (${inFilter}) AND g.archived IS NOT TRUE
-                            GROUP BY g."projectId"
-                    `;
 
                     // update goal score after mark criteria as deleted
                     await ctx.$executeRaw`
@@ -483,11 +443,32 @@ export const updateLinkedGoalsByProject = async (projectId: string, activityId: 
                         WHERE goal.id = criteria.goalId;
                     `;
 
+                    const projectsToUpdate = Prisma.sql`
+                        SELECT DISTINCT g."projectId" FROM "Goal" as g
+                        WHERE g.id IN (${inFilter}) AND g."archived" IS NOT TRUE
+                    `;
+
                     // recalc average affected projects score
                     await ctx.$executeRaw`
                         UPDATE "Project" AS project
                             SET "averageScore" = goal."score"
-                            FROM (${tempSelectScoreGoals}) AS goal
+                            FROM (
+                                SELECT
+                                    g."projectId",
+                                    AVG(
+                                        CASE
+                                            WHEN g."completedCriteriaWeight" IS NOT NULL AND g."completedCriteriaWeight" > 0 THEN g."completedCriteriaWeight"
+                                            WHEN state.type = '${Prisma.raw(
+                                                StateType.Completed,
+                                            )}' AND g."completedCriteriaWeight" IS NULL THEN 100
+                                            ELSE 0
+                                        END
+                                    )::int
+                                FROM "Goal" AS g
+                                INNER JOIN "State" AS state ON state.id = g."stateId"
+                                WHERE g."projectId" IN (${projectsToUpdate}) AND g.archived IS NOT TRUE
+                                GROUP BY 1
+                            ) AS goal("projectId", score)
                             WHERE project.id = goal."projectId";
                         `;
                 }
