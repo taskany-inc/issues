@@ -19,7 +19,11 @@ export enum ModalEvent {
 
 export interface MapModalToComponentProps {
     [ModalEvent.GoalCreateModal]: {
-        id?: string;
+        project?: {
+            id: string;
+            title: string;
+            flowId: string;
+        };
         title?: string;
         onGoalCreate?: (goal: GoalCreateReturnType) => void;
     };
