@@ -10,6 +10,7 @@ export enum jobState {
 
 export enum jobKind {
     email = 'email',
+    cron = 'cron',
 }
 
 type Templates = typeof templates;
@@ -19,6 +20,9 @@ export interface JobDataMap {
         template: keyof Templates;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: any;
+    };
+    cron: {
+        template: 'goalPing';
     };
 }
 
