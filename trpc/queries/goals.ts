@@ -2,6 +2,7 @@ import { Goal, GoalAchieveCriteria, Prisma, Role, State, StateType } from '@pris
 
 import { QueryWithFilters } from '../../src/schema/common';
 import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
+import { calcAchievedWeight } from '../../src/utils/recalculateCriteriaScore';
 
 const defaultOrderBy = {
     updatedAt: 'desc',
@@ -385,7 +386,7 @@ export const goalDeepQuery = {
     },
     goalAchiveCriteria: {
         include: {
-            goalAsCriteria: {
+            criteriaGoal: {
                 include: {
                     activity: {
                         include: {
@@ -405,6 +406,9 @@ export const goalDeepQuery = {
         },
         orderBy: {
             createdAt: 'asc',
+        },
+        where: {
+            deleted: { not: true },
         },
     },
     dependsOn: {
@@ -550,45 +554,6 @@ export const goalDeepQuery = {
     },
 } as const;
 
-const maxPossibleCriteriaWeight = 100;
-
-export const calcAchievedWeight = (
-    list: (GoalAchieveCriteria & { goalAsCriteria: (Goal & { state: State | null }) | null })[],
-): number => {
-    const { achivedWithWeight, comletedWithoutWeight, anyWithoutWeight, allWeight } = list.reduce(
-        (acc, value) => {
-            // `where` filter by `deleted` field doesn't work in *Many queries
-            if (value.deleted) {
-                return acc;
-            }
-
-            acc.allWeight += value.weight;
-
-            if (!value.weight) {
-                acc.anyWithoutWeight += 1;
-            }
-            if (value.isDone || (value.goalAsCriteria && value.goalAsCriteria.state?.type === StateType.Completed)) {
-                acc.achivedWithWeight += value.weight;
-
-                if (!value.weight) {
-                    acc.comletedWithoutWeight += 1;
-                }
-            }
-
-            return acc;
-        },
-        { achivedWithWeight: 0, comletedWithoutWeight: 0, anyWithoutWeight: 0, allWeight: 0 },
-    );
-
-    const remainingtWeight = maxPossibleCriteriaWeight - allWeight;
-    const quantityByWeightlessCriteria = anyWithoutWeight > 0 ? remainingtWeight / anyWithoutWeight : 0;
-
-    return Math.min(
-        achivedWithWeight + Math.ceil(quantityByWeightlessCriteria * comletedWithoutWeight),
-        maxPossibleCriteriaWeight,
-    );
-};
-
 export const addCalculatedGoalsFields = (goal: any, activityId: string, role: Role) => {
     const _isOwner = goal.ownerId === activityId;
     const _isParticipant = goal.participants?.some((participant: any) => participant?.id === activityId);
@@ -598,8 +563,22 @@ export const addCalculatedGoalsFields = (goal: any, activityId: string, role: Ro
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
     const _hasAchievementCriteria = !!goal.goalAchiveCriteria?.length;
     const _achivedCriteriaWeight: number | null =
-        goal.completedCriteriaWeight == null && goal.goalAchieveCriteria
-            ? calcAchievedWeight(goal.goalAchieveCriteria)
+        goal.completedCriteriaWeight == null && goal.goalAchieveCriteria?.length
+            ? calcAchievedWeight(
+                  goal.goalAchieveCriteria.map(
+                      ({
+                          weight,
+                          isDone,
+                          deleted,
+                          criteriaGoal,
+                      }: GoalAchieveCriteria & { criteriaGoal: (Goal & { state: State | null }) | null }) => ({
+                          weight,
+                          isDone,
+                          deleted,
+                          goalState: criteriaGoal?.state?.type,
+                      }),
+                  ),
+              )
             : goal.completedCriteriaWeight;
 
     let parentOwner = false;

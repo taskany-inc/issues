@@ -103,7 +103,7 @@ interface CriteriaAsGoalProps extends GoalCriteriaItemProps {
 function criteriaGuard(props: unknown): props is CriteriaAsGoalProps['item'] {
     if (typeof props === 'object' && props != null) {
         return (
-            ('goalIdAsCriteria' in props && props.goalIdAsCriteria != null) ||
+            ('criteriaGoalId' in props && props.criteriaGoalId != null) ||
             ('projectId' in props && props.projectId != null)
         );
     }
@@ -170,12 +170,12 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
         },
         [onClick],
     );
-    const itemToRender: Partial<GoalAchiveCriteria['goalAsCriteria'] & { shortId: string; weight: number }> =
+    const itemToRender: Partial<GoalAchiveCriteria['criteriaGoal'] & { shortId: string; weight: number }> =
         useMemo(() => {
-            if (item.goalAsCriteria) {
+            if (item.criteriaGoal) {
                 return {
-                    ...item.goalAsCriteria,
-                    shortId: `${item.goalAsCriteria.projectId}-${item.goalAsCriteria.scopeId}`,
+                    ...item.criteriaGoal,
+                    shortId: `${item.criteriaGoal.projectId}-${item.criteriaGoal.scopeId}`,
                     weight: item.weight,
                 };
             }
