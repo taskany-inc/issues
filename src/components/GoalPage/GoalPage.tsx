@@ -85,8 +85,8 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
     const onGoalCriteriaClick = useCallback(
         (item: GoalAchiveCriteria) => {
-            if (item.goalAsCriteria) {
-                const { projectId, scopeId, title, description, updatedAt } = item.goalAsCriteria;
+            if (item.criteriaGoal) {
+                const { projectId, scopeId, title, description, updatedAt } = item.criteriaGoal;
                 const shortId = `${projectId}-${scopeId}`;
 
                 setPreview(shortId, {

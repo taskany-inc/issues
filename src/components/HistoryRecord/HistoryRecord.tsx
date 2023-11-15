@@ -455,20 +455,20 @@ export const HistoryRecordParticipant: React.FC<
 );
 
 type CriteriaItem = GoalAchieveCriteria & {
-    goalAsCriteria: (Goal & { state: StateData | null }) | null;
+    criteriaGoal: (Goal & { state: StateData | null }) | null;
     strike?: boolean;
 };
 
-const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ goalAsCriteria, title, strike }) => {
-    if (goalAsCriteria) {
+const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title, strike }) => {
+    if (criteriaGoal) {
         return (
             <StyledIssueListItem
                 strike={strike}
                 size="xs"
                 issue={{
-                    title: goalAsCriteria.title,
-                    _shortId: `${goalAsCriteria.projectId}-${goalAsCriteria.scopeId}`,
-                    id: goalAsCriteria.id,
+                    title: criteriaGoal.title,
+                    _shortId: `${criteriaGoal.projectId}-${criteriaGoal.scopeId}`,
+                    id: criteriaGoal.id,
                 }}
             />
         );
@@ -494,7 +494,7 @@ export const HistoryRecordCriteria: React.FC<
     useEffect(() => {
         recordCtx.setSubjectText((prev) => {
             const target = from || to;
-            if (target?.goalAsCriteria != null) {
+            if (target?.criteriaGoal != null) {
                 if (isChangeAction) {
                     if (action === 'complete') {
                         return 'goalComplete';
@@ -521,7 +521,7 @@ export const HistoryRecordCriteria: React.FC<
             to={nullable(to, (val) => (
                 <>
                     <HistoryRecordCriteriaItem {...val} strike={action === 'remove'} />
-                    {val?.goalAsCriteria && <Text size="xs">{tr('as criteria')}</Text>}
+                    {val?.criteriaGoal && <Text size="xs">{tr('as criteria')}</Text>}
                     {nullable(isChangeAction, () => (
                         <Text size="xs">{tr(action === 'complete' ? 'as completed' : 'as uncompleted')}</Text>
                     ))}

@@ -18,12 +18,7 @@ import {
     batchGoalByProjectIdSchema,
     togglePartnerProjectSchema,
 } from '../../src/schema/goal';
-import {
-    ToggleSubscriptionSchema,
-    suggestionsQuerySchema,
-    queryWithFiltersSchema,
-    batchGoalsSchema,
-} from '../../src/schema/common';
+import { ToggleSubscriptionSchema, suggestionsQuerySchema, batchGoalsSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import {
     createGoal,
@@ -31,7 +26,6 @@ import {
     getGoalHistory,
     mixHistoryWithComments,
     makeGoalRelationMap,
-    updateGoalWithCalculatedWeight,
     goalHistorySeparator,
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
@@ -47,6 +41,7 @@ import type { FieldDiff } from '../../src/types/common';
 import { encodeHistoryEstimate, formateEstimate } from '../../src/utils/dateTime';
 import { goalAccessMiddleware, commentAccessMiddleware, criteriaAccessMiddleware } from '../access/accessMiddlewares';
 import { addCalculatedProjectFields, nonArchivedPartialQuery } from '../queries/project';
+import { recalculateCriteriaScore, goalIncludeCriteriaParams } from '../../src/utils/recalculateCriteriaScore';
 
 const updateProjectUpdatedAt = async (id?: string | null) => {
     if (!id) return;
@@ -194,7 +189,7 @@ export const goal = router({
                     ...goalDeepQuery,
                     goalAchiveCriteria: {
                         include: {
-                            goalAsCriteria: {
+                            criteriaGoal: {
                                 include: {
                                     activity: {
                                         include: {
@@ -332,9 +327,12 @@ export const goal = router({
                     },
                     include: {
                         ...goalDeepQuery,
+                        goalInCriteria: goalIncludeCriteriaParams,
                     },
                 });
                 await updateProjectUpdatedAt(goal.projectId);
+
+                await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
 
                 // TODO: goal was moved
 
@@ -364,7 +362,7 @@ export const goal = router({
                     owner: { include: { user: true, ghost: true } },
                     project: true,
                     tags: true,
-                    goalAsCriteria: true,
+                    goalInCriteria: true,
                     priority: true,
                 },
             });
@@ -485,23 +483,26 @@ export const goal = router({
                                 data: history.map((record) => ({ ...record, activityId })),
                             },
                         },
-                        goalAsCriteria: actualGoal.goalAsCriteria
-                            ? {
-                                  update: {
-                                      isDone: input.state.type === StateType.Completed,
-                                  },
-                              }
-                            : undefined,
+                        goalInCriteria: {
+                            updateMany: {
+                                where: {
+                                    id: { in: actualGoal.goalInCriteria.map(({ id }) => id) },
+                                },
+                                data: {
+                                    isDone: input.state.type === StateType.Completed,
+                                },
+                            },
+                        },
                     },
                     include: {
                         ...goalDeepQuery,
-                        goalAsCriteria: true,
+                        goalInCriteria: goalIncludeCriteriaParams,
                     },
                 });
                 await updateProjectUpdatedAt(actualGoal?.projectId);
 
-                if (goal.goalAsCriteria) {
-                    await updateGoalWithCalculatedWeight(goal.goalAsCriteria.goalId);
+                if (actualGoal.stateId !== goal.stateId) {
+                    await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
                 }
 
                 const recipients = Array.from(
@@ -621,11 +622,17 @@ export const goal = router({
                             },
                         },
                     },
+                    include: {
+                        state: true,
+                        goalInCriteria: goalIncludeCriteriaParams,
+                    },
                 });
 
                 if (updatedGoal) {
-                    await updateProjectUpdatedAt(updatedGoal.projectId);
-                    await updateGoalWithCalculatedWeight(updatedGoal.id);
+                    await recalculateCriteriaScore(updatedGoal.id)
+                        .recalcLinkedGoalsScores()
+                        .recalcAverageProjectScore()
+                        .run();
                 }
 
                 const recipients = Array.from(
@@ -666,7 +673,7 @@ export const goal = router({
                     activity: { include: { user: true, ghost: true } },
                     owner: { include: { user: true, ghost: true } },
                     state: true,
-                    goalAsCriteria: true,
+                    goalInCriteria: true,
                     project: true,
                 },
             });
@@ -696,36 +703,37 @@ export const goal = router({
                                 activityId,
                             },
                         },
-                        goalAsCriteria: actualGoal.goalAsCriteria
-                            ? {
-                                  update: {
-                                      isDone: input.state.type === StateType.Completed,
-                                  },
-                              }
-                            : undefined,
+                        goalInCriteria: {
+                            updateMany: {
+                                where: {
+                                    id: { in: actualGoal.goalInCriteria.map(({ id }) => id) },
+                                },
+                                data: { isDone: input.state.type === StateType.Completed },
+                            },
+                        },
                     },
                     include: {
-                        goalAsCriteria: true,
                         state: true,
+                        goalInCriteria: goalIncludeCriteriaParams,
                     },
                 }),
             ];
 
             // recording complete state for linked as criteria goal
-            if (actualGoal.goalAsCriteria && actualGoal.state) {
+            if (actualGoal.goalInCriteria.length && actualGoal.state) {
                 const earlyIsCompleted = actualGoal.state.type === StateType.Completed;
                 const nowIsCompleted = input.state.type === StateType.Completed;
 
                 if (earlyIsCompleted !== nowIsCompleted) {
                     promises.push(
-                        prisma.goalHistory.create({
-                            data: {
-                                goalId: actualGoal.goalAsCriteria.goalId,
+                        prisma.goalHistory.createMany({
+                            data: actualGoal.goalInCriteria.map(({ goalId, id }) => ({
+                                goalId,
+                                nextValue: id,
                                 subject: 'criteria',
                                 action: nowIsCompleted ? 'complete' : 'uncomplete',
-                                nextValue: actualGoal.goalAsCriteria.id,
                                 activityId,
-                            },
+                            })),
                         }),
                     );
                 }
@@ -734,9 +742,10 @@ export const goal = router({
             try {
                 const [updatedGoal] = await Promise.all(promises);
 
-                if (updatedGoal.goalAsCriteria) {
-                    await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
-                }
+                await recalculateCriteriaScore(updatedGoal.id)
+                    .recalcLinkedGoalsScores()
+                    .recalcAverageProjectScore()
+                    .run();
 
                 const recipients = Array.from(
                     new Set(
@@ -780,7 +789,7 @@ export const goal = router({
                     owner: { include: { user: true, ghost: true } },
                     state: true,
                     project: true,
-                    goalAsCriteria: true,
+                    goalInCriteria: true,
                 },
             }),
             input.stateId ? prisma.state.findUnique({ where: { id: input.stateId } }) : Promise.resolve(undefined),
@@ -800,13 +809,16 @@ export const goal = router({
                     data: {
                         id: input.goalId,
                         stateId: _isEditable ? pushState?.id : actualGoal.stateId,
-                        goalAsCriteria: actualGoal.goalAsCriteria
-                            ? {
-                                  update: {
-                                      isDone: _isEditable && pushState?.type && pushState?.type === StateType.Completed,
-                                  },
-                              }
-                            : undefined,
+                        goalInCriteria: {
+                            updateMany: {
+                                where: {
+                                    id: { in: actualGoal.goalInCriteria.map(({ id }) => id) },
+                                },
+                                data: {
+                                    isDone: _isEditable && pushState?.type && pushState?.type === StateType.Completed,
+                                },
+                            },
+                        },
                         history:
                             _isEditable && input.stateId && input.stateId !== actualGoal.stateId
                                 ? {
@@ -825,7 +837,7 @@ export const goal = router({
                         },
                     },
                     include: {
-                        goalAsCriteria: true,
+                        goalInCriteria: goalIncludeCriteriaParams,
                         state: true,
                     },
                 }),
@@ -848,8 +860,11 @@ export const goal = router({
             ]);
             await updateProjectUpdatedAt(updatedGoal.projectId);
 
-            if (updatedGoal.goalAsCriteria) {
-                await updateGoalWithCalculatedWeight(updatedGoal.goalAsCriteria.goalId);
+            if (_isEditable && input.stateId !== updatedGoal.stateId) {
+                await recalculateCriteriaScore(updatedGoal.id)
+                    .recalcLinkedGoalsScores()
+                    .recalcAverageProjectScore()
+                    .run();
             }
 
             const recipients = Array.from(
@@ -968,7 +983,8 @@ export const goal = router({
                         goal: {
                             connect: { id: input.goalId },
                         },
-                        goalAsCriteria: input.goalAsGriteria?.id
+                        // TODO: rename validate field
+                        criteriaGoal: input.goalAsGriteria?.id
                             ? {
                                   connect: { id: input.goalAsGriteria.id },
                               }
@@ -995,8 +1011,26 @@ export const goal = router({
                     },
                 });
 
-                await updateGoalWithCalculatedWeight(newCriteria.goalId);
-                await updateProjectUpdatedAt(actualGoal.projectId);
+                const actualGoal = await prisma.goal.findUnique({
+                    where: { id: input.goalId },
+                    include: {
+                        state: true,
+                        goalAchiveCriteria: {
+                            include: {
+                                criteriaGoal: {
+                                    include: { state: true },
+                                },
+                            },
+                        },
+                    },
+                });
+
+                if (actualGoal) {
+                    await recalculateCriteriaScore(actualGoal.id)
+                        .recalcCurrentGoalScore()
+                        .recalcAverageProjectScore()
+                        .run();
+                }
 
                 return newCriteria;
             } catch (error: any) {
@@ -1027,35 +1061,43 @@ export const goal = router({
                     isDoneByConnect = connectedGoal?.state?.type === StateType.Completed;
                 }
 
-                const updatedCriteria = await prisma.goalAchieveCriteria.create({
-                    data: {
-                        title: input.title,
-                        weight: Number(input.weight),
-                        isDone: isDoneByConnect == null ? currentCriteria.isDone : isDoneByConnect,
-                        activity: {
-                            connect: {
-                                id: ctx.session.user.activityId,
+                const [updatedCriteria] = await Promise.all([
+                    prisma.goalAchieveCriteria.create({
+                        data: {
+                            title: input.title,
+                            weight: Number(input.weight),
+                            isDone: isDoneByConnect == null ? currentCriteria.isDone : isDoneByConnect,
+                            activity: {
+                                connect: {
+                                    id: ctx.session.user.activityId,
+                                },
                             },
+                            goal: {
+                                connect: { id: input.goalId },
+                            },
+                            criteriaGoal: input.goalAsGriteria?.id
+                                ? {
+                                      connect: { id: input.goalAsGriteria.id },
+                                  }
+                                : undefined,
+                            // TODO: remove after change scheme
+                            goalAsCriteria: input.goalAsGriteria?.id
+                                ? {
+                                      connect: { id: input.goalAsGriteria.id },
+                                  }
+                                : undefined,
+                            createdAt: currentCriteria.createdAt,
                         },
-                        goal: {
-                            connect: { id: input.goalId },
-                        },
-                        goalAsCriteria: input.goalAsGriteria?.id
-                            ? {
-                                  connect: { id: input.goalAsGriteria.id },
-                              }
-                            : undefined,
-                        createdAt: currentCriteria.createdAt,
-                    },
-                });
-
-                const [, , actualGoal] = await Promise.all([
+                    }),
                     prisma.goalAchieveCriteria.update({
                         where: { id: currentCriteria.id },
                         data: {
                             deleted: true,
                         },
                     }),
+                ]);
+
+                const [, actualGoal] = await Promise.all([
                     prisma.goalHistory.create({
                         data: {
                             previousValue: currentCriteria.id,
@@ -1074,13 +1116,26 @@ export const goal = router({
                             },
                         },
                     }),
-                    prisma.goal.findUnique({ where: { id: input.goalId } }),
+                    prisma.goal.findUnique({
+                        where: { id: input.goalId },
+                        include: {
+                            state: true,
+                            goalAchiveCriteria: {
+                                include: {
+                                    criteriaGoal: {
+                                        include: { state: true },
+                                    },
+                                },
+                            },
+                        },
+                    }),
                 ]);
 
-                await updateProjectUpdatedAt(actualGoal?.projectId);
-
-                if (updatedCriteria) {
-                    await updateGoalWithCalculatedWeight(updatedCriteria.goalId);
+                if (actualGoal) {
+                    await recalculateCriteriaScore(actualGoal.id)
+                        .recalcCurrentGoalScore()
+                        .recalcAverageProjectScore()
+                        .run();
                 }
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1099,7 +1154,7 @@ export const goal = router({
                     throw Error('No current criteria');
                 }
 
-                const [, , actualGoal] = await Promise.all([
+                await Promise.all([
                     prisma.goalAchieveCriteria.update({
                         where: { id: input.id },
                         data: { isDone: input.isDone },
@@ -1117,13 +1172,12 @@ export const goal = router({
                             },
                         },
                     }),
-                    prisma.goal.findUnique({ where: { id: currentCriteria.goalId } }),
                 ]);
 
-                await updateProjectUpdatedAt(actualGoal?.projectId);
-
-                // update goal criteria weight
-                await updateGoalWithCalculatedWeight(currentCriteria.goalId);
+                await recalculateCriteriaScore(currentCriteria.goalId)
+                    .recalcCurrentGoalScore()
+                    .recalcAverageProjectScore()
+                    .run();
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
@@ -1138,7 +1192,7 @@ export const goal = router({
 
             try {
                 if (current) {
-                    const [, , actualGoal] = await Promise.all([
+                    await Promise.all([
                         prisma.goalAchieveCriteria.update({
                             where: { id: input.id },
                             data: {
@@ -1158,11 +1212,28 @@ export const goal = router({
                                 },
                             },
                         }),
-                        prisma.goal.findUnique({ where: { id: input.goalId } }),
                     ]);
 
-                    await updateGoalWithCalculatedWeight(current.goalId);
-                    await updateProjectUpdatedAt(actualGoal?.projectId);
+                    const actualGoal = await prisma.goal.findUnique({
+                        where: { id: input.goalId },
+                        include: {
+                            state: true,
+                            goalAchiveCriteria: {
+                                include: {
+                                    criteriaGoal: {
+                                        include: { state: true },
+                                    },
+                                },
+                            },
+                        },
+                    });
+
+                    if (actualGoal) {
+                        await recalculateCriteriaScore(actualGoal.id)
+                            .recalcCurrentGoalScore()
+                            .recalcAverageProjectScore()
+                            .run();
+                    }
                 }
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1181,19 +1252,40 @@ export const goal = router({
                     return null;
                 }
 
-                const [, actualGoal] = await Promise.all([
-                    prisma.goalAchieveCriteria.update({
-                        where: { id: input.id },
-                        data: {
-                            title: input.title,
-                            goalAsCriteria: {
-                                connect: { id: input.goalAsCriteria.id },
+                await prisma.goalAchieveCriteria.update({
+                    where: { id: input.id },
+                    data: {
+                        title: input.title,
+                        criteriaGoal: {
+                            connect: { id: input.goalAsCriteria.id },
+                        },
+                        // TODO remove after change validation scheme
+                        goalAsCriteria: {
+                            connect: { id: input.goalAsCriteria.id },
+                        },
+                    },
+                });
+
+                const actualGoal = await prisma.goal.findUnique({
+                    where: { id: actualCriteria.goalId },
+                    include: {
+                        state: true,
+                        goalAchiveCriteria: {
+                            include: {
+                                criteriaGoal: {
+                                    include: { state: true },
+                                },
                             },
                         },
-                    }),
-                    prisma.goal.findUnique({ where: { id: actualCriteria.goalId } }),
-                ]);
-                await updateProjectUpdatedAt(actualGoal?.projectId);
+                    },
+                });
+
+                if (actualGoal) {
+                    await recalculateCriteriaScore(actualGoal.id)
+                        .recalcCurrentGoalScore()
+                        .recalcAverageProjectScore()
+                        .run();
+                }
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
@@ -1524,79 +1616,5 @@ export const goal = router({
                     cause: error,
                 });
             }
-        }),
-    getGoalList: protectedProcedure
-        .input(
-            z.object({
-                query: queryWithFiltersSchema.optional(),
-                limit: z.number(),
-                cursor: z.string().nullish(),
-                skip: z.number().optional(),
-                grouped: z.boolean().optional(),
-            }),
-        )
-        .query(async ({ input, ctx }) => {
-            const { cursor, limit, query, skip, grouped: _ } = input;
-            const { activityId, role } = ctx.session.user;
-
-            const countGetter = prisma.goal.count();
-            const projectsGetter = prisma.project.findMany({
-                select: { id: true, parent: { select: { id: true } }, children: { select: { id: true } } },
-            });
-            const goalsGetter = prisma.goal.findMany({
-                take: limit + 1,
-                skip,
-                cursor: cursor ? { id: cursor } : undefined,
-                ...(query ? goalsFilter(query, activityId) : {}),
-                orderBy: {
-                    id: 'asc',
-                },
-                include: {
-                    ...goalDeepQuery,
-                },
-            });
-
-            const [goals, projects, count] = await Promise.all([goalsGetter, projectsGetter, countGetter]);
-
-            let nextCursor: typeof cursor | undefined;
-
-            if (goals.length > limit) {
-                const nextItem = goals.pop(); // return the last item from the array
-                nextCursor = nextItem?.id;
-            }
-
-            const _projectsMap = projects.reduce<Record<string, { parent?: string[]; children?: string[] }>>(
-                (acc, project) => {
-                    acc[project.id] = {
-                        parent: project.parent.map(({ id }) => id),
-                        children: project.children.map(({ id }) => id),
-                    };
-
-                    for (const p of project.parent) {
-                        acc[p.id] = {
-                            children: [project.id],
-                        };
-                    }
-
-                    for (const p of project.children) {
-                        acc[p.id] = {
-                            parent: [project.id],
-                        };
-                    }
-
-                    return acc;
-                },
-                {},
-            );
-
-            return {
-                items: goals.map((g) => ({
-                    ...g,
-                    ...addCalculatedGoalsFields(g, activityId, role),
-                    _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
-                })),
-                nextCursor,
-                meta: { count },
-            };
         }),
 });
