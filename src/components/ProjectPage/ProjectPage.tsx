@@ -79,7 +79,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         };
     }, [on, utils.project.getDeepInfo, utils.project.getById]);
 
-    const onGoalPrewiewShow = useCallback(
+    const onGoalPreviewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
@@ -192,9 +192,10 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 {nullable(project, (p) => (
                     <ProjectListItemConnected
                         key={p.id}
+                        visible
                         project={p}
                         onTagClick={setTagsFilterOutside}
-                        onClickProvider={onGoalPrewiewShow}
+                        onClickProvider={onGoalPreviewShow}
                         selectedResolver={selectedGoalResolver}
                         queryState={queryState}
                     />

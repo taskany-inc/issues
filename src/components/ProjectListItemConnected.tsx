@@ -1,7 +1,7 @@
-import { FC, MouseEventHandler, useState, useMemo, useCallback, useEffect } from 'react';
-import { nullable } from '@taskany/bricks';
+import { FC, useMemo, useEffect, ComponentProps, MouseEventHandler } from 'react';
+import { Link, TreeViewElement, nullable } from '@taskany/bricks';
 
-import { GoalByIdReturnType, ProjectByIdReturnType } from '../../trpc/inferredTypes';
+import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';
 import { QueryState } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';
@@ -11,49 +11,48 @@ import { ProjectListItemCollapsable } from './ProjectListItemCollapsable/Project
 import { GoalListItem } from './GoalListItem';
 import { InlineCreateGoalControl } from './InlineCreateGoalControl/InlineCreateGoalControl';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
+import { TableRowItem, Title } from './Table';
+import { NextLink } from './NextLink';
 
-export const ProjectListItemConnected: FC<{
-    project: NonNullable<ProjectByIdReturnType>;
+interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     queryState?: Partial<QueryState>;
     onTagClick?: React.ComponentProps<typeof GoalListItem>['onTagClick'];
-    onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLAnchorElement>;
+    onClickProvider?: (g: NonNullable<GoalByIdReturnType>) => MouseEventHandler<HTMLElement>;
     selectedResolver?: (id: string) => boolean;
-    deep?: number;
-    collapsed?: boolean;
-    hasLink?: boolean;
-}> = ({
-    hasLink = false,
+}
+
+const onProjectClickHandler = (e: React.MouseEvent) => {
+    if (!e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+    } else {
+        e.stopPropagation();
+    }
+};
+
+export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     queryState,
     project,
     onClickProvider,
     onTagClick,
     selectedResolver,
-    deep = 0,
-    collapsed: defaultCollapsed = false,
+    ...props
 }) => {
-    const [collapsed, setIsCollapsed] = useState(() => defaultCollapsed);
     const { on } = useGoalPreview();
     const utils = trpc.useContext();
 
-    const { data: projectDeepInfo, isLoading: isDeepInfoLoading } = trpc.project.getDeepInfo.useQuery(
+    const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
             id: project.id,
             goalsQuery: queryState,
         },
         {
-            enabled: !collapsed,
             keepPreviousData: true,
             staleTime: refreshInterval,
         },
     );
 
     const ids = useMemo(() => project?.children.map(({ id }) => id) || [], [project]);
-    const { data: childrenProjects = [], status } = trpc.project.getByIds.useQuery(
-        { ids, goalsQuery: queryState },
-        {
-            enabled: !collapsed,
-        },
-    );
+    const { data: childrenProjects = [], isLoading } = trpc.project.getByIds.useQuery({ ids, goalsQuery: queryState });
 
     useEffect(() => {
         const unsubUpdate = on('on:goal:update', (updatedId) => {
@@ -77,65 +76,60 @@ export const ProjectListItemConnected: FC<{
         };
     }, [on, projectDeepInfo?.goals, utils.project.getByIds, utils.project.getDeepInfo]);
 
-    const onClick = useCallback(() => {
-        setIsCollapsed((value) => !value);
-    }, []);
-
-    const contentHidden = status === 'loading' || collapsed;
-
     return (
         <ProjectListItemCollapsable
-            href={hasLink ? routes.project(project.id) : undefined}
-            disabled={!project._count.children && !project._count.goals}
-            goals={projectDeepInfo?.goals.map((g) => (
-                <GoalListItem
-                    createdAt={g.createdAt}
-                    updatedAt={g.updatedAt}
-                    id={g.id}
-                    shortId={g._shortId}
-                    state={g.state}
-                    title={g.title}
-                    issuer={g.activity}
-                    owner={g.owner}
-                    tags={g.tags}
-                    priority={g.priority}
-                    comments={g._count?.comments}
-                    estimate={g.estimate}
-                    estimateType={g.estimateType}
-                    participants={g.participants}
-                    starred={g._isStarred}
-                    watching={g._isWatching}
-                    achivedCriteriaWeight={g._achivedCriteriaWeight}
-                    key={g.id}
-                    focused={selectedResolver?.(g.id)}
-                    onClick={onClickProvider?.(g as NonNullable<GoalByIdReturnType>)}
-                    onTagClick={onTagClick}
-                    // if current project haven't child projects need to decrease deep for correct view in tree
-                    deep={(project.children.length || 0) === 0 ? deep - 1 : deep}
-                />
-            ))}
+            href={routes.project(project.id)}
+            onClick={onProjectClickHandler}
             project={project}
-            projectChidlsLen={project.children.length || 0}
-            onClick={onClick}
-            deep={deep}
-            contentHidden={contentHidden}
+            goals={projectDeepInfo?.goals.map((g) => (
+                <TreeViewElement key={g.id}>
+                    <Link as={NextLink} href={routes.goal(g._shortId)} inline>
+                        <TableRowItem
+                            title={<Title size="m">{g.title}</Title>}
+                            onClick={(e) => {
+                                onClickProvider?.(g as NonNullable<GoalByIdReturnType>)(e);
+                                onProjectClickHandler(e);
+                            }}
+                        >
+                            <GoalListItem
+                                createdAt={g.createdAt}
+                                updatedAt={g.updatedAt}
+                                id={g.id}
+                                state={g.state}
+                                issuer={g.activity}
+                                owner={g.owner}
+                                tags={g.tags}
+                                priority={g.priority}
+                                comments={g._count?.comments}
+                                estimate={g.estimate}
+                                estimateType={g.estimateType}
+                                participants={g.participants}
+                                starred={g._isStarred}
+                                watching={g._isWatching}
+                                achivedCriteriaWeight={g._achivedCriteriaWeight}
+                                focused={selectedResolver?.(g.id)}
+                                onTagClick={onTagClick}
+                            />
+                        </TableRowItem>
+                    </Link>
+                </TreeViewElement>
+            ))}
+            {...props}
         >
-            {/* FIXME https://github.com/taskany-inc/issues/issues/1927 */}
-            {nullable(
-                !projectDeepInfo?.goals.length,
-                () => !isDeepInfoLoading && <InlineCreateGoalControl projectId={project.id} />,
-            )}
+            <TreeViewElement>
+                {nullable(
+                    !projectDeepInfo?.goals.length,
+                    () => !isLoading && <InlineCreateGoalControl project={project} />,
+                )}
+            </TreeViewElement>
             {childrenProjects.map((p) => (
                 <ProjectListItemConnected
                     key={p.id}
-                    hasLink
                     project={p}
                     queryState={queryState}
-                    deep={deep + 1}
                     onTagClick={onTagClick}
                     onClickProvider={onClickProvider}
                     selectedResolver={selectedResolver}
-                    collapsed
                 />
             ))}
         </ProjectListItemCollapsable>

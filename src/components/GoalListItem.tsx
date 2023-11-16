@@ -1,12 +1,10 @@
 import React, { MouseEventHandler, useCallback, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import NextLink from 'next/link';
-import { textColor, gapS, gray9, radiusM } from '@taskany/colors';
+import { gray9 } from '@taskany/colors';
 import { Text, Tag as TagItem, nullable, CircleProgressBar, TableRow, TableCell } from '@taskany/bricks';
 import { IconEyeOutline, IconStarSolid } from '@taskany/icons';
 import type { State as StateType, Tag } from '@prisma/client';
 
-import { routes } from '../hooks/router';
 import { DateType } from '../types/date';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { formateEstimate } from '../utils/dateTime';
@@ -17,16 +15,11 @@ import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
 import { State } from './State';
 import { RelativeTime } from './RelativeTime/RelativeTime';
-import { WrappedRowLink } from './WrappedRowLink';
-import { collapseOffset } from './CollapsableItem';
 import { CommentsCountBadge } from './CommentsCountBadge';
 import { TagsList } from './TagsList';
 
 interface GoalListItemProps {
     id: string;
-    shortId: string;
-    projectId?: string | null;
-    title: string;
     owner?: ActivityByIdReturnType | null;
     issuer?: ActivityByIdReturnType | null;
     participants?: ActivityByIdReturnType[];
@@ -43,8 +36,6 @@ interface GoalListItemProps {
     watching?: boolean;
     className?: string;
     achivedCriteriaWeight?: number | null;
-    deep?: number;
-    onClick?: MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: (tag: Tag) => MouseEventHandler<HTMLDivElement>;
 }
 
@@ -87,15 +78,6 @@ const StyledTagsCell = styled(TableCell)<{ hover?: boolean }>`
     `}
 `;
 
-const StyledTableRow = styled(TableRow)`
-    position: relative;
-    padding: ${gapS};
-
-    border-radius: ${radiusM};
-
-    color: ${textColor};
-`;
-
 const TagsCell: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     const [rect, setRect] = useState({ top: 0, left: 0, width: 0 });
     const [hovered, toggle] = useState<boolean | undefined>(undefined);
@@ -134,26 +116,20 @@ const TagsCell: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                     {children}
                 </StyledOverTagsContentWrapper>
             )}
-            <StyledTagsCell ref={targetRef} col={1} onMouseOverCapture={onEnterHandler} hover={hovered}>
+            <StyledTagsCell ref={targetRef} width="100px" onMouseOverCapture={onEnterHandler} hover={hovered}>
                 <StyledTagsList>{children}</StyledTagsList>
             </StyledTagsCell>
         </>
     );
 };
 
-// px
-const maxTitleColumnWidth = 420;
-
 export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
     ({
-        shortId,
         owner,
         issuer,
         participants,
         updatedAt,
-        projectId,
         tags,
-        title,
         comments,
         state,
         focused,
@@ -163,8 +139,6 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         starred,
         watching,
         achivedCriteriaWeight,
-        deep,
-        onClick,
         className,
         onTagClick,
     }) => {
@@ -177,105 +151,82 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
             return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
         }, [issuer, owner]);
 
-        const titleColumnWidth = maxTitleColumnWidth - (deep && deep > 0 ? deep : 0) * collapseOffset;
-
         return (
-            <NextLink href={routes.goal(shortId)} passHref legacyBehavior>
-                <WrappedRowLink>
-                    <StyledTableRow
-                        focused={focused}
-                        className={className}
-                        onClick={onClick}
-                        gap={10}
-                        align="center"
-                        interactive
-                    >
-                        <TableCell width={titleColumnWidth}>
-                            <Text size="m" weight="bold">
-                                {title}
-                            </Text>
-                        </TableCell>
+            <TableRow focused={focused} className={className} gap={10} align="center" interactive>
+                <TableCell width="90px">
+                    {nullable(state, (s) => (
+                        <State size="s" title={s?.title} hue={s?.hue} />
+                    ))}
+                </TableCell>
 
-                        <TableCell col={1}>
-                            {nullable(state, (s) => (
-                                <State size="s" title={s?.title} hue={s?.hue} />
-                            ))}
-                        </TableCell>
+                <TableCell width="90px">
+                    {nullable(priority?.title, (title) => (
+                        <GoalTextItem>{getPriorityText(title)}</GoalTextItem>
+                    ))}
+                </TableCell>
 
-                        <TableCell width="11ch">
-                            {nullable(priority?.title, (title) => (
-                                <GoalTextItem>{getPriorityText(title)}</GoalTextItem>
-                            ))}
-                        </TableCell>
+                <TableCell width="40px">
+                    <UserGroup users={issuers} />
+                </TableCell>
 
-                        {nullable(projectId, (pId) => (
-                            <TableCell col={1}>
-                                <GoalTextItem>{pId}</GoalTextItem>
-                            </TableCell>
-                        ))}
+                <TableCell width="60px">
+                    <GoalTextItem>
+                        {nullable(estimate, (e) =>
+                            formateEstimate(e, {
+                                type: estimateType === 'Year' ? estimateType : 'Quarter',
+                                locale,
+                            }),
+                        )}
+                    </GoalTextItem>
+                </TableCell>
 
-                        <TableCell align="center" width={32}>
-                            <UserGroup users={issuers} />
-                        </TableCell>
+                <TableCell width="30px">
+                    {nullable(achivedCriteriaWeight, (weight) => (
+                        <CircleProgressBar value={weight} />
+                    ))}
+                </TableCell>
 
-                        <TableCell width="8ch">
-                            <GoalTextItem>
-                                {nullable(estimate, (e) =>
-                                    formateEstimate(e, {
-                                        type: estimateType === 'Year' ? estimateType : 'Quarter',
-                                        locale,
-                                    }),
-                                )}
-                            </GoalTextItem>
-                        </TableCell>
+                <TagsCell>
+                    {nullable(tags, (t) =>
+                        t.map((tag) =>
+                            nullable(tag, (item) => (
+                                <TagItem key={item.id} onClick={onTagClick?.(item)}>
+                                    {item.title}
+                                </TagItem>
+                            )),
+                        ),
+                    )}
+                </TagsCell>
 
-                        <TableCell width={24}>
-                            {achivedCriteriaWeight != null && <CircleProgressBar value={achivedCriteriaWeight} />}
-                        </TableCell>
+                <TableCell width="40px">
+                    {nullable(participants, (p) => (
+                        <UserGroup users={p} />
+                    ))}
+                </TableCell>
 
-                        <TagsCell>
-                            {nullable(tags, (t) =>
-                                t.map((tag) =>
-                                    nullable(tag, (item) => (
-                                        <TagItem key={item.id} onClick={onTagClick?.(item)}>
-                                            {item.title}
-                                        </TagItem>
-                                    )),
-                                ),
-                            )}
-                        </TagsCell>
+                <TableCell width="40px">
+                    {nullable(comments, (c) => (
+                        <GoalTextItem>
+                            <CommentsCountBadge count={c} />
+                        </GoalTextItem>
+                    ))}
+                </TableCell>
 
-                        <TableCell width={90}>
-                            {nullable(participants, (p) => (
-                                <UserGroup users={p} />
-                            ))}
-                        </TableCell>
+                <TableCell width="110px">
+                    <RelatedTextItem>
+                        <RelativeTime date={updatedAt} />
+                    </RelatedTextItem>
+                </TableCell>
 
-                        <TableCell width="6ch">
-                            {nullable(comments, (c) => (
-                                <GoalTextItem>
-                                    <CommentsCountBadge count={c} />
-                                </GoalTextItem>
-                            ))}
-                        </TableCell>
-
-                        <TableCell col={1}>
-                            <RelatedTextItem>
-                                <RelativeTime date={updatedAt} />
-                            </RelatedTextItem>
-                        </TableCell>
-
-                        <TableCell width={40} justify="between">
-                            {nullable(starred, () => (
-                                <IconStarSolid size="s" />
-                            ))}
-                            {nullable(watching, () => (
-                                <IconEyeOutline size="s" />
-                            ))}
-                        </TableCell>
-                    </StyledTableRow>
-                </WrappedRowLink>
-            </NextLink>
+                <TableCell width="40px" justify="between">
+                    {nullable(starred, () => (
+                        <IconStarSolid size="s" />
+                    ))}
+                    {nullable(watching, () => (
+                        <IconEyeOutline size="s" />
+                    ))}
+                </TableCell>
+            </TableRow>
         );
     },
 );

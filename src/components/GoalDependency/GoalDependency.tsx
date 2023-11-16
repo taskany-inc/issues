@@ -101,9 +101,7 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
                                 name: 'title',
                                 renderColumn: (values) => (
                                     <CustomCell col={6}>
-                                        <Title size="s" weight="bold">
-                                            {values.title}
-                                        </Title>
+                                        <Title size="s">{values.title}</Title>
                                     </CustomCell>
                                 ),
                             },

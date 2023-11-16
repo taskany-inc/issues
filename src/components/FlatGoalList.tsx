@@ -10,6 +10,7 @@ import { useFMPMetric } from '../utils/telemetry';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
 import { GoalListItem } from './GoalListItem';
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
+import { TableRowItem, Title } from './Table';
 
 interface GoalListProps {
     queryState?: QueryState;
@@ -67,7 +68,7 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilter
 
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
-    const onGoalPrewiewShow = useCallback(
+    const onGoalPreviewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
@@ -81,30 +82,31 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilter
         <>
             <Table>
                 {goalsOnScreen?.map((g) => (
-                    <GoalListItem
-                        createdAt={g.createdAt}
-                        updatedAt={g.updatedAt}
-                        id={g.id}
-                        shortId={g._shortId}
-                        projectId={g.projectId}
-                        state={g.state}
-                        title={g.title}
-                        issuer={g.activity}
-                        owner={g.owner}
-                        tags={g.tags}
-                        priority={g.priority}
-                        comments={g._count?.comments}
-                        estimate={g.estimate}
-                        estimateType={g.estimateType}
-                        participants={g.participants}
-                        starred={g._isStarred}
-                        watching={g._isWatching}
-                        achivedCriteriaWeight={g._achivedCriteriaWeight}
+                    <TableRowItem
                         key={g.id}
-                        focused={selectedGoalResolver(g.id)}
-                        onClick={onGoalPrewiewShow(g as GoalByIdReturnType)}
-                        onTagClick={setTagFilterOutside}
-                    />
+                        title={<Title size="m">{g.title}</Title>}
+                        onClick={onGoalPreviewShow(g as GoalByIdReturnType)}
+                    >
+                        <GoalListItem
+                            createdAt={g.createdAt}
+                            updatedAt={g.updatedAt}
+                            id={g.id}
+                            state={g.state}
+                            issuer={g.activity}
+                            owner={g.owner}
+                            tags={g.tags}
+                            priority={g.priority}
+                            comments={g._count?.comments}
+                            estimate={g.estimate}
+                            estimateType={g.estimateType}
+                            participants={g.participants}
+                            starred={g._isStarred}
+                            watching={g._isWatching}
+                            achivedCriteriaWeight={g._achivedCriteriaWeight}
+                            focused={selectedGoalResolver(g.id)}
+                            onTagClick={setTagFilterOutside}
+                        />
+                    </TableRowItem>
                 ))}
             </Table>
 

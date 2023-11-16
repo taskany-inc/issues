@@ -1,24 +1,15 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import { gapM, gapS, gapXs, gray4 } from '@taskany/colors';
-import { Table, Text, nullable } from '@taskany/bricks';
+import { gapS, gapXs } from '@taskany/colors';
+import { Text, TreeView, TreeViewNode, nullable } from '@taskany/bricks';
 import { IconServersOutline } from '@taskany/icons';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
-import { CollapsableItem, CollapsableContentItem } from '../CollapsableItem';
 import { ProjectListItem } from '../ProjectListItem';
 import { WrappedRowLink } from '../WrappedRowLink';
 import { projectListItem, projectListItemTitle } from '../../utils/domObjects';
-
-const StyledGoalsListContainer = styled(Table)<{ children?: React.ReactNode }>`
-    margin: 0;
-    padding: ${gapS} 0 ${gapM} 0;
-
-    box-sizing: border-box;
-
-    border-top: 1px solid ${gray4};
-`;
+import { TableRowItem, Title } from '../Table';
 
 const StyledProjectIcons = styled.div`
     display: flex;
@@ -26,95 +17,74 @@ const StyledProjectIcons = styled.div`
     gap: ${gapXs};
 `;
 
-interface ProjectListItemCollapsableProps {
+const StyledTitleWrapper = styled(StyledProjectIcons)`
+    justify-content: space-between;
+    margin-right: ${gapS};
+`;
+
+interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
-    project: NonNullable<ProjectByIdReturnType>;
-    disabled?: boolean;
+    project: Omit<NonNullable<ProjectByIdReturnType>, '_count'>;
     goals?: ReactNode;
     children?: React.ReactNode;
-    onClick?: () => void;
-    contentHidden: boolean;
-    deep?: number;
-    projectChidlsLen?: number;
+    onClick?: MouseEventHandler<HTMLElement>;
 }
-
-const onProjectClickHandler = (e: React.MouseEvent) => {
-    if (!e.metaKey && !e.ctrlKey) {
-        e.preventDefault();
-    } else {
-        e.stopPropagation();
-    }
-};
 
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
     project,
-    onClick,
     children,
     goals,
-    disabled,
-    contentHidden,
-    deep = 0,
-    projectChidlsLen = 0,
     href,
+    className,
+    interactive = true,
+    onClick,
+    ...props
 }) => {
-    const calculatedDeep = useMemo(() => {
-        if (deep > 0) {
-            if (contentHidden || !projectChidlsLen) {
-                return deep - 1;
-            }
-        }
-
-        return deep;
-    }, [deep, contentHidden, projectChidlsLen]);
-
     const projectComponent = (
-        <ProjectListItem
-            title={project.title}
-            owner={project.activity}
-            participants={project.participants}
-            starred={project._isStarred}
-            watching={project._isWatching}
-            averageScore={project.averageScore}
-            onClick={onProjectClickHandler}
-            disabled={disabled}
-            deep={calculatedDeep}
-            {...projectListItemTitle.attr}
+        <TableRowItem
+            title={
+                <StyledTitleWrapper>
+                    <Title size="l" {...projectListItemTitle.attr}>
+                        {project.title}
+                    </Title>
+                    {nullable(project.children.length, (length) => (
+                        <StyledProjectIcons>
+                            <IconServersOutline size="xs" />
+                            <Text size="xs">{length}</Text>
+                        </StyledProjectIcons>
+                    ))}
+                </StyledTitleWrapper>
+            }
+            onClick={onClick}
         >
-            {nullable(projectChidlsLen, (c) => (
-                <StyledProjectIcons>
-                    <IconServersOutline size="xs" />
-                    <Text size="xs">{c}</Text>
-                </StyledProjectIcons>
-            ))}
-        </ProjectListItem>
+            <ProjectListItem
+                owner={project.activity}
+                participants={project.participants}
+                starred={project._isStarred}
+                watching={project._isWatching}
+                averageScore={project.averageScore}
+            />
+        </TableRowItem>
     );
 
     return (
-        <CollapsableItem
-            collapsed={contentHidden}
-            onClick={disabled ? undefined : onClick}
-            hasChild={projectChidlsLen > 0}
-            header={
-                <Table>
-                    {href ? (
-                        <NextLink href={href} passHref legacyBehavior>
+        <TreeView className={className} {...projectListItem.attr}>
+            <TreeViewNode
+                interactive={interactive}
+                title={nullable(
+                    href,
+                    (h) => (
+                        <NextLink href={h} passHref legacyBehavior>
                             <WrappedRowLink>{projectComponent}</WrappedRowLink>
                         </NextLink>
-                    ) : (
-                        projectComponent
-                    )}
-                </Table>
-            }
-            content={
-                <>
-                    <CollapsableContentItem>
-                        <StyledGoalsListContainer>{goals}</StyledGoalsListContainer>
-                    </CollapsableContentItem>
-                    {children}
-                </>
-            }
-            deep={deep}
-            {...projectListItem.attr}
-        />
+                    ),
+                    projectComponent,
+                )}
+                {...props}
+            >
+                {goals}
+                {children}
+            </TreeViewNode>
+        </TreeView>
     );
 };
