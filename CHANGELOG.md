@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.8.0](https://github.com/taskany-inc/issues/compare/v2.7.0...v2.8.0) (2023-11-16)
+
+
+### Features
+
+* add OpenTelemetry ([04e03da](https://github.com/taskany-inc/issues/commit/04e03da06c3c59fd161a54ac4888f3632987eade))
+* improve opentelemetry dx ([d332755](https://github.com/taskany-inc/issues/commit/d332755409aec3a4a6b46260090ba97f33942f41))
+
+
+### Bug Fixes
+
+* folder for OpenTelemetry files ([b835d90](https://github.com/taskany-inc/issues/commit/b835d9045f50e627f763576cc85876574cfe5f9f))
+
 ## [2.7.0](https://github.com/taskany-inc/issues/compare/v2.6.0...v2.7.0) (2023-11-13)
 
 
