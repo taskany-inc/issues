@@ -81,3 +81,12 @@ export function createEmailJob<T extends keyof Templates, Params extends Paramet
         },
     });
 }
+
+export function createCronJob<T extends JobDataMap['cron']['template']>(template: T, cron: string) {
+    return createJob('cron', {
+        data: {
+            template,
+        },
+        cron,
+    });
+}

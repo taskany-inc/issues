@@ -2,6 +2,8 @@
 import assert from 'assert';
 
 import { prisma } from '../src/utils/prisma';
+import { createSheep } from '../src/utils/worker/sheep';
+import { createCronJob } from '../src/utils/worker/create';
 
 const adminEmail = process.env.ADMIN_EMAIL || 'tony@taskany.org';
 const adminPassword = process.env.ADMIN_PASSWORD || 'taskany';
@@ -136,5 +138,7 @@ const userPassword = 'taskany';
                 },
             },
         }),
+        createSheep(),
+        createCronJob('goalPing', '0 0 1 * * *'),
     ]);
 })();
