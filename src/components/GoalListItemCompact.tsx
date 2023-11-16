@@ -130,11 +130,7 @@ const Column: ColumnRender = ({ col, componentProps }) => {
 
     switch (col.name) {
         case 'title':
-            content = (
-                <Title size="s" weight="bold">
-                    {title}
-                </Title>
-            );
+            content = <Title size="s">{title}</Title>;
             break;
         case 'state':
             content = nullable(state, (s) => <StateDot size="m" title={s?.title} hue={s?.hue} />);

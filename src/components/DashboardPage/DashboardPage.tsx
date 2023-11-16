@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import { nullable, Table } from '@taskany/bricks';
+import { nullable, TreeViewElement } from '@taskany/bricks';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -8,7 +7,6 @@ import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { Page } from '../Page';
 import { CommonHeader } from '../CommonHeader';
-import { GoalsGroup } from '../GoalsGroup';
 import { trpc } from '../../utils/trpcClient';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
@@ -18,6 +16,10 @@ import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
 import { safeGetUserName } from '../../utils/getUserName';
 import { FilteredPage } from '../FilteredPage/FilteredPage';
+import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
+import { routes } from '../../hooks/router';
+import { GoalListItem } from '../GoalListItem';
+import { TableRowItem, Title } from '../Table';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -82,7 +84,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         if (isGoalDeletedAlready) setPreview(null);
     }, [goals, preview, setPreview]);
 
-    const onGoalPrewiewShow = useCallback(
+    const onGoalPreviewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
@@ -130,25 +132,50 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 onFilterStar={onFilterStar}
                 isLoading={isLoading}
             >
-                <Table>
-                    {groupsOnScreen?.map((group) => (
-                        <React.Fragment key={group.project.id}>
-                            <GoalsGroup
-                                goals={group.goals as NonNullable<GoalByIdReturnType>[]}
-                                selectedResolver={selectedGoalResolver}
-                                onClickProvider={onGoalPrewiewShow}
-                                onTagClick={setTagsFilterOutside}
-                                project={group.project}
-                            />
-                            {nullable(!group.goals.length, () => (
-                                <InlineCreateGoalControl projectId={group.project.id} />
-                            ))}
-                        </React.Fragment>
-                    ))}
-                </Table>
+                {groupsOnScreen?.map(({ project, goals }) => (
+                    <ProjectListItemCollapsable
+                        key={project.id}
+                        interactive={false}
+                        visible
+                        project={project}
+                        href={routes.project(project.id)}
+                        goals={goals.map((g) => (
+                            <TreeViewElement key={g.id}>
+                                <TableRowItem
+                                    title={<Title size="m">{g.title}</Title>}
+                                    onClick={onGoalPreviewShow(g as GoalByIdReturnType)}
+                                >
+                                    <GoalListItem
+                                        createdAt={g.createdAt}
+                                        updatedAt={g.updatedAt}
+                                        id={g.id}
+                                        state={g.state}
+                                        issuer={g.activity}
+                                        owner={g.owner}
+                                        tags={g.tags}
+                                        priority={g.priority}
+                                        comments={g._count?.comments}
+                                        estimate={g.estimate}
+                                        estimateType={g.estimateType}
+                                        participants={g.participants}
+                                        starred={g._isStarred}
+                                        watching={g._isWatching}
+                                        achivedCriteriaWeight={g._achivedCriteriaWeight}
+                                        focused={selectedGoalResolver(g.id)}
+                                        onTagClick={setTagsFilterOutside}
+                                    />
+                                </TableRowItem>
+                            </TreeViewElement>
+                        ))}
+                    >
+                        {nullable(!goals.length, () => (
+                            <InlineCreateGoalControl project={project} />
+                        ))}
+                    </ProjectListItemCollapsable>
+                ))}
 
                 {nullable(hasNextPage, () => (
-                    <LoadMoreButton onClick={() => fetchNextPage()} />
+                    <LoadMoreButton onClick={fetchNextPage as () => void} />
                 ))}
             </FilteredPage>
         </Page>

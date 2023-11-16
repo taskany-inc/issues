@@ -9,7 +9,7 @@ import { routes } from '../hooks/router';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 
 import { UserGroup } from './UserGroup';
-import { TitleContainer, Title, TextItem } from './Table';
+import { Title, TextItem } from './Table';
 
 interface ProjectListItemCompactProps {
     id: string;
@@ -38,11 +38,7 @@ export const ProjectListItemCompact: React.FC<ProjectListItemCompactProps> = Rea
                         </TableCell>
                     ))}
                     <TableCell col={6.5}>
-                        <TitleContainer>
-                            <Title size="s" weight="bold">
-                                {title}
-                            </Title>
-                        </TitleContainer>
+                        <Title size="s">{title}</Title>
                     </TableCell>
                     <TableCell col={3}>
                         <TextItem>{id}</TextItem>

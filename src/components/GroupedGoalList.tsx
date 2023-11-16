@@ -50,7 +50,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, se
 
     useFMPMetric(!!data);
 
-    const onGoalPrewiewShow = useCallback(
+    const onGoalPreviewShow = useCallback(
         (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
@@ -76,11 +76,9 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, se
                     key={project.id}
                     project={project}
                     onTagClick={setTagFilterOutside}
-                    onClickProvider={onGoalPrewiewShow}
+                    onClickProvider={onGoalPreviewShow}
                     selectedResolver={selectedGoalResolver}
                     queryState={queryState}
-                    hasLink
-                    collapsed
                 />
             ))}
 

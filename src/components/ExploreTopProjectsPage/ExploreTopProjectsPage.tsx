@@ -9,6 +9,7 @@ import { ExplorePageLayout } from '../ExplorePageLayout/ExplorePageLayout';
 import { ProjectListItem } from '../ProjectListItem';
 import { trpc } from '../../utils/trpcClient';
 import { WrappedRowLink } from '../WrappedRowLink';
+import { TableRowItem, Title } from '../Table';
 
 import { tr } from './ExploreTopProjectsPage.i18n';
 
@@ -28,14 +29,15 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             nullable(project, (p) => (
                                 <NextLink key={p.id} href={routes.project(p.id)} passHref>
                                     <WrappedRowLink>
-                                        <ProjectListItem
-                                            title={p.title}
-                                            owner={p.activity}
-                                            starred={p._isStarred}
-                                            watching={p._isWatching}
-                                            participants={p.participants}
-                                            averageScore={p.averageScore}
-                                        />
+                                        <TableRowItem title={<Title size="l">{p.title}</Title>}>
+                                            <ProjectListItem
+                                                owner={p.activity}
+                                                starred={p._isStarred}
+                                                watching={p._isWatching}
+                                                participants={p.participants}
+                                                averageScore={p.averageScore}
+                                            />
+                                        </TableRowItem>
                                     </WrappedRowLink>
                                 </NextLink>
                             )),
