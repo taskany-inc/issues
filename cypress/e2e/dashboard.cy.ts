@@ -34,7 +34,7 @@ describe('Dashboard', () => {
             .filter(`:contains(${projectOne})`)
             .should('exist')
             .and('contain.text', projectOne)
-            .next(createGoalInlineControl.query)
+            .get(createGoalInlineControl.query)
             .should('exist');
     });
 });
