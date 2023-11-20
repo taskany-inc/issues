@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.8.1](https://github.com/taskany-inc/issues/compare/v2.8.0...v2.8.1) (2023-11-20)
+
+
+### Bug Fixes
+
+* "Create goal" button is shown inside the tree ([45eef52](https://github.com/taskany-inc/issues/commit/45eef52c3aadcfad9ae2c5e4c349ec29521aa9d4))
+* after click on the "Create goal" button, the selected project should be in the goal form ([aa4ea68](https://github.com/taskany-inc/issues/commit/aa4ea685f9f48ad0a0a51a1dadd2922a87250b06))
+
 ## [2.8.0](https://github.com/taskany-inc/issues/compare/v2.7.0...v2.8.0) (2023-11-16)
 
 
