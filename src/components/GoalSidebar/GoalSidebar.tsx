@@ -245,16 +245,16 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     canEdit={goal._isEditable}
                     onSubmit={onGoalCriteriaAdd}
                     onRemove={onGoalCriteriaRemove}
-                    onGoalClick={onGoalOpen ? (value) => onGoalOpen(value.scopedId) : undefined}
+                    onGoalClick={onGoalOpen ? (value) => onGoalOpen(value.shortId) : undefined}
                     validateGoalCriteriaBindings={validateGoalCriteriaBindings}
                     versaCriterialList={goal._versaCriteria.reduce<VersaGoalItem[]>(
-                        (acc, { goal: { id: goalId, state, _scopedId }, id, title }) => {
+                        (acc, { goal: { id: goalId, state, _shortId }, id, title }) => {
                             acc.push({
                                 id: goalId,
                                 title,
                                 stateColor: state?.hue,
                                 criteriaId: id,
-                                scopedId: _scopedId,
+                                shortId: _shortId,
                             });
                             return acc;
                         },

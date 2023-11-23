@@ -21,7 +21,7 @@ interface GoalBadgeItemProps {
     stateColor?: number;
     id: string;
     title: string;
-    scopedId: string;
+    shortId: string;
 }
 
 interface VersaCriteriaProps {
@@ -90,8 +90,8 @@ export const VersaCriteria: React.FC<VersaCriteriaProps> = ({
     const validateBindings = useCallback(
         (selectedId: string) => {
             return validateGoalCriteriaBindings({
-                currentGoalId: goalId,
-                selectedGoalId: selectedId,
+                currentGoalId: selectedId,
+                selectedGoalId: goalId,
             });
         },
         [goalId, validateGoalCriteriaBindings],
@@ -105,7 +105,7 @@ export const VersaCriteria: React.FC<VersaCriteriaProps> = ({
                         <TextListItem key={goal.id}>
                             <GoalBadge
                                 title={goal.title}
-                                href={routes.goal(goal.scopedId)}
+                                href={routes.goal(goal.shortId)}
                                 onClick={handleGoalClick(goal)}
                                 color={goal.stateColor}
                                 theme={themeId}

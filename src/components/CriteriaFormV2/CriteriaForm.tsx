@@ -45,6 +45,7 @@ export const maxPossibleWeight = 100;
 export const minPossibleWeight = 1;
 
 const schema = z.object({
+    id: z.string().optional(),
     mode: z.enum<CriteriaFormMode, Readonly<[CriteriaFormMode, CriteriaFormMode]>>(['simple', 'goal']),
     weight: z.string().optional(),
     title: z.string().optional(),
@@ -52,6 +53,7 @@ const schema = z.object({
         .object({
             id: z.string(),
             title: z.string(),
+            stateColor: z.number().optional(),
         })
         .nullish(),
 });
@@ -118,6 +120,12 @@ function patchZodSchema(data: ValidityData, checkBindingsBetweenGoals: (selected
                         message: tr('Title must be longer than 1 symbol'),
                         path: ['title'],
                     });
+                } else if (data.title.some((t) => t === val.title)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: tr('Title must be unique'),
+                        path: ['title'],
+                    });
                 }
             }
             if (val.mode === 'goal' && !val.selected?.id.length) {
@@ -125,14 +133,6 @@ function patchZodSchema(data: ValidityData, checkBindingsBetweenGoals: (selected
                     code: z.ZodIssueCode.custom,
                     message: tr('Goal must be selected'),
                     path: ['selected'],
-                });
-            }
-
-            if (data.title.some((t) => t === val.title)) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: tr('Title must be unique'),
-                    path: ['title'],
                 });
             }
 
@@ -149,7 +149,7 @@ interface CriteriaFormProps {
 
     onModeChange?: (mode: CriteriaFormMode) => void;
     onSubmit: (values: CriteriaFormValues) => void;
-    onCancel: () => void;
+    onCancel?: () => void;
     onItemChange?: (item?: SuggestItem) => void;
     onInputChange?: (value?: string) => void;
     validateBindingsFor: (selectedId: string) => Promise<void>;
@@ -165,6 +165,7 @@ interface WeightFieldProps {
     onChange: ReactEventHandler<HTMLInputElement>;
     error?: { message?: string };
     maxValue: number;
+    visible?: boolean;
 }
 
 const StyledWeightFieldWrapper = styled.div`
@@ -204,9 +205,13 @@ const StyledFormControlInput = styled(FormControlInput)`
     width: 3ch;
 `;
 
+const StyledAutoCompleteRadiosWrapper = styled.div`
+    margin-left: calc(${gapS} + 1px); // 'cause input have 1px border
+`;
+
 const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
-    ({ error, maxValue, value, onChange, name }, ref) => {
-        const [showWeigthInput, setShowWeigthInput] = useState(false);
+    ({ error, maxValue, value, onChange, name, visible = false }, ref) => {
+        const [showWeigthInput, setShowWeigthInput] = useState(visible);
         const innerInputRef = useRef<HTMLInputElement>(null);
         const inputRef = useForkedRef(ref, innerInputRef);
 
@@ -228,7 +233,7 @@ const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
                                 onChange={onChange}
                                 ref={inputRef}
                                 {...onESC}
-                                autoFocus
+                                autoFocus={!value}
                                 autoComplete="off"
                                 name={name}
                                 disabled={maxPossibleWeight === maxValue}
@@ -318,7 +323,7 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
 export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
     (
         {
-            defaultMode,
+            defaultMode = 'simple',
             onInputChange,
             onItemChange,
             onModeChange,
@@ -347,7 +352,7 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
                 reValidateMode: 'onChange',
             });
 
-        const isEditMode = values != null;
+        const isEditMode = values != null && !!values.title?.length;
 
         const radios: Array<{ value: CriteriaFormMode; title: string }> = [
             { title: tr('Simple'), value: 'simple' },
@@ -379,7 +384,9 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
 
                 if (name === 'mode') {
                     onModeChange?.(currentValues.mode as NonNullable<CriteriaFormMode>);
-                    setError('title', { message: undefined });
+                    if (!!currentValues.title && !currentValues.selected) {
+                        trigger('title');
+                    }
                 }
             });
 
@@ -399,10 +406,10 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
                 selected: null,
                 title: undefined,
             });
-            onCancel();
+            onCancel?.();
         }, [reset, onCancel]);
 
-        const needShowWeightField = useMemo(() => {
+        const isTitleFilled = useMemo(() => {
             if (mode === 'simple') {
                 return !!title;
             }
@@ -442,17 +449,19 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
                                 name="mode"
                                 control={control}
                                 render={({ field }) => (
-                                    <AutoCompleteRadioGroup
-                                        title={tr('Mode')}
-                                        items={radios}
-                                        {...field}
-                                        onChange={(val) => setValue('mode', val.value)}
-                                    />
+                                    <StyledAutoCompleteRadiosWrapper>
+                                        <AutoCompleteRadioGroup
+                                            title={tr('Mode')}
+                                            items={radios}
+                                            {...field}
+                                            onChange={(val) => setValue('mode', val.value)}
+                                        />
+                                    </StyledAutoCompleteRadiosWrapper>
                                 )}
                             />
                         ))}
                         <StyledFormRow>
-                            {nullable(needShowWeightField, () => (
+                            {nullable(isTitleFilled, () => (
                                 <Controller
                                     name="weight"
                                     control={control}
@@ -461,6 +470,7 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
                                             {...field}
                                             maxValue={validityData.sumOfCriteria}
                                             error={fieldState.error}
+                                            visible={values?.weight != null && Number(values.weight) > 0}
                                         />
                                     )}
                                 />
@@ -475,8 +485,11 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
                                 <Button text={tr('Cancel')} view="default" outline onClick={handleCancel} />
                             </StyledFormControlsWrapper>
                         </StyledFormRow>
-                        <AutoCompleteList title={tr('Suggestions')} />
+                        {nullable(mode !== 'simple' && !isTitleFilled, () => (
+                            <AutoCompleteList title={tr('Suggestions')} />
+                        ))}
                     </AutoComplete>
+                    <input type="hidden" {...register('id')} />
                     <input type="hidden" {...register('selected.id')} />
                     <input type="hidden" {...register('selected.title')} />
                 </Form>

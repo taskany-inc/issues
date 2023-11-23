@@ -22,7 +22,6 @@ import { InlineTrigger } from '../InlineTrigger';
 import {
     ValidityData,
     criteriaSchema,
-    updateCriteriaSchema,
     maxPossibleWeight,
     patchZodSchema,
     ValidityMessage,
@@ -280,25 +279,6 @@ export const AddCriteriaForm: React.FC<
                     onClick={onClick}
                 />
             )}
-        />
-    );
-};
-
-export const EditCriteriaForm: React.FC<
-    CriteriaFormProps & {
-        values: z.infer<typeof updateCriteriaSchema>;
-        onSubmit: (val: z.infer<typeof updateCriteriaSchema>) => void;
-    }
-> = ({ validityData, onSubmit, goalId, onReset, values }) => {
-    return (
-        <CriteriaForm
-            schema={patchZodSchema(updateCriteriaSchema, validityData, getErrorMessages(validityData))}
-            actionBtnText={tr('Save')}
-            goalId={goalId}
-            onSubmit={onSubmit}
-            onReset={onReset}
-            validityData={validityData}
-            values={values}
         />
     );
 };

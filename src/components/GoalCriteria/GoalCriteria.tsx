@@ -1,6 +1,6 @@
-import React, { ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Text, nullable, Table } from '@taskany/bricks';
+import { Text, nullable, Table, MenuItem, TableRow, TableCell, Dropdown } from '@taskany/bricks';
 import {
     IconTargetOutline,
     IconCircleOutline,
@@ -8,24 +8,19 @@ import {
     IconTickCircleOutline,
     IconBinOutline,
     IconEdit1Outline,
+    IconPlusCircleOutline,
+    IconMoreVerticalOutline,
 } from '@taskany/icons';
-import { backgroundColor, brandColor, gray10, danger0, gray8, gray9, gray4, gapS } from '@taskany/colors';
-import NextLink from 'next/link';
+import { backgroundColor, brandColor, gray10, danger0, gray8, gray9, gray4, gapS, gapXs } from '@taskany/colors';
 
-import {
-    AddCriteriaSchema,
-    RemoveCriteriaSchema,
-    UpdateCriteriaSchema,
-    UpdateCriteriaStateSchema,
-} from '../../schema/criteria';
-import { Title } from '../Table';
-import { GoalAchiveCriteria } from '../../../trpc/inferredTypes';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { Circle } from '../Circle';
-import { GoalListItemCompact, CustomCell } from '../GoalListItemCompact';
-import { routes } from '../../hooks/router';
-import { EditCriteriaForm } from '../CriteriaForm/CriteriaForm';
-import { StateDot } from '../StateDot';
+import { CriteriaForm } from '../CriteriaFormV2/CriteriaForm';
+import { GoalBadge } from '../GoalBadge';
+import { Box } from '../Box';
+import { trpc } from '../../utils/trpcClient';
+import { InlineTrigger } from '../InlineTrigger';
+import { Badge } from '../Badge';
 
 import { tr } from './GoalCriteria.i18n';
 
@@ -50,10 +45,6 @@ const StyledTickIcon = styled(IconTickCircleOutline)`
     fill: ${backgroundColor};
 `;
 
-const StyledGoalTitle = styled(Title)`
-    text-decoration: none;
-`;
-
 const StyledCheckboxWrapper = styled.span<{ canEdit: boolean }>`
     display: inline-flex;
     cursor: pointer;
@@ -65,6 +56,13 @@ const StyledCheckboxWrapper = styled.span<{ canEdit: boolean }>`
             cursor: default;
         `}
 `;
+
+interface CriteriaActionItem {
+    label: string;
+    handler: () => void;
+    color?: string;
+    icon: React.ReactNode;
+}
 
 interface GoalCriteriaCheckBoxProps {
     checked: boolean;
@@ -85,46 +83,83 @@ const StyledTextHeading = styled(Text)`
     border-bottom: 1px solid ${gray4};
 `;
 
-interface GoalCriteriaItemProps {
-    onRemove: () => void;
-    onCheck?: (val: boolean) => void;
-    onConvertToGoal?: () => void;
-    onClick?: () => void;
-    onUpdateClick: () => void;
-    item: GoalAchiveCriteria;
-    canEdit: boolean;
-    goalId: string;
-}
+const StyledIconTableCell = styled(TableCell)`
+    padding-top: calc(${gapXs} + 5px); // offset by input vertical center
+`;
 
-interface CriteriaAsGoalProps extends GoalCriteriaItemProps {
-    item: GoalAchiveCriteria;
-}
+const StyledBadge = styled(Badge)`
+    padding: 0;
+`;
 
-function criteriaGuard(props: unknown): props is CriteriaAsGoalProps['item'] {
-    if (typeof props === 'object' && props != null) {
-        return (
-            ('criteriaGoalId' in props && props.criteriaGoalId != null) ||
-            ('projectId' in props && props.projectId != null)
-        );
-    }
+const StyledGoalBadge = styled(GoalBadge)`
+    padding: 0;
+`;
 
-    return false;
-}
+const useGoalSuggestions = (value = '') => {
+    const [query, setQuery] = useState(() => value);
 
-type CriteriaActionItem = {
-    label: string;
-    handler: () => void;
-    color?: string;
-    icon: React.ReactNode;
+    const { data: suggestions } = trpc.goal.suggestions.useQuery(
+        {
+            input: query,
+            limit: 5,
+        },
+        {
+            staleTime: 0,
+            cacheTime: 0,
+        },
+    );
+
+    return [suggestions, setQuery] as [typeof suggestions, React.Dispatch<React.SetStateAction<string>>];
 };
 
-const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
-    const { onCheck, canEdit, onRemove, onConvertToGoal, onUpdateClick, onClick, item } = props;
-    const onToggle = useCallback(() => {
-        onCheck?.(!item.isDone);
-    }, [onCheck, item.isDone]);
+type CriteriaFormData = NonNullable<React.ComponentProps<typeof CriteriaForm>['values']>;
+type CriteriaValidityData = React.ComponentProps<typeof CriteriaForm>['validityData'];
 
-    const goalAsCriteria = criteriaGuard(props.item);
+interface CriteriaItemValue {
+    id: string;
+    title: string;
+    weight: number;
+    isDone: boolean;
+    criteriaGoal?: {
+        id: string;
+        title: string;
+        href: string;
+        stateColor?: number;
+    } | null;
+}
+
+interface CriteriaItemProps {
+    criteria: CriteriaItemValue;
+    canEdit: boolean;
+    onClick: (value: CriteriaItemValue) => void;
+    onUpdateState: (value: CriteriaItemValue) => void;
+    onRemove: (value: CriteriaItemValue) => void;
+    onConvertGoal: (value: CriteriaItemValue) => void;
+    onCancel: () => void;
+    renderForm: (props: { onEditCancel: () => void }) => React.ReactNode;
+}
+
+const calculateModeCriteria = (props: CriteriaItemValue) => {
+    // as pre added criteria
+    if (props.title === '') {
+        return 'edit';
+    }
+
+    return 'view';
+};
+
+const CriteriaItem: React.FC<CriteriaItemProps> = ({
+    criteria,
+    canEdit,
+    onUpdateState,
+    onConvertGoal,
+    onRemove,
+    onCancel,
+    onClick,
+    renderForm,
+}) => {
+    const { criteriaGoal, title } = criteria;
+    const [mode, setMode] = useState<'view' | 'edit'>(() => calculateModeCriteria(criteria));
 
     const availableActions = useMemo<CriteriaActionItem[] | undefined>(() => {
         if (!canEdit) {
@@ -135,15 +170,15 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
             {
                 label: 'Edit',
                 icon: <IconEdit1Outline size="xxs" />,
-                handler: onUpdateClick,
+                handler: () => setMode('edit'),
             },
         ];
 
-        if (!goalAsCriteria && onConvertToGoal) {
+        if (!criteriaGoal && onConvertGoal) {
             actions.push({
                 label: tr('Create as goal'),
                 icon: <IconTargetOutline size="xxs" />,
-                handler: onConvertToGoal,
+                handler: () => onConvertGoal(criteria),
             });
         }
 
@@ -151,137 +186,128 @@ const GoalCriteriaItem: React.FC<GoalCriteriaItemProps> = (props) => {
             label: tr('Delete'),
             icon: <IconBinOutline size="xxs" />,
             color: danger0,
-            handler: onRemove,
+            handler: () => onRemove(criteria),
         });
 
         return actions;
-    }, [canEdit, onRemove, goalAsCriteria, onConvertToGoal, onUpdateClick]);
+    }, [canEdit, criteria, criteriaGoal, onConvertGoal, onRemove]);
 
     const handleChange = useCallback((val: CriteriaActionItem) => {
         val.handler();
     }, []);
 
-    const onTitleClickHandler = useCallback(
-        (e: React.MouseEvent) => {
-            if (onClick) {
-                e.preventDefault();
-                onClick();
-            }
-        },
-        [onClick],
-    );
-    const itemToRender: Partial<GoalAchiveCriteria['criteriaGoal'] & { shortId: string; weight: number }> =
-        useMemo(() => {
-            if (item.criteriaGoal) {
-                return {
-                    ...item.criteriaGoal,
-                    shortId: `${item.criteriaGoal.projectId}-${item.criteriaGoal.scopeId}`,
-                    weight: item.weight,
-                };
-            }
-
-            return item;
-        }, [item]);
+    const handleCancel = useCallback(() => {
+        if (criteria.title === '') {
+            onCancel();
+        } else {
+            setMode('view');
+        }
+    }, [criteria.title, onCancel]);
 
     return (
-        <GoalListItemCompact
-            icon
-            actions={availableActions}
-            onActionClick={handleChange}
-            item={itemToRender}
-            align="start"
-            rawIcon={
-                goalAsCriteria ? (
-                    <StateDot size="m" title={itemToRender?.title} hue={itemToRender?.state?.hue} />
-                ) : (
-                    <GoalCriteriaCheckBox onClick={onToggle} checked={item.isDone} canEdit={canEdit} />
-                )
-            }
-            columns={[
-                {
-                    name: 'title',
-                    renderColumn(values) {
-                        if (!criteriaGuard(values)) {
-                            return (
-                                <CustomCell width="75%">
-                                    <Title size="s" weight="thin">
-                                        {values.title}
-                                    </Title>
-                                </CustomCell>
-                            );
-                        }
-                        return (
-                            <CustomCell width="75%">
-                                <NextLink passHref href={routes.goal(values.shortId)} legacyBehavior>
-                                    <StyledGoalTitle size="s" weight="bold" onClick={onTitleClickHandler} as="a">
-                                        {values.title}
-                                    </StyledGoalTitle>
-                                </NextLink>
-                            </CustomCell>
-                        );
-                    },
-                },
-                {
-                    name: 'weight',
-                    renderColumn: ({ weight }) => (
-                        <CustomCell justify="end">
-                            {nullable(weight, (w) => (
-                                <Text size="s">{w}</Text>
-                            ))}
-                        </CustomCell>
-                    ),
-                },
-            ]}
-        />
+        <TableRow gap={5} align="start">
+            {nullable(
+                mode === 'edit',
+                () => (
+                    <>
+                        <StyledIconTableCell width="16px">
+                            <StyledCircleIcon size="s" />
+                        </StyledIconTableCell>
+                        <TableCell width="calc(100% - 16px)">{renderForm({ onEditCancel: handleCancel })}</TableCell>
+                    </>
+                ),
+                <>
+                    <TableCell width="calc(100% - 5ch)" align="baseline">
+                        {nullable(
+                            criteriaGoal,
+                            (goal) => (
+                                <StyledGoalBadge
+                                    title={goal.title}
+                                    color={goal.stateColor}
+                                    theme={1}
+                                    href={goal.href}
+                                    onClick={() => onClick(criteria)}
+                                />
+                            ),
+                            <StyledBadge
+                                icon={
+                                    <GoalCriteriaCheckBox
+                                        checked={criteria.isDone}
+                                        canEdit={canEdit}
+                                        onClick={() => onUpdateState({ ...criteria, isDone: !criteria.isDone })}
+                                    />
+                                }
+                                text={title}
+                            />,
+                        )}
+                    </TableCell>
+                    <TableCell width="3ch" justify="end" align="start">
+                        {nullable(criteria.weight > 0, () => (
+                            <Text size="s" color={gray9}>
+                                {criteria.weight}
+                            </Text>
+                        ))}
+                    </TableCell>
+                    <TableCell min align="baseline">
+                        <Dropdown
+                            onChange={handleChange}
+                            renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
+                            placement="right"
+                            items={availableActions}
+                            renderItem={(props) => (
+                                <MenuItem
+                                    key={props.index}
+                                    onClick={props.onClick}
+                                    icon={props.item.icon}
+                                    ghost
+                                    color={props.item.color}
+                                >
+                                    {props.item.label}
+                                </MenuItem>
+                            )}
+                        />
+                    </TableCell>
+                </>,
+            )}
+        </TableRow>
     );
 };
 
-interface GoalCriteriaProps {
-    goalId: string;
-    criteriaList?: GoalAchiveCriteria[];
-    canEdit: boolean;
-    onClick?: (item: GoalAchiveCriteria) => void;
-    onAddCriteria: (val: AddCriteriaSchema) => void;
-    onToggleCriteria: (val: UpdateCriteriaStateSchema) => void;
-    onRemoveCriteria: (val: RemoveCriteriaSchema) => void;
-    onConvertToGoal: (val: GoalAchiveCriteria) => void;
-    onUpdateCriteria: (val: UpdateCriteriaSchema) => void;
-    renderTrigger?: (obj: {
-        goalId: string;
-        onSubmit: (val: AddCriteriaSchema) => void;
-        validityData: { sum: number; title: string[] };
-    }) => ReactNode;
+interface CriteriaActionFn<T> {
+    (val: T): void;
 }
 
+interface GoalCriteriaProps {
+    list: CriteriaItemValue[];
+    canEdit: boolean;
+    onGoalClick: CriteriaActionFn<CriteriaItemValue>;
+    onCreate: CriteriaActionFn<Required<CriteriaFormData>>;
+    onUpdate: CriteriaActionFn<Required<CriteriaFormData>>;
+    onRemove: CriteriaActionFn<CriteriaItemValue>;
+    onUpdateState: CriteriaActionFn<CriteriaItemValue>;
+    onConvertToGoal: CriteriaActionFn<CriteriaItemValue>;
+    onClick?: CriteriaActionFn<CriteriaItemValue>;
+    validateGoalCriteriaBindings: (selectedGoalId: string) => Promise<void>;
+}
+
+const existingSubmittingData = (val: CriteriaFormData): val is Required<CriteriaFormData> => 'title' in val;
+
 export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
-    goalId,
-    criteriaList = [],
+    list,
     canEdit,
-    onClick,
-    onAddCriteria,
-    onToggleCriteria,
-    onRemoveCriteria,
+    onGoalClick,
+    onCreate,
+    onUpdate,
+    onRemove,
+    onUpdateState,
     onConvertToGoal,
-    onUpdateCriteria,
-    renderTrigger,
+    validateGoalCriteriaBindings,
 }) => {
-    const [{ mode, criteriaId }, setViewItemMode] = useState<
-        { mode: 'view'; criteriaId: null } | { mode: 'edit'; criteriaId: string }
-    >({
-        mode: 'view',
-        criteriaId: null,
-    });
-    const onAddHandler = useCallback(
-        (val: AddCriteriaSchema) => {
-            if (goalId) {
-                onAddCriteria({ ...val, goalId });
-            }
-        },
-        [onAddCriteria, goalId],
-    );
+    const [suggestions = [], setQuery] = useGoalSuggestions();
+    const [addingCriteria, setAddingCriteria] = useState(false);
 
     const sortedCriteriaItems = useMemo(() => {
-        const list = criteriaList.reduce<Record<'done' | 'undone', GoalAchiveCriteria[]>>(
+        const sorted = list.reduce<Record<'done' | 'undone', CriteriaItemValue[]>>(
             (acc, criteria) => {
                 if (criteria.isDone) {
                     acc.done.push(criteria);
@@ -297,27 +323,62 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             },
         );
 
-        return list.done.concat(list.undone);
+        return sorted.done.concat(sorted.undone);
+    }, [list]);
+
+    const criteriaList = useMemo(() => {
+        if (addingCriteria) {
+            return sortedCriteriaItems.concat({
+                id: '',
+                title: '',
+                weight: 0,
+                isDone: false,
+            });
+        }
+
+        return sortedCriteriaItems;
+    }, [sortedCriteriaItems, addingCriteria]);
+
+    const shouldShowTitle = useMemo(() => {
+        if (criteriaList.length) {
+            if (criteriaList.length === 1 && criteriaList[0].id == null) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }, [criteriaList]);
 
-    const dataForValidateCriteria = useMemo(
-        () =>
-            sortedCriteriaItems.reduce<{ sum: number; title: string[] }>(
-                (acc, { weight, title, id }) => {
-                    if (mode === 'edit' && id === criteriaId) {
-                        return acc;
-                    }
-                    acc.sum += weight;
-                    acc.title.push(title);
-                    return acc;
-                },
-                {
-                    sum: 0,
-                    title: [],
-                },
-            ),
-        [sortedCriteriaItems, mode, criteriaId],
+    const handleFormSubmit = useCallback(
+        (hideForm: () => void) => (values: CriteriaFormData) => {
+            if (existingSubmittingData(values)) {
+                if (addingCriteria) {
+                    onCreate(values);
+                } else {
+                    onUpdate(values);
+                }
+            }
+
+            hideForm();
+        },
+        [onCreate, onUpdate, addingCriteria],
     );
+
+    const dataForValidate = useMemo(() => {
+        return sortedCriteriaItems.reduce<CriteriaValidityData>(
+            (acc, criteria) => {
+                acc.title.push(criteria.title);
+                acc.sumOfCriteria += criteria.weight;
+                return acc;
+            },
+            {
+                title: [],
+                sumOfCriteria: 0,
+            },
+        );
+    }, [sortedCriteriaItems]);
 
     return (
         <ActivityFeedItem>
@@ -325,62 +386,77 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                 <IconMessageTickOutline size="s" color={backgroundColor} />
             </Circle>
             <StyledWrapper>
-                {nullable(criteriaList.length, () => (
+                {nullable(shouldShowTitle, () => (
                     <StyledTextHeading size="s" weight="bold" color={gray9}>
                         {tr('Achievement criteria')}
                     </StyledTextHeading>
                 ))}
                 <Table gap={5}>
-                    {sortedCriteriaItems.map((item) => {
-                        if (mode === 'view' || item.id !== criteriaId) {
-                            return (
-                                <GoalCriteriaItem
-                                    key={item.id}
-                                    goalId={goalId}
-                                    onCheck={(state) => onToggleCriteria({ ...item, isDone: state })}
-                                    onRemove={() => onRemoveCriteria({ id: item.id, goalId })}
-                                    onConvertToGoal={() => onConvertToGoal(item)}
-                                    onClick={onClick ? () => onClick(item) : undefined}
-                                    onUpdateClick={() =>
-                                        setViewItemMode({
-                                            mode: 'edit',
-                                            criteriaId: item.id,
-                                        })
-                                    }
-                                    canEdit={canEdit}
-                                    item={item}
-                                />
-                            );
-                        }
-                        if (mode === 'edit' && criteriaId === item.id) {
-                            return (
-                                <EditCriteriaForm
-                                    key={item.id}
-                                    validityData={dataForValidateCriteria}
-                                    goalId={goalId}
-                                    values={{
-                                        id: item.id,
-                                        title: item.title,
-                                        goalId,
-                                        goalAsGriteria:
-                                            item.goalIdAsCriteria != null ? { id: item.goalIdAsCriteria } : undefined,
-                                        weight: item.weight ? String(item.weight) : '',
-                                    }}
-                                    onSubmit={onUpdateCriteria}
-                                    onReset={() =>
-                                        setViewItemMode({
-                                            mode: 'view',
-                                            criteriaId: null,
-                                        })
-                                    }
-                                />
-                            );
-                        }
-
-                        return null;
-                    })}
-
-                    {renderTrigger?.({ goalId, validityData: dataForValidateCriteria, onSubmit: onAddHandler })}
+                    {criteriaList.map((criteria) => (
+                        <CriteriaItem
+                            key={criteria.id}
+                            criteria={criteria}
+                            onRemove={onRemove}
+                            onConvertGoal={onConvertToGoal}
+                            onUpdateState={onUpdateState}
+                            onCancel={() => setAddingCriteria(false)}
+                            onClick={onGoalClick}
+                            canEdit={canEdit}
+                            renderForm={(props) => (
+                                <Box>
+                                    <CriteriaForm
+                                        withModeSwitch
+                                        defaultMode={criteria.criteriaGoal != null ? 'goal' : 'simple'}
+                                        values={
+                                            !addingCriteria
+                                                ? {
+                                                      mode: criteria.criteriaGoal != null ? 'goal' : 'simple',
+                                                      title: criteria.title,
+                                                      selected: criteria.criteriaGoal,
+                                                      weight: criteria.weight != null ? String(criteria.weight) : '',
+                                                  }
+                                                : undefined
+                                        }
+                                        validityData={{
+                                            ...dataForValidate,
+                                            sumOfCriteria: dataForValidate.sumOfCriteria - criteria.weight,
+                                        }}
+                                        items={suggestions?.map((goal) => ({
+                                            id: goal.id,
+                                            title: goal.title,
+                                            stateColor: goal.state?.hue,
+                                        }))}
+                                        onSubmit={handleFormSubmit(props.onEditCancel)}
+                                        onInputChange={(val = '') => setQuery(val)}
+                                        onCancel={props.onEditCancel}
+                                        renderItem={(props) => (
+                                            <MenuItem
+                                                ghost
+                                                focused={props.active || props.hovered}
+                                                onClick={props.onItemClick}
+                                                onMouseMove={props.onMouseMove}
+                                                onMouseLeave={props.onMouseLeave}
+                                            >
+                                                <GoalBadge
+                                                    title={props.item.title}
+                                                    color={props.item.stateColor}
+                                                    theme={1}
+                                                />
+                                            </MenuItem>
+                                        )}
+                                        validateBindingsFor={validateGoalCriteriaBindings}
+                                    />
+                                </Box>
+                            )}
+                        />
+                    ))}
+                    {nullable(canEdit, () => (
+                        <InlineTrigger
+                            icon={<IconPlusCircleOutline size="s" />}
+                            text="Add achievement criteria"
+                            onClick={() => setAddingCriteria(true)}
+                        />
+                    ))}
                 </Table>
             </StyledWrapper>
         </ActivityFeedItem>
