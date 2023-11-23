@@ -310,8 +310,19 @@ export const goal = router({
                     ...rest,
                     goal: {
                         ...goal,
-                        _scopedId: `${goal.projectId}-${goal.scopeId}`,
+                        _shortId: `${goal.projectId}-${goal.scopeId}`,
                     },
+                })),
+
+                _criteria: goal.goalAchiveCriteria.map(({ criteriaGoal, ...criteria }) => ({
+                    ...criteria,
+                    criteriaGoal:
+                        criteriaGoal != null
+                            ? {
+                                  ...criteriaGoal,
+                                  _shortId: `${criteriaGoal.projectId}-${criteriaGoal.scopeId}`,
+                              }
+                            : null,
                 })),
             };
         } catch (error: any) {

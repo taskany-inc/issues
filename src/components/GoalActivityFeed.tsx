@@ -1,18 +1,18 @@
 import { nullable } from '@taskany/bricks';
-import { ComponentProps, forwardRef, useCallback } from 'react';
+import { forwardRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 import { editGoalKeys } from '../utils/hotkeys';
-import { GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { GoalAchiveCriteria, GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { useGoalResource } from '../hooks/useGoalResource';
 import { usePageContext } from '../hooks/usePageContext';
+import { routes } from '../hooks/router';
 
 import { GoalDeleteModal } from './GoalDeleteModal/GoalDeleteModal';
 import { CommentView } from './CommentView/CommentView';
 import { GoalCriteria } from './GoalCriteria/GoalCriteria';
 import { GoalActivity } from './GoalActivity';
-import { AddCriteriaForm } from './CriteriaForm/CriteriaForm';
 
 const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('./GoalEditForm/GoalEditForm'));
@@ -22,10 +22,18 @@ interface GoalActivityFeedProps {
     goal: NonNullable<GoalByIdReturnType>;
     shortId?: string;
 
-    onGoalCriteriaClick?: ComponentProps<typeof GoalCriteria>['onClick'];
+    onGoalCriteriaClick?: (item: GoalAchiveCriteria) => void;
     onGoalDeleteConfirm?: () => void;
     onInvalidate?: () => void;
 }
+
+type CriteriaActionData = Parameters<
+    Required<React.ComponentProps<typeof GoalCriteria>>['onClick' | 'onConvertToGoal' | 'onRemove' | 'onUpdateState']
+>[0];
+
+type CriteriaActionFormData = Parameters<
+    Required<React.ComponentProps<typeof GoalCriteria>>['onCreate' | 'onUpdate']
+>[0];
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
     ({ goal, shortId, onGoalCriteriaClick, onGoalDeleteConfirm, onInvalidate }, ref) => {
@@ -38,6 +46,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             onGoalCriteriaUpdate,
             onGoalCriteriaRemove,
             onGoalCriteriaConvert,
+            validateGoalCriteriaBindings,
             onGoalCommentCreate,
             onGoalCommentReactionToggle,
             onGoalCommentDelete,
@@ -69,6 +78,83 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             [onGoalCommentUpdate, user?.activityId],
         );
 
+        const handleCreateCriteria = useCallback(
+            async (data: Required<CriteriaActionFormData>) => {
+                await onGoalCriteriaAdd({
+                    title: data.title,
+                    weight: String(data.weight),
+                    goalId: goal.id,
+                    goalAsGriteria: data.selected
+                        ? {
+                              id: data.selected.id,
+                          }
+                        : undefined,
+                });
+            },
+            [goal.id, onGoalCriteriaAdd],
+        );
+        const handleUpdateCriteria = useCallback(
+            async (data: Required<CriteriaActionFormData>) => {
+                await onGoalCriteriaUpdate({
+                    id: data.id,
+                    title: data.title,
+                    weight: String(data.weight),
+                    goalId: goal.id,
+                    goalAsGriteria: data.selected
+                        ? {
+                              id: data.selected.id,
+                          }
+                        : undefined,
+                });
+            },
+            [goal.id, onGoalCriteriaUpdate],
+        );
+        const handleRemoveCriteria = useCallback(
+            async (data: CriteriaActionData) => {
+                await onGoalCriteriaRemove({
+                    id: data.id,
+                    goalId: goal.id,
+                });
+            },
+            [goal.id, onGoalCriteriaRemove],
+        );
+        const handleUpdateCriteriaState = useCallback(
+            async (data: CriteriaActionData) => {
+                await onGoalCriteriaToggle({
+                    id: data.id,
+                    isDone: data.isDone,
+                });
+            },
+            [onGoalCriteriaToggle],
+        );
+        const handleConvertCriteriaToGoal = useCallback(
+            async (data: CriteriaActionData) => {
+                onGoalCriteriaConvert({
+                    id: data.id,
+                    title: data.title,
+                });
+            },
+            [onGoalCriteriaConvert],
+        );
+
+        const handleValidateGoalToCriteriaBinging = useCallback(
+            (selectedId: string) => {
+                return validateGoalCriteriaBindings({ currentGoalId: goal.id, selectedGoalId: selectedId });
+            },
+            [goal.id, validateGoalCriteriaBindings],
+        );
+
+        const handleGoalClick = useCallback(
+            (data: CriteriaActionData) => {
+                const targetCriteria = goal.goalAchiveCriteria.find(({ id }) => id === data.id);
+
+                if (targetCriteria != null) {
+                    onGoalCriteriaClick?.(targetCriteria);
+                }
+            },
+            [goal.goalAchiveCriteria, onGoalCriteriaClick],
+        );
+
         return (
             <>
                 <GoalActivity
@@ -76,26 +162,31 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     feed={goal._activityFeed}
                     header={
                         <>
-                            {nullable(goal.goalAchiveCriteria.length || goal._isEditable, () => (
+                            {nullable(goal._criteria.length || goal._isEditable, () => (
                                 <GoalCriteria
-                                    goalId={goal.id}
-                                    criteriaList={goal.goalAchiveCriteria}
-                                    onAddCriteria={onGoalCriteriaAdd}
-                                    onToggleCriteria={onGoalCriteriaToggle}
-                                    onRemoveCriteria={onGoalCriteriaRemove}
-                                    onConvertToGoal={onGoalCriteriaConvert}
-                                    onUpdateCriteria={onGoalCriteriaUpdate}
-                                    onClick={onGoalCriteriaClick}
                                     canEdit={goal._isEditable}
-                                    renderTrigger={(props) =>
-                                        nullable(goal._isEditable, () => (
-                                            <AddCriteriaForm
-                                                goalId={props.goalId}
-                                                onSubmit={props.onSubmit}
-                                                validityData={props.validityData}
-                                            />
-                                        ))
-                                    }
+                                    onCreate={handleCreateCriteria}
+                                    onUpdate={handleUpdateCriteria}
+                                    onUpdateState={handleUpdateCriteriaState}
+                                    onConvertToGoal={handleConvertCriteriaToGoal}
+                                    onRemove={handleRemoveCriteria}
+                                    onGoalClick={handleGoalClick}
+                                    validateGoalCriteriaBindings={handleValidateGoalToCriteriaBinging}
+                                    list={goal._criteria.map((criteria) => ({
+                                        id: criteria.id,
+                                        title: criteria.title,
+                                        weight: criteria.weight,
+                                        criteriaGoal:
+                                            criteria.criteriaGoal != null
+                                                ? {
+                                                      id: criteria.criteriaGoal.id,
+                                                      title: criteria.criteriaGoal.title,
+                                                      stateColor: criteria.criteriaGoal.state?.hue || 0,
+                                                      href: routes.goal(criteria.criteriaGoal._shortId),
+                                                  }
+                                                : null,
+                                        isDone: criteria.isDone,
+                                    }))}
                                 />
                             ))}
                             {nullable(lastStateComment, (value) => (

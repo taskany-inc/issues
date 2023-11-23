@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import type { Activity, GoalAchieveCriteria } from '@prisma/client';
+import type { Activity } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
@@ -283,7 +283,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     );
 
     const onGoalCriteriaConvert = useCallback(
-        (val: GoalAchieveCriteria, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
+        (val: { title: string; id: string }, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
             dispatchModalEvent(ModalEvent.GoalCreateModal, {
                 title: val.title,
                 onGoalCreate: async (createdGoal) => {
