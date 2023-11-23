@@ -1048,9 +1048,9 @@ export const goal = router({
 
             let isDoneByConnect = false;
 
-            if (input.goalAsGriteria?.id) {
+            if (input.criteriaGoal?.id) {
                 const connectedGoal = await prisma.goal.findUnique({
-                    where: { id: input.goalAsGriteria.id },
+                    where: { id: input.criteriaGoal.id },
                     include: { state: true },
                 });
 
@@ -1072,9 +1072,9 @@ export const goal = router({
                             connect: { id: input.goalId },
                         },
                         // TODO: rename validate field
-                        criteriaGoal: input.goalAsGriteria?.id
+                        criteriaGoal: input.criteriaGoal?.id
                             ? {
-                                  connect: { id: input.goalAsGriteria.id },
+                                  connect: { id: input.criteriaGoal.id },
                               }
                             : undefined,
                     },
@@ -1140,9 +1140,9 @@ export const goal = router({
 
                 let isDoneByConnect: boolean | null = null;
 
-                if (input.goalAsGriteria?.id) {
+                if (input.criteriaGoal?.id) {
                     const connectedGoal = await prisma.goal.findUnique({
-                        where: { id: input.goalAsGriteria.id },
+                        where: { id: input.criteriaGoal.id },
                         include: { state: true },
                     });
 
@@ -1163,15 +1163,15 @@ export const goal = router({
                             goal: {
                                 connect: { id: input.goalId },
                             },
-                            criteriaGoal: input.goalAsGriteria?.id
+                            criteriaGoal: input.criteriaGoal?.id
                                 ? {
-                                      connect: { id: input.goalAsGriteria.id },
+                                      connect: { id: input.criteriaGoal.id },
                                   }
                                 : undefined,
                             // TODO: remove after change scheme
-                            goalAsCriteria: input.goalAsGriteria?.id
+                            goalAsCriteria: input.criteriaGoal?.id
                                 ? {
-                                      connect: { id: input.goalAsGriteria.id },
+                                      connect: { id: input.criteriaGoal.id },
                                   }
                                 : undefined,
                             createdAt: currentCriteria.createdAt,

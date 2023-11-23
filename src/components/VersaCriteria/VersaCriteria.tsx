@@ -66,7 +66,7 @@ export const VersaCriteria: React.FC<VersaCriteriaProps> = ({
                     title: values.title,
                     goalId: values.selected.id,
                     weight: values.weight,
-                    goalAsGriteria: {
+                    criteriaGoal: {
                         id: goalId,
                     },
                 });
