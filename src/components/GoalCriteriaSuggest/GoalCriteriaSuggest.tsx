@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { trpc } from '../../utils/trpcClient';
 import { InlineTrigger } from '../InlineTrigger';
-import { CriteriaForm } from '../CriteriaFormV2/CriteriaForm';
+import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { GoalBadge } from '../GoalBadge';
 
 import { tr } from './GoalCriteriaSuggest.i18n';

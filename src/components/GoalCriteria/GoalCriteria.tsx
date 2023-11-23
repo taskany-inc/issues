@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Text, nullable, Table, MenuItem, TableRow, TableCell, Dropdown } from '@taskany/bricks';
+import { Text, nullable, Table, MenuItem, TableRow, TableCell, Dropdown, useClickOutside } from '@taskany/bricks';
 import {
     IconTargetOutline,
     IconCircleOutline,
@@ -11,18 +11,35 @@ import {
     IconPlusCircleOutline,
     IconMoreVerticalOutline,
 } from '@taskany/icons';
-import { backgroundColor, brandColor, gray10, danger0, gray8, gray9, gray4, gapS, gapXs } from '@taskany/colors';
+import {
+    backgroundColor,
+    brandColor,
+    gray10,
+    danger0,
+    gray8,
+    gray9,
+    gray4,
+    gapS,
+    gapXs,
+    radiusS,
+} from '@taskany/colors';
 
 import { ActivityFeedItem } from '../ActivityFeed';
 import { Circle } from '../Circle';
-import { CriteriaForm } from '../CriteriaFormV2/CriteriaForm';
+import { CriteriaForm } from '../CriteriaForm/CriteriaForm';
 import { GoalBadge } from '../GoalBadge';
-import { Box } from '../Box';
 import { trpc } from '../../utils/trpcClient';
 import { InlineTrigger } from '../InlineTrigger';
 import { Badge } from '../Badge';
 
 import { tr } from './GoalCriteria.i18n';
+
+export const StyledBox = styled.div`
+    padding: ${gapXs};
+    border: 1px solid ${gray4};
+    border-radius: ${radiusS};
+    width: 100%;
+`;
 
 const StyledWrapper = styled.div`
     display: grid;
@@ -136,7 +153,7 @@ interface CriteriaItemProps {
     onRemove: (value: CriteriaItemValue) => void;
     onConvertGoal: (value: CriteriaItemValue) => void;
     onCancel: () => void;
-    renderForm: (props: { onEditCancel: () => void }) => React.ReactNode;
+    renderForm: (props: { onEditCancel: () => void; ref: React.Ref<HTMLDivElement> }) => React.ReactNode;
 }
 
 const calculateModeCriteria = (props: CriteriaItemValue) => {
@@ -160,6 +177,12 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
 }) => {
     const { criteriaGoal, title } = criteria;
     const [mode, setMode] = useState<'view' | 'edit'>(() => calculateModeCriteria(criteria));
+    const formRef = useRef<HTMLDivElement>(null);
+
+    useClickOutside(formRef, () => {
+        setMode('view');
+        onCancel();
+    });
 
     const availableActions = useMemo<CriteriaActionItem[] | undefined>(() => {
         if (!canEdit) {
@@ -213,7 +236,9 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
                         <StyledIconTableCell width="16px">
                             <StyledCircleIcon size="s" />
                         </StyledIconTableCell>
-                        <TableCell width="calc(100% - 16px)">{renderForm({ onEditCancel: handleCancel })}</TableCell>
+                        <TableCell width="calc(100% - 16px)">
+                            {renderForm({ onEditCancel: handleCancel, ref: formRef })}
+                        </TableCell>
                     </>
                 ),
                 <>
@@ -403,22 +428,24 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                             onClick={onGoalClick}
                             canEdit={canEdit}
                             renderForm={(props) => (
-                                <Box>
+                                <StyledBox>
                                     <CriteriaForm
+                                        ref={props.ref}
                                         withModeSwitch
                                         defaultMode={criteria.criteriaGoal != null ? 'goal' : 'simple'}
                                         values={
                                             !addingCriteria
                                                 ? {
+                                                      id: criteria.id,
                                                       mode: criteria.criteriaGoal != null ? 'goal' : 'simple',
                                                       title: criteria.title,
                                                       selected: criteria.criteriaGoal,
-                                                      weight: criteria.weight != null ? String(criteria.weight) : '',
+                                                      weight: criteria.weight > 0 ? String(criteria.weight) : '',
                                                   }
                                                 : undefined
                                         }
                                         validityData={{
-                                            ...dataForValidate,
+                                            title: dataForValidate.title.filter((title) => title !== criteria.title),
                                             sumOfCriteria: dataForValidate.sumOfCriteria - criteria.weight,
                                         }}
                                         items={suggestions?.map((goal) => ({
@@ -446,7 +473,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                         )}
                                         validateBindingsFor={validateGoalCriteriaBindings}
                                     />
-                                </Box>
+                                </StyledBox>
                             )}
                         />
                     ))}

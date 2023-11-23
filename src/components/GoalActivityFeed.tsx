@@ -84,7 +84,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     title: data.title,
                     weight: String(data.weight),
                     goalId: goal.id,
-                    goalAsGriteria: data.selected
+                    criteriaGoal: data.selected
                         ? {
                               id: data.selected.id,
                           }
@@ -100,7 +100,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     title: data.title,
                     weight: String(data.weight),
                     goalId: goal.id,
-                    goalAsGriteria: data.selected
+                    criteriaGoal: data.selected
                         ? {
                               id: data.selected.id,
                           }
