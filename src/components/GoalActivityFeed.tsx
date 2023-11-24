@@ -1,5 +1,5 @@
 import { nullable } from '@taskany/bricks';
-import { forwardRef, useCallback } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
@@ -155,6 +155,28 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             [goal.goalAchiveCriteria, onGoalCriteriaClick],
         );
 
+        const criteriaList = useMemo(() => {
+            if (goal._criteria?.length) {
+                return goal._criteria.map((criteria) => ({
+                    id: criteria.id,
+                    title: criteria.title,
+                    weight: criteria.weight,
+                    criteriaGoal:
+                        criteria.criteriaGoal != null
+                            ? {
+                                  id: criteria.criteriaGoal.id,
+                                  title: criteria.criteriaGoal.title,
+                                  stateColor: criteria.criteriaGoal.state?.hue || 0,
+                                  href: routes.goal(criteria.criteriaGoal._shortId),
+                              }
+                            : null,
+                    isDone: criteria.isDone,
+                }));
+            }
+
+            return [];
+        }, [goal._criteria]);
+
         return (
             <>
                 <GoalActivity
@@ -162,7 +184,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     feed={goal._activityFeed}
                     header={
                         <>
-                            {nullable(goal._criteria.length || goal._isEditable, () => (
+                            {nullable(criteriaList || goal._isEditable, () => (
                                 <GoalCriteria
                                     canEdit={goal._isEditable}
                                     onCreate={handleCreateCriteria}
@@ -172,21 +194,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     onRemove={handleRemoveCriteria}
                                     onGoalClick={handleGoalClick}
                                     validateGoalCriteriaBindings={handleValidateGoalToCriteriaBinging}
-                                    list={goal._criteria.map((criteria) => ({
-                                        id: criteria.id,
-                                        title: criteria.title,
-                                        weight: criteria.weight,
-                                        criteriaGoal:
-                                            criteria.criteriaGoal != null
-                                                ? {
-                                                      id: criteria.criteriaGoal.id,
-                                                      title: criteria.criteriaGoal.title,
-                                                      stateColor: criteria.criteriaGoal.state?.hue || 0,
-                                                      href: routes.goal(criteria.criteriaGoal._shortId),
-                                                  }
-                                                : null,
-                                        isDone: criteria.isDone,
-                                    }))}
+                                    list={criteriaList}
                                 />
                             ))}
                             {nullable(lastStateComment, (value) => (
