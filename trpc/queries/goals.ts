@@ -349,6 +349,12 @@ export const goalDeepQuery = {
                     ghost: true,
                 },
             },
+            accessUsers: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
             stargizers: true,
             watchers: true,
             children: {

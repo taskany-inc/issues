@@ -1,0 +1,6 @@
+{
+    "Cannot delete person now": "Невозможно удалить пользователя",
+    "The user has actual goals": "У пользователя есть незакрытые цели",
+    "Before deleting, you must move this goals to another person:": "Перед удалением назначьте эти цели другим пользователям:",
+    "Ok, got it": "Хорошо, сделаю"
+}

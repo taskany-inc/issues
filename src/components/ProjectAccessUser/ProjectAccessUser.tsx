@@ -10,9 +10,7 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { UserEditableList } from '../UserEditableList/UserEditableList';
 import { SettingsCard } from '../SettingsContent';
 
-import { tr } from './ProjectParticipants.i18n';
-
-type User = NonNullable<ActivityByIdReturnType>;
+import { tr } from './ProjectAccessUser.i18n';
 
 const StyledTitle = styled(Text)`
     padding: ${gapS} ${gapM} ${gapM};
@@ -23,15 +21,15 @@ const StyledListContianer = styled.div`
     padding: ${gapS} ${gapM};
 `;
 
-export const ProjectParticipants: FC<{
+export const ProjectAccessUser: FC<{
     project: NonNullable<ProjectByIdReturnType>;
 }> = ({ project }) => {
     const [userIdToRemove, setUserIdToRemove] = useState<string>('');
-    const filterIds = useMemo(() => project.participants.map(({ id }) => id) ?? [], [project]);
+    const filterIds = useMemo(() => project.accessUsers.map(({ id }) => id) ?? [], [project]);
 
     const { updateProject } = useProjectResource(project.id);
 
-    const { data: userToRemoveGoals, status } = trpc.project.getActivityGoals.useQuery(
+    const { data: userToRemoveGoals = [], status } = trpc.project.getActivityGoals.useQuery(
         {
             id: project.id,
             ownerId: userIdToRemove,
@@ -42,29 +40,33 @@ export const ProjectParticipants: FC<{
     );
 
     const onAdd = useCallback(
-        (user: User) => {
+        (user: NonNullable<ActivityByIdReturnType>) => {
             updateProject()({
                 ...project,
-                participants: [...project.participants, user],
+                accessUsers: [...project.accessUsers, user],
             });
         },
         [updateProject, project],
     );
 
     useEffect(() => {
-        if (userToRemoveGoals && userToRemoveGoals.length) {
-            dispatchModalEvent(ModalEvent.ParticipantDeleteError, {
+        if (status !== 'success') {
+            return;
+        }
+
+        if (userToRemoveGoals.length) {
+            dispatchModalEvent(ModalEvent.AccessUserDeleteError, {
                 goals: userToRemoveGoals,
             })();
         }
 
-        if (userToRemoveGoals && !userToRemoveGoals.length) {
+        if (!userToRemoveGoals.length) {
             updateProject()({
                 ...project,
-                participants: project.participants.filter((user) => user.id !== userIdToRemove),
+                accessUsers: project.accessUsers.filter((user) => user.id !== userIdToRemove),
             });
         }
-    }, [userIdToRemove, userToRemoveGoals, updateProject, project]);
+    }, [status, userIdToRemove, userToRemoveGoals, updateProject, project]);
 
     useEffect(() => {
         if (status === 'success' || status === 'error') {
@@ -75,15 +77,15 @@ export const ProjectParticipants: FC<{
     return (
         <SettingsCard>
             <StyledTitle size="m" weight="bold" color={gray9}>
-                {tr('Participants')}
+                {tr('Access')}
             </StyledTitle>
             <StyledListContianer>
                 <UserEditableList
-                    users={project.participants}
+                    users={project.accessUsers}
                     filterIds={filterIds}
                     onAdd={onAdd}
                     onRemove={setUserIdToRemove}
-                    triggerText={tr('Add participant')}
+                    triggerText={tr('Add user')}
                     editable
                 />
             </StyledListContianer>

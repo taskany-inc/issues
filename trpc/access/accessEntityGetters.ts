@@ -49,7 +49,7 @@ export const getProject = (id: string) =>
     prisma.project.findUnique({
         where: { id },
         include: {
-            participants: {
+            accessUsers: {
                 include: {
                     user: true,
                     ghost: true,

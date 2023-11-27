@@ -32,7 +32,7 @@ export const addCalculatedProjectFields = <
     };
 };
 
-export const checkProjectAccess = <T extends { participants: WithId[]; activityId: string }>(
+export const checkProjectAccess = <T extends { accessUsers: WithId[]; activityId: string }>(
     project: T,
     activityId: string,
     role: Role,
@@ -43,8 +43,8 @@ export const checkProjectAccess = <T extends { participants: WithId[]; activityI
 
     return (
         project.activityId === activityId ||
-        !project.participants.length ||
-        project.participants.some((p) => p.id === activityId)
+        !project.accessUsers.length ||
+        project.accessUsers.some((p) => p.id === activityId)
     );
 };
 
@@ -92,6 +92,12 @@ export const getProjectSchema = ({
                 where: projectAccessQuery,
             },
             participants: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
+            accessUsers: {
                 include: {
                     user: true,
                     ghost: true,

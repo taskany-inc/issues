@@ -64,8 +64,8 @@ import {
 } from '../../utils/domObjects';
 import { safeUserData } from '../../utils/getUserName';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
-import { ProjectParticipants } from '../ProjectParticipants/ProjectParticipants';
-import { ParticipantDeleteErrorModal } from '../ParticipantDeleteErrorModal/ParticipantDeleteErrorModal';
+import { ProjectAccessUser } from '../ProjectAccessUser/ProjectAccessUser';
+import { AccessUserDeleteErrorModal } from '../AccessUserDeleteErrorModal/AccessUserDeleteErrorModal';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -341,7 +341,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     </Form>
                 </SettingsCard>
 
-                <ProjectParticipants project={project.data} />
+                <ProjectAccessUser project={project.data} />
 
                 <SettingsCard view="warning">
                     <Form>
@@ -384,7 +384,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 </SettingsCard>
             </SettingsContent>
 
-            <ParticipantDeleteErrorModal />
+            <AccessUserDeleteErrorModal />
 
             <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
                 <ModalHeader>

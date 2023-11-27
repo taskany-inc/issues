@@ -15,7 +15,7 @@ export enum ModalEvent {
     WhatsNewModal = 'WhatsNewModal',
     ImageFullScreen = 'ImageFullScreen',
     GoalPreviewModal = 'GoalPreviewModal',
-    ParticipantDeleteError = 'ParticipantDeleteError',
+    AccessUserDeleteError = 'AccessUserDeleteError',
 }
 
 export interface MapModalToComponentProps {
@@ -46,7 +46,7 @@ export interface MapModalToComponentProps {
     [ModalEvent.GoalPreviewModal]: {
         type: 'on:goal:update' | 'on:goal:delete';
     };
-    [ModalEvent.ParticipantDeleteError]: {
+    [ModalEvent.AccessUserDeleteError]: {
         goals: Pick<NonNullable<GoalByIdReturnType>, 'title' | '_shortId'>[];
     };
 }

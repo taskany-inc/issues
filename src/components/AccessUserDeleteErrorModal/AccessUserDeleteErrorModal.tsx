@@ -9,7 +9,7 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import ModalOnEvent, { ModalContext } from '../ModalOnEvent';
 import { routes } from '../../hooks/router';
 
-import { tr } from './ParticipantDeleteErrorModal.i18n';
+import { tr } from './AccessUserDeleteErrorModal.i18n';
 
 const StyledTip = styled(Tip)`
     color: ${warn0};
@@ -29,20 +29,20 @@ const StyledModalActions = styled.div`
     justify-content: flex-end;
 `;
 
-export const ParticipantDeleteErrorModal: FC = () => (
-    <ModalOnEvent view="warn" event={ModalEvent.ParticipantDeleteError}>
+export const AccessUserDeleteErrorModal: FC = () => (
+    <ModalOnEvent view="warn" event={ModalEvent.AccessUserDeleteError}>
         <ModalHeader>
-            <FormTitle color={warn0}>{tr('Cannot delete participant now')}</FormTitle>
+            <FormTitle color={warn0}>{tr('Cannot delete person now')}</FormTitle>
         </ModalHeader>
         <ModalContent>
             <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
                 {tr('The user has actual goals')}
             </StyledTip>
-            <Text size="s">{tr('Before deleting a participant, you must move their goals to another person:')}</Text>
+            <Text size="s">{tr('Before deleting, you must move this goals to another person:')}</Text>
             <ModalContext.Consumer>
                 {(ctx) => (
                     <StyledGoalList>
-                        {ctx?.[ModalEvent.ParticipantDeleteError]?.goals.map((goal) => (
+                        {ctx?.[ModalEvent.AccessUserDeleteError]?.goals.map((goal) => (
                             <NextLink key={goal._shortId} href={routes.goal(goal._shortId)} passHref legacyBehavior>
                                 <Text size="s" weight="bolder" as="a">
                                     {goal.title}
@@ -57,7 +57,7 @@ export const ParticipantDeleteErrorModal: FC = () => (
                     size="m"
                     view="warning"
                     text={tr('Ok, got it')}
-                    onClick={dispatchModalEvent(ModalEvent.ParticipantDeleteError)}
+                    onClick={dispatchModalEvent(ModalEvent.AccessUserDeleteError)}
                 />
             </StyledModalActions>
         </ModalContent>
