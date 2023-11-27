@@ -31,7 +31,7 @@ interface VersaCriteriaProps {
     versaCriterialList: GoalBadgeItemProps[];
     onSubmit: (values: AddCriteriaSchema) => Promise<void>;
     onRemove: (...args: any[]) => Promise<void>;
-    validateGoalCriteriaBindings: (values: { selectedGoalId: string; currentGoalId: string }) => Promise<void>;
+    validateGoalCriteriaBindings: (values: { goalId: string; criteriaGoalId: string }) => Promise<void>;
 }
 
 const StyledTextList = styled(TextList)`
@@ -61,9 +61,9 @@ export const VersaCriteria: React.FC<VersaCriteriaProps> = ({
 
     const handleConnectGoal = useCallback(
         async (values: FormValues) => {
-            if (values.title && values.selected) {
+            if ('selected' in values && values.selected != null) {
                 await onSubmit({
-                    title: values.title,
+                    title: values.selected.title,
                     goalId: values.selected.id,
                     weight: values.weight,
                     criteriaGoal: {
@@ -90,8 +90,8 @@ export const VersaCriteria: React.FC<VersaCriteriaProps> = ({
     const validateBindings = useCallback(
         (selectedId: string) => {
             return validateGoalCriteriaBindings({
-                currentGoalId: selectedId,
-                selectedGoalId: goalId,
+                criteriaGoalId: selectedId,
+                goalId,
             });
         },
         [goalId, validateGoalCriteriaBindings],

@@ -84,11 +84,12 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     title: data.title,
                     weight: String(data.weight),
                     goalId: goal.id,
-                    criteriaGoal: data.selected
-                        ? {
-                              id: data.selected.id,
-                          }
-                        : undefined,
+                    criteriaGoal:
+                        'selected' in data
+                            ? {
+                                  id: data.selected.id,
+                              }
+                            : undefined,
                 });
             },
             [goal.id, onGoalCriteriaAdd],
@@ -100,11 +101,12 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     title: data.title,
                     weight: String(data.weight),
                     goalId: goal.id,
-                    criteriaGoal: data.selected
-                        ? {
-                              id: data.selected.id,
-                          }
-                        : undefined,
+                    criteriaGoal:
+                        'selected' in data
+                            ? {
+                                  id: data.selected.id,
+                              }
+                            : undefined,
                 });
             },
             [goal.id, onGoalCriteriaUpdate],
@@ -139,7 +141,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
 
         const handleValidateGoalToCriteriaBinging = useCallback(
             (selectedId: string) => {
-                return validateGoalCriteriaBindings({ currentGoalId: goal.id, selectedGoalId: selectedId });
+                return validateGoalCriteriaBindings({ criteriaGoalId: selectedId, goalId: goal.id });
             },
             [goal.id, validateGoalCriteriaBindings],
         );
@@ -184,7 +186,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     feed={goal._activityFeed}
                     header={
                         <>
-                            {nullable(criteriaList || goal._isEditable, () => (
+                            {nullable(criteriaList?.length || goal._isEditable, () => (
                                 <GoalCriteria
                                     canEdit={goal._isEditable}
                                     onCreate={handleCreateCriteria}

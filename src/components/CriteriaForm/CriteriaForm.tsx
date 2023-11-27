@@ -44,32 +44,62 @@ type CriteriaFormMode = 'simple' | 'goal';
 export const maxPossibleWeight = 100;
 export const minPossibleWeight = 1;
 
-const schema = z.object({
-    id: z.string().optional(),
-    mode: z.enum<CriteriaFormMode, Readonly<[CriteriaFormMode, CriteriaFormMode]>>(['simple', 'goal']),
-    weight: z.string().optional(),
-    title: z.string().optional(),
-    selected: z
-        .object({
-            id: z.string(),
-            title: z.string(),
-            stateColor: z.number().optional(),
-        })
-        .nullish(),
-});
+interface FormValues {
+    mode: CriteriaFormMode;
+    title: string;
+    weight?: string;
+    selected?: SuggestItem;
+}
 
-type CriteriaFormValues = z.infer<typeof schema>;
-
-function patchZodSchema(
+function patchZodSchema<T extends FormValues>(
     data: ValidityData,
     checkBindingsBetweenGoals: (selectedGoalId: string) => Promise<void>,
-    defaultValues?: z.infer<typeof schema>,
+    defaultValues?: T,
 ) {
-    return schema
-        .merge(
+    return z
+        .discriminatedUnion('mode', [
             z.object({
-                /* INFO: https://github.com/colinhacks/zod#abort-early */
-                weight: schema.shape.weight.superRefine((val, ctx): val is string => {
+                mode: z.literal('simple'),
+                id: z.string().optional(),
+                selected: z.object({}).optional(),
+            }),
+            z.object({
+                mode: z.literal('goal'),
+                id: z.string().optional(),
+                selected: z.object({
+                    id: z.string().refine(
+                        async (val) => {
+                            if (defaultValues?.selected?.id === val) {
+                                return true;
+                            }
+
+                            try {
+                                await checkBindingsBetweenGoals(val);
+                                return true;
+                            } catch (_error) {
+                                return false;
+                            }
+                        },
+                        { message: tr('This binding is already exist'), path: [] },
+                    ),
+                    title: z.string().refine(
+                        (val) => {
+                            return !data.title.includes(val);
+                        },
+                        { message: tr('Title must be unique') },
+                    ),
+                    stateColor: z.number().optional(),
+                }),
+            }),
+        ])
+        .and(
+            z.object({
+                title: z
+                    .string({ required_error: tr('Title is required') })
+                    .min(1, tr('Title must be longer than 1 symbol'))
+                    .refine((val) => !data.title.includes(val), tr('Title must be unique')),
+                weight: z.string().superRefine((val, ctx): val is string => {
+                    /* INFO: https://github.com/colinhacks/zod#abort-early */
                     if (!val || !val.length) {
                         return z.NEVER;
                     }
@@ -96,57 +126,11 @@ function patchZodSchema(
 
                     return z.NEVER;
                 }),
-                selected: schema.shape.selected.refine(async (val) => {
-                    if (!val?.id) {
-                        return true;
-                    }
-
-                    if (defaultValues?.selected?.id === val.id) {
-                        return true;
-                    }
-
-                    try {
-                        await checkBindingsBetweenGoals(val.id);
-                        return true;
-                    } catch (_error) {
-                        return false;
-                    }
-                }, tr('These binding is already exist')),
             }),
-        )
-        .superRefine((val, ctx): val is Required<CriteriaFormValues> => {
-            if (val.mode === 'simple') {
-                if (!val.title) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: tr('Title is required'),
-                        path: ['title'],
-                    });
-                } else if (val.title.length < 1) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: tr('Title must be longer than 1 symbol'),
-                        path: ['title'],
-                    });
-                } else if (data.title.includes(val.selected?.title || val.title)) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: tr('Title must be unique'),
-                        path: ['title'],
-                    });
-                }
-            }
-            if (val.mode === 'goal' && !val.selected?.id.length) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: tr('Goal must be selected'),
-                    path: ['selected'],
-                });
-            }
-
-            return z.NEVER;
-        });
+        );
 }
+
+type CriteriaFormValues = FormValues & z.infer<ReturnType<typeof patchZodSchema>>;
 
 interface CriteriaFormProps {
     items: SuggestItem[];
@@ -267,6 +251,9 @@ const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
         );
     },
 );
+interface ErrorMessage {
+    message?: string;
+}
 
 interface CriteriaTitleFieldProps {
     name: 'title';
@@ -274,8 +261,11 @@ interface CriteriaTitleFieldProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onChange: (...args: any[]) => void;
     errors?: {
-        title?: { message?: string };
-        selected?: { message?: string };
+        title?: ErrorMessage;
+        selected?: {
+            id?: ErrorMessage;
+            title?: ErrorMessage;
+        };
     };
     mode: CriteriaFormMode;
     selectedItem?: SuggestItem | null;
@@ -307,7 +297,13 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
 
     const error = useMemo(() => {
         if (mode === 'goal' && selected) {
-            return selected;
+            if (selected.id) {
+                return selected.id;
+            }
+
+            if (selected.title) {
+                return selected.title;
+            }
         }
 
         if (mode === 'simple' && title) {
@@ -353,7 +349,6 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
                     mode: defaultMode,
                     title: '',
                     weight: '',
-                    selected: undefined,
                 },
                 values,
                 mode: 'onChange',
@@ -377,14 +372,23 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
                     if (name === 'title') {
                         onInputChange?.(currentValues.title);
 
-                        if (currentValues.selected != null && currentValues.selected.id != null) {
+                        if (
+                            'selected' in currentValues &&
+                            currentValues.selected != null &&
+                            currentValues.selected.id != null
+                        ) {
                             resetField('selected');
                             resetField('weight', { defaultValue: '' });
                         }
                     }
+
+                    return;
                 }
 
-                if (name === 'selected' || name === 'selected.id' || name === 'selected.title') {
+                if (
+                    currentValues.mode === 'goal' &&
+                    (name === 'selected' || name === 'selected.id' || name === 'selected.title')
+                ) {
                     onItemChange?.(currentValues.selected as Required<SuggestItem>);
 
                     trigger('selected');
@@ -392,7 +396,7 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
 
                 if (name === 'mode') {
                     onModeChange?.(currentValues.mode as NonNullable<CriteriaFormMode>);
-                    if (!!currentValues.title && !currentValues.selected) {
+                    if (currentValues.title) {
                         trigger('title');
                     }
                 }
@@ -411,7 +415,7 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
 
         const handleCancel = useCallback(() => {
             reset({
-                selected: null,
+                selected: undefined,
                 title: undefined,
             });
             onCancel?.();
