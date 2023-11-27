@@ -10,14 +10,14 @@ export const getProjectAccessFilter = (activityId: string, role: Role) => {
             OR: [
                 { activityId },
                 {
-                    participants: {
+                    accessUsers: {
                         some: {
                             id: activityId,
                         },
                     },
                 },
                 {
-                    participants: {
+                    accessUsers: {
                         none: {},
                     },
                 },

@@ -137,7 +137,6 @@ export const project = router({
             const requestSchemaWithoutOwner = requestSchema({ withOwner: false });
 
             const accessFilter = getProjectAccessFilter(activityId, role);
-            // TODO: should we use getProjectSchema here?
             const projectIds = await prisma.project.findMany({
                 where: {
                     OR: [
@@ -509,13 +508,14 @@ export const project = router({
     update: protectedProcedure
         .input(projectUpdateSchema)
         .use(projectEditAccessMiddleware)
-        .mutation(async ({ input: { id, parent, participants, ...data }, ctx }) => {
+        .mutation(async ({ input: { id, parent, accessUsers, ...data }, ctx }) => {
             const project = await prisma.project.findUnique({
                 where: { id },
                 include: {
                     parent: true,
                     activity: { include: { user: true, ghost: true } },
                     participants: { include: { user: true, ghost: true } },
+                    accessUsers: { include: { user: true, ghost: true } },
                     watchers: { include: { user: true, ghost: true } },
                 },
             });
@@ -525,10 +525,10 @@ export const project = router({
             const parentsToConnect = parent?.filter((pr) => !project.parent.some((p) => p.id === pr.id));
             const parentsToDisconnect = project.parent.filter((p) => !parent?.some((pr) => p.id === pr.id));
 
-            const participantsToConnect =
-                participants?.filter((pr) => !project.participants.some((p) => p.id === pr.id)) ?? [];
-            const participantsToDisconnect = project.participants.filter(
-                (p) => !participants?.some((pr) => p.id === pr.id),
+            const accessUsersToConnect =
+                accessUsers?.filter((pr) => !project.accessUsers.some((p) => p.id === pr.id)) ?? [];
+            const accessUsersToDisconnect = project.accessUsers.filter(
+                (p) => !accessUsers?.some((pr) => p.id === pr.id),
             );
 
             try {
@@ -536,9 +536,9 @@ export const project = router({
                     where: { id },
                     data: {
                         ...data,
-                        participants: {
-                            connect: participantsToConnect?.map((p) => ({ id: p.id })) || [],
-                            disconnect: participantsToDisconnect.map((p) => ({ id: p.id })),
+                        accessUsers: {
+                            connect: accessUsersToConnect?.map((p) => ({ id: p.id })) || [],
+                            disconnect: accessUsersToDisconnect.map((p) => ({ id: p.id })),
                         },
                         parent: {
                             connect: parentsToConnect?.map((p) => ({ id: p.id })) || [],
@@ -548,6 +548,12 @@ export const project = router({
                     include: {
                         parent: true,
                         participants: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
+                        accessUsers: {
                             include: {
                                 user: true,
                                 ghost: true,
@@ -567,6 +573,7 @@ export const project = router({
                         include: {
                             activity: { include: { user: true, ghost: true } },
                             participants: { include: { user: true, ghost: true } },
+                            accessUsers: { include: { user: true, ghost: true } },
                             watchers: { include: { user: true, ghost: true } },
                         },
                     });
@@ -575,7 +582,7 @@ export const project = router({
                         newParents.map((parent) => {
                             const recipients = Array.from(
                                 new Set(
-                                    [parent.activity, ...parent.participants, ...parent.watchers]
+                                    [parent.activity, ...parent.accessUsers, ...parent.participants, ...parent.watchers]
                                         .filter(Boolean)
                                         .map((r) => r.user?.email),
                                 ),
@@ -605,6 +612,7 @@ export const project = router({
                         include: {
                             activity: { include: { user: true, ghost: true } },
                             participants: { include: { user: true, ghost: true } },
+                            accessUsers: { include: { user: true, ghost: true } },
                             watchers: { include: { user: true, ghost: true } },
                         },
                     });
@@ -613,7 +621,7 @@ export const project = router({
                         oldParents.map((parent) => {
                             const recipients = Array.from(
                                 new Set(
-                                    [parent.activity, ...parent.participants, ...parent.watchers]
+                                    [parent.activity, ...parent.accessUsers, ...parent.participants, ...parent.watchers]
                                         .filter(Boolean)
                                         .map((r) => r.user?.email),
                                 ),
@@ -635,7 +643,7 @@ export const project = router({
                 const updatedFields: {
                     title?: FieldDiff;
                     description?: FieldDiff;
-                    participants?: FieldDiff;
+                    accessUsers?: FieldDiff;
                 } = {};
 
                 if (updatedProject.title !== project.title) {
@@ -646,20 +654,20 @@ export const project = router({
                     updatedFields.description = [project.description, updatedProject.description];
                 }
 
-                if (participantsToConnect.length || participantsToDisconnect.length) {
+                if (accessUsersToConnect.length || accessUsersToDisconnect.length) {
                     const participantsToString = <T extends Activity & { user: User | null; ghost: Ghost | null }>(
-                        participants: T[],
-                    ) => participants.map((participant) => prepareUserDataFromActivity(participant)?.email).join(', ');
+                        accessUsers: T[],
+                    ) => accessUsers.map((participant) => prepareUserDataFromActivity(participant)?.email).join(', ');
 
-                    updatedFields.participants = [
-                        participantsToString(project.participants),
-                        participantsToString(updatedProject.participants),
+                    updatedFields.accessUsers = [
+                        participantsToString(project.accessUsers),
+                        participantsToString(updatedProject.accessUsers),
                     ];
                 }
 
                 const recipients = Array.from(
                     new Set(
-                        [...project.participants, ...project.watchers, project.activity]
+                        [...project.participants, ...updatedProject.accessUsers, ...project.watchers, project.activity]
                             .filter(Boolean)
                             .map((r) => r.user?.email),
                     ),

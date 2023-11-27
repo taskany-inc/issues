@@ -120,6 +120,7 @@ model Activity {
   reactions          Reaction[]
   projects           Project[]
   projectParticipant Project[]             @relation("projectParticipants")
+  projectAccess      Project[]             @relation("projectAccess")
   goalParticipant    Goal[]                @relation("goalParticipants")
   goalWatchers       Goal[]                @relation("goalWatchers")
   goalStargizers     Goal[]                @relation("goalStargizers")
@@ -151,6 +152,7 @@ model Project {
   activity     Activity   @relation(fields: [activityId], references: [id])
   activityId   String
   participants Activity[] @relation("projectParticipants")
+  accessUsers  Activity[] @relation("projectAccess")
   goals        Goal[]     @relation("projectGoals")
   flow         Flow       @relation(fields: [flowId], references: [id])
   flowId       String

@@ -55,7 +55,7 @@ export const projectUpdateSchema = z.object({
             }),
         )
         .optional(),
-    participants: z
+    accessUsers: z
         .array(
             z.object({
                 id: z.string(),
