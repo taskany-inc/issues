@@ -299,7 +299,7 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
 };
 
 interface CriteriaActionFn<T> {
-    (val: T): void;
+    (val: T): void | Promise<void>;
 }
 
 interface GoalCriteriaProps {
@@ -330,6 +330,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
 }) => {
     const [addingCriteria, setAddingCriteria] = useState(false);
     const [query, setQuery] = useState('');
+    const [criteriaEditMode, setEditMode] = useState<CriteriaFormData['mode'] | null>(null);
 
     const { data: suggestions = [] } = trpc.goal.suggestions.useQuery(
         {
@@ -339,6 +340,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
         {
             staleTime: 0,
             cacheTime: 0,
+            enabled: criteriaEditMode === 'goal',
         },
     );
 
@@ -389,17 +391,24 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
 
     const handleFormSubmit = useCallback(
         (hideForm: () => void) => (values: CriteriaFormData) => {
+            let res: any;
             if (existingSubmittingData(values)) {
                 if (addingCriteria) {
-                    onCreate(values);
+                    res = onCreate(values);
                 } else {
-                    onUpdate(values);
+                    res = onUpdate(values);
                 }
-            }
 
-            hideForm();
+                if (typeof res.then === 'function') {
+                    res.then(hideForm);
+                } else {
+                    hideForm();
+                }
+
+                setEditMode(null);
+            }
         },
-        [onCreate, onUpdate, addingCriteria],
+        [addingCriteria, onCreate, onUpdate],
     );
 
     const dataForValidate = useMemo(() => {
@@ -415,6 +424,37 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             },
         );
     }, [sortedCriteriaItems]);
+
+    const mapCriteriaToValues = useCallback((criteria: CriteriaItemValue): CriteriaFormData => {
+        if (criteria.criteriaGoal) {
+            setEditMode('goal');
+
+            return {
+                mode: 'goal',
+                id: criteria.id,
+                title: criteria.title,
+                selected: {
+                    id: criteria.criteriaGoal.id,
+                    title: criteria.criteriaGoal.title,
+                    stateColor: criteria.criteriaGoal.stateColor,
+                },
+                weight: criteria.weight > 0 ? String(criteria.weight) : '',
+            };
+        }
+
+        setEditMode('simple');
+
+        return {
+            mode: 'simple',
+            id: criteria.id,
+            title: criteria.title,
+            weight: criteria.weight > 0 ? String(criteria.weight) : '',
+        };
+    }, []);
+
+    const handleChangeInput = useCallback((val = '') => {
+        setQuery(val);
+    }, []);
 
     return (
         <ActivityFeedItem>
@@ -441,19 +481,10 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                             renderForm={(props) => (
                                 <CriteriaForm
                                     ref={props.ref}
+                                    onModeChange={(mode) => setEditMode(mode)}
                                     withModeSwitch
                                     defaultMode={criteria.criteriaGoal != null ? 'goal' : 'simple'}
-                                    values={
-                                        !addingCriteria
-                                            ? {
-                                                  id: criteria.id,
-                                                  mode: criteria.criteriaGoal != null ? 'goal' : 'simple',
-                                                  title: criteria.title,
-                                                  selected: criteria.criteriaGoal,
-                                                  weight: criteria.weight > 0 ? String(criteria.weight) : '',
-                                              }
-                                            : undefined
-                                    }
+                                    values={mapCriteriaToValues(criteria)}
                                     validityData={{
                                         title: dataForValidate.title.filter((title) => title !== criteria.title),
                                         sumOfCriteria: dataForValidate.sumOfCriteria - criteria.weight,
@@ -464,7 +495,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                         stateColor: goal.state?.hue,
                                     }))}
                                     onSubmit={handleFormSubmit(props.onEditCancel)}
-                                    onInputChange={(val = '') => setQuery(val)}
+                                    onInputChange={handleChangeInput}
                                     onCancel={props.onEditCancel}
                                     renderItem={(props) => (
                                         <MenuItem
