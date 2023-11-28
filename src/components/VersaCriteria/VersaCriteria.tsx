@@ -90,8 +90,8 @@ export const VersaCriteria: React.FC<VersaCriteriaProps> = ({
     const validateBindings = useCallback(
         (selectedId: string) => {
             return validateGoalCriteriaBindings({
-                criteriaGoalId: selectedId,
-                goalId,
+                criteriaGoalId: goalId,
+                goalId: selectedId,
             });
         },
         [goalId, validateGoalCriteriaBindings],

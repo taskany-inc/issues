@@ -293,7 +293,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
                         convertGoalCriteria.mutateAsync({
                             title: createdGoal?.title,
                             id: val.id,
-                            goalAsCriteria: {
+                            criteriaGoal: {
                                 id: createdGoal.id,
                             },
                         }),
