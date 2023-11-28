@@ -370,7 +370,9 @@ export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
             const sub = watch((currentValues, { name, type }) => {
                 if (type === 'change') {
                     if (name === 'title') {
-                        onInputChange?.(currentValues.title);
+                        if (currentValues.mode === 'goal') {
+                            onInputChange?.(currentValues.title);
+                        }
 
                         if (
                             'selected' in currentValues &&

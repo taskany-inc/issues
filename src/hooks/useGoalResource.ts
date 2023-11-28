@@ -248,7 +248,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
 
     const onGoalCriteriaAdd = useCallback(
         async (val: AddCriteriaSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
-            await addGoalCriteria.mutateAsync(val);
+            await notifyPromise(addGoalCriteria.mutateAsync(val), 'criteriaCreate');
 
             invalidate(invalidateKey);
         },
@@ -257,7 +257,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
 
     const onGoalCriteriaToggle = useCallback(
         async (val: UpdateCriteriaStateSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
-            await toggleGoalCriteria.mutateAsync(val);
+            await notifyPromise(toggleGoalCriteria.mutateAsync(val), 'criteriaUpdate');
 
             invalidate(invalidateKey);
         },
@@ -266,7 +266,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
 
     const onGoalCriteriaUpdate = useCallback(
         async (val: UpdateCriteriaSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
-            await updateGoalCriteria.mutateAsync(val);
+            await notifyPromise(updateGoalCriteria.mutateAsync(val), 'criteriaUpdate');
 
             invalidate(invalidateKey);
         },
@@ -275,7 +275,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
 
     const onGoalCriteriaRemove = useCallback(
         async (val: RemoveCriteriaSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
-            await removeGoalCriteria.mutateAsync(val);
+            await notifyPromise(removeGoalCriteria.mutateAsync(val), 'criteriaDelete');
 
             invalidate(invalidateKey);
         },
@@ -289,13 +289,16 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
                 onGoalCreate: async (createdGoal) => {
                     if (!createdGoal) return;
 
-                    await convertGoalCriteria.mutateAsync({
-                        title: createdGoal?.title,
-                        id: val.id,
-                        goalAsCriteria: {
-                            id: createdGoal.id,
-                        },
-                    });
+                    await notifyPromise(
+                        convertGoalCriteria.mutateAsync({
+                            title: createdGoal?.title,
+                            id: val.id,
+                            goalAsCriteria: {
+                                id: createdGoal.id,
+                            },
+                        }),
+                        'criteriaUpdate',
+                    );
 
                     invalidate(invalidateKey);
                 },
