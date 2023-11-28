@@ -330,7 +330,6 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
 }) => {
     const [addingCriteria, setAddingCriteria] = useState(false);
     const [query, setQuery] = useState('');
-    const [criteriaEditMode, setEditMode] = useState<CriteriaFormData['mode'] | null>(null);
 
     const { data: suggestions = [] } = trpc.goal.suggestions.useQuery(
         {
@@ -340,7 +339,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
         {
             staleTime: 0,
             cacheTime: 0,
-            enabled: criteriaEditMode === 'goal',
+            enabled: query.length > 2,
         },
     );
 
@@ -404,8 +403,6 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                 } else {
                     hideForm();
                 }
-
-                setEditMode(null);
             }
         },
         [addingCriteria, onCreate, onUpdate],
@@ -427,8 +424,6 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
 
     const mapCriteriaToValues = useCallback((criteria: CriteriaItemValue): CriteriaFormData => {
         if (criteria.criteriaGoal) {
-            setEditMode('goal');
-
             return {
                 mode: 'goal',
                 id: criteria.id,
@@ -441,8 +436,6 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                 weight: criteria.weight > 0 ? String(criteria.weight) : '',
             };
         }
-
-        setEditMode('simple');
 
         return {
             mode: 'simple',
@@ -481,7 +474,6 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                             renderForm={(props) => (
                                 <CriteriaForm
                                     ref={props.ref}
-                                    onModeChange={(mode) => setEditMode(mode)}
                                     withModeSwitch
                                     defaultMode={criteria.criteriaGoal != null ? 'goal' : 'simple'}
                                     values={mapCriteriaToValues(criteria)}

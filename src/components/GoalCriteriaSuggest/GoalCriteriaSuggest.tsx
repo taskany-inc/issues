@@ -13,7 +13,7 @@ import { tr } from './GoalCriteriaSuggest.i18n';
 type CriteriaFormValues = Parameters<React.ComponentProps<typeof CriteriaForm>['onSubmit']>[0];
 
 interface GoalCriteriaComboBoxProps {
-    onSubmit: (values: CriteriaFormValues) => void;
+    onSubmit: (values: CriteriaFormValues) => Promise<void>;
     checkGoalsBindingsFor: (selectedGoalId: string) => Promise<void>;
 }
 
@@ -45,17 +45,15 @@ export const GoalCriteriaComboBox: React.FC<GoalCriteriaComboBoxProps> = ({ onSu
         ),
     ]);
 
-    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+    const hidePopup = useCallback(() => {
         if (popupVisible) {
             setPopupVisible(false);
         }
-    });
+    }, [popupVisible]);
 
-    useClickOutside(formRef, () => {
-        if (popupVisible) {
-            setPopupVisible(false);
-        }
-    });
+    const [onESC] = useKeyboard([KeyCode.Escape], hidePopup);
+
+    useClickOutside(formRef, hidePopup);
 
     const itemsToRender = useMemo(() => {
         if (selectedGoal?.title === query) {
@@ -88,6 +86,15 @@ export const GoalCriteriaComboBox: React.FC<GoalCriteriaComboBoxProps> = ({ onSu
         setQuery(item?.title);
     }, []);
 
+    const handleSubmit = useCallback(
+        async (values: CriteriaFormValues) => {
+            await onSubmit(values);
+
+            hidePopup();
+        },
+        [onSubmit, hidePopup],
+    );
+
     return (
         <>
             <InlineTrigger
@@ -110,8 +117,8 @@ export const GoalCriteriaComboBox: React.FC<GoalCriteriaComboBoxProps> = ({ onSu
                         defaultMode="goal"
                         onInputChange={setQuery}
                         onItemChange={handleGoalChange}
-                        onSubmit={onSubmit}
-                        onCancel={() => setPopupVisible(false)}
+                        onSubmit={handleSubmit}
+                        onCancel={hidePopup}
                         items={itemsToRender}
                         validityData={validityData}
                         validateBindingsFor={checkGoalsBindingsFor}

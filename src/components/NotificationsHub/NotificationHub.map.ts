@@ -5,6 +5,7 @@ type SubscribeNamespacesAction<T extends string> = NamespacedAction<T, 'Watch' |
 type Namespaces =
     | CUDNamespacedAction<'goals'>
     | CUDNamespacedAction<'comment'>
+    | CUDNamespacedAction<'criteria'>
     | NamespacedAction<'project', 'Transfer' | 'Create' | 'Update' | 'Delete'>
     | NamespacedAction<'filter', 'Star' | 'Unstar' | 'Delete' | 'Create'>
     | SubscribeNamespacesAction<'project'>
@@ -144,6 +145,18 @@ export const getNotificicationKeyMap = (key: keyof NotificationMap) => {
             onSuccess: 'Successfully copied',
             onPending: 'Copying...',
             onError: 'An error occurred while copying',
+        },
+        criteriaCreate: {
+            onSuccess: 'Voila! New criteria created 🎉',
+            onPending: 'Creating...',
+        },
+        criteriaDelete: {
+            onSuccess: 'Deleted successfully 🎉',
+            onPending: 'We are deleting criteria...',
+        },
+        criteriaUpdate: {
+            onSuccess: 'Voila! Successfully updated 🎉',
+            onPending: 'We are updating criteria...',
         },
     };
 
