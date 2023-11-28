@@ -42,7 +42,7 @@ export const removeCriteria = z.object({
 export const convertCriteriaToGoalSchema = z.object({
     id: z.string(),
     title: z.string(),
-    goalAsCriteria: z.object({
+    criteriaGoal: z.object({
         id: z.string(),
     }),
 });

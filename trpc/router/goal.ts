@@ -1051,6 +1051,7 @@ export const goal = router({
             }
 
             let isDoneByConnect = false;
+            let criteriaTitle = input.title;
 
             if (input.criteriaGoal?.id) {
                 const connectedGoal = await prisma.goal.findUnique({
@@ -1058,13 +1059,18 @@ export const goal = router({
                     include: { state: true },
                 });
 
-                isDoneByConnect = connectedGoal?.state?.type === StateType.Completed;
+                if (connectedGoal) {
+                    isDoneByConnect = connectedGoal.state?.type === StateType.Completed;
+
+                    // replace by default if have connected goal
+                    criteriaTitle = connectedGoal.title;
+                }
             }
 
             try {
                 const newCriteria = await prisma.goalAchieveCriteria.create({
                     data: {
-                        title: input.title,
+                        title: criteriaTitle,
                         weight: Number(input.weight),
                         isDone: isDoneByConnect,
                         activity: {
@@ -1075,7 +1081,6 @@ export const goal = router({
                         goal: {
                             connect: { id: input.goalId },
                         },
-                        // TODO: rename validate field
                         criteriaGoal: input.criteriaGoal?.id
                             ? {
                                   connect: { id: input.criteriaGoal.id },
@@ -1143,6 +1148,7 @@ export const goal = router({
                 }
 
                 let isDoneByConnect: boolean | null = null;
+                let criteriaTitle = input.title;
 
                 if (input.criteriaGoal?.id) {
                     const connectedGoal = await prisma.goal.findUnique({
@@ -1150,13 +1156,18 @@ export const goal = router({
                         include: { state: true },
                     });
 
-                    isDoneByConnect = connectedGoal?.state?.type === StateType.Completed;
+                    if (connectedGoal) {
+                        isDoneByConnect = connectedGoal.state?.type === StateType.Completed;
+
+                        // replace by default if have connected goal
+                        criteriaTitle = connectedGoal.title;
+                    }
                 }
 
                 const [updatedCriteria] = await Promise.all([
                     prisma.goalAchieveCriteria.create({
                         data: {
-                            title: input.title,
+                            title: criteriaTitle,
                             weight: Number(input.weight),
                             isDone: isDoneByConnect == null ? currentCriteria.isDone : isDoneByConnect,
                             activity: {
@@ -1168,12 +1179,6 @@ export const goal = router({
                                 connect: { id: input.goalId },
                             },
                             criteriaGoal: input.criteriaGoal?.id
-                                ? {
-                                      connect: { id: input.criteriaGoal.id },
-                                  }
-                                : undefined,
-                            // TODO: remove after change scheme
-                            goalAsCriteria: input.criteriaGoal?.id
                                 ? {
                                       connect: { id: input.criteriaGoal.id },
                                   }
@@ -1333,11 +1338,7 @@ export const goal = router({
                     data: {
                         title: input.title,
                         criteriaGoal: {
-                            connect: { id: input.goalAsCriteria.id },
-                        },
-                        // TODO remove after change validation scheme
-                        goalAsCriteria: {
-                            connect: { id: input.goalAsCriteria.id },
+                            connect: { id: input.criteriaGoal.id },
                         },
                     },
                 });
@@ -1684,6 +1685,7 @@ export const goal = router({
                             },
                         ],
                     },
+                    include: { criteriaGoal: true },
                 });
 
                 return criteriaList;

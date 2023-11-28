@@ -411,7 +411,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     const dataForValidate = useMemo(() => {
         return sortedCriteriaItems.reduce<CriteriaValidityData>(
             (acc, criteria) => {
-                acc.title.push(criteria.title);
+                acc.title.push(criteria.criteriaGoal?.title ?? criteria.title);
                 acc.sumOfCriteria += criteria.weight;
                 return acc;
             },
@@ -427,7 +427,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             return {
                 mode: 'goal',
                 id: criteria.id,
-                title: criteria.title,
+                title: criteria.criteriaGoal.title,
                 selected: {
                     id: criteria.criteriaGoal.id,
                     title: criteria.criteriaGoal.title,
@@ -478,7 +478,9 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                                     defaultMode={criteria.criteriaGoal != null ? 'goal' : 'simple'}
                                     values={mapCriteriaToValues(criteria)}
                                     validityData={{
-                                        title: dataForValidate.title.filter((title) => title !== criteria.title),
+                                        title: dataForValidate.title.filter(
+                                            (title) => title !== (criteria.criteriaGoal?.title ?? criteria.title),
+                                        ),
                                         sumOfCriteria: dataForValidate.sumOfCriteria - criteria.weight,
                                     }}
                                     items={suggestions?.map((goal) => ({

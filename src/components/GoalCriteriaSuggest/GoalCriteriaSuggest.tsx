@@ -69,9 +69,9 @@ export const GoalCriteriaComboBox: React.FC<GoalCriteriaComboBoxProps> = ({ onSu
 
     const validityData = useMemo(() => {
         return criteriaList.reduce<{ sumOfCriteria: number; title: string[] }>(
-            (acc, { weight, title }) => {
+            (acc, { weight, title, criteriaGoal }) => {
                 acc.sumOfCriteria += weight;
-                acc.title.push(title);
+                acc.title.push(criteriaGoal?.title ?? title);
                 return acc;
             },
             {
