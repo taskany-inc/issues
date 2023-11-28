@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.10.1](https://github.com/taskany-inc/issues/compare/v2.10.0...v2.10.1) (2023-11-28)
+
+
+### Bug Fixes
+
+* **VersaCriteria:** hide popup after submit ([690cbf9](https://github.com/taskany-inc/issues/commit/690cbf9a6ea585475ef129eed63cdab328a47495))
+
 ## [2.10.0](https://github.com/taskany-inc/issues/compare/v2.9.0...v2.10.0) (2023-11-27)
 
 
