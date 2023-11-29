@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.10.2](https://github.com/taskany-inc/issues/compare/v2.10.1...v2.10.2) (2023-11-29)
+
+
+### Bug Fixes
+
+* ***Criteria:** get criteria title and validation ([1db1aba](https://github.com/taskany-inc/issues/commit/1db1aba68a75648b9ae9111550cd9cb0f55fc45e))
+
 ## [2.10.1](https://github.com/taskany-inc/issues/compare/v2.10.0...v2.10.1) (2023-11-28)
 
 
