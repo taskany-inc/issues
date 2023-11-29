@@ -1716,5 +1716,7 @@ export const goal = router({
             if (criteria != null) {
                 throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'These bindings is already exist' });
             }
+
+            return null;
         }),
 });

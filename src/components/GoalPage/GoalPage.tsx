@@ -17,7 +17,6 @@ import { useRouter } from '../../hooks/router';
 import { StarButton } from '../StarButton/StarButton';
 import { trpc } from '../../utils/trpcClient';
 import { refreshInterval } from '../../utils/config';
-import { GoalAchiveCriteria, GoalDependencyItem } from '../../../trpc/inferredTypes';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
 import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
@@ -83,38 +82,9 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
         };
     }, [on, invalidate]);
 
-    const onGoalCriteriaClick = useCallback(
-        (item: GoalAchiveCriteria) => {
-            if (item.criteriaGoal) {
-                const { projectId, scopeId, title, description, updatedAt } = item.criteriaGoal;
-                const shortId = `${projectId}-${scopeId}`;
-
-                setPreview(shortId, {
-                    title,
-                    description,
-                    updatedAt,
-                });
-            }
-        },
-        [setPreview],
-    );
-
-    const onGoalDependencyClick = useCallback(
-        ({ projectId, scopeId, title, description, updatedAt }: GoalDependencyItem) => {
-            const shortId = `${projectId}-${scopeId}`;
-
-            setPreview(shortId, {
-                title,
-                description,
-                updatedAt,
-            });
-        },
-        [setPreview],
-    );
-
-    const onVersaGoalClick = useCallback(
-        (shortId: string) => {
-            setPreview(shortId);
+    const onGoalClick = useCallback(
+        (goal: { _shortId: string }) => {
+            setPreview(goal._shortId);
         },
         [setPreview],
     );
@@ -182,7 +152,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         ref={commentsRef}
                         goal={goal}
                         shortId={id}
-                        onGoalCriteriaClick={onGoalCriteriaClick}
+                        onGoalClick={onGoalClick}
                         onGoalDeleteConfirm={router.goals}
                     />
                 </div>
@@ -191,8 +161,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                     <GoalSidebar
                         goal={goal}
                         onGoalTransfer={onGoalTransfer((transferredGoal) => router.goal(transferredGoal._shortId))}
-                        onGoalDependencyClick={onGoalDependencyClick}
-                        onGoalOpen={onVersaGoalClick}
+                        onGoalClick={onGoalClick}
                     />
                 </div>
             </GoalContent>

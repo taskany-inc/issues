@@ -15,5 +15,6 @@
     "Add": "Добавить",
     "Cancel": "Отменить",
     "Suggestions": "Предложения",
-    "This binding is already exist": "Такая связка уже существует"
+    "This binding is already exist": "Такая связка уже существует",
+    "Criteria title": "Заголовок критерия"
 }
