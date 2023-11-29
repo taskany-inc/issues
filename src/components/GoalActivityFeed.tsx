@@ -85,7 +85,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     weight: String(data.weight),
                     goalId: goal.id,
                     criteriaGoal:
-                        'selected' in data && data.selected != null
+                        'selected' in data && data.selected.id != null
                             ? {
                                   id: data.selected.id,
                               }
@@ -102,7 +102,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     weight: String(data.weight),
                     goalId: goal.id,
                     criteriaGoal:
-                        'selected' in data && data.selected != null
+                        'selected' in data && data.selected.id != null
                             ? {
                                   id: data.selected.id,
                               }
