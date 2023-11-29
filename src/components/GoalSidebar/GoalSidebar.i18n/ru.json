@@ -18,5 +18,7 @@
     "blocks": "Блокирует",
     "dependsOn": "Зависит от",
     "relatedTo": "Связана с",
-    "Delete": "Удалить"
+    "Delete": "Удалить",
+    "Connect to goal": "Привязать к цели",
+    "Is the criteria for": "Является критерием для"
 }

@@ -1,6 +1,6 @@
-import { useState, useRef, FC, ReactNode, MutableRefObject, useCallback } from 'react';
+import { useState, useRef, FC, ReactNode, MutableRefObject, useCallback, ComponentProps } from 'react';
 import styled from 'styled-components';
-import { Popup, nullable } from '@taskany/bricks';
+import { KeyCode, Popup, nullable, useKeyboard } from '@taskany/bricks';
 import { gapXs } from '@taskany/colors';
 
 const StyledWrapper = styled.div`
@@ -10,24 +10,47 @@ const StyledWrapper = styled.div`
 interface GoalFormPopupTriggerProps {
     children: ReactNode;
     renderTrigger: (props: { onClick: () => void; ref: MutableRefObject<HTMLDivElement | null> }) => ReactNode;
+    onClick?: () => void;
+    onCancel?: () => void;
+    placement?: ComponentProps<typeof Popup>['placement'];
+    defaultVisible?: boolean;
 }
 
-export const GoalFormPopupTrigger: FC<GoalFormPopupTriggerProps> = ({ children, renderTrigger }) => {
-    const [visible, setVisible] = useState(false);
+export const GoalFormPopupTrigger: FC<GoalFormPopupTriggerProps> = ({
+    children,
+    renderTrigger,
+    onClick,
+    onCancel,
+    placement = 'bottom-start',
+    defaultVisible,
+}) => {
+    const [visible, setVisible] = useState(Boolean(defaultVisible));
     const popupRef = useRef<HTMLDivElement | null>(null);
 
     const onClickOutside = useCallback(() => {
         setVisible(false);
-    }, []);
+        onCancel?.();
+    }, [onCancel]);
+
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        if (visible) {
+            onClickOutside();
+        }
+    });
+
+    const onClickHandler = useCallback(() => {
+        setVisible(true);
+        onClick?.();
+    }, [onClick]);
 
     return (
         <>
             {renderTrigger({
-                onClick: () => setVisible(true),
+                onClick: onClickHandler,
                 ref: popupRef,
             })}
             <Popup
-                placement="bottom-start"
+                placement={placement}
                 visible={visible}
                 reference={popupRef}
                 onClickOutside={onClickOutside}
@@ -35,8 +58,11 @@ export const GoalFormPopupTrigger: FC<GoalFormPopupTriggerProps> = ({ children, 
                 minWidth={450}
                 maxWidth={450}
                 arrow
+                {...onESC}
             >
-                <StyledWrapper>{nullable(visible, () => children)}</StyledWrapper>
+                {nullable(visible, () => (
+                    <StyledWrapper>{children}</StyledWrapper>
+                ))}
             </Popup>
         </>
     );

@@ -1,12 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    AutoComplete,
     AutoCompleteRadioGroup,
-    AutoCompleteList,
     nullable,
     Form,
-    useKeyboard,
-    KeyCode,
     Text,
     Button,
     FormControl,
@@ -14,19 +10,25 @@ import {
     FormControlInput,
     FormControlError,
 } from '@taskany/bricks';
-import { gapS, gapSm, gray7 } from '@taskany/colors';
-import { IconPlusCircleOutline, IconSearchOutline, IconTargetOutline } from '@taskany/icons';
-import { ReactEventHandler, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { gapSm, gray7 } from '@taskany/colors';
+import { IconTargetOutline } from '@taskany/icons';
+import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import colorLayer from 'color-layer';
 import styled from 'styled-components';
 import { z } from 'zod';
 
-import { InlineTrigger } from '../InlineTrigger';
-import { useForkedRef } from '../../hooks/useForkedRef';
 import { usePageContext } from '../../hooks/usePageContext';
+import { GoalSelect } from '../GoalSelect';
+import { GoalBadge } from '../GoalBadge';
+import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
+import { AddInlineTrigger } from '../AddInlineTrigger';
 
 import { tr } from './CriteriaForm.i18n';
+
+const StyledGoalBadge = styled(GoalBadge)`
+    padding: 0;
+`;
 
 interface SuggestItem {
     id: string;
@@ -53,7 +55,7 @@ interface FormValues {
 
 function patchZodSchema<T extends FormValues>(
     data: ValidityData,
-    checkBindingsBetweenGoals: (selectedGoalId: string) => Promise<void>,
+    checkBindingsBetweenGoals: CriteriaFormProps['validateBindingsFor'],
     defaultValues?: T,
 ) {
     return z
@@ -65,7 +67,7 @@ function patchZodSchema<T extends FormValues>(
             }),
             z.object({
                 mode: z.literal('goal'),
-                id: z.string().optional(),
+                id: z.string(),
                 selected: z.object({
                     id: z.string().refine(
                         async (val) => {
@@ -82,12 +84,9 @@ function patchZodSchema<T extends FormValues>(
                         },
                         { message: tr('This binding is already exist'), path: [] },
                     ),
-                    title: z.string().refine(
-                        (val) => {
-                            return !data.title.includes(val);
-                        },
-                        { message: tr('Title must be unique') },
-                    ),
+                    title: z
+                        .string()
+                        .refine((val) => !data.title.includes(val), { message: tr('Title must be unique') }),
                     stateColor: z.number().optional(),
                 }),
             }),
@@ -134,120 +133,62 @@ type CriteriaFormValues = FormValues & z.infer<ReturnType<typeof patchZodSchema>
 
 interface CriteriaFormProps {
     items: SuggestItem[];
-    defaultMode?: CriteriaFormMode;
+    value?: SuggestItem[];
+    mode: CriteriaFormMode;
     withModeSwitch?: boolean;
     values?: CriteriaFormValues;
     validityData: { title: string[]; sumOfCriteria: number };
 
-    onModeChange?: (mode: CriteriaFormMode) => void;
+    setMode: (mode: CriteriaFormMode) => void;
     onSubmit: (values: CriteriaFormValues) => void;
-    onCancel?: () => void;
     onItemChange?: (item?: SuggestItem) => void;
     onInputChange?: (value?: string) => void;
-    validateBindingsFor: (selectedId: string) => Promise<void>;
-
-    renderItem: React.ComponentProps<typeof AutoComplete<SuggestItem>>['renderItem'];
+    validateBindingsFor: (selectedId: string) => Promise<null>;
 }
 
-const keyGetter = (item: SuggestItem) => item.id;
-
-interface WeightFieldProps {
-    name: 'weight';
-    value?: string;
-    onChange: ReactEventHandler<HTMLInputElement>;
-    error?: { message?: string };
+interface WeightFieldProps extends Pick<ComponentProps<typeof FormControlInput>, 'name' | 'value' | 'onChange'> {
+    error?: ComponentProps<typeof FormControlError>['error'];
     maxValue: number;
-    visible?: boolean;
 }
-
-const StyledWeightFieldWrapper = styled.div`
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: ${gapS};
-    height: 28px; // input height
-`;
-
-const StyledText = styled(Text)`
-    white-space: nowrap;
-`;
 
 const StyledFormRow = styled.div`
     display: flex;
     flex-wrap: nowrap;
     margin-top: ${gapSm};
-    margin-left: calc(${gapS} + 1px); // 'cause input have 1px border
 `;
 
-const StyledFormControlsWrapper = styled.div`
-    display: inline-flex;
+const StyledButton = styled(Button)`
     margin-left: auto;
-    white-space: nowrap;
-    gap: ${gapS};
-`;
-
-const StyledFormControl = styled(FormControl)`
-    display: flex;
-    flex-wrap: nowrap;
-    max-width: 100px;
-    width: 100%;
 `;
 
 const StyledFormControlInput = styled(FormControlInput)`
     width: 3ch;
 `;
 
-const StyledAutoCompleteRadiosWrapper = styled.div`
-    margin-left: calc(${gapS} + 1px); // 'cause input have 1px border
-`;
-
 const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
-    ({ error, maxValue, value, onChange, name, visible = false }, ref) => {
-        const [showWeigthInput, setShowWeigthInput] = useState(visible);
-        const innerInputRef = useRef<HTMLInputElement>(null);
-        const inputRef = useForkedRef(ref, innerInputRef);
-
-        const [onESC] = useKeyboard([KeyCode.Escape], () => {
-            if (document.activeElement === innerInputRef.current) {
-                setShowWeigthInput(false);
-            }
-        });
-
+    ({ error, maxValue, value, onChange, name }, ref) => {
         return (
-            <StyledWeightFieldWrapper>
-                {nullable(
-                    showWeigthInput,
-                    () => (
-                        <StyledFormControl error={error?.message != null} variant="outline" inline>
-                            <FormControlLabel color={gray7}>{tr('Weight')}</FormControlLabel>
-                            <StyledFormControlInput
-                                value={value}
-                                onChange={onChange}
-                                ref={inputRef}
-                                {...onESC}
-                                autoFocus={!value}
-                                autoComplete="off"
-                                name={name}
-                                disabled={maxPossibleWeight === maxValue}
-                            >
-                                {nullable(error?.message, (message) => (
-                                    <FormControlError>{message}</FormControlError>
-                                ))}
-                            </StyledFormControlInput>
-                            <StyledText size="s" color={gray7}>
-                                {tr.raw('Weight out of', {
-                                    upTo: maxPossibleWeight - maxValue,
-                                })}
-                            </StyledText>
-                        </StyledFormControl>
-                    ),
-                    <InlineTrigger
-                        icon={<IconPlusCircleOutline size="s" />}
-                        onClick={() => setShowWeigthInput(true)}
-                        text={tr('Add weight')}
-                    />,
-                )}
-            </StyledWeightFieldWrapper>
+            <FormControl error={error?.message != null} variant="outline" inline>
+                <FormControlLabel color={gray7}>{tr('Weight')}</FormControlLabel>
+                <StyledFormControlInput
+                    value={value}
+                    onChange={onChange}
+                    ref={ref}
+                    autoFocus
+                    autoComplete="off"
+                    name={name}
+                    disabled={maxPossibleWeight === maxValue}
+                >
+                    {nullable(error, (err) => (
+                        <FormControlError error={err} />
+                    ))}
+                </StyledFormControlInput>
+                <Text size="s" color={gray7}>
+                    {tr.raw('Weight out of', {
+                        upTo: maxPossibleWeight - maxValue,
+                    })}
+                </Text>
+            </FormControl>
         );
     },
 );
@@ -255,11 +196,8 @@ interface ErrorMessage {
     message?: string;
 }
 
-interface CriteriaTitleFieldProps {
-    name: 'title';
-    value?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onChange: (...args: any[]) => void;
+interface CriteriaTitleFieldProps
+    extends Pick<ComponentProps<typeof FilterAutoCompleteInput>, 'name' | 'value' | 'onChange'> {
     errors?: {
         title?: ErrorMessage;
         selected?: {
@@ -269,6 +207,7 @@ interface CriteriaTitleFieldProps {
     };
     mode: CriteriaFormMode;
     selectedItem?: SuggestItem | null;
+    isEditMode?: boolean;
 }
 
 const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
@@ -278,21 +217,19 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
     value,
     name,
     errors = {},
+    isEditMode,
 }) => {
     const { themeId } = usePageContext();
     const { selected, title } = errors;
 
     const icon = useMemo(() => {
-        if (mode === 'goal') {
-            if (selectedItem && selectedItem.stateColor) {
-                const color = selectedItem.stateColor || 1;
-                const sat = color === 1 ? 0 : undefined;
+        if (mode === 'simple') return false;
+        if (!selectedItem || !selectedItem?.stateColor) return;
 
-                return <IconTargetOutline size="s" color={colorLayer(color, 10, sat)[themeId]} />;
-            }
+        const color = selectedItem.stateColor || 1;
+        const sat = color === 1 ? 0 : undefined;
 
-            return <IconSearchOutline size="s" color={gray7} />;
-        }
+        return <IconTargetOutline size="s" color={colorLayer(color, 10, sat)[themeId]} />;
     }, [mode, selectedItem, themeId]);
 
     const error = useMemo(() => {
@@ -314,200 +251,197 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
     }, [mode, selected, title]);
 
     return (
-        <FormControl variant="outline" error={error?.message != null}>
-            <FormControlInput iconLeft={icon} value={value} onChange={onChange} name={name}>
-                {nullable(error?.message, (message) => (
-                    <FormControlError>{message}</FormControlError>
-                ))}
-            </FormControlInput>
-        </FormControl>
+        <FilterAutoCompleteInput
+            name={name}
+            icon={icon}
+            value={value}
+            error={error}
+            onChange={onChange}
+            disabled={isEditMode}
+            placeholder={mode === 'simple' ? tr('Criteria title') : undefined}
+        />
     );
 };
 
-export const CriteriaForm = forwardRef<HTMLDivElement, CriteriaFormProps>(
-    (
-        {
-            defaultMode = 'simple',
-            onInputChange,
-            onItemChange,
-            onModeChange,
-            onSubmit,
-            onCancel,
-            items,
-            withModeSwitch,
-            renderItem,
-            validityData,
-            validateBindingsFor,
-            values,
-        },
-        ref,
-    ) => {
-        const { control, watch, setValue, register, resetField, handleSubmit, reset, setError, trigger } =
-            useForm<CriteriaFormValues>({
-                resolver: zodResolver(patchZodSchema(validityData, validateBindingsFor, values)),
-                defaultValues: {
-                    mode: defaultMode,
-                    title: '',
-                    weight: '',
-                },
-                values,
-                mode: 'onChange',
-                reValidateMode: 'onChange',
-            });
+export const CriteriaForm = ({
+    onInputChange,
+    onItemChange,
+    onSubmit,
+    items,
+    withModeSwitch,
+    validityData,
+    validateBindingsFor,
+    values,
+    value,
+    mode,
+    setMode,
+}: CriteriaFormProps) => {
+    const [showWeightInput, setShowWeightInput] = useState(Boolean(values?.title));
 
-        const isEditMode = values != null && !!values.title?.length;
-
-        const radios: Array<{ value: CriteriaFormMode; title: string }> = [
-            { title: tr('Simple'), value: 'simple' },
-            { title: tr('Goal'), value: 'goal' },
-        ];
-
-        const title = watch('title');
-        const selected = watch('selected');
-        const mode = watch('mode', defaultMode);
-
-        useEffect(() => {
-            const sub = watch((currentValues, { name, type }) => {
-                if (type === 'change') {
-                    if (name === 'title') {
-                        if (currentValues.mode === 'goal') {
-                            onInputChange?.(currentValues.title);
-                        }
-
-                        if (
-                            'selected' in currentValues &&
-                            currentValues.selected != null &&
-                            currentValues.selected.id != null
-                        ) {
-                            resetField('selected');
-                            resetField('weight', { defaultValue: '' });
-                        }
-                    }
-
-                    return;
-                }
-
-                if (
-                    currentValues.mode === 'goal' &&
-                    (name === 'selected' || name === 'selected.id' || name === 'selected.title')
-                ) {
-                    onItemChange?.(currentValues.selected as Required<SuggestItem>);
-
-                    trigger('selected');
-                }
-
-                if (name === 'mode') {
-                    onModeChange?.(currentValues.mode as NonNullable<CriteriaFormMode>);
-                    if (currentValues.title) {
-                        trigger('title');
-                    }
-                }
-            });
-
-            return () => sub.unsubscribe();
-        }, [watch, onInputChange, onItemChange, onModeChange, resetField, setError, trigger]);
-
-        const handleSelectItem = useCallback(
-            ([item]: SuggestItem[]) => {
-                setValue('selected', item);
-                setValue('title', item.title);
+    const { control, watch, setValue, register, resetField, handleSubmit, setError, trigger } =
+        useForm<CriteriaFormValues>({
+            resolver: zodResolver(patchZodSchema(validityData, validateBindingsFor, values)),
+            defaultValues: {
+                mode,
+                title: '',
+                weight: '',
             },
-            [setValue],
-        );
+            values,
+            mode: 'onChange',
+            reValidateMode: 'onChange',
+        });
 
-        const handleCancel = useCallback(() => {
-            reset({
-                selected: undefined,
-                title: undefined,
-            });
-            onCancel?.();
-        }, [reset, onCancel]);
+    const isEditMode = values != null && !!values.title?.length;
 
-        const isTitleFilled = useMemo(() => {
-            if (mode === 'simple') {
-                return !!title;
+    const radios: Array<{ value: CriteriaFormMode; title: string }> = [
+        { title: tr('Simple'), value: 'simple' },
+        { title: tr('Goal'), value: 'goal' },
+    ];
+
+    const title = watch('title');
+    const selected = watch('selected');
+
+    useEffect(() => {
+        const sub = watch((currentValues, { name, type }) => {
+            if (type === 'change') {
+                if (name === 'title') {
+                    onInputChange?.(currentValues.title);
+
+                    if (
+                        'selected' in currentValues &&
+                        currentValues.selected != null &&
+                        currentValues.selected.id != null
+                    ) {
+                        resetField('selected');
+                        resetField('weight', { defaultValue: '' });
+                    }
+                }
+
+                return;
             }
 
-            if (mode === 'goal') {
-                return !!(title && selected?.id);
+            if (
+                currentValues.mode === 'goal' &&
+                (name === 'selected' || name === 'selected.id' || name === 'selected.title')
+            ) {
+                onItemChange?.(currentValues.selected as Required<SuggestItem>);
+
+                trigger('selected');
             }
 
-            return false;
-        }, [mode, title, selected?.id]);
+            if (name === 'mode') {
+                if (currentValues.title) {
+                    trigger('title');
+                }
+            }
+        });
 
-        return (
-            <div ref={ref}>
-                <Form onSubmit={handleSubmit(onSubmit)}>
-                    <AutoComplete
-                        mode="single"
-                        items={items}
-                        onChange={handleSelectItem}
-                        renderItem={renderItem}
-                        keyGetter={keyGetter}
-                    >
+        return () => sub.unsubscribe();
+    }, [watch, onInputChange, onItemChange, resetField, setError, trigger]);
+
+    const handleSelectItem = useCallback(
+        (item: SuggestItem) => {
+            setValue('selected', item);
+            setValue('title', item.title);
+        },
+        [setValue],
+    );
+
+    const handleChangeMode = useCallback(
+        (mode: CriteriaFormMode) => {
+            setValue('mode', mode);
+            setMode(mode);
+        },
+        [setMode, setValue],
+    );
+
+    const needShowWeightField = useMemo(() => {
+        if (mode === 'simple') {
+            return !!title;
+        }
+
+        if (mode === 'goal') {
+            return !!(title && selected?.id);
+        }
+
+        return false;
+    }, [mode, title, selected?.id]);
+
+    return (
+        <Form onSubmit={handleSubmit(onSubmit)}>
+            <GoalSelect
+                items={items}
+                value={value}
+                onClick={handleSelectItem}
+                renderItem={(props) => (
+                    <StyledGoalBadge title={props.item.title} color={props.item.stateColor} theme={1} />
+                )}
+            >
+                <>
+                    <Controller
+                        name="title"
+                        control={control}
+                        render={({ field, formState }) => (
+                            <CriteriaTitleField
+                                mode={mode}
+                                isEditMode={isEditMode}
+                                selectedItem={selected}
+                                {...field}
+                                errors={formState.errors}
+                            />
+                        )}
+                    />
+
+                    {nullable(withModeSwitch, () => (
                         <Controller
-                            name="title"
+                            name="mode"
                             control={control}
-                            render={({ field, formState }) => (
-                                <CriteriaTitleField
-                                    mode={mode as CriteriaFormMode}
-                                    selectedItem={selected}
+                            render={({ field }) => (
+                                <AutoCompleteRadioGroup
+                                    title={tr('Mode')}
+                                    items={radios}
                                     {...field}
-                                    errors={formState.errors}
+                                    onChange={(val) => handleChangeMode(val.value)}
                                 />
                             )}
                         />
+                    ))}
 
-                        {nullable(withModeSwitch, () => (
+                    <StyledFormRow>
+                        {nullable(needShowWeightField, () => (
                             <Controller
-                                name="mode"
+                                name="weight"
                                 control={control}
-                                render={({ field }) => (
-                                    <StyledAutoCompleteRadiosWrapper>
-                                        <AutoCompleteRadioGroup
-                                            title={tr('Mode')}
-                                            items={radios}
-                                            {...field}
-                                            onChange={(val) => setValue('mode', val.value)}
-                                        />
-                                    </StyledAutoCompleteRadiosWrapper>
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        {nullable(
+                                            showWeightInput,
+                                            () => (
+                                                <CriteriaWeightField
+                                                    {...field}
+                                                    maxValue={validityData.sumOfCriteria}
+                                                    error={fieldState.error}
+                                                />
+                                            ),
+                                            <AddInlineTrigger
+                                                onClick={() => setShowWeightInput(true)}
+                                                text={tr('Add weight')}
+                                                centered={false}
+                                            />,
+                                        )}
+                                    </>
                                 )}
                             />
                         ))}
-                        <StyledFormRow>
-                            {nullable(isTitleFilled, () => (
-                                <Controller
-                                    name="weight"
-                                    control={control}
-                                    render={({ field, fieldState }) => (
-                                        <CriteriaWeightField
-                                            {...field}
-                                            maxValue={validityData.sumOfCriteria}
-                                            error={fieldState.error}
-                                            visible={values?.weight != null && Number(values.weight) > 0}
-                                        />
-                                    )}
-                                />
-                            ))}
-                            <StyledFormControlsWrapper>
-                                <Button
-                                    type="submit"
-                                    text={isEditMode ? tr('Save') : tr('Add')}
-                                    view="primary"
-                                    outline
-                                />
-                                <Button text={tr('Cancel')} view="default" outline onClick={handleCancel} />
-                            </StyledFormControlsWrapper>
-                        </StyledFormRow>
-                        {nullable(mode !== 'simple' && !isTitleFilled, () => (
-                            <AutoCompleteList title={tr('Suggestions')} />
-                        ))}
-                    </AutoComplete>
-                    <input type="hidden" {...register('id')} />
-                    <input type="hidden" {...register('selected.id')} />
-                    <input type="hidden" {...register('selected.title')} />
-                </Form>
-            </div>
-        );
-    },
-);
+
+                        <StyledButton type="submit" text={isEditMode ? tr('Save') : tr('Add')} view="primary" outline />
+                    </StyledFormRow>
+                </>
+            </GoalSelect>
+
+            <input type="hidden" {...register('id')} />
+            <input type="hidden" {...register('selected.id')} />
+            <input type="hidden" {...register('selected.title')} />
+        </Form>
+    );
+};

@@ -18,5 +18,7 @@
     "blocks": "This goal blocked by",
     "dependsOn": "This goal depends on",
     "relatedTo": "This goal relates to",
-    "Delete": ""
+    "Delete": "",
+    "Connect to goal": "",
+    "Is the criteria for": ""
 }

@@ -1,4 +1,4 @@
-import { ComponentProps, FC, useMemo } from 'react';
+import { ComponentProps, FC, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
@@ -17,13 +17,14 @@ import { TextList, TextListItem } from '../TextList';
 import { safeUserData } from '../../utils/getUserName';
 import { goalPageDeleteButton } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
-import { GoalDependencyListByKind } from '../GoalDependencyList';
+import { GoalList } from '../GoalList';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList';
 import { dependencyKind } from '../../schema/goal';
-import { VersaCriteria } from '../VersaCriteria/VersaCriteria';
-import { UserEditableList, UserEditableListTrigger } from '../UserEditableList/UserEditableList';
+import { UserEditableList } from '../UserEditableList/UserEditableList';
+import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
+import { AddInlineTrigger } from '../AddInlineTrigger';
 
 import { tr } from './GoalSidebar.i18n';
 
@@ -43,13 +44,10 @@ const StyledTextList = styled(TextList).attrs({
 interface GoalSidebarProps {
     goal: NonNullable<GoalByIdReturnType>;
     onGoalTransfer: ComponentProps<typeof GoalParentComboBox>['onChange'];
-    onGoalDependencyClick?: ComponentProps<typeof GoalDependencyListByKind>['onClick'];
-    onGoalOpen?: (shortId: string) => void;
+    onGoalClick?: ComponentProps<typeof GoalList>['onClick'];
 }
 
-type VersaGoalItem = React.ComponentProps<typeof VersaCriteria>['versaCriterialList'][number];
-
-export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoalDependencyClick, onGoalOpen }) => {
+export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoalClick }) => {
     const participantsFilter = useMemo(() => {
         const participantsIds = goal.participants.map(({ id }) => id);
         const { owner, activity: issuer } = goal;
@@ -95,6 +93,22 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
         };
     }, []);
 
+    const handleConnectGoal = useCallback(
+        async (values: { title?: string; selected?: { id: string } | null; weight?: string }) => {
+            if (values.title && values.selected) {
+                await onGoalCriteriaAdd({
+                    title: values.title,
+                    goalId: values.selected.id,
+                    weight: values.weight,
+                    criteriaGoal: {
+                        id: goal.id,
+                    },
+                });
+            }
+        },
+        [goal.id, onGoalCriteriaAdd],
+    );
+
     return (
         <>
             <IssueMeta title={tr('Issuer')}>
@@ -121,7 +135,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                                 <IconXCircleSolid size="xs" onClick={onClick} />
                                             </UserBadge>
                                         ),
-                                        <UserEditableListTrigger text={tr('Assign')} onClick={onClick} />,
+                                        <AddInlineTrigger text={tr('Assign')} onClick={onClick} />,
                                     )
                                 }
                             />
@@ -165,7 +179,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 placeholder={tr('Type project title')}
                                 onChange={({ id }) => addPartnerProject(id)}
                                 renderTrigger={(props) => (
-                                    <UserEditableListTrigger text={tr('Add project')} onClick={props.onClick} />
+                                    <AddInlineTrigger text={tr('Add project')} onClick={props.onClick} />
                                 )}
                             />
                         </StyledInlineInput>
@@ -178,11 +192,17 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     {goal._relations.map(({ kind, goals }) => {
                         return nullable(goals.length, () => (
                             <IssueMeta title={heading[kind]} key={kind}>
-                                <GoalDependencyListByKind
-                                    id={goal.id}
+                                <GoalList
+                                    canEdit={goal._isEditable}
                                     goals={goals}
-                                    onClick={onGoalDependencyClick}
-                                    onRemove={onGoalDependencyRemove}
+                                    onClick={onGoalClick}
+                                    onRemove={(removedGoal) =>
+                                        onGoalDependencyRemove({
+                                            id: goal.id,
+                                            kind: removedGoal._kind,
+                                            relation: { id: removedGoal.id },
+                                        })
+                                    }
                                 />
                             </IssueMeta>
                         ));
@@ -191,11 +211,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     {nullable(goal._isEditable, () => (
                         <GoalFormPopupTrigger
                             renderTrigger={(props) => (
-                                <UserEditableListTrigger
-                                    text={tr('Add dependency')}
-                                    ref={props.ref}
-                                    onClick={props.onClick}
-                                />
+                                <AddInlineTrigger text={tr('Add dependency')} ref={props.ref} onClick={props.onClick} />
                             )}
                         >
                             <GoalDependency id={goal.id} items={goal._relations} onSubmit={onGoalDependencyAdd} />
@@ -205,27 +221,38 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
             ))}
 
             {nullable(goal._versaCriteria?.length || goal._isEditable, () => (
-                <VersaCriteria
-                    goalId={goal.id}
-                    canEdit={goal._isEditable}
-                    onSubmit={onGoalCriteriaAdd}
-                    onRemove={onGoalCriteriaRemove}
-                    onGoalClick={onGoalOpen ? (value) => onGoalOpen(value.shortId) : undefined}
-                    validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                    versaCriterialList={goal._versaCriteria.reduce<VersaGoalItem[]>(
-                        (acc, { goal: { id: goalId, state, _shortId, title }, id }) => {
-                            acc.push({
-                                id: goalId,
-                                title,
-                                stateColor: state?.hue,
-                                criteriaId: id,
-                                shortId: _shortId,
-                            });
-                            return acc;
-                        },
-                        [],
-                    )}
-                />
+                <IssueMeta title={tr('Is the criteria for')}>
+                    <GoalList
+                        canEdit={goal._isEditable}
+                        goals={goal._versaCriteria.map((criteria) => ({
+                            ...criteria.goal,
+                            criteriaId: criteria.id,
+                        }))}
+                        onClick={onGoalClick ? (goal) => onGoalClick(goal) : undefined}
+                        onRemove={(goal) => onGoalCriteriaRemove({ id: goal.criteriaId, goalId: goal.id })}
+                    />
+
+                    {nullable(goal._isEditable, () => (
+                        <GoalFormPopupTrigger
+                            renderTrigger={(props) => (
+                                <AddInlineTrigger
+                                    text={tr('Connect to goal')}
+                                    ref={props.ref}
+                                    onClick={props.onClick}
+                                />
+                            )}
+                        >
+                            <GoalCriteriaSuggest
+                                id={goal.id}
+                                defaultMode="goal"
+                                items={goal._versaCriteria}
+                                onSubmit={handleConnectGoal}
+                                validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                                versa
+                            />
+                        </GoalFormPopupTrigger>
+                    ))}
+                </IssueMeta>
             ))}
 
             {nullable(goal._isEditable || goal.tags.length, () => (
@@ -249,7 +276,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 value={goal.tags}
                                 onChange={onGoalTagAdd}
                                 renderTrigger={(props) => (
-                                    <UserEditableListTrigger text={tr('Add tag')} onClick={props.onClick} />
+                                    <AddInlineTrigger text={tr('Add tag')} onClick={props.onClick} />
                                 )}
                             />
                         </StyledInlineInput>
@@ -265,7 +292,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                             placeholder={tr('Type project title')}
                             onChange={onGoalTransfer}
                             renderTrigger={(props) => (
-                                <UserEditableListTrigger
+                                <AddInlineTrigger
                                     icon={<IconArrowRightOutline size="xs" />}
                                     text={tr('Transfer goal')}
                                     onClick={props.onClick}
@@ -274,7 +301,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                         />
                     </StyledInlineInput>
 
-                    <UserEditableListTrigger
+                    <AddInlineTrigger
                         icon={<IconBinOutline size="xs" {...goalPageDeleteButton.attr} />}
                         text={tr('Archive goal')}
                         onClick={dispatchModalEvent(ModalEvent.GoalDeleteModal)}
