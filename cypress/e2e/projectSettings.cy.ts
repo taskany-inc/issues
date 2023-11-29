@@ -62,11 +62,14 @@ describe('ProjectSettings', () => {
 
     beforeEach(() => {
         cy.intercept('/api/trpc/project.update*').as('updateProject');
-        cy.signInViaEmail();
-        cy.visit(routes.projectSettings(id));
     });
 
     describe('save button must be active if anything was changed', () => {
+        beforeEach(() => {
+            cy.signInViaEmail();
+            cy.visit(routes.projectSettings(id));
+        });
+
         it('change title', () => {
             cy.get(projectSettingsSaveButton.query).should('be.disabled');
 
@@ -115,6 +118,11 @@ describe('ProjectSettings', () => {
     });
 
     describe('change title', () => {
+        beforeEach(() => {
+            cy.signInViaEmail();
+            cy.visit(routes.projectSettings(id));
+        });
+
         it('title is filled', () => {
             cy.get(projectSettingsTitleInput.query).type(addedText);
 
@@ -138,6 +146,11 @@ describe('ProjectSettings', () => {
     });
 
     describe('change description', () => {
+        beforeEach(() => {
+            cy.signInViaEmail();
+            cy.visit(routes.projectSettings(id));
+        });
+
         it('description is filled', () => {
             cy.get(projectSettingsDescriptionInput.query).type(addedText);
 
@@ -163,6 +176,11 @@ describe('ProjectSettings', () => {
     });
 
     describe('add parents', () => {
+        beforeEach(() => {
+            cy.signInViaEmail();
+            cy.visit(routes.projectSettings(id));
+        });
+
         it('add one parent', () => {
             cy.get(projectSettingsParentMultiInputTrigger.query).click();
             cy.focused().clear().type(titleParentOne);
@@ -219,6 +237,11 @@ describe('ProjectSettings', () => {
     });
 
     describe('remove project', () => {
+        beforeEach(() => {
+            cy.signInViaEmail();
+            cy.visit(routes.projectSettings(id));
+        });
+
         it('open/close removing project modal', () => {
             cy.get(projectSettingsConfirmDeleteProjectButton.query).should('not.exist');
 
@@ -260,8 +283,6 @@ describe('ProjectSettings', () => {
     describe('check routing', () => {
         describe('user is NOT the owner', () => {
             beforeEach(() => {
-                cy.clearCookies();
-                cy.visit(routes.signIn());
                 cy.signInViaEmail({ email: userEmail, password: userPassword });
             });
 
@@ -281,6 +302,11 @@ describe('ProjectSettings', () => {
     });
 
     describe('transfer project to other user', () => {
+        beforeEach(() => {
+            cy.signInViaEmail();
+            cy.visit(routes.projectSettings(id));
+        });
+
         it('open/close transferring project modal', () => {
             cy.get(projectSettingsConfirmTransferProjectButton.query).should('not.exist');
 
@@ -353,8 +379,6 @@ describe('ProjectSettings', () => {
     describe('check routing', () => {
         describe('user is the owner', () => {
             beforeEach(() => {
-                cy.clearCookies();
-                cy.visit(routes.signIn());
                 cy.signInViaEmail({ email: userEmail, password: userPassword });
             });
 
@@ -374,6 +398,11 @@ describe('ProjectSettings', () => {
         });
 
         describe('admin is NOT owner', () => {
+            beforeEach(() => {
+                cy.signInViaEmail();
+                cy.visit(routes.projectSettings(id));
+            });
+
             it('going via tab from project page', () => {
                 cy.visit(routes.project(id));
 
