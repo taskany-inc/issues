@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.10.3](https://github.com/taskany-inc/issues/compare/v2.10.2...v2.10.3) (2023-11-30)
+
+
+### Bug Fixes
+
+* **GoalCriteria:** correct condition for `criteriaGoal` ([6bf390f](https://github.com/taskany-inc/issues/commit/6bf390fab820b715fad2336ec739360829c6899d))
+
 ## [2.10.2](https://github.com/taskany-inc/issues/compare/v2.10.1...v2.10.2) (2023-11-29)
 
 
