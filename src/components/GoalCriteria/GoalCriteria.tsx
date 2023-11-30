@@ -423,7 +423,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     }, [sortedCriteriaItems]);
 
     const mapCriteriaToValues = useCallback((criteria: CriteriaItemValue): CriteriaFormData => {
-        if (criteria.criteriaGoal) {
+        if (criteria.criteriaGoal?.id != null) {
             return {
                 mode: 'goal',
                 id: criteria.id,
@@ -442,6 +442,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             id: criteria.id,
             title: criteria.title,
             weight: criteria.weight > 0 ? String(criteria.weight) : '',
+            selected: undefined,
         };
     }, []);
 
