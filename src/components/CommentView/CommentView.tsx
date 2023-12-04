@@ -2,7 +2,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { State, User } from '@prisma/client';
 import styled from 'styled-components';
-import { brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
+import { backgroundColor, brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
 import {
     Card,
     CardComment,
@@ -145,8 +145,13 @@ const StyledMd = styled(Md)`
 `;
 
 const StyledStateDot = styled(StateDot)`
-    width: 32px;
-    height: 32px;
+    position: absolute;
+    bottom: -50%;
+    right: -50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border: 4px solid ${backgroundColor};
 `;
 
 export const CommentView: FC<CommentViewProps> = ({
@@ -246,7 +251,10 @@ export const CommentView: FC<CommentViewProps> = ({
         <ActivityFeedItem id={pin ? '' : `comment-${id}`} {...comment.attr}>
             <Circle size={32}>
                 {pin ? (
-                    <StyledStateDot hue={state?.hue} />
+                    <>
+                        <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />
+                        <StyledStateDot hue={state?.hue} />
+                    </>
                 ) : (
                     nullable(
                         profileUrl && author,
