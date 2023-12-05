@@ -248,4 +248,9 @@ Cypress.Commands.addAll({
             '@workerMain.js',
         ]);
     },
+    loadLangFile: () => {
+        cy.fixture('langs.json').then((content) => {
+            Cypress.env('translations', content);
+        });
+    },
 });
