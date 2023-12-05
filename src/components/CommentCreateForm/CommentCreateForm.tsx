@@ -12,6 +12,7 @@ import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { ColorizedMenuItem } from '../ColorizedMenuItem';
 import { StateDot } from '../StateDot';
+import { useLatest } from '../../hooks/useLatest';
 
 import { tr } from './CommentCreateForm.i18n';
 
@@ -50,6 +51,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
 
     const [pushState, setPushState] = useState(stateId ? statesMap[stateId] : undefined);
     const [description, setDescription] = useState(currentDescription);
+    const descriptionRef = useLatest(description);
     const [focused, setFocused] = useState(Boolean(currentDescription));
     const [busy, setBusy] = useState(false);
 
@@ -60,28 +62,26 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
 
     const onCommentChange = useCallback(
         ({ description }: { description: string }) => {
+            setDescription(description);
             onChange?.({ description, stateId: pushState?.id });
         },
         [onChange, pushState?.id],
     );
 
     const onCommentSubmit = useCallback(
-        async (form: CommentSchema) => {
+        async (form: CommentSchema & { stateId?: string }) => {
             setBusy(true);
             setFocused(false);
 
-            await onSubmit?.({
-                ...form,
-                stateId: pushState?.id,
-            });
+            await onSubmit?.(form);
 
             setDescription('');
-            setPushState(stateId ? statesMap[stateId] : undefined);
+            setPushState(form.stateId ? statesMap[form.stateId] : undefined);
 
             setBusy(false);
             setFocused(true);
         },
-        [onSubmit, pushState?.id, stateId, statesMap],
+        [onSubmit, statesMap],
     );
 
     const onCancelCreate = useCallback(() => {
@@ -96,13 +96,32 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
         (state: State) => {
             setPushState((prev) => {
                 const newState = state.id === prev?.id ? undefined : state;
-                onChange?.({ description, stateId: newState?.id });
+                onChange?.({ description: descriptionRef.current, stateId: newState?.id });
 
                 return newState;
             });
         },
-        [onChange, setPushState, description],
+        [onChange, descriptionRef],
     );
+
+    const onCommentFormSubmit = useCallback(
+        (type: 'pushState' | 'default') => {
+            return (formData: CommentSchema) => {
+                const data: CommentSchema & { stateId?: string } = { ...formData };
+
+                if (type === 'pushState' && pushState) {
+                    data.stateId = pushState?.id;
+                }
+
+                return onCommentSubmit(data);
+            };
+        },
+        [onCommentSubmit, pushState],
+    );
+
+    const onCommentСlick = useCallback(() => {
+        onCommentFormSubmit('default')({ description: descriptionRef.current });
+    }, [descriptionRef, onCommentFormSubmit]);
 
     return (
         <ActivityFeedItem>
@@ -113,12 +132,19 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                 focused={focused}
                 busy={busy}
                 onChange={onCommentChange}
-                onSubmit={onCommentSubmit}
+                onSubmit={onCommentFormSubmit('pushState')}
                 onCancel={onCancelCreate}
                 onFocus={onCommentFocus}
                 actionButton={
                     <>
-                        <Button size="m" view="primary" disabled={busy} outline type="submit" text={tr('Comment')} />
+                        <Button
+                            size="m"
+                            view="primary"
+                            disabled={busy}
+                            outline
+                            onClick={onCommentСlick}
+                            text={tr('Comment')}
+                        />
                         {nullable(states, () => (
                             <StyledStateUpdate>
                                 <Button

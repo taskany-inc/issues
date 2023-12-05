@@ -270,7 +270,7 @@ export const CommentView: FC<CommentViewProps> = ({
 
             {editMode ? (
                 <CommentForm
-                    description={description}
+                    description={commentDescription.description}
                     focused={focused}
                     busy={busy}
                     autoFocus
