@@ -34,39 +34,34 @@ const run = () => {
                     if (!data) {
                         reject(new Error('No content'));
                     }
+                    const { entries } = JSON.parse(data);
 
-                    const jsonString = data.split('\n\n').at(-1);
+                    const content = Object.keys(entries).reduce<LangsContent>((acc, key) => {
+                        const fileName = key.split('/').at(-1);
 
-                    if (jsonString) {
-                        const { entries } = JSON.parse(jsonString);
+                        const keys = Object.keys(entries[key]);
 
-                        const content = Object.keys(entries).reduce<LangsContent>((acc, key) => {
-                            const fileName = key.split('/').at(-1);
+                        if (fileName) {
+                            acc[fileName] = keys.reduce<NamespaceContent>((tr, k) => {
+                                tr[k] = entries[key][k].translations;
+                                return tr;
+                            }, {});
+                        }
 
-                            const keys = Object.keys(entries[key]);
+                        return acc;
+                    }, {});
 
-                            if (fileName) {
-                                acc[fileName] = keys.reduce<NamespaceContent>((tr, k) => {
-                                    tr[k] = entries[key][k].translations;
-                                    return tr;
-                                }, {});
-                            }
+                    await fs.writeFile(
+                        path.join(process.cwd(), 'cypress/fixtures/langs.json'),
+                        JSON.stringify(content, null, 4),
+                        {
+                            encoding: 'utf-8',
+                        },
+                    );
 
-                            return acc;
-                        }, {});
+                    await fs.rm(path.resolve(tempFile));
 
-                        await fs.writeFile(
-                            path.join(process.cwd(), 'cypress/fixtures/langs.json'),
-                            JSON.stringify(content, null, 4),
-                            {
-                                encoding: 'utf-8',
-                            },
-                        );
-
-                        await fs.rm(path.resolve(tempFile));
-
-                        resolve(0);
-                    }
+                    resolve(0);
                 } catch (error) {
                     reject(error);
                 }

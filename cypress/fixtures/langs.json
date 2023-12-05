@@ -500,15 +500,15 @@
     "GoalDependency": {
         "blocks": {
             "ru": "Блокирует",
-            "en": "This goal blocked by"
+            "en": "Blocked by"
         },
         "dependsOn": {
             "ru": "Зависит от",
-            "en": "This goal depends on"
+            "en": "Depends on"
         },
         "relatedTo": {
             "ru": "Связана с",
-            "en": "This goal relates to"
+            "en": "Relates to"
         },
         "Kind": {
             "ru": "Вид зависимости",
@@ -578,15 +578,15 @@
     "GoalSidebar": {
         "blocks": {
             "ru": "Блокирует",
-            "en": "This goal blocked by"
+            "en": "Blocked by"
         },
         "dependsOn": {
             "ru": "Зависит от",
-            "en": "This goal depends on"
+            "en": "Depends on"
         },
         "relatedTo": {
             "ru": "Связана с",
-            "en": "This goal relates to"
+            "en": "Relates to"
         },
         "Issuer": {
             "ru": "Автор",
@@ -752,6 +752,10 @@
             "ru": "критерий",
             "en": ""
         },
+        "partner project": {
+            "ru": "партнерский проект",
+            "en": ""
+        },
         "goal as criteria": {
             "ru": "цель",
             "en": "goal"
@@ -768,13 +772,21 @@
             "ru": "вернул(а) цель в работу",
             "en": "returns goal to work"
         },
-        "partner project": {
-            "ru": "партнерский проект",
-            "en": ""
-        },
         "as criteria": {
             "ru": "как критерий",
             "en": ""
+        },
+        "author and more made changes in": {
+            "ru": "{author} и еще {count} внесли изменения в {subject}",
+            "en": "{author} and {count} more made changes in {subject}"
+        },
+        "author and the other author made changes in": {
+            "ru": "{author} и {oneMoreAuthor} внесли изменения в {subject}",
+            "en": "{author} and {oneMoreAuthor} made changes in {subject}"
+        },
+        "author made changes in": {
+            "ru": "{author} внес(ла) изменения в {subject}",
+            "en": "{author} made changes in {subject}"
         }
     },
     "HotkeysModal": {
@@ -871,6 +883,10 @@
         "Create goal": {
             "ru": "Цель",
             "en": "Goal"
+        },
+        "Create personal goal": {
+            "ru": "Персональная цель",
+            "en": "Personal goal"
         },
         "Create project": {
             "ru": "Проект",
@@ -979,6 +995,16 @@
         "Settings": {
             "ru": "Настройки",
             "en": "Settings"
+        }
+    },
+    "ProjectParticipants": {
+        "Participants": {
+            "ru": "Участники",
+            "en": ""
+        },
+        "Add participant": {
+            "ru": "Добавить участника",
+            "en": ""
         }
     },
     "ProjectSettingsPage": {
@@ -1349,10 +1375,6 @@
         "Goal's description must be a string": {
             "ru": "Описание может быть только строкой",
             "en": "Goal's description must be a string"
-        },
-        "Goal's project are is required": {
-            "ru": "Укажите проект",
-            "en": "Goal's project are is required"
         },
         "Title must be longer than 2 symbols": {
             "ru": "Заголовок должен быть длиннее 2 символов",
