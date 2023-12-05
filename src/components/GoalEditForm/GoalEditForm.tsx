@@ -9,7 +9,7 @@ import { trpc } from '../../utils/trpcClient';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { getDateStringFromEstimate } from '../../utils/dateTime';
 import { goalForm, goalUpdateButton } from '../../utils/domObjects';
-import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
+import { dispatchPreviewUpdateEvent, useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import RotatableTip from '../RotatableTip/RotatableTip';
 
 import { tr } from './GoalEditForm.i18n';
@@ -21,6 +21,7 @@ interface GoalEditFormProps {
 }
 
 const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
+    const { setPreview, shortId } = useGoalPreview();
     const [busy, setBusy] = useState(false);
     const { invalidate, goalUpdate } = useGoalResource(
         {
@@ -42,7 +43,29 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         const updatedGoal = await goalUpdate(form);
 
         onSubmit(updatedGoal);
-        utils.project.getDeepInfo.invalidate({ id: form.parent.id });
+
+        utils.project.getAll.invalidate();
+        utils.goal.getBatch.invalidate();
+        utils.project.getUserProjectsWithGoals.invalidate();
+
+        if (!updatedGoal) {
+            return;
+        }
+
+        if (goal._shortId === shortId && updatedGoal._shortId !== goal._shortId) {
+            setPreview(updatedGoal._shortId, updatedGoal);
+        }
+
+        if (updatedGoal.projectId) {
+            utils.project.getDeepInfo.invalidate({ id: updatedGoal.projectId });
+            utils.project.getById.invalidate({ id: updatedGoal.projectId });
+        }
+
+        if (updatedGoal.projectId !== goal.projectId && goal.projectId) {
+            utils.project.getDeepInfo.invalidate({ id: goal.projectId });
+            utils.project.getById.invalidate({ id: goal.projectId });
+        }
+
         await invalidate();
     };
 

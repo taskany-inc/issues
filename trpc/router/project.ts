@@ -49,6 +49,7 @@ export const project = router({
                 prisma.project.findMany({
                     take,
                     where: {
+                        personal: false,
                         title: {
                             contains: query,
                             mode: 'insensitive',
@@ -74,6 +75,7 @@ export const project = router({
                             id: {
                                 in: include,
                             },
+                            personal: false,
                             ...accessFilter,
                             ...nonArchivedPartialQuery,
                         },
@@ -303,64 +305,68 @@ export const project = router({
                     cursor: z.string().nullish(),
                     skip: z.number().optional(),
                     firstLevel: z.boolean().optional(),
+                    includePersonal: z.boolean().optional(),
                     goalsQuery: queryWithFiltersSchema.optional(),
                 })
                 .optional(),
         )
-        .query(async ({ ctx, input: { cursor, skip, limit, firstLevel, goalsQuery } = {} }) => {
-            const { activityId, role } = ctx.session.user;
+        .query(
+            async ({ ctx, input: { cursor, skip, limit, firstLevel, goalsQuery, includePersonal = false } = {} }) => {
+                const { activityId, role } = ctx.session.user;
 
-            if (goalsQuery && goalsQuery.stateType) {
-                const stateByTypes = await prisma.state.findMany({
-                    where: {
-                        type: {
-                            in: goalsQuery.stateType,
+                if (goalsQuery && goalsQuery.stateType) {
+                    const stateByTypes = await prisma.state.findMany({
+                        where: {
+                            type: {
+                                in: goalsQuery.stateType,
+                            },
                         },
+                    });
+                    stateByTypes.forEach((state) => {
+                        if (!goalsQuery.state) {
+                            goalsQuery.state = [];
+                        }
+                        if (!goalsQuery.state.includes(state.id)) {
+                            goalsQuery.state.push(state.id);
+                        }
+                    });
+                }
+
+                const projectPagination = limit
+                    ? { take: limit + 1, skip, cursor: cursor ? { id: cursor } : undefined }
+                    : undefined;
+
+                const whereQuery = {
+                    personal: includePersonal ? {} : false,
+                    goals: {
+                        some: goalsQuery ? goalsFilter(goalsQuery, activityId, role).where : {},
                     },
-                });
-                stateByTypes.forEach((state) => {
-                    if (!goalsQuery.state) {
-                        goalsQuery.state = [];
-                    }
-                    if (!goalsQuery.state.includes(state.id)) {
-                        goalsQuery.state.push(state.id);
-                    }
-                });
-            }
+                };
 
-            const projectPagination = limit
-                ? { take: limit + 1, skip, cursor: cursor ? { id: cursor } : undefined }
-                : undefined;
+                const projects = await prisma.project
+                    .findMany({
+                        ...projectPagination,
+                        orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+                        ...getProjectSchema({
+                            role,
+                            activityId,
+                            goalsQuery,
+                            firstLevel,
+                            whereQuery,
+                        }),
+                    })
+                    .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
 
-            const whereQuery = {
-                goals: {
-                    some: goalsQuery ? goalsFilter(goalsQuery, activityId, role).where : {},
-                },
-            };
+                let nextCursor: typeof cursor | undefined;
 
-            const projects = await prisma.project
-                .findMany({
-                    ...projectPagination,
-                    orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
-                    ...getProjectSchema({
-                        role,
-                        activityId,
-                        goalsQuery,
-                        firstLevel,
-                        whereQuery,
-                    }),
-                })
-                .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
+                if (limit && projects.length > limit) {
+                    const nextItem = projects.pop();
+                    nextCursor = nextItem?.id;
+                }
 
-            let nextCursor: typeof cursor | undefined;
-
-            if (limit && projects.length > limit) {
-                const nextItem = projects.pop();
-                nextCursor = nextItem?.id;
-            }
-
-            return { projects, nextCursor };
-        }),
+                return { projects, nextCursor };
+            },
+        ),
     getTop: protectedProcedure
         .input(
             z

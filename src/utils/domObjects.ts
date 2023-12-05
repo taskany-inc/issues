@@ -10,6 +10,7 @@ export const createFastButton = header.add('createFastButton');
 export const createSelectButton = header.add('createSelectButton');
 export const createProjectItem = header.add('createProjectItem');
 export const createGoalItem = header.add('createGoalItem');
+export const createPersonalGoalItem = header.add('createPersonalGoalItem');
 
 export const filtersPanel = DO('filtersPanel');
 export const filtersPanelResetButton = filtersPanel.add('resetButton');

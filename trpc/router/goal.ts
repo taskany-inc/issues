@@ -26,6 +26,8 @@ import {
     mixHistoryWithComments,
     makeGoalRelationMap,
     goalHistorySeparator,
+    createPersonalProject,
+    clearEmptyPersonalProject,
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
@@ -44,6 +46,7 @@ import {
     criteriaAccessMiddleware,
     goalAccessMiddleware,
     goalByShortIdAccessMiddleware,
+    goalParticipantEditAccessMiddleware,
 } from '../access/accessMiddlewares';
 import { addCalculatedProjectFields, nonArchivedPartialQuery } from '../queries/project';
 import { recalculateCriteriaScore, goalIncludeCriteriaParams } from '../../src/utils/recalculateCriteriaScore';
@@ -328,25 +331,30 @@ export const goal = router({
         }),
     create: protectedProcedure.input(goalCommonSchema).mutation(async ({ ctx, input }) => {
         if (!input.owner.id) return null;
-        if (!input.parent.id) return null;
 
         const { activityId, role } = ctx.session.user;
 
-        const actualProject = await prisma.project.findUnique({
-            where: { id: input.parent.id },
-            include: {
-                activity: { include: { user: true, ghost: true } },
-                participants: { include: { user: true, ghost: true } },
-                watchers: { include: { user: true, ghost: true } },
-            },
-        });
+        const actualProject = input.parent
+            ? await prisma.project.findUnique({
+                  where: { id: input.parent.id },
+                  include: {
+                      activity: { include: { user: true, ghost: true } },
+                      participants: { include: { user: true, ghost: true } },
+                      watchers: { include: { user: true, ghost: true } },
+                  },
+              })
+            : await createPersonalProject({
+                  ownerId: input.owner.id,
+                  activityId,
+                  role,
+              });
 
         if (!actualProject) {
             return null;
         }
 
         try {
-            const newGoal = await createGoal(input, activityId, role);
+            const newGoal = await createGoal(input, actualProject.id, activityId, role);
             await updateProjectUpdatedAt(actualProject.id);
 
             const recipients = prepareRecipients([
@@ -383,16 +391,29 @@ export const goal = router({
         .input(goalChangeProjectSchema)
         .use(goalEditAccessMiddleware)
         .mutation(async ({ ctx, input }) => {
-            const actualGoal = await prisma.goal.findUnique({
-                where: { id: input.id },
-            });
+            const [actualGoal, actualProject] = await Promise.all([
+                prisma.goal.findUnique({
+                    where: { id: input.id },
+                    include: {
+                        participants: { include: { user: true, ghost: true } },
+                    },
+                }),
+                prisma.project.findUnique({
+                    where: {
+                        id: input.projectId,
+                    },
+                }),
+            ]);
 
-            if (!actualGoal) return null;
+            if (!actualGoal || !actualProject || actualProject.personal) return null;
 
             const { activityId, role } = ctx.session.user;
 
             try {
                 await changeGoalProject(input.id, input.projectId);
+                await updateProjectUpdatedAt(actualGoal?.projectId);
+                await clearEmptyPersonalProject(actualGoal?.projectId);
+
                 const goal = await prisma.goal.update({
                     where: {
                         id: input.id,
@@ -413,6 +434,7 @@ export const goal = router({
                         goalInCriteria: goalIncludeCriteriaParams,
                     },
                 });
+
                 await updateProjectUpdatedAt(goal.projectId);
 
                 await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
@@ -439,11 +461,11 @@ export const goal = router({
             const actualGoal = await prisma.goal.findUnique({
                 where: { id: input.id },
                 include: {
+                    project: true,
                     participants: { include: { user: true, ghost: true } },
                     watchers: { include: { user: true, ghost: true } },
                     activity: { include: { user: true, ghost: true } },
                     owner: { include: { user: true, ghost: true } },
-                    project: true,
                     tags: true,
                     goalInCriteria: true,
                     priority: true,
@@ -546,6 +568,18 @@ export const goal = router({
                 updatedFields.estimate = [prevFormatedEstimate, nextFormatedEstimate];
             }
 
+            const personalGoalOwnerChanged = actualGoal.ownerId !== input.owner.id && actualGoal.project?.personal;
+
+            if (personalGoalOwnerChanged) {
+                const newParent = await createPersonalProject({
+                    ownerId: input.owner.id,
+                    activityId,
+                    role,
+                });
+                await changeGoalProject(actualGoal.id, newParent.id);
+                await updateProjectUpdatedAt(newParent.id);
+            }
+
             try {
                 const goal = await prisma.goal.update({
                     where: { id: actualGoal.id },
@@ -566,6 +600,11 @@ export const goal = router({
                                 data: history.map((record) => ({ ...record, activityId })),
                             },
                         },
+                        participants: personalGoalOwnerChanged
+                            ? {
+                                  set: [{ id: input.owner.id }, { id: activityId }],
+                              }
+                            : {},
                         goalInCriteria: {
                             updateMany: {
                                 where: {
@@ -582,7 +621,12 @@ export const goal = router({
                         goalInCriteria: goalIncludeCriteriaParams,
                     },
                 });
+
                 await updateProjectUpdatedAt(actualGoal?.projectId);
+
+                if (personalGoalOwnerChanged) {
+                    await clearEmptyPersonalProject(actualGoal.projectId);
+                }
 
                 if (actualGoal.stateId !== goal.stateId) {
                     await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
@@ -1348,7 +1392,7 @@ export const goal = router({
         }),
     addParticipant: protectedProcedure
         .input(toggleParticipantsSchema)
-        .use(goalEditAccessMiddleware)
+        .use(goalParticipantEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -1377,7 +1421,7 @@ export const goal = router({
         }),
     removeParticipant: protectedProcedure
         .input(toggleParticipantsSchema)
-        .use(goalEditAccessMiddleware)
+        .use(goalParticipantEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -1716,12 +1760,31 @@ export const goal = router({
         )
         .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
+            const { activityId, role } = ctx.session.user;
             const actualGoal = await prisma.goal.findUnique({
                 where: { id: input.id },
+                include: {
+                    project: { include: { goals: true } },
+                    participants: { include: { user: true, ghost: true } },
+                },
             });
 
             if (!actualGoal) return null;
             if (actualGoal.ownerId === input.ownerId) return null;
+            if (actualGoal.project?.personal) {
+                const newProject = await createPersonalProject({
+                    ownerId: input.ownerId,
+                    activityId,
+                    role,
+                });
+
+                await changeGoalProject(actualGoal.id, newProject.id);
+
+                if (actualGoal.projectId) {
+                    await updateProjectUpdatedAt(actualGoal.projectId);
+                    await clearEmptyPersonalProject(actualGoal.projectId);
+                }
+            }
 
             const history = {
                 subject: 'owner',
@@ -1736,15 +1799,24 @@ export const goal = router({
                     where: { id: input.id },
                     data: {
                         ownerId: input.ownerId,
+                        participants: actualGoal.project?.personal
+                            ? {
+                                  set: [{ id: input.ownerId }, { id: activityId }],
+                              }
+                            : {},
                         history: {
                             create: history,
                         },
+                    },
+                    include: {
+                        ...goalDeepQuery,
+                        goalInCriteria: goalIncludeCriteriaParams,
                     },
                 });
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
 
-                return updatedGoal;
+                return { ...updatedGoal, ...addCalculatedGoalsFields(updatedGoal, activityId, role) };
             } catch (error: any) {
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',

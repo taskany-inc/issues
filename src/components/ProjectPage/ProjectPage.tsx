@@ -89,7 +89,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
     useEffect(() => {
-        if (!project) return;
+        if (!project || project.personal) return;
 
         setCurrentProjectCache({
             id: project.id,

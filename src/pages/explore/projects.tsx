@@ -9,6 +9,7 @@ export const getServerSideProps = declareSsrProps(
 
         await ssrHelpers.project.getAll.fetch({
             firstLevel: true,
+            includePersonal: true,
             goalsQuery: parseQueryState(preset ? Object.fromEntries(new URLSearchParams(preset.params)) : query)
                 .queryState,
         });

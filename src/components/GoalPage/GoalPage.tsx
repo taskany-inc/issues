@@ -47,14 +47,14 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
     const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
     useEffect(() => {
-        project && setCurrentProjectCache(project);
+        project && !project.personal && setCurrentProjectCache(project);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     useWillUnmount(() => {
         setCurrentProjectCache(null);
     });
 
-    const { onGoalStateChange, onGoalWatchingToggle, onGoalStarToggle, onGoalTransfer, invalidate } = useGoalResource(
+    const { onGoalStateChange, onGoalWatchingToggle, onGoalStarToggle, invalidate } = useGoalResource(
         { id: goal?.id },
         { invalidate: { getById: id } },
     );
@@ -160,7 +160,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                 <div>
                     <GoalSidebar
                         goal={goal}
-                        onGoalTransfer={onGoalTransfer((transferredGoal) => router.goal(transferredGoal._shortId))}
+                        onGoalTransfer={(transferredGoal) => router.goal(transferredGoal._shortId)}
                         onGoalClick={onGoalClick}
                     />
                 </div>

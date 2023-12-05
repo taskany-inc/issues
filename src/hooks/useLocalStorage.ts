@@ -4,10 +4,18 @@ import { safelyParseJson } from '../utils/safelyParseJson';
 
 import { useLatest } from './useLatest';
 
-export type LastOrCurrentProject = { id: string; title: string; flowId: string; description?: string | null } | null;
+export type LastOrCurrentProject = {
+    id: string;
+    title: string;
+    flowId: string;
+    description?: string | null;
+} | null;
 export type RecentProjectsCache = Record<
     string,
-    { rate: number; cache: { id: string; title: string; flowId: string; description?: string | null } }
+    {
+        rate: number;
+        cache: { id: string; title: string; flowId: string; description?: string | null };
+    }
 >;
 export type GoalCreateFormAction = number | null;
 export type DraftGoalComment = Record<string, { stateId?: string; description?: string }>;

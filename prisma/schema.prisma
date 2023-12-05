@@ -160,6 +160,7 @@ model Project {
   watchers     Activity[] @relation("projectWatchers")
   stargizers   Activity[] @relation("projectStargizers")
   averageScore Int?
+  personal     Boolean?   @default(false)
   archived     Boolean?   @default(false)
   sharedGoals  Goal[]     @relation("partnershipProjects")
 

@@ -50,6 +50,7 @@ interface GoalFormProps extends React.HTMLAttributes<HTMLDivElement> {
     title?: string;
     description?: string;
     parent?: { id: string; title: string; flowId: string; description?: string | null };
+    personal?: boolean;
     tags?: TagModel[];
     state?: State;
     priority?: {
@@ -85,6 +86,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     actionButton,
     tip,
     onSubmit,
+    personal,
     ...attrs
 }) => {
     const locale = useLocale();
@@ -105,7 +107,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
             title,
             description,
             owner,
-            parent,
+            parent: personal ? null : parent,
             state,
             priority,
             estimate,
@@ -163,7 +165,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
                 <FormActions flat="top">
                     <FormAction left inline>
-                        {nullable(!id, () => (
+                        {nullable(!id && !personal, () => (
                             <Controller
                                 name="parent"
                                 control={control}
@@ -247,7 +249,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     text={tr('State')}
                                     flowId={parentWatcher?.flowId}
                                     error={errorsResolver(field.name)}
-                                    disabled={!parentWatcher?.flowId || busy}
+                                    disabled={(!personal && !parentWatcher?.flowId) || busy}
                                     {...field}
                                 />
                             )}

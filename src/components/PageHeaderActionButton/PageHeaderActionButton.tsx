@@ -3,13 +3,19 @@ import { Button, Dropdown, MenuItem } from '@taskany/bricks';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { createFastButton, createGoalItem, createProjectItem, createSelectButton } from '../../utils/domObjects';
+import {
+    createFastButton,
+    createGoalItem,
+    createProjectItem,
+    createSelectButton,
+    createPersonalGoalItem,
+} from '../../utils/domObjects';
 
 import { tr } from './PageHeaderActionButton.i18n';
 
 export const PageHeaderActionButton: FC = () => {
-    const onMenuItemClick = useCallback(({ event }: { event: ModalEvent }) => {
-        dispatchModalEvent(event)();
+    const onMenuItemClick = useCallback(({ event, params }: { event: ModalEvent; params: unknown }) => {
+        dispatchModalEvent(event, params)();
     }, []);
 
     return (
@@ -28,11 +34,21 @@ export const PageHeaderActionButton: FC = () => {
                     {
                         title: tr('Create goal'),
                         event: ModalEvent.GoalCreateModal,
+                        params: {},
                         attrs: createGoalItem.attr,
+                    },
+                    {
+                        title: tr('Create personal goal'),
+                        event: ModalEvent.GoalCreateModal,
+                        params: {
+                            personal: true,
+                        },
+                        attrs: createPersonalGoalItem.attr,
                     },
                     {
                         title: tr('Create project'),
                         event: ModalEvent.ProjectCreateModal,
+                        params: {},
                         attrs: createProjectItem.attr,
                     },
                 ]}

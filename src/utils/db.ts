@@ -1,4 +1,5 @@
-import { nanoid } from 'nanoid';
+import { customAlphabet, nanoid } from 'nanoid';
+import { alphanumeric } from 'nanoid-dictionary';
 import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction, StateType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
@@ -6,10 +7,11 @@ import { GoalCommon, dependencyKind, exceptionsDependencyKind } from '../schema/
 import { addCalculatedGoalsFields, addCommonCalculatedGoalFields } from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordSubject, castToSubject } from '../types/history';
 import { ReactionsMap } from '../types/reactions';
+import { getProjectSchema } from '../../trpc/queries/project';
 
 import { prisma } from './prisma';
 import { subjectToEnumValue } from './goalHistory';
-import { safeGetUserName } from './getUserName';
+import { safeGetUserEmail, safeGetUserName } from './getUserName';
 import { calcAchievedWeight } from './recalculateCriteriaScore';
 
 /**
@@ -23,7 +25,7 @@ import { calcAchievedWeight } from './recalculateCriteriaScore';
  * @param input goal FormData
  * @returns new goal id
  */
-export const createGoal = async (input: GoalCommon, activityId: string, role: Role) => {
+export const createGoal = async (input: GoalCommon, projectId: string, activityId: string, role: Role) => {
     const id = nanoid();
     const priorityId = input.priority.id;
 
@@ -33,13 +35,13 @@ export const createGoal = async (input: GoalCommon, activityId: string, role: Ro
             ${id},
             ${input.title},
             ${input.description || ''},
-            ${input.parent.id},
+            ${projectId},
             ${input.owner.id},
             ${activityId},
             ${input.state.id},
             ${priorityId},
             coalesce(max("scopeId"), 0) + 1
-        FROM "Goal" WHERE "projectId" = ${input.parent.id};
+        FROM "Goal" WHERE "projectId" = ${projectId};
     `;
 
     const goal = await prisma.goal.update({
@@ -78,12 +80,124 @@ export const createGoal = async (input: GoalCommon, activityId: string, role: Ro
     };
 };
 
+export const createPersonalProject = async ({
+    ownerId,
+    activityId,
+    role,
+}: {
+    ownerId: string;
+    activityId: string;
+    role: Role;
+}) => {
+    const usersInclude = {
+        activity: { include: { user: true, ghost: true } },
+        participants: { include: { user: true, ghost: true } },
+        watchers: { include: { user: true, ghost: true } },
+    };
+
+    const { include, where } = getProjectSchema({
+        role,
+        activityId,
+        whereQuery: {
+            personal: true,
+            activityId: ownerId,
+            accessUsers: {
+                some: {
+                    id: activityId,
+                },
+            },
+        },
+    });
+
+    const existedProject = await prisma.project.findFirst({
+        where,
+        include: {
+            ...include,
+            ...usersInclude,
+        },
+    });
+
+    if (existedProject) {
+        return existedProject;
+    }
+
+    const [owner, suggestedFlows] = await Promise.all([
+        prisma.activity.findUnique({
+            where: {
+                id: ownerId,
+            },
+            include: { user: true, ghost: true },
+        }),
+        prisma.flow.findMany({
+            where: {
+                recommended: true,
+            },
+            include: {
+                states: true,
+            },
+        }),
+    ]);
+
+    const flow = suggestedFlows[0];
+
+    if (!owner) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: `No user with id ${ownerId}` });
+    }
+
+    if (!flow) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'No suggested flow' });
+    }
+
+    return prisma.project.create({
+        data: {
+            id: owner.user?.nickname?.replace(/\s/g, '') || customAlphabet(alphanumeric)(),
+            title: `Personal for ${safeGetUserName(owner) || safeGetUserEmail(owner)}`,
+            activityId: ownerId,
+            personal: true,
+            flowId: flow.id,
+            accessUsers: {
+                connect: [
+                    {
+                        id: activityId,
+                    },
+                ],
+            },
+        },
+        include: usersInclude,
+    });
+};
+
 export const changeGoalProject = async (id: string, newProjectId: string) => {
     return prisma.$executeRaw`
         UPDATE "Goal"
         SET "projectId" = ${newProjectId}, "scopeId" = (SELECT coalesce(max("scopeId"), 0) + 1 FROM "Goal" WHERE "projectId" = ${newProjectId})
         WHERE "id" = ${id};
     `;
+};
+
+export const clearEmptyPersonalProject = async (id?: string | null) => {
+    if (!id) {
+        return null;
+    }
+
+    const project = await prisma.project.findUnique({
+        where: {
+            id,
+        },
+        include: {
+            goals: true,
+        },
+    });
+
+    if (project && project.personal && !project.goals.length) {
+        return prisma.project.delete({
+            where: {
+                id,
+            },
+        });
+    }
+
+    return null;
 };
 
 type RequestParamsBySubject = { [K in keyof HistoryRecordSubject]?: { ids: string[]; sourceIdx: number[] } };

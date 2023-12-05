@@ -49,6 +49,7 @@ export const search = router({
             prisma.project.findMany({
                 take: 5,
                 where: {
+                    personal: false,
                     OR: [
                         {
                             title: {

@@ -32,6 +32,11 @@ export const goalEditAccessChecker = (session: Session, goal: GoalEntity) => {
         : notAllowed('No access to update Goal');
 };
 
+export const goalParticipantEditAccessChecker = (session: Session, goal: GoalEntity) =>
+    goalEditAccessChecker(session, goal) && !goal.project?.personal
+        ? allowed()
+        : notAllowed('No access to update Goal');
+
 export const commentAccessChecker = (session: Session, comment: CommentEntity) => {
     const { activityId } = session.user;
 
