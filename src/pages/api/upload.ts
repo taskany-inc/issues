@@ -25,8 +25,8 @@ const cors = Cors({
 });
 
 type ResponseObj = {
-    failed: string[];
-    succeeded: string[];
+    failed: { type: string; filePath: string; name: string }[];
+    succeeded: { type: string; filePath: string; name: string }[];
     errorMessage?: string;
 };
 
@@ -82,7 +82,7 @@ route.post(upload.array(formFieldName, 10), async (req: any, res: NextApiRespons
 
         if (!s3Client) {
             const filePath = await saveFileInPublic(fileName, buffer);
-            resultObject.succeeded.push(filePath);
+            resultObject.succeeded.push({ type: mimetype, filePath, name: originalname });
         } else {
             await s3Client
                 .send(
@@ -96,9 +96,15 @@ route.post(upload.array(formFieldName, 10), async (req: any, res: NextApiRespons
                         ContentType: mimetype,
                     }),
                 )
-                .then(() => resultObject.succeeded.push(`${process.env.PUBLIC_URL}/static/${folder}/${fileName}`))
+                .then(() =>
+                    resultObject.succeeded.push({
+                        type: mimetype,
+                        filePath: `${process.env.PUBLIC_URL}/static/${folder}/${fileName}`,
+                        name: originalname,
+                    }),
+                )
                 .catch((error) => {
-                    resultObject.failed.push(originalname);
+                    resultObject.failed.push({ type: mimetype, filePath: originalname, name: originalname });
                     resultObject.errorMessage = error.message;
                 });
         }
