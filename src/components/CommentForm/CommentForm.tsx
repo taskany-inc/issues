@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import { backgroundColor, gapM, gray4 } from '@taskany/colors';
 import { Button, Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
@@ -65,28 +65,24 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     onCancel,
 }) => {
     const ref = useRef(null);
-    const [newDescription, setNewDescription] = useState(description);
 
     const onDescriptionChange = useCallback(
         (descr = '') => {
-            setNewDescription(descr);
             onChange?.({ description: descr });
         },
         [onChange],
     );
 
     const onCommentCancel = useCallback(() => {
-        setNewDescription('');
         onCancel?.();
     }, [onCancel]);
 
     const onCommentSubmit = useCallback(() => {
-        onSubmit?.({ description: newDescription });
-        setNewDescription('');
-    }, [onSubmit, newDescription]);
+        onSubmit?.({ description });
+    }, [description, onSubmit]);
 
     useClickOutside(ref, () => {
-        if (newDescription === '') {
+        if (description === '') {
             onCancel?.();
         }
     });
@@ -101,7 +97,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                     onCancel={onCommentCancel}
                     onFocus={onFocus}
                     autoFocus={autoFocus}
-                    value={newDescription}
+                    value={description}
                     onChange={onDescriptionChange}
                     {...commentFormDescription.attr}
                 />
@@ -117,7 +113,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         </FormAction>
                         <FormAction right inline>
                             {nullable(!busy, () => (
-                                <Button outline text={tr('Cancel')} onClick={onCancel} />
+                                <Button outline text={tr('Cancel')} onClick={onCommentCancel} />
                             ))}
 
                             {actionButton}
