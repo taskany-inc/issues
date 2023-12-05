@@ -8,6 +8,8 @@ import {
     ProjectCreateReturnType,
 } from '../trpc/inferredTypes';
 
+import translations from './fixtures/langs.json';
+
 export {};
 
 export interface SignInFields {
@@ -60,6 +62,7 @@ declare global {
             task(event: 'db:remove:user', data?: { ids: string[] }): Chainable<null>;
             interceptEditor(): Chainable<void>;
             waitEditor(): Chainable<void>;
+            loadLangFile(): Chainable<void>;
         }
         interface Cypress {
             env(): {
@@ -71,8 +74,8 @@ declare global {
                 createdGoal?: GoalCreateReturnType;
                 testUser: UserData['user'];
                 createdComment: CommentCreateReturnType;
+                translations: typeof translations;
             };
-
             env(key: 'currentUser'): UserData;
             env(key: 'currentUser', value: UserData): void;
             env(key: 'ADMIN_EMAIL'): string;
@@ -87,6 +90,8 @@ declare global {
             env(key: 'createdComment'): CommentCreateReturnType;
             env(key: 'testUser', value: UserData['user']): void;
             env(key: 'testUser'): UserData['user'];
+            env(key: 'translations'): typeof translations;
+            env(key: 'translations', value: typeof translations): void;
         }
     }
 }
