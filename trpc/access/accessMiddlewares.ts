@@ -9,6 +9,7 @@ import {
     goalEditAccessChecker,
     projectAccessChecker,
     goalAccessChecker,
+    goalParticipantEditAccessChecker,
 } from './accessCheckers';
 import { getComment, getGoal, getGoalByCriteria, getGoalByShortId, getProject } from './accessEntityGetters';
 
@@ -61,6 +62,12 @@ export const goalEditAccessMiddleware = createEntityCheckMiddleware(
     (input: { id: string; goalId: string }) => input.id ?? input.goalId,
     getGoal,
     goalEditAccessChecker,
+);
+
+export const goalParticipantEditAccessMiddleware = createEntityCheckMiddleware(
+    (input: { id: string; goalId: string }) => input.id ?? input.goalId,
+    getGoal,
+    goalParticipantEditAccessChecker,
 );
 
 export const criteriaAccessMiddleware = createEntityCheckMiddleware(

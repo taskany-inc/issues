@@ -24,17 +24,25 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
     ({ text, value, flowId, error, disabled, onChange }, ref) => {
         const [state, setState] = useState(value);
 
-        const flowById = trpc.flow.getById.useQuery(flowId, {
+        const defaultFlowEnabled = !flowId && !disabled;
+
+        const { data: flowById } = trpc.flow.getById.useQuery(flowId, {
             enabled: !!flowId,
         });
 
+        const { data: defaultFlow = [] } = trpc.flow.recommedations.useQuery(undefined, {
+            enabled: defaultFlowEnabled,
+        });
+
+        const flow = defaultFlowEnabled ? defaultFlow[0] : flowById;
+
         useEffect(() => {
-            const defaultState = flowById?.data?.states?.filter((s) => s?.default)[0];
+            const defaultState = flow?.states?.filter((s) => s?.default)[0];
             if (!value && defaultState) {
                 setState(defaultState);
                 onChange?.(defaultState);
             }
-        }, [value, onChange, flowById]);
+        }, [value, onChange, flow]);
 
         const onStateChange = useCallback(
             (s: Partial<State>) => {
@@ -51,7 +59,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                 text={state?.title || text}
                 value={state}
                 onChange={onStateChange}
-                items={flowById?.data?.states}
+                items={flow?.states}
                 disabled={disabled}
                 renderTrigger={(props) => (
                     <Button

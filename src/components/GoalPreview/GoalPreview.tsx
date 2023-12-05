@@ -54,9 +54,9 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         onClose?.();
     }, [onClose]);
 
-    const { onGoalTransfer, onGoalStateChange } = useGoalResource(
+    const { onGoalStateChange } = useGoalResource(
         { id: goal?.id },
-        { invalidate: { getById: shortId }, afterInvalidate: dispatchPreviewUpdateEvent },
+        { invalidate: { getById: goal?._shortId }, afterInvalidate: dispatchPreviewUpdateEvent },
     );
 
     const commentsRef = useRef<HTMLDivElement>(null);
@@ -126,12 +126,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                 </StyledModalContent>
                 <StyledModalContent>
                     {nullable(goal, (g) => (
-                        <GoalSidebar
-                            goal={g}
-                            onGoalTransfer={onGoalTransfer((transferredGoal) => {
-                                setPreview(transferredGoal._shortId, transferredGoal);
-                            })}
-                        />
+                        <GoalSidebar goal={g} onGoalTransfer={(goal) => setPreview(goal._shortId, goal)} />
                     ))}
                 </StyledModalContent>
             </StyledModalWrapper>

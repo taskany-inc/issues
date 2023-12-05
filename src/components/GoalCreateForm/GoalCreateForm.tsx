@@ -45,9 +45,10 @@ interface GoalCreateFormProps {
     };
     title?: string;
     onGoalCreate?: (val: GoalCreateReturnType) => void;
+    personal?: boolean;
 }
 
-const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, project }) => {
+const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, project, personal }) => {
     const router = useRouter();
     const { user } = usePageContext();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
@@ -92,7 +93,17 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
 
         const res = await goalCreate(form);
 
-        if (res && res._shortId) {
+        setBusy(false);
+
+        if (!res || !res._shortId) {
+            return;
+        }
+
+        utils.project.getAll.invalidate();
+        utils.goal.getBatch.invalidate();
+        utils.project.getUserProjectsWithGoals.invalidate();
+
+        if (form.parent) {
             const newRecentProjectsCache = { ...recentProjectsCache };
             if (newRecentProjectsCache[form.parent.id]) {
                 newRecentProjectsCache[form.parent.id].rate += 1;
@@ -104,28 +115,27 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
             }
             setRecentProjectsCache(newRecentProjectsCache);
             setLastProjectCache(form.parent);
-            setGoalCreateFormActionCache(createGoalType);
 
-            if (createGoalType === 1) {
-                router.goal(res._shortId);
-                dispatchModalEvent(ModalEvent.GoalCreateModal)();
-            }
-
-            if (createGoalType === 2) {
-                dispatchModalEvent(ModalEvent.GoalCreateModal)();
-                setTimeout(() => {
-                    dispatchModalEvent(ModalEvent.GoalCreateModal)();
-                }, 0);
-            }
-
-            if (createGoalType === 3) {
-                dispatchModalEvent(ModalEvent.GoalCreateModal)();
-            }
-
-            onGoalCreate?.(res);
+            utils.project.getDeepInfo.invalidate({ id: form.parent.id });
         }
-        utils.project.getDeepInfo.invalidate({ id: form.parent.id });
-        setBusy(false);
+
+        if (createGoalType === 1) {
+            router.goal(res._shortId);
+            dispatchModalEvent(ModalEvent.GoalCreateModal)();
+        }
+
+        if (createGoalType === 2) {
+            dispatchModalEvent(ModalEvent.GoalCreateModal)();
+            setTimeout(() => {
+                dispatchModalEvent(ModalEvent.GoalCreateModal)();
+            }, 0);
+        }
+
+        if (createGoalType === 3) {
+            dispatchModalEvent(ModalEvent.GoalCreateModal)();
+        }
+        setGoalCreateFormActionCache(createGoalType);
+        onGoalCreate?.(res);
     };
 
     return (
@@ -134,6 +144,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
             validitySchema={goalCommonSchema}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
             parent={project || currentProjectCache || lastProjectCache || undefined}
+            personal={personal}
             priority={defaultPriority ?? undefined}
             onSubmit={createGoal}
             title={title}

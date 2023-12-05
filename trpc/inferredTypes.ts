@@ -13,6 +13,7 @@ export type GoalBatchReturnType = RouterOutputs['goal']['getBatch'];
 export type ActivityByIdReturnType = RouterOutputs['user']['suggestions'][number];
 export type GoalAchiveCriteria = NonNullable<GoalByIdReturnType>['goalAchiveCriteria'][number];
 export type GoalDependencyItem = NonNullable<NonNullable<GoalByIdReturnType>['_relations']>[number]['goals'][number];
+export type GoalChangeProjectReturnType = RouterOutputs['goal']['changeProject'];
 export type GoalUpdateReturnType = RouterOutputs['goal']['update'];
 export type GoalCreateReturnType = RouterOutputs['goal']['create'];
 export type CommentCreateReturnType = RouterOutputs['goal']['createComment'];

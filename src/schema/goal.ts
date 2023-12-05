@@ -59,17 +59,14 @@ export const goalCommonSchema = z.object({
     owner: z.object({
         id: z.string(),
     }),
-    parent: z.object(
-        {
+    parent: z
+        .object({
             id: z.string(),
             title: z.string(),
             flowId: z.string(),
-        },
-        {
-            invalid_type_error: tr("Goal's project are is required"),
-            required_error: tr("Goal's project are is required"),
-        },
-    ),
+        })
+        .nullable()
+        .optional(),
     state: z.object({
         id: z.string(),
         hue: z.number().optional(),
@@ -129,17 +126,14 @@ export const goalUpdateSchema = z.object({
             email: z.string(),
         }),
     }),
-    parent: z.object(
-        {
+    parent: z
+        .object({
             id: z.string(),
             title: z.string(),
             flowId: z.string(),
-        },
-        {
-            invalid_type_error: tr("Goal's project are is required"),
-            required_error: tr("Goal's project are is required"),
-        },
-    ),
+        })
+        .nullable()
+        .optional(),
     state: z.object({
         id: z.string(),
         hue: z.number().optional(),

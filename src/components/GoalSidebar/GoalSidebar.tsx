@@ -10,7 +10,7 @@ import { UserComboBox } from '../UserComboBox';
 import { TagComboBox } from '../TagComboBox';
 import { GoalParentComboBox } from '../GoalParentComboBox';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType, GoalByIdReturnType, GoalChangeProjectReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
 import { TextList, TextListItem } from '../TextList';
@@ -43,7 +43,7 @@ const StyledTextList = styled(TextList).attrs({
 
 interface GoalSidebarProps {
     goal: NonNullable<GoalByIdReturnType>;
-    onGoalTransfer: ComponentProps<typeof GoalParentComboBox>['onChange'];
+    onGoalTransfer: (goal: NonNullable<GoalChangeProjectReturnType>) => void;
     onGoalClick?: ComponentProps<typeof GoalList>['onClick'];
 }
 
@@ -61,6 +61,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
     const relationsGoalsLength = useMemo(() => goal._relations.flatMap((deps) => deps.goals).length, [goal._relations]);
 
     const {
+        goalProjectChange,
         addPartnerProject,
         removePartnerProject,
         onGoalParticipantAdd,
@@ -109,6 +110,30 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
         [goal.id, onGoalCriteriaAdd],
     );
 
+    const onTranfer = useCallback(
+        async (project: { id: string }) => {
+            const transferedGoal = await goalProjectChange(project.id);
+
+            if (transferedGoal) {
+                onGoalTransfer(transferedGoal);
+                dispatchPreviewUpdateEvent();
+            }
+        },
+        [goalProjectChange, onGoalTransfer],
+    );
+
+    const onOwnerChange = useCallback(
+        async (activity?: ActivityByIdReturnType) => {
+            const updatedGoal = await goalOwnerUpdate(activity);
+
+            if (updatedGoal?.project?.personal) {
+                onGoalTransfer(updatedGoal);
+                dispatchPreviewUpdateEvent();
+            }
+        },
+        [goalOwnerUpdate, onGoalTransfer],
+    );
+
     return (
         <>
             <IssueMeta title={tr('Issuer')}>
@@ -126,7 +151,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 placement="bottom-start"
                                 placeholder={tr('Type user name or email')}
                                 filter={participantsFilter}
-                                onChange={goalOwnerUpdate}
+                                onChange={onOwnerChange}
                                 renderTrigger={({ onClick }) =>
                                     nullable(
                                         safeUserData(goal.owner),
@@ -150,7 +175,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     <UserEditableList
                         users={goal.participants}
                         filterIds={participantsFilter}
-                        editable={goal._isEditable}
+                        editable={goal._isEditable && !goal.project?.personal}
                         onAdd={onGoalParticipantAdd}
                         onRemove={onGoalParticipantRemove}
                         triggerText={tr('Add participant')}
@@ -290,7 +315,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                         <GoalParentComboBox
                             placement="bottom-start"
                             placeholder={tr('Type project title')}
-                            onChange={onGoalTransfer}
+                            onChange={onTranfer}
                             renderTrigger={(props) => (
                                 <AddInlineTrigger
                                     icon={<IconArrowRightOutline size="xs" />}

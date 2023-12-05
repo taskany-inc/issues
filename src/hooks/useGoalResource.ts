@@ -403,9 +403,11 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
                 ownerId: activity?.id,
             });
 
-            await notifyPromise(promise, 'goalsUpdate');
+            const [data] = await notifyPromise(promise, 'goalsUpdate');
 
-            await invalidate();
+            if (!data?.project?.personal) {
+                await invalidate();
+            }
 
             return promise;
         },
@@ -467,18 +469,6 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         [invalidate, goalTagsUpdate],
     );
 
-    const onGoalTransfer = useCallback(
-        (callback: (transferredGoal: NonNullable<Awaited<ReturnType<typeof goalProjectChange>>>) => void) =>
-            async (project: { id: string }) => {
-                const transferredGoal = await goalProjectChange(project.id);
-
-                if (transferredGoal) {
-                    callback(transferredGoal);
-                }
-            },
-        [goalProjectChange],
-    );
-
     return {
         highlightCommentId,
         lastStateComment,
@@ -493,7 +483,6 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
 
         onGoalStateChange,
         onGoalDelete,
-        onGoalTransfer,
 
         onGoalWatchingToggle,
         onGoalStarToggle,
