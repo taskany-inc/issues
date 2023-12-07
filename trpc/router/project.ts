@@ -21,6 +21,7 @@ import { updateLinkedGoalsByProject } from '../../src/utils/db';
 import { prepareUserDataFromActivity } from '../../src/utils/getUserName';
 import { projectAccessMiddleware, projectEditAccessMiddleware } from '../access/accessMiddlewares';
 import { getProjectAccessFilter } from '../queries/access';
+import { prepareRecipients } from '../../src/utils/prepareRecipients';
 
 export const project = router({
     suggestions: protectedProcedure
@@ -580,13 +581,12 @@ export const project = router({
 
                     await Promise.all(
                         newParents.map((parent) => {
-                            const recipients = Array.from(
-                                new Set(
-                                    [parent.activity, ...parent.accessUsers, ...parent.participants, ...parent.watchers]
-                                        .filter(Boolean)
-                                        .map((r) => r.user?.email),
-                                ),
-                            );
+                            const recipients = prepareRecipients([
+                                parent.activity,
+                                ...parent.accessUsers,
+                                ...parent.participants,
+                                ...parent.watchers,
+                            ]);
 
                             return createEmailJob('childProjectCreated', {
                                 to: recipients,
@@ -619,13 +619,12 @@ export const project = router({
 
                     await Promise.all(
                         oldParents.map((parent) => {
-                            const recipients = Array.from(
-                                new Set(
-                                    [parent.activity, ...parent.accessUsers, ...parent.participants, ...parent.watchers]
-                                        .filter(Boolean)
-                                        .map((r) => r.user?.email),
-                                ),
-                            );
+                            const recipients = prepareRecipients([
+                                parent.activity,
+                                ...parent.accessUsers,
+                                ...parent.participants,
+                                ...parent.watchers,
+                            ]);
 
                             return createEmailJob('childProjectDeleted', {
                                 to: recipients,
@@ -665,13 +664,12 @@ export const project = router({
                     ];
                 }
 
-                const recipients = Array.from(
-                    new Set(
-                        [...project.participants, ...updatedProject.accessUsers, ...project.watchers, project.activity]
-                            .filter(Boolean)
-                            .map((r) => r.user?.email),
-                    ),
-                );
+                const recipients = prepareRecipients([
+                    ...project.participants,
+                    ...updatedProject.accessUsers,
+                    ...project.watchers,
+                    project.activity,
+                ]);
 
                 await createEmailJob('projectUpdated', {
                     to: recipients,

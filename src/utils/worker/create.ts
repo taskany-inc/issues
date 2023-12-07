@@ -44,22 +44,27 @@ export function createJob<K extends keyof JobDataMap>(kind: K, { data, priority,
     });
 }
 
-type Maper<T extends keyof Templates = keyof Templates> = <Params extends Parameters<Templates[T]>[number]>(
+type Mapper<T extends keyof Templates = keyof Templates> = <Params extends Parameters<Templates[T]>[number]>(
     params: Params,
 ) => Params;
 
-const excludeCurrentUser: Maper = (params) => ({
+const excludeCurrentUser: Mapper = (params) => ({
     ...params,
     to: params.to.filter((email) => email !== params.authorEmail),
 });
 
-const mappers = [excludeCurrentUser];
+const excludeDuplicateUsers: Mapper = (params) => ({
+    ...params,
+    to: Array.from(new Set(params.to)),
+});
+
+const mappers = [excludeDuplicateUsers, excludeCurrentUser];
 
 export function createEmailJob<T extends keyof Templates, Params extends Parameters<Templates[T]>[number]>(
     template: T,
     data: Params,
 ) {
-    const mappedParams = mappers.reduce<Params>((acum, mapper) => mapper(acum), data);
+    const mappedParams = mappers.reduce<Params>((acc, mapper) => mapper(acc), data);
 
     if (!mappedParams.to.length) {
         return null;

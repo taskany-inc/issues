@@ -499,3 +499,65 @@ ${footer}`);
         text: subject,
     };
 };
+
+interface PartnerProjectToGoalProps {
+    to: SendMailProps['to'];
+    key: string;
+    title: string;
+    authorEmail: string;
+    author: string;
+    partnerProject: {
+        key?: string;
+        title?: string;
+    };
+}
+
+export const addPartnerProjectToGoal = async ({
+    to,
+    key,
+    title,
+    author,
+    partnerProject,
+}: PartnerProjectToGoalProps) => {
+    const subject = `ℹ️ Added partner project to #${key}: ${title}`;
+    const html = md.render(`
+🧑‍💻 **${author}** added a partner project **[${partnerProject.key}: ${partnerProject.title}](${absUrl(
+        `/projects/${partnerProject.key}`,
+    )})** to **[${title}](${absUrl(`/goals/${key}`)})**.
+
+${notice}
+
+${footer}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
+
+export const removePartnerProjectToGoal = async ({
+    to,
+    key,
+    title,
+    author,
+    partnerProject,
+}: PartnerProjectToGoalProps) => {
+    const subject = `ℹ️ Removed partner project from #${key}: ${title}`;
+    const html = md.render(`
+🧑‍💻 **${author}** removed a partner project **[${partnerProject.key}: ${partnerProject.title}](${absUrl(
+        `/projects/${partnerProject.key}`,
+    )})** from **[${title}](${absUrl(`/goals/${key}`)})**.
+
+${notice}
+
+${footer}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
