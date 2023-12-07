@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.11.0](https://github.com/taskany-inc/issues/compare/v2.10.4...v2.11.0) (2023-12-07)
+
+
+### Features
+
+* **CommentView:** show avatar with state comment ([899d781](https://github.com/taskany-inc/issues/commit/899d78130441f470ae814350a0abd961e6599cbb))
+* **Goal:** email notification ([db021bc](https://github.com/taskany-inc/issues/commit/db021bcda48d52b7fabe8ebaabc2a2afd60934c0))
+* return type & name from uploaded files ([4fd3468](https://github.com/taskany-inc/issues/commit/4fd346859b9d8106e5be3cc12391827587e3322b))
+
+
+### Bug Fixes
+
+* **ProjectPageTab:** hide alone goals tab ([9cf1c12](https://github.com/taskany-inc/issues/commit/9cf1c120b59c5f166ee9caee54761f33a6dd09e6))
+* submit comment form ([6459896](https://github.com/taskany-inc/issues/commit/64598969c1e8ea44602c051f7b90c241b340cd23))
+
 ## [2.10.4](https://github.com/taskany-inc/issues/compare/v2.10.3...v2.10.4) (2023-11-30)
 
 
