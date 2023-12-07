@@ -134,6 +134,8 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             [onGoalCriteriaConvert],
         );
 
+        const isPublicProject = !goal.project?.accessUsers.length;
+
         return (
             <>
                 <GoalActivity
@@ -141,10 +143,10 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     feed={goal._activityFeed}
                     header={
                         <>
-                            {nullable(goal._criteria?.length || goal._isEditable, () => (
+                            {nullable(goal._criteria?.length || (goal._isEditable && isPublicProject), () => (
                                 <GoalCriteria
                                     goalId={goal.id}
-                                    canEdit={goal._isEditable}
+                                    canEdit={goal._isEditable && isPublicProject}
                                     onCreate={handleCreateCriteria}
                                     onUpdate={handleUpdateCriteria}
                                     onUpdateState={handleUpdateCriteriaState}

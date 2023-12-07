@@ -109,6 +109,8 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
         [goal.id, onGoalCriteriaAdd],
     );
 
+    const isPublicProject = !goal.project?.accessUsers.length;
+
     return (
         <>
             <IssueMeta title={tr('Issuer')}>
@@ -158,13 +160,13 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                 </IssueMeta>
             ))}
 
-            {nullable(goal._isEditable || goal.partnershipProjects.length, () => (
+            {nullable((goal._isEditable && isPublicProject) || goal.partnershipProjects.length, () => (
                 <IssueMeta title={tr('Partnership projects')}>
                     <StyledTextList>
                         {goal.partnershipProjects?.map((project) => (
                             <TextListItem key={project.id}>
                                 <ProjectBadge id={project.id} title={project.title}>
-                                    {nullable(goal._isEditable, () => (
+                                    {nullable(goal._isEditable && isPublicProject, () => (
                                         <IconXCircleSolid size="xs" onClick={() => removePartnerProject(project.id)} />
                                     ))}
                                 </ProjectBadge>
@@ -172,7 +174,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                         ))}
                     </StyledTextList>
 
-                    {nullable(goal._isEditable, () => (
+                    {nullable(goal._isEditable && isPublicProject, () => (
                         <StyledInlineInput>
                             <GoalParentComboBox
                                 placement="bottom-start"
@@ -187,13 +189,13 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                 </IssueMeta>
             ))}
 
-            {nullable(relationsGoalsLength || goal._isEditable, () => (
+            {nullable(relationsGoalsLength || (goal._isEditable && isPublicProject), () => (
                 <>
                     {goal._relations.map(({ kind, goals }) => {
                         return nullable(goals.length, () => (
                             <IssueMeta title={heading[kind]} key={kind}>
                                 <GoalList
-                                    canEdit={goal._isEditable}
+                                    canEdit={goal._isEditable && isPublicProject}
                                     goals={goals}
                                     onClick={onGoalClick}
                                     onRemove={(removedGoal) =>
@@ -208,7 +210,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                         ));
                     })}
 
-                    {nullable(goal._isEditable, () => (
+                    {nullable(goal._isEditable && isPublicProject, () => (
                         <GoalFormPopupTrigger
                             renderTrigger={(props) => (
                                 <AddInlineTrigger text={tr('Add dependency')} ref={props.ref} onClick={props.onClick} />
@@ -220,10 +222,10 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                 </>
             ))}
 
-            {nullable(goal._versaCriteria?.length || goal._isEditable, () => (
+            {nullable(goal._versaCriteria?.length || (goal._isEditable && isPublicProject), () => (
                 <IssueMeta title={tr('Is the criteria for')}>
                     <GoalList
-                        canEdit={goal._isEditable}
+                        canEdit={goal._isEditable && isPublicProject}
                         goals={goal._versaCriteria.map((criteria) => ({
                             ...criteria.goal,
                             criteriaId: criteria.id,
@@ -232,7 +234,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                         onRemove={(goal) => onGoalCriteriaRemove({ id: goal.criteriaId, goalId: goal.id })}
                     />
 
-                    {nullable(goal._isEditable, () => (
+                    {nullable(goal._isEditable && isPublicProject, () => (
                         <GoalFormPopupTrigger
                             renderTrigger={(props) => (
                                 <AddInlineTrigger

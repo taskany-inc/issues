@@ -110,7 +110,9 @@ export const goal = router({
                     AND: {
                         ...selectParams,
                         project: {
-                            ...getProjectAccessFilter(activityId, role),
+                            accessUsers: {
+                                none: {},
+                            },
                         },
                     },
                 },
