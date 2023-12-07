@@ -48,6 +48,7 @@ import {
 import { addCalculatedProjectFields, nonArchivedPartialQuery } from '../queries/project';
 import { recalculateCriteriaScore, goalIncludeCriteriaParams } from '../../src/utils/recalculateCriteriaScore';
 import { getProjectAccessFilter } from '../queries/access';
+import { prepareRecipients } from '../../src/utils/prepareRecipients';
 
 const updateProjectUpdatedAt = async (id?: string | null) => {
     if (!id) return;
@@ -348,13 +349,11 @@ export const goal = router({
             const newGoal = await createGoal(input, activityId, role);
             await updateProjectUpdatedAt(actualProject.id);
 
-            const recipients = Array.from(
-                new Set(
-                    [...actualProject.participants, ...actualProject.watchers, actualProject.activity]
-                        .filter(Boolean)
-                        .map((r) => r.user?.email),
-                ),
-            );
+            const recipients = prepareRecipients([
+                ...actualProject.participants,
+                ...actualProject.watchers,
+                actualProject.activity,
+            ]);
 
             await Promise.all([
                 createEmailJob('goalCreated', {
@@ -589,13 +588,12 @@ export const goal = router({
                     await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
                 }
 
-                const recipients = Array.from(
-                    new Set(
-                        [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
-                            .filter(Boolean)
-                            .map((r) => r.user?.email),
-                    ),
-                );
+                const recipients = prepareRecipients([
+                    ...actualGoal.participants,
+                    ...actualGoal.watchers,
+                    actualGoal.activity,
+                    actualGoal.owner,
+                ]);
 
                 await createEmailJob('goalUpdated', {
                     to: recipients,
@@ -723,13 +721,12 @@ export const goal = router({
                         .run();
                 }
 
-                const recipients = Array.from(
-                    new Set(
-                        [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
-                            .filter(Boolean)
-                            .map((r) => r.user?.email),
-                    ),
-                );
+                const recipients = prepareRecipients([
+                    ...actualGoal.participants,
+                    ...actualGoal.watchers,
+                    actualGoal.activity,
+                    actualGoal.owner,
+                ]);
 
                 await createEmailJob('goalArchived', {
                     to: recipients,
@@ -835,13 +832,12 @@ export const goal = router({
                     .recalcAverageProjectScore()
                     .run();
 
-                const recipients = Array.from(
-                    new Set(
-                        [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
-                            .filter(Boolean)
-                            .map((r) => r.user?.email),
-                    ),
-                );
+                const recipients = prepareRecipients([
+                    ...actualGoal.participants,
+                    ...actualGoal.watchers,
+                    actualGoal.activity,
+                    actualGoal.owner,
+                ]);
 
                 await createEmailJob('goalStateUpdated', {
                     to: recipients,
@@ -959,13 +955,12 @@ export const goal = router({
                         .run();
                 }
 
-                const recipients = Array.from(
-                    new Set(
-                        [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner]
-                            .filter(Boolean)
-                            .map((r) => r.user?.email),
-                    ),
-                );
+                const recipients = prepareRecipients([
+                    ...actualGoal.participants,
+                    ...actualGoal.watchers,
+                    actualGoal.activity,
+                    actualGoal.owner,
+                ]);
 
                 if (input.stateId) {
                     await createEmailJob('goalStateUpdatedWithComment', {
@@ -1521,9 +1516,52 @@ export const goal = router({
                             },
                         },
                     },
+                    include: {
+                        activity: { include: { user: true } },
+                        owner: { include: { user: true } },
+                        participants: { include: { user: true } },
+                        watchers: { include: { user: true } },
+                    },
                 });
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                const connectedProject = await prisma.project.findUnique({
+                    where: { id: input.projectId },
+                    include: {
+                        activity: { include: { user: true } },
+                        accessUsers: { include: { user: true } },
+                        participants: { include: { user: true } },
+                        watchers: { include: { user: true } },
+                    },
+                });
+
+                let recipients: string[] = [];
+
+                if (updatedGoal && connectedProject) {
+                    recipients = prepareRecipients([
+                        updatedGoal.owner,
+                        updatedGoal.activity,
+                        connectedProject.activity,
+                        ...updatedGoal.participants,
+                        ...updatedGoal.watchers,
+                        ...connectedProject.accessUsers,
+                        ...connectedProject.participants,
+                        ...connectedProject.watchers,
+                    ]);
+                }
+
+                await createEmailJob('addPartnerProjectToGoal', {
+                    to: recipients,
+                    key: `${updatedGoal.projectId}-${updatedGoal.scopeId}`,
+                    title: updatedGoal.title,
+                    partnerProject: {
+                        key: connectedProject?.id,
+                        title: connectedProject?.title,
+                    },
+                    author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
+                });
 
                 return updatedGoal;
             } catch (error: any) {
@@ -1550,6 +1588,54 @@ export const goal = router({
                             },
                         },
                     },
+                    include: {
+                        activity: { include: { user: true } },
+                        owner: { include: { user: true } },
+                        participants: { include: { user: true } },
+                        watchers: { include: { user: true } },
+                    },
+                });
+
+                const disconnectedProject = await prisma.project.findUnique({
+                    where: { id: input.projectId },
+                    include: {
+                        activity: { include: { user: true } },
+                        accessUsers: { include: { user: true } },
+                        participants: { include: { user: true } },
+                        watchers: { include: { user: true } },
+                    },
+                });
+
+                let recipients: string[] = [];
+
+                if (updatedGoal && disconnectedProject) {
+                    recipients = [
+                        updatedGoal.owner,
+                        updatedGoal.activity,
+                        disconnectedProject.activity,
+                        ...updatedGoal.participants,
+                        ...updatedGoal.watchers,
+                        ...disconnectedProject.accessUsers,
+                        ...disconnectedProject.participants,
+                        ...disconnectedProject.watchers,
+                    ].reduce<string[]>((acc, cur) => {
+                        if (cur?.user?.email) {
+                            acc.push(cur.user.email);
+                        }
+                        return acc;
+                    }, []);
+                }
+
+                await createEmailJob('removePartnerProjectToGoal', {
+                    to: recipients,
+                    key: `${updatedGoal.projectId}-${updatedGoal.scopeId}`,
+                    title: updatedGoal.title,
+                    partnerProject: {
+                        key: disconnectedProject?.id,
+                        title: disconnectedProject?.title,
+                    },
+                    author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
                 });
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
