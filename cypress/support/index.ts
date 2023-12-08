@@ -237,7 +237,6 @@ Cypress.Commands.addAll({
         cy.intercept('**/editor.main.nls.js').as('editor.main.nls.js');
         cy.intercept('**/markdown.js').as('markdown.js');
         cy.intercept('**/workerMain.js').as('workerMain.js');
-        cy.intercept('**/simpleWorker.nls.js').as('simpleWorker.nls.js');
     },
     waitEditor: () => {
         cy.wait([
@@ -247,7 +246,6 @@ Cypress.Commands.addAll({
             '@editor.main.nls.js',
             '@markdown.js',
             '@workerMain.js',
-            '@simpleWorker.nls.js',
         ]);
     },
 });
