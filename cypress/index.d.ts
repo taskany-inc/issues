@@ -17,6 +17,15 @@ export interface SignInFields {
     password: string;
 }
 
+interface TagData {
+    activityId: string;
+    createdAt: string;
+    description?: string | null;
+    id: string;
+    title: string;
+    updatedAt: string;
+}
+
 interface UserData {
     user: {
         name: string;
@@ -64,9 +73,12 @@ declare global {
                 event: 'db:create:goal',
                 data?: { title: string; projectId: string; ownerEmail: string },
             ): Chainable<any>;
+            task(event: 'db:create:tag', data: { title: string; userEmail: string }): Chainable<TagData>;
+            task(event: 'db:remove:tag', data: { id: string }): Chainable<null>;
             interceptEditor(): Chainable<void>;
             waitEditor(): Chainable<void>;
             loadLangFile(): Chainable<void>;
+            getErrorTooltip(errorMessage: string): Chainable<JQuery<HTMLElement>>;
         }
         interface Cypress {
             env(): {

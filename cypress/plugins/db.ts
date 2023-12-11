@@ -26,7 +26,9 @@ export type DbTasks =
     | TaskParams<'db:create:user', { email: string; name?: string; password: string; provider: string }, Promise<any>>
     | TaskParams<'db:remove:user', { id: string }, Promise<null>>
     | TaskParams<'db:create:goal', { title: string; projectId: string; ownerEmail: string }, Promise<any>>
-    | TaskParams<'db:remove:goal', { id: string }, Promise<null>>;
+    | TaskParams<'db:remove:goal', { id: string }, Promise<null>>
+    | TaskParams<'db:create:tag', { title: string; userEmail: string }, Promise<any>>
+    | TaskParams<'db:remove:tag', { id: string }, Promise<null>>;
 
 interface DbPluginEvents extends Cypress.PluginEvents {
     (action: 'task', tasks: DbTasks): void;
@@ -42,6 +44,7 @@ export const initDb = (on: DbPluginEvents) => {
                 }),
                 prisma.user.findUniqueOrThrow({ where: { email: ownerEmail } }),
             ]);
+
             const project = await prisma.project.create({
                 data: {
                     title,
@@ -85,6 +88,25 @@ export const initDb = (on: DbPluginEvents) => {
             });
 
             return user;
+        },
+
+        'db:create:tag': async ({ title, userEmail }) => {
+            const user = await prisma.user.findUniqueOrThrow({ where: { email: userEmail } });
+            const tag = await prisma.tag.create({
+                data: {
+                    title,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    activityId: user.activityId!,
+                },
+            });
+
+            return tag;
+        },
+
+        'db:remove:tag': async ({ id }) => {
+            await prisma.tag.delete({ where: { id } });
+
+            return null;
         },
 
         'db:remove:user': async ({ id }) => {

@@ -25,11 +25,26 @@ import {
     filtersPanelResetButton,
     goalPageEditButton,
     goalPageDeleteButton,
+    tagsCombobox,
+    goalTagList,
+    goalTagListItem,
+    goalTagListItemClean,
+    goalTitleInputError,
+    comboboxErrorDot,
+    estimateQuarterTrigger,
+    estimateQuarterItem,
+    estimateYearTrigger,
+    estimateStrictDateTrigger,
+    estimateYearItem,
+    estimateStrictDateInput,
 } from '../../src/utils/domObjects';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
 import { GoalCreateReturnType } from '../../trpc/inferredTypes';
+import { getTranslation } from '../support/lang';
+import { createLocaleDate, getQuarterFromDate, getYearFromDate } from '../../src/utils/dateTime';
+import { Quarters } from '../../src/types/date';
 
 const testUser = {
     name: 'Test user 1',
@@ -37,33 +52,43 @@ const testUser = {
     password: 'password',
     provider: 'provider1',
 };
-const lowPriority = 'Low';
 const testProjectForGoals = 'my awesome test project';
 const projectKey = keyPredictor(testProjectForGoals);
 const testGoalTitle = 'my awesome test goal title';
 const testGoalDescription = 'my awesome test goal description';
+const testTag = 'test tag for goal';
+const testTagForManualCreate = 'manual tag';
 
 before(() => {
-    cy.task('db:create:user', testUser).then((u: any) => {
+    cy.task('db:create:user', testUser).then((u) => {
         Cypress.env('testUser', u);
     });
     cy.task('db:create:project', {
         title: testProjectForGoals,
         key: projectKey,
         ownerEmail: Cypress.env('ADMIN_EMAIL'),
-    }).then((p: any) => {
+    }).then((p) => {
         Cypress.env('stubProject', p.id);
     });
+    cy.task('db:create:tag', {
+        title: testTag,
+        userEmail: Cypress.env('ADMIN_EMAIL'),
+    }).then((res) => {
+        Cypress.env('tag', res);
+    });
+    cy.loadLangFile();
 });
 
 after(() => {
     cy.task('db:remove:user', { id: Cypress.env('testUser').id });
     cy.task('db:remove:project', { id: Cypress.env('stubProject') });
+    cy.task('db:remove:tag', { id: Cypress.env('tag').id });
 });
 
 describe('Goals', () => {
     describe('create', () => {
         beforeEach(() => {
+            cy.intercept('/api/trpc/tag.suggestions?*').as('gettingTags');
             cy.signInViaEmail();
         });
 
@@ -103,13 +128,19 @@ describe('Goals', () => {
             });
 
             it('should have clean fields', (done) => {
+                const translations = getTranslation({
+                    GoalCreateForm: ['Create only'],
+                });
+
                 cy.get(goalTitleInput.query).should('have.value', '');
                 cy.get(goalDescriptionInput.query).should('have.value', '');
                 cy.get(projectsCombobox.query).should('have.value', '');
                 cy.get(priorityCombobox.query).contains(Cypress.env('defaultPriority'));
                 cy.get(estimateCombobox.query).should('have.text', '');
                 cy.get(stateCombobox.query).should('be.disabled');
-                cy.get(goalActionCreateOnly.query).should('be.enabled').contains('Create only');
+                cy.get(goalActionCreateOnly.query)
+                    .should('be.enabled')
+                    .contains(translations.GoalCreateForm['Create only']());
                 cy.get(usersCombobox.query)
                     .should('exist')
                     .then(($el) => {
@@ -125,6 +156,31 @@ describe('Goals', () => {
                     });
             });
 
+            it('should fill the title and select project', () => {
+                const translates = getTranslation({
+                    schema: [
+                        'Title is required',
+                        'Title can be 50 symbols maximum',
+                        "Goal's project are is required",
+                        "Goal's title must be longer than 10 symbols",
+                    ],
+                });
+                cy.get(goalTitleInput.query).should('have.value', '');
+                cy.get(projectsCombobox.query).should('have.value', '');
+
+                cy.get(goalActionCreateOnly.query).should('exist').and('be.visible').click();
+
+                cy.get(goalTitleInputError.query)
+                    .should('exist')
+                    .and('be.visible')
+                    .getErrorTooltip(translates.schema["Goal's title must be longer than 10 symbols"]());
+
+                cy.get(comboboxErrorDot.query)
+                    .should('exist')
+                    .and('be.visible')
+                    .getErrorTooltip(translates.schema["Goal's project are is required"]());
+            });
+
             it('state control is enabled after choose project', () => {
                 cy.get(projectsCombobox.query).should('have.value', '').click();
                 cy.get(comboboxInput.query).should('have.value', '');
@@ -134,21 +190,106 @@ describe('Goals', () => {
                 cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');
             });
             it('can change priority value', () => {
-                cy.get(priorityCombobox.query).should('have.text', Cypress.env('defaultPriority')).click();
-                cy.get(comboboxItem.query).should('have.length', 4).filter(`:contains(${lowPriority})`).click();
-                cy.get(priorityCombobox.query).contains(`${lowPriority}`);
+                const translations = getTranslation({
+                    PriorityText: ['Low', 'Medium'],
+                });
+
+                cy.get(priorityCombobox.query).contains(translations.PriorityText.Medium()).click();
+                cy.get(comboboxItem.query)
+                    .should('have.length', 4)
+                    .filter(`:contains(${translations.PriorityText.Low()})`)
+                    .click();
+                cy.get(priorityCombobox.query).contains(translations.PriorityText.Low());
             });
 
-            // TODO: https://github.com/taskany-inc/issues/issues/1746
-            it.skip('can set estimate', () => {
-                cy.get(estimateCombobox.query).should('have.text', '').click();
-                cy.get(estimateCombobox.query).should('have.text', '2023');
+            describe('can set estimate', () => {
+                const now = new Date();
+                const currentYear = getYearFromDate(now);
+                const years: string[] = [];
+                const quarters = Object.values(Quarters);
+                const currentQuarter = getQuarterFromDate(now);
+                const currentDate = createLocaleDate(now, { locale: 'en' });
+
+                for (let i = currentYear - 1; i <= currentYear + 4; i++) {
+                    years.push(String(i));
+                }
+
+                beforeEach(() => {
+                    cy.clock(now, ['Date']);
+
+                    cy.get(estimateCombobox.query).should('have.text', '').click();
+                    cy.get(estimateYearTrigger.query).should('be.visible');
+                    cy.get(estimateQuarterTrigger.query).should('be.visible');
+                    cy.get(estimateStrictDateTrigger.query).should('be.visible');
+                });
+
+                afterEach(() => {
+                    cy.clock().invoke('restore');
+                });
+                it('set estimate year', () => {
+                    cy.get(estimateYearTrigger.query).click();
+                    cy.get(estimateYearItem.query)
+                        .should('be.visible')
+                        .and('be.enabled')
+                        .each((el) => {
+                            cy.wrap(el).its('[0].innerText').should('be.oneOf', years);
+                        });
+
+                    cy.get(estimateCombobox.query).should('have.text', `${currentYear}`).click();
+                });
+                it('set estimate quarter', () => {
+                    cy.get(estimateQuarterTrigger.query).click();
+                    cy.get(estimateQuarterItem.query)
+                        .should('be.visible')
+                        .and('be.enabled')
+                        .each((el) => {
+                            cy.wrap(el).its('[0].innerText').should('be.oneOf', quarters);
+                        });
+
+                    cy.get(estimateCombobox.query).should('have.text', `${currentQuarter}/${currentYear}`).click();
+                });
+
+                it('set estimate strict date', () => {
+                    cy.get(estimateStrictDateTrigger.query).click();
+                    cy.get(estimateStrictDateInput.query)
+                        .should('be.visible')
+                        .and('be.enabled')
+                        .and('have.value', currentDate);
+
+                    cy.get(estimateCombobox.query).should('have.text', currentDate).click();
+                });
             });
 
-            // TODO: https://github.com/taskany-inc/issues/issues/1746
-            describe.skip('goal tags', () => {
-                it('create and set', () => {});
-                it('select in early created', () => {});
+            describe('goal tags', () => {
+                it('select from early created and remove them', () => {
+                    cy.get(tagsCombobox.query).click();
+                    cy.get(comboboxInput.query).type(testTag.slice(0, 5));
+
+                    cy.wait('@gettingTags');
+
+                    cy.get(comboboxItem.query).should('exist').and('have.length', 1);
+                    cy.get(comboboxItem.query).first().contains(Cypress.env('tag').title).click();
+
+                    cy.get(goalTagList.query).should('be.visible').its('[0].children').should('have.length', 1);
+                    cy.get(goalTagListItem.query).contains(Cypress.env('tag').title);
+                    cy.get(goalTagListItemClean.query).should('exist').and('not.be.visible');
+
+                    cy.get(goalTagListItem.query).first().realHover();
+                    cy.get(goalTagListItemClean.query).should('be.visible').click();
+                    cy.get(goalTagListItem.query).should('not.exist');
+                });
+                it('create and set', () => {
+                    cy.get(tagsCombobox.query).click();
+                    cy.get(comboboxInput.query).type(testTagForManualCreate);
+
+                    cy.wait('@gettingTags');
+
+                    cy.get(comboboxItem.query).should('exist').and('have.length', 1);
+                    cy.get(comboboxItem.query).first().contains(testTagForManualCreate).click();
+                    cy.get(goalTagList.query).should('be.visible').its('[0].children').should('have.length', 1);
+                    cy.get(goalTagListItem.query).contains(testTagForManualCreate);
+                    cy.get(goalTagListItemClean.query).should('exist').and('not.be.visible');
+                });
             });
 
             it('can choose the other user', (done) => {
@@ -270,9 +411,6 @@ describe('Goals', () => {
                 cy.get(goalPageHeaderTitle.query).contains(testGoalTitle);
             });
         });
-
-        // TODO: https://github.com/taskany-inc/issues/issues/1746
-        describe.skip('correct data on goal page after create', () => {});
     });
 
     describe('modify access', () => {

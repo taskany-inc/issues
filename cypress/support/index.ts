@@ -254,3 +254,24 @@ Cypress.Commands.addAll({
         });
     },
 });
+
+/**
+ * with { prevObject: 'element' }
+ * ex.: cy.get(sel).callActionForGettingSubject()
+ */
+
+Cypress.Commands.addAll(
+    { prevSubject: 'element' },
+    {
+        getErrorTooltip: (subject: JQuery<HTMLSpanElement>, errorMessage: string) => {
+            return cy
+                .wrap(subject)
+                .realHover()
+                .invoke('attr', 'aria-describedby')
+                .should('not.be.undefined')
+                .then((ttId) => {
+                    return cy.get(`#${ttId}`).should('have.text', errorMessage);
+                });
+        },
+    },
+);
