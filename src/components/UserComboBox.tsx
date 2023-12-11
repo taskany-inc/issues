@@ -1,12 +1,10 @@
 import React, { useState, ChangeEvent, useCallback } from 'react';
-import { Button, UserPic, UserMenuItem, nullable, FormControl, FormControlInput } from '@taskany/bricks';
+import { Button, UserPic, UserMenuItem, nullable, FormControl, FormControlInput, ComboBox } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { safeGetUserEmail, safeGetUserImage, safeGetUserName, safeUserData } from '../utils/getUserName';
-import { comboboxItem, usersCombobox, comboboxInput } from '../utils/domObjects';
-
-import { CommonCombobox } from './CommonCombobox';
+import { comboboxItem, usersCombobox, comboboxInput, combobox } from '../utils/domObjects';
 
 interface UserComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -15,10 +13,10 @@ interface UserComboBoxProps {
     disabled?: boolean;
     placeholder?: string;
     filter?: string[];
-    error?: React.ComponentProps<typeof CommonCombobox>['error'];
-    placement?: React.ComponentProps<typeof CommonCombobox>['placement'];
-    offset?: React.ComponentProps<typeof CommonCombobox>['offset'];
-    renderTrigger?: React.ComponentProps<typeof CommonCombobox>['renderTrigger'] & React.HTMLAttributes<HTMLElement>;
+    error?: React.ComponentProps<typeof ComboBox>['error'];
+    placement?: React.ComponentProps<typeof ComboBox>['placement'];
+    offset?: React.ComponentProps<typeof ComboBox>['offset'];
+    renderTrigger?: React.ComponentProps<typeof ComboBox>['renderTrigger'] & React.HTMLAttributes<HTMLElement>;
 
     onChange?: (activity: NonNullable<ActivityByIdReturnType>) => void;
 }
@@ -62,7 +60,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
         }, []);
 
         return (
-            <CommonCombobox
+            <ComboBox
                 ref={ref}
                 text={safeGetUserName(value) || text}
                 value={inputState}
@@ -118,6 +116,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                         {...comboboxItem.attr}
                     />
                 )}
+                {...combobox.attr}
             />
         );
     },

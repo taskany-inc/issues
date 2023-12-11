@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { gray9 } from '@taskany/colors';
-import { Button, MenuItem, Text } from '@taskany/bricks';
+import { Button, Dropdown, MenuItem, Text } from '@taskany/bricks';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 
 import { useRouter } from '../../hooks/router';
@@ -14,6 +14,7 @@ import { GoalCommon, goalCommonSchema } from '../../schema/goal';
 import { ActivityByIdReturnType, GoalCreateReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import {
+    combobox,
     createActionToggle,
     goalActionCreateAndGo,
     goalActionCreateOneMore,
@@ -21,7 +22,6 @@ import {
     goalCancelButton,
     goalForm,
 } from '../../utils/domObjects';
-import { CommonDropdown } from '../CommonDropdown';
 import RotatableTip from '../RotatableTip/RotatableTip';
 
 import { tr } from './GoalCreateForm.i18n';
@@ -166,7 +166,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
                             text={createOptions[createGoalType - 1].title}
                             {...createOptions[createGoalType - 1].attr}
                         />
-                        <CommonDropdown
+                        <Dropdown
                             placement="top-end"
                             arrow
                             items={createOptions}
@@ -202,6 +202,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
                                     )}
                                 </StyledMenuItem>
                             )}
+                            {...combobox.attr}
                         />
                     </StyledButtonWithDropdown>
                 </>

@@ -31,12 +31,14 @@ import { PriorityDropdown } from '../PriorityDropdown';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { HelpButton } from '../HelpButton/HelpButton';
 import {
+    combobox,
     estimateCombobox,
     goalDescriptionInput,
-    goalOwnerSelectControl,
-    goalPrioritySelectControl,
-    goalProjectSelectControl,
+    goalTagList,
+    goalTagListItem,
+    goalTagListItemClean,
     goalTitleInput,
+    goalTitleInputError,
 } from '../../utils/domObjects';
 import { TagsList } from '../TagsList';
 
@@ -144,7 +146,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         {...goalTitleInput.attr}
                     />
                     {nullable(errorsResolver('title'), (error) => (
-                        <FormControlError error={error} placement="top-start" />
+                        <FormControlError error={error} placement="top-start" {...goalTitleInputError.attr} />
                     ))}
                 </FormControl>
 
@@ -176,7 +178,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                         error={errorsResolver(field.name)}
                                         disabled={busy}
                                         {...field}
-                                        {...goalProjectSelectControl.attr}
                                     />
                                 )}
                             />
@@ -191,7 +192,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     error={errorsResolver(field.name)}
                                     disabled={busy}
                                     {...field}
-                                    {...goalPrioritySelectControl.attr}
                                 />
                             )}
                         />
@@ -206,7 +206,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     error={errorsResolver(field.name)}
                                     disabled={busy}
                                     {...field}
-                                    {...goalOwnerSelectControl.attr}
                                 />
                             )}
                         />
@@ -250,6 +249,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     flowId={parentWatcher?.flowId}
                                     error={errorsResolver(field.name)}
                                     disabled={(!personal && !parentWatcher?.flowId) || busy}
+                                    {...combobox.attr}
                                     {...field}
                                 />
                             )}
@@ -263,6 +263,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     disabled={busy || (tagsWatcher || []).length >= tagsLimit}
                                     placeholder={tr('Enter tag title')}
                                     error={errorsResolver(field.name)}
+                                    {...combobox.attr}
                                     {...field}
                                 />
                             )}
@@ -276,10 +277,13 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         {nullable(
                             tagsWatcher,
                             (tags) => (
-                                <TagsList>
+                                <TagsList {...goalTagList.attr}>
                                     {tags.map((tag) => (
-                                        <Tag key={tag.id}>
-                                            <TagCleanButton onClick={onTagDeleteProvider(tag)} />
+                                        <Tag key={tag.id} {...goalTagListItem.attr}>
+                                            <TagCleanButton
+                                                onClick={onTagDeleteProvider(tag)}
+                                                {...goalTagListItemClean.attr}
+                                            />
                                             {tag.title}
                                         </Tag>
                                     ))}

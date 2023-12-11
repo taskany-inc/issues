@@ -20,7 +20,7 @@ const StyledClue = styled(Text)`
     padding-bottom: ${gapS};
 `;
 
-interface EstimateOptionProps {
+interface EstimateOptionProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'className'> {
     title?: string;
     clue?: string | null;
     readOnly?: boolean;
@@ -36,6 +36,7 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({
     onClick,
     renderTrigger,
     onClose,
+    ...attrs
 }) => {
     return (
         <StyledWrapper>
@@ -47,9 +48,9 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({
                 {nullable(
                     readOnly,
                     () => (
-                        <IconPlusCircleSolid size="xs" color={gray9} onClick={onClick} />
+                        <IconPlusCircleSolid size="xs" color={gray9} onClick={onClick} {...attrs} />
                     ),
-                    <IconXCircleSolid size="xs" color={gray9} onClick={onClose} />,
+                    <IconXCircleSolid size="xs" color={gray9} onClick={onClose} {...attrs} />,
                 )}
             </StyledContent>
 

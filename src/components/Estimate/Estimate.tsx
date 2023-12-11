@@ -6,6 +6,7 @@ import { IconExclamationCircleSolid } from '@taskany/icons';
 
 import { createDateRange, isPastDate, getQuarterFromDate, getYearFromDate, getDateString } from '../../utils/dateTime';
 import { DateType, DateRange, QuartersAliases } from '../../types/date';
+import { estimateComboboxWrongDateMessage } from '../../utils/domObjects';
 
 import { tr } from './Estimate.i18n';
 import { EstimateContextProvider } from './EstimateProvider';
@@ -128,7 +129,7 @@ export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value
     return (
         <StyledWrapper ref={ref}>
             {nullable(warning, (warn) => (
-                <StyledWarningWrapper>
+                <StyledWarningWrapper {...estimateComboboxWrongDateMessage.attr}>
                     <StyledIconExclamationCircleSolid size="xs" color={warn0} />
                     <Text color={warn0} size="xs">
                         {warn.message}
