@@ -8,7 +8,7 @@
     "Title must be longer than 2 symbols": "Заголовок должен быть длиннее 2 символов",
     "Title can be 50 symbols maximum": "Заголовок может содержать не более 50 символов",
     "Goal's title must be a string": "Заголовок может быть только строкой",
-    "Goal's description must be longer than 10 symbols": "Описание цели должно быть длиннее 10 символов",
+    "Goal's title must be longer than 10 symbols": "Заголовок цели должен быть длиннее 10 символов",
     "Goal's description is required": "Описание цели обязательно",
     "Goal's description must be a string": "Описание может быть только строкой",
     "Goal's project are is required": "Укажите проект",
