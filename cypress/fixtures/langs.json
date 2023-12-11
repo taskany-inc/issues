@@ -1364,9 +1364,9 @@
             "ru": "Заголовок может быть только строкой",
             "en": "Goal's title must be a string"
         },
-        "Goal's description must be longer than 10 symbols": {
-            "ru": "Описание цели должно быть длиннее 10 символов",
-            "en": "Goal's description must be longer than 10 symbols"
+        "Goal's title must be longer than 10 symbols": {
+            "ru": "Заголовок цели должен быть длиннее 10 символов",
+            "en": "Goal's title must be longer than 10 symbols"
         },
         "Goal's description is required": {
             "ru": "Описание цели обязательно",
