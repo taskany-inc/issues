@@ -189,7 +189,7 @@ export const dateAgo = (date: Date, pastDate: number, { locale }: LocaleArg): st
     }
 };
 
-export const isPastDate = (date: Date): boolean => date < new Date();
+export const isPastDate = (date: Date): boolean => new Date(date) < new Date();
 
 export const incYearIfDateHasPassed = (date: Date): Date => {
     if (isPastDate(date)) {
