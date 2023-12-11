@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.11.1](https://github.com/taskany-inc/issues/compare/v2.11.0...v2.11.1) (2023-12-11)
+
+
+### Bug Fixes
+
+* downgrade local monaco-loader version ([641b25a](https://github.com/taskany-inc/issues/commit/641b25ac0ce8e60d0b8a48db95dd49aabced12d9))
+
 ## [2.11.0](https://github.com/taskany-inc/issues/compare/v2.10.4...v2.11.0) (2023-12-07)
 
 
