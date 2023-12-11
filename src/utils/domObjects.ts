@@ -41,6 +41,7 @@ export const createGoalInlineControl = DO('createGoalInlineControl');
 
 export const goalForm = DO('goalForm');
 export const goalTitleInput = goalForm.add('title');
+export const goalTitleInputError = goalForm.add('error');
 export const goalDescriptionInput = goalForm.add('description');
 export const goalProjectSelectControl = goalForm.add('project');
 export const goalPrioritySelectControl = goalForm.add('priority');
@@ -51,6 +52,9 @@ export const goalActionCreateOnly = goalForm.add('createOnly');
 export const goalSaveButton = goalForm.add('saveButton');
 export const goalCancelButton = goalForm.add('cancelButton');
 export const goalUpdateButton = goalForm.add('updateButton');
+export const goalTagList = goalForm.add('tagList');
+export const goalTagListItem = goalTagList.add('item');
+export const goalTagListItemClean = goalTagListItem.add('clean');
 
 export const goalDeleteForm = DO('goalDeleteForm');
 export const goalDeleteShortIdInput = goalDeleteForm.add('shortIdInput');
@@ -95,8 +99,16 @@ export const projectsCombobox = combobox.add('projects');
 export const priorityCombobox = combobox.add('priority');
 export const stateCombobox = combobox.add('state');
 export const estimateCombobox = combobox.add('estimate');
+export const estimateComboboxWrongDateMessage = combobox.add('wrongDate');
+export const estimateYearTrigger = combobox.add('year');
+export const estimateYearItem = combobox.add('yearItem');
+export const estimateQuarterTrigger = combobox.add('quarter');
+export const estimateQuarterItem = combobox.add('quarterItem');
+export const estimateStrictDateTrigger = combobox.add('strictDate');
+export const estimateStrictDateInput = combobox.add('strictDateInput');
 export const tagsCombobox = combobox.add('tags');
 export const createActionToggle = combobox.add('actionToggle');
+export const comboboxErrorDot = combobox.add('error-dot');
 
 export const comment = DO('comment');
 export const commentDescription = comment.add('description');

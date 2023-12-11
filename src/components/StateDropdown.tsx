@@ -8,7 +8,6 @@ import { stateCombobox } from '../utils/domObjects';
 
 import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
-import { CommonDropdown } from './CommonDropdown';
 
 interface StateDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];
@@ -20,8 +19,8 @@ interface StateDropdownProps {
     onChange?: (state: State) => void;
 }
 
-export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps>(
-    ({ text, value, flowId, error, disabled, onChange }, ref) => {
+export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps & React.RefAttributes<HTMLDivElement>>(
+    ({ text, value, flowId, error, disabled, onChange, ...attrs }, ref) => {
         const [state, setState] = useState(value);
 
         const defaultFlowEnabled = !flowId && !disabled;
@@ -53,7 +52,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
         );
 
         return (
-            <CommonDropdown
+            <Dropdown
                 ref={ref}
                 error={error}
                 text={state?.title || text}
@@ -81,6 +80,7 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                         {props.item.title}
                     </ColorizedMenuItem>
                 )}
+                {...attrs}
             />
         );
     },

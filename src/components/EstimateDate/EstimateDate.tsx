@@ -7,6 +7,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { currentLocaleDate, parseLocaleDate, createLocaleDate } from '../../utils/dateTime';
 import { EstimateOption } from '../EstimateOption';
 import { useEstimateContext } from '../Estimate/EstimateProvider';
+import { estimateStrictDateInput, estimateStrictDateTrigger } from '../../utils/domObjects';
 
 import { tr } from './EstimateDate.i18n';
 
@@ -88,6 +89,7 @@ export const EstimateDate: React.FC = () => {
                     placeholder={tr('Date input mask placeholder')}
                     onChange={onInputChange}
                     value={fullDate}
+                    {...estimateStrictDateInput.attr}
                 >
                     {/* @ts-ignore incorrect type in react-input-mask */}
                     {(props) => (
@@ -97,6 +99,7 @@ export const EstimateDate: React.FC = () => {
                     )}
                 </InputMask>
             )}
+            {...estimateStrictDateTrigger.attr}
         />
     );
 };

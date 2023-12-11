@@ -8,6 +8,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { createLocaleDate, getQuarterFromDate, getRelativeQuarterRange, getYearFromDate } from '../../utils/dateTime';
 import { EstimateOption } from '../EstimateOption';
 import { useEstimateContext } from '../Estimate/EstimateProvider';
+import { estimateQuarterItem, estimateQuarterTrigger } from '../../utils/domObjects';
 
 import { tr } from './EstimateQuarter.i18n';
 
@@ -53,7 +54,14 @@ const ButtonGroup = <T extends string>({
     return (
         <StyledItems column={items.length}>
             {items.map((item) => (
-                <StyledButton key={item} size="s" text={item} checked={value === item} onClick={onToggleAlias(item)} />
+                <StyledButton
+                    key={item}
+                    size="s"
+                    text={item}
+                    checked={value === item}
+                    onClick={onToggleAlias(item)}
+                    {...estimateQuarterItem.attr}
+                />
             ))}
         </StyledItems>
     );
@@ -126,6 +134,7 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ aliases }) => 
                     ))}
                 </StyledButtonGroupsWrapper>
             )}
+            {...estimateQuarterTrigger.attr}
         />
     );
 };

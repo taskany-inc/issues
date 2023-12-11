@@ -7,6 +7,7 @@ import { createLocaleDate, createYearRange, getYearFromDate } from '../../utils/
 import { useLocale } from '../../hooks/useLocale';
 import { EstimateOption } from '../EstimateOption';
 import { useEstimateContext } from '../Estimate/EstimateProvider';
+import { estimateYearItem, estimateYearTrigger } from '../../utils/domObjects';
 
 import { tr } from './EstimateYear.i18n';
 
@@ -87,11 +88,13 @@ export const EstimateYear: React.FC = () => {
                                 text={String(y)}
                                 checked={year === y}
                                 onClick={() => changeHander(year === y ? undefined : y)}
+                                {...estimateYearItem.attr}
                             />
                         ))}
                     </StyledItems>
                 </StyledTriggerWrapper>
             )}
+            {...estimateYearTrigger.attr}
         />
     );
 };

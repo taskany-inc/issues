@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useClickOutside, Popup, nullable } from '@taskany/bricks';
 import { gapS, danger10, radiusM } from '@taskany/colors';
 
-import { combobox } from '../utils/domObjects';
+import { combobox, comboboxErrorDot } from '../utils/domObjects';
 
 import { EstimateProps, Estimate } from './Estimate/Estimate';
 import { EstimateYear } from './EstimateYear/EstimateYear';
@@ -68,7 +68,12 @@ export const EstimatePopup = React.forwardRef<HTMLDivElement, EstimatePopupProps
             <div ref={ref} {...combobox.attr}>
                 {nullable(error, (err) => (
                     <>
-                        <StyledErrorTrigger ref={errorRef} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} />
+                        <StyledErrorTrigger
+                            ref={errorRef}
+                            onMouseEnter={onMouseEnter}
+                            onMouseLeave={onMouseLeave}
+                            {...comboboxErrorDot.attr}
+                        />
                         <Popup tooltip view="danger" placement="top-start" visible={errorVisible} reference={errorRef}>
                             {err.message}
                         </Popup>

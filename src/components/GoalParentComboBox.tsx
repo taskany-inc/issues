@@ -1,12 +1,11 @@
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ComboBox, FormControl, FormControlInput } from '@taskany/bricks';
+import { Button, ComboBox, FormControl, FormControlError, FormControlInput, nullable } from '@taskany/bricks';
 
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';
-import { projectsCombobox, comboboxInput } from '../utils/domObjects';
+import { projectsCombobox, comboboxInput, combobox, comboboxErrorDot } from '../utils/domObjects';
 
 import { ProjectMenuItem } from './ProjectMenuItem';
-import { CommonCombobox } from './CommonCombobox';
 
 interface GoalParentComboBoxProps {
     text?: React.ComponentProps<typeof ComboBox>['text'];
@@ -69,35 +68,34 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
         }, []);
 
         return (
-            <CommonCombobox
-                ref={ref}
-                text={value ? `#${value?.id}` : text}
-                value={inputState}
-                visible={completionVisible}
-                error={error}
-                disabled={disabled}
-                placement={placement}
-                offset={offset}
-                items={items}
-                onClickOutside={onClickOutside}
-                onChange={onChange}
-                renderTrigger={(props) =>
-                    renderTrigger ? (
-                        renderTrigger({
-                            ...props,
-                            ...projectsCombobox.attr,
-                        })
-                    ) : (
-                        <Button
-                            disabled={props.disabled}
-                            text={props.text}
-                            onClick={props.onClick}
-                            {...projectsCombobox.attr}
-                        />
-                    )
-                }
-                renderInput={(props) => (
-                    <FormControl variant="outline">
+            <FormControl variant="outline" {...combobox.attr}>
+                <ComboBox
+                    ref={ref}
+                    text={value ? `#${value?.id}` : text}
+                    value={inputState}
+                    visible={completionVisible}
+                    disabled={disabled}
+                    placement={placement}
+                    offset={offset}
+                    items={items}
+                    onClickOutside={onClickOutside}
+                    onChange={onChange}
+                    renderTrigger={(props) =>
+                        renderTrigger ? (
+                            renderTrigger({
+                                ...props,
+                                ...projectsCombobox.attr,
+                            })
+                        ) : (
+                            <Button
+                                disabled={props.disabled}
+                                text={props.text}
+                                onClick={props.onClick}
+                                {...projectsCombobox.attr}
+                            />
+                        )
+                    }
+                    renderInput={(props) => (
                         <FormControlInput
                             autoFocus
                             placeholder={placeholder}
@@ -108,17 +106,20 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                             {...props}
                             {...comboboxInput.attr}
                         />
-                    </FormControl>
-                )}
-                renderItem={(props) => (
-                    <ProjectMenuItem
-                        key={props.item.id}
-                        title={props.item.title}
-                        focused={props.cursor === props.index}
-                        onClick={props.onClick}
-                    />
-                )}
-            />
+                    )}
+                    renderItem={(props) => (
+                        <ProjectMenuItem
+                            key={props.item.id}
+                            title={props.item.title}
+                            focused={props.cursor === props.index}
+                            onClick={props.onClick}
+                        />
+                    )}
+                />
+                {nullable(error, (e) => (
+                    <FormControlError error={e} {...comboboxErrorDot.attr} />
+                ))}
+            </FormControl>
         );
     },
 );
