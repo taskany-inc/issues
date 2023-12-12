@@ -3,8 +3,8 @@ import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction, Sta
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, dependencyKind, exceptionsDependencyKind } from '../schema/goal';
-import { addCalculatedGoalsFields } from '../../trpc/queries/goals';
-import { HistoryRecordWithActivity, HistoryRecordSubject, HistoryAction } from '../types/history';
+import { addCalculatedGoalsFields, addCommonCalculatedGoalFields } from '../../trpc/queries/goals';
+import { HistoryRecordWithActivity, HistoryRecordSubject, castToSubject } from '../types/history';
 import { ReactionsMap } from '../types/reactions';
 
 import { prisma } from './prisma';
@@ -112,7 +112,7 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
         {},
     );
 
-    const historyWithMeta: HistoryRecordWithActivity[] = Array.from(history);
+    const historyWithMeta: HistoryRecordWithActivity[] = [];
     const needRequestForSubject = Object.keys(requestParamsBySubjects) as (keyof typeof requestParamsBySubjects)[];
     const replacedValueIdx = needRequestForSubject
         .map((subject) => (requestParamsBySubjects[subject] || {}).sourceIdx)
@@ -133,12 +133,14 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
 
                 switch (subject) {
                     case 'dependencies':
-                        return prisma.goal.findMany({
-                            where: query.where,
-                            include: {
-                                state: true,
-                            },
-                        });
+                        return prisma.goal
+                            .findMany({
+                                where: query.where,
+                                include: {
+                                    state: true,
+                                },
+                            })
+                            .then((deps) => deps.map((dep) => ({ ...dep, ...addCommonCalculatedGoalFields(dep) })));
                     case 'tags':
                         return prisma.tag.findMany(query);
                     case 'owner':
@@ -175,46 +177,33 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
             }),
         );
 
-        const metaResults: Record<string, (typeof results)[number][number]>[] = [];
+        const meta: Map<string, (typeof results)[number][number]> = new Map(
+            results.flat().map((value) => [value.id, value]),
+        );
 
-        for (const records of results) {
-            const meta: Record<string, (typeof records)[number]> = {};
-
-            for (const record of records) {
-                meta[record.id] = record;
-            }
-
-            metaResults.push(meta);
-        }
-
-        const metaObj = metaResults.reduce((acc, values) => {
-            acc = { ...acc, ...values };
-
-            return acc;
-        }, {});
-
-        replacedValueIdx.forEach((sourceIndex) => {
-            if (sourceIndex == null) {
-                return;
-            }
-
-            const record = history[sourceIndex];
-            const valueCanBeArray = ['dependencies', 'tags', 'estimates'].includes(record.subject);
+        history.forEach((item, index) => {
+            const valueCanBeArray = ['dependencies', 'tags', 'estimates'].includes(item.subject);
+            let prev;
+            let next;
 
             if (valueCanBeArray) {
-                historyWithMeta[sourceIndex] = {
-                    ...record,
-                    action: record.action as HistoryAction,
-                    previousValue: record.previousValue?.split(', ').map((id) => metaObj[id]),
-                    nextValue: record.nextValue?.split(', ').map((id) => metaObj[id]),
-                };
+                prev = item.previousValue?.split(goalHistorySeparator).map((id) => meta.get(id)) ?? null;
+                next = item.nextValue?.split(goalHistorySeparator).map((id) => meta.get(id)) ?? null;
             } else {
-                historyWithMeta[sourceIndex] = {
-                    ...record,
-                    action: record.action as HistoryAction,
-                    previousValue: record.previousValue ? metaObj[record.previousValue] : null,
-                    nextValue: record.nextValue ? metaObj[record.nextValue] : null,
-                };
+                prev = item.previousValue ? meta.get(item.previousValue) : null;
+                next = item.nextValue ? meta.get(item.nextValue) : null;
+            }
+
+            if (castToSubject(item)) {
+                if (replacedValueIdx.includes(index)) {
+                    historyWithMeta[index] = {
+                        ...item,
+                        previousValue: prev || null,
+                        nextValue: next || null,
+                    };
+                } else {
+                    historyWithMeta[index] = item;
+                }
             }
         });
     }
@@ -222,9 +211,10 @@ export const getGoalHistory = async <T extends GoalHistory & { activity: Activit
     return historyWithMeta;
 };
 
-type mixHistoryWithCommentsReturnType<H, C> =
+type MixHistoryWithCommentsReturnType<H, C> =
     | { type: 'history'; value: H }
     | { type: 'comment'; value: Omit<C, 'reactions'> & { reactions: ReactionsMap } };
+
 export const mixHistoryWithComments = <
     H extends HistoryRecordWithActivity,
     C extends Comment & { reactions: (Reaction & Pick<HistoryRecordWithActivity, 'activity'>)[] },
@@ -232,11 +222,11 @@ export const mixHistoryWithComments = <
     history: H[],
     comments: C[],
 ): {
-    _activityFeed: mixHistoryWithCommentsReturnType<H, C>[];
-    _comments: Extract<mixHistoryWithCommentsReturnType<H, C>, { type: 'comment' }>['value'][];
+    _activityFeed: MixHistoryWithCommentsReturnType<H, C>[];
+    _comments: Extract<MixHistoryWithCommentsReturnType<H, C>, { type: 'comment' }>['value'][];
     comments: C[];
 } => {
-    const activity: mixHistoryWithCommentsReturnType<H, C>[] = history.map((record) => {
+    const activity: MixHistoryWithCommentsReturnType<H, C>[] = history.map((record) => {
         return {
             type: 'history',
             value: record,

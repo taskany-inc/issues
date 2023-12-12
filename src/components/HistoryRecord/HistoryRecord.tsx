@@ -21,7 +21,7 @@ import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot';
-import { HistoryAction, HistoryRecordSubject } from '../../types/history';
+import { HistoryRecordAction, HistoryRecordSubject } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { Circle } from '../Circle';
 import { useLocale } from '../../hooks/useLocale';
@@ -44,7 +44,7 @@ interface HistoryRecordProps {
     id: string;
     author: User | null;
     subject: WholeSubject;
-    action: HistoryAction;
+    action: HistoryRecordAction;
     children?: React.ReactNode;
     createdAt: Date;
 }
@@ -113,7 +113,7 @@ const StyledFlexReset = styled.div`
 `;
 
 interface HistoryRecordContext {
-    setActionText: (value: SetStateAction<HistoryAction>) => void;
+    setActionText: (value: SetStateAction<HistoryRecordAction>) => void;
     setSubjectText: (value: SetStateAction<WholeSubject>) => void;
 }
 
@@ -177,7 +177,7 @@ export const HistoryMultilineRecord: React.FC<{ withPretext?: boolean } & Histor
 );
 
 export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, action, createdAt, children }) => {
-    const translates = useMemo<Record<HistoryAction | WholeSubject, string>>(() => {
+    const translates = useMemo<Record<HistoryRecordAction | WholeSubject, string>>(() => {
         return {
             change: tr('change'),
             edit: tr('edit'),
@@ -242,9 +242,9 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ author, subject, a
 };
 
 export const HistoryRecordDependency: React.FC<{
-    issues: Array<React.ComponentProps<typeof IssueListItem>['issue']>;
+    issues?: Array<React.ComponentProps<typeof IssueListItem>['issue']>;
     strike?: boolean;
-}> = ({ issues, strike = false }) => {
+}> = ({ issues = [], strike = false }) => {
     return (
         <>
             {issues.map((issue) => (
@@ -483,7 +483,7 @@ const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title
 
 export const HistoryRecordCriteria: React.FC<
     HistoryChangeProps<CriteriaItem> & {
-        action: HistoryAction;
+        action: HistoryRecordAction;
         strike?: boolean;
     }
 > = ({ from, to, action }) => {
