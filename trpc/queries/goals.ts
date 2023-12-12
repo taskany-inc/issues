@@ -570,18 +570,27 @@ export const goalDeepQuery = {
     },
 } as const;
 
-export const addCalculatedGoalsFields = (goal: any, activityId: string, role: Role) => {
-    const _isOwner = goal.ownerId === activityId;
-    const _isParticipant = goal.participants?.some((participant: any) => participant?.id === activityId);
-    const _isWatching = goal.watchers?.some((watcher: any) => watcher?.id === activityId);
-    const _isStarred = goal.stargizers?.some((stargizer: any) => stargizer?.id === activityId);
-    const _isIssuer = goal.activityId === activityId;
+export const addCommonCalculatedGoalFields = (goal: any) => {
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
     const _hasAchievementCriteria = !!goal.goalAchiveCriteria?.length;
     const _achivedCriteriaWeight: number | null =
         goal.completedCriteriaWeight == null && goal.goalAchieveCriteria?.length
             ? calcAchievedWeight(goal.goalAchieveCriteria)
             : goal.completedCriteriaWeight;
+
+    return {
+        _shortId,
+        _hasAchievementCriteria,
+        _achivedCriteriaWeight,
+    };
+};
+
+export const addCalculatedGoalsFields = (goal: any, activityId: string, role: Role) => {
+    const _isOwner = goal.ownerId === activityId;
+    const _isParticipant = goal.participants?.some((participant: any) => participant?.id === activityId);
+    const _isWatching = goal.watchers?.some((watcher: any) => watcher?.id === activityId);
+    const _isStarred = goal.stargizers?.some((stargizer: any) => stargizer?.id === activityId);
+    const _isIssuer = goal.activityId === activityId;
 
     let parentOwner = false;
     function checkParent(project?: any) {
@@ -606,9 +615,7 @@ export const addCalculatedGoalsFields = (goal: any, activityId: string, role: Ro
         _isStarred,
         _isIssuer,
         _isEditable,
-        _shortId,
-        _hasAchievementCriteria,
-        _achivedCriteriaWeight,
+        ...addCommonCalculatedGoalFields(goal),
     };
 };
 
