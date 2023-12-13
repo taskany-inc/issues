@@ -25,5 +25,8 @@
     "as criteria": "",
     "goal complete": "completed goal",
     "goal in progress": "returns goal to work",
-    "partner project": ""
+    "partner project": "",
+    "author and more made changes in": "{author} and {count} more made changes in {subject}",
+    "author and the other author made changes in": "{author} and {oneMoreAuthor} made changes in {subject}",
+    "author made changes in": "{author} made changes in {subject}"
 }
