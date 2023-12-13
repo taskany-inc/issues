@@ -10,6 +10,11 @@ import { CustomCell, GoalListItemCompact } from '../GoalListItemCompact';
 import { Title } from '../Table';
 import { UserGroup } from '../UserGroup';
 import { GoalSelect } from '../GoalSelect';
+import {
+    goalDependenciesInput,
+    goalDependenciesRadios,
+    goalDependenciesSuggestionItemTitle,
+} from '../../utils/domObjects';
 
 import { tr } from './GoalDependency.i18n';
 
@@ -81,7 +86,9 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
                             name: 'title',
                             renderColumn: (values) => (
                                 <CustomCell col={6}>
-                                    <Title size="s">{values.title}</Title>
+                                    <Title size="s" {...goalDependenciesSuggestionItemTitle.attr}>
+                                        {values.title}
+                                    </Title>
                                 </CustomCell>
                             ),
                         },
@@ -110,13 +117,14 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
                 />
             )}
         >
-            <FilterAutoCompleteInput onChange={setGoalQuery} />
+            <FilterAutoCompleteInput onChange={setGoalQuery} {...goalDependenciesInput.attr} />
             <AutoCompleteRadioGroup
                 title={tr('Kind')}
                 items={radios}
                 name="Kind"
                 onChange={({ value }) => setKind(value)}
                 value={kind}
+                {...goalDependenciesRadios.attr}
             />
         </GoalSelect>
     );

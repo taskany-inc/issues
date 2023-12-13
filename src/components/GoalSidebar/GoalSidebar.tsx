@@ -15,7 +15,13 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
 import { TextList, TextListItem } from '../TextList';
 import { safeUserData } from '../../utils/getUserName';
-import { goalPageDeleteButton } from '../../utils/domObjects';
+import {
+    goalDependencies,
+    goalDependenciesTrigger,
+    goalDependencyGoalsListItem,
+    goalDependencyKinds,
+    goalPageDeleteButton,
+} from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
 import { GoalList } from '../GoalList';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
@@ -213,10 +219,10 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
             ))}
 
             {nullable(relationsGoalsLength || goal._isEditable, () => (
-                <>
+                <div {...goalDependencies.attr}>
                     {goal._relations.map(({ kind, goals }) => {
                         return nullable(goals.length, () => (
-                            <IssueMeta title={heading[kind]} key={kind}>
+                            <IssueMeta title={heading[kind]} key={kind} {...goalDependencyKinds[kind].attr}>
                                 <GoalList
                                     canEdit={goal._isEditable}
                                     goals={goals}
@@ -228,6 +234,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                             relation: { id: removedGoal.id },
                                         })
                                     }
+                                    {...goalDependencyGoalsListItem.attr}
                                 />
                             </IssueMeta>
                         ));
@@ -236,13 +243,18 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     {nullable(goal._isEditable, () => (
                         <GoalFormPopupTrigger
                             renderTrigger={(props) => (
-                                <AddInlineTrigger text={tr('Add dependency')} ref={props.ref} onClick={props.onClick} />
+                                <AddInlineTrigger
+                                    text={tr('Add dependency')}
+                                    ref={props.ref}
+                                    onClick={props.onClick}
+                                    {...goalDependenciesTrigger.attr}
+                                />
                             )}
                         >
                             <GoalDependency id={goal.id} items={goal._relations} onSubmit={onGoalDependencyAdd} />
                         </GoalFormPopupTrigger>
                     ))}
-                </>
+                </div>
             ))}
 
             {nullable(goal._versaCriteria?.length || goal._isEditable, () => (

@@ -26,6 +26,7 @@ export const GoalList = <T extends Goal & { state?: { hue?: number } | null; _sh
     onClick,
     onRemove,
     canEdit,
+    ...attrs
 }: GoalDependencyListByKindProps<T>) => {
     const { themeId } = usePageContext();
 
@@ -54,6 +55,7 @@ export const GoalList = <T extends Goal & { state?: { hue?: number } | null; _sh
                         color={goal?.state?.hue}
                         href={routes.goal(goal._shortId)}
                         onClick={onClickHandler(goal)}
+                        {...attrs}
                     >
                         {nullable(canEdit, () => (
                             <IconXCircleSolid size="xs" onClick={onRemoveHandler(goal)} />

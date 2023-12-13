@@ -15,9 +15,9 @@
     "Partnership projects": "",
     "Add project": "",
     "Add dependency": "",
-    "blocks": "This goal blocked by",
-    "dependsOn": "This goal depends on",
-    "relatedTo": "This goal relates to",
+    "blocks": "Blocked by",
+    "dependsOn": "Depends on",
+    "relatedTo": "Relates to",
     "Delete": "",
     "Connect to goal": "",
     "Is the criteria for": ""

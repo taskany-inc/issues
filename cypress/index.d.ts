@@ -60,6 +60,10 @@ declare global {
             ): Chainable<UserData['user']>;
             task(event: 'db:remove:user', data: { id: string }): Chainable<null>;
             task(event: 'db:remove:user', data?: { ids: string[] }): Chainable<null>;
+            task(
+                event: 'db:create:goal',
+                data?: { title: string; projectId: string; ownerEmail: string },
+            ): Chainable<any>;
             interceptEditor(): Chainable<void>;
             waitEditor(): Chainable<void>;
             loadLangFile(): Chainable<void>;

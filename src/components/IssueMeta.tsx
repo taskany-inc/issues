@@ -36,9 +36,9 @@ const EditButton = styled.span`
     }
 `;
 
-export const IssueMeta: React.FC<IssueMetaProps> = ({ title, onEdit, children }) => {
+export const IssueMeta: React.FC<IssueMetaProps> = ({ title, onEdit, children, ...rest }) => {
     return (
-        <StyledIssueMeta>
+        <StyledIssueMeta {...rest}>
             <StyledIssueMetaTitle size="s" weight="bold" color={gray9}>
                 {title}{' '}
                 {nullable(onEdit, () => (
