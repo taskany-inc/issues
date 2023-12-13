@@ -21,7 +21,7 @@ interface AddInlineTriggerProps {
 }
 
 export const AddInlineTrigger = forwardRef<HTMLDivElement, AddInlineTriggerProps>(
-    ({ icon = <IconPlusCircleOutline size="xs" />, text, onClick, centered = true }, ref) => (
-        <StyledInlineTrigger ref={ref} icon={icon} text={text} onClick={onClick} centered={centered} />
+    ({ icon = <IconPlusCircleOutline size="xs" />, text, onClick, centered = true, ...attrs }, ref) => (
+        <StyledInlineTrigger ref={ref} icon={icon} text={text} onClick={onClick} centered={centered} {...attrs} />
     ),
 );

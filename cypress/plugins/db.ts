@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
+import { addCalculatedGoalsFields } from '../../trpc/queries/goals';
+
 type TaskParams<K extends string, D, R> = {
     [key in K]: D extends void ? (data?: D) => R : (data: D) => R;
 };
@@ -23,6 +25,7 @@ export type DbTasks =
     | TaskParams<'db:remove:project', { id: string }, Promise<null>>
     | TaskParams<'db:create:user', { email: string; name?: string; password: string; provider: string }, Promise<any>>
     | TaskParams<'db:remove:user', { id: string }, Promise<null>>
+    | TaskParams<'db:create:goal', { title: string; projectId: string; ownerEmail: string }, Promise<any>>
     | TaskParams<'db:remove:goal', { id: string }, Promise<null>>;
 
 interface DbPluginEvents extends Cypress.PluginEvents {
@@ -87,6 +90,31 @@ export const initDb = (on: DbPluginEvents) => {
         'db:remove:user': async ({ id }) => {
             await prisma.user.delete({ where: { id } });
             return null;
+        },
+
+        'db:create:goal': async ({ title, projectId, ownerEmail }) => {
+            const [user, goals] = await Promise.all([
+                prisma.user.findUniqueOrThrow({ where: { email: ownerEmail } }),
+                prisma.goal.findMany({ where: { projectId } }),
+            ]);
+
+            if (!user.activityId) return;
+
+            const goal = await prisma.goal.create({
+                data: {
+                    title,
+                    description: '',
+                    projectId,
+                    activityId: user.activityId,
+                    ownerId: user.activityId,
+                    scopeId: goals.length + 1,
+                },
+            });
+
+            return {
+                ...goal,
+                ...addCalculatedGoalsFields(goal, user.activityId, user.role),
+            };
         },
 
         'db:remove:goal': async ({ id }) => {

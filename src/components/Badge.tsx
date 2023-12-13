@@ -57,9 +57,9 @@ const StyledText = styled(Text).attrs({
     grid-row: span 2;
 `;
 
-export const Badge: React.FC<BadgeProps> = ({ icon, text, action, className }) => {
+export const Badge: React.FC<BadgeProps> = ({ icon, text, action, className, ...attrs }) => {
     return (
-        <StyledBadge className={className}>
+        <StyledBadge className={className} {...attrs}>
             {icon}
 
             <StyledText>{text}</StyledText>

@@ -24,6 +24,7 @@ export const GoalBadge: React.FC<GoalBadgeProps> = ({
     children,
     className,
     onClick,
+    ...attrs
 }) => {
     const sat = color === 1 ? 0 : undefined;
     return (
@@ -40,6 +41,7 @@ export const GoalBadge: React.FC<GoalBadgeProps> = ({
                 title,
             )}
             action={children}
+            {...attrs}
         />
     );
 };

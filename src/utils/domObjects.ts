@@ -110,3 +110,19 @@ export const commentFormSubmitButton = commentForm.add('submitButton');
 
 export const userSettings = DO('userSettings');
 export const userSettingsLogoutButton = userSettings.add('logoutButton');
+
+export const goalDependencies = DO('goalDependencies');
+export const goalDependenciesTrigger = goalDependencies.add('trigger');
+export const goalDependenciesRadios = goalDependencies.add('radios');
+export const goalDependenciesInput = goalDependencies.add('input');
+export const goalDependenciesSuggestions = goalDependencies.add('suggestions');
+export const goalDependenciesSuggestionItemTitle = goalDependencies.add('suggestionItemTitle');
+export const goalDependencyKindBlocks = goalDependencies.add('blocksKind');
+export const goalDependencyKindDependsOn = goalDependencies.add('dependsOnKind');
+export const goalDependencyKindRelatedTo = goalDependencies.add('relatedToKind');
+export const goalDependencyKinds = {
+    blocks: goalDependencyKindBlocks,
+    dependsOn: goalDependencyKindDependsOn,
+    relatedTo: goalDependencyKindRelatedTo,
+};
+export const goalDependencyGoalsListItem = goalDependencies.add('goalsListItem');
