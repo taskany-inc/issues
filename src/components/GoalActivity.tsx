@@ -1,24 +1,12 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { GoalComment } from '../types/comment';
+import { safeUserData } from '../utils/getUserName';
 
 import { ActivityFeed } from './ActivityFeed';
-import {
-    HistoryRecord,
-    HistoryRecordDependency,
-    HistoryRecordTags,
-    HistoryRecordTextChange,
-    HistoryRecordEstimate,
-    HistoryRecordPriority,
-    HistoryRecordState,
-    HistoryRecordParticipant,
-    HistoryRecordProject,
-    HistoryRecordLongTextChange,
-    HistoryRecordCriteria,
-    HistoryRecordPartnerProject,
-} from './HistoryRecord/HistoryRecord';
+import { HistoryRecordGroup } from './HistoryRecord/HistoryRecord';
 
 interface GoalActivityProps {
     feed: NonNullable<GoalByIdReturnType>['_activityFeed'];
@@ -30,67 +18,63 @@ interface GoalActivityProps {
 
 export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
     ({ feed, header, footer, renderCommentItem }, ref) => {
+        const unionFeed = useMemo(() => {
+            const res = [];
+            let tempRecords = [];
+
+            for (let i = 0; i < feed.length; i += 1) {
+                const current = feed[i];
+                const next = feed[i + 1];
+
+                if (current.type === 'history') {
+                    if (current.type === next?.type && current.value.subject === next.value.subject) {
+                        tempRecords.push(current.value);
+                    } else {
+                        res.push({
+                            type: current.type,
+                            value: tempRecords.concat([current.value]),
+                        });
+
+                        tempRecords = [];
+                    }
+                } else {
+                    // only comments
+                    res.push(current);
+                }
+            }
+
+            return res;
+        }, [feed]);
+
         return (
             <ActivityFeed ref={ref}>
                 {header}
 
-                {feed.map((item) =>
-                    nullable(item, ({ type, value }) => (
-                        <React.Fragment key={value.id}>
-                            {type === 'comment' && renderCommentItem(value)}
+                {unionFeed.map((item) =>
+                    nullable(item, ({ type, value }) => {
+                        if (type === 'history') {
+                            return (
+                                <HistoryRecordGroup
+                                    key={`${type}.${value.length}${value.at(-1)?.id ?? ''}`}
+                                    subject={value[value.length - 1].subject}
+                                    groupped={value.length > 1}
+                                    values={value.map(
+                                        ({ id, action, subject, nextValue, previousValue, activity, createdAt }) => ({
+                                            author: safeUserData(activity),
+                                            from: previousValue,
+                                            to: nextValue,
+                                            action,
+                                            id,
+                                            subject,
+                                            createdAt,
+                                        }),
+                                    )}
+                                />
+                            );
+                        }
 
-                            {type === 'history' && (
-                                <HistoryRecord
-                                    author={value.activity.user}
-                                    id={value.id}
-                                    subject={value.subject}
-                                    action={value.action}
-                                    createdAt={value.createdAt}
-                                >
-                                    {value.subject === 'dependencies' && (
-                                        <HistoryRecordDependency
-                                            issues={value.previousValue || value.nextValue}
-                                            strike={!!value.previousValue}
-                                        />
-                                    )}
-                                    {value.subject === 'tags' && (
-                                        <HistoryRecordTags from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {value.subject === 'description' && (
-                                        <HistoryRecordLongTextChange from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {value.subject === 'title' && (
-                                        <HistoryRecordTextChange from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {value.subject === 'estimate' && (
-                                        <HistoryRecordEstimate from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {value.subject === 'priority' && (
-                                        <HistoryRecordPriority from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {value.subject === 'state' && (
-                                        <HistoryRecordState from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {(value.subject === 'participants' || value.subject === 'owner') && (
-                                        <HistoryRecordParticipant from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {value.subject === 'project' && (
-                                        <HistoryRecordProject from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {value.subject === 'partnerProject' && (
-                                        <HistoryRecordPartnerProject from={value.previousValue} to={value.nextValue} />
-                                    )}
-                                    {value.subject === 'criteria' && (
-                                        <HistoryRecordCriteria
-                                            from={value.previousValue}
-                                            to={value.nextValue}
-                                            action={value.action}
-                                        />
-                                    )}
-                                </HistoryRecord>
-                            )}
-                        </React.Fragment>
-                    )),
+                        return <React.Fragment key={value.id}>{renderCommentItem(value)}</React.Fragment>;
+                    }),
                 )}
 
                 {footer}
