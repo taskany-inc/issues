@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import { ComponentProps, FC } from 'react';
 import styled from 'styled-components';
 import { nullable } from '@taskany/bricks';
 import { IconXCircleSolid } from '@taskany/icons';
 import { gapXs } from '@taskany/colors';
+import { User } from '@prisma/client';
 
-import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { safeUserData } from '../../utils/getUserName';
 import { TextList, TextListItem } from '../TextList';
 import { UserBadge } from '../UserBadge';
@@ -21,11 +21,11 @@ const StyledInputContainer = styled.div`
 `;
 
 export const UserEditableList: FC<{
-    editable: boolean;
-    users: NonNullable<ActivityByIdReturnType[]>;
+    editable?: boolean;
+    users: { id: string; user: User | null }[];
     filterIds: string[];
     onRemove: (id: string) => void;
-    onAdd: (user: NonNullable<ActivityByIdReturnType>) => void;
+    onAdd: ComponentProps<typeof UserComboBox>['onChange'];
     triggerText: string;
     className?: string;
 }> = ({ editable, users, filterIds, triggerText, onRemove, onAdd, className }) => (
