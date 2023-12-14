@@ -561,3 +561,47 @@ ${footer}`);
         text: subject,
     };
 };
+
+interface ParticipantsToProject {
+    key: string;
+    title: string;
+    author: string;
+    authorEmail: string;
+    to: SendMailProps['to'];
+}
+
+export const addParticipantsToProject = async ({ to, key, title, author }: ParticipantsToProject) => {
+    const subject = `ℹ️ Project #${key}: ${title} was updated`;
+    const html = md.render(`
+🧑‍💻 **${author}** added you to the list of project participants **[${key}: ${title}](${absUrl(`/projects/${key}`)})**.
+
+${notice}
+
+${footer}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
+
+export const removeParticipantsToProject = async ({ to, key, title, author }: ParticipantsToProject) => {
+    const subject = `ℹ️ Project #${key}: ${title} was updated`;
+    const html = md.render(`
+🧑‍💻 **${author}** removed you from the list of project participants **[${key}: ${title}](${absUrl(
+        `/projects/${key}`,
+    )})**.
+
+${notice}
+
+${footer}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};

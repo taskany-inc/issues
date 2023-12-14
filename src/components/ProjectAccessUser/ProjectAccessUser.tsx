@@ -1,43 +1,19 @@
-import { FC, useCallback, useMemo, useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Text } from '@taskany/bricks';
-import { gapS, gapM, gray9, gray3 } from '@taskany/colors';
+import { FC, useCallback, useMemo } from 'react';
 
-import { trpc } from '../../utils/trpcClient';
 import { ActivityByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { UserEditableList } from '../UserEditableList/UserEditableList';
-import { SettingsCard } from '../SettingsContent';
+import { ProjectSettingsUserList } from '../ProjectSettingsUserList';
 
 import { tr } from './ProjectAccessUser.i18n';
 
-const StyledTitle = styled(Text)`
-    padding: ${gapS} ${gapM} ${gapM};
-`;
-
-const StyledListContianer = styled.div`
-    background-color: ${gray3};
-    padding: ${gapS} ${gapM};
-`;
-
-export const ProjectAccessUser: FC<{
+interface ProjectAccessUserProps {
     project: NonNullable<ProjectByIdReturnType>;
-}> = ({ project }) => {
-    const [userIdToRemove, setUserIdToRemove] = useState<string>('');
+}
+
+export const ProjectAccessUser: FC<ProjectAccessUserProps> = ({ project }) => {
     const filterIds = useMemo(() => project.accessUsers.map(({ id }) => id) ?? [], [project]);
-
-    const { updateProject } = useProjectResource(project.id);
-
-    const { data: userToRemoveGoals = [], status } = trpc.project.getActivityGoals.useQuery(
-        {
-            id: project.id,
-            ownerId: userIdToRemove,
-        },
-        {
-            enabled: Boolean(userIdToRemove),
-        },
-    );
+    const { updateProject, checkActivityGoals } = useProjectResource(project.id);
 
     const onAdd = useCallback(
         (user: NonNullable<ActivityByIdReturnType>) => {
@@ -49,46 +25,33 @@ export const ProjectAccessUser: FC<{
         [updateProject, project],
     );
 
-    useEffect(() => {
-        if (status !== 'success') {
-            return;
-        }
+    const onRemove = useCallback(
+        async (id: string) => {
+            const removedUserGoals = await checkActivityGoals(id);
 
-        if (userToRemoveGoals.length) {
-            dispatchModalEvent(ModalEvent.AccessUserDeleteError, {
-                goals: userToRemoveGoals,
-            })();
-        }
+            if (removedUserGoals.length) {
+                dispatchModalEvent(ModalEvent.AccessUserDeleteError, {
+                    goals: removedUserGoals,
+                })();
+                return;
+            }
 
-        if (!userToRemoveGoals.length) {
             updateProject()({
                 ...project,
-                accessUsers: project.accessUsers.filter((user) => user.id !== userIdToRemove),
+                accessUsers: project.accessUsers.filter((user) => user.id !== id),
             });
-        }
-    }, [status, userIdToRemove, userToRemoveGoals, updateProject, project]);
-
-    useEffect(() => {
-        if (status === 'success' || status === 'error') {
-            setUserIdToRemove('');
-        }
-    }, [status]);
+        },
+        [checkActivityGoals, project, updateProject],
+    );
 
     return (
-        <SettingsCard>
-            <StyledTitle size="m" weight="bold" color={gray9}>
-                {tr('Access')}
-            </StyledTitle>
-            <StyledListContianer>
-                <UserEditableList
-                    users={project.accessUsers}
-                    filterIds={filterIds}
-                    onAdd={onAdd}
-                    onRemove={setUserIdToRemove}
-                    triggerText={tr('Add user')}
-                    editable
-                />
-            </StyledListContianer>
-        </SettingsCard>
+        <ProjectSettingsUserList
+            title={tr('Access')}
+            users={project.accessUsers}
+            filterIds={filterIds}
+            onAdd={onAdd}
+            onRemove={onRemove}
+            triggerText={tr('Add user')}
+        />
     );
 };

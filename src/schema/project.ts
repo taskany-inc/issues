@@ -76,3 +76,10 @@ export type ProjectTransferOwnership = z.infer<typeof projectTransferOwnershipSc
 export const projectDeleteSchema = z.object({
     id: z.string(),
 });
+
+export const participantsToProjectSchema = z.object({
+    id: z.string(),
+    participants: z.array(z.string()),
+});
+
+export type ParticipantsToProject = z.infer<typeof participantsToProjectSchema>;

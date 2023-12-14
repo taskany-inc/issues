@@ -15,6 +15,9 @@ export const useProjectResource = (id: string) => {
     const toggleWatcherMutation = trpc.project.toggleWatcher.useMutation();
     const toggleStargizerMutation = trpc.project.toggleStargizer.useMutation();
     const transferOwnershipMutation = trpc.project.transferOwnership.useMutation();
+    const getActivityGoals = trpc.project.getActivityGoals.useMutation();
+    const addParticipants = trpc.project.addParticipants.useMutation();
+    const removeParticipants = trpc.project.removeParticipants.useMutation();
 
     const invalidate = useCallback(() => {
         utils.project.getById.invalidate({ id });
@@ -105,6 +108,38 @@ export const useProjectResource = (id: string) => {
         [id, transferOwnershipMutation],
     );
 
+    const checkActivityGoals = useCallback(
+        (ownerId: string) => {
+            return getActivityGoals.mutateAsync({
+                id,
+                ownerId,
+            });
+        },
+        [getActivityGoals, id],
+    );
+
+    const onProjectParticipantAdd = useCallback(
+        async (participants: string[]) => {
+            const promise = addParticipants.mutateAsync({ id, participants });
+
+            await notifyPromise(promise, 'projectUpdate');
+
+            invalidate();
+        },
+        [addParticipants, id, invalidate],
+    );
+
+    const onProjectParticipantRemove = useCallback(
+        async (participants: string[]) => {
+            const promise = removeParticipants.mutateAsync({ id, participants });
+
+            await notifyPromise(promise, 'projectUpdate');
+
+            invalidate();
+        },
+        [removeParticipants, id, invalidate],
+    );
+
     return {
         createProject,
         updateProject,
@@ -112,6 +147,9 @@ export const useProjectResource = (id: string) => {
         toggleProjectWatching,
         toggleProjectStar,
         transferOwnership,
+        checkActivityGoals,
+        onProjectParticipantAdd,
+        onProjectParticipantRemove,
         invalidate,
     };
 };

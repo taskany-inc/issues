@@ -66,6 +66,7 @@ import { safeUserData } from '../../utils/getUserName';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { ProjectAccessUser } from '../ProjectAccessUser/ProjectAccessUser';
 import { AccessUserDeleteErrorModal } from '../AccessUserDeleteErrorModal/AccessUserDeleteErrorModal';
+import { ProjectParticipants } from '../ProjectParticipants/ProjectParticipants';
 
 import { tr } from './ProjectSettingsPage.i18n';
 
@@ -342,6 +343,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 </SettingsCard>
 
                 <ProjectAccessUser project={project.data} />
+
+                <ProjectParticipants id={project.data.id} participants={project.data.participants} />
 
                 <SettingsCard view="warning">
                     <Form>

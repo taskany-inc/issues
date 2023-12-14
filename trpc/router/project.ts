@@ -10,6 +10,7 @@ import {
     projectUpdateSchema,
     projectSuggestionsSchema,
     projectDeleteSchema,
+    participantsToProjectSchema,
 } from '../../src/schema/project';
 import { addCalculatedGoalsFields, goalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
@@ -815,7 +816,7 @@ export const project = router({
             }),
         )
         .use(projectAccessMiddleware)
-        .query(async ({ input: { ownerId, id }, ctx }) => {
+        .mutation(async ({ input: { ownerId, id }, ctx }) => {
             const { activityId, role } = ctx.session.user;
 
             return prisma.goal
@@ -837,5 +838,65 @@ export const project = router({
                         ...addCalculatedGoalsFields(g, activityId, role),
                     })),
                 );
+        }),
+    addParticipants: protectedProcedure
+        .input(participantsToProjectSchema)
+        .use(projectEditAccessMiddleware)
+        .mutation(async ({ input: { id, participants }, ctx }) => {
+            try {
+                const [updatedProject, recipients] = await Promise.all([
+                    prisma.project.update({
+                        where: { id },
+                        data: {
+                            participants: {
+                                connect: participants.map((id) => ({ id })),
+                            },
+                        },
+                    }),
+                    prisma.user.findMany({ where: { activityId: { in: participants } } }),
+                ]);
+
+                await createEmailJob('addParticipantsToProject', {
+                    to: prepareRecipients(recipients.map((user) => ({ user }))),
+                    key: updatedProject.id,
+                    title: updatedProject.title,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
+                });
+
+                return updatedProject;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
+        }),
+    removeParticipants: protectedProcedure
+        .input(participantsToProjectSchema)
+        .use(projectEditAccessMiddleware)
+        .mutation(async ({ input: { id, participants }, ctx }) => {
+            try {
+                const [updatedProject, recipients] = await Promise.all([
+                    prisma.project.update({
+                        where: { id },
+                        data: {
+                            participants: {
+                                disconnect: participants.map((id) => ({ id })),
+                            },
+                        },
+                    }),
+                    prisma.user.findMany({ where: { activityId: { in: participants } } }),
+                ]);
+
+                await createEmailJob('removeParticipantsToProject', {
+                    to: prepareRecipients(recipients.map((user) => ({ user }))),
+                    key: updatedProject.id,
+                    title: updatedProject.title,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
+                });
+
+                return updatedProject;
+            } catch (error: any) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
+            }
         }),
 });
