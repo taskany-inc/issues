@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.12.0](https://github.com/taskany-inc/issues/compare/v2.11.1...v2.12.0) (2023-12-14)
+
+
+### Features
+
+* **GoalHistory:** grouping the same history records ([76b39f8](https://github.com/taskany-inc/issues/commit/76b39f8c5915a1543b0ab28842bb0f095ef1f510))
+
+
+### Bug Fixes
+
+* **GoalHistory:** rewrite types with calculated fields ([79c613a](https://github.com/taskany-inc/issues/commit/79c613af67e4d14ba068b6e64d3b8c09acb4ef19))
+
 ## [2.11.1](https://github.com/taskany-inc/issues/compare/v2.11.0...v2.11.1) (2023-12-11)
 
 
