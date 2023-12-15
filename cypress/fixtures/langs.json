@@ -901,6 +901,12 @@
             "en": "Low"
         }
     },
+    "PrivateDepsWarning": {
+        "Goal has private dependencies": {
+            "ru": "",
+            "en": ""
+        }
+    },
     "ProjectAccessUser": {
         "Access": {
             "ru": "Доступ",

@@ -312,263 +312,278 @@ export const goalsFilter = (
     };
 };
 
-export const goalDeepQuery = {
-    owner: {
-        include: {
-            user: true,
-            ghost: true,
-        },
-    },
-    activity: {
-        include: {
-            user: true,
-            ghost: true,
-        },
-    },
-    tags: true,
-    state: true,
-    priority: true,
-    project: {
-        include: {
-            parent: true,
-            tags: true,
-            flow: {
-                include: {
-                    states: true,
-                },
-            },
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-            participants: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-            accessUsers: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-            stargizers: true,
-            watchers: true,
-            children: {
-                include: {
-                    parent: true,
-                },
-            },
-            _count: {
-                select: {
-                    stargizers: true,
-                    watchers: true,
-                    participants: true,
-                    children: true,
-                    goals: true,
-                    parent: true,
-                },
+export const getGoalDeepQuery = (user?: { activityId: string; role: Role }) => {
+    const depsWhere = {
+        ...(user
+            ? {
+                  project: {
+                      ...getProjectAccessFilter(user.activityId, user.role),
+                  },
+              }
+            : {}),
+        ...nonArchievedGoalsPartialQuery,
+    };
+
+    return {
+        owner: {
+            include: {
+                user: true,
+                ghost: true,
             },
         },
-    },
-    partnershipProjects: {
-        include: {
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-            participants: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-            _count: {
-                select: {
-                    stargizers: true,
-                    watchers: true,
-                    participants: true,
-                    children: true,
-                    goals: true,
-                    parent: true,
-                },
+        activity: {
+            include: {
+                user: true,
+                ghost: true,
             },
         },
-    },
-    goalAchiveCriteria: {
-        include: {
-            criteriaGoal: {
-                include: {
-                    activity: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
+        tags: true,
+        state: true,
+        priority: true,
+        project: {
+            include: {
+                parent: true,
+                tags: true,
+                flow: {
+                    include: {
+                        states: true,
                     },
-                    owner: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
+                },
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
                     },
-                    state: true,
                 },
-            },
-        },
-        orderBy: {
-            createdAt: 'asc',
-        },
-        where: {
-            deleted: { not: true },
-        },
-    },
-    dependsOn: {
-        include: {
-            state: true,
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
+                participants: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
                 },
-            },
-            owner: {
-                include: {
-                    user: true,
-                    ghost: true,
+                accessUsers: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
                 },
-            },
-        },
-        where: nonArchievedGoalsPartialQuery,
-    },
-    relatedTo: {
-        include: {
-            state: true,
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
+                stargizers: true,
+                watchers: true,
+                children: {
+                    include: {
+                        parent: true,
+                    },
                 },
-            },
-            owner: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-        },
-        where: nonArchievedGoalsPartialQuery,
-    },
-    blocks: {
-        include: {
-            state: true,
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-            owner: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-        },
-        where: nonArchievedGoalsPartialQuery,
-    },
-    connected: {
-        include: {
-            state: true,
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-            owner: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-        },
-        where: nonArchievedGoalsPartialQuery,
-    },
-    comments: {
-        orderBy: {
-            createdAt: 'asc',
-        },
-        include: {
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-            state: true,
-            reactions: {
-                include: {
-                    activity: {
-                        include: {
-                            user: true,
-                            ghost: true,
-                        },
+                _count: {
+                    select: {
+                        stargizers: true,
+                        watchers: true,
+                        participants: true,
+                        children: true,
+                        goals: true,
+                        parent: true,
                     },
                 },
             },
         },
-    },
-    reactions: {
-        include: {
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
+        partnershipProjects: {
+            include: {
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                participants: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        stargizers: true,
+                        watchers: true,
+                        participants: true,
+                        children: true,
+                        goals: true,
+                        parent: true,
+                    },
                 },
             },
         },
-    },
-    stargizers: {
-        include: {
-            user: true,
-            ghost: true,
+        goalAchiveCriteria: {
+            include: {
+                criteriaGoal: {
+                    include: {
+                        activity: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
+                        owner: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
+                        state: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'asc',
+            },
+            where: {
+                deleted: { not: true },
+            },
         },
-    },
-    watchers: {
-        include: {
-            user: true,
-            ghost: true,
+        dependsOn: {
+            include: {
+                state: true,
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                owner: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+            },
+            where: depsWhere,
         },
-    },
-    participants: {
-        include: {
-            user: true,
-            ghost: true,
+        relatedTo: {
+            include: {
+                state: true,
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                owner: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+            },
+            where: depsWhere,
         },
-    },
-    _count: {
-        select: {
-            stargizers: true,
-            watchers: true,
-            comments: true,
+        blocks: {
+            include: {
+                state: true,
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                owner: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+            },
+            where: depsWhere,
         },
-    },
-    history: {
-        include: {
-            activity: {
-                include: {
-                    user: true,
-                    ghost: true,
+        connected: {
+            include: {
+                state: true,
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                owner: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+            },
+            where: depsWhere,
+        },
+        comments: {
+            orderBy: {
+                createdAt: 'asc',
+            },
+            include: {
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                state: true,
+                reactions: {
+                    include: {
+                        activity: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
+                    },
                 },
             },
         },
-    },
-} as const;
+        reactions: {
+            include: {
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+            },
+        },
+        stargizers: {
+            include: {
+                user: true,
+                ghost: true,
+            },
+        },
+        watchers: {
+            include: {
+                user: true,
+                ghost: true,
+            },
+        },
+        participants: {
+            include: {
+                user: true,
+                ghost: true,
+            },
+        },
+        _count: {
+            select: {
+                stargizers: true,
+                watchers: true,
+                comments: true,
+            },
+        },
+        history: {
+            include: {
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+            },
+        },
+    } as const;
+};
+
+export const goalDeepQuery = getGoalDeepQuery();
 
 export const addCommonCalculatedGoalFields = (goal: any) => {
     const _shortId = `${goal.projectId}-${goal.scopeId}`;

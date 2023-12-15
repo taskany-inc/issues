@@ -4,7 +4,12 @@ import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { addCalculatedGoalsFields, goalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
+import {
+    addCalculatedGoalsFields,
+    getGoalDeepQuery,
+    goalsFilter,
+    nonArchievedGoalsPartialQuery,
+} from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
@@ -28,6 +33,7 @@ import {
     goalHistorySeparator,
     createPersonalProject,
     clearEmptyPersonalProject,
+    countPrivateDependencies,
 } from '../../src/utils/db';
 import { createEmailJob } from '../../src/utils/worker/create';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
@@ -50,7 +56,7 @@ import {
 } from '../access/accessMiddlewares';
 import { addCalculatedProjectFields, nonArchivedPartialQuery } from '../queries/project';
 import { recalculateCriteriaScore, goalIncludeCriteriaParams } from '../../src/utils/recalculateCriteriaScore';
-import { getProjectAccessFilter } from '../queries/access';
+import { getProjectAccessFilter, goalAchiveCriteriaFilter } from '../queries/access';
 import { prepareRecipients } from '../../src/utils/prepareRecipients';
 
 const updateProjectUpdatedAt = async (id?: string | null) => {
@@ -117,9 +123,10 @@ export const goal = router({
                         },
                     },
                 },
-                include: {
-                    ...goalDeepQuery,
-                },
+                include: getGoalDeepQuery({
+                    activityId,
+                    role,
+                }),
             });
 
             const checkEnableGoalByProjectOwner = (goal: (typeof data)[number]) => {
@@ -172,9 +179,10 @@ export const goal = router({
                     orderBy: {
                         id: 'asc',
                     },
-                    include: {
-                        ...goalDeepQuery,
-                    },
+                    include: getGoalDeepQuery({
+                        activityId,
+                        role,
+                    }),
                 }),
                 prisma.goal.count(),
             ]);
@@ -228,7 +236,10 @@ export const goal = router({
                         archived: false,
                     },
                     include: {
-                        ...goalDeepQuery,
+                        ...getGoalDeepQuery({
+                            activityId,
+                            role,
+                        }),
                         goalAchiveCriteria: {
                             include: {
                                 criteriaGoal: {
@@ -253,6 +264,7 @@ export const goal = router({
                                 createdAt: 'asc',
                             },
                             where: {
+                                AND: goalAchiveCriteriaFilter(activityId, role),
                                 OR: [{ deleted: false }, { deleted: null }],
                             },
                         },
@@ -263,38 +275,63 @@ export const goal = router({
 
                 const history = await getGoalHistory(goal.history || []);
 
-                const versaCriteriaGoals = await prisma.goalAchieveCriteria.findMany({
-                    where: {
-                        AND: {
-                            criteriaGoalId: goal.id,
-                            OR: [{ deleted: false }, { deleted: null }],
-                        },
-                    },
-                    include: {
-                        goal: {
-                            include: {
-                                state: true,
-                                activity: {
-                                    include: {
-                                        user: true,
-                                        ghost: true,
-                                    },
+                const [versaCriteriaGoals, privateDepsCount] = await Promise.all([
+                    prisma.goalAchieveCriteria.findMany({
+                        where: {
+                            AND: {
+                                criteriaGoalId: goal.id,
+                                OR: [{ deleted: false }, { deleted: null }],
+                                AND: {
+                                    OR: [
+                                        {
+                                            goal: {
+                                                project: {
+                                                    ...getProjectAccessFilter(activityId, role),
+                                                },
+                                            },
+                                        },
+                                    ],
                                 },
-                                owner: {
-                                    include: {
-                                        user: true,
-                                        ghost: true,
+                            },
+                        },
+                        include: {
+                            goal: {
+                                include: {
+                                    state: true,
+                                    activity: {
+                                        include: {
+                                            user: true,
+                                            ghost: true,
+                                        },
+                                    },
+                                    owner: {
+                                        include: {
+                                            user: true,
+                                            ghost: true,
+                                        },
                                     },
                                 },
                             },
                         },
-                    },
-                });
+                    }),
+                    await countPrivateDependencies({
+                        projectId,
+                        scopeId,
+                    }),
+                ]);
+
+                const _hasPrivateDeps = Boolean(
+                    privateDepsCount.blocks ||
+                        privateDepsCount.dependsOn ||
+                        privateDepsCount.relatedTo ||
+                        privateDepsCount.goalAchiveCriteria,
+                );
 
                 return {
                     ...goal,
                     ...addCalculatedGoalsFields(goal, activityId, role),
                     ...mixHistoryWithComments(history, goal.comments),
+                    _hasPrivateDeps,
                     _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                     _relations: makeGoalRelationMap(
                         {
@@ -430,7 +467,10 @@ export const goal = router({
                         },
                     },
                     include: {
-                        ...goalDeepQuery,
+                        ...getGoalDeepQuery({
+                            activityId,
+                            role,
+                        }),
                         goalInCriteria: goalIncludeCriteriaParams,
                     },
                 });
@@ -617,7 +657,10 @@ export const goal = router({
                         },
                     },
                     include: {
-                        ...goalDeepQuery,
+                        ...getGoalDeepQuery({
+                            activityId,
+                            role,
+                        }),
                         goalInCriteria: goalIncludeCriteriaParams,
                     },
                 });
@@ -1085,6 +1128,8 @@ export const goal = router({
                 where: { id: input.goalId },
             });
 
+            const { activityId, role } = ctx.session.user;
+
             if (!actualGoal) {
                 return null;
             }
@@ -1157,6 +1202,7 @@ export const goal = router({
                                     include: { state: true },
                                 },
                             },
+                            where: goalAchiveCriteriaFilter(activityId, role),
                         },
                     },
                 });
@@ -1180,6 +1226,8 @@ export const goal = router({
             const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
                 where: { id: input.id },
             });
+
+            const { activityId, role } = ctx.session.user;
 
             try {
                 if (!currentCriteria) {
@@ -1262,6 +1310,7 @@ export const goal = router({
                                         include: { state: true },
                                     },
                                 },
+                                where: goalAchiveCriteriaFilter(activityId, role),
                             },
                         },
                     }),
@@ -1809,7 +1858,10 @@ export const goal = router({
                         },
                     },
                     include: {
-                        ...goalDeepQuery,
+                        ...getGoalDeepQuery({
+                            activityId,
+                            role,
+                        }),
                         goalInCriteria: goalIncludeCriteriaParams,
                     },
                 });
@@ -1828,10 +1880,12 @@ export const goal = router({
     getGoalCriteriaList: protectedProcedure
         .input(z.object({ id: z.string().optional() }))
         .use(goalAccessMiddleware)
-        .query(async ({ input }) => {
+        .query(async ({ input, ctx }) => {
             if (!input.id) {
                 return;
             }
+
+            const { activityId, role } = ctx.session.user;
 
             try {
                 const criteriaList = await prisma.goalAchieveCriteria.findMany({
@@ -1841,6 +1895,7 @@ export const goal = router({
                             {
                                 OR: [{ deleted: false }, { deleted: null }],
                             },
+                            goalAchiveCriteriaFilter(activityId, role),
                         ],
                     },
                     include: { criteriaGoal: true },

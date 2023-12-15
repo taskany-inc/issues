@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { addCalculatedGoalsFields, goalDeepQuery } from '../queries/goals';
+import { addCalculatedGoalsFields, getGoalDeepQuery } from '../queries/goals';
 import { getProjectAccessFilter } from '../queries/access';
 
 export const search = router({
@@ -42,9 +42,10 @@ export const search = router({
                         },
                     ],
                 },
-                include: {
-                    ...goalDeepQuery,
-                },
+                include: getGoalDeepQuery({
+                    activityId,
+                    role,
+                }),
             }),
             prisma.project.findMany({
                 take: 5,

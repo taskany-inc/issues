@@ -25,3 +25,18 @@ export const getProjectAccessFilter = (activityId: string, role: Role) => {
         },
     };
 };
+
+export const goalAchiveCriteriaFilter = (activityId: string, role: Role) => ({
+    OR: [
+        {
+            criteriaGoal: null,
+        },
+        {
+            criteriaGoal: {
+                project: {
+                    ...getProjectAccessFilter(activityId, role),
+                },
+            },
+        },
+    ],
+});
