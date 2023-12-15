@@ -89,6 +89,7 @@ export const GoalHeader: FC<GoalHeaderProps> = ({
                                 priority={g.priority?.title}
                                 achivedCriteriaWeight={g._hasAchievementCriteria ? g._achivedCriteriaWeight : undefined}
                                 comments={g._count?.comments ?? 0}
+                                hasPrivateDeps={g._hasPrivateDeps}
                                 onCommentsClick={onCommentsClick}
                                 updatedAt={date}
                             />

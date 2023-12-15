@@ -12,7 +12,12 @@ import {
     projectDeleteSchema,
     participantsToProjectSchema,
 } from '../../src/schema/project';
-import { addCalculatedGoalsFields, goalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
+import {
+    addCalculatedGoalsFields,
+    getGoalDeepQuery,
+    goalsFilter,
+    nonArchievedGoalsPartialQuery,
+} from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
@@ -230,7 +235,10 @@ export const project = router({
                                     nonArchivedPartialQuery,
                                 ],
                             },
-                            include: goalDeepQuery,
+                            include: getGoalDeepQuery({
+                                activityId,
+                                role,
+                            }),
                         },
                         sharedGoals: {
                             //  all shared goals with filters
@@ -250,7 +258,10 @@ export const project = router({
                                     nonArchivedPartialQuery,
                                 ],
                             },
-                            include: goalDeepQuery,
+                            include: getGoalDeepQuery({
+                                activityId,
+                                role,
+                            }),
                         },
                         _count: {
                             select: {
@@ -474,9 +485,10 @@ export const project = router({
                 }),
                 prisma.goal.findMany({
                     ...goalsFilter(goalsQuery, activityId, role, { projectId: id }),
-                    include: {
-                        ...goalDeepQuery,
-                    },
+                    include: getGoalDeepQuery({
+                        activityId,
+                        role,
+                    }),
                 }),
             ]);
 

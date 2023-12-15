@@ -4,7 +4,11 @@ import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction, Sta
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, dependencyKind, exceptionsDependencyKind } from '../schema/goal';
-import { addCalculatedGoalsFields, addCommonCalculatedGoalFields } from '../../trpc/queries/goals';
+import {
+    addCalculatedGoalsFields,
+    addCommonCalculatedGoalFields,
+    nonArchievedGoalsPartialQuery,
+} from '../../trpc/queries/goals';
 import { HistoryRecordWithActivity, HistoryRecordSubject, castToSubject } from '../types/history';
 import { ReactionsMap } from '../types/reactions';
 import { getProjectSchema } from '../../trpc/queries/project';
@@ -162,6 +166,76 @@ export const createPersonalProject = async ({
         },
         include: usersInclude,
     });
+};
+
+export const countPrivateDependencies = async ({
+    projectId,
+    scopeId,
+}: {
+    projectId: string;
+    scopeId: number;
+}): Promise<{
+    goalAchiveCriteria: number;
+    dependsOn: number;
+    relatedTo: number;
+    blocks: number;
+}> => {
+    const depsWhere = {
+        NOT: {
+            project: {
+                accessUsers: {
+                    none: {},
+                },
+            },
+        },
+        ...nonArchievedGoalsPartialQuery,
+    };
+
+    const data = await prisma.goal.findFirst({
+        where: {
+            projectId,
+            scopeId,
+            archived: false,
+        },
+        include: {
+            _count: {
+                select: {
+                    goalAchiveCriteria: {
+                        where: {
+                            criteriaGoal: {
+                                id: {},
+                            },
+                            NOT: {
+                                criteriaGoal: {
+                                    project: {
+                                        accessUsers: {
+                                            none: {},
+                                        },
+                                    },
+                                },
+                            },
+                            OR: [{ deleted: false }, { deleted: null }],
+                        },
+                    },
+                    dependsOn: {
+                        where: depsWhere,
+                    },
+                    relatedTo: {
+                        where: depsWhere,
+                    },
+                    blocks: {
+                        where: depsWhere,
+                    },
+                },
+            },
+        },
+    });
+
+    if (!data) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Goal is absent' });
+    }
+
+    return data._count;
 };
 
 export const changeGoalProject = async (id: string, newProjectId: string) => {

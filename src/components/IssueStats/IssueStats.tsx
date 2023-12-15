@@ -11,6 +11,7 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 import { UserGroup } from '../UserGroup';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { CommentsCountBadge } from '../CommentsCountBadge';
+import { PrivateDepsWarning } from '../PrivateDepsWarning/PrivateDepsWarning';
 
 interface IssueStatsProps {
     updatedAt: Date;
@@ -21,6 +22,7 @@ interface IssueStatsProps {
     estimateType?: DateType | null;
     priority?: string | null;
     achivedCriteriaWeight?: number | null;
+    hasPrivateDeps?: boolean;
     mode?: 'compact' | 'default';
     onCommentsClick?: () => void;
 }
@@ -57,6 +59,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
     comments,
     achivedCriteriaWeight,
     updatedAt,
+    hasPrivateDeps,
     mode,
     onCommentsClick,
 }) => {
@@ -106,6 +109,12 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
                     <Link inline onClick={onCommentsClick}>
                         <CommentsCountBadge count={comments} />
                     </Link>
+                </DotSep>
+            ))}
+
+            {nullable(hasPrivateDeps, () => (
+                <DotSep>
+                    <PrivateDepsWarning />
                 </DotSep>
             ))}
         </StyledIssueStats>
