@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.13.0](https://github.com/taskany-inc/issues/compare/v2.12.0...v2.13.0) (2023-12-18)
+
+
+### Features
+
+* allow participants editing in project settings ([66be007](https://github.com/taskany-inc/issues/commit/66be007f383cfead3f29fa8c6e180d3d5c10a44d))
+
 ## [2.12.0](https://github.com/taskany-inc/issues/compare/v2.11.1...v2.12.0) (2023-12-14)
 
 
