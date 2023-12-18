@@ -352,7 +352,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     );
 
     const onGoalParticipantRemove = useCallback(
-        (activityId?: string | null, invalidateKey?: RefetchKeys | RefetchKeys[]) => async () => {
+        async (activityId?: string | null, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
             if (!id || !activityId) return;
 
             await notifyPromise(removeParticipantMutation.mutateAsync({ id, activityId }), 'goalsUpdate');
