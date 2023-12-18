@@ -64,9 +64,6 @@ export const createGoal = async (input: GoalCommon, projectId: string, activityI
             watchers: {
                 connect: [{ id: activityId }, { id: input.owner.id }],
             },
-            participants: {
-                connect: [{ id: activityId }, { id: input.owner.id }],
-            },
         },
         include: {
             activity: { include: { user: true, ghost: true } },
