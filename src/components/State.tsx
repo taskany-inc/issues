@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import colorLayer from 'color-layer';
-import { gapS, gapXs, gray6, radiusXl } from '@taskany/colors';
+import { gapS, gapXs, radiusXl } from '@taskany/colors';
+import dynamic from 'next/dynamic';
 
-import { usePageContext } from '../hooks/usePageContext';
+import { stateBg, stateBgHover, stateStroke, stateStrokeHover } from './StateWrapper';
+
+const StateWrapper = dynamic(() => import('./StateWrapper'));
 
 interface StateProps {
     title: string;
@@ -30,13 +32,9 @@ const StyledState = styled.div<{
 
     transition: background-color, color, border-color 300ms ease-in-out;
 
-    & + & {
-        margin-left: 6px;
-    }
-
-    color: var(--stroke);
-    border: 3px solid var(--stroke);
-    background-color: var(--bkg);
+    color: ${stateStroke};
+    border: 3px solid ${stateStroke};
+    background-color: ${stateBg};
 
     ${({ onClick }) =>
         onClick &&
@@ -44,9 +42,9 @@ const StyledState = styled.div<{
             cursor: pointer;
 
             &:hover {
-                color: var(--strokeHover);
-                border-color: var(--strokeHover);
-                background-color: var(--bkgHover);
+                color: ${stateStrokeHover};
+                border-color: ${stateStrokeHover};
+                background-color: ${stateBgHover};
             }
         `}
 
@@ -55,36 +53,18 @@ const StyledState = styled.div<{
         `
             padding: calc(${gapXs}/2) ${gapS};
             font-size: 12px;
-            border: 2px solid var(--stroke);
+            border: 2px solid ${stateStroke};
             font-weight: 500;
         `}
 `;
 
 // eslint-disable-next-line react/display-name
 export const State = React.forwardRef<HTMLDivElement, StateProps>(({ title, hue = 1, size = 'm', onClick }, ref) => {
-    const { themeId } = usePageContext();
-    const [colors, setColors] = useState({
-        '--bkg': 'transparent',
-        '--stroke': gray6,
-        '--bkgHover': 'transparent',
-        '--strokeHover': gray6,
-    } as React.CSSProperties);
-
-    useEffect(() => {
-        setColors(() => {
-            const sat = hue === 1 ? 0 : undefined;
-            return {
-                '--bkg': colorLayer(hue, 3, sat)[themeId],
-                '--stroke': colorLayer(hue, 10, sat)[themeId],
-                '--bkgHover': colorLayer(hue, 4, sat)[themeId],
-                '--strokeHover': colorLayer(hue, 10, sat)[themeId],
-            } as React.CSSProperties;
-        });
-    }, [hue, themeId]);
-
     return (
-        <StyledState ref={ref} size={size} onClick={onClick} style={colors}>
-            {title}
-        </StyledState>
+        <StateWrapper hue={hue}>
+            <StyledState ref={ref} size={size} onClick={onClick}>
+                {title}
+            </StyledState>
+        </StateWrapper>
     );
 });

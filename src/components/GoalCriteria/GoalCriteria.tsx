@@ -184,7 +184,6 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
                             <GoalBadge
                                 title={goal.title}
                                 color={goal.state?.hue}
-                                theme={1}
                                 href={routes.goal(goal._shortId)}
                                 onClick={() => onClick?.(goal)}
                             />
