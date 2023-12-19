@@ -11,8 +11,9 @@ import {
     UpdateCriteriaStateSchema,
 } from '../schema/criteria';
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
-import { GoalComment } from '../types/comment';
 import { TagObject } from '../types/tag';
+import { safeUserData } from '../utils/getUserName';
+import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
 import { useHighlightedComment } from './useHighlightedComment';
 import { useReactionsResource } from './useReactionsResource';
@@ -29,7 +30,7 @@ type Configuration = { invalidate: Functions; afterInvalidate?: () => void };
 type GoalFields = {
     id?: string;
     stateId?: string | null;
-    comments?: GoalComment[];
+    comments?: NonNullable<GoalByIdReturnType>['_comments'];
 };
 
 export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
@@ -243,7 +244,15 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         }
 
         const foundResult = fields.comments?.findLast((comment) => comment.stateId);
-        return foundResult?.stateId === fields.stateId ? foundResult : null;
+        if (!foundResult) return;
+
+        return foundResult.stateId === fields.stateId
+            ? {
+                  ...foundResult,
+                  hue: foundResult.state?.hue,
+                  author: safeUserData(foundResult.activity),
+              }
+            : null;
     }, [fields.comments, fields.stateId]);
 
     const onGoalCriteriaAdd = useCallback(

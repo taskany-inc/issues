@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { State, User } from '@prisma/client';
 import styled from 'styled-components';
 import { backgroundColor, brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
 import {
@@ -57,9 +56,13 @@ interface CommentViewProps {
     createdAt: Date;
     updatedAt?: Date;
     reactions: ReactionsMap;
-    author?: User | null;
+    author?: {
+        name: string;
+        email: string;
+        image?: string;
+    };
     highlight?: boolean;
-    state?: State | null;
+    hue?: number;
     pin?: boolean;
 
     onReactionToggle?: React.ComponentProps<typeof ReactionsDropdown>['onClick'];
@@ -161,7 +164,7 @@ export const CommentView: FC<CommentViewProps> = ({
     createdAt,
     highlight,
     reactions,
-    state,
+    hue,
     pin,
     onChange,
     onCancel,
@@ -253,7 +256,7 @@ export const CommentView: FC<CommentViewProps> = ({
                 {pin ? (
                     <>
                         <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />
-                        <StyledStateDot hue={state?.hue} />
+                        <StyledStateDot hue={hue} />
                     </>
                 ) : (
                     nullable(
@@ -327,10 +330,10 @@ export const CommentView: FC<CommentViewProps> = ({
                     </StyledCardInfo>
 
                     <StyledCardComment>
-                        {nullable(state, (s) => (
+                        {nullable(hue, (h) => (
                             <StyledTimestamp>
                                 {nullable(!pin, () => (
-                                    <StateDot hue={s.hue} />
+                                    <StateDot hue={h} />
                                 ))}
                                 <Text size="m" weight="bolder" color={gray9}>
                                     {createLocaleDate(createdAt, { locale })}
