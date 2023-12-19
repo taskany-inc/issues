@@ -24,6 +24,9 @@ interface StateSwitchProps {
 
 const StyledStates = styled.div`
     padding: 0 ${gapM};
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 6px;
 `;
 
 const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => {

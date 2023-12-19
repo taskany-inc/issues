@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
-import { usePageContext } from '../hooks/usePageContext';
 
 import { GoalBadge } from './GoalBadge';
 import { TextList, TextListItem } from './TextList';
@@ -28,8 +27,6 @@ export const GoalList = <T extends Goal & { state?: { hue?: number } | null; _sh
     canEdit,
     ...attrs
 }: GoalDependencyListByKindProps<T>) => {
-    const { themeId } = usePageContext();
-
     const onRemoveHandler = useCallback(
         (goal: T) => async () => {
             await onRemove?.(goal);
@@ -51,7 +48,6 @@ export const GoalList = <T extends Goal & { state?: { hue?: number } | null; _sh
                 <TextListItem key={goal.id}>
                     <GoalBadge
                         title={goal.title}
-                        theme={themeId}
                         color={goal?.state?.hue}
                         href={routes.goal(goal._shortId)}
                         onClick={onClickHandler(goal)}

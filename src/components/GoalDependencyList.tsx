@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { ToggleGoalDependency } from '../schema/goal';
 import { GoalDependencyItem } from '../../trpc/inferredTypes';
 import { routes } from '../hooks/router';
-import { usePageContext } from '../hooks/usePageContext';
 
 import { GoalBadge } from './GoalBadge';
 
@@ -23,7 +22,6 @@ interface GoalDependencyListByKindProps {
 }
 
 export const GoalDependencyListByKind = ({ id, goals = [], onClick, onRemove }: GoalDependencyListByKindProps) => {
-    const { themeId } = usePageContext();
     const onClickHandler = useCallback(
         (goal: GoalDependency) => (e?: React.MouseEvent) => {
             if (onClick) {
@@ -38,7 +36,6 @@ export const GoalDependencyListByKind = ({ id, goals = [], onClick, onRemove }: 
         <StyledGoalBadge
             key={item.id}
             title={item.title}
-            theme={themeId}
             color={item?.state?.hue}
             href={routes.goal(item._shortId)}
             onClick={onClickHandler(item)}

@@ -1,21 +1,31 @@
-import React, { useMemo } from 'react';
-import { StateDot as StateDotBrick, StateDotProps } from '@taskany/bricks';
-import colorLayer from 'color-layer';
+import React from 'react';
+import { StateDot as StateDotBricks, StateDotProps, nullable } from '@taskany/bricks';
+import { IconTargetOutline } from '@taskany/icons';
+import styled from 'styled-components';
 
-import { usePageContext } from '../hooks/usePageContext';
+import { StateWrapper, stateStrokeHover } from './StateWrapper';
+
+const StyledDot = styled(StateDotBricks)`
+    background-color: ${stateStrokeHover};
+`;
+
+const StyledIcon = styled(IconTargetOutline)`
+    color: ${stateStrokeHover};
+`;
 
 // eslint-disable-next-line react/display-name
-export const StateDot: React.FC<Omit<StateDotProps & { hue?: number }, 'hoverColor' | 'color'>> = React.memo(
-    ({ hue = 1, ...props }) => {
-        const { themeId = 1 } = usePageContext();
-        const { color, hoverColor } = useMemo(() => {
-            const sat = hue === 1 ? 0 : undefined;
-            return {
-                color: colorLayer(hue, 10, sat)[themeId],
-                hoverColor: colorLayer(hue, 9, sat)[themeId],
-            };
-        }, [hue, themeId]);
-
-        return <StateDotBrick color={color} hoverColor={hoverColor} {...props} />;
-    },
-);
+export const StateDot: React.FC<
+    Omit<StateDotProps & { hue?: number; view?: 'solid' | 'stroke' }, 'hoverColor' | 'color'>
+> = React.memo(({ hue = 1, view = 'solid', ...props }) => {
+    return (
+        <StateWrapper hue={hue}>
+            {nullable(
+                view === 'solid',
+                () => (
+                    <StyledDot {...props} />
+                ),
+                <StyledIcon size="s" />,
+            )}
+        </StateWrapper>
+    );
+});

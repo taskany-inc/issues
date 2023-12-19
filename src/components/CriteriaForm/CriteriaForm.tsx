@@ -11,18 +11,16 @@ import {
     FormControlError,
 } from '@taskany/bricks';
 import { gapSm, gray7 } from '@taskany/colors';
-import { IconTargetOutline } from '@taskany/icons';
 import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import colorLayer from 'color-layer';
 import styled from 'styled-components';
 import { z } from 'zod';
 
-import { usePageContext } from '../../hooks/usePageContext';
 import { GoalSelect } from '../GoalSelect';
 import { GoalBadge } from '../GoalBadge';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { AddInlineTrigger } from '../AddInlineTrigger';
+import { StateDot } from '../StateDot';
 
 import { tr } from './CriteriaForm.i18n';
 
@@ -219,7 +217,6 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
     errors = {},
     isEditMode,
 }) => {
-    const { themeId } = usePageContext();
     const { selected, title } = errors;
 
     const icon = useMemo(() => {
@@ -227,10 +224,9 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
         if (!selectedItem || !selectedItem?.stateColor) return;
 
         const color = selectedItem.stateColor || 1;
-        const sat = color === 1 ? 0 : undefined;
 
-        return <IconTargetOutline size="s" color={colorLayer(color, 10, sat)[themeId]} />;
-    }, [mode, selectedItem, themeId]);
+        return <StateDot size="s" hue={color} view="stroke" />;
+    }, [mode, selectedItem]);
 
     const error = useMemo(() => {
         if (mode === 'goal' && selected) {
@@ -373,9 +369,7 @@ export const CriteriaForm = ({
                 items={items}
                 value={value}
                 onClick={handleSelectItem}
-                renderItem={(props) => (
-                    <StyledGoalBadge title={props.item.title} color={props.item.stateColor} theme={1} />
-                )}
+                renderItem={(props) => <StyledGoalBadge title={props.item.title} color={props.item.stateColor} />}
             >
                 <>
                     <Controller
