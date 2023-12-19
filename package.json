@@ -52,7 +52,6 @@
     "@trpc/next": "10.35.0",
     "@trpc/react-query": "10.35.0",
     "@trpc/server": "10.35.0",
-    "color-layer": "1.0.3",
     "concurrently": "8.2.1",
     "cors": "2.8.5",
     "cron-parser": "4.9.0",
