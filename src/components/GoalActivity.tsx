@@ -1,19 +1,19 @@
-import React, { forwardRef, useMemo } from 'react';
+import React, { ComponentProps, forwardRef, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
-import { GoalComment } from '../types/comment';
 import { safeUserData } from '../utils/getUserName';
 
 import { ActivityFeed } from './ActivityFeed';
 import { HistoryRecordGroup } from './HistoryRecord/HistoryRecord';
+import type { CommentView } from './CommentView/CommentView';
 
 interface GoalActivityProps {
     feed: NonNullable<GoalByIdReturnType>['_activityFeed'];
     header?: React.ReactNode;
     footer?: React.ReactNode;
 
-    renderCommentItem: (item: GoalComment) => React.ReactNode;
+    renderCommentItem: (item: ComponentProps<typeof CommentView> & { activityId: string }) => React.ReactNode;
 }
 
 export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
@@ -27,19 +27,32 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                 const next = feed[i + 1];
 
                 if (current.type === 'history') {
-                    if (current.type === next?.type && current.value.subject === next.value.subject) {
-                        tempRecords.push(current.value);
-                    } else {
-                        res.push({
-                            type: current.type,
-                            value: tempRecords.concat([current.value]),
-                        });
+                    tempRecords.push({
+                        ...current.value,
+                        author: safeUserData(current.value.activity),
+                    });
 
-                        tempRecords = [];
+                    if (current.type === next?.type && current.value.subject === next.value.subject) {
+                        // eslint-disable-next-line no-continue
+                        continue;
                     }
+
+                    res.push({
+                        type: current.type,
+                        value: tempRecords,
+                    });
+
+                    tempRecords = [];
                 } else {
                     // only comments
-                    res.push(current);
+                    res.push({
+                        type: current.type,
+                        value: {
+                            ...current.value,
+                            author: safeUserData(current.value.activity),
+                            hue: current.value.state?.hue,
+                        },
+                    });
                 }
             }
 
@@ -59,8 +72,8 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                                     subject={value[value.length - 1].subject}
                                     groupped={value.length > 1}
                                     values={value.map(
-                                        ({ id, action, subject, nextValue, previousValue, activity, createdAt }) => ({
-                                            author: safeUserData(activity),
+                                        ({ id, action, author, subject, nextValue, previousValue, createdAt }) => ({
+                                            author,
                                             from: previousValue,
                                             to: nextValue,
                                             action,

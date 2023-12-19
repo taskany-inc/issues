@@ -159,9 +159,9 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                 <CommentView
                                     pin
                                     id={value.id}
-                                    author={value.activity?.user}
+                                    author={value.author}
                                     description={value.description}
-                                    state={value.state}
+                                    hue={value.hue}
                                     createdAt={value.createdAt}
                                     reactions={value.reactions}
                                     onSubmit={onGoalCommentSubmit(value)}
@@ -182,9 +182,9 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     renderCommentItem={(value) => (
                         <CommentView
                             id={value.id}
-                            author={value.activity?.user}
+                            author={value.author}
                             description={value.description}
-                            state={value.state}
+                            hue={value.hue}
                             createdAt={value.createdAt}
                             highlight={value.id === highlightCommentId}
                             reactions={value.reactions}
