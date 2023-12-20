@@ -22,6 +22,10 @@ const StyledTitleWrapper = styled(StyledProjectIcons)`
     margin-right: ${gapS};
 `;
 
+const StyledTreeViewNode = styled(TreeViewNode)`
+    width: fit-content;
+`;
+
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
     project: Omit<NonNullable<ProjectByIdReturnType>, '_count'>;
@@ -69,7 +73,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
 
     return (
         <TreeView className={className} {...projectListItem.attr}>
-            <TreeViewNode
+            <StyledTreeViewNode
                 interactive={interactive}
                 title={nullable(
                     href,
@@ -84,7 +88,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
             >
                 {goals}
                 {children}
-            </TreeViewNode>
+            </StyledTreeViewNode>
         </TreeView>
     );
 };

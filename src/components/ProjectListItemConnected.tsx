@@ -86,6 +86,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     <Link as={NextLink} href={routes.goal(g._shortId)} inline>
                         <TableRowItem
                             title={<Title size="m">{g.title}</Title>}
+                            focused={selectedResolver?.(g.id)}
                             onClick={(e) => {
                                 onClickProvider?.(g as NonNullable<GoalByIdReturnType>)(e);
                                 onProjectClickHandler(e);
@@ -107,7 +108,6 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                                 starred={g._isStarred}
                                 watching={g._isWatching}
                                 achivedCriteriaWeight={g._achivedCriteriaWeight}
-                                focused={selectedResolver?.(g.id)}
                                 onTagClick={onTagClick}
                             />
                         </TableRowItem>
