@@ -144,6 +144,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                                 <TableRowItem
                                     title={<Title size="m">{g.title}</Title>}
                                     onClick={onGoalPreviewShow(g as GoalByIdReturnType)}
+                                    focused={selectedGoalResolver(g.id)}
                                 >
                                     <GoalListItem
                                         createdAt={g.createdAt}
@@ -161,7 +162,6 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                                         starred={g._isStarred}
                                         watching={g._isWatching}
                                         achivedCriteriaWeight={g._achivedCriteriaWeight}
-                                        focused={selectedGoalResolver(g.id)}
                                         onTagClick={setTagsFilterOutside}
                                     />
                                 </TableRowItem>

@@ -132,7 +132,6 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         tags,
         comments,
         state,
-        focused,
         estimate,
         estimateType,
         priority,
@@ -152,7 +151,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
         }, [issuer, owner]);
 
         return (
-            <TableRow focused={focused} className={className} gap={10} align="center" interactive>
+            <TableRow className={className} gap={10} align="center">
                 <TableCell width="90px">
                     {nullable(state, (s) => (
                         <State size="s" title={s?.title} hue={s?.hue} />

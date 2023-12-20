@@ -17,6 +17,7 @@ import { PresetDropdown } from '../PresetDropdown';
 import { LimitDropdown } from '../LimitDropdown';
 import { StarredFilter } from '../StarredFilter/StarredFilter';
 import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
+import { ScrollableView } from '../ScrollableView';
 
 import { tr } from './FilteredPage.i18n';
 
@@ -160,7 +161,9 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                 </StyledFilterControls>
             </FiltersPanel>
 
-            <PageContent>{children}</PageContent>
+            <PageContent>
+                <ScrollableView>{children}</ScrollableView>
+            </PageContent>
 
             {nullable(queryString, (params) => (
                 <ModalOnEvent event={ModalEvent.FilterCreateModal} hotkeys={createFilterKeys}>
