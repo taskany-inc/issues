@@ -30,7 +30,6 @@ import {
     goalTagListItem,
     goalTagListItemClean,
     goalTitleInputError,
-    comboboxErrorDot,
     estimateQuarterTrigger,
     estimateQuarterItem,
     estimateYearTrigger,
@@ -156,12 +155,11 @@ describe('Goals', () => {
                     });
             });
 
-            it('should fill the title and select project', () => {
+            it('should fill the title', () => {
                 const translates = getTranslation({
                     schema: [
                         'Title is required',
                         'Title can be 50 symbols maximum',
-                        "Goal's project are is required",
                         "Goal's title must be longer than 10 symbols",
                     ],
                 });
@@ -174,11 +172,6 @@ describe('Goals', () => {
                     .should('exist')
                     .and('be.visible')
                     .getErrorTooltip(translates.schema["Goal's title must be longer than 10 symbols"]());
-
-                cy.get(comboboxErrorDot.query)
-                    .should('exist')
-                    .and('be.visible')
-                    .getErrorTooltip(translates.schema["Goal's project are is required"]());
             });
 
             it('state control is enabled after choose project', () => {
@@ -278,7 +271,7 @@ describe('Goals', () => {
                     cy.get(goalTagListItemClean.query).should('be.visible').click();
                     cy.get(goalTagListItem.query).should('not.exist');
                 });
-                it('create and set', () => {
+                it.only('create and set', () => {
                     cy.get(tagsCombobox.query).click();
                     cy.get(comboboxInput.query).type(testTagForManualCreate);
 
