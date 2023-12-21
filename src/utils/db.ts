@@ -483,14 +483,7 @@ export const updateLinkedGoalsByProject = async (projectId: string, activityId: 
                 // mark criterias with these goals as deleted
                 const updateCriterias = ctx.goalAchieveCriteria.updateMany({
                     where: {
-                        OR: [
-                            {
-                                criteriaGoalId: { in: goalIds.map(({ id }) => id) },
-                            },
-                            {
-                                goalIdAsCriteria: { in: goalIds.map(({ id }) => id) },
-                            },
-                        ],
+                        criteriaGoalId: { in: goalIds.map(({ id }) => id) },
                     },
                     data: { deleted: true },
                 });
@@ -500,14 +493,7 @@ export const updateLinkedGoalsByProject = async (projectId: string, activityId: 
                 // get all goals which current project's goals as criteria
                 const res = await ctx.goalAchieveCriteria.findMany({
                     where: {
-                        OR: [
-                            {
-                                criteriaGoalId: { in: goalIds.map(({ id }) => id) },
-                            },
-                            {
-                                goalIdAsCriteria: { in: goalIds.map(({ id }) => id) },
-                            },
-                        ],
+                        criteriaGoalId: { in: goalIds.map(({ id }) => id) },
                     },
                     include: {
                         criteriaGoal: {
