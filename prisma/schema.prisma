@@ -211,7 +211,6 @@ model Goal {
   connected          Goal[]                @relation("connected")
   history            GoalHistory[]
   goalAchiveCriteria GoalAchieveCriteria[] @relation("GoalCriterion")
-  goalAsCriteria     GoalAchieveCriteria?  @relation("GoalAsCriteria") // drop in next release
   goalInCriteria     GoalAchieveCriteria[] @relation("GoalInCriteria")
 
   completedCriteriaWeight Int?
@@ -364,15 +363,13 @@ model GoalAchieveCriteria {
   id               String   @id @default(cuid())
   goal             Goal     @relation("GoalCriterion", fields: [goalId], references: [id], onDelete: Cascade)
   goalId           String
-  goalAsCriteria   Goal?    @relation("GoalAsCriteria", fields: [goalIdAsCriteria], references: [id], onDelete: Cascade) // drop in next release
-  goalIdAsCriteria String?  @unique // drop in next release
   title            String
   weight           Int
   isDone           Boolean  @default(false)
   activity         Activity @relation(fields: [activityId], references: [id])
   activityId       String
   deleted          Boolean?
-  criteriaGoalId   String? // fill from goalIdAsCriteria column
+  criteriaGoalId   String?
   criteriaGoal     Goal?    @relation("GoalInCriteria", fields: [criteriaGoalId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
