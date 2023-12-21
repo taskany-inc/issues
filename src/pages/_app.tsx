@@ -11,6 +11,7 @@ import { trpc } from '../utils/trpcClient';
 import { TLocale, setSSRLocale } from '../utils/getLang';
 import { GoalPreviewProvider } from '../components/GoalPreview/GoalPreviewProvider';
 import { getTelemetryInstanceSingleton, useWebTelemetryMonitoringInit } from '../utils/telemetry';
+import { ThemeSetter } from '../components/ThemeSetter';
 
 const defaultThemes = ['light', 'dark'];
 
@@ -38,11 +39,13 @@ const App = ({ Component, pageProps, router }: AppProps) => {
 
             <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
                 <ThemeProvider themes={defaultThemes}>
-                    <GoalPreviewProvider>
-                        <PageLoadProgress height={2} ref={pageLoadRef} />
-                        <Component {...pageProps} />
-                        <ReactQueryDevtools />
-                    </GoalPreviewProvider>
+                    <ThemeSetter>
+                        <GoalPreviewProvider>
+                            <PageLoadProgress height={2} ref={pageLoadRef} />
+                            <Component {...pageProps} />
+                            <ReactQueryDevtools />
+                        </GoalPreviewProvider>
+                    </ThemeSetter>
                 </ThemeProvider>
             </SessionProvider>
         </>
