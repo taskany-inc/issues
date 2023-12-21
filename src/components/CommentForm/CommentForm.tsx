@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { backgroundColor, gapM, gray4 } from '@taskany/colors';
 import { Button, Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
@@ -64,6 +64,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     onFocus,
     onCancel,
 }) => {
+    const [error, setError] = useState<{ message: string } | undefined>();
     const ref = useRef(null);
 
     const onDescriptionChange = useCallback(
@@ -87,6 +88,11 @@ export const CommentForm: React.FC<CommentFormProps> = ({
         }
     });
 
+    const onUploadFail = useCallback((errorMessage?: string) => {
+        if (!errorMessage) return;
+        setError({ message: errorMessage });
+    }, []);
+
     return (
         <StyledCommentForm ref={ref} tabIndex={0}>
             <Form onSubmit={onCommentSubmit} {...commentForm.attr}>
@@ -96,6 +102,8 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                     height={focused ? 120 : 40}
                     onCancel={onCommentCancel}
                     onFocus={onFocus}
+                    onUploadFail={onUploadFail}
+                    error={error}
                     autoFocus={autoFocus}
                     value={description}
                     onChange={onDescriptionChange}
