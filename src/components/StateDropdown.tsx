@@ -29,19 +29,15 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
             enabled: !!flowId,
         });
 
-        const { data: defaultFlow = [] } = trpc.flow.recommedations.useQuery(undefined, {
+        const { data: defaultFlow } = trpc.flow.recommedations.useQuery(undefined, {
             enabled: defaultFlowEnabled,
+            refetchOnMount: 'always',
+            select([flow]) {
+                return flow;
+            },
         });
 
-        const flow = defaultFlowEnabled ? defaultFlow[0] : flowById;
-
-        useEffect(() => {
-            const defaultState = flow?.states?.filter((s) => s?.default)[0];
-            if (!value && defaultState) {
-                setState(defaultState);
-                onChange?.(defaultState);
-            }
-        }, [value, onChange, flow]);
+        const flow = defaultFlowEnabled ? defaultFlow : flowById;
 
         const onStateChange = useCallback(
             (s: Partial<State>) => {
@@ -50,6 +46,12 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
             },
             [onChange],
         );
+
+        useEffect(() => {
+            if (value) return;
+            const defaultState = flow?.states.find((state) => state.default === true);
+            defaultState && onStateChange(defaultState);
+        }, [flow, onStateChange, value]);
 
         return (
             <Dropdown
