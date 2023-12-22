@@ -86,11 +86,10 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilter
                         key={g.id}
                         title={<Title size="m">{g.title}</Title>}
                         onClick={onGoalPreviewShow(g as GoalByIdReturnType)}
+                        focused={selectedGoalResolver(g.id)}
                     >
                         <GoalListItem
-                            createdAt={g.createdAt}
                             updatedAt={g.updatedAt}
-                            id={g.id}
                             state={g.state}
                             issuer={g.activity}
                             owner={g.owner}
@@ -103,7 +102,6 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilter
                             starred={g._isStarred}
                             watching={g._isWatching}
                             achivedCriteriaWeight={g._achivedCriteriaWeight}
-                            focused={selectedGoalResolver(g.id)}
                             onTagClick={setTagFilterOutside}
                         />
                     </TableRowItem>
