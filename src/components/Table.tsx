@@ -13,7 +13,7 @@ export const TextItem = styled(Text).attrs({
 
 const TableRowWrapper = styled(TableRow)`
     display: grid;
-    grid-template-columns: 400px 740px;
+    grid-template-columns: minmax(400px, 1fr) 780px;
     align-items: center;
     flex: 1;
 
