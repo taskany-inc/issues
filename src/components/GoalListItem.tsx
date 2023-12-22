@@ -19,18 +19,15 @@ import { CommentsCountBadge } from './CommentsCountBadge';
 import { TagsList } from './TagsList';
 
 interface GoalListItemProps {
-    id: string;
     owner?: ActivityByIdReturnType | null;
     issuer?: ActivityByIdReturnType | null;
     participants?: ActivityByIdReturnType[];
     tags?: Array<Tag | undefined>;
     state?: StateType | null;
-    createdAt: Date;
     updatedAt: Date;
     estimate?: Date | null;
     estimateType?: DateType | null;
     comments?: number;
-    focused?: boolean;
     priority?: Priority | null;
     starred?: boolean;
     watching?: boolean;
@@ -197,7 +194,7 @@ export const GoalListItem: React.FC<GoalListItemProps> = React.memo(
                     )}
                 </TagsCell>
 
-                <TableCell width="40px">
+                <TableCell width="90px">
                     {nullable(participants, (p) => (
                         <UserGroup users={p} />
                     ))}
