@@ -147,9 +147,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                                     focused={selectedGoalResolver(g.id)}
                                 >
                                     <GoalListItem
-                                        createdAt={g.createdAt}
                                         updatedAt={g.updatedAt}
-                                        id={g.id}
                                         state={g.state}
                                         issuer={g.activity}
                                         owner={g.owner}

@@ -93,9 +93,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                             }}
                         >
                             <GoalListItem
-                                createdAt={g.createdAt}
                                 updatedAt={g.updatedAt}
-                                id={g.id}
                                 state={g.state}
                                 issuer={g.activity}
                                 owner={g.owner}
