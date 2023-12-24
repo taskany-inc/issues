@@ -139,6 +139,6 @@ const userPassword = 'taskany';
             },
         }),
         createSheep(),
-        createCronJob('goalPing', '0 0 1 * * *'),
+        createCronJob('goalPing', '0 0 0 1 * *'),
     ]);
 })();
