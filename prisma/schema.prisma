@@ -336,6 +336,8 @@ model Job {
   data     Json
   delay    Int?
   retry    Int?
+  runs     Int     @default(0)
+  force    Boolean @default(false)
   cron     String?
   error    String?
 
