@@ -48,7 +48,7 @@ console.log('Worker started successfully');
                             currentDate: new Date(job.updatedAt),
                         });
 
-                        if (Number(interval.next().toDate()) > Date.now()) {
+                        if (Number(interval.next().toDate()) > Date.now() && !job.force) {
                             return;
                         }
                     }
@@ -60,7 +60,10 @@ console.log('Worker started successfully');
                     setTimeout(async () => {
                         try {
                             await resolve[job.kind as jobKind](job.data as any);
-                            await prisma.job.update({ where: { id: job.id }, data: { state: jobState.completed } });
+                            await prisma.job.update({
+                                where: { id: job.id },
+                                data: { state: jobState.completed, runs: { increment: 1 }, force: false },
+                            });
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         } catch (error: any) {
                             if (job.retry !== retryLimit) {

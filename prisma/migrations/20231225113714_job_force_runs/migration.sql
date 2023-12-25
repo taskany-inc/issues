@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Job" ADD COLUMN     "force" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "runs" INTEGER NOT NULL DEFAULT 0;
