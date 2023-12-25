@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.15.0](https://github.com/taskany-inc/issues/compare/v2.14.0...v2.15.0) (2023-12-25)
+
+
+### Features
+
+* emails for crons ([3fe5fcf](https://github.com/taskany-inc/issues/commit/3fe5fcfc5f23747b32130726eab6988376c898a9))
+* runs & force support ([74f94af](https://github.com/taskany-inc/issues/commit/74f94af9dfdae881de52522bfb05b5f38c9aac95))
+* system theme resolves as dark or light ([600a7b6](https://github.com/taskany-inc/issues/commit/600a7b6a2dde69a4d26b5589b3cdbfefc34fd3e8))
+
+
+### Bug Fixes
+
+* **CommentForm:** add an error handler ([9ddafdf](https://github.com/taskany-inc/issues/commit/9ddafdf4adc7ec271d93c7afffbd09f98eb1da3f))
+* **FlatGoalList:** list item is focused when GoalPreview is open ([33f765e](https://github.com/taskany-inc/issues/commit/33f765eb1f381ae733e4e1e3e5346d66de6ca198))
+* **GoalListItem:** comments icon is show ([d7fd983](https://github.com/taskany-inc/issues/commit/d7fd98362d6087761e4485af45ae210184e429c1))
+* **StateDropdown:** default state is always set ([8510668](https://github.com/taskany-inc/issues/commit/8510668fe42242251cee3255d5743a14adefaf65))
+* table is stratched ([36bcda8](https://github.com/taskany-inc/issues/commit/36bcda896d678c538ab00d5bcca8d3a1cc8b2baf))
+
 ## [2.14.0](https://github.com/taskany-inc/issues/compare/v2.13.0...v2.14.0) (2023-12-21)
 
 
