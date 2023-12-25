@@ -52,7 +52,7 @@
     "@trpc/next": "10.35.0",
     "@trpc/react-query": "10.35.0",
     "@trpc/server": "10.35.0",
-    "concurrently": "8.2.1",
+    "concurrently": "8.2.2",
     "cors": "2.8.5",
     "cron-parser": "4.9.0",
     "cyrillic-to-translit-js": "3.2.1",
