@@ -3,10 +3,10 @@ import { FilterDropdownItem, FiltersDropdownBase, FiltersDropdownItemProps } fro
 
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 
-type ColorizedFilterItem = {
+interface ColorizedFilterItem {
     hue: number;
     text: string;
-};
+}
 
 export const ColorizedFilterDropdown: FC<{
     items: Array<FilterDropdownItem<ColorizedFilterItem>>;

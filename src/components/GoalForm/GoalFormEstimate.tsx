@@ -4,10 +4,10 @@ import { DateType } from '../../types/date';
 import { getDateString } from '../../utils/dateTime';
 import { EstimatePopup } from '../EstimatePopup';
 
-type Estimate = {
+interface Estimate {
     date: string;
     type: DateType;
-};
+}
 
 type GoalFormEstimateProps = Omit<ComponentProps<typeof EstimatePopup>, 'onChange' | 'value'> & {
     onChange: (date: Estimate | null) => void;

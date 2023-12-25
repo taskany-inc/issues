@@ -2,9 +2,9 @@ import { DateRange, DateType, Quarters, QuartersAliases, QuartersKeys } from '..
 
 import { TLocale } from './getLang';
 
-type LocaleArg = {
+interface LocaleArg {
     locale: TLocale;
-};
+}
 
 export const createLocaleDate = (date: Date, { locale }: LocaleArg): string =>
     new Intl.DateTimeFormat(locale, {

@@ -9,7 +9,9 @@ export const nonArchivedPartialQuery = {
     OR: [{ archived: null }, { archived: false }],
 };
 
-type WithId = { id: string };
+interface WithId {
+    id: string;
+}
 
 export const addCalculatedProjectFields = <
     T extends { watchers?: WithId[]; stargizers?: WithId[]; activityId?: string; personal?: boolean | null },

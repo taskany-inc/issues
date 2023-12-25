@@ -27,11 +27,11 @@ const StyledIconExclamationCircleSolid = styled(IconExclamationCircleSolid)`
     display: flex;
 `;
 
-export type EstimateValue = {
+export interface EstimateValue {
     type: DateType;
     range: DateRange;
     alias?: QuartersAliases;
-};
+}
 
 export interface EstimateProps {
     value?: EstimateValue;
