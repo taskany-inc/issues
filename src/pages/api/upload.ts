@@ -24,11 +24,11 @@ const cors = Cors({
     methods: ['HEAD', 'OPTIONS', 'POST'],
 });
 
-type ResponseObj = {
+interface ResponseObj {
     failed: { type: string; filePath: string; name: string }[];
     succeeded: { type: string; filePath: string; name: string }[];
     errorMessage?: string;
-};
+}
 
 const upload = multer({ storage: multer.memoryStorage() });
 

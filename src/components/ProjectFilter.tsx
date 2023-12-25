@@ -6,10 +6,10 @@ import { FilterCheckbox } from './FilterCheckbox';
 import { FilterTabLabel } from './FilterTabLabel';
 import { FilterAutoCompleteInput } from './FilterAutoCompleteInput/FilterAutoCompleteInput';
 
-type Project = {
+interface Project {
     id: string;
     title: string;
-};
+}
 
 interface ProjectFilterAutoCompleteProps {
     text: string;

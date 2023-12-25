@@ -26,12 +26,15 @@ type Functions = {
     [K in RefetchKeys]?: Parameters<TRPCContextGoal[K]['invalidate']>[0];
 };
 
-type Configuration = { invalidate: Functions; afterInvalidate?: () => void };
-type GoalFields = {
+interface Configuration {
+    invalidate: Functions;
+    afterInvalidate?: () => void;
+}
+interface GoalFields {
     id?: string;
     stateId?: string | null;
     comments?: NonNullable<GoalByIdReturnType>['_comments'];
-};
+}
 
 export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     const utils = trpc.useContext();

@@ -1,6 +1,9 @@
 export { DateType } from '@prisma/client';
 
-export type DateRange = { start?: Date | null; end: Date };
+export interface DateRange {
+    start?: Date | null;
+    end: Date;
+}
 
 export enum Quarters {
     Q1 = 'Q1',

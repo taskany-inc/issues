@@ -24,13 +24,13 @@ type GoalPreviewEmitter = {
     [key in GoalPreviewEvent]: Listener[];
 };
 
-type ContextType = {
+interface ContextType {
     shortId: string | null;
     preview: GoalByIdReturnType | null;
     defaults: Partial<GoalByIdReturnType> | null;
     setPreview: (shortId: string | null, defaults?: Partial<GoalByIdReturnType>) => void;
     on: Sub;
-};
+}
 
 const GoalPreviewProviderContext = createContext<ContextType>({
     shortId: null,

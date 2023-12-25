@@ -6,11 +6,11 @@ import { FilterCheckbox } from './FilterCheckbox';
 import { FilterTabLabel } from './FilterTabLabel';
 import { FilterAutoCompleteInput } from './FilterAutoCompleteInput/FilterAutoCompleteInput';
 
-type Tag = {
+interface Tag {
     id: string;
     title: string;
     description?: string | null;
-};
+}
 
 interface TagFilterProps {
     text: string;
