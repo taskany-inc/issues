@@ -1,6 +1,6 @@
 import { Goal, State, Project, Tag, Activity, User, GoalAchieveCriteria, Ghost, Priority } from '@prisma/client';
 
-import { addCommonCalculatedGoalFields } from '../../trpc/queries/goals';
+import { addCommonCalculatedGoalFields } from '../utils/db/calculatedGoalsFields';
 
 export const subjectToTableNameMap = {
     dependencies: true,

@@ -12,12 +12,7 @@ import {
     projectDeleteSchema,
     participantsToProjectSchema,
 } from '../../src/schema/project';
-import {
-    addCalculatedGoalsFields,
-    getGoalDeepQuery,
-    goalsFilter,
-    nonArchievedGoalsPartialQuery,
-} from '../queries/goals';
+import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
@@ -28,6 +23,7 @@ import { prepareUserDataFromActivity } from '../../src/utils/getUserName';
 import { projectAccessMiddleware, projectEditAccessMiddleware } from '../access/accessMiddlewares';
 import { getProjectAccessFilter } from '../queries/access';
 import { prepareRecipients } from '../../src/utils/prepareRecipients';
+import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 
 export const project = router({
     suggestions: protectedProcedure

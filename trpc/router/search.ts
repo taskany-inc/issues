@@ -2,8 +2,9 @@ import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { addCalculatedGoalsFields, getGoalDeepQuery } from '../queries/goals';
+import { getGoalDeepQuery } from '../queries/goals';
 import { getProjectAccessFilter } from '../queries/access';
+import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 
 export const search = router({
     global: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {

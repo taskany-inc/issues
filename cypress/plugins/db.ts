@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-import { addCalculatedGoalsFields } from '../../trpc/queries/goals';
+import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 
 type TaskParams<K extends string, D, R> = {
     [key in K]: D extends void ? (data?: D) => R : (data: D) => R;

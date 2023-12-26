@@ -4,6 +4,8 @@ import { prisma } from '../prisma';
 
 import * as templates from './mail/templates';
 
+export const defaultJobDelay = process.env.WORKER_JOBS_DELAY ? parseInt(process.env.WORKER_JOBS_DELAY, 10) : 1000;
+
 export enum jobState {
     scheduled = 'scheduled',
     pending = 'pending',
@@ -13,6 +15,7 @@ export enum jobState {
 export enum jobKind {
     email = 'email',
     cron = 'cron',
+    comment = 'comment',
 }
 
 type Templates = typeof templates;
@@ -26,6 +29,11 @@ export interface JobDataMap {
     cron: {
         template: 'goalPing';
     };
+    comment: {
+        goalId: string;
+        activityId: string;
+        description: string;
+    };
 }
 
 export type JobKind = keyof JobDataMap;
@@ -37,7 +45,10 @@ interface CreateJobProps<K extends keyof JobDataMap> {
     cron?: string;
 }
 
-export function createJob<K extends keyof JobDataMap>(kind: K, { data, priority, delay, cron }: CreateJobProps<K>) {
+export function createJob<K extends keyof JobDataMap>(
+    kind: K,
+    { data, priority, delay = defaultJobDelay, cron }: CreateJobProps<K>,
+) {
     return prisma.job.create({
         data: {
             state: jobState.scheduled,
@@ -78,5 +89,12 @@ export function createCronJob<T extends JobDataMap['cron']['template']>(template
             template,
         },
         cron,
+    });
+}
+
+export function createCommentJob(data: JobDataMap['comment'], delay?: number) {
+    return createJob('comment', {
+        data,
+        delay,
     });
 }
