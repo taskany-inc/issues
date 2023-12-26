@@ -8,7 +8,6 @@ import * as resolve from './resolve';
 const prisma = new PrismaClient();
 const queueInterval = process.env.WORKER_JOBS_INTERVAL ? parseInt(process.env.WORKER_JOBS_INTERVAL, 10) : 3000;
 const retryLimit = process.env.WORKER_JOBS_RETRY ? parseInt(process.env.WORKER_JOBS_RETRY, 10) : 3;
-const defaultJobDelay = process.env.WORKER_JOBS_DELAY ? parseInt(process.env.WORKER_JOBS_DELAY, 10) : 1000;
 
 // eslint-disable-next-line no-console
 console.log('Worker started successfully');
@@ -53,6 +52,10 @@ console.log('Worker started successfully');
                         }
                     }
 
+                    if (job.delay && Date.now() - new Date(job.createdAt).valueOf() < job.delay) {
+                        return;
+                    }
+
                     setTimeout(async () => {
                         await prisma.job.update({ where: { id: job.id }, data: { state: jobState.pending } });
                     }, 0);
@@ -73,7 +76,7 @@ console.log('Worker started successfully');
                                         where: { id: job.id },
                                         data: { state: jobState.scheduled, error: error?.message, retry },
                                     });
-                                }, retry * defaultJobDelay);
+                                }, 0);
                             } else {
                                 Sentry.captureException(error, {
                                     fingerprint: ['worker', 'resolve', 'retry'],
@@ -85,7 +88,7 @@ console.log('Worker started successfully');
                                 await prisma.job.delete({ where: { id: job.id } });
                             }
                         }
-                    }, job.delay || defaultJobDelay);
+                    }, 0);
                 }
             });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
