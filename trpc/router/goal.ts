@@ -4,12 +4,7 @@ import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import {
-    addCalculatedGoalsFields,
-    getGoalDeepQuery,
-    goalsFilter,
-    nonArchievedGoalsPartialQuery,
-} from '../queries/goals';
+import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
@@ -58,15 +53,9 @@ import { addCalculatedProjectFields, nonArchivedPartialQuery } from '../queries/
 import { recalculateCriteriaScore, goalIncludeCriteriaParams } from '../../src/utils/recalculateCriteriaScore';
 import { getProjectAccessFilter, goalAchiveCriteriaFilter } from '../queries/access';
 import { prepareRecipients } from '../../src/utils/prepareRecipients';
-
-const updateProjectUpdatedAt = async (id?: string | null) => {
-    if (!id) return;
-
-    return prisma.project.update({
-        where: { id },
-        data: { id },
-    });
-};
+import { updateProjectUpdatedAt } from '../../src/utils/db/updateProjectUpdatedAt';
+import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
+import { createComment } from '../../src/utils/db/createComment';
 
 export const goal = router({
     suggestions: protectedProcedure
@@ -942,129 +931,14 @@ export const goal = router({
 
             const { activityId, role } = ctx.session.user;
 
-            const [commentAuthor, actualGoal, pushState] = await Promise.all([
-                prisma.activity.findUnique({
-                    where: { id: ctx.session.user.activityId },
-                    include: { user: true, ghost: true },
-                }),
-                prisma.goal.findUnique({
-                    where: { id: input.goalId },
-                    include: {
-                        participants: { include: { user: true, ghost: true } },
-                        watchers: { include: { user: true, ghost: true } },
-                        activity: { include: { user: true, ghost: true } },
-                        owner: { include: { user: true, ghost: true } },
-                        state: true,
-                        project: true,
-                        goalInCriteria: true,
-                    },
-                }),
-                input.stateId ? prisma.state.findUnique({ where: { id: input.stateId } }) : Promise.resolve(undefined),
-            ]);
-
-            if (!commentAuthor) return null;
-            if (!actualGoal) return null;
-
-            const { _isEditable, _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
-
             try {
-                // We want to see state changes record and comment next in activity feed.
-                const [updatedGoal, newComment] = await prisma.$transaction([
-                    // Update goal and push to history first.
-                    prisma.goal.update({
-                        where: { id: input.goalId },
-                        data: {
-                            id: input.goalId,
-                            stateId: _isEditable ? pushState?.id : actualGoal.stateId,
-                            goalInCriteria: {
-                                updateMany: {
-                                    where: {
-                                        id: { in: actualGoal.goalInCriteria.map(({ id }) => id) },
-                                    },
-                                    data: {
-                                        isDone:
-                                            _isEditable && pushState?.type && pushState?.type === StateType.Completed,
-                                    },
-                                },
-                            },
-                            history:
-                                _isEditable && input.stateId && input.stateId !== actualGoal.stateId
-                                    ? {
-                                          create: {
-                                              subject: 'state',
-                                              action: 'change',
-                                              previousValue: actualGoal.stateId,
-                                              nextValue: input.stateId,
-                                              activityId,
-                                          },
-                                      }
-                                    : undefined,
-                            // subscribe comment author
-                            watchers: {
-                                connect: [{ id: commentAuthor.id }],
-                            },
-                        },
-                        include: {
-                            goalInCriteria: goalIncludeCriteriaParams,
-                            state: true,
-                        },
-                    }),
-                    // Create comment next.
-                    prisma.comment.create({
-                        data: {
-                            description: input.description,
-                            activityId: commentAuthor.id,
-                            goalId: input.goalId,
-                            stateId: _isEditable ? input.stateId : undefined,
-                        },
-                        include: {
-                            activity: {
-                                include: {
-                                    user: true,
-                                },
-                            },
-                        },
-                    }),
-                ]);
-                await updateProjectUpdatedAt(updatedGoal.projectId);
-
-                if (_isEditable && input.stateId !== updatedGoal.stateId) {
-                    await recalculateCriteriaScore(updatedGoal.id)
-                        .recalcLinkedGoalsScores()
-                        .recalcAverageProjectScore()
-                        .run();
-                }
-
-                const recipients = prepareRecipients(
-                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
-                    ctx.session.user.email,
-                );
-
-                if (input.stateId) {
-                    await createEmailJob('goalStateUpdatedWithComment', {
-                        to: recipients,
-                        shortId: _shortId,
-                        stateTitleBefore: actualGoal.state?.title,
-                        stateTitleAfter: updatedGoal.state?.title,
-                        title: actualGoal.title,
-                        commentId: newComment.id,
-                        author: newComment.activity.user?.name || newComment.activity.user?.email,
-                        authorEmail: ctx.session.user.email,
-                        body: newComment.description,
-                    });
-                } else {
-                    await createEmailJob('goalCommented', {
-                        to: recipients,
-                        shortId: _shortId,
-                        title: actualGoal.title,
-                        commentId: newComment.id,
-                        author: newComment.activity.user?.name || newComment.activity.user?.email,
-                        authorEmail: ctx.session.user.email,
-                        body: newComment.description,
-                    });
-                }
-
-                return newComment;
+                return createComment({
+                    description: input.description,
+                    stateId: input.stateId,
+                    activityId,
+                    goalId: input.goalId,
+                    role,
+                });
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }

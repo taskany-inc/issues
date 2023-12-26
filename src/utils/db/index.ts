@@ -3,20 +3,17 @@ import { alphanumeric } from 'nanoid-dictionary';
 import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction, StateType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
-import { GoalCommon, dependencyKind, exceptionsDependencyKind } from '../schema/goal';
-import {
-    addCalculatedGoalsFields,
-    addCommonCalculatedGoalFields,
-    nonArchievedGoalsPartialQuery,
-} from '../../trpc/queries/goals';
-import { HistoryRecordWithActivity, HistoryRecordSubject, castToSubject } from '../types/history';
-import { ReactionsMap } from '../types/reactions';
-import { getProjectSchema } from '../../trpc/queries/project';
+import { GoalCommon, dependencyKind, exceptionsDependencyKind } from '../../schema/goal';
+import { nonArchievedGoalsPartialQuery } from '../../../trpc/queries/goals';
+import { HistoryRecordWithActivity, HistoryRecordSubject, castToSubject } from '../../types/history';
+import { ReactionsMap } from '../../types/reactions';
+import { getProjectSchema } from '../../../trpc/queries/project';
+import { prisma } from '../prisma';
+import { subjectToEnumValue } from '../goalHistory';
+import { safeGetUserEmail, safeGetUserName } from '../getUserName';
+import { calcAchievedWeight } from '../recalculateCriteriaScore';
 
-import { prisma } from './prisma';
-import { subjectToEnumValue } from './goalHistory';
-import { safeGetUserEmail, safeGetUserName } from './getUserName';
-import { calcAchievedWeight } from './recalculateCriteriaScore';
+import { addCalculatedGoalsFields, addCommonCalculatedGoalFields } from './calculatedGoalsFields';
 
 /**
  * Type-safe wrapper in raw SQL query.

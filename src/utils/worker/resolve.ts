@@ -1,3 +1,5 @@
+import { createComment } from '../db/createComment';
+
 import * as emailTemplates from './mail/templates';
 import { sendMail } from './mail';
 import { JobDataMap } from './create';
@@ -14,4 +16,14 @@ export const cron = async ({ template }: JobDataMap['cron']) => {
     } else {
         throw new Error('No supported cron jobs');
     }
+};
+
+export const comment = async ({ activityId, description, goalId }: JobDataMap['comment']) => {
+    await createComment({
+        description,
+        activityId,
+        goalId,
+        role: 'USER',
+        shouldUpdateGoal: false,
+    });
 };

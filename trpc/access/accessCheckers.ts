@@ -1,7 +1,7 @@
 import { Session } from 'next-auth';
 
-import { addCalculatedGoalsFields } from '../queries/goals';
 import { addCalculatedProjectFields, checkProjectAccess } from '../queries/project';
+import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 
 import { CommentEntity, GoalEntity, ProjectEntity } from './accessEntityGetters';
 
