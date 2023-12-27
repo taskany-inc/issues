@@ -394,11 +394,10 @@ export const goal = router({
             const newGoal = await createGoal(input, actualProject.id, activityId, role);
             await updateProjectUpdatedAt(actualProject.id);
 
-            const recipients = prepareRecipients([
-                ...actualProject.participants,
-                ...actualProject.watchers,
-                actualProject.activity,
-            ]);
+            const recipients = prepareRecipients(
+                [...actualProject.participants, ...actualProject.watchers, actualProject.activity],
+                ctx.session.user.email,
+            );
 
             await Promise.all([
                 createEmailJob('goalCreated', {
@@ -675,12 +674,10 @@ export const goal = router({
                     await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
                 }
 
-                const recipients = prepareRecipients([
-                    ...actualGoal.participants,
-                    ...actualGoal.watchers,
-                    actualGoal.activity,
-                    actualGoal.owner,
-                ]);
+                const recipients = prepareRecipients(
+                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
+                    ctx.session.user.email,
+                );
 
                 await createEmailJob('goalUpdated', {
                     to: recipients,
@@ -808,12 +805,10 @@ export const goal = router({
                         .run();
                 }
 
-                const recipients = prepareRecipients([
-                    ...actualGoal.participants,
-                    ...actualGoal.watchers,
-                    actualGoal.activity,
-                    actualGoal.owner,
-                ]);
+                const recipients = prepareRecipients(
+                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
+                    ctx.session.user.email,
+                );
 
                 await createEmailJob('goalArchived', {
                     to: recipients,
@@ -919,12 +914,10 @@ export const goal = router({
                     .recalcAverageProjectScore()
                     .run();
 
-                const recipients = prepareRecipients([
-                    ...actualGoal.participants,
-                    ...actualGoal.watchers,
-                    actualGoal.activity,
-                    actualGoal.owner,
-                ]);
+                const recipients = prepareRecipients(
+                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
+                    ctx.session.user.email,
+                );
 
                 await createEmailJob('goalStateUpdated', {
                     to: recipients,
@@ -1042,12 +1035,10 @@ export const goal = router({
                         .run();
                 }
 
-                const recipients = prepareRecipients([
-                    ...actualGoal.participants,
-                    ...actualGoal.watchers,
-                    actualGoal.activity,
-                    actualGoal.owner,
-                ]);
+                const recipients = prepareRecipients(
+                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
+                    ctx.session.user.email,
+                );
 
                 if (input.stateId) {
                     await createEmailJob('goalStateUpdatedWithComment', {
@@ -1632,16 +1623,19 @@ export const goal = router({
                 let recipients: string[] = [];
 
                 if (updatedGoal && connectedProject) {
-                    recipients = prepareRecipients([
-                        updatedGoal.owner,
-                        updatedGoal.activity,
-                        connectedProject.activity,
-                        ...updatedGoal.participants,
-                        ...updatedGoal.watchers,
-                        ...connectedProject.accessUsers,
-                        ...connectedProject.participants,
-                        ...connectedProject.watchers,
-                    ]);
+                    recipients = prepareRecipients(
+                        [
+                            updatedGoal.owner,
+                            updatedGoal.activity,
+                            connectedProject.activity,
+                            ...updatedGoal.participants,
+                            ...updatedGoal.watchers,
+                            ...connectedProject.accessUsers,
+                            ...connectedProject.participants,
+                            ...connectedProject.watchers,
+                        ],
+                        ctx.session.user.email,
+                    );
                 }
 
                 await createEmailJob('addPartnerProjectToGoal', {

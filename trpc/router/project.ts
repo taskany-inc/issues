@@ -600,12 +600,10 @@ export const project = router({
 
                     await Promise.all(
                         newParents.map((parent) => {
-                            const recipients = prepareRecipients([
-                                parent.activity,
-                                ...parent.accessUsers,
-                                ...parent.participants,
-                                ...parent.watchers,
-                            ]);
+                            const recipients = prepareRecipients(
+                                [parent.activity, ...parent.accessUsers, ...parent.participants, ...parent.watchers],
+                                ctx.session.user.email,
+                            );
 
                             return createEmailJob('childProjectCreated', {
                                 to: recipients,
@@ -638,12 +636,10 @@ export const project = router({
 
                     await Promise.all(
                         oldParents.map((parent) => {
-                            const recipients = prepareRecipients([
-                                parent.activity,
-                                ...parent.accessUsers,
-                                ...parent.participants,
-                                ...parent.watchers,
-                            ]);
+                            const recipients = prepareRecipients(
+                                [parent.activity, ...parent.accessUsers, ...parent.participants, ...parent.watchers],
+                                ctx.session.user.email,
+                            );
 
                             return createEmailJob('childProjectDeleted', {
                                 to: recipients,
@@ -683,12 +679,10 @@ export const project = router({
                     ];
                 }
 
-                const recipients = prepareRecipients([
-                    ...project.participants,
-                    ...updatedProject.accessUsers,
-                    ...project.watchers,
-                    project.activity,
-                ]);
+                const recipients = prepareRecipients(
+                    [...project.participants, ...updatedProject.accessUsers, ...project.watchers, project.activity],
+                    ctx.session.user.email,
+                );
 
                 await createEmailJob('projectUpdated', {
                     to: recipients,
@@ -869,7 +863,10 @@ export const project = router({
                 ]);
 
                 await createEmailJob('addParticipantsToProject', {
-                    to: prepareRecipients(recipients.map((user) => ({ user }))),
+                    to: prepareRecipients(
+                        recipients.map((user) => ({ user })),
+                        ctx.session.user.email,
+                    ),
                     key: updatedProject.id,
                     title: updatedProject.title,
                     author: ctx.session.user.name || ctx.session.user.email,
@@ -899,7 +896,10 @@ export const project = router({
                 ]);
 
                 await createEmailJob('removeParticipantsToProject', {
-                    to: prepareRecipients(recipients.map((user) => ({ user }))),
+                    to: prepareRecipients(
+                        recipients.map((user) => ({ user })),
+                        ctx.session.user.email,
+                    ),
                     key: updatedProject.id,
                     title: updatedProject.title,
                     author: ctx.session.user.name || ctx.session.user.email,
