@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/nextjs';
+
 import { prisma } from '../prisma';
 
 import * as templates from './mail/templates';
@@ -48,36 +50,24 @@ export function createJob<K extends keyof JobDataMap>(kind: K, { data, priority,
     });
 }
 
-type Mapper<T extends keyof Templates = keyof Templates> = <Params extends Parameters<Templates[T]>[number]>(
-    params: Params,
-) => Params;
-
-const excludeCurrentUser: Mapper = (params) => ({
-    ...params,
-    to: params.to.filter((email) => email !== params.authorEmail),
-});
-
-const excludeDuplicateUsers: Mapper = (params) => ({
-    ...params,
-    to: Array.from(new Set(params.to)),
-});
-
-const mappers = [excludeDuplicateUsers, excludeCurrentUser];
-
 export function createEmailJob<T extends keyof Templates, Params extends Parameters<Templates[T]>[number]>(
     template: T,
     data: Params,
 ) {
-    const mappedParams = mappers.reduce<Params>((acc, mapper) => mapper(acc), data);
-
-    if (!mappedParams.to.length) {
+    if (!data.to.length) {
+        Sentry.captureException(new Error('No recipients defined'), {
+            extra: {
+                template,
+                ...data,
+            },
+        });
         return null;
     }
 
     return createJob('email', {
         data: {
             template,
-            data: mappedParams,
+            data,
         },
     });
 }
