@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.16.0](https://github.com/taskany-inc/issues/compare/v2.15.0...v2.16.0) (2023-12-28)
+
+
+### Features
+
+* job delay queue ([91844e9](https://github.com/taskany-inc/issues/commit/91844e9fb65587c1528b972995f3dc281d1c0e5b))
+
+
+### Bug Fixes
+
+* add sentry capture error inside create email job ([a5bdf52](https://github.com/taskany-inc/issues/commit/a5bdf52772c3951790b343081dfff5de4ab0ea9c))
+* table width ([752a461](https://github.com/taskany-inc/issues/commit/752a461c5d56f855d06567358e23bd5b3549eec7))
+
 ## [2.15.0](https://github.com/taskany-inc/issues/compare/v2.14.0...v2.15.0) (2023-12-25)
 
 
