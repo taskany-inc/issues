@@ -19,7 +19,7 @@
     "To confirm transfering {project} ownership please type project key {key} and select new owner below.": "Чтобы подтвердить передачу прав на проект {project} введите ключ проекта и выберите нового владельца ниже.",
     "New project owner": "Новый владелец",
     "Enter name or email": "Имя или почта",
-    "What happens when you delete a project": "What happens when you delete a project",
+    "What happens when you delete a project": "Что произойдет, если вы удалите проект",
     "All active goals will be archived": "Все активные цели проекта будут перемещены в архив",
     "Criteria as project goals will be removed": "Критерии в качестве целей проекта будут удалены",
     "Criteria-affected goals will be recalculated as progress towards meeting the criteria": "Для затронутых критериями целей будет пересчитан прогресс выполнения критериев",
