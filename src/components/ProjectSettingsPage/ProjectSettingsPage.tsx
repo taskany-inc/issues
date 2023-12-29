@@ -73,7 +73,6 @@ import { tr } from './ProjectSettingsPage.i18n';
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 const StyledTip = styled(Tip)`
-    color: ${warn0};
     padding: ${gapS} 0;
 `;
 
@@ -396,8 +395,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                 <ModalContent>
                     <SettingsCard view="warning">
-                        <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
-                            <Text as="span" weight="bold" size="s" color={warn0}>
+                        <StyledTip view="warning" icon={<IconExclamationCircleSolid size="s" />}>
+                            <Text as="span" weight="bold" size="s" color="inherit">
                                 {tr('What happens when you delete a project')}:
                             </Text>
                         </StyledTip>
@@ -547,7 +546,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <FormTitle color={warn0}>{tr('Cannot delete project now')}</FormTitle>
                 </ModalHeader>
                 <ModalContent>
-                    <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
+                    <StyledTip view="warning" icon={<IconExclamationCircleSolid size="s" />}>
                         {tr('The project has child projects')}
                     </StyledTip>
                     <Text size="s">{tr('Before delete a project, you must move it to another project or delete')}</Text>
