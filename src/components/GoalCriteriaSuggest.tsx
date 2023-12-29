@@ -17,6 +17,8 @@ interface GoalCriteriaComboBoxProps {
     }[];
     versa?: boolean;
     editMode?: boolean;
+    /** Value allows restrict search results by current user */
+    restrictedSearch?: boolean;
     withModeSwitch?: React.ComponentProps<typeof CriteriaForm>['withModeSwitch'];
     defaultMode?: React.ComponentProps<typeof CriteriaForm>['mode'];
     values?: React.ComponentProps<typeof CriteriaForm>['values'];
@@ -34,6 +36,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
     values,
     onSubmit,
     validateGoalCriteriaBindings,
+    restrictedSearch = false,
 }) => {
     const [mode, setMode] = useState(defaultMode);
     const [query, setQuery] = useState<string | void>('');
@@ -55,7 +58,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
             {
                 input: query as string,
                 limit: 5,
-                onlyCurrentUser: true,
+                onlyCurrentUser: restrictedSearch,
             },
             { enabled: mode === 'goal' && !editMode, cacheTime: 0 },
         ),

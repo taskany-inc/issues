@@ -286,6 +286,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 onSubmit={handleConnectGoal}
                                 validateGoalCriteriaBindings={validateGoalCriteriaBindings}
                                 versa
+                                restrictedSearch
                             />
                         </GoalFormPopupTrigger>
                     ))}
