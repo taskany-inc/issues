@@ -12,7 +12,6 @@ import { routes } from '../../hooks/router';
 import { tr } from './AccessUserDeleteErrorModal.i18n';
 
 const StyledTip = styled(Tip)`
-    color: ${warn0};
     padding: ${gapS} 0;
 `;
 
@@ -35,7 +34,7 @@ export const AccessUserDeleteErrorModal: FC = () => (
             <FormTitle color={warn0}>{tr('Cannot delete person now')}</FormTitle>
         </ModalHeader>
         <ModalContent>
-            <StyledTip icon={<IconExclamationCircleSolid size="s" color={warn0} />}>
+            <StyledTip view="warning" icon={<IconExclamationCircleSolid size="s" />}>
                 {tr('The user has actual goals')}
             </StyledTip>
             <Text size="s">{tr('Before deleting, you must move this goals to another person:')}</Text>
