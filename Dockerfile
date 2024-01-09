@@ -1,11 +1,11 @@
-FROM node:18.12.0-alpine as build
+FROM node:20.9.0-alpine as build
 
 WORKDIR /app
 COPY . .
 RUN npm ci --no-audit --progress=false
 RUN npm run build
 
-FROM node:18.12.0-alpine AS runner
+FROM node:20.9.0-alpine AS runner
 
 WORKDIR /app
 COPY --from=build /app/package*.json ./

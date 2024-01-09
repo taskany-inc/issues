@@ -74,7 +74,7 @@ COPY .taskany.config.json .
 RUN npm ci
 RUN npm run build
 
-FROM node:18.12.0-alpine AS runner
+FROM node:20.9.0-alpine AS runner
 
 WORKDIR /app
 COPY --from=build /app/package*.json ./
