@@ -37,7 +37,8 @@ test('returns lastDayOfQuarter for en locale', () => {
 });
 
 test('returns available years for passed number', () => {
-    expect(getAvailableYears(6)).toStrictEqual([2023, 2024, 2025, 2026, 2027, 2028]);
+    const currentYear = new Date().getFullYear();
+    expect(getAvailableYears(6)).toStrictEqual(Array.from({ length: 6 }).map((_, index) => currentYear + index));
 });
 
 describe('increment year if the date has passed', () => {

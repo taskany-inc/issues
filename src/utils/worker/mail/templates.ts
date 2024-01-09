@@ -19,7 +19,7 @@ const notice = "_NB: you got this email because  you're the owner/issuer/partici
 const footer = `
 ____
 
-© 2023 Taskany inc.
+© ${new Date().getFullYear()} Taskany inc.
 `;
 
 interface GoalCommentedEmailProps {
