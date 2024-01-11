@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.16.1](https://github.com/taskany-inc/issues/compare/v2.16.0...v2.16.1) (2024-01-11)
+
+
+### Bug Fixes
+
+* automatic year increment ([05ec9d3](https://github.com/taskany-inc/issues/commit/05ec9d39ad92365e8772860bec1fe4d49681005b))
+* **GoalCriteriaSuggest:** correct restrict search for suggest ([b1a4a68](https://github.com/taskany-inc/issues/commit/b1a4a6820ae16cfa57e966dea780d5eaa6e96657))
+* translate warning to ru ([e629a40](https://github.com/taskany-inc/issues/commit/e629a40f930b092761012c45012ab9921354d3dc))
+
 ## [2.16.0](https://github.com/taskany-inc/issues/compare/v2.15.0...v2.16.0) (2023-12-28)
 
 
