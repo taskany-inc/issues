@@ -30,7 +30,7 @@ import {
     clearEmptyPersonalProject,
     countPrivateDependencies,
 } from '../../src/utils/db';
-import { createEmailJob } from '../../src/utils/worker/create';
+import { createEmail } from '../../src/utils/createEmail';
 import { calculateDiffBetweenArrays } from '../../src/utils/calculateDiffBetweenArrays';
 import {
     convertCriteriaToGoalSchema,
@@ -383,13 +383,14 @@ export const goal = router({
             const newGoal = await createGoal(input, actualProject.id, activityId, role);
             await updateProjectUpdatedAt(actualProject.id);
 
-            const recipients = prepareRecipients(
-                [...actualProject.participants, ...actualProject.watchers, actualProject.activity],
-                ctx.session.user.email,
-            );
+            const recipients = prepareRecipients([
+                ...actualProject.participants,
+                ...actualProject.watchers,
+                actualProject.activity,
+            ]);
 
             await Promise.all([
-                createEmailJob('goalCreated', {
+                createEmail('goalCreated', {
                     to: recipients,
                     projectKey: actualProject.id,
                     projectTitle: actualProject.title,
@@ -398,8 +399,8 @@ export const goal = router({
                     author: ctx.session.user.name || ctx.session.user.email,
                     authorEmail: ctx.session.user.email,
                 }),
-                createEmailJob('goalAssigned', {
-                    to: [newGoal.owner?.user?.email],
+                createEmail('goalAssigned', {
+                    to: prepareRecipients([newGoal.owner]),
                     shortId: newGoal._shortId,
                     title: newGoal.title,
                     author: ctx.session.user.name || ctx.session.user.email,
@@ -663,12 +664,14 @@ export const goal = router({
                     await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
                 }
 
-                const recipients = prepareRecipients(
-                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
-                    ctx.session.user.email,
-                );
+                const recipients = prepareRecipients([
+                    ...actualGoal.participants,
+                    ...actualGoal.watchers,
+                    actualGoal.activity,
+                    actualGoal.owner,
+                ]);
 
-                await createEmailJob('goalUpdated', {
+                await createEmail('goalUpdated', {
                     to: recipients,
                     shortId: _shortId,
                     title: actualGoal.title,
@@ -679,14 +682,14 @@ export const goal = router({
 
                 if (actualGoal.ownerId !== input.owner.id) {
                     await Promise.all([
-                        createEmailJob('goalUnassigned', {
-                            to: [actualGoal.owner?.user?.email],
+                        createEmail('goalUnassigned', {
+                            to: prepareRecipients([actualGoal.owner]),
                             shortId: _shortId,
                             title: actualGoal.title,
                             author: ctx.session.user.name || ctx.session.user.email,
                             authorEmail: ctx.session.user.email,
                         }),
-                        createEmailJob('goalAssigned', {
+                        createEmail('goalAssigned', {
                             to: [input.owner.user.email],
                             shortId: _shortId,
                             title: actualGoal.title,
@@ -794,12 +797,14 @@ export const goal = router({
                         .run();
                 }
 
-                const recipients = prepareRecipients(
-                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
-                    ctx.session.user.email,
-                );
+                const recipients = prepareRecipients([
+                    ...actualGoal.participants,
+                    ...actualGoal.watchers,
+                    actualGoal.activity,
+                    actualGoal.owner,
+                ]);
 
-                await createEmailJob('goalArchived', {
+                await createEmail('goalArchived', {
                     to: recipients,
                     shortId: _shortId,
                     title: actualGoal.title,
@@ -903,12 +908,14 @@ export const goal = router({
                     .recalcAverageProjectScore()
                     .run();
 
-                const recipients = prepareRecipients(
-                    [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
-                    ctx.session.user.email,
-                );
+                const recipients = prepareRecipients([
+                    ...actualGoal.participants,
+                    ...actualGoal.watchers,
+                    actualGoal.activity,
+                    actualGoal.owner,
+                ]);
 
-                await createEmailJob('goalStateUpdated', {
+                await createEmail('goalStateUpdated', {
                     to: recipients,
                     shortId: _shortId,
                     stateTitleBefore: actualGoal.state?.title,
@@ -1497,22 +1504,19 @@ export const goal = router({
                 let recipients: string[] = [];
 
                 if (updatedGoal && connectedProject) {
-                    recipients = prepareRecipients(
-                        [
-                            updatedGoal.owner,
-                            updatedGoal.activity,
-                            connectedProject.activity,
-                            ...updatedGoal.participants,
-                            ...updatedGoal.watchers,
-                            ...connectedProject.accessUsers,
-                            ...connectedProject.participants,
-                            ...connectedProject.watchers,
-                        ],
-                        ctx.session.user.email,
-                    );
+                    recipients = prepareRecipients([
+                        updatedGoal.owner,
+                        updatedGoal.activity,
+                        connectedProject.activity,
+                        ...updatedGoal.participants,
+                        ...updatedGoal.watchers,
+                        ...connectedProject.accessUsers,
+                        ...connectedProject.participants,
+                        ...connectedProject.watchers,
+                    ]);
                 }
 
-                await createEmailJob('addPartnerProjectToGoal', {
+                await createEmail('addPartnerProjectToGoal', {
                     to: recipients,
                     key: `${updatedGoal.projectId}-${updatedGoal.scopeId}`,
                     title: updatedGoal.title,
@@ -1587,7 +1591,7 @@ export const goal = router({
                     }, []);
                 }
 
-                await createEmailJob('removePartnerProjectToGoal', {
+                await createEmail('removePartnerProjectToGoal', {
                     to: recipients,
                     key: `${updatedGoal.projectId}-${updatedGoal.scopeId}`,
                     title: updatedGoal.title,

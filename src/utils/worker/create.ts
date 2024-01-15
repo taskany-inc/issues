@@ -1,5 +1,3 @@
-import * as Sentry from '@sentry/nextjs';
-
 import { prisma } from '../prisma';
 
 import * as templates from './mail/templates';
@@ -65,16 +63,6 @@ export function createEmailJob<T extends keyof Templates, Params extends Paramet
     template: T,
     data: Params,
 ) {
-    if (!data.to.length) {
-        Sentry.captureException(new Error('No recipients defined'), {
-            extra: {
-                template,
-                ...data,
-            },
-        });
-        return null;
-    }
-
     return createJob('email', {
         data: {
             template,

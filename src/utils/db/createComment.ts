@@ -3,7 +3,7 @@ import { Role, StateType } from '@prisma/client';
 import { prisma } from '../prisma';
 import { goalIncludeCriteriaParams, recalculateCriteriaScore } from '../recalculateCriteriaScore';
 import { prepareRecipients } from '../prepareRecipients';
-import { createEmailJob } from '../worker/create';
+import { createEmail } from '../createEmail';
 
 import { updateProjectUpdatedAt } from './updateProjectUpdatedAt';
 import { addCalculatedGoalsFields } from './calculatedGoalsFields';
@@ -115,13 +115,15 @@ export const createComment = async ({
     }
 
     if (newComment.activity.user) {
-        const recipients = prepareRecipients(
-            [...actualGoal.participants, ...actualGoal.watchers, actualGoal.activity, actualGoal.owner],
-            newComment.activity.user.email,
-        );
+        const recipients = prepareRecipients([
+            ...actualGoal.participants,
+            ...actualGoal.watchers,
+            actualGoal.activity,
+            actualGoal.owner,
+        ]);
 
         if (stateId) {
-            await createEmailJob('goalStateUpdatedWithComment', {
+            await createEmail('goalStateUpdatedWithComment', {
                 to: recipients,
                 shortId: _shortId,
                 stateTitleBefore: actualGoal.state?.title,
@@ -133,7 +135,7 @@ export const createComment = async ({
                 body: newComment.description,
             });
         } else {
-            await createEmailJob('goalCommented', {
+            await createEmail('goalCommented', {
                 to: recipients,
                 shortId: _shortId,
                 title: actualGoal.title,

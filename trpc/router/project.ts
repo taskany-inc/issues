@@ -16,7 +16,7 @@ import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '..
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
-import { createEmailJob } from '../../src/utils/worker/create';
+import { createEmail } from '../../src/utils/createEmail';
 import { FieldDiff } from '../../src/types/common';
 import { updateLinkedGoalsByProject } from '../../src/utils/db';
 import { prepareUserDataFromActivity } from '../../src/utils/getUserName';
@@ -596,12 +596,14 @@ export const project = router({
 
                     await Promise.all(
                         newParents.map((parent) => {
-                            const recipients = prepareRecipients(
-                                [parent.activity, ...parent.accessUsers, ...parent.participants, ...parent.watchers],
-                                ctx.session.user.email,
-                            );
+                            const recipients = prepareRecipients([
+                                parent.activity,
+                                ...parent.accessUsers,
+                                ...parent.participants,
+                                ...parent.watchers,
+                            ]);
 
-                            return createEmailJob('childProjectCreated', {
+                            return createEmail('childProjectCreated', {
                                 to: recipients,
                                 childKey: updatedProject.id,
                                 childTitle: updatedProject.title,
@@ -632,12 +634,14 @@ export const project = router({
 
                     await Promise.all(
                         oldParents.map((parent) => {
-                            const recipients = prepareRecipients(
-                                [parent.activity, ...parent.accessUsers, ...parent.participants, ...parent.watchers],
-                                ctx.session.user.email,
-                            );
+                            const recipients = prepareRecipients([
+                                parent.activity,
+                                ...parent.accessUsers,
+                                ...parent.participants,
+                                ...parent.watchers,
+                            ]);
 
-                            return createEmailJob('childProjectDeleted', {
+                            return createEmail('childProjectDeleted', {
                                 to: recipients,
                                 childKey: updatedProject.id,
                                 childTitle: updatedProject.title,
@@ -675,12 +679,14 @@ export const project = router({
                     ];
                 }
 
-                const recipients = prepareRecipients(
-                    [...project.participants, ...updatedProject.accessUsers, ...project.watchers, project.activity],
-                    ctx.session.user.email,
-                );
+                const recipients = prepareRecipients([
+                    ...project.participants,
+                    ...updatedProject.accessUsers,
+                    ...project.watchers,
+                    project.activity,
+                ]);
 
-                await createEmailJob('projectUpdated', {
+                await createEmail('projectUpdated', {
                     to: recipients,
                     key: project.id,
                     title: project.title,
@@ -797,8 +803,8 @@ export const project = router({
                     },
                 });
 
-                await createEmailJob('projectTransfered', {
-                    to: [newOwner.user?.email],
+                await createEmail('projectTransfered', {
+                    to: prepareRecipients([newOwner]),
                     key: project.id,
                     title: project.title,
                     author: ctx.session.user.name || ctx.session.user.email,
@@ -858,11 +864,8 @@ export const project = router({
                     prisma.user.findMany({ where: { activityId: { in: participants } } }),
                 ]);
 
-                await createEmailJob('addParticipantsToProject', {
-                    to: prepareRecipients(
-                        recipients.map((user) => ({ user })),
-                        ctx.session.user.email,
-                    ),
+                await createEmail('addParticipantsToProject', {
+                    to: prepareRecipients(recipients.map((user) => ({ user }))),
                     key: updatedProject.id,
                     title: updatedProject.title,
                     author: ctx.session.user.name || ctx.session.user.email,
@@ -891,11 +894,8 @@ export const project = router({
                     prisma.user.findMany({ where: { activityId: { in: participants } } }),
                 ]);
 
-                await createEmailJob('removeParticipantsToProject', {
-                    to: prepareRecipients(
-                        recipients.map((user) => ({ user })),
-                        ctx.session.user.email,
-                    ),
+                await createEmail('removeParticipantsToProject', {
+                    to: prepareRecipients(recipients.map((user) => ({ user }))),
                     key: updatedProject.id,
                     title: updatedProject.title,
                     author: ctx.session.user.name || ctx.session.user.email,
