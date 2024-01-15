@@ -6,15 +6,13 @@ interface Participant {
     user?: User | null;
 }
 
-const excludeCurrentUser = (emails: string[], authorEmail?: string) => emails.filter((email) => email !== authorEmail);
-
 const excludeDuplicateUsers = (emails: string[]) => Array.from(new Set(emails));
 
 const excludeFalsyEmails = (emails: string[]) => emails.filter((email) => Boolean(email) === true);
 
-const mappers = [excludeFalsyEmails, excludeDuplicateUsers, excludeCurrentUser];
+const mappers = [excludeFalsyEmails, excludeDuplicateUsers];
 
-export const prepareRecipients = (participants: (Participant | null)[], authorEmail?: string) => {
+export const prepareRecipients = (participants: (Participant | null | undefined)[]) => {
     const allParticipants = participants.reduce<string[]>((acc, cur) => {
         if (cur?.user?.email) {
             acc.push(cur.user.email);
@@ -22,5 +20,5 @@ export const prepareRecipients = (participants: (Participant | null)[], authorEm
         return acc;
     }, []);
 
-    return mappers.reduce<string[]>((acc, mapper) => mapper(acc, authorEmail), allParticipants);
+    return mappers.reduce<string[]>((acc, mapper) => mapper(acc), allParticipants);
 };

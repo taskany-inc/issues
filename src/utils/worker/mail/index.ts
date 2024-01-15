@@ -1,7 +1,7 @@
 import { mailServer } from './server';
 
 export interface SendMailProps {
-    to: Array<string | undefined>;
+    to: Array<string>;
     subject: string;
     text: string;
     html: string;
