@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.16.2](https://github.com/taskany-inc/issues/compare/v2.16.1...v2.16.2) (2024-01-17)
+
+
+### Bug Fixes
+
+* groupBy is not included in filter queryState ([065b26e](https://github.com/taskany-inc/issues/commit/065b26e6f3bf58db7293a0e83625d5bcecc7c58a))
+* sentry does not send error when goal has only assignee ([0a2e3c0](https://github.com/taskany-inc/issues/commit/0a2e3c0815d50717edff66b68528112bec61a162))
+
 ## [2.16.1](https://github.com/taskany-inc/issues/compare/v2.16.0...v2.16.1) (2024-01-11)
 
 
