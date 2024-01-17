@@ -451,9 +451,25 @@ export const project = router({
                         },
                         ...(goalsQuery
                             ? {
-                                  goals: {
-                                      some: goalsFilter(goalsQuery, activityId, role).where,
-                                  },
+                                  OR: [
+                                      {
+                                          goals: {
+                                              some: goalsFilter(goalsQuery, activityId, role).where,
+                                          },
+                                      },
+                                      {
+                                          goals: {
+                                              none: goalsFilter(goalsQuery, activityId, role).where,
+                                          },
+                                          children: {
+                                              some: {
+                                                  goals: {
+                                                      some: goalsFilter(goalsQuery, activityId, role).where,
+                                                  },
+                                              },
+                                          },
+                                      },
+                                  ],
                               }
                             : {}),
                     },
