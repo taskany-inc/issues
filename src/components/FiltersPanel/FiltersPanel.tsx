@@ -63,7 +63,6 @@ export const FiltersPanel: FC<{
     counter?: number;
     queryState?: QueryState;
     queryFilterState?: FilterQueryState;
-    queryString?: string;
     onSearchChange: (search: string) => void;
     onFilterApply?: (state: Partial<QueryState>) => void;
 }> = memo(
