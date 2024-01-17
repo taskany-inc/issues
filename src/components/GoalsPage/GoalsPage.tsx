@@ -22,7 +22,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         defaultPresetFallback,
     });
 
-    const { currentPreset, queryState, setTagsFilterOutside, setPreset, setGroupedView } = useUrlFilterParams({
+    const { currentPreset, queryState, groupBy, setTagsFilterOutside, setPreset, setGroupBy } = useUrlFilterParams({
         preset,
     });
 
@@ -39,7 +39,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
             ? currentPreset.description
             : tr('These are goals across all projects');
 
-    const groupedView = queryState?.groupBy === 'project';
+    const groupedView = groupBy === 'project';
 
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
@@ -70,14 +70,11 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 filterControls={nullable(
                     groupedView,
                     () => (
-                        <FiltersMenuItem
-                            active
-                            onClick={() => setGroupedView(queryState?.groupBy ? 'none' : undefined)}
-                        >
+                        <FiltersMenuItem active onClick={() => setGroupBy(undefined)}>
                             {tr('Ungroup')}
                         </FiltersMenuItem>
                     ),
-                    <FiltersMenuItem onClick={() => setGroupedView('project')}>{tr('Group')}</FiltersMenuItem>,
+                    <FiltersMenuItem onClick={() => setGroupBy('project')}>{tr('Group')}</FiltersMenuItem>,
                 )}
             >
                 {nullable(

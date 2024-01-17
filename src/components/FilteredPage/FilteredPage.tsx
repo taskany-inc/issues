@@ -118,7 +118,6 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                 counter={counter}
                 queryState={queryState}
                 queryFilterState={queryFilterState}
-                queryString={queryString}
                 onSearchChange={setFulltextFilter}
                 onFilterApply={batchQueryState}
             >
@@ -156,7 +155,11 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                         </FiltersAction>
                     )}
                     {nullable(queryString || filterPreset, () => (
-                        <StyledResetButton text="Reset" onClick={resetQueryState} {...filtersPanelResetButton.attr} />
+                        <StyledResetButton
+                            text={tr('Reset')}
+                            onClick={resetQueryState}
+                            {...filtersPanelResetButton.attr}
+                        />
                     ))}
                 </StyledFilterControls>
             </FiltersPanel>
