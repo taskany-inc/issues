@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.16.3](https://github.com/taskany-inc/issues/compare/v2.16.2...v2.16.3) (2024-01-18)
+
+
+### Bug Fixes
+
+* bricks up to date ([10992cc](https://github.com/taskany-inc/issues/commit/10992cc2ec37a4a45bfe898c07788194d6e1245c))
+* support filter nested goals ([b12b493](https://github.com/taskany-inc/issues/commit/b12b493a128cb2a83a59d9573c2c5e996687ad8b))
+
 ## [2.16.2](https://github.com/taskany-inc/issues/compare/v2.16.1...v2.16.2) (2024-01-17)
 
 
