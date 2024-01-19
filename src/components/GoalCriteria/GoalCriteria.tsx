@@ -25,12 +25,13 @@ import { CustomCell } from '../GoalListItemCompact';
 
 import { tr } from './GoalCriteria.i18n';
 
-const StyledWrapper = styled.div`
+const StyledIssueMeta = styled(IssueMeta)`
     display: grid;
-    grid-template-columns: 70%;
+    grid-template-columns: 100%;
     grid-template-rows: minmax(32px, 100%);
     align-items: center;
     gap: ${gapS};
+    max-width: 520px;
 `;
 
 const StyledCircleIcon = styled(IconCircleOutline)`
@@ -176,7 +177,7 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
 
     return (
         <>
-            <TableRow key={criteria.id} align="start">
+            <TableRow key={criteria.id} align="baseline">
                 <CustomCell>
                     {nullable(
                         criteria.criteriaGoal,
@@ -200,14 +201,14 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
                         />,
                     )}
                 </CustomCell>
-                <CustomCell width="24px" justify="end" align="baseline">
+                <CustomCell col={1} justify="end">
                     {nullable(criteria.weight > 0, () => (
                         <Text size="s" color={gray9}>
                             {criteria.weight}
                         </Text>
                     ))}
                 </CustomCell>
-                <CustomCell min align="start" forIcon>
+                <CustomCell col={1} justify="end" forIcon>
                     <Dropdown
                         onChange={handleChange}
                         renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
@@ -299,50 +300,46 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             <Circle size={32}>
                 <IconMessageTickOutline size="s" color={backgroundColor} />
             </Circle>
-            <StyledWrapper>
-                <IssueMeta title={tr('Achievement criteria')}>
-                    <>
-                        <Table>
-                            {sortedCriteriaItems.map((criteria) => (
-                                <CriteriaItem
-                                    goalId={goalId}
-                                    canEdit={canEdit}
-                                    key={criteria.id}
-                                    criteria={criteria}
-                                    onClick={onGoalClick}
-                                    onUpdateState={onUpdateState}
-                                    onUpdate={onUpdate}
-                                    onConvertGoal={onConvertToGoal}
-                                    onRemove={onRemove}
-                                    validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                                />
-                            ))}
-                        </Table>
+            <StyledIssueMeta title={tr('Achievement criteria')}>
+                <Table>
+                    {sortedCriteriaItems.map((criteria) => (
+                        <CriteriaItem
+                            goalId={goalId}
+                            canEdit={canEdit}
+                            key={criteria.id}
+                            criteria={criteria}
+                            onClick={onGoalClick}
+                            onUpdateState={onUpdateState}
+                            onUpdate={onUpdate}
+                            onConvertGoal={onConvertToGoal}
+                            onRemove={onRemove}
+                            validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                        />
+                    ))}
+                </Table>
 
-                        {nullable(canEdit, () => (
-                            <GoalFormPopupTrigger
-                                renderTrigger={(props) => (
-                                    <AddInlineTrigger
-                                        text={tr('Add achievement criteria')}
-                                        ref={props.ref}
-                                        onClick={props.onClick}
-                                        centered={false}
-                                    />
-                                )}
-                            >
-                                <GoalCriteriaSuggest
-                                    id={goalId}
-                                    withModeSwitch
-                                    defaultMode="simple"
-                                    items={list.map((criteria) => ({ ...criteria, goal: criteria.criteriaGoal }))}
-                                    onSubmit={onCreate}
-                                    validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                                />
-                            </GoalFormPopupTrigger>
-                        ))}
-                    </>
-                </IssueMeta>
-            </StyledWrapper>
+                {nullable(canEdit, () => (
+                    <GoalFormPopupTrigger
+                        renderTrigger={(props) => (
+                            <AddInlineTrigger
+                                text={tr('Add achievement criteria')}
+                                ref={props.ref}
+                                onClick={props.onClick}
+                                centered={false}
+                            />
+                        )}
+                    >
+                        <GoalCriteriaSuggest
+                            id={goalId}
+                            withModeSwitch
+                            defaultMode="simple"
+                            items={list.map((criteria) => ({ ...criteria, goal: criteria.criteriaGoal }))}
+                            onSubmit={onCreate}
+                            validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                        />
+                    </GoalFormPopupTrigger>
+                ))}
+            </StyledIssueMeta>
         </ActivityFeedItem>
     );
 };
