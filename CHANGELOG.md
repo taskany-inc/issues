@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.16.4](https://github.com/taskany-inc/issues/compare/v2.16.3...v2.16.4) (2024-01-22)
+
+
+### Bug Fixes
+
+* **GoalCriteria:** make them wider ([11b2b51](https://github.com/taskany-inc/issues/commit/11b2b51ee1ae0eedb35dc168d5294faaca2b8641))
+
 ## [2.16.3](https://github.com/taskany-inc/issues/compare/v2.16.2...v2.16.3) (2024-01-18)
 
 
