@@ -18,8 +18,8 @@ const colorsMap: Record<SettingsCardViewType, string> = {
 };
 
 export const SettingsCard = styled(FormCard)<{ view?: SettingsCardViewType }>`
-    & + & {
-        margin-top: ${gapM};
+    &:not(:last-child) {
+        margin-bottom: ${gapM};
     }
 
     border-color: ${({ view = 'default' }) => colorsMap[view]};
