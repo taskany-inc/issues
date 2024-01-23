@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.16.5](https://github.com/taskany-inc/issues/compare/v2.16.4...v2.16.5) (2024-01-23)
+
+
+### Bug Fixes
+
+* **SettingsContent:** space between content & tips ([ff0c21d](https://github.com/taskany-inc/issues/commit/ff0c21df65eda98d1275dc44d9765d1758f17c75))
+
 ## [2.16.4](https://github.com/taskany-inc/issues/compare/v2.16.3...v2.16.4) (2024-01-22)
 
 
