@@ -1,14 +1,14 @@
-import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, nullable } from '@taskany/bricks';
+import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, nullable, useCopyToClipboard } from '@taskany/bricks';
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
 import { gray7, textColor } from '@taskany/colors';
 import dynamic from 'next/dynamic';
 import { IconClipboardOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import styled from 'styled-components';
+import * as Sentry from '@sentry/nextjs';
 
 import { CardHeader } from '../CardHeader';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
-import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { Light } from '../Light';
 
@@ -29,7 +29,12 @@ interface GoalContentHeaderProps extends Pick<ComponentProps<typeof RelativeTime
 
 export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, description, date, kind }) => {
     const [isRelative, onDateViewTypeChange] = useClickSwitch();
-    const [, copyValue] = useCopyToClipboard();
+
+    const onError = useCallback((err: Error) => {
+        Sentry.captureException(err);
+    }, []);
+
+    const [, copyValue] = useCopyToClipboard(onError);
 
     const onCopyDescription = useCallback(() => {
         if (!description) return;

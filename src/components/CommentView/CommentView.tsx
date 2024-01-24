@@ -13,8 +13,10 @@ import {
     nullable,
     Button,
     Link,
+    useCopyToClipboard,
 } from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
+import * as Sentry from '@sentry/nextjs';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import {
@@ -37,7 +39,6 @@ import { CommentForm } from '../CommentForm/CommentForm';
 import { StateDot } from '../StateDot';
 import { getUserName } from '../../utils/getUserName';
 import { CardHeader } from '../CardHeader';
-import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { useLatest } from '../../hooks/useLatest';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { Light } from '../Light';
@@ -179,7 +180,13 @@ export const CommentView: FC<CommentViewProps> = ({
     const [commentDescription, setCommentDescription] = useState({ description });
     const { reactionsProps } = useReactionsResource(reactions);
     const [isRelative, onDateViewTypeChange] = useClickSwitch();
-    const [, copyValue] = useCopyToClipboard();
+
+    const onError = useCallback((err: Error) => {
+        Sentry.captureException(err);
+    }, []);
+
+    const [, copyValue] = useCopyToClipboard(onError);
+
     const descriptionRef = useLatest(commentDescription.description);
 
     const canEdit = Boolean(onSubmit);
