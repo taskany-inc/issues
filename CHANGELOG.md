@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.17.0](https://github.com/taskany-inc/issues/compare/v2.16.5...v2.17.0) (2024-01-25)
+
+
+### Features
+
+* parallel  worker support ([d49769c](https://github.com/taskany-inc/issues/commit/d49769cec7afc822f6e69c4cb484c9d668295f25))
+* **useCopyToClipboard:** add hook from bricks ([945cc9a](https://github.com/taskany-inc/issues/commit/945cc9a9c73a1d407c76abc7450588778245e10a))
+
 ## [2.16.5](https://github.com/taskany-inc/issues/compare/v2.16.4...v2.16.5) (2024-01-23)
 
 
