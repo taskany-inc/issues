@@ -1,10 +1,11 @@
 import { ComponentProps, MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import { nullable } from '@taskany/bricks';
+import { ListView, nullable } from '@taskany/bricks';
 
 import { QueryState } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';
 import { trpc } from '../utils/trpcClient';
 import { useFMPMetric } from '../utils/telemetry';
+import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
@@ -69,8 +70,15 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, on
         return pages.flatMap((page) => page.projects);
     }, [data]);
 
+    const handleItemEnter = useCallback(
+        (goal: NonNullable<GoalByIdReturnType>) => {
+            setPreview(goal._shortId, goal);
+        },
+        [setPreview],
+    );
+
     return (
-        <>
+        <ListView onKeyboardClick={handleItemEnter}>
             {projectsOnScreen.map((project) => (
                 <ProjectListItemConnected
                     key={project.id}
@@ -85,6 +93,6 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, on
             {nullable(hasNextPage, () => (
                 <LoadMoreButton onClick={() => fetchNextPage()} />
             ))}
-        </>
+        </ListView>
     );
 };

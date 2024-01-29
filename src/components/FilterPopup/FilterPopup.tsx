@@ -104,35 +104,37 @@ export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = 
     return (
         <>
             {nullable(visible, () => (
-                <StyledPopupOverlay />
+                <>
+                    <StyledPopupOverlay />
+                    <StyledPopup
+                        reference={filterRef}
+                        interactive
+                        placement="bottom-start"
+                        visible={visible}
+                        {...onESC}
+                        offset={[-5, 0]}
+                    >
+                        <StyledPopupWrapper key={String(visible)} ref={popupWrapperRef}>
+                            <StyledTabs active={activeTab} layout="vertical">
+                                {children}
+                            </StyledTabs>
+                            <StyledFilterPanelPopupFooter>
+                                <StyledTip
+                                    title={tr('Pro tip!')}
+                                    size="xs"
+                                    icon={<IconBulbOnOutline size="xs" color={textColor} />}
+                                >
+                                    {tr('You can apply and save filters as preset.')}
+                                </StyledTip>
+                                <StyledActionWrapper>
+                                    <Button outline text={tr('Cancel')} onClick={() => switchVisible(false)} />
+                                    <Button view="primary" outline text={tr('Apply')} onClick={onApplyClick} />
+                                </StyledActionWrapper>
+                            </StyledFilterPanelPopupFooter>
+                        </StyledPopupWrapper>
+                    </StyledPopup>
+                </>
             ))}
-            <StyledPopup
-                reference={filterRef}
-                interactive
-                placement="bottom-start"
-                visible={visible}
-                {...onESC}
-                offset={[-5, 0]}
-            >
-                <StyledPopupWrapper key={String(visible)} ref={popupWrapperRef}>
-                    <StyledTabs active={activeTab} layout="vertical">
-                        {children}
-                    </StyledTabs>
-                    <StyledFilterPanelPopupFooter>
-                        <StyledTip
-                            title={tr('Pro tip!')}
-                            size="xs"
-                            icon={<IconBulbOnOutline size="xs" color={textColor} />}
-                        >
-                            {tr('You can apply and save filters as preset.')}
-                        </StyledTip>
-                        <StyledActionWrapper>
-                            <Button outline text={tr('Cancel')} onClick={() => switchVisible(false)} />
-                            <Button view="primary" outline text={tr('Apply')} onClick={onApplyClick} />
-                        </StyledActionWrapper>
-                    </StyledFilterPanelPopupFooter>
-                </StyledPopupWrapper>
-            </StyledPopup>
         </>
     );
 };

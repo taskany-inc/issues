@@ -133,6 +133,7 @@ export const GlobalSearch = () => {
         [router],
     );
     const resultsExists = Boolean(suggestions.data?.goals?.length || suggestions.data?.projects.length);
+
     return (
         <TaskanyGlobalSearch
             query={query}
@@ -140,77 +141,78 @@ export const GlobalSearch = () => {
             searchResultExists={resultsExists}
             placeholder={tr('Search or jump to...')}
         >
-            <ListView onKeyboardClick={onKeyboardNavigate}>
-                {nullable(suggestions.data?.goals?.length, () => (
-                    <>
-                        <StyledGroupHeader size="m" weight="bolder">
-                            {tr('Goals')} <IconTargetOutline size="s" />
-                        </StyledGroupHeader>
-                        <Table width={tableWidth}>
-                            {suggestions.data?.goals.map((item) => {
-                                const value: ListViewItemValue = ['goal', item._shortId];
+            {resultsExists && (
+                <ListView onKeyboardClick={onKeyboardNavigate}>
+                    {nullable(suggestions.data?.goals?.length, () => (
+                        <>
+                            <StyledGroupHeader size="m" weight="bolder">
+                                {tr('Goals')} <IconTargetOutline size="s" />
+                            </StyledGroupHeader>
+                            <Table width={tableWidth}>
+                                {suggestions.data?.goals.map((item) => {
+                                    const value: ListViewItemValue = ['goal', item._shortId];
 
-                                return (
+                                    return (
+                                        <ListViewItem
+                                            key={item.id}
+                                            value={value}
+                                            renderItem={({ active, ...props }) => (
+                                                <NextLink passHref href={routes.goal(item._shortId)} legacyBehavior>
+                                                    <StyledGoalListItemCompact
+                                                        focused={active}
+                                                        align="center"
+                                                        gap={10}
+                                                        item={item}
+                                                        columns={[
+                                                            { name: 'title', columnProps: { col: 3 } },
+                                                            {
+                                                                name: 'state',
+                                                                columnProps: { col: 1, justify: 'end' },
+                                                            },
+                                                            {
+                                                                name: 'priority',
+                                                                columnProps: { width: '12ch' },
+                                                            },
+                                                            { name: 'projectId', columnProps: { col: 3 } },
+                                                            { name: 'issuers' },
+                                                            { name: 'estimate', columnProps: { width: '8ch' } },
+                                                        ]}
+                                                        {...props}
+                                                    />
+                                                </NextLink>
+                                            )}
+                                        />
+                                    );
+                                })}
+                            </Table>
+                        </>
+                    ))}
+                    {nullable(suggestions.data?.projects?.length, () => (
+                        <>
+                            <StyledGroupHeader size="m" weight="bolder">
+                                {tr('Projects')} <IconUsersOutline size="s" />
+                            </StyledGroupHeader>
+                            <Table width={tableWidth}>
+                                {suggestions.data?.projects?.map((item) => (
                                     <ListViewItem
                                         key={item.id}
-                                        value={value}
+                                        value={['project', item.id]}
                                         renderItem={({ active, ...props }) => (
-                                            <NextLink passHref href={routes.goal(item._shortId)} legacyBehavior>
-                                                <StyledGoalListItemCompact
-                                                    focused={active}
-                                                    align="center"
-                                                    gap={10}
-                                                    item={item}
-                                                    columns={[
-                                                        { name: 'title', columnProps: { col: 3 } },
-                                                        {
-                                                            name: 'state',
-                                                            columnProps: { col: 1, justify: 'end' },
-                                                        },
-                                                        {
-                                                            name: 'priority',
-                                                            columnProps: { width: '12ch' },
-                                                        },
-                                                        { name: 'projectId', columnProps: { col: 3 } },
-                                                        { name: 'issuers' },
-                                                        { name: 'estimate', columnProps: { width: '8ch' } },
-                                                    ]}
-                                                    {...props}
-                                                />
-                                            </NextLink>
+                                            <StyledProjectListItemCompact
+                                                id={item.id}
+                                                title={item.title}
+                                                owner={item.activity}
+                                                focused={active}
+                                                {...props}
+                                            />
                                         )}
                                     />
-                                );
-                            })}
-                        </Table>
-                    </>
-                ))}
-                {nullable(suggestions.data?.projects?.length, () => (
-                    <>
-                        <StyledGroupHeader size="m" weight="bolder">
-                            {tr('Projects')} <IconUsersOutline size="s" />
-                        </StyledGroupHeader>
-                        <Table width={tableWidth}>
-                            {suggestions.data?.projects?.map((item) => (
-                                <ListViewItem
-                                    key={item.id}
-                                    value={['project', item.id]}
-                                    renderItem={({ active, ...props }) => (
-                                        <StyledProjectListItemCompact
-                                            key={item.id}
-                                            id={item.id}
-                                            title={item.title}
-                                            owner={item.activity}
-                                            focused={active}
-                                            {...props}
-                                        />
-                                    )}
-                                />
-                            ))}
-                        </Table>
-                    </>
-                ))}
-            </ListView>
+                                ))}
+                            </Table>
+                        </>
+                    ))}
+                </ListView>
+            )}
         </TaskanyGlobalSearch>
     );
 };

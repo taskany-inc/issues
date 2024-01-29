@@ -1,7 +1,8 @@
 import { MouseEventHandler, useCallback, useEffect } from 'react';
-import { nullable } from '@taskany/bricks';
+import { ListView, nullable } from '@taskany/bricks';
 
 import { Page } from '../Page';
+import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
@@ -124,6 +125,13 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(id);
 
+    const handleItemEnter = useCallback(
+        (goal: NonNullable<GoalByIdReturnType>) => {
+            setPreview(goal._shortId, goal);
+        },
+        [setPreview],
+    );
+
     return (
         <Page
             user={user}
@@ -161,17 +169,19 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 onFilterStar={onFilterStar}
                 isLoading={isLoadingDeepInfoProject}
             >
-                {nullable(project, (p) => (
-                    <ProjectListItemConnected
-                        key={p.id}
-                        visible
-                        project={p}
-                        onTagClick={setTagsFilterOutside}
-                        onClickProvider={onGoalPreviewShow}
-                        selectedResolver={selectedGoalResolver}
-                        queryState={queryState}
-                    />
-                ))}
+                <ListView onKeyboardClick={handleItemEnter}>
+                    {nullable(project, (p) => (
+                        <ProjectListItemConnected
+                            key={p.id}
+                            visible
+                            project={p}
+                            onTagClick={setTagsFilterOutside}
+                            onClickProvider={onGoalPreviewShow}
+                            selectedResolver={selectedGoalResolver}
+                            queryState={queryState}
+                        />
+                    ))}
+                </ListView>
             </FilteredPage>
         </Page>
     );
