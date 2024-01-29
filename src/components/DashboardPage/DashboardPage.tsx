@@ -1,10 +1,11 @@
 import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import { nullable, TreeViewElement } from '@taskany/bricks';
+import { ListView, nullable, TreeViewElement } from '@taskany/bricks';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
+import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { Page } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { trpc } from '../../utils/trpcClient';
@@ -119,6 +120,13 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             ? currentPreset.description
             : tr('This is your personal goals bundle');
 
+    const handleItemEnter = useCallback(
+        (goal: NonNullable<GoalByIdReturnType>) => {
+            setPreview(goal._shortId, goal);
+        },
+        [setPreview],
+    );
+
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <CommonHeader title={title} description={description} />
@@ -130,28 +138,30 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 onFilterStar={onFilterStar}
                 isLoading={isLoading}
             >
-                {groupsOnScreen?.map(({ project, goals }) => (
-                    <ProjectListItemCollapsable
-                        key={project.id}
-                        interactive={false}
-                        visible
-                        project={project}
-                        href={routes.project(project.id)}
-                        goals={nullable(goals, (g) => (
-                            <TreeViewElement>
-                                <GoalTableList
-                                    goals={g}
-                                    selectedGoalResolver={selectedGoalResolver}
-                                    onGoalPreviewShow={onGoalPreviewShow}
-                                />
-                            </TreeViewElement>
-                        ))}
-                    >
-                        {nullable(!goals.length, () => (
-                            <InlineCreateGoalControl project={project} />
-                        ))}
-                    </ProjectListItemCollapsable>
-                ))}
+                <ListView onKeyboardClick={handleItemEnter}>
+                    {groupsOnScreen?.map(({ project, goals }) => (
+                        <ProjectListItemCollapsable
+                            key={project.id}
+                            interactive={false}
+                            visible
+                            project={project}
+                            href={routes.project(project.id)}
+                            goals={nullable(goals, (g) => (
+                                <TreeViewElement>
+                                    <GoalTableList
+                                        goals={g}
+                                        selectedGoalResolver={selectedGoalResolver}
+                                        onGoalPreviewShow={onGoalPreviewShow}
+                                    />
+                                </TreeViewElement>
+                            ))}
+                        >
+                            {nullable(!goals.length, () => (
+                                <InlineCreateGoalControl project={project} />
+                            ))}
+                        </ProjectListItemCollapsable>
+                    ))}
+                </ListView>
 
                 {nullable(hasNextPage, () => (
                     <LoadMoreButton onClick={fetchNextPage as () => void} />

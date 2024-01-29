@@ -1,7 +1,7 @@
 import { Badge, CircleProgressBar, State, Table, TableCell, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
 import { MouseEventHandler, useMemo } from 'react';
 import cn from 'classnames';
-import { Link, nullable } from '@taskany/bricks';
+import { Link, ListViewItem, nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
 import { GoalListItem } from '../GoalListItem/GoalListItem';
@@ -135,16 +135,22 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
         <Table {...attrs}>
             {data.map((row) => (
                 <Link key={row.goal.id} as={NextLink} href={routes.goal(row.goal?._shortId as string)} inline>
-                    <GoalListItem
-                        onClick={onGoalPreviewShow(row.goal)}
-                        selected={selectedGoalResolver?.(row.goal?.id as string)}
-                    >
-                        {row.list.map(({ content, width, className }, index) => (
-                            <TableCell key={index} width={width} className={cn(s.Column, className)}>
-                                {content}
-                            </TableCell>
-                        ))}
-                    </GoalListItem>
+                    <ListViewItem
+                        value={row.goal}
+                        renderItem={({ active, hovered: _, ...props }) => (
+                            <GoalListItem
+                                onClick={onGoalPreviewShow(row.goal)}
+                                selected={selectedGoalResolver?.(row.goal?.id as string) || active}
+                                {...props}
+                            >
+                                {row.list.map(({ content, width, className }, index) => (
+                                    <TableCell key={index} width={width} className={cn(s.Column, className)}>
+                                        {content}
+                                    </TableCell>
+                                ))}
+                            </GoalListItem>
+                        )}
+                    />
                 </Link>
             ))}
         </Table>

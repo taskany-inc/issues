@@ -1,10 +1,11 @@
 import { ComponentProps, MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
-import { nullable } from '@taskany/bricks';
+import { ListView, nullable } from '@taskany/bricks';
 
 import { QueryState } from '../hooks/useUrlFilterParams';
 import { trpc } from '../utils/trpcClient';
 import { refreshInterval } from '../utils/config';
 import { useFMPMetric } from '../utils/telemetry';
+import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
 import { GoalTableList } from './GoalTableList/GoalTableList';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
@@ -77,8 +78,15 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, onTagClick }
         [setPreview],
     );
 
+    const handleItemEnter = useCallback(
+        (goal: NonNullable<GoalByIdReturnType>) => {
+            setPreview(goal._shortId, goal);
+        },
+        [setPreview],
+    );
+
     return (
-        <>
+        <ListView onKeyboardClick={handleItemEnter}>
             {nullable(goalsOnScreen, (goals) => (
                 <GoalTableList
                     goals={goals}
@@ -91,6 +99,6 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, onTagClick }
             {nullable(hasNextPage, () => (
                 <LoadMoreButton onClick={onFetchNextPage} />
             ))}
-        </>
+        </ListView>
     );
 };
