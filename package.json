@@ -38,7 +38,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "0.48.0",
     "@opentelemetry/resources": "1.19.0",
     "@opentelemetry/sdk-node": "0.45.1",
-    "@opentelemetry/sdk-trace-node": "1.18.1",
+    "@opentelemetry/sdk-trace-node": "1.21.0",
     "@opentelemetry/semantic-conventions": "1.18.1",
     "@salutejs/web-telemetry": "1.0.3",
     "@sentry/nextjs": "7.92.0",
