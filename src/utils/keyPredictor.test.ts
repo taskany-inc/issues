@@ -1,41 +1,42 @@
-import { test, expect } from '@jest/globals';
+import { test, describe } from 'node:test';
+import assert from 'node:assert';
 
 import { keyPredictor } from './keyPredictor';
 
 describe('keyPredictor', () => {
     test('empty is empty', () => {
-        expect(keyPredictor('')).toBe('');
+        assert.strictEqual(keyPredictor(''), '');
     });
 
     test('changes to uppercase', () => {
-        expect(keyPredictor('brg')).toBe('BRG');
+        assert.strictEqual(keyPredictor('brg'), 'BRG');
     });
 
     test('10 symbols maximum', () => {
-        expect(keyPredictor('GBDCXDRTMLPCSWMNDRKLVZ')).toBe('GBDCXDRTML');
+        assert.strictEqual(keyPredictor('GBDCXDRTMLPCSWMNDRKLVZ'), 'GBDCXDRTML');
     });
 
     test('removes vowel letters', () => {
-        expect(keyPredictor('ABCDEFG')).toBe('BCDFG');
+        assert.strictEqual(keyPredictor('ABCDEFG'), 'BCDFG');
     });
 
     test('removes special characters', () => {
-        expect(keyPredictor('-—+={}[]?!.,&^%:#@"()/<>|\\~`*;')).toBe('');
+        assert.strictEqual(keyPredictor('-—+={}[]?!.,&^%:#@"()/<>|\\~`*;'), '');
     });
 
     test('trims and removes extra spaces', () => {
-        expect(keyPredictor(' GBDC XDRTML ')).toBe('GBDCXDRTML');
+        assert.strictEqual(keyPredictor(' GBDC XDRTML '), 'GBDCXDRTML');
     });
 
     test('removes unicode', () => {
-        expect(keyPredictor('😎GBDC😍XDRTML♥')).toBe('GBDCXDRTML');
+        assert.strictEqual(keyPredictor('😎GBDC😍XDRTML♥'), 'GBDCXDRTML');
     });
 
     test('do not remove vowels', () => {
-        expect(keyPredictor('AEOIUYW', { allowVowels: true })).toBe('AEOIUYW');
+        assert.strictEqual(keyPredictor('AEOIUYW', { allowVowels: true }), 'AEOIUYW');
     });
 
     test('correct with numbers', () => {
-        expect(keyPredictor('front1234end')).toBe('FRNT1234ND');
+        assert.strictEqual(keyPredictor('front1234end'), 'FRNT1234ND');
     });
 });

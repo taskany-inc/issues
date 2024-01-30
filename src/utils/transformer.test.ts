@@ -1,4 +1,5 @@
-import { expect } from '@jest/globals';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 
 import { deserialize, serialize } from './transformer';
 
@@ -22,9 +23,9 @@ describe('Transformer', () => {
         ];
         for (const { from, to } of values) {
             const serialized = serialize(from);
-            expect(serialized).toStrictEqual(to);
+            assert.deepStrictEqual(serialized, to);
             const deserialized = deserialize(to);
-            expect(deserialized).toStrictEqual(from);
+            assert.deepStrictEqual(deserialized, from);
         }
     });
 });
