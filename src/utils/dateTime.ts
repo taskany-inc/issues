@@ -191,17 +191,6 @@ export const dateAgo = (date: Date, pastDate: number, { locale }: LocaleArg): st
 
 export const isPastDate = (date: Date): boolean => new Date(date) < new Date();
 
-export const incYearIfDateHasPassed = (date: Date): Date => {
-    if (isPastDate(date)) {
-        const incrementedYear = date.getFullYear() + 1;
-        const updatedDateInTimestamp = date.setFullYear(incrementedYear);
-
-        date = new Date(updatedDateInTimestamp);
-    }
-
-    return date;
-};
-
 // Return string in format yyyy-mm-dd from Estimate value (in UTC timezone)
 
 export const getDateStringFromEstimate = (date: Date) => date.toISOString().split('T')[0];

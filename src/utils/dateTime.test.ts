@@ -1,61 +1,41 @@
-import { test, expect } from '@jest/globals';
+import test from 'node:test';
+import assert from 'node:assert';
 
 import { Quarters } from '../types/date';
 
 import { TLocale } from './getLang';
-import {
-    getAvailableYears,
-    createLocaleDate,
-    parseLocaleDate,
-    incYearIfDateHasPassed,
-    createQuarterRange,
-} from './dateTime';
+import { getAvailableYears, createLocaleDate, parseLocaleDate, createQuarterRange } from './dateTime';
 
 const locales: Array<TLocale> = ['en', 'ru'];
 
 locales.forEach((locale) => {
     test(`returns formatted date for ${locale} locale`, () => {
         const dateString = createLocaleDate(new Date(2054, 10, 2), { locale });
-        expect(parseLocaleDate(dateString, { locale }).getDay()).toBe(1);
-        expect(parseLocaleDate(dateString, { locale }).getMonth()).toBe(10);
-        expect(parseLocaleDate(dateString, { locale }).getFullYear()).toBe(2054);
+        assert.strictEqual(parseLocaleDate(dateString, { locale }).getDay(), 1);
+        assert.strictEqual(parseLocaleDate(dateString, { locale }).getMonth(), 10);
+        assert.strictEqual(parseLocaleDate(dateString, { locale }).getFullYear(), 2054);
     });
 });
 
 test('returns locale date for en locale', () => {
-    expect(new Date(parseLocaleDate('11/2/2054', { locale: 'en' })).getFullYear()).toBe(2054);
+    assert.strictEqual(new Date(parseLocaleDate('11/2/2054', { locale: 'en' })).getFullYear(), 2054);
 });
 
 test('returns locale date for ru locale', () => {
-    expect(new Date(parseLocaleDate('02.11.2054', { locale: 'ru' })).getFullYear()).toBe(2054);
+    assert.strictEqual(new Date(parseLocaleDate('02.11.2054', { locale: 'ru' })).getFullYear(), 2054);
 });
 
 test('returns lastDayOfQuarter for en locale', () => {
-    expect(createLocaleDate(createQuarterRange(Quarters.Q4).end, { locale: 'en' })).toBe(
+    assert.strictEqual(
+        createLocaleDate(createQuarterRange(Quarters.Q4).end, { locale: 'en' }),
         `12/31/${new Date().getFullYear()}`,
     );
 });
 
 test('returns available years for passed number', () => {
     const currentYear = new Date().getFullYear();
-    expect(getAvailableYears(6)).toStrictEqual(Array.from({ length: 6 }).map((_, index) => currentYear + index));
-});
-
-describe('increment year if the date has passed', () => {
-    it('should not increment', () => {
-        const currentDate = new Date();
-        const futureDate = new Date(currentDate.getFullYear() + 1, currentDate.getMonth());
-
-        const result = incYearIfDateHasPassed(futureDate);
-        expect(result).toEqual(futureDate);
-    });
-
-    it('should increment', () => {
-        const currentDate = new Date();
-        const expectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
-        let pastDate = new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), currentDate.getDay());
-
-        pastDate = incYearIfDateHasPassed(pastDate);
-        expect(pastDate).toEqual(expectedDate);
-    });
+    assert.deepStrictEqual(
+        getAvailableYears(6),
+        Array.from({ length: 6 }).map((_, index) => currentYear + index),
+    );
 });
