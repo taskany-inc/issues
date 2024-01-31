@@ -270,6 +270,7 @@ model Reaction {
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 
+  @@unique([emoji, commentId, activityId])
   @@index([activityId])
   @@index([goalId])
   @@index([commentId])
@@ -362,17 +363,17 @@ model GoalHistory {
 }
 
 model GoalAchieveCriteria {
-  id               String   @id @default(cuid())
-  goal             Goal     @relation("GoalCriterion", fields: [goalId], references: [id], onDelete: Cascade)
-  goalId           String
-  title            String
-  weight           Int
-  isDone           Boolean  @default(false)
-  activity         Activity @relation(fields: [activityId], references: [id])
-  activityId       String
-  deleted          Boolean?
-  criteriaGoalId   String?
-  criteriaGoal     Goal?    @relation("GoalInCriteria", fields: [criteriaGoalId], references: [id], onDelete: Cascade)
+  id             String   @id @default(cuid())
+  goal           Goal     @relation("GoalCriterion", fields: [goalId], references: [id], onDelete: Cascade)
+  goalId         String
+  title          String
+  weight         Int
+  isDone         Boolean  @default(false)
+  activity       Activity @relation(fields: [activityId], references: [id])
+  activityId     String
+  deleted        Boolean?
+  criteriaGoalId String?
+  criteriaGoal   Goal?    @relation("GoalInCriteria", fields: [criteriaGoalId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
