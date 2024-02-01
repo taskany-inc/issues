@@ -10,7 +10,7 @@
     color: var(--text-secondary);
 }
 
-.Row:hover {
+.Row_hovered, .Row:hover {
     border: 1px solid var(--layer-border-hover);
     background: var(--layer-hover);
 }
