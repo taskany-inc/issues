@@ -140,7 +140,8 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                         renderItem={({ active, hovered: _, ...props }) => (
                             <GoalListItem
                                 onClick={onGoalPreviewShow(row.goal)}
-                                selected={selectedGoalResolver?.(row.goal?.id as string) || active}
+                                selected={selectedGoalResolver?.(row.goal?.id as string)}
+                                hovered={active}
                                 {...props}
                             >
                                 {row.list.map(({ content, width, className }, index) => (

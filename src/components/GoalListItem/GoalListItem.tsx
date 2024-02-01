@@ -6,13 +6,14 @@ import s from './GoalListItem.module.css';
 
 interface GoalListItemProps extends HTMLAttributes<HTMLDivElement> {
     selected?: boolean;
+    hovered?: boolean;
     className?: string;
     onClick?: MouseEventHandler<HTMLElement>;
 }
 
-export const GoalListItem: FC<GoalListItemProps> = ({ children, selected, className, ...rest }) => {
+export const GoalListItem: FC<GoalListItemProps> = ({ children, selected, hovered, className, ...rest }) => {
     return (
-        <TableRow className={cn(s.Row, { [s.Row_selected]: selected }, className)} {...rest}>
+        <TableRow className={cn(s.Row, { [s.Row_selected]: selected, [s.Row_hovered]: hovered }, className)} {...rest}>
             {children}
         </TableRow>
     );
