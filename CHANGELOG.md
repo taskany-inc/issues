@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.17.1](https://github.com/taskany-inc/issues/compare/v2.17.0...v2.17.1) (2024-02-01)
+
+
+### Bug Fixes
+
+* add uniq rule to Reaction model ([ec2fb84](https://github.com/taskany-inc/issues/commit/ec2fb840659efba73bfb75123b12476b47398c23))
+
 ## [2.17.0](https://github.com/taskany-inc/issues/compare/v2.16.5...v2.17.0) (2024-01-25)
 
 
