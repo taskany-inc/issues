@@ -1,25 +1,23 @@
-import { MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
-import { Table, nullable } from '@taskany/bricks';
+import { ComponentProps, MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
+import { nullable } from '@taskany/bricks';
 
-import { GoalByIdReturnType } from '../../trpc/inferredTypes';
-import { QueryState, useUrlFilterParams } from '../hooks/useUrlFilterParams';
+import { QueryState } from '../hooks/useUrlFilterParams';
 import { trpc } from '../utils/trpcClient';
 import { refreshInterval } from '../utils/config';
 import { useFMPMetric } from '../utils/telemetry';
 
+import { GoalTableList } from './GoalTableList/GoalTableList';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
-import { GoalListItem } from './GoalListItem';
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
-import { TableRowItem, Title } from './Table';
 
 interface GoalListProps {
     queryState?: QueryState;
-    setTagFilterOutside: ReturnType<typeof useUrlFilterParams>['setTagsFilterOutside'];
+    onTagClick?: ComponentProps<typeof GoalTableList>['onTagClick'];
 }
 
 const pageSize = 20;
 
-export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilterOutside }) => {
+export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, onTagClick }) => {
     const utils = trpc.useContext();
     const { preview, setPreview, on } = useGoalPreview();
 
@@ -69,7 +67,7 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilter
     const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
     const onGoalPreviewShow = useCallback(
-        (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
+        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
 
@@ -78,35 +76,17 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, setTagFilter
             },
         [setPreview],
     );
+
     return (
         <>
-            <Table>
-                {goalsOnScreen?.map((g) => (
-                    <TableRowItem
-                        key={g.id}
-                        title={<Title size="m">{g.title}</Title>}
-                        onClick={onGoalPreviewShow(g as GoalByIdReturnType)}
-                        focused={selectedGoalResolver(g.id)}
-                    >
-                        <GoalListItem
-                            updatedAt={g.updatedAt}
-                            state={g.state}
-                            issuer={g.activity}
-                            owner={g.owner}
-                            tags={g.tags}
-                            priority={g.priority}
-                            comments={g._count?.comments}
-                            estimate={g.estimate}
-                            estimateType={g.estimateType}
-                            participants={g.participants}
-                            starred={g._isStarred}
-                            watching={g._isWatching}
-                            achivedCriteriaWeight={g._achivedCriteriaWeight}
-                            onTagClick={setTagFilterOutside}
-                        />
-                    </TableRowItem>
-                ))}
-            </Table>
+            {nullable(goalsOnScreen, (goals) => (
+                <GoalTableList
+                    goals={goals}
+                    onTagClick={onTagClick}
+                    selectedGoalResolver={selectedGoalResolver}
+                    onGoalPreviewShow={onGoalPreviewShow}
+                />
+            ))}
 
             {nullable(hasNextPage, () => (
                 <LoadMoreButton onClick={onFetchNextPage} />

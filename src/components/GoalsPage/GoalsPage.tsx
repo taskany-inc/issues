@@ -80,9 +80,9 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 {nullable(
                     groupedView,
                     () => (
-                        <GroupedGoalList queryState={queryState} setTagFilterOutside={setTagsFilterOutside} />
+                        <GroupedGoalList queryState={queryState} onTagClick={setTagsFilterOutside} />
                     ),
-                    <FlatGoalList queryState={queryState} setTagFilterOutside={setTagsFilterOutside} />,
+                    <FlatGoalList queryState={queryState} onTagClick={setTagsFilterOutside} />,
                 )}
             </FilteredPage>
         </Page>

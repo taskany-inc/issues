@@ -1,9 +1,8 @@
-import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
+import { ComponentProps, MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 
-import { QueryState, useUrlFilterParams } from '../hooks/useUrlFilterParams';
+import { QueryState } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';
-import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';
 import { useFMPMetric } from '../utils/telemetry';
 
@@ -13,12 +12,12 @@ import { ProjectListItemConnected } from './ProjectListItemConnected';
 
 interface GroupedGoalListProps {
     queryState?: QueryState;
-    setTagFilterOutside: ReturnType<typeof useUrlFilterParams>['setTagsFilterOutside'];
+    onTagClick?: ComponentProps<typeof ProjectListItemConnected>['onTagClick'];
 }
 
 export const projectsSize = 20;
 
-export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, setTagFilterOutside }) => {
+export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, onTagClick }) => {
     const { preview, setPreview, on } = useGoalPreview();
     const utils = trpc.useContext();
     const { data, fetchNextPage, hasNextPage } = trpc.project.getAll.useInfiniteQuery(
@@ -52,7 +51,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, se
     useFMPMetric(!!data);
 
     const onGoalPreviewShow = useCallback(
-        (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
+        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
 
@@ -76,10 +75,10 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, se
                 <ProjectListItemConnected
                     key={project.id}
                     project={project}
-                    onTagClick={setTagFilterOutside}
                     onClickProvider={onGoalPreviewShow}
                     selectedResolver={selectedGoalResolver}
                     queryState={queryState}
+                    onTagClick={onTagClick}
                 />
             ))}
 

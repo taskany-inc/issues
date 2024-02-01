@@ -257,3 +257,8 @@ export const decodeHistoryEstimate = (data: string): { date: Date; type: DateTyp
         return null;
     }
 };
+
+export const calculateElapsedDays = (startDate: Date) => {
+    const timeDifference = new Date().getTime() - startDate.getTime();
+    return Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+};

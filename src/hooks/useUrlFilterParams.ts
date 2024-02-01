@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
-import { StateType, Tag } from '@prisma/client';
+import { StateType } from '@prisma/client';
 
 import { FilterById } from '../../trpc/inferredTypes';
 import { SortDirection, SortableProps } from '../components/SortFilter/SortFilter';
@@ -258,14 +258,14 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     }, [pushStateToRouter]);
 
     const setTagsFilterOutside = useCallback(
-        (t: Tag): MouseEventHandler<HTMLDivElement> =>
+        (tag: { id: string }): MouseEventHandler<HTMLDivElement> =>
             (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
                 const newTagsFilterValue = new Set(queryState?.tag);
 
-                newTagsFilterValue.has(t.id) ? newTagsFilterValue.delete(t.id) : newTagsFilterValue.add(t.id);
+                newTagsFilterValue.has(tag.id) ? newTagsFilterValue.delete(tag.id) : newTagsFilterValue.add(tag.id);
 
                 const newSelected = Array.from(newTagsFilterValue);
 
