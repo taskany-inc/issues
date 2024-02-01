@@ -203,6 +203,18 @@ Priority:
         : ''
 }
 
+${
+    updatedFields.estimate
+        ? `
+Priority:
+\`\`\` diff
+- ${updatedFields.estimate[0]}
++ ${updatedFields.estimate[1]}
+\`\`\`
+`
+        : ''
+}
+
 ${notice}
 
 ${footer}`);
