@@ -65,6 +65,9 @@ export const StateFilter: React.FC<StateFilterProps> = ({
                         value={props.item.id}
                         onClick={props.onItemClick}
                         checked={props.checked}
+                        focused={props.active}
+                        onMouseLeave={props.onMouseLeave}
+                        onMouseMove={props.onMouseMove}
                         iconLeft={<StateDot hue={props.item.hue} />}
                         label={props.item.title}
                     />

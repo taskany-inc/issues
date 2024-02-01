@@ -85,7 +85,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
                 keyGetter={getId}
                 value={values}
                 onChange={onChange}
-                renderItem={({ item, checked, onItemClick }) => {
+                renderItem={({ item, checked, onItemClick, active, onMouseLeave, onMouseMove }) => {
                     let label = item.name;
 
                     if (item.id === authorizedUser.activityId) {
@@ -97,6 +97,9 @@ export const UserFilter: React.FC<UserFilterProps> = ({
                             name="user"
                             value={item.id}
                             checked={checked}
+                            focused={active}
+                            onMouseLeave={onMouseLeave}
+                            onMouseMove={onMouseMove}
                             onClick={onItemClick}
                             iconLeft={<UserPic name={item.name} email={item.email} size={14} />}
                             label={label}

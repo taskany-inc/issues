@@ -42,11 +42,14 @@ export const TagFilter: React.FC<TagFilterProps> = ({ text, tags, value = [], on
                 inputProps={{ onChange: onSearchChange }}
                 value={values}
                 onChange={onChange}
-                renderItem={({ item, checked, onItemClick }) => (
+                renderItem={({ item, checked, active, onItemClick, onMouseLeave, onMouseMove }) => (
                     <FilterCheckbox
                         name="tag"
                         value={item.id}
                         checked={checked}
+                        focused={active}
+                        onMouseLeave={onMouseLeave}
+                        onMouseMove={onMouseMove}
                         onClick={onItemClick}
                         label={item.title}
                     />

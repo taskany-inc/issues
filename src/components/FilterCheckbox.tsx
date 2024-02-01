@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Checkbox, CheckboxInput, CheckboxLabel, Text, nullable } from '@taskany/bricks';
-import { gapS, gapSm, gapXs } from '@taskany/colors';
+import { gapS, gapSm, gapXs, gray4, radiusS } from '@taskany/colors';
 
 const StyledCheckboxLabel = styled(CheckboxLabel)`
     display: inline-flex;
@@ -10,8 +10,10 @@ const StyledCheckboxLabel = styled(CheckboxLabel)`
     margin-left: ${gapS};
 `;
 
-const StyledCheckbox = styled(Checkbox)`
+const StyledCheckbox = styled(Checkbox)<{ focused?: boolean }>`
     padding: ${gapXs} 0;
+    border-radius: ${radiusS};
+    ${({ focused }) => focused && `background-color: ${gray4};`}
 `;
 
 const StyledChekboxInput = styled(CheckboxInput)`
@@ -24,10 +26,20 @@ type CheckboxProps = React.ComponentProps<typeof Checkbox> & React.ComponentProp
 interface FilterCheckboxProps extends CheckboxProps {
     label: string;
     iconLeft?: React.ReactNode;
+    focused?: boolean;
 }
 
-export const FilterCheckbox: React.FC<FilterCheckboxProps> = ({ name, onClick, checked, value, label, iconLeft }) => (
-    <StyledCheckbox name={name} onClick={onClick}>
+export const FilterCheckbox: React.FC<FilterCheckboxProps> = ({
+    name,
+    onClick,
+    checked,
+    focused,
+    value,
+    label,
+    iconLeft,
+    ...attr
+}) => (
+    <StyledCheckbox name={name} onClick={onClick} focused={focused} {...attr}>
         <StyledChekboxInput checked={checked} value={value} />
         <StyledCheckboxLabel>
             {nullable(iconLeft, (icon) => icon)}

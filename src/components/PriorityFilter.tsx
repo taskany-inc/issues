@@ -39,11 +39,14 @@ export const PriorityFilter: FC<PriorityFilterProps> = ({ text, value = [], prio
                 value={values}
                 keyGetter={getKey}
                 onChange={onChange}
-                renderItem={({ item, checked, onItemClick }) => (
+                renderItem={({ item, checked, active, onMouseLeave, onMouseMove, onItemClick }) => (
                     <FilterCheckbox
                         name="priority"
                         value={getKey(item)}
                         checked={checked}
+                        focused={active}
+                        onMouseLeave={onMouseLeave}
+                        onMouseMove={onMouseMove}
                         onClick={onItemClick}
                         label={getPriorityText(item.title)}
                     />
