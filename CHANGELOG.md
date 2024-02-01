@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.18.0](https://github.com/taskany-inc/issues/compare/v2.17.0...v2.18.0) (2024-02-01)
+
+
+### Features
+
+* goals list keyboard navigation ([b517417](https://github.com/taskany-inc/issues/commit/b517417a4ebdfa9b8f2d5906b493f633e709f620))
+* **Harmony:** add components & themes ([b9b6e22](https://github.com/taskany-inc/issues/commit/b9b6e22850ac305f1d8d41b7203d505f3c9e64e8))
+* new vision of GoalListItem ([c2d6a81](https://github.com/taskany-inc/issues/commit/c2d6a81e8fbb7d4e69f1cd7df734600ead642de2))
+
+
+### Bug Fixes
+
+* add uniq rule to Reaction model ([ec2fb84](https://github.com/taskany-inc/issues/commit/ec2fb840659efba73bfb75123b12476b47398c23))
+* email sent when updatedFields are not empty ([91e42f1](https://github.com/taskany-inc/issues/commit/91e42f1a227341d9c9e40fcd8bef52ceaa8f2f19))
+
 ## [2.17.0](https://github.com/taskany-inc/issues/compare/v2.16.5...v2.17.0) (2024-01-25)
 
 
