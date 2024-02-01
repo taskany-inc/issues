@@ -8,7 +8,6 @@ import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { Page } from '../Page';
 import { CommonHeader } from '../CommonHeader';
 import { trpc } from '../../utils/trpcClient';
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
@@ -18,8 +17,7 @@ import { safeGetUserName } from '../../utils/getUserName';
 import { FilteredPage } from '../FilteredPage/FilteredPage';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { routes } from '../../hooks/router';
-import { GoalListItem } from '../GoalListItem';
-import { TableRowItem, Title } from '../Table';
+import { GoalTableList } from '../GoalTableList/GoalTableList';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -30,7 +28,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
     const { preset, shadowPreset, userFilters } = useFiltersPreset({ defaultPresetFallback });
 
-    const { currentPreset, queryState, setTagsFilterOutside, setPreset } = useUrlFilterParams({
+    const { currentPreset, queryState, setPreset } = useUrlFilterParams({
         preset,
     });
 
@@ -85,7 +83,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
     }, [goals, preview, setPreview]);
 
     const onGoalPreviewShow = useCallback(
-        (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
+        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
 
@@ -139,30 +137,13 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                         visible
                         project={project}
                         href={routes.project(project.id)}
-                        goals={goals.map((g) => (
-                            <TreeViewElement key={g.id}>
-                                <TableRowItem
-                                    title={<Title size="m">{g.title}</Title>}
-                                    onClick={onGoalPreviewShow(g as GoalByIdReturnType)}
-                                    focused={selectedGoalResolver(g.id)}
-                                >
-                                    <GoalListItem
-                                        updatedAt={g.updatedAt}
-                                        state={g.state}
-                                        issuer={g.activity}
-                                        owner={g.owner}
-                                        tags={g.tags}
-                                        priority={g.priority}
-                                        comments={g._count?.comments}
-                                        estimate={g.estimate}
-                                        estimateType={g.estimateType}
-                                        participants={g.participants}
-                                        starred={g._isStarred}
-                                        watching={g._isWatching}
-                                        achivedCriteriaWeight={g._achivedCriteriaWeight}
-                                        onTagClick={setTagsFilterOutside}
-                                    />
-                                </TableRowItem>
+                        goals={nullable(goals, (g) => (
+                            <TreeViewElement>
+                                <GoalTableList
+                                    goals={g}
+                                    selectedGoalResolver={selectedGoalResolver}
+                                    onGoalPreviewShow={onGoalPreviewShow}
+                                />
                             </TreeViewElement>
                         ))}
                     >

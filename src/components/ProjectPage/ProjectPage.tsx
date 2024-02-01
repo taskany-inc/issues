@@ -9,7 +9,6 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { trpc } from '../../utils/trpcClient';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
@@ -76,7 +75,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
     }, [on, utils.project.getDeepInfo, utils.project.getById]);
 
     const onGoalPreviewShow = useCallback(
-        (goal: GoalByIdReturnType): MouseEventHandler<HTMLAnchorElement> =>
+        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
                 if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
 

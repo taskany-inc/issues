@@ -16,6 +16,7 @@ interface RelativeTimeProps {
     date: Date;
     kind?: RelativeTimeKind;
     isRelativeTime?: boolean;
+    className?: string;
 }
 
 const StyledKind = styled.span`
@@ -27,7 +28,7 @@ const StyledRelativeTime = styled.span`
     align-items: center;
 `;
 
-export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true }) => {
+export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true, className }) => {
     const { ssrTime } = usePageContext();
     const locale = useLocale();
     const [time, setTime] = useState(ssrTime);
@@ -56,7 +57,7 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelati
     const timeValue = isRelativeTime ? dateAgo(localeDate, time, { locale }) : createLocaleDate(localeDate, { locale });
 
     return (
-        <StyledRelativeTime>
+        <StyledRelativeTime className={className}>
             {nullable(kind, (k) => (
                 <StyledKind>{map[k]}</StyledKind>
             ))}

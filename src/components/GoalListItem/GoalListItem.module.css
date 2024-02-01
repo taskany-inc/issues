@@ -1,0 +1,21 @@
+.Row {
+    min-height: var(--gap-l);
+
+    padding: var(--gap-s) var(--gap-sm);
+    border-radius: var(--radius-m);
+    border: 1px solid var(--layer-border);
+    background: var(--layer);
+    transition: background 200ms ease-in;
+
+    color: var(--text-secondary);
+}
+
+.Row:hover {
+    border: 1px solid var(--layer-border-hover);
+    background: var(--layer-hover);
+}
+
+.Row_selected, .Row_selected:hover {
+    padding-left: calc(var(--gap-s) + 1px); /* 1px default border */
+    border-left: var(--gap-xs) solid var(--blue-600);
+}
