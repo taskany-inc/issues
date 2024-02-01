@@ -44,6 +44,7 @@ postgres
 /cypress/screenshots
 
 TODO.md
+/public/theme
 
 # Sentry
 .sentryclirc

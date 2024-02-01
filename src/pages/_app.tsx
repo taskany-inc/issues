@@ -1,5 +1,6 @@
 import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import '../utils/wdyr';
+import '@taskany/bricks/harmony/style.css';
 import { PageLoadProgress } from '@taskany/bricks';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';

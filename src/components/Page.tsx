@@ -76,6 +76,15 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
         setPreview(null);
     }, [router.asPath, setPreview]);
 
+    useEffect(() => {
+        const currentHref = document?.getElementById('themeVariables')?.getAttribute('href') || '';
+        const newHref = currentHref?.replace(/(.*)\/[^/]+$/, `$1/${theme}.css`);
+
+        if (newHref) {
+            document?.getElementById('themeVariables')?.setAttribute('href', newHref);
+        }
+    }, [theme]);
+
     return (
         <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], ssrTime }}>
             <Head>
