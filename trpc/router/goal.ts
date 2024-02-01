@@ -671,14 +671,16 @@ export const goal = router({
                     actualGoal.owner,
                 ]);
 
-                await createEmail('goalUpdated', {
-                    to: recipients,
-                    shortId: _shortId,
-                    title: actualGoal.title,
-                    updatedFields,
-                    author: ctx.session.user.name || ctx.session.user.email,
-                    authorEmail: ctx.session.user.email,
-                });
+                if (Object.keys(updatedFields).length) {
+                    await createEmail('goalUpdated', {
+                        to: recipients,
+                        shortId: _shortId,
+                        title: actualGoal.title,
+                        updatedFields,
+                        author: ctx.session.user.name || ctx.session.user.email,
+                        authorEmail: ctx.session.user.email,
+                    });
+                }
 
                 if (actualGoal.ownerId !== input.owner.id) {
                     await Promise.all([
