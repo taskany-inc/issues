@@ -42,11 +42,14 @@ export const ProjectFilter: React.FC<ProjectFilterAutoCompleteProps> = ({
                 value={values}
                 keyGetter={getKey}
                 onChange={onChange}
-                renderItem={({ item, onItemClick, checked }) => (
+                renderItem={({ item, onItemClick, checked, active, onMouseLeave, onMouseMove }) => (
                     <FilterCheckbox
                         name="project"
                         value={item.id}
                         checked={checked}
+                        focused={active}
+                        onMouseLeave={onMouseLeave}
+                        onMouseMove={onMouseMove}
                         onClick={onItemClick}
                         label={item.title}
                     />
