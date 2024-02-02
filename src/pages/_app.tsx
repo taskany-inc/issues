@@ -28,7 +28,7 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 const App = ({ Component, pageProps, router }: AppProps) => {
     setSSRLocale(router.locale as TLocale);
 
-    const pageLoadRef = usePageLoad(router);
+    const pageLoadRef = usePageLoad();
 
     useWebTelemetryMonitoringInit();
 

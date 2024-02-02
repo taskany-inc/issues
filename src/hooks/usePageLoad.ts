@@ -1,25 +1,26 @@
-import { useEffect, useRef } from 'react';
-import { NextRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 import { PageLoadProgressRef } from '@taskany/bricks';
 
-export const usePageLoad = (router: NextRouter): React.RefObject<PageLoadProgressRef> => {
-    const ref = useRef<PageLoadProgressRef>(null);
+export const usePageLoad = () => {
+    const pageLoadingRef = useRef<PageLoadProgressRef>(null);
+    const router = useRouter();
+    const [progress, setProgress] = useState(false);
+
+    // it can be window.location.pathname or react-router-dom as well
+    const [prevLoc, setPrevLoc] = useState(router.pathname);
 
     useEffect(() => {
-        if (ref.current) {
-            const methods = ref.current;
+        setProgress(router.pathname !== prevLoc);
+    }, [router, prevLoc]);
 
-            router.events.on('routeChangeStart', methods.start);
-            router.events.on('routeChangeComplete', methods.done);
-            router.events.on('routeChangeError', methods.done);
+    useEffect(() => {
+        if (router.pathname !== prevLoc) setPrevLoc(router.pathname);
+    }, [router, prevLoc]);
 
-            return () => {
-                router.events.on('routeChangeStart', methods.start);
-                router.events.on('routeChangeComplete', methods.done);
-                router.events.on('routeChangeError', methods.done);
-            };
-        }
-    }, [router]);
+    useEffect(() => {
+        progress ? pageLoadingRef.current?.start() : pageLoadingRef.current?.done();
+    }, [progress]);
 
-    return ref;
+    return pageLoadingRef;
 };
