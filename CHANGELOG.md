@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.18.1](https://github.com/taskany-inc/issues/compare/v2.18.0...v2.18.1) (2024-02-02)
+
+
+### Bug Fixes
+
+* bricks up to date ([9eec9a3](https://github.com/taskany-inc/issues/commit/9eec9a39e345a764903f5629df164b58526f704a))
+* error on enter keypress ([3201162](https://github.com/taskany-inc/issues/commit/32011621525634a1420d8686899bd4d3e59ba9e5))
+* **GoalListItem:** keyboard hover ([1a2da59](https://github.com/taskany-inc/issues/commit/1a2da59cedd4ac93c865d05a6450fb82a81a9f62))
+
 ## [2.18.0](https://github.com/taskany-inc/issues/compare/v2.17.0...v2.18.0) (2024-02-01)
 
 
