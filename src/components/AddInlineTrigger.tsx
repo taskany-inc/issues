@@ -4,7 +4,18 @@ import styled from 'styled-components';
 
 import { InlineTrigger } from './InlineTrigger';
 
-const StyledInlineTrigger = styled(InlineTrigger)<{ centered?: boolean }>`
+type InlineTriggerProps = ComponentProps<typeof InlineTrigger>;
+
+const StyledInlineTrigger = styled(
+    ({
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        centered,
+        forwardRef,
+        ...props
+    }: InlineTriggerProps & { centered?: boolean; forwardRef: InlineTriggerProps['ref'] }) => (
+        <InlineTrigger ref={forwardRef} {...props} />
+    ),
+)`
     ${({ centered }) =>
         centered &&
         `
@@ -15,13 +26,20 @@ const StyledInlineTrigger = styled(InlineTrigger)<{ centered?: boolean }>`
 
 interface AddInlineTriggerProps {
     text: string;
-    onClick: ComponentProps<typeof InlineTrigger>['onClick'];
+    onClick: InlineTriggerProps['onClick'];
     icon?: React.ReactNode;
     centered?: boolean;
 }
 
 export const AddInlineTrigger = forwardRef<HTMLDivElement, AddInlineTriggerProps>(
     ({ icon = <IconPlusCircleOutline size="xs" />, text, onClick, centered = true, ...attrs }, ref) => (
-        <StyledInlineTrigger ref={ref} icon={icon} text={text} onClick={onClick} centered={centered} {...attrs} />
+        <StyledInlineTrigger
+            forwardRef={ref}
+            icon={icon}
+            text={text}
+            onClick={onClick}
+            centered={centered}
+            {...attrs}
+        />
     ),
 );
