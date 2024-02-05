@@ -5,7 +5,6 @@ import {
     useClickOutside,
     KeyCode,
     Popup,
-    Button,
     Tabs,
     TabContent,
     TabsMenu,
@@ -14,6 +13,7 @@ import {
 } from '@taskany/bricks';
 import { gray10, gapS, gapXs, textColor, gapM, radiusM } from '@taskany/colors';
 import { IconBulbOnOutline } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { tr } from './FilterPopup.i18n';
 
@@ -127,8 +127,8 @@ export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = 
                                     {tr('You can apply and save filters as preset.')}
                                 </StyledTip>
                                 <StyledActionWrapper>
-                                    <Button outline text={tr('Cancel')} onClick={() => switchVisible(false)} />
-                                    <Button view="primary" outline text={tr('Apply')} onClick={onApplyClick} />
+                                    <Button text={tr('Cancel')} onClick={() => switchVisible(false)} />
+                                    <Button view="primary" text={tr('Apply')} onClick={onApplyClick} />
                                 </StyledActionWrapper>
                             </StyledFilterPanelPopupFooter>
                         </StyledPopupWrapper>

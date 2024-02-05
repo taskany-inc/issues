@@ -1,6 +1,7 @@
-import { FC, useCallback } from 'react';
-import { Button, Dropdown, MenuItem } from '@taskany/bricks';
+import { FC, useCallback, useMemo } from 'react';
+import { MenuItem } from '@taskany/bricks';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
+import { Button, Dropdown, DropdownPanel, DropdownTrigger } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import {
@@ -18,64 +19,68 @@ export const PageHeaderActionButton: FC = () => {
         dispatchModalEvent(event, params)();
     }, []);
 
+    const options = useMemo(() => {
+        return [
+            {
+                title: tr('Create goal'),
+                event: ModalEvent.GoalCreateModal,
+                params: {},
+                attrs: createGoalItem.attr,
+            },
+            {
+                title: tr('Create personal goal'),
+                event: ModalEvent.GoalCreateModal,
+                params: {
+                    personal: true,
+                },
+                attrs: createPersonalGoalItem.attr,
+            },
+            {
+                title: tr('Create project'),
+                event: ModalEvent.ProjectCreateModal,
+                params: {},
+                attrs: createProjectItem.attr,
+            },
+        ];
+    }, []);
+
     return (
         <>
             <Button
                 text={tr('Create')}
                 view="primary"
-                outline
                 brick="right"
                 onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
                 {...createFastButton.attr}
             />
-            <Dropdown
-                onChange={onMenuItemClick}
-                items={[
-                    {
-                        title: tr('Create goal'),
-                        event: ModalEvent.GoalCreateModal,
-                        params: {},
-                        attrs: createGoalItem.attr,
-                    },
-                    {
-                        title: tr('Create personal goal'),
-                        event: ModalEvent.GoalCreateModal,
-                        params: {
-                            personal: true,
-                        },
-                        attrs: createPersonalGoalItem.attr,
-                    },
-                    {
-                        title: tr('Create project'),
-                        event: ModalEvent.ProjectCreateModal,
-                        params: {},
-                        attrs: createProjectItem.attr,
-                    },
-                ]}
-                renderTrigger={(props) => (
-                    <Button
-                        view="primary"
-                        outline
-                        brick="left"
-                        iconRight={props.visible ? <IconUpSmallSolid size="s" /> : <IconDownSmallSolid size="s" />}
-                        ref={props.ref}
-                        onClick={props.onClick}
-                        {...createSelectButton.attr}
-                    />
-                )}
-                renderItem={(props) => (
-                    <MenuItem
-                        key={props.item.title}
-                        focused={props.cursor === props.index}
-                        onClick={props.onClick}
-                        view="primary"
-                        ghost
-                        {...props.item.attrs}
-                    >
-                        {props.item.title}
-                    </MenuItem>
-                )}
-            />
+            <Dropdown hideOnClick>
+                <DropdownTrigger
+                    arrow={false}
+                    renderTrigger={(props) => (
+                        <Button
+                            view="primary"
+                            brick="left"
+                            iconRight={props.isOpen ? <IconUpSmallSolid size="s" /> : <IconDownSmallSolid size="s" />}
+                            ref={props.ref}
+                            onClick={props.onClick}
+                            {...createSelectButton.attr}
+                        />
+                    )}
+                />
+                <DropdownPanel placement="top-end" arrow>
+                    {options.map((option) => (
+                        <MenuItem
+                            key={option.title}
+                            onClick={() => onMenuItemClick(option)}
+                            view="primary"
+                            ghost
+                            {...option.attrs}
+                        >
+                            {option.title}
+                        </MenuItem>
+                    ))}
+                </DropdownPanel>
+            </Dropdown>
         </>
     );
 };

@@ -108,7 +108,6 @@ const KeyInput: React.FC<KeyInputProps> = ({
                     </FormControl>
                 ) : (
                     <StyledButton
-                        outline
                         disabled={disabled}
                         size={size}
                         text={value}

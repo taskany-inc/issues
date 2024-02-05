@@ -1,7 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, ChangeEvent } from 'react';
-import { Button, ComboBox, FormControl, FormControlInput, Tag } from '@taskany/bricks';
+import { ComboBox, FormControl, FormControlInput, Tag } from '@taskany/bricks';
 import { IconTagOutline } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';

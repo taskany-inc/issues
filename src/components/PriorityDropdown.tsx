@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Dropdown, MenuItem } from '@taskany/bricks';
+import { Dropdown, MenuItem } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 
 import { combobox, comboboxItem, priorityCombobox } from '../utils/domObjects';
 import { trpc } from '../utils/trpcClient';

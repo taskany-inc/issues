@@ -11,12 +11,12 @@ import {
     Tag,
     TagCleanButton,
     nullable,
-    Button,
     FormControl,
     FormControlInput,
     FormControlError,
 } from '@taskany/bricks';
 import { IconCalendarTickOutline } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { FormEditor } from '../FormEditor/FormEditor';
 import { errorsProvider } from '../../utils/forms';

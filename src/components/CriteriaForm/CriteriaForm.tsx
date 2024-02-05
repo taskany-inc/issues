@@ -4,7 +4,6 @@ import {
     nullable,
     Form,
     Text,
-    Button,
     FormControl,
     FormControlLabel,
     FormControlInput,
@@ -15,6 +14,7 @@ import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState }
 import { Controller, useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { z } from 'zod';
+import { Button } from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect';
 import { GoalBadge } from '../GoalBadge';
@@ -428,7 +428,7 @@ export const CriteriaForm = ({
                             />
                         ))}
 
-                        <StyledButton type="submit" text={isEditMode ? tr('Save') : tr('Add')} view="primary" outline />
+                        <StyledButton type="submit" text={isEditMode ? tr('Save') : tr('Add')} view="primary" />
                     </StyledFormRow>
                 </>
             </GoalSelect>

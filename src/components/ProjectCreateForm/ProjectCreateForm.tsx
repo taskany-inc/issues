@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import {
-    Button,
     Text,
     Form,
     FormActions,
@@ -16,6 +15,7 @@ import {
     FormControlInput,
     FormControlError,
 } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
@@ -221,14 +221,12 @@ const ProjectCreateForm: React.FC = () => {
                         </FormAction>
                         <FormAction right inline>
                             <Button
-                                outline
                                 text={tr('Cancel')}
                                 onClick={dispatchModalEvent(ModalEvent.ProjectCreateModal)}
                                 {...projectCancelButton.attr}
                             />
                             <Button
                                 view="primary"
-                                outline
                                 disabled={busy}
                                 type="submit"
                                 text={tr('Create')}

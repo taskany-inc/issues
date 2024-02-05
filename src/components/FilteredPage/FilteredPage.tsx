@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { Button, FiltersAction, nullable } from '@taskany/bricks';
+import { FiltersAction, nullable } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { IconStarOutline, IconStarSolid } from '@taskany/icons';
@@ -42,7 +43,7 @@ const StyledFilterControls = styled.div`
     flex: 1 0 0;
 `;
 
-const StyledResetButton = styled(Button)`
+const StyledButton = styled(Button)`
     margin-left: auto;
 `;
 
@@ -155,11 +156,7 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                         </FiltersAction>
                     )}
                     {nullable(queryString || filterPreset, () => (
-                        <StyledResetButton
-                            text={tr('Reset')}
-                            onClick={resetQueryState}
-                            {...filtersPanelResetButton.attr}
-                        />
+                        <StyledButton text={tr('Reset')} onClick={resetQueryState} {...filtersPanelResetButton.attr} />
                     ))}
                 </StyledFilterControls>
             </FiltersPanel>

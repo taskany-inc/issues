@@ -2,7 +2,6 @@ import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 're
 import dynamic from 'next/dynamic';
 import { danger0 } from '@taskany/colors';
 import {
-    Button,
     Text,
     Form,
     FormAction,
@@ -13,6 +12,7 @@ import {
     FormControl,
     FormControlInput,
 } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { goalDeleteForm, goalDeleteShortIdInput, goalDeleteSubmitButton } from '../../utils/domObjects';
@@ -85,9 +85,8 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
                     <FormActions flat="top">
                         <FormAction left />
                         <FormAction right inline>
-                            <Button size="m" text={tr('Cancel')} onClick={onDeleteCancel} />
+                            <Button text={tr('Cancel')} onClick={onDeleteCancel} />
                             <Button
-                                size="m"
                                 view="danger"
                                 disabled={deleteConfirmation !== shortId}
                                 onClick={onConfirm}

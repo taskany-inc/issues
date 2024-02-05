@@ -4,7 +4,6 @@ import { FieldError } from 'react-hook-form';
 import styled from 'styled-components';
 import { gapM, gapS, gray7 } from '@taskany/colors';
 import {
-    Button,
     Text,
     Form,
     FormAction,
@@ -21,6 +20,7 @@ import {
     FormControlInput,
     FormControlError,
 } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -153,7 +153,6 @@ const UserInviteForm: React.FC = () => {
                         <FormAction left />
                         <FormAction right inline>
                             <Button
-                                size="m"
                                 view="primary"
                                 type="submit"
                                 disabled={!isValid}

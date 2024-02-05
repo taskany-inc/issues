@@ -20,7 +20,8 @@ import {
     Priority,
 } from '@prisma/client';
 import styled, { css } from 'styled-components';
-import { UserPic, Text, Tag, nullable, Button, Badge } from '@taskany/bricks';
+import { UserPic, Text, Tag, nullable, Badge } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 import {
     IconDoubleCaretRightCircleSolid,
     IconDividerLineOutline,
@@ -418,22 +419,21 @@ const HistoryRecordPartnerProject: React.FC<HistoryChangeProps<Project>> = ({ fr
 );
 
 const HistoryRecordLongTextChange: React.FC<HistoryChangeProps<string>> = ({ from, to }) => {
-    const [viewDestiption, setViewDescription] = useState(false);
+    const [viewDescription, setViewDescription] = useState(false);
 
     const handlerViewDescription = () => {
-        setViewDescription(!viewDestiption);
+        setViewDescription(!viewDescription);
     };
 
     return (
         <>
             <StyledButton
-                ghost={!viewDestiption}
-                outline={viewDestiption}
+                view={!viewDescription ? undefined : 'checked'}
                 iconRight={<IconDividerLineOutline size="xs" />}
                 onClick={handlerViewDescription}
             />
 
-            {viewDestiption && (
+            {viewDescription && (
                 <HistoryMultilineRecord
                     from={nullable(from, () => (
                         <Text as="span" size="xs" strike>

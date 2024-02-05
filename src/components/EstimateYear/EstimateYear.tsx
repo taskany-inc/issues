@@ -1,4 +1,4 @@
-import { Button } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 import { useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { gapS, gapXs } from '@taskany/colors';
@@ -21,11 +21,6 @@ const StyledItems = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: ${gapXs};
-`;
-
-const StyledButton = styled(Button)`
-    display: flex;
-    justify-content: center;
 `;
 
 const currentYear = getYearFromDate(new Date());
@@ -82,11 +77,11 @@ export const EstimateYear: React.FC = () => {
                 <StyledTriggerWrapper>
                     <StyledItems>
                         {years.map((y) => (
-                            <StyledButton
+                            <Button
                                 key={y}
-                                size="s"
+                                size="xs"
                                 text={String(y)}
-                                checked={year === y}
+                                view={year === y ? 'checked' : undefined}
                                 onClick={() => changeHander(year === y ? undefined : y)}
                                 {...estimateYearItem.attr}
                             />

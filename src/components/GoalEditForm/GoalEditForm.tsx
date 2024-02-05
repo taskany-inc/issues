@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 
 import { GoalForm } from '../GoalForm/GoalForm';
 import { GoalUpdateReturnType, GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -97,11 +97,10 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             onSubmit={updateGoal}
             actionButton={
                 <>
-                    <Button outline text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
+                    <Button text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
                     <Button
                         view="primary"
                         disabled={busy}
-                        outline
                         type="submit"
                         text={tr('Submit')}
                         {...goalUpdateButton.attr}

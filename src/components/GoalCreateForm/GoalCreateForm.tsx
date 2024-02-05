@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { gray9 } from '@taskany/colors';
-import { Button, Dropdown, MenuItem, Text } from '@taskany/bricks';
+import { MenuItem, Text } from '@taskany/bricks';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
+import { Button, Dropdown, DropdownPanel, DropdownTrigger } from '@taskany/bricks/harmony';
 
 import { useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -28,13 +29,7 @@ import { tr } from './GoalCreateForm.i18n';
 
 const StyledMenuItem = styled(MenuItem)`
     text-align: left;
-    width: 140px;
-    padding: 0;
-`;
-
-const StyledButtonWithDropdown = styled.div`
-    display: flex;
-    align-items: center;
+    max-width: 240px;
 `;
 
 interface GoalCreateFormProps {
@@ -151,60 +146,59 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
             actionButton={
                 <>
                     <Button
-                        outline
                         text={tr('Cancel')}
                         onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
                         {...goalCancelButton.attr}
                     />
-                    <StyledButtonWithDropdown>
+                    <>
                         <Button
                             view="primary"
                             disabled={busy}
-                            outline
                             type="submit"
                             brick="right"
                             text={createOptions[createGoalType - 1].title}
                             {...createOptions[createGoalType - 1].attr}
                         />
-                        <Dropdown
-                            placement="top-end"
-                            arrow
-                            items={createOptions}
-                            offset={[-5, 20]}
-                            onChange={onCreateTypeChange}
-                            renderTrigger={(props) => (
-                                <Button
-                                    disabled={busy}
-                                    view="primary"
-                                    outline
-                                    brick="left"
-                                    iconRight={
-                                        props.visible ? <IconUpSmallSolid size="s" /> : <IconDownSmallSolid size="s" />
-                                    }
-                                    ref={props.ref}
-                                    onClick={props.onClick}
-                                    {...createActionToggle.attr}
-                                />
-                            )}
-                            renderItem={(props) => (
-                                <StyledMenuItem
-                                    view="primary"
-                                    key={props.item.id}
-                                    ghost
-                                    onClick={props.onClick}
-                                    {...props.item.attr}
-                                >
-                                    <Text>{props.item.title}</Text>
-                                    {props.item.clue && (
-                                        <Text size="xs" color={gray9}>
-                                            {props.item.clue}
-                                        </Text>
-                                    )}
-                                </StyledMenuItem>
-                            )}
-                            {...combobox.attr}
-                        />
-                    </StyledButtonWithDropdown>
+                        <Dropdown {...combobox.attr} hideOnClick>
+                            <DropdownTrigger
+                                arrow={false}
+                                renderTrigger={(props) => (
+                                    <Button
+                                        view="primary"
+                                        brick="left"
+                                        ref={props.ref}
+                                        onClick={props.onClick}
+                                        iconRight={
+                                            props.isOpen ? (
+                                                <IconUpSmallSolid size="s" />
+                                            ) : (
+                                                <IconDownSmallSolid size="s" />
+                                            )
+                                        }
+                                        {...createActionToggle.attr}
+                                    />
+                                )}
+                            />
+                            <DropdownPanel placement="top-end" arrow>
+                                {createOptions.map((option) => (
+                                    <StyledMenuItem
+                                        view="primary"
+                                        key={option.title}
+                                        ghost
+                                        {...option.attr}
+                                        onClick={() => onCreateTypeChange(option)}
+                                    >
+                                        <Text>{option.title}</Text>
+                                        {option.clue && (
+                                            <Text size="xs" color={gray9}>
+                                                {option.clue}
+                                            </Text>
+                                        )}
+                                    </StyledMenuItem>
+                                ))}
+                            </DropdownPanel>
+                        </Dropdown>
+                    </>
                 </>
             }
             tip={<RotatableTip context="goal" />}

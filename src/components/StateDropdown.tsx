@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Dropdown } from '@taskany/bricks';
+import { Dropdown } from '@taskany/bricks';
 import { IconGitPullOutline } from '@taskany/icons';
 import { State } from '@prisma/client';
+import { Button } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 import { stateCombobox } from '../utils/domObjects';

@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    Button,
     Form,
     FormActions,
     FormAction,
@@ -14,6 +13,7 @@ import {
     nullable,
 } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
+import { Button } from '@taskany/bricks/harmony';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFilterSchema, CreateFilter } from '../../schema/filter';
@@ -89,12 +89,8 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
                     <FormActions flat="top">
                         <FormAction left inline />
                         <FormAction right inline>
-                            <Button
-                                outline
-                                text={tr('Cancel')}
-                                onClick={dispatchModalEvent(ModalEvent.FilterCreateModal)}
-                            />
-                            <Button view="primary" outline type="submit" text={tr('Create preset')} />
+                            <Button text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.FilterCreateModal)} />
+                            <Button view="primary" type="submit" text={tr('Create preset')} />
                         </FormAction>
                     </FormActions>
                 </Form>

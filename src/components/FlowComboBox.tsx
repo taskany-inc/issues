@@ -1,7 +1,8 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Flow } from '@prisma/client';
-import { Button, ComboBox, MenuItem, FormControl, FormControlInput } from '@taskany/bricks';
+import { ComboBox, MenuItem, FormControl, FormControlInput } from '@taskany/bricks';
 import { IconGitPullOutline } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 
@@ -35,7 +36,7 @@ export const FlowComboBox = React.forwardRef<HTMLDivElement, FlowComboBoxProps>(
                 onChange={onChange}
                 renderTrigger={(props) => (
                     <Button
-                        ghost
+                        view="ghost"
                         text={props.text}
                         disabled={props.disabled}
                         onClick={props.onClick}

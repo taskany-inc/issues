@@ -1,7 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { backgroundColor, gapM, gray4 } from '@taskany/colors';
-import { Button, Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
+import { Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 
 import { CommentSchema } from '../../schema/comment';
 import { commentForm, commentFormDescription } from '../../utils/domObjects';
@@ -121,7 +122,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         </FormAction>
                         <FormAction right inline>
                             {nullable(!busy, () => (
-                                <Button outline text={tr('Cancel')} onClick={onCommentCancel} />
+                                <Button text={tr('Cancel')} onClick={onCommentCancel} />
                             ))}
 
                             {actionButton}
