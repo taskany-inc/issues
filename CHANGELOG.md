@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.18.3](https://github.com/taskany-inc/issues/compare/v2.18.2...v2.18.3) (2024-02-05)
+
+
+### Bug Fixes
+
+* **Autocomplete:** enable navigation ([93e70f2](https://github.com/taskany-inc/issues/commit/93e70f28c71238cb6d02b9986d13b146262a8aa6))
+
 ## [2.18.2](https://github.com/taskany-inc/issues/compare/v2.18.1...v2.18.2) (2024-02-02)
 
 
