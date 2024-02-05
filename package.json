@@ -31,7 +31,7 @@
     "seed": "tsx -r dotenv/config prisma/seed.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.374.0",
+    "@aws-sdk/client-s3": "3.504.0",
     "@hookform/resolvers": "3.3.2",
     "@mdx-js/loader": "3.0.0",
     "@mdx-js/react": "3.0.0",
