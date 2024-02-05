@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { State } from '@prisma/client';
-import { Button, Dropdown, UserPic, nullable } from '@taskany/bricks';
+import { UserPic, nullable } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
+import { Button, Dropdown, DropdownPanel, DropdownTrigger } from '@taskany/bricks/harmony';
 
 import { commentFormSubmitButton } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -47,7 +48,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
         }, {});
     }, [states]);
 
-    const { user, themeId } = usePageContext();
+    const { user } = usePageContext();
 
     const [pushState, setPushState] = useState(stateId ? statesMap[stateId] : undefined);
     const [description, setDescription] = useState(currentDescription);
@@ -137,61 +138,49 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                 onFocus={onCommentFocus}
                 actionButton={
                     <>
-                        <Button
-                            size="m"
-                            view="primary"
-                            disabled={busy}
-                            outline
-                            onClick={onCommentСlick}
-                            text={tr('Comment')}
-                        />
-                        {nullable(states, () => (
+                        <Button view="primary" disabled={busy} onClick={onCommentСlick} text={tr('Comment')} />
+                        {nullable(states, (list) => (
                             <StyledStateUpdate>
                                 <Button
-                                    view="primary"
                                     disabled={busy}
-                                    hue={pushState ? [pushState.hue, themeId] : undefined}
-                                    outline
                                     type="submit"
                                     brick="right"
                                     text={tr('Update state')}
                                     iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
                                     {...commentFormSubmitButton.attr}
                                 />
-                                <Dropdown
-                                    placement="top-end"
-                                    arrow
-                                    items={states}
-                                    offset={[-5, 20]}
-                                    onChange={onStateSelect}
-                                    renderTrigger={(props) => (
-                                        <Button
-                                            view="primary"
-                                            hue={pushState ? [pushState.hue, themeId] : undefined}
-                                            outline
-                                            brick="left"
-                                            iconRight={
-                                                props.visible ? (
-                                                    <IconUpSmallSolid size="s" />
-                                                ) : (
-                                                    <IconDownSmallSolid size="s" />
-                                                )
-                                            }
-                                            ref={props.ref}
-                                            onClick={props.onClick}
-                                        />
-                                    )}
-                                    renderItem={(props) => (
-                                        <ColorizedMenuItem
-                                            key={props.item.id}
-                                            hue={props.item.hue}
-                                            checked={props.item.id === pushState?.id}
-                                            onClick={props.onClick}
-                                        >
-                                            {props.item.title}
-                                        </ColorizedMenuItem>
-                                    )}
-                                />
+                                <Dropdown hideOnClick>
+                                    <DropdownTrigger
+                                        arrow={false}
+                                        renderTrigger={(props) => (
+                                            <Button
+                                                brick="left"
+                                                type="button"
+                                                iconRight={
+                                                    props.isOpen ? (
+                                                        <IconUpSmallSolid size="s" />
+                                                    ) : (
+                                                        <IconDownSmallSolid size="s" />
+                                                    )
+                                                }
+                                                ref={props.ref}
+                                                onClick={props.onClick}
+                                            />
+                                        )}
+                                    />
+                                    <DropdownPanel placement="top-end" arrow>
+                                        {list.map((state) => (
+                                            <ColorizedMenuItem
+                                                key={state.id}
+                                                hue={state.hue}
+                                                checked={state.id === pushState?.id}
+                                                onClick={() => onStateSelect(state)}
+                                            >
+                                                {state.title}
+                                            </ColorizedMenuItem>
+                                        ))}
+                                    </DropdownPanel>
+                                </Dropdown>
                             </StyledStateUpdate>
                         ))}
                     </>

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { Button } from '@taskany/bricks';
 import { gapM, gapS } from '@taskany/colors';
+import { Button } from '@taskany/bricks/harmony';
 
 import { tr } from './LoadMoreButton.i18n';
 

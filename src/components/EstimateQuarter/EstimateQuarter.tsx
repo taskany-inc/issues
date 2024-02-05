@@ -1,7 +1,8 @@
-import { Button, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import { gapXs } from '@taskany/colors';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import { Button } from '@taskany/bricks/harmony';
 
 import { Quarters, QuartersAliases, QuartersKeys } from '../../types/date';
 import { useLocale } from '../../hooks/useLocale';
@@ -16,11 +17,6 @@ const StyledItems = styled.div<{ column: number }>`
     display: grid;
     grid-template-columns: repeat(${({ column }) => column}, 1fr);
     gap: ${gapXs};
-`;
-
-const StyledButton = styled(Button)`
-    display: flex;
-    justify-content: center;
 `;
 
 const StyledButtonGroupsWrapper = styled.div`
@@ -54,11 +50,11 @@ const ButtonGroup = <T extends string>({
     return (
         <StyledItems column={items.length}>
             {items.map((item) => (
-                <StyledButton
+                <Button
                     key={item}
-                    size="s"
+                    size="xs"
+                    view={value === item ? 'checked' : undefined}
                     text={item}
-                    checked={value === item}
                     onClick={onToggleAlias(item)}
                     {...estimateQuarterItem.attr}
                 />

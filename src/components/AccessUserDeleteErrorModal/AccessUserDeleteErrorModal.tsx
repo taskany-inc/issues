@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import { FormTitle, ModalContent, ModalHeader, Tip, Text, Button } from '@taskany/bricks';
+import { FormTitle, ModalContent, ModalHeader, Tip, Text } from '@taskany/bricks';
 import { gapS, warn0 } from '@taskany/colors';
 import { IconExclamationCircleSolid } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import ModalOnEvent, { ModalContext } from '../ModalOnEvent';
@@ -53,7 +54,6 @@ export const AccessUserDeleteErrorModal: FC = () => (
             </ModalContext.Consumer>
             <StyledModalActions>
                 <Button
-                    size="m"
                     view="warning"
                     text={tr('Ok, got it')}
                     onClick={dispatchModalEvent(ModalEvent.AccessUserDeleteError)}

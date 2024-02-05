@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { gapXs } from '@taskany/colors';
-import { Button } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 import { IconMoodTongueOutline, iconSizesMap } from '@taskany/icons';
 
 interface ReactionsButtonProps {
@@ -10,10 +9,6 @@ interface ReactionsButtonProps {
 
     onClick?: (emoji?: string) => void;
 }
-
-const StyledButton = styled(Button)`
-    margin-right: ${gapXs};
-`;
 
 const StyledEmoji = styled.span`
     font-size: ${iconSizesMap.s}px;
@@ -30,7 +25,7 @@ export const ReactionsButton = React.memo(
         );
 
         return (
-            <StyledButton
+            <Button
                 ref={ref}
                 text={count && count > 1 ? String(count) : undefined}
                 iconLeft={

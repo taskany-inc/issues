@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import {
-    Button,
     Fieldset,
     Form,
     FormAction,
@@ -21,6 +20,7 @@ import {
 import { z } from 'zod';
 import dynamic from 'next/dynamic';
 import { gapM, gapS, gray3, gray8 } from '@taskany/colors';
+import { Button } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
@@ -223,14 +223,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                         <FormActions flat="top">
                             <FormAction left />
                             <FormAction right inline>
-                                <Button
-                                    size="m"
-                                    view="primary"
-                                    type="submit"
-                                    disabled={!formState.isDirty}
-                                    text={tr('Save')}
-                                    outline
-                                />
+                                <Button view="primary" type="submit" disabled={!formState.isDirty} text={tr('Save')} />
                             </FormAction>
                         </FormActions>
                     </Form>
@@ -269,12 +262,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                         <Fieldset title={tr('Danger zone')} view="warning">
                             <FormActions>
                                 <FormAction left>
-                                    <Button
-                                        view="warning"
-                                        outline
-                                        text={tr('Clear local cache')}
-                                        onClick={clearLocalCache}
-                                    />
+                                    <Button view="warning" text={tr('Clear local cache')} onClick={clearLocalCache} />
                                 </FormAction>
                             </FormActions>
                             <FormActions>

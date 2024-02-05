@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, useCallback } from 'react';
-import { Button, UserPic, UserMenuItem, nullable, FormControl, FormControlInput, ComboBox } from '@taskany/bricks';
+import { UserPic, UserMenuItem, nullable, FormControl, FormControlInput, ComboBox } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';

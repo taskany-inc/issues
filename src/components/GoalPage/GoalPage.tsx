@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { gapM } from '@taskany/colors';
-import { Button, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import { IconEditOutline } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';

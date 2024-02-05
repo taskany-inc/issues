@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
 import { gapM, gapS, gapXs, gray3, gray8, gray9, warn0 } from '@taskany/colors';
 import {
-    Button,
     Text,
     Fieldset,
     Form,
@@ -25,6 +24,7 @@ import {
     FormControlError,
 } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { PageSep } from '../PageSep';
@@ -328,12 +328,10 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                             <FormAction left />
                             <FormAction right inline>
                                 <Button
-                                    size="m"
                                     view="primary"
                                     type="submit"
                                     disabled={!isDirty}
                                     text={tr('Save')}
-                                    outline
                                     {...projectSettingsSaveButton.attr}
                                 />
                             </FormAction>
@@ -357,7 +355,6 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 <FormAction right inline>
                                     <Button
                                         onClick={handleDeleteProjectBtnClick}
-                                        size="m"
                                         view="warning"
                                         text={tr('Delete project')}
                                         {...projectSettingsDeleteProjectButton.attr}
@@ -374,7 +371,6 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 <FormAction right inline>
                                     <Button
                                         onClick={dispatchModalEvent(ModalEvent.ProjectTransferModal)}
-                                        size="m"
                                         view="warning"
                                         text={tr('Transfer ownership')}
                                         {...projectSettingsTransferProjectButton.attr}
@@ -450,13 +446,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                             <FormAction left />
                             <FormAction right inline>
                                 <Button
-                                    size="m"
                                     text={tr('Cancel')}
                                     onClick={onDeleteCancel}
                                     {...projectSettingsCancelDeleteProjectButton.attr}
                                 />
                                 <Button
-                                    size="m"
                                     view="warning"
                                     disabled={keyConfirmation !== project.data.id}
                                     onClick={deleteProject(onProjectDelete)}
@@ -518,13 +512,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                             </FormAction>
                             <FormAction right inline>
                                 <Button
-                                    size="m"
                                     text={tr('Cancel')}
                                     onClick={onTransferCancel}
                                     {...projectSettingsCancelTransferProjectButton.attr}
                                 />
                                 <Button
-                                    size="m"
                                     view="warning"
                                     disabled={!transferTo || keyConfirmation !== project.data.id}
                                     onClick={
@@ -552,7 +544,6 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <Text size="s">{tr('Before delete a project, you must move it to another project or delete')}</Text>
                     <StyledModalActions>
                         <Button
-                            size="m"
                             view="warning"
                             text={tr('Ok, got it')}
                             onClick={dispatchModalEvent(ModalEvent.ProjectCannotDeleteModal)}

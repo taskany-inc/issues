@@ -1,7 +1,8 @@
 import React, { FC, useCallback, useRef } from 'react';
 import styled from 'styled-components';
-import { Button, Dot, ModalContent, ModalHeader, ModalPreview, nullable } from '@taskany/bricks';
+import { Dot, ModalContent, ModalHeader, ModalPreview, nullable } from '@taskany/bricks';
 import { IconEditOutline } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { routes } from '../../hooks/router';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';

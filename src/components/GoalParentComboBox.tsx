@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ComboBox, FormControl, FormControlError, FormControlInput, nullable } from '@taskany/bricks';
+import { ComboBox, FormControl, FormControlError, FormControlInput, nullable } from '@taskany/bricks';
+import { Button } from '@taskany/bricks/harmony';
 
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';

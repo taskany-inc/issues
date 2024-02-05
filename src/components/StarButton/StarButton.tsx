@@ -1,6 +1,7 @@
 import React from 'react';
-import { Badge, Button } from '@taskany/bricks';
+import { Badge } from '@taskany/bricks';
 import { IconStarOutline, IconStarSolid } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { tr } from './StarButton.i18n';
 

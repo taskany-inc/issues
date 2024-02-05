@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Button, FormTitle, ModalContent, ModalHeader, nullable } from '@taskany/bricks';
+import { FormTitle, ModalContent, ModalHeader, nullable } from '@taskany/bricks';
 import { gapM, gapS } from '@taskany/colors';
 import dynamic from 'next/dynamic';
+import { Button } from '@taskany/bricks/harmony';
 
 import { routes } from '../../hooks/router';
 import { useLocale } from '../../hooks/useLocale';
@@ -27,15 +28,11 @@ const StyledIframe = styled.iframe<{ visible?: boolean }>`
     `}
 `;
 
-const StyledButton = styled(Button)``;
-
 const StyledFooter = styled.div`
     padding-top: ${gapM};
-    text-align: right;
-
-    ${StyledButton} + ${StyledButton} {
-        margin-left: ${gapS};
-    }
+    display: flex;
+    justify-content: end;
+    gap: ${gapS};
 `;
 
 const WhatsNew = () => {
@@ -90,8 +87,8 @@ const WhatsNew = () => {
                 ))}
 
                 <StyledFooter>
-                    <StyledButton outline text={tr('Dismiss')} onClick={onDelayClick} />
-                    <StyledButton view="primary" outline text={tr('Awesome! Thank you!')} onClick={onReadClick} />
+                    <Button text={tr('Dismiss')} onClick={onDelayClick} />
+                    <Button view="primary" text={tr('Awesome! Thank you!')} onClick={onReadClick} />
                 </StyledFooter>
             </ModalContent>
         </ModalOnEvent>

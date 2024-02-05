@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    Button,
     Form,
     FormActions,
     FormAction,
@@ -14,6 +13,7 @@ import {
     FormControlError,
 } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
+import { Button } from '@taskany/bricks/harmony';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFeedbackSchema, CreateFeedback } from '../../schema/feedback';
@@ -82,8 +82,8 @@ const FeedbackCreateForm: React.FC = () => {
                 <FormActions flat="top">
                     <FormAction left inline />
                     <FormAction right inline>
-                        <Button outline text={'Cancel'} onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)} />
-                        <Button view="primary" outline type="submit" text={tr('Send feedback')} />
+                        <Button text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)} />
+                        <Button view="primary" type="submit" text={tr('Send feedback')} />
                     </FormAction>
                 </FormActions>
             </Form>

@@ -11,12 +11,12 @@ import {
     Text,
     UserPic,
     nullable,
-    Button,
     Link,
     useCopyToClipboard,
 } from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import * as Sentry from '@sentry/nextjs';
+import { Button } from '@taskany/bricks/harmony';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import {
@@ -289,10 +289,8 @@ export const CommentView: FC<CommentViewProps> = ({
                     onCancel={onCommentCancel}
                     actionButton={
                         <Button
-                            size="m"
                             view="primary"
                             disabled={commentDescription.description === description || busy}
-                            outline
                             type="submit"
                             text={tr('Save')}
                             {...commentFormSubmitButton.attr}

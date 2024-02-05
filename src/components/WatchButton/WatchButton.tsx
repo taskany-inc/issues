@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '@taskany/bricks';
 import { IconEyeOutline, IconEyeClosedSolid } from '@taskany/icons';
+import { Button } from '@taskany/bricks/harmony';
 
 import { tr } from './WatchButton.i18n';
 
