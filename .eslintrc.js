@@ -12,6 +12,7 @@ module.exports = {
         '@taskany/rules/prefer-interface': 'error',
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
         'no-restricted-syntax': 'off',
         'spaced-comment': [
             'error',
@@ -72,7 +73,6 @@ module.exports = {
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error'],
         'react/display-name': 'off',
-        '@typescript-eslint/no-non-null-assertion': 'error',
         'react-hooks/exhaustive-deps': 'error',
         '@typescript-eslint/no-unused-vars': [
             'error',

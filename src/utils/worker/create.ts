@@ -10,12 +10,6 @@ export enum jobState {
     completed = 'completed',
 }
 
-export enum jobKind {
-    email = 'email',
-    cron = 'cron',
-    comment = 'comment',
-}
-
 type Templates = typeof templates;
 
 export interface JobDataMap {
@@ -33,8 +27,6 @@ export interface JobDataMap {
         description: string;
     };
 }
-
-export type JobKind = keyof JobDataMap;
 
 interface CreateJobProps<K extends keyof JobDataMap> {
     data: JobDataMap[K];
