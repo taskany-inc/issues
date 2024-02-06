@@ -107,6 +107,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     queryState={queryState}
                     onClickProvider={onClickProvider}
                     selectedResolver={selectedResolver}
+                    titleSize="m"
                 />
             ))}
         </ProjectListItemCollapsable>

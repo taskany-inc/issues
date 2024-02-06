@@ -28,6 +28,7 @@ interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof Tre
     goals?: ReactNode;
     children?: React.ReactNode;
     onClick?: MouseEventHandler<HTMLElement>;
+    titleSize?: 'm' | 'l';
 }
 
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
@@ -36,6 +37,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     goals,
     href,
     className,
+    titleSize = 'l',
     interactive = true,
     onClick,
     ...props
@@ -44,7 +46,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         <TableRowItem
             title={
                 <StyledTitleWrapper>
-                    <Title size="l" {...projectListItemTitle.attr}>
+                    <Title size={titleSize} {...projectListItemTitle.attr}>
                         {project.title}
                     </Title>
                     {nullable(project.children.length, (length) => (
