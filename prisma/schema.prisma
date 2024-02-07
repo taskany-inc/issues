@@ -299,6 +299,12 @@ model State {
   goals    Goal[]    @relation("goalState")
   comments Comment[]
 
+  lightForeground String?
+  lightBackground String?
+
+  darkForeground String?
+  darkBackground String?
+
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
