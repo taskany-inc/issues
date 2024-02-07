@@ -7,7 +7,9 @@ import { Button } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { Page, PageContent, PageActions } from '../Page';
+import { Page } from '../Page/Page';
+import { PageContent } from '../PageContent/PageContent';
+import { PageActions } from '../PageActions/PageActions';
 import { PageSep } from '../PageSep';
 import { IssueKey } from '../IssueKey';
 import { useLocalStorage } from '../../hooks/useLocalStorage';

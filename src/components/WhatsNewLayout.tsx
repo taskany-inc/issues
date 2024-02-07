@@ -4,7 +4,6 @@ import { useTheme } from 'next-themes';
 
 import { PageContext } from '../utils/pageContext';
 
-import { GlobalStyle } from './GlobalStyle';
 import { Theme } from './Theme';
 
 interface WhatsNewLayoutProps {
@@ -18,7 +17,6 @@ export const WhatsNewLayout: React.FC<WhatsNewLayoutProps> = ({ children }) => {
 
     return (
         <MDXProvider components={components}>
-            <GlobalStyle />
             <TextStyle />
 
             {nullable(resolvedTheme as PageContext['theme'], (t) => (

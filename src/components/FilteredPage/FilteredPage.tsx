@@ -12,7 +12,7 @@ import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { filtersPanelResetButton } from '../../utils/domObjects';
 import { FilterById } from '../../../trpc/inferredTypes';
-import { PageContent } from '../Page';
+import { PageContent } from '../PageContent/PageContent';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { PresetDropdown } from '../PresetDropdown';
 import { LimitDropdown } from '../LimitDropdown';

@@ -4,7 +4,7 @@ import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
-import { Page } from '../../components/Page';
+import { Page } from '../../components/Page/Page';
 import { routes } from '../../hooks/router';
 import { AvailableHelpPages } from '../../types/help';
 import { TLocale } from '../../utils/getLang';

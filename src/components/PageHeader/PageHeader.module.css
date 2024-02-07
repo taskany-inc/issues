@@ -1,0 +1,13 @@
+/* Order of styles on page: SC, CSS Modules */
+.PageHeader.PageHeader {
+    background-color: var(--layer);
+}
+
+.PageHeader .PageHeaderSearch {
+    margin-left: var(--gap-m);
+}
+
+.PageHeader .PageHeaderNav {
+    display: flex;
+    align-items: center;
+}

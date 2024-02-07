@@ -2,35 +2,34 @@ import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import styled from 'styled-components';
 import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
-import { gapS, gray4, radiusM, textColor } from '@taskany/colors';
+import { gray4, radiusM, textColor } from '@taskany/colors';
 import { TextStyle, nullable } from '@taskany/bricks';
 
-import { pageContext, PageContext } from '../utils/pageContext';
-import { useHotkeys } from '../hooks/useHotkeys';
-import { ModalEvent } from '../utils/dispatchModal';
-import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../utils/hotkeys';
+import { pageContext, PageContext } from '../../utils/pageContext';
+import { useHotkeys } from '../../hooks/useHotkeys';
+import { ModalEvent } from '../../utils/dispatchModal';
+import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../../utils/hotkeys';
+import { Theme } from '../Theme';
+import { PageHeader } from '../PageHeader/PageHeader';
+import { PageFooter } from '../PageFooter/PageFooter';
+import { ModalContext } from '../ModalOnEvent';
+import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 
-import { Theme } from './Theme';
-import { GlobalStyle } from './GlobalStyle';
-import { PageHeader } from './PageHeader/PageHeader';
-import { PageFooter } from './PageFooter/PageFooter';
-import { ModalContext } from './ModalOnEvent';
-import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
+import s from './Page.module.css';
 
-const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
-const GoalPreview = dynamic(() => import('./GoalPreview/GoalPreview'));
-const ProjectCreateForm = dynamic(() => import('./ProjectCreateForm/ProjectCreateForm'));
-const GoalCreateForm = dynamic(() => import('./GoalCreateForm/GoalCreateForm'));
-const UserInviteForm = dynamic(() => import('./UserInviteForm/UserInviteForm'));
-const HotkeysModal = dynamic(() => import('./HotkeysModal/HotkeysModal'));
-const NotificationsHub = dynamic(() => import('./NotificationsHub/NotificationsHub'));
-const FeedbackCreateForm = dynamic(() => import('./FeedbackCreateForm/FeedbackCreateForm'));
-const WhatsNew = dynamic(() => import('./WhatsNew/WhatsNew'));
-const ImageFullScreen = dynamic(() => import('./ImageFullScreen'));
+const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
+const GoalPreview = dynamic(() => import('../GoalPreview/GoalPreview'));
+const ProjectCreateForm = dynamic(() => import('../ProjectCreateForm/ProjectCreateForm'));
+const GoalCreateForm = dynamic(() => import('../GoalCreateForm/GoalCreateForm'));
+const UserInviteForm = dynamic(() => import('../UserInviteForm/UserInviteForm'));
+const HotkeysModal = dynamic(() => import('../HotkeysModal/HotkeysModal'));
+const NotificationsHub = dynamic(() => import('../NotificationsHub/NotificationsHub'));
+const FeedbackCreateForm = dynamic(() => import('../FeedbackCreateForm/FeedbackCreateForm'));
+const WhatsNew = dynamic(() => import('../WhatsNew/WhatsNew'));
+const ImageFullScreen = dynamic(() => import('../ImageFullScreen'));
 
 interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     user: Session['user'];
@@ -38,25 +37,6 @@ interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     title?: string;
     children?: React.ReactNode;
 }
-
-const StyledContent = styled.main`
-    /* presses the footer to the bottom*/
-    min-height: calc(100vh - 160px);
-`;
-
-export const PageContent = styled.div`
-    padding: 10px 40px 0 40px;
-`;
-
-export const PageActions = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: right;
-
-    > * + * {
-        margin-left: ${gapS};
-    }
-`;
 
 const mapThemeOnId = { light: 0, dark: 1 } as const;
 
@@ -91,7 +71,6 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
                 <title>{title}</title>
             </Head>
 
-            <GlobalStyle />
             <TextStyle />
 
             {nullable(theme, (t) => (
@@ -107,7 +86,9 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
 
             <PageHeader />
 
-            <StyledContent {...attrs}>{children}</StyledContent>
+            <main className={s.PageMain} {...attrs}>
+                {children}
+            </main>
 
             <ModalOnEvent event={ModalEvent.ProjectCreateModal} hotkeys={createProjectKeys}>
                 <ProjectCreateForm />

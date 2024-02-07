@@ -1,0 +1,4 @@
+/* Order of styles on page: SC, CSS Modules */
+.FiltersPanel.FiltersPanel {
+    background-color: var(--layer);
+}

@@ -6,7 +6,7 @@ import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { Page } from '../Page';
+import { Page } from '../Page/Page';
 import { CommonHeader } from '../CommonHeader';
 import { trpc } from '../../utils/trpcClient';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';

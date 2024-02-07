@@ -31,7 +31,7 @@ import { PageSep } from '../PageSep';
 import { useRouter } from '../../hooks/router';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
-import { Page } from '../Page';
+import { Page } from '../Page/Page';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { errorsProvider } from '../../utils/forms';
 import { useLocalStorage } from '../../hooks/useLocalStorage';

@@ -5,7 +5,7 @@ import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
-import { Page } from '../Page';
+import { Page } from '../Page/Page';
 import { CommonHeader } from '../CommonHeader';
 import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { safeGetUserName } from '../../utils/getUserName';

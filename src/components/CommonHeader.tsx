@@ -4,7 +4,8 @@ import { Text, nullable } from '@taskany/bricks';
 
 import { pageBreadcrumbs, pageDescription, pageHeader, pageTitle } from '../utils/domObjects';
 
-import { PageActions, PageContent } from './Page';
+import { PageContent } from './PageContent/PageContent';
+import { PageActions } from './PageActions/PageActions';
 
 interface CommonHeaderProps {
     title: React.ReactNode;

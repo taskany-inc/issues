@@ -28,6 +28,7 @@ import { getUserName, prepareUserDataFromActivity } from '../../utils/getUserNam
 import { filtersPanel } from '../../utils/domObjects';
 
 import { tr } from './FiltersPanel.i18n';
+import s from './FiltersPanel.module.css';
 
 type Users = React.ComponentProps<typeof UserFilter>['users'];
 
@@ -150,7 +151,7 @@ export const FiltersPanel: FC<{
 
         return (
             <>
-                <FiltersPanelContainer loading={loading} {...filtersPanel.attr}>
+                <FiltersPanelContainer className={s.FiltersPanel} loading={loading} {...filtersPanel.attr}>
                     <FiltersPanelContent>
                         <FiltersSearchContainer>
                             <SearchFilter
