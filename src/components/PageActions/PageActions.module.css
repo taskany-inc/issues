@@ -1,0 +1,9 @@
+.PageActions {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+}
+
+.PageActions > * + * {
+    margin-left: var(--gap-s);
+}

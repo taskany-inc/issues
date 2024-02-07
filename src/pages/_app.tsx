@@ -14,6 +14,8 @@ import { GoalPreviewProvider } from '../components/GoalPreview/GoalPreviewProvid
 import { getTelemetryInstanceSingleton, useWebTelemetryMonitoringInit } from '../utils/telemetry';
 import { ThemeSetter } from '../components/ThemeSetter';
 
+import './_app.css';
+
 const defaultThemes = ['light', 'dark'];
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {

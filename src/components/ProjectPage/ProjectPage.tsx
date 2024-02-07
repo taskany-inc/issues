@@ -1,7 +1,7 @@
 import { MouseEventHandler, useCallback, useEffect } from 'react';
 import { ListView, nullable } from '@taskany/bricks';
 
-import { Page } from '../Page';
+import { Page } from '../Page/Page';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';

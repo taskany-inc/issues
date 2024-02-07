@@ -1,5 +1,4 @@
 import { FC, useCallback } from 'react';
-import styled from 'styled-components';
 import NextLink from 'next/link';
 import {
     Header,
@@ -11,7 +10,6 @@ import {
     UserMenu,
     nullable,
 } from '@taskany/bricks';
-import { gapM } from '@taskany/colors';
 
 import { header, headerMenu, headerMenuExplore, headerMenuGoals } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -22,15 +20,7 @@ import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
 import { BetaBadge } from '../BetaBadge';
 
 import { tr } from './PageHeader.i18n';
-
-const HeaderSearch = styled.div`
-    margin-left: ${gapM};
-`;
-
-const StyledHeaderNav = styled(HeaderNav)`
-    display: flex;
-    align-items: center;
-`;
+import s from './PageHeader.module.css';
 
 export const PageHeader: FC = () => {
     const { userSettings, signIn } = useRouter();
@@ -55,6 +45,7 @@ export const PageHeader: FC = () => {
 
     return (
         <Header
+            className={s.PageHeader}
             logo={
                 <HeaderLogo>
                     <PageHeaderLogo />
@@ -66,7 +57,7 @@ export const PageHeader: FC = () => {
                 </HeaderMenu>
             }
             nav={
-                <StyledHeaderNav {...headerMenu.attr}>
+                <HeaderNav className={s.PageHeaderNav} {...headerMenu.attr}>
                     {links.map(({ href, title, beta, attr }) => (
                         <NextLink href={href} passHref key={href} legacyBehavior>
                             <HeaderNavLink {...attr}>
@@ -77,10 +68,10 @@ export const PageHeader: FC = () => {
                             </HeaderNavLink>
                         </NextLink>
                     ))}
-                    <HeaderSearch>
+                    <div className={s.PageHeaderSearch}>
                         <GlobalSearch />
-                    </HeaderSearch>
-                </StyledHeaderNav>
+                    </div>
+                </HeaderNav>
             }
             {...header.attr}
         >

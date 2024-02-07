@@ -3,7 +3,8 @@ import NextLink from 'next/link';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { routes } from '../../hooks/router';
-import { Page, PageContent } from '../Page';
+import { Page } from '../Page/Page';
+import { PageContent } from '../PageContent/PageContent';
 import { PageSep } from '../PageSep';
 import { ExplorePageLayout } from '../ExplorePageLayout/ExplorePageLayout';
 import { ProjectListItem } from '../ProjectListItem';

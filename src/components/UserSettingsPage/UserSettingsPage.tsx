@@ -24,7 +24,7 @@ import { Button } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
-import { Page } from '../Page';
+import { Page } from '../Page/Page';
 import { PageSep } from '../PageSep';
 import { CommonHeader } from '../CommonHeader';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
