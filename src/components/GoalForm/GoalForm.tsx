@@ -3,20 +3,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
 import { State, Tag as TagModel } from '@prisma/client';
-import {
-    Form,
-    FormActions,
-    FormAction,
-    ModalContent,
-    Tag,
-    TagCleanButton,
-    nullable,
-    FormControl,
-    FormControlInput,
-    FormControlError,
-} from '@taskany/bricks';
+import { Form, FormActions, FormAction, ModalContent, Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconCalendarTickOutline } from '@taskany/icons';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
 import { FormEditor } from '../FormEditor/FormEditor';
 import { errorsProvider } from '../../utils/forms';
@@ -137,16 +126,18 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     return (
         <ModalContent {...attrs}>
             <Form onSubmit={handleSubmit(onSubmit)}>
-                <FormControl flat="bottom" size="l">
+                <FormControl>
                     <FormControlInput
                         {...register('title')}
                         disabled={busy}
                         autoFocus
                         placeholder={tr("Goal's title")}
+                        brick="bottom"
+                        size="m"
                         {...goalTitleInput.attr}
                     />
                     {nullable(errorsResolver('title'), (error) => (
-                        <FormControlError error={error} placement="top-start" {...goalTitleInputError.attr} />
+                        <FormControlError error={error} {...goalTitleInputError.attr} />
                     ))}
                 </FormControl>
 

@@ -1,18 +1,8 @@
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { danger0 } from '@taskany/colors';
-import {
-    Text,
-    Form,
-    FormAction,
-    FormActions,
-    FormTitle,
-    ModalContent,
-    ModalHeader,
-    FormControl,
-    FormControlInput,
-} from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { Text, Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
+import { Button, FormControl, FormControlInput } from '@taskany/bricks/harmony';
 
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { goalDeleteForm, goalDeleteShortIdInput, goalDeleteSubmitButton } from '../../utils/domObjects';
@@ -71,13 +61,14 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
                 <br />
 
                 <Form {...goalDeleteForm.attr}>
-                    <FormControl flat="bottom" size="l">
+                    <FormControl>
                         <FormControlInput
+                            brick="bottom"
                             placeholder={shortId}
-                            autoComplete="off"
                             autoFocus
                             onChange={onConfirmationInputChange}
                             ref={ref}
+                            size="m"
                             {...goalDeleteShortIdInput.attr}
                         />
                     </FormControl>

@@ -1,0 +1,20 @@
+.SubmitButton {
+    margin-left: auto;
+}
+
+.FormRow {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-top: var(--gap-sm);
+}
+
+.FormControl {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+/* Order of styles on page: SC, CSS Modules */
+.GoalBadge.GoalBadge {
+    padding: 0;
+}

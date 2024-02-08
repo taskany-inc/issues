@@ -1,20 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-    AutoCompleteRadioGroup,
-    nullable,
-    Form,
-    Text,
-    FormControl,
-    FormControlLabel,
-    FormControlInput,
-    FormControlError,
-} from '@taskany/bricks';
-import { gapSm, gray7 } from '@taskany/colors';
+import { AutoCompleteRadioGroup, nullable, Form, Text } from '@taskany/bricks';
+import { gray7 } from '@taskany/colors';
 import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import styled from 'styled-components';
 import { z } from 'zod';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlLabel, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect';
 import { GoalBadge } from '../GoalBadge';
@@ -23,10 +13,7 @@ import { AddInlineTrigger } from '../AddInlineTrigger';
 import { StateDot } from '../StateDot';
 
 import { tr } from './CriteriaForm.i18n';
-
-const StyledGoalBadge = styled(GoalBadge)`
-    padding: 0;
-`;
+import s from './CriteriaForm.module.css';
 
 interface SuggestItem {
     id: string;
@@ -149,38 +136,26 @@ interface WeightFieldProps extends Pick<ComponentProps<typeof FormControlInput>,
     maxValue: number;
 }
 
-const StyledFormRow = styled.div`
-    display: flex;
-    flex-wrap: nowrap;
-    margin-top: ${gapSm};
-`;
-
-const StyledButton = styled(Button)`
-    margin-left: auto;
-`;
-
-const StyledFormControlInput = styled(FormControlInput)`
-    width: 3ch;
-`;
-
 const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
     ({ error, maxValue, value, onChange, name }, ref) => {
         return (
-            <FormControl error={error?.message != null} variant="outline" inline>
+            <FormControl className={s.FormControl}>
                 <FormControlLabel color={gray7}>{tr('Weight')}</FormControlLabel>
-                <StyledFormControlInput
+                <FormControlInput
+                    outline
+                    size="xs"
                     value={value}
                     onChange={onChange}
                     ref={ref}
                     autoFocus
-                    autoComplete="off"
                     name={name}
                     disabled={maxPossibleWeight === maxValue}
-                >
-                    {nullable(error, (err) => (
-                        <FormControlError error={err} />
-                    ))}
-                </StyledFormControlInput>
+                    maxLength={3}
+                    style={{ width: error ? '10ch' : '7ch' }}
+                />
+                {nullable(error, (err) => (
+                    <FormControlError error={err} />
+                ))}
                 <Text size="s" color={gray7}>
                     {tr.raw('Weight out of', {
                         upTo: maxPossibleWeight - maxValue,
@@ -369,7 +344,9 @@ export const CriteriaForm = ({
                 items={items}
                 value={value}
                 onClick={handleSelectItem}
-                renderItem={(props) => <StyledGoalBadge title={props.item.title} color={props.item.stateColor} />}
+                renderItem={(props) => (
+                    <GoalBadge title={props.item.title} color={props.item.stateColor} className={s.GoalBadge} />
+                )}
             >
                 <>
                     <Controller
@@ -401,7 +378,7 @@ export const CriteriaForm = ({
                         />
                     ))}
 
-                    <StyledFormRow>
+                    <div className={s.FormRow}>
                         {nullable(needShowWeightField, () => (
                             <Controller
                                 name="weight"
@@ -428,8 +405,13 @@ export const CriteriaForm = ({
                             />
                         ))}
 
-                        <StyledButton type="submit" text={isEditMode ? tr('Save') : tr('Add')} view="primary" />
-                    </StyledFormRow>
+                        <Button
+                            type="submit"
+                            text={isEditMode ? tr('Save') : tr('Add')}
+                            view="primary"
+                            className={s.SubmitButton}
+                        />
+                    </div>
                 </>
             </GoalSelect>
 

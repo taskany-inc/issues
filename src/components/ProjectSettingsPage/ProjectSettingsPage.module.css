@@ -1,0 +1,44 @@
+.FormControlInput {
+    width: 100%;
+}
+
+.FormControlLabel {
+    padding: var(--gap-s);
+    padding-left: var(--gap-m);
+    min-width: 100px;
+    color: var(--gray8);
+}
+
+.FormControl {
+    display: flex;
+    align-items: center;
+    background-color: var(--gray3);
+}
+
+.SubmitButton {
+    margin-left: auto;
+}
+
+/* Order of styles on page: SC, CSS Modules */
+.TextList.TextList {
+    margin-left: var(--gap-m);
+}
+
+
+.TextListItem {
+    margin-left: var(--gap-xs);
+}
+
+.Tip {
+    padding: var(--gap-s) 0;
+}
+
+/* Order of styles on page: SC, CSS Modules */
+.Tag.Tag {
+    display: flex;
+    gap: var(--gap-xs);
+}
+
+.Tag:not(:last-of-type) {
+    margin-right: var(--gap-xs);
+}

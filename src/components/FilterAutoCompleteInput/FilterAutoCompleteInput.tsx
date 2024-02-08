@@ -1,6 +1,7 @@
 import React, { ChangeEvent, ComponentProps, ReactNode, useCallback } from 'react';
 import styled from 'styled-components';
-import { FormControl, FormControlError, FormControlInput, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { FormControl, FormControlError, FormControlInput } from '@taskany/bricks/harmony';
 import { IconSearchOutline } from '@taskany/icons';
 import { gapS } from '@taskany/colors';
 
@@ -31,8 +32,9 @@ export const FilterAutoCompleteInput: React.FC<FilterAutoCompleteInputProps> = (
     );
 
     return (
-        <StyledFormControl variant="outline" error={error?.message != null}>
+        <StyledFormControl>
             <FormControlInput
+                outline
                 autoFocus
                 placeholder={placeholder}
                 iconLeft={icon}

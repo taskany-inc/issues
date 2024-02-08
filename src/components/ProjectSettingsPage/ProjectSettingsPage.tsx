@@ -1,9 +1,8 @@
 import { ChangeEvent, useCallback, useState } from 'react';
-import styled from 'styled-components';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import { gapM, gapS, gapXs, gray3, gray8, gray9, warn0 } from '@taskany/colors';
+import { gapS, gray9, warn0 } from '@taskany/colors';
 import {
     Text,
     Fieldset,
@@ -18,13 +17,9 @@ import {
     UserPic,
     Tag,
     Tip,
-    FormControl,
-    FormControlInput,
-    FormControlLabel,
-    FormControlError,
 } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlInput, FormControlLabel, FormControlError } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { PageSep } from '../PageSep';
@@ -68,53 +63,10 @@ import { ProjectAccessUser } from '../ProjectAccessUser/ProjectAccessUser';
 import { AccessUserDeleteErrorModal } from '../AccessUserDeleteErrorModal/AccessUserDeleteErrorModal';
 import { ProjectParticipants } from '../ProjectParticipants/ProjectParticipants';
 
+import s from './ProjectSettingsPage.module.css';
 import { tr } from './ProjectSettingsPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
-
-const StyledTip = styled(Tip)`
-    padding: ${gapS} 0;
-`;
-
-const StyledModalActions = styled.div`
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: flex-end;
-`;
-
-const StyledTag = styled(Tag)`
-    display: flex;
-    gap: ${gapXs};
-
-    :not(:last-of-type) {
-        margin-right: ${gapXs};
-    }
-`;
-
-const StyledTextList = styled(TextList)`
-    margin-left: ${gapM};
-`;
-
-const StyledTextListItem = styled(TextListItem)`
-    margin-left: ${gapXs};
-`;
-
-const StyledFormControl = styled(FormControl).attrs({ size: 'l' })`
-    flex-direction: row;
-    align-items: center;
-    gap: 0;
-    background-color: ${gray3};
-`;
-
-const StyledFormControlLabel = styled(FormControlLabel).attrs({
-    size: 'm',
-    weight: 'bold',
-    color: gray8,
-})`
-    padding: ${gapS};
-    padding-left: ${gapM};
-`;
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
@@ -250,40 +202,54 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 <SettingsCard>
                     <Form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
                         <Fieldset title={tr('General')}>
-                            <StyledFormControl flat="bottom">
-                                <StyledFormControlLabel>{tr('key')}:</StyledFormControlLabel>
+                            <FormControl className={s.FormControl}>
+                                <FormControlLabel className={s.FormControlLabel} weight="bold">
+                                    {tr('key')}:
+                                </FormControlLabel>
                                 <FormControlInput
+                                    size="m"
+                                    brick="bottom"
                                     {...register('id')}
                                     disabled
                                     defaultValue={project.data.id}
-                                    autoComplete="off"
+                                    className={s.FormControlInput}
                                 />
-                            </StyledFormControl>
+                            </FormControl>
 
-                            <StyledFormControl flat="bottom">
-                                <StyledFormControlLabel>{tr('Title')}:</StyledFormControlLabel>
+                            <FormControl className={s.FormControl}>
+                                <FormControlLabel className={s.FormControlLabel} weight="bold">
+                                    {tr('Title')}:
+                                </FormControlLabel>
                                 <FormControlInput
+                                    size="m"
+                                    brick="center"
                                     {...register('title')}
                                     defaultValue={project.data.title}
-                                    autoComplete="off"
                                     {...projectSettingsTitleInput.attr}
+                                    className={s.FormControlInput}
                                 />
                                 {nullable(errorsResolver('title'), (error) => (
                                     <FormControlError error={error} />
                                 ))}
-                            </StyledFormControl>
+                            </FormControl>
 
-                            <StyledFormControl flat="both">
-                                <StyledFormControlLabel>{tr('Description')}:</StyledFormControlLabel>
+                            <FormControl className={s.FormControl}>
+                                <FormControlLabel className={s.FormControlLabel} weight="bold">
+                                    {tr('Description')}:
+                                </FormControlLabel>
                                 <FormControlInput
+                                    size="m"
+                                    outline={false}
+                                    brick="top"
                                     {...register('description')}
                                     defaultValue={project.data?.description ?? undefined}
                                     {...projectSettingsDescriptionInput.attr}
+                                    className={s.FormControlInput}
                                 />
                                 {nullable(errorsResolver('description'), (error) => (
                                     <FormControlError error={error} />
                                 ))}
-                            </StyledFormControl>
+                            </FormControl>
 
                             <Controller
                                 name="parent"
@@ -303,19 +269,19 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                             />
                                         )}
                                         renderInput={(props) => (
-                                            <FormControl variant="outline">
-                                                <FormControlInput autoFocus {...props} />
+                                            <FormControl>
+                                                <FormControlInput outline autoFocus {...props} />
                                             </FormControl>
                                         )}
                                         renderItem={(item) => (
-                                            <StyledTag key={item.id}>
+                                            <Tag className={s.Tag} key={item.id}>
                                                 {item.title}
                                                 <IconXSolid
                                                     size="xxs"
                                                     onClick={item.onClick}
                                                     {...projectSettingsParentMultiInputTagClean.attr}
                                                 />
-                                            </StyledTag>
+                                            </Tag>
                                         )}
                                         {...field}
                                         {...projectSettingsParentMultiInput.attr}
@@ -391,36 +357,36 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                 <ModalContent>
                     <SettingsCard view="warning">
-                        <StyledTip view="warning" icon={<IconExclamationCircleSolid size="s" />}>
+                        <Tip className={s.Tip} view="warning" icon={<IconExclamationCircleSolid size="s" />}>
                             <Text as="span" weight="bold" size="s" color="inherit">
                                 {tr('What happens when you delete a project')}:
                             </Text>
-                        </StyledTip>
+                        </Tip>
 
-                        <StyledTextList type="unordered">
-                            <StyledTextListItem>
+                        <TextList className={s.TextList}>
+                            <TextListItem className={s.TextListItem}>
                                 <Text size="s">{tr('All active goals will be archived')};</Text>
-                            </StyledTextListItem>
-                            <StyledTextListItem>
+                            </TextListItem>
+                            <TextListItem className={s.TextListItem}>
                                 <Text size="s">{tr('Criteria as project goals will be removed')};</Text>
-                            </StyledTextListItem>
-                            <StyledTextListItem>
+                            </TextListItem>
+                            <TextListItem className={s.TextListItem}>
                                 <Text size="s">
                                     {tr(
                                         'Criteria-affected goals will be recalculated as progress towards meeting the criteria',
                                     )}
                                     ;
                                 </Text>
-                            </StyledTextListItem>
-                            <StyledTextListItem>
+                            </TextListItem>
+                            <TextListItem className={s.TextListItem}>
                                 <Text size="s">
                                     {tr(
                                         'For affected projects, average progress across all goals will be recalculated',
                                     )}
                                     .
                                 </Text>
-                            </StyledTextListItem>
-                        </StyledTextList>
+                            </TextListItem>
+                        </TextList>
                     </SettingsCard>
                     <br />
                     <Text>
@@ -433,10 +399,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <br />
 
                     <Form {...projectSettingsDeleteForm.attr}>
-                        <FormControl flat="bottom" size="l">
+                        <FormControl>
                             <FormControlInput
+                                size="m"
+                                brick="bottom"
                                 placeholder={tr('Project key')}
-                                autoComplete="off"
                                 onChange={onConfirmationInputChange}
                                 {...projectSettingsDeleteProjectInput.attr}
                             />
@@ -482,10 +449,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <br />
 
                     <Form {...projectSettingsTransferForm.attr}>
-                        <FormControl flat="bottom" size="l">
+                        <FormControl>
                             <FormControlInput
+                                size="m"
+                                brick="bottom"
                                 placeholder={tr('Project key')}
-                                autoComplete="off"
                                 onChange={onConfirmationInputChange}
                                 {...projectSettingsTransferProjectKeyInput.attr}
                             />
@@ -538,17 +506,16 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <FormTitle color={warn0}>{tr('Cannot delete project now')}</FormTitle>
                 </ModalHeader>
                 <ModalContent>
-                    <StyledTip view="warning" icon={<IconExclamationCircleSolid size="s" />}>
+                    <Tip className={s.Tip} view="warning" icon={<IconExclamationCircleSolid size="s" />}>
                         {tr('The project has child projects')}
-                    </StyledTip>
+                    </Tip>
                     <Text size="s">{tr('Before delete a project, you must move it to another project or delete')}</Text>
-                    <StyledModalActions>
-                        <Button
-                            view="warning"
-                            text={tr('Ok, got it')}
-                            onClick={dispatchModalEvent(ModalEvent.ProjectCannotDeleteModal)}
-                        />
-                    </StyledModalActions>
+                    <Button
+                        className={s.SubmitButton}
+                        view="warning"
+                        text={tr('Ok, got it')}
+                        onClick={dispatchModalEvent(ModalEvent.ProjectCannotDeleteModal)}
+                    />
                 </ModalContent>
             </ModalOnEvent>
         </Page>

@@ -1,26 +1,19 @@
 import { useEffect, useState, useCallback, ChangeEventHandler } from 'react';
-import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
+import { Fieldset, Form, FormAction, FormActions, FormRadio, FormRadioInput, nullable } from '@taskany/bricks';
+import { z } from 'zod';
+import dynamic from 'next/dynamic';
 import {
-    Fieldset,
-    Form,
-    FormAction,
-    FormActions,
-    FormRadio,
-    FormRadioInput,
+    Button,
     FormControl,
     FormControlInput,
     FormControlLabel,
     FormControlError,
-    nullable,
-} from '@taskany/bricks';
-import { z } from 'zod';
-import dynamic from 'next/dynamic';
-import { gapM, gapS, gray3, gray8 } from '@taskany/colors';
-import { Button } from '@taskany/bricks/harmony';
+    Checkbox,
+} from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
@@ -33,25 +26,10 @@ import { notifyPromise } from '../../utils/notifyPromise';
 import { dispatchErrorNotification, dispatchSuccessNotification } from '../../utils/dispatchNotification';
 import { userSettings, userSettingsLogoutButton } from '../../utils/domObjects';
 
+import s from './UserSettingsPage.module.css';
 import { tr } from './UserSettingsPage.i18n';
 
 const RotatableTip = dynamic(() => import('../RotatableTip/RotatableTip'), { ssr: false });
-
-const StyledFormControl = styled(FormControl).attrs({ size: 'l' })`
-    flex-direction: row;
-    align-items: center;
-    gap: 0;
-    background-color: ${gray3};
-`;
-
-const StyledFormControlLabel = styled(FormControlLabel).attrs({
-    size: 'm',
-    weight: 'bold',
-    color: gray8,
-})`
-    padding: ${gapS};
-    padding-left: ${gapM};
-`;
 
 const patchUserSchemaWithAsyncValidate = (validityFn: (val: string) => Promise<boolean>) => {
     return updateUserSchema.merge(
@@ -198,26 +176,48 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 <SettingsCard>
                     <Form onSubmit={handleSubmit(updateUser)}>
                         <Fieldset title={tr('General')}>
-                            <StyledFormControl flat="bottom">
-                                <StyledFormControlLabel>{tr('Email')}:</StyledFormControlLabel>
-                                <FormControlInput autoComplete="off" disabled defaultValue={user.email} />
-                            </StyledFormControl>
+                            <FormControl className={s.FormControl}>
+                                <FormControlLabel weight="bold" className={s.FormControlLabel}>
+                                    {tr('Email')}:
+                                </FormControlLabel>
+                                <FormControlInput
+                                    disabled
+                                    defaultValue={user.email}
+                                    size="m"
+                                    brick="bottom"
+                                    className={s.FormControlInput}
+                                />
+                            </FormControl>
 
-                            <StyledFormControl flat="bottom">
-                                <StyledFormControlLabel>{tr('Name')}:</StyledFormControlLabel>
-                                <FormControlInput {...register('name')} autoComplete="off" />
+                            <FormControl className={s.FormControl}>
+                                <FormControlLabel weight="bold" className={s.FormControlLabel}>
+                                    {tr('Name')}:
+                                </FormControlLabel>
+                                <FormControlInput
+                                    {...register('name')}
+                                    size="m"
+                                    brick="center"
+                                    className={s.FormControlInput}
+                                />
                                 {nullable(formState.isSubmitted, () => (
                                     <FormControlError error={formState.errors.name} />
                                 ))}
-                            </StyledFormControl>
+                            </FormControl>
 
-                            <StyledFormControl flat="both">
-                                <StyledFormControlLabel>{tr('Nickname')}:</StyledFormControlLabel>
-                                <FormControlInput {...register('nickname')} autoComplete="off" />
+                            <FormControl className={s.FormControl}>
+                                <FormControlLabel weight="bold" className={s.FormControlLabel}>
+                                    {tr('Nickname')}:
+                                </FormControlLabel>
+                                <FormControlInput
+                                    {...register('nickname')}
+                                    size="m"
+                                    brick="top"
+                                    className={s.FormControlInput}
+                                />
                                 {nullable(formState.isSubmitted, () => (
                                     <FormControlError error={formState.errors.nickname} />
                                 ))}
-                            </StyledFormControl>
+                            </FormControl>
                         </Fieldset>
 
                         <FormActions flat="top">
@@ -249,10 +249,12 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 <SettingsCard>
                     <Form>
                         <Fieldset title={tr('You are hero')}>
-                            <StyledFormControl flat="both">
-                                <StyledFormControlLabel>{tr('Beta features')}:</StyledFormControlLabel>
-                                <FormControlInput type="checkbox" checked={betaUser} onChange={onBetaUserChange} />
-                            </StyledFormControl>
+                            <FormControl className={s.FormControl}>
+                                <FormControlLabel weight="bold" className={s.FormControlLabel}>
+                                    {tr('Beta features')}:
+                                </FormControlLabel>
+                                <Checkbox checked={betaUser} onChange={onBetaUserChange} />
+                            </FormControl>
                         </Fieldset>
                     </Form>
                 </SettingsCard>

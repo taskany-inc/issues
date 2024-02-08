@@ -16,11 +16,8 @@ import {
     TagCleanButton,
     Keyboard,
     nullable,
-    FormControl,
-    FormControlInput,
-    FormControlError,
 } from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -135,7 +132,7 @@ const UserInviteForm: React.FC = () => {
                 </StyledTagsList>
 
                 <Form>
-                    <FormControl flat="bottom" size="l">
+                    <FormControl>
                         <FormControlInput
                             ref={inputRef}
                             value={inputValue}
@@ -143,6 +140,8 @@ const UserInviteForm: React.FC = () => {
                             autoFocus
                             onChange={onInputChange}
                             onKeyDown={onInputKeyDown}
+                            size="m"
+                            brick="bottom"
                         />
                         {nullable(error, (err) => (
                             <FormControlError error={err} />
