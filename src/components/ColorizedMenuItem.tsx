@@ -1,28 +1,37 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { MarkedListItem } from '@taskany/bricks';
+import { Dot } from '@taskany/bricks/harmony';
 import styled from 'styled-components';
-
-import { StateDot } from './StateDot';
-import { StateWrapper, stateBgHover } from './StateWrapper';
 
 const StyledMenuListItem = styled(MarkedListItem)`
     :hover {
-        background-color: ${stateBgHover};
+        background-color: var(--state-hover-background);
     }
 `;
 
-export const ColorizedMenuItem: FC<{
-    hue: number;
+interface ColorizedMenuItemProps {
+    color?: string;
+    hoverBackground?: string;
+
     children?: React.ReactNode;
     focused?: boolean;
     checked?: boolean;
+
     onClick?: () => void;
-}> = ({ hue, children, ...props }) => {
+}
+
+export const ColorizedMenuItem: FC<ColorizedMenuItemProps> = ({ color, hoverBackground, children, ...props }) => {
+    const style = useMemo(
+        () =>
+            ({
+                '--state-hover-background': hoverBackground,
+            } as React.CSSProperties),
+        [hoverBackground],
+    );
+
     return (
-        <StateWrapper hue={hue}>
-            <StyledMenuListItem mark={<StateDot hue={hue} />} {...props}>
-                {children}
-            </StyledMenuListItem>
-        </StateWrapper>
+        <StyledMenuListItem style={style} mark={<Dot size="m" color={color} />} {...props}>
+            {children}
+        </StyledMenuListItem>
     );
 };

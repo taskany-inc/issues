@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import { backgroundColor, brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
+import { brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
 import {
     Card,
     CardComment,
@@ -16,7 +16,7 @@ import {
 } from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import * as Sentry from '@sentry/nextjs';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, Dot } from '@taskany/bricks/harmony';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import {
@@ -36,7 +36,6 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Circle } from '../Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
-import { StateDot } from '../StateDot';
 import { getUserName } from '../../utils/getUserName';
 import { CardHeader } from '../CardHeader';
 import { useLatest } from '../../hooks/useLatest';
@@ -47,6 +46,7 @@ import { NextLink } from '../NextLink';
 import { profileUrl } from '../../utils/config';
 
 import { tr } from './CommentView.i18n';
+import s from './CommentView.module.css';
 
 const Md = dynamic(() => import('../Md'));
 const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
@@ -63,7 +63,7 @@ interface CommentViewProps {
         image?: string;
     };
     highlight?: boolean;
-    hue?: number;
+    stateColor?: string;
     pin?: boolean;
 
     onReactionToggle?: React.ComponentProps<typeof ReactionsDropdown>['onClick'];
@@ -148,16 +148,6 @@ const StyledMd = styled(Md)`
     overflow-x: auto;
 `;
 
-const StyledStateDot = styled(StateDot)`
-    position: absolute;
-    bottom: -50%;
-    right: -50%;
-    transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    border: 4px solid ${backgroundColor};
-`;
-
 export const CommentView: FC<CommentViewProps> = ({
     id,
     author,
@@ -165,7 +155,7 @@ export const CommentView: FC<CommentViewProps> = ({
     createdAt,
     highlight,
     reactions,
-    hue,
+    stateColor,
     pin,
     onChange,
     onCancel,
@@ -263,7 +253,7 @@ export const CommentView: FC<CommentViewProps> = ({
                 {pin ? (
                     <>
                         <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />
-                        <StyledStateDot hue={hue} />
+                        <Dot className={s.UserPicDot} color={stateColor} />
                     </>
                 ) : (
                     nullable(
@@ -335,10 +325,10 @@ export const CommentView: FC<CommentViewProps> = ({
                     </StyledCardInfo>
 
                     <StyledCardComment>
-                        {nullable(hue, (h) => (
+                        {nullable(stateColor, (color) => (
                             <StyledTimestamp>
                                 {nullable(!pin, () => (
-                                    <StateDot hue={h} />
+                                    <Dot color={color} />
                                 ))}
                                 <Text size="m" weight="bolder" color={gray9}>
                                     {createLocaleDate(createdAt, { locale })}

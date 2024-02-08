@@ -2,16 +2,19 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { gapM } from '@taskany/colors';
 import { KeyCode, useKeyPress, useKeyboard, Popup } from '@taskany/bricks';
+import { State } from '@taskany/bricks/harmony';
 import { StateType } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
-
-import { State } from './State';
+import { usePageContext } from '../hooks/usePageContext';
 
 interface StateObject {
     id: string;
     title: string;
-    hue: number;
+    darkForeground?: string;
+    darkBackground?: string;
+    lightForeground?: string;
+    lightBackground?: string;
     type: StateType;
 }
 
@@ -30,6 +33,7 @@ const StyledStates = styled.div`
 `;
 
 const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => {
+    const { theme } = usePageContext();
     const popupRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLDivElement>(null);
     const [popupVisible, setPopupVisibility] = useState(false);
@@ -59,7 +63,16 @@ const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => 
 
     const [onENTER] = useKeyboard([KeyCode.Enter], () => {
         if (flowById?.data?.states?.length && cursor) {
-            onItemClick(flowById?.data?.states[cursor])();
+            const item = flowById?.data?.states[cursor];
+            onItemClick({
+                id: item.id,
+                title: item.title,
+                type: item.type,
+                darkForeground: item.darkForeground || undefined,
+                darkBackground: item.darkBackground || undefined,
+                lightForeground: item.lightForeground || undefined,
+                lightBackground: item.lightBackground || undefined,
+            })();
             setPopupVisibility(false);
         }
     });
@@ -92,7 +105,12 @@ const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => 
     return (
         <>
             <span ref={popupRef} {...onESC} {...onENTER}>
-                <State ref={buttonRef} title={state?.title} hue={state?.hue} onClick={onButtonClick} />
+                <State
+                    ref={buttonRef}
+                    title={state?.title}
+                    color={state?.[`${theme}Foreground`] || undefined}
+                    onClick={onButtonClick}
+                />
             </span>
 
             <Popup
@@ -107,13 +125,21 @@ const StateSwitch: React.FC<StateSwitchProps> = ({ state, flowId, onClick }) => 
                 <StyledStates>
                     {flowById?.data?.states
                         ?.filter((s) => s.id !== state.id)
-                        .map((s: StateObject) => (
+                        .map((s) => (
                             <State
                                 key={s.id}
-                                hue={s.hue}
+                                color={s[`${theme}Foreground`] || undefined}
                                 title={s.title}
                                 // focused={s.id === state?.id || cursor === i}
-                                onClick={onItemClick(s)}
+                                onClick={onItemClick({
+                                    id: s.id,
+                                    title: s.title,
+                                    type: s.type,
+                                    darkForeground: s.darkForeground || undefined,
+                                    darkBackground: s.darkBackground || undefined,
+                                    lightForeground: s.lightForeground || undefined,
+                                    lightBackground: s.lightBackground || undefined,
+                                })}
                             />
                         ))}
                 </StyledStates>

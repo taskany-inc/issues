@@ -21,7 +21,7 @@ import {
 } from '@prisma/client';
 import styled, { css } from 'styled-components';
 import { UserPic, Text, Tag, nullable, Badge } from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, Dot } from '@taskany/bricks/harmony';
 import {
     IconDoubleCaretRightCircleSolid,
     IconDividerLineOutline,
@@ -35,12 +35,12 @@ import { IssueListItem } from '../IssueListItem';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { StateDot } from '../StateDot';
 import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { Circle } from '../Circle';
 import { useLocale } from '../../hooks/useLocale';
 import { getUserName, prepareUserDataFromActivity, safeGetUserName, safeUserData } from '../../utils/getUserName';
+import { usePageContext } from '../../hooks/usePageContext';
 
 import { tr } from './HistoryRecord.i18n';
 
@@ -485,23 +485,27 @@ const HistoryRecordPriority: React.FC<HistoryChangeProps<Priority>> = ({ from, t
     />
 );
 
-const HistoryDottedState: React.FC<{ title: string; hue: number }> = ({ title, hue }) => (
+const HistoryDottedState: React.FC<{ title: string; color?: string }> = ({ title, color }) => (
     <>
-        <StateDot hue={hue} size="s" />
+        <Dot color={color} size="s" />
         <Text size="xs">{title}</Text>
     </>
 );
 
-const HistoryRecordState: React.FC<HistoryChangeProps<StateData>> = ({ from, to }) => (
-    <HistorySimplifyRecord
-        from={nullable(from, (f) => (
-            <HistoryDottedState title={f.title} hue={f.hue} />
-        ))}
-        to={nullable(to, (t) => (
-            <HistoryDottedState title={t.title} hue={t.hue} />
-        ))}
-    />
-);
+const HistoryRecordState: React.FC<HistoryChangeProps<StateData>> = ({ from, to }) => {
+    const { theme } = usePageContext();
+
+    return (
+        <HistorySimplifyRecord
+            from={nullable(from, (f) => (
+                <HistoryDottedState title={f.title} color={f[`${theme}Foreground`] || undefined} />
+            ))}
+            to={nullable(to, (t) => (
+                <HistoryDottedState title={t.title} color={t[`${theme}Foreground`] || undefined} />
+            ))}
+        />
+    );
+};
 
 const HistoryParticipant: React.FC<{ name?: string | null; pic?: string | null; email?: string | null }> = ({
     name = 'unknown',

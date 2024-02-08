@@ -28,7 +28,7 @@ interface GoalActivityFeedProps {
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
     ({ goal, shortId, onGoalClick, onGoalDeleteConfirm, onInvalidate }, ref) => {
-        const { user } = usePageContext();
+        const { user, theme } = usePageContext();
         const {
             onGoalCommentUpdate,
             onGoalDelete,
@@ -161,7 +161,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     id={value.id}
                                     author={value.author}
                                     description={value.description}
-                                    hue={value.hue}
+                                    stateColor={value.state?.[`${theme}Foreground`] || undefined}
                                     createdAt={value.createdAt}
                                     reactions={value.reactions}
                                     onSubmit={onGoalCommentSubmit(value)}
@@ -184,7 +184,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                             id={value.id}
                             author={value.author}
                             description={value.description}
-                            hue={value.hue}
+                            stateColor={value.stateColor}
                             createdAt={value.createdAt}
                             highlight={value.id === highlightCommentId}
                             reactions={value.reactions}

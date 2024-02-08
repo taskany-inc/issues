@@ -1,13 +1,14 @@
 import { nullable } from '@taskany/bricks';
+import { State } from '@taskany/bricks/harmony';
 import { ComponentProps, FC, ReactNode, useCallback } from 'react';
 import styled from 'styled-components';
 
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { goalPageHeader } from '../utils/domObjects';
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
+import { usePageContext } from '../hooks/usePageContext';
 
 import StateSwitch from './StateSwitch';
-import { State } from './State';
 import { IssueStats } from './IssueStats/IssueStats';
 import { IssueTitle } from './IssueTitle';
 
@@ -54,6 +55,8 @@ export const GoalHeader: FC<GoalHeaderProps> = ({
     onGoalStateChange,
     onCommentsClick,
 }) => {
+    const { theme } = usePageContext();
+
     const onStateChangeHandler = useCallback<NonNullable<GoalHeaderProps['onGoalStateChange']>>(
         (val) => {
             onGoalStateChange?.(val);
@@ -78,7 +81,7 @@ export const GoalHeader: FC<GoalHeaderProps> = ({
                             g._isEditable && g.project?.flowId ? (
                                 <StateSwitch state={s} flowId={g.project.flowId} onClick={onStateChangeHandler} />
                             ) : (
-                                <State title={s.title} hue={s.hue} />
+                                <State title={s.title} color={s[`${theme}Foreground`] || undefined} />
                             ),
                         )}
 

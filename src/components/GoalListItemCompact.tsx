@@ -1,6 +1,7 @@
 import React, { MouseEventHandler, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { nullable, Dropdown, MenuItem, TableRow, TableCell, TableRowProps, TableCellProps } from '@taskany/bricks';
+import { Dot } from '@taskany/bricks/harmony';
 import { IconMoreVerticalOutline, IconTargetOutline } from '@taskany/icons';
 import type { State as StateType } from '@prisma/client';
 
@@ -9,11 +10,11 @@ import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
 import { formateEstimate } from '../utils/dateTime';
 import { useLocale } from '../hooks/useLocale';
 import { Priority } from '../types/priority';
+import { usePageContext } from '../hooks/usePageContext';
 
 import { getPriorityText } from './PriorityText/PriorityText';
 import { UserGroup } from './UserGroup';
 import { Title, TextItem } from './Table';
-import { StateDot } from './StateDot';
 
 interface CommonGoalListItemCompactProps {
     shortId: string;
@@ -109,6 +110,7 @@ const StyledActionsWrapper = styled.div`
 
 const Column: ColumnRender = ({ col, componentProps }) => {
     const locale = useLocale();
+    const { theme } = usePageContext();
     const issuers = useMemo(() => {
         const { issuer, owner } = componentProps;
         if (issuer && owner && owner.id === issuer.id) {
@@ -133,7 +135,9 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             content = <Title size="s">{title}</Title>;
             break;
         case 'state':
-            content = nullable(state, (s) => <StateDot size="m" title={s?.title} hue={s?.hue} />);
+            content = nullable(state, (s) => (
+                <Dot size="m" title={s?.title} color={s?.[`${theme}Foreground`] || undefined} />
+            ));
             break;
         case 'priority':
             content = nullable(priority, (p) => <TextItem>{getPriorityText(p.title)}</TextItem>);

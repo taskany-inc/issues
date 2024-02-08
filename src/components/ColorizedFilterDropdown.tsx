@@ -4,7 +4,8 @@ import { FilterDropdownItem, FiltersDropdownBase, FiltersDropdownItemProps } fro
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 
 interface ColorizedFilterItem {
-    hue: number;
+    color: string;
+    hoverBackground: string;
     text: string;
 }
 
@@ -20,7 +21,13 @@ export const ColorizedFilterDropdown: FC<{
         value={value}
         onChange={onChange}
         renderItem={({ item: { id, data }, selected, onClick }: FiltersDropdownItemProps<ColorizedFilterItem>) => (
-            <ColorizedMenuItem key={id} hue={data.hue} checked={selected} onClick={onClick}>
+            <ColorizedMenuItem
+                key={id}
+                color={data.color}
+                hoverBackground={data.hoverBackground}
+                checked={selected}
+                onClick={onClick}
+            >
                 {data.text}
             </ColorizedMenuItem>
         )}

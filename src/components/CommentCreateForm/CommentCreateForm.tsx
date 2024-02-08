@@ -12,7 +12,7 @@ import { CommentSchema } from '../../schema/comment';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { ColorizedMenuItem } from '../ColorizedMenuItem';
-import { StateDot } from '../StateDot';
+// import { StateDot } from '../StateDot';
 import { useLatest } from '../../hooks/useLatest';
 
 import { tr } from './CommentCreateForm.i18n';
@@ -48,7 +48,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
         }, {});
     }, [states]);
 
-    const { user } = usePageContext();
+    const { user, theme } = usePageContext();
 
     const [pushState, setPushState] = useState(stateId ? statesMap[stateId] : undefined);
     const [description, setDescription] = useState(currentDescription);
@@ -146,7 +146,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                     type="submit"
                                     brick="right"
                                     text={tr('Update state')}
-                                    iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
+                                    // iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
                                     {...commentFormSubmitButton.attr}
                                 />
                                 <Dropdown hideOnClick>
@@ -172,7 +172,8 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                         {list.map((state) => (
                                             <ColorizedMenuItem
                                                 key={state.id}
-                                                hue={state.hue}
+                                                color={state[`${theme}Foreground`] || undefined}
+                                                hoverBackground={state[`${theme}Background`] || undefined}
                                                 checked={state.id === pushState?.id}
                                                 onClick={() => onStateSelect(state)}
                                             >

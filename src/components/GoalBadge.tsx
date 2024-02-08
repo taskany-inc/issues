@@ -1,32 +1,24 @@
 import React from 'react';
 import { Link, nullable } from '@taskany/bricks';
+import { Dot } from '@taskany/bricks/harmony';
 
 import { Badge } from './Badge';
 import { NextLink } from './NextLink';
-import { StateDot } from './StateDot';
 
 interface GoalBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'color'> {
     title: string;
     href?: string;
-    color?: number;
+    color?: string;
     children?: React.ReactNode;
     className?: string;
     onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
-export const GoalBadge: React.FC<GoalBadgeProps> = ({
-    href,
-    title,
-    color = 1,
-    children,
-    className,
-    onClick,
-    ...attrs
-}) => {
+export const GoalBadge: React.FC<GoalBadgeProps> = ({ href, title, color, children, className, onClick, ...attrs }) => {
     return (
         <Badge
             className={className}
-            icon={<StateDot view="stroke" hue={color} size="s" />}
+            icon={<Dot color={color} size="s" />}
             text={nullable(
                 href,
                 () => (

@@ -4,13 +4,12 @@ import { gray7 } from '@taskany/colors';
 import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button, FormControl, FormControlLabel, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlLabel, FormControlInput, FormControlError, Dot } from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect';
 import { GoalBadge } from '../GoalBadge';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { AddInlineTrigger } from '../AddInlineTrigger';
-import { StateDot } from '../StateDot';
 
 import { tr } from './CriteriaForm.i18n';
 import s from './CriteriaForm.module.css';
@@ -18,7 +17,7 @@ import s from './CriteriaForm.module.css';
 interface SuggestItem {
     id: string;
     title: string;
-    stateColor?: number;
+    stateColor?: string;
 }
 
 interface ValidityData {
@@ -72,7 +71,7 @@ function patchZodSchema<T extends FormValues>(
                     title: z
                         .string()
                         .refine((val) => !data.title.includes(val), { message: tr('Title must be unique') }),
-                    stateColor: z.number().optional(),
+                    stateColor: z.string().optional(),
                 }),
             }),
         ])
@@ -198,9 +197,7 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
         if (mode === 'simple') return false;
         if (!selectedItem || !selectedItem?.stateColor) return;
 
-        const color = selectedItem.stateColor || 1;
-
-        return <StateDot size="s" hue={color} view="stroke" />;
+        return <Dot color={selectedItem.stateColor} />;
     }, [mode, selectedItem]);
 
     const error = useMemo(() => {

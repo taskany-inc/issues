@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Dropdown } from '@taskany/bricks';
 import { IconGitPullOutline } from '@taskany/icons';
 import { State } from '@prisma/client';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, Dot } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 import { stateCombobox } from '../utils/domObjects';
+import { usePageContext } from '../hooks/usePageContext';
 
-import { StateDot } from './StateDot';
 import { ColorizedMenuItem } from './ColorizedMenuItem';
 
 interface StateDropdownProps {
@@ -22,6 +22,7 @@ interface StateDropdownProps {
 
 export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps & React.RefAttributes<HTMLDivElement>>(
     ({ text, value, flowId, error, disabled, onChange, ...attrs }, ref) => {
+        const { theme } = usePageContext();
         const [state, setState] = useState(value);
 
         const defaultFlowEnabled = !flowId && !disabled;
@@ -69,14 +70,20 @@ export const StateDropdown = React.forwardRef<HTMLDivElement, StateDropdownProps
                         text={props.text}
                         onClick={props.onClick}
                         disabled={props.disabled}
-                        iconLeft={state ? <StateDot hue={state.hue} /> : <IconGitPullOutline size="xs" />}
+                        iconLeft={
+                            state ? (
+                                <Dot color={state[`${theme}Foreground`] || undefined} />
+                            ) : (
+                                <IconGitPullOutline size="xs" />
+                            )
+                        }
                         {...stateCombobox.attr}
                     />
                 )}
                 renderItem={(props) => (
                     <ColorizedMenuItem
                         key={props.item.id}
-                        hue={props.item.hue}
+                        color={props.item[`${theme}Foreground`]}
                         focused={props.cursor === props.index}
                         onClick={props.onClick}
                     >

@@ -1,16 +1,16 @@
 import { useCallback, useMemo } from 'react';
 import { StateType } from '@prisma/client';
 import { Tab } from '@taskany/bricks';
+import { Dot } from '@taskany/bricks/harmony';
 
 import { FilterBase } from './FilterBase/FilterBase';
 import { FilterCheckbox } from './FilterCheckbox';
-import { StateDot } from './StateDot';
 import { FilterTabLabel } from './FilterTabLabel';
 
 interface State {
     id: string;
     title: string;
-    hue: number;
+    color: string;
     type: StateType;
 }
 
@@ -68,7 +68,7 @@ export const StateFilter: React.FC<StateFilterProps> = ({
                         focused={props.active}
                         onMouseLeave={props.onMouseLeave}
                         onMouseMove={props.onMouseMove}
-                        iconLeft={<StateDot hue={props.item.hue} />}
+                        iconLeft={<Dot color={props.item.color} />}
                         label={props.item.title}
                     />
                 )}

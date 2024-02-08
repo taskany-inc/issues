@@ -6,7 +6,6 @@ import { IconMessageTextOutline } from '@taskany/icons';
 
 import { GoalListItem } from '../GoalListItem/GoalListItem';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { StateWrapper } from '../StateWrapper';
 import { safeUserData } from '../../utils/getUserName';
 import { calculateElapsedDays, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
@@ -15,6 +14,7 @@ import { NextLink } from '../NextLink';
 import { routes } from '../../hooks/router';
 import { TagsList } from '../TagsList';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
+import { usePageContext } from '../../hooks/usePageContext';
 
 import s from './GoalTableList.module.css';
 
@@ -33,6 +33,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
     ...attrs
 }: GoalTableListProps<T>) => {
     const locale = useLocale();
+    const { theme } = usePageContext();
 
     const data = useMemo(
         () =>
@@ -77,9 +78,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     },
                     {
                         content: (
-                            <StateWrapper hue={goal.state?.hue}>
-                                <State color="var(--state-stroke)" title={goal.state?.title} />
-                            </StateWrapper>
+                            <State color={goal.state?.[`${theme}Foreground`] || undefined} title={goal.state?.title} />
                         ),
                         width: 130,
                     },
@@ -128,7 +127,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     },
                 ],
             })),
-        [goals, locale, onTagClick],
+        [goals, locale, onTagClick, theme],
     );
 
     return (
