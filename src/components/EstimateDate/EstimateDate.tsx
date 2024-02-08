@@ -1,4 +1,4 @@
-import { FormControl, FormControlInput } from '@taskany/bricks';
+import { FormControl, FormControlInput } from '@taskany/bricks/harmony';
 import { IconXSolid } from '@taskany/icons';
 import { useState, useCallback, useEffect } from 'react';
 import InputMask from 'react-input-mask';
@@ -93,8 +93,13 @@ export const EstimateDate: React.FC = () => {
                 >
                     {/* @ts-ignore incorrect type in react-input-mask */}
                     {(props) => (
-                        <FormControl variant="outline">
-                            <FormControlInput iconRight={<IconXSolid size="xxs" onClick={onRemoveDate} />} {...props} />
+                        <FormControl>
+                            <FormControlInput
+                                outline
+                                size="xs"
+                                iconRight={<IconXSolid size="xxs" onClick={onRemoveDate} />}
+                                {...props}
+                            />
                         </FormControl>
                     )}
                 </InputMask>

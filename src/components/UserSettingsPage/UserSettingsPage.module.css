@@ -1,0 +1,16 @@
+.FormControlInput {
+    width: 100%;
+}
+
+.FormControlLabel {
+    padding: var(--gap-s);
+    padding-left: var(--gap-m);
+    min-width: 80px;
+    color: var(--gray8);
+}
+
+.FormControl {
+    display: flex;
+    align-items: center;
+    background-color: var(--gray3);
+}

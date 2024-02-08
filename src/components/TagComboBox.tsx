@@ -1,8 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useState, ChangeEvent } from 'react';
-import { ComboBox, FormControl, FormControlInput, Tag } from '@taskany/bricks';
+import { ComboBox, Tag } from '@taskany/bricks';
 import { IconTagOutline } from '@taskany/icons';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlInput } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
@@ -110,8 +110,9 @@ export const TagComboBox = React.forwardRef<
                 )
             }
             renderInput={(props) => (
-                <FormControl variant="outline">
+                <FormControl>
                     <FormControlInput
+                        outline
                         autoFocus
                         disabled={props.disabled}
                         placeholder={placeholder}

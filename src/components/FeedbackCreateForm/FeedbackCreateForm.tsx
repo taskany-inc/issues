@@ -1,19 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-    Form,
-    FormActions,
-    FormAction,
-    FormTextarea,
-    ModalContent,
-    FormControl,
-    FormControlInput,
-    nullable,
-    FormControlError,
-} from '@taskany/bricks';
+import { Form, FormActions, FormAction, FormTextarea, ModalContent, nullable } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFeedbackSchema, CreateFeedback } from '../../schema/feedback';
@@ -64,8 +54,13 @@ const FeedbackCreateForm: React.FC = () => {
     return (
         <ModalContent>
             <Form disabled={formBusy} onSubmit={handleSubmit(onPending, onError)}>
-                <FormControl flat="bottom" size="l">
-                    <FormControlInput {...register('title')} placeholder={tr('Feedback title')} />
+                <FormControl>
+                    <FormControlInput
+                        brick="bottom"
+                        size="m"
+                        {...register('title')}
+                        placeholder={tr('Feedback title')}
+                    />
                     {nullable(errorsResolver('title'), (error) => (
                         <FormControlError error={error} />
                     ))}

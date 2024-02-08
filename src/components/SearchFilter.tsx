@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { debounce } from 'throttle-debounce';
-import { FormControl, FormControlInput } from '@taskany/bricks';
+import { FormControl, FormControlInput } from '@taskany/bricks/harmony';
 
 export const SearchFilter: FC<{
     placeholder?: string;
@@ -14,8 +14,14 @@ export const SearchFilter: FC<{
         [debouncedSearchHandler],
     );
     return (
-        <FormControl variant="outline">
-            <FormControlInput placeholder={placeholder} defaultValue={defaultValue} onChange={onSearchInputChange} />
+        <FormControl>
+            <FormControlInput
+                outline
+                size="xs"
+                placeholder={placeholder}
+                defaultValue={defaultValue}
+                onChange={onSearchInputChange}
+            />
         </FormControl>
     );
 };

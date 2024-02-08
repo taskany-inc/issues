@@ -1,19 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-    Form,
-    FormActions,
-    FormAction,
-    FormTextarea,
-    ModalContent,
-    FormControl,
-    FormControlInput,
-    FormControlError,
-    nullable,
-} from '@taskany/bricks';
+import { Form, FormActions, FormTextarea, FormAction, ModalContent, nullable } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFilterSchema, CreateFilter } from '../../schema/filter';
@@ -71,8 +61,13 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
         <>
             <ModalContent>
                 <Form disabled={formBusy} onSubmit={handleSubmit(onPending, onError)}>
-                    <FormControl brick="right" flat="bottom" size="l">
-                        <FormControlInput {...register('title')} placeholder={tr('Preset title')} />
+                    <FormControl>
+                        <FormControlInput
+                            brick="bottom"
+                            size="m"
+                            {...register('title')}
+                            placeholder={tr('Preset title')}
+                        />
                         {nullable(errorsResolver('title'), (error) => (
                             <FormControlError error={error} />
                         ))}

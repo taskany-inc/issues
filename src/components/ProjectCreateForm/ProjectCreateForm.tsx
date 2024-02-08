@@ -3,19 +3,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import {
-    Text,
-    Form,
-    FormActions,
-    FormAction,
-    FormTextarea,
-    ModalContent,
-    nullable,
-    FormControl,
-    FormControlInput,
-    FormControlError,
-} from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { Text, Form, FormActions, FormAction, FormTextarea, ModalContent, nullable } from '@taskany/bricks';
+import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
@@ -155,12 +144,14 @@ const ProjectCreateForm: React.FC = () => {
             <ModalContent>
                 <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined} {...projectCreateForm.attr}>
                     <StyledProjectTitleContainer>
-                        <StyledFormControl flat="bottom" brick="right" size="l">
+                        <StyledFormControl>
                             <FormControlInput
                                 {...register('title')}
                                 onChange={titleChangeHandler}
                                 disabled={busy}
                                 placeholder={tr('Project title')}
+                                brick="bottom"
+                                size="m"
                                 {...projectTitleInput.attr}
                             />
                             {nullable(errorsResolver('title'), (error) => (

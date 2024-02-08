@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { ComboBox, FormControl, FormControlError, FormControlInput, nullable } from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { ComboBox, nullable } from '@taskany/bricks';
+import { Button, FormControl, FormControlError, FormControlInput } from '@taskany/bricks/harmony';
 
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';
@@ -69,7 +69,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
         }, []);
 
         return (
-            <FormControl variant="outline" {...combobox.attr}>
+            <FormControl {...combobox.attr}>
                 <ComboBox
                     ref={ref}
                     text={value ? `#${value?.id}` : text}
@@ -99,6 +99,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                     renderInput={(props) => (
                         <FormControlInput
                             autoFocus
+                            outline
                             placeholder={placeholder}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                 setInputState(e.currentTarget.value);

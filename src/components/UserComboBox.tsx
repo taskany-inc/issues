@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, useCallback } from 'react';
-import { UserPic, UserMenuItem, nullable, FormControl, FormControlInput, ComboBox } from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { UserPic, UserMenuItem, nullable, ComboBox } from '@taskany/bricks';
+import { Button, FormControl, FormControlInput } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
@@ -92,8 +92,9 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                     )
                 }
                 renderInput={(props) => (
-                    <FormControl variant="outline">
+                    <FormControl>
                         <FormControlInput
+                            outline
                             autoFocus
                             disabled={props.disabled}
                             placeholder={placeholder}
