@@ -11,6 +11,7 @@ import { TextStyle, nullable } from '@taskany/bricks';
 import { pageContext, PageContext } from '../../utils/pageContext';
 import { useHotkeys } from '../../hooks/useHotkeys';
 import { ModalEvent } from '../../utils/dispatchModal';
+import { trpc } from '../../utils/trpcClient';
 import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../../utils/hotkeys';
 import { Theme } from '../Theme';
 import { PageHeader } from '../PageHeader/PageHeader';
@@ -42,12 +43,13 @@ const mapThemeOnId = { light: 0, dark: 1 } as const;
 
 export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, ...attrs }) => {
     const { setPreview } = useGoalPreview();
+    const { data: userSettings } = trpc.user.settings.useQuery();
 
     useHotkeys();
 
     const { resolvedTheme } = useTheme();
     const theme = (
-        user?.settings?.theme === 'system' ? resolvedTheme || 'dark' : user?.settings?.theme || 'light'
+        userSettings?.theme === 'system' ? resolvedTheme || 'dark' : userSettings?.theme || 'light'
     ) as PageContext['theme'];
 
     const router = useRouter();
@@ -56,19 +58,11 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
         setPreview(null);
     }, [router.asPath, setPreview]);
 
-    useEffect(() => {
-        const currentHref = document?.getElementById('themeVariables')?.getAttribute('href') || '';
-        const newHref = currentHref?.replace(/(.*)\/[^/]+$/, `$1/${theme}.css`);
-
-        if (newHref) {
-            document?.getElementById('themeVariables')?.setAttribute('href', newHref);
-        }
-    }, [theme]);
-
     return (
         <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], ssrTime }}>
             <Head>
                 <title>{title}</title>
+                <link rel="stylesheet" id="themeVariables" href={`/theme/${theme}.css`} />
             </Head>
 
             <TextStyle />
