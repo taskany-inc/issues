@@ -23,8 +23,6 @@ export default class MyDocument extends Document {
             <Html>
                 <Head>
                     <ExternalScripts />
-                    {/* eslint-disable-next-line @next/next/no-css-tags */}
-                    <link rel="stylesheet" id="themeVariables" href="/theme/themePlaceholder.css" />
                 </Head>
                 <body>
                     <Main />
