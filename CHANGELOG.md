@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.19.1](https://github.com/taskany-inc/issues/compare/v2.19.0...v2.19.1) (2024-02-12)
+
+
+### Bug Fixes
+
+* remove themePlaceholder ([402948d](https://github.com/taskany-inc/issues/commit/402948dfeabd8c3beb5bda745edfec2f9280e9fb))
+
 ## [2.19.0](https://github.com/taskany-inc/issues/compare/v2.18.3...v2.19.0) (2024-02-08)
 
 
