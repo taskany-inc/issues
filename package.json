@@ -87,7 +87,7 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
-    "@babel/core": "7.22.10",
+    "@babel/core": "7.23.9",
     "@commitlint/cli": "18.6.0",
     "@commitlint/config-conventional": "18.6.0",
     "@faker-js/faker": "8.2.0",
