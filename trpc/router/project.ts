@@ -11,6 +11,7 @@ import {
     projectSuggestionsSchema,
     projectDeleteSchema,
     participantsToProjectSchema,
+    teamsToProjectSchema,
 } from '../../src/schema/project';
 import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
@@ -544,6 +545,7 @@ export const project = router({
             const project = await prisma.project.findUnique({
                 where: { id },
                 include: {
+                    teams: true,
                     parent: true,
                     activity: { include: { user: true, ghost: true } },
                     participants: { include: { user: true, ghost: true } },
@@ -862,6 +864,45 @@ export const project = router({
                         ...addCalculatedGoalsFields(g, activityId, role),
                     })),
                 );
+        }),
+    updateTeams: protectedProcedure
+        .input(teamsToProjectSchema)
+        .use(projectEditAccessMiddleware)
+        .mutation(async ({ input: { id, teams } }) => {
+            const project = await prisma.project.findUnique({
+                where: { id },
+                include: {
+                    teams: true,
+                },
+            });
+
+            if (!project) return null;
+
+            const teamsToConnect =
+                teams?.filter((externalTeamId) => !project.teams.some((t) => t.externalTeamId === externalTeamId)) ??
+                [];
+            const teamsToDisconnect = project.teams.filter(
+                (t) => !teams?.some((externalTeamId) => externalTeamId === t.externalTeamId),
+            );
+
+            return prisma.project.update({
+                where: {
+                    id,
+                },
+                data: {
+                    teams: {
+                        connectOrCreate: teamsToConnect.map((externalTeamId) => ({
+                            where: {
+                                externalTeamId,
+                            },
+                            create: {
+                                externalTeamId,
+                            },
+                        })),
+                        disconnect: teamsToDisconnect.map((p) => ({ id: p.id })),
+                    },
+                },
+            });
         }),
     addParticipants: protectedProcedure
         .input(participantsToProjectSchema)

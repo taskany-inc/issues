@@ -8,6 +8,7 @@ export const routes = {
 
     project: (id: string) => `/projects/${id}`,
     projectSettings: (id: string) => `/projects/${id}/settings`,
+    projectTeam: (id: string) => `/projects/${id}/team`,
 
     goals: () => '/goals',
     goal: (shortId: string) => `/goals/${shortId}`,
@@ -21,6 +22,9 @@ export const routes = {
 
     help: (slug: AvailableHelpPages) => `/help/${slug}`,
     whatsnew: (release: string, locale: TLocale) => `/whatsnew/${release}/${locale}`,
+
+    crewTeam: (id: string) => `${process.env.NEXT_PUBLIC_CREW_URL}teams/${id}`,
+    crewUser: (id: string) => `${process.env.NEXT_PUBLIC_CREW_URL}users/${id}`,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

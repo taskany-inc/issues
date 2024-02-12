@@ -1,0 +1,7 @@
+.TeamComboBoxList {
+    margin-top: var(--gap-s);
+}
+
+.TeamComboBoxSearch {
+    width: 16rem;
+}
