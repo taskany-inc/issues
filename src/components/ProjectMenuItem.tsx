@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { gapS, gapXs, gray4, radiusM } from '@taskany/colors';
 import { Text } from '@taskany/bricks';
+import { HTMLAttributes } from 'react';
 
 import { comboboxItem } from '../utils/domObjects';
 
@@ -36,8 +37,13 @@ const StyledProjectCard = styled.div<{ focused?: boolean }>`
         `}
 `;
 
-export const ProjectMenuItem: React.FC<ProjectMenuItemProps> = ({ title, focused, onClick }) => (
-    <StyledProjectCard onClick={onClick} focused={focused} {...comboboxItem.attr}>
+export const ProjectMenuItem: React.FC<ProjectMenuItemProps & HTMLAttributes<HTMLDivElement>> = ({
+    title,
+    focused,
+    onClick,
+    ...rest
+}) => (
+    <StyledProjectCard onClick={onClick} focused={focused} {...rest} {...comboboxItem.attr}>
         <Text size="s" weight="bold">
             {title}
         </Text>

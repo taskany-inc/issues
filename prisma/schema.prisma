@@ -163,6 +163,7 @@ model Project {
   personal     Boolean?   @default(false)
   archived     Boolean?   @default(false)
   sharedGoals  Goal[]     @relation("partnershipProjects")
+  teams        Team[]     @relation("projects")
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
@@ -396,4 +397,10 @@ model Release {
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
+}
+
+model Team {
+  id             String    @id @default(cuid())
+  externalTeamId String    @unique
+  projects       Project[] @relation("projects")
 }

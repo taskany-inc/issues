@@ -1,10 +1,9 @@
-import { Badge, CircleProgressBar, State, Table, TableCell, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
+import { Badge, CircleProgressBar, State, Table, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
 import { MouseEventHandler, useMemo } from 'react';
-import cn from 'classnames';
 import { Link, ListViewItem, nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
-import { GoalListItem } from '../GoalListItem/GoalListItem';
+import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { StateWrapper } from '../StateWrapper';
 import { safeUserData } from '../../utils/getUserName';
@@ -138,18 +137,18 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     <ListViewItem
                         value={row.goal}
                         renderItem={({ active, hovered: _, ...props }) => (
-                            <GoalListItem
+                            <TableListItem
                                 onClick={onGoalPreviewShow(row.goal)}
                                 selected={selectedGoalResolver?.(row.goal?.id as string)}
                                 hovered={active}
                                 {...props}
                             >
                                 {row.list.map(({ content, width, className }, index) => (
-                                    <TableCell key={index} width={width} className={cn(s.Column, className)}>
+                                    <TableListItemElement key={index} width={width} className={className}>
                                         {content}
-                                    </TableCell>
+                                    </TableListItemElement>
                                 ))}
-                            </GoalListItem>
+                            </TableListItem>
                         )}
                     />
                 </Link>

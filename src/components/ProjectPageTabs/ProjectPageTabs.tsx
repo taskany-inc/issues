@@ -10,10 +10,12 @@ import { tr } from './ProjectPageTabs.i18n';
 
 export const ProjectPageTabs: FC<{ id: string; editable?: boolean }> = ({ id, editable = false }) => {
     const tabsMenuOptions: Array<[title: string, href: string, ownerOnly: boolean]> = useMemo(
-        () => [
-            [tr('Goals'), routes.project(id), true],
-            [tr('Settings'), routes.projectSettings(id), true],
-        ],
+        () =>
+            [
+                [tr('Goals'), routes.project(id), false],
+                process.env.NEXT_PUBLIC_CREW_URL ? [tr('Resources'), routes.projectTeam(id), false] : null,
+                [tr('Settings'), routes.projectSettings(id), true],
+            ].filter(Boolean),
         [id],
     );
 

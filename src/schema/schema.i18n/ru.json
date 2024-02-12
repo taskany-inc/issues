@@ -12,5 +12,6 @@
     "Goal's description is required": "Описание цели обязательно",
     "Goal's description must be a string": "Описание может быть только строкой",
     "Goal's project are is required": "Укажите проект",
-    "Choose a dependency": "Укажите тип зависимости"
+    "Choose a dependency": "Укажите тип зависимости",
+    "Max {max} items in a single request": "Максимум {max} объектов в одном запросе"
 }

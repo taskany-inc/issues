@@ -82,4 +82,11 @@ export const participantsToProjectSchema = z.object({
     participants: z.array(z.string()),
 });
 
+export const teamsToProjectSchema = z.object({
+    id: z.string(),
+    teams: z.array(z.string()),
+});
+
+export type TeamsUpdate = z.infer<typeof teamsToProjectSchema>;
+
 export type ParticipantsToProject = z.infer<typeof participantsToProjectSchema>;

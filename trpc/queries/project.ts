@@ -111,6 +111,7 @@ export const getProjectSchema = ({
                     ghost: true,
                 },
             },
+            teams: true,
             _count: {
                 select: {
                     stargizers: true,

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { ProjectCreate, ProjectUpdate } from '../schema/project';
+import { ProjectCreate, ProjectUpdate, TeamsUpdate } from '../schema/project';
 import { trpc } from '../utils/trpcClient';
 import { ProjectUpdateReturnType } from '../../trpc/inferredTypes';
 import { notifyPromise } from '../utils/notifyPromise';
@@ -12,6 +12,7 @@ export const useProjectResource = (id: string) => {
     const createMutation = trpc.project.create.useMutation();
     const updateMutation = trpc.project.update.useMutation();
     const deleteMutation = trpc.project.delete.useMutation();
+    const updateTeamsMutation = trpc.project.updateTeams.useMutation();
     const toggleWatcherMutation = trpc.project.toggleWatcher.useMutation();
     const toggleStargizerMutation = trpc.project.toggleStargizer.useMutation();
     const transferOwnershipMutation = trpc.project.transferOwnership.useMutation();
@@ -140,7 +141,19 @@ export const useProjectResource = (id: string) => {
         [removeParticipants, id, invalidate],
     );
 
+    const updateProjectTeams = useCallback(
+        async (data: TeamsUpdate) => {
+            const promise = updateTeamsMutation.mutateAsync(data);
+
+            await notifyPromise(promise, 'projectUpdate');
+
+            invalidate();
+        },
+        [updateTeamsMutation, invalidate],
+    );
+
     return {
+        updateProjectTeams,
         createProject,
         updateProject,
         deleteProject,

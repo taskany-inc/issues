@@ -1,21 +1,3 @@
-.Column:not(:last-child) {
-    padding-right: var(--gap-m);
-    position: relative;
-}
-
-.Column:not(:first-child):not(:last-child)::after {
-    content: '';
-    height: 24px;
-    width: 1px;
-
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-
-    border-right: 1px solid var(--gray-900);
-}
-
 .Title {
     display: flex;
     flex-direction: column;

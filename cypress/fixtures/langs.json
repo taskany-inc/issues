@@ -1023,6 +1023,10 @@
         "Settings": {
             "ru": "Настройки",
             "en": "Settings"
+        },
+        "Team": {
+            "ru": "Команда",
+            "en": "Team"
         }
     },
     "ProjectParticipants": {
@@ -1157,6 +1161,20 @@
             "en": "Ok, got it"
         }
     },
+    "ProjectTeamPage": {
+        "title": {
+            "ru": "Taskany — {project} — Настройки",
+            "en": "Taskany — {project} — Settings"
+        },
+        "Add team": {
+            "ru": "Добавить команду",
+            "en": "Add team"
+        },
+        "enter the title": {
+            "ru": "",
+            "en": ""
+        }
+    },
     "Reactions": {
         "and {count} more": {
             "ru": " и еще {count}",
@@ -1235,6 +1253,12 @@
         "Starred": {
             "ru": "Избранное",
             "en": "Starred"
+        }
+    },
+    "TeamListItem": {
+        "delete": {
+            "ru": "удалить",
+            "en": "delete"
         }
     },
     "UserEditableList": {
@@ -1371,6 +1395,10 @@
         "Comments's description must be longer than 1 symbol": {
             "ru": "Текст комментария должен быть длиннее 1 символа",
             "en": "Comments's description must be longer than 1 symbol"
+        },
+        "Max {max} items in a single request": {
+            "ru": "Максимум {max} объектов в одном запросе",
+            "en": "Max {max} items in a single request"
         },
         "Title is required": {
             "ru": "Заголовок обязателен",

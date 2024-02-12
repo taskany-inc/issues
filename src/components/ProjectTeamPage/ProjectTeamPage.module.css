@@ -1,0 +1,8 @@
+.ProjectTeamPageActions {
+    display: inline-block;
+    margin-bottom: var(--gap-s);
+}
+
+.ProjectTeamPageTeamLink {
+    display: contents;
+}
