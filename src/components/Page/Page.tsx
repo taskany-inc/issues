@@ -43,7 +43,7 @@ const mapThemeOnId = { light: 0, dark: 1 } as const;
 
 export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, ...attrs }) => {
     const { setPreview } = useGoalPreview();
-    const { data: userSettings } = trpc.user.settings.useQuery();
+    const { data: userSettings = user?.settings } = trpc.user.settings.useQuery();
 
     useHotkeys();
 
