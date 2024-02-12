@@ -104,7 +104,7 @@
     "@types/node": "18.16.3",
     "@types/nodemailer": "6.4.14",
     "@types/react": "18.2.48",
-    "@types/react-dom": "18.2.15",
+    "@types/react-dom": "18.2.19",
     "@types/react-input-mask": "3.0.5",
     "@types/styled-components": "5.1.26",
     "@types/throttle-debounce": "5.0.2",
