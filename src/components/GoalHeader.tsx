@@ -79,7 +79,19 @@ export const GoalHeader: FC<GoalHeaderProps> = ({
                     <StyledPublicActions>
                         {nullable(g?.state, (s) =>
                             g._isEditable && g.project?.flowId ? (
-                                <StateSwitch state={s} flowId={g.project.flowId} onClick={onStateChangeHandler} />
+                                <StateSwitch
+                                    state={{
+                                        id: s.id,
+                                        title: s.title,
+                                        type: s.type,
+                                        lightBackground: s.lightBackground || undefined,
+                                        lightForeground: s.lightForeground || undefined,
+                                        darkBackground: s.darkBackground || undefined,
+                                        darkForeground: s.darkForeground || undefined,
+                                    }}
+                                    flowId={g.project.flowId}
+                                    onClick={onStateChangeHandler}
+                                />
                             ) : (
                                 <State title={s.title} color={s[`${theme}Foreground`] || undefined} />
                             ),

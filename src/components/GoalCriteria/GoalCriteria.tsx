@@ -91,7 +91,7 @@ interface CriteriaItemValue {
         title: string;
         _shortId: string;
         state?: {
-            hue: number;
+            color: string;
         } | null;
     } | null;
 }
@@ -169,7 +169,7 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
                     selected: {
                         id: criteria.criteriaGoal?.id || '',
                         title: criteria.criteriaGoal?.title || '',
-                        stateColor: criteria.criteriaGoal?.state?.hue,
+                        stateColor: criteria.criteriaGoal?.state?.color,
                     },
                 },
             ];
@@ -184,7 +184,7 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
                         (goal) => (
                             <GoalBadge
                                 title={goal.title}
-                                color={goal.state?.hue}
+                                color={goal.state?.color}
                                 href={routes.goal(goal._shortId)}
                                 onClick={() => onClick?.(goal)}
                             />
@@ -333,6 +333,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                             id={goalId}
                             withModeSwitch
                             defaultMode="simple"
+                            // @ts-ignore https://github.com/taskany-inc/issues/issues/2303
                             items={list.map((criteria) => ({ ...criteria, goal: criteria.criteriaGoal }))}
                             onSubmit={onCreate}
                             validateGoalCriteriaBindings={validateGoalCriteriaBindings}

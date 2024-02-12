@@ -26,6 +26,7 @@ import { SortFilter } from '../SortFilter/SortFilter';
 import { FilterPopup } from '../FilterPopup/FilterPopup';
 import { getUserName, prepareUserDataFromActivity } from '../../utils/getUserName';
 import { filtersPanel } from '../../utils/domObjects';
+import { usePageContext } from '../../hooks/usePageContext';
 
 import { tr } from './FiltersPanel.i18n';
 import s from './FiltersPanel.module.css';
@@ -68,6 +69,7 @@ export const FiltersPanel: FC<{
     onFilterApply?: (state: Partial<QueryState>) => void;
 }> = memo(
     ({ children, loading, total = 0, counter = 0, queryState, queryFilterState, onSearchChange, onFilterApply }) => {
+        const { theme } = usePageContext();
         const filterNodeRef = useRef<HTMLSpanElement>(null);
         const [ownersQuery, setOwnersQuery] = useState('');
         const [issuersQuery, setIssuersQuery] = useState('');
@@ -178,7 +180,12 @@ export const FiltersPanel: FC<{
                 </FiltersPanelContainer>
                 <FiltersPanelApplied
                     queryState={queryState}
-                    states={states}
+                    states={states.map((s) => ({
+                        id: s.id,
+                        title: s.title,
+                        type: s.type,
+                        color: s[`${theme}Foreground`] || undefined,
+                    }))}
                     issuers={mapUserToView(issuers)}
                     owners={mapUserToView(owners)}
                     participants={mapUserToView(participants)}
@@ -196,7 +203,12 @@ export const FiltersPanel: FC<{
                         text={tr('State')}
                         value={filterQuery?.state}
                         stateTypes={filterQuery?.stateType}
-                        states={states}
+                        states={states.map((s) => ({
+                            id: s.id,
+                            title: s.title,
+                            type: s.type,
+                            color: s[`${theme}Foreground`] || undefined,
+                        }))}
                         onStateChange={setPartialQueryByKey('state')}
                         onStateTypeChange={setPartialQueryByKey('stateType')}
                     />

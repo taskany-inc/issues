@@ -10,7 +10,7 @@ import { FilterTabLabel } from './FilterTabLabel';
 interface State {
     id: string;
     title: string;
-    color: string;
+    color?: string;
     type: StateType;
 }
 

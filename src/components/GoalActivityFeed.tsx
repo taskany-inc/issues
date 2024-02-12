@@ -152,6 +152,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     onRemove={handleRemoveCriteria}
                                     onGoalClick={onGoalClick}
                                     validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                                    // @ts-ignore https://github.com/taskany-inc/issues/issues/2303
                                     list={goal._criteria}
                                 />
                             ))}

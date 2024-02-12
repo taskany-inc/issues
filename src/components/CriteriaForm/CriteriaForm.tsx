@@ -4,7 +4,14 @@ import { gray7 } from '@taskany/colors';
 import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button, FormControl, FormControlLabel, FormControlInput, FormControlError, Dot } from '@taskany/bricks/harmony';
+import {
+    Button,
+    FormControl,
+    FormControlLabel,
+    FormControlInput,
+    FormControlError,
+    Dot,
+} from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect';
 import { GoalBadge } from '../GoalBadge';
