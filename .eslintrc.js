@@ -79,5 +79,16 @@ module.exports = {
             { argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_', varsIgnorePattern: '^_' },
         ],
         'prefer-destructuring': 'error',
+        'no-restricted-imports': [
+            'warn',
+            {
+                paths: [
+                    {
+                        name: '@prisma/client',
+                        message: 'Use the trpc procedures inferred types instead',
+                    },
+                ],
+            },
+        ],
     },
 };
