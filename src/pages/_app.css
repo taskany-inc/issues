@@ -4,7 +4,8 @@ body {
 
     font-family: var(--font-display);
     color: var(--text-primary);
-    font-size: var(--font-size-m);;
+    font-size: var(--font-size-m);
+    
     margin: 0;
     padding: 0;
 
