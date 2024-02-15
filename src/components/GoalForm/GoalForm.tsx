@@ -3,11 +3,11 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
 import { State, Tag as TagModel } from '@prisma/client';
-import { Form, FormActions, FormAction, ModalContent, Tag, TagCleanButton, nullable } from '@taskany/bricks';
+import { Form, FormAction, ModalContent, Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconCalendarTickOutline } from '@taskany/icons';
 import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
-import { FormEditor } from '../FormEditor/FormEditor';
+import { FormControlEditor } from '../FormControlEditor/FormControlEditor';
 import { errorsProvider } from '../../utils/forms';
 import { formateEstimate } from '../../utils/dateTime';
 import { DateType } from '../../types/date';
@@ -30,9 +30,11 @@ import {
     goalTitleInputError,
 } from '../../utils/domObjects';
 import { TagsList } from '../TagsList';
+import { FormActions } from '../FormActions/FormActions';
 
 import { GoalFormEstimate } from './GoalFormEstimate';
 import { tr } from './GoalForm.i18n';
+import s from './GoalForm.module.css';
 
 const tagsLimit = 5;
 interface GoalFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -125,38 +127,45 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
     return (
         <ModalContent {...attrs}>
-            <Form onSubmit={handleSubmit(onSubmit)}>
-                <FormControl>
-                    <FormControlInput
-                        {...register('title')}
-                        disabled={busy}
-                        autoFocus
-                        placeholder={tr("Goal's title")}
-                        brick="bottom"
-                        size="m"
-                        {...goalTitleInput.attr}
-                    />
-                    {nullable(errorsResolver('title'), (error) => (
-                        <FormControlError error={error} {...goalTitleInputError.attr} />
-                    ))}
-                </FormControl>
-
-                <Controller
-                    name="description"
-                    control={control}
-                    render={({ field }) => (
-                        <FormEditor
-                            flat="both"
-                            placeholder={tr('And its description')}
-                            error={errorsResolver(field.name)}
+            <Form onSubmit={handleSubmit(onSubmit)} className={s.Form}>
+                <div>
+                    <FormControl>
+                        <FormControlInput
+                            {...register('title')}
                             disabled={busy}
-                            {...field}
-                            {...goalDescriptionInput.attr}
+                            autoFocus
+                            placeholder={tr("Goal's title")}
+                            brick="bottom"
+                            size="m"
+                            {...goalTitleInput.attr}
                         />
-                    )}
-                />
+                        {nullable(errorsResolver('title'), (error) => (
+                            <FormControlError error={error} {...goalTitleInputError.attr} />
+                        ))}
+                    </FormControl>
 
-                <FormActions flat="top">
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field }) => (
+                            <FormControl>
+                                <FormControlEditor
+                                    placeholder={tr('And its description')}
+                                    disabled={busy}
+                                    brick="center"
+                                    height={200}
+                                    {...field}
+                                    {...goalDescriptionInput.attr}
+                                />
+                                {nullable(errorsResolver(field.name), (error) => (
+                                    <FormControlError error={error} />
+                                ))}
+                            </FormControl>
+                        )}
+                    />
+                </div>
+
+                <FormActions>
                     <FormAction left inline>
                         {nullable(!id && !personal, () => (
                             <Controller
@@ -263,7 +272,8 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         <HelpButton slug="goals" />
                     </FormAction>
                 </FormActions>
-                <FormActions flat="top">
+
+                <FormActions>
                     <FormAction left>
                         {nullable(
                             tagsWatcher,

@@ -1,7 +1,8 @@
-import { FormEditor as FormEditorBricks, editorLoader } from '@taskany/bricks';
+import { editorLoader } from '@taskany/bricks';
 import React from 'react';
+import { FormControlEditor as FormEditor } from '@taskany/bricks/harmony';
 
-import { tr } from './FormEditor.i18n';
+import { tr } from './FormControlEditor.i18n';
 
 editorLoader.config({
     paths: {
@@ -9,9 +10,9 @@ editorLoader.config({
     },
 });
 
-export const FormEditor = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof FormEditorBricks>>(
+export const FormControlEditor = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof FormEditor>>(
     ({ ...props }, ref) => (
-        <FormEditorBricks
+        <FormEditor
             ref={ref}
             messages={{
                 attachmentsButton: tr('Attach files'),

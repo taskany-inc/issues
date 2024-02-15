@@ -1,15 +1,16 @@
 import React, { useCallback, useRef, useState } from 'react';
-import styled from 'styled-components';
-import { backgroundColor, gapM, gray4 } from '@taskany/colors';
-import { Form, FormCard, FormAction, FormActions, nullable, useClickOutside } from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { Form, FormAction, nullable, useClickOutside } from '@taskany/bricks';
+import { Button, FormControl, FormControlError } from '@taskany/bricks/harmony';
+import cn from 'classnames';
 
 import { CommentSchema } from '../../schema/comment';
 import { commentForm, commentFormDescription } from '../../utils/domObjects';
-import { FormEditor } from '../FormEditor/FormEditor';
+import { FormControlEditor } from '../FormControlEditor/FormControlEditor';
 import { HelpButton } from '../HelpButton/HelpButton';
+import { FormActions } from '../FormActions/FormActions';
 
 import { tr } from './CommentForm.i18n';
+import s from './CommentForm.module.css';
 
 interface CommentFormProps {
     actionButton: React.ReactNode;
@@ -23,36 +24,6 @@ interface CommentFormProps {
     onFocus?: () => void;
     onCancel?: () => void;
 }
-
-const StyledFormBottom = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding-top: ${gapM};
-`;
-
-const StyledCommentForm = styled(FormCard)`
-    &::before {
-        position: absolute;
-        z-index: 0;
-
-        content: '';
-
-        width: 14px;
-        height: 14px;
-
-        background-color: ${backgroundColor};
-
-        border-left: 1px solid ${gray4};
-        border-top: 1px solid ${gray4};
-        border-radius: 2px;
-
-        transform: rotate(-45deg);
-        top: 10px;
-        left: -8px;
-    }
-`;
 
 export const CommentForm: React.FC<CommentFormProps> = ({
     description = '',
@@ -95,30 +66,33 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     }, []);
 
     return (
-        <StyledCommentForm ref={ref} tabIndex={0}>
+        <div className={cn(s.CommentFormWrapper, { [s.CommentFormWrapper_focused]: focused })} ref={ref} tabIndex={0}>
             <Form onSubmit={onCommentSubmit} {...commentForm.attr}>
-                <FormEditor
-                    disabled={busy}
-                    placeholder={tr('Leave a comment')}
-                    height={focused ? 120 : 40}
-                    onCancel={onCommentCancel}
-                    onFocus={onFocus}
-                    onUploadFail={onUploadFail}
-                    error={error}
-                    autoFocus={autoFocus}
-                    value={description}
-                    onChange={onDescriptionChange}
-                    {...commentFormDescription.attr}
-                />
+                <FormControl>
+                    <FormControlEditor
+                        disabled={busy}
+                        placeholder={tr('Leave a comment')}
+                        height={focused ? 120 : 80}
+                        onCancel={onCommentCancel}
+                        onFocus={onFocus}
+                        onUploadFail={onUploadFail}
+                        autoFocus={autoFocus}
+                        value={description}
+                        onChange={onDescriptionChange}
+                        outline
+                        {...commentFormDescription.attr}
+                    />
+                    {nullable(error, (err) => (
+                        <FormControlError error={err} />
+                    ))}
+                </FormControl>
 
                 {nullable(focused, () => (
                     <FormActions>
                         <FormAction left inline>
-                            {nullable(focused, () => (
-                                <StyledFormBottom>
-                                    <HelpButton slug="comments" />
-                                </StyledFormBottom>
-                            ))}
+                            <div className={s.FormHelpButton}>
+                                <HelpButton slug="comments" />
+                            </div>
                         </FormAction>
                         <FormAction right inline>
                             {nullable(!busy, () => (
@@ -130,6 +104,6 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                     </FormActions>
                 ))}
             </Form>
-        </StyledCommentForm>
+        </div>
     );
 };

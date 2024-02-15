@@ -1,0 +1,39 @@
+.FormHelpButton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--gap-m);
+}
+
+.CommentFormWrapper {
+    position: relative;
+    transition: 200ms ease-in;
+    transition-property: background-color;
+}
+
+.CommentFormWrapper::before {
+    position: absolute;
+    z-index: 1;
+
+    content: '';
+
+    width: 14px;
+    height: 14px;
+
+    background-color: var(--background);
+
+    border-left: 1px solid var(--input-border);
+    border-top: 1px solid var(--input-border);
+
+    transform: rotate(-45deg);
+    /*
+        Provides precise vertical & horizontal placements
+        of the arrow relative to the form
+    */
+    top: 10px;
+    left: -7px;
+}
+
+.CommentFormWrapper_focused::before {
+    background-color: var(--input-fill-focused-borderless);
+}

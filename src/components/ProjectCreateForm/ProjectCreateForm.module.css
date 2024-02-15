@@ -1,0 +1,8 @@
+.FormControl {
+    flex: 1;
+}
+
+.ProjectTitleContainer {
+    display: flex;
+    align-items: center;
+}
