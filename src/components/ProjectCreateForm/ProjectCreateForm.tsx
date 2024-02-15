@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { Text, Form, FormActions, FormAction, FormTextarea, ModalContent, nullable } from '@taskany/bricks';
-import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import { Text, Form, FormAction, ModalContent, nullable, setRefs } from '@taskany/bricks';
+import { Button, FormControl, FormControlInput, FormControlError, Textarea, Tooltip } from '@taskany/bricks/harmony';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
@@ -23,19 +22,12 @@ import {
     projectTitleInput,
 } from '../../utils/domObjects';
 import RotatableTip from '../RotatableTip/RotatableTip';
+import { FormActions } from '../FormActions/FormActions';
 
 import { tr } from './ProjectCreateForm.i18n';
+import s from './ProjectCreateForm.module.css';
 
 const KeyInput = dynamic(() => import('../KeyInput'));
-
-const StyledProjectTitleContainer = styled.div`
-    display: flex;
-    align-items: center;
-`;
-
-const StyledFormControl = styled(FormControl)`
-    flex: 1;
-`;
 
 const ProjectCreateForm: React.FC = () => {
     const router = useRouter();
@@ -139,12 +131,15 @@ const ProjectCreateForm: React.FC = () => {
             : tr.raw('Key already exists', { key: keyWatcher })
         : tr('Key must be 3 or longer characters');
 
+    const errorRef = useRef<HTMLTextAreaElement>(null);
+    const error = errorsResolver('description');
+
     return (
         <>
             <ModalContent>
                 <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined} {...projectCreateForm.attr}>
-                    <StyledProjectTitleContainer>
-                        <StyledFormControl>
+                    <div className={s.ProjectTitleContainer}>
+                        <FormControl className={s.FormControl}>
                             <FormControlInput
                                 {...register('title')}
                                 onChange={titleChangeHandler}
@@ -155,9 +150,9 @@ const ProjectCreateForm: React.FC = () => {
                                 {...projectTitleInput.attr}
                             />
                             {nullable(errorsResolver('title'), (error) => (
-                                <FormControlError error={error} placement="top-start" />
+                                <FormControlError error={error} />
                             ))}
-                        </StyledFormControl>
+                        </FormControl>
 
                         {nullable(titleWatcher, () => (
                             <Controller
@@ -175,19 +170,25 @@ const ProjectCreateForm: React.FC = () => {
                                 )}
                             />
                         ))}
-                    </StyledProjectTitleContainer>
+                    </div>
 
-                    <FormTextarea
+                    <Textarea
                         {...register('description')}
-                        flat="both"
-                        minHeight={100}
+                        brick="center"
                         disabled={busy}
+                        height={200}
                         placeholder={tr('Short description')}
-                        error={errorsResolver('description')}
+                        ref={setRefs(errorRef, register('description').ref)}
+                        view={error && 'danger'}
                         {...projectDescriptionInput.attr}
                     />
+                    {nullable(error, (err) => (
+                        <Tooltip reference={errorRef} view="danger">
+                            {err.message}
+                        </Tooltip>
+                    ))}
 
-                    <FormActions flat="top">
+                    <FormActions>
                         <FormAction left inline>
                             <Controller
                                 name="flow"
@@ -206,7 +207,8 @@ const ProjectCreateForm: React.FC = () => {
                             <HelpButton slug="projects" />
                         </FormAction>
                     </FormActions>
-                    <FormActions flat="top">
+
+                    <FormActions>
                         <FormAction left>
                             <RotatableTip context="project" />
                         </FormAction>
