@@ -7,6 +7,9 @@ export interface SendMailProps {
     html: string;
 }
 
+// TODO: https://github.com/taskany-inc/issues/issues/2330
+// import { render } from '@react-email/render';
+// const emailHtml = render(<Email url="https://example.com" />);
 export const sendMail = ({ to, subject, text, html }: SendMailProps) =>
     mailServer.sendMail({
         from: `"Taskany Issues" <${process.env.MAIL_USER}>`,
