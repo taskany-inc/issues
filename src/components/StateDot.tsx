@@ -24,7 +24,7 @@ export const StateDot: React.FC<
                 () => (
                     <StyledDot {...props} />
                 ),
-                <StyledIcon size="s" />,
+                <StyledIcon size="s" {...props} />,
             )}
         </StateWrapper>
     );

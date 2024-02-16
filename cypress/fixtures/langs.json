@@ -1,1042 +1,218 @@
 {
-    "AccessUserDeleteErrorModal": {
-        "Cannot delete person now": {
-            "ru": "Невозможно удалить пользователя",
-            "en": "Cannot delete person now"
-        },
-        "The user has actual goals": {
-            "ru": "У пользователя есть незакрытые цели",
-            "en": "The user has actual goals"
-        },
-        "Before deleting, you must move this goals to another person:": {
-            "ru": "Перед удалением назначьте эти цели другим пользователям:",
-            "en": "Before deleting, you must move this goals to another person:"
-        },
-        "Ok, got it": {
-            "ru": "Хорошо, сделаю",
-            "en": "Ok, got it"
-        }
-    },
-    "AdminPage": {
-        "This page is protected AdminPanel": {
-            "ru": "",
+    "WhatsNew": {
+        "What's New!": {
+            "ru": "Мы обновились!",
             "en": ""
         },
-        "Only admin users can see this page.": {
-            "ru": "",
+        "Dismiss": {
+            "ru": "Прочту позже",
+            "en": ""
+        },
+        "Awesome! Thank you!": {
+            "ru": "Круто! Спасибо!",
             "en": ""
         }
     },
-    "CommentCreateForm": {
-        "Comment": {
-            "ru": "Написать",
-            "en": "Comment"
-        },
-        "Update state": {
-            "ru": "Обновить статус",
-            "en": "Update state"
+    "WatchingFilter": {
+        "Watching": {
+            "ru": "Подписки",
+            "en": "Watching"
         }
     },
-    "CommentForm": {
-        "Leave a comment": {
-            "ru": "Оставить комментарий...",
-            "en": "Leave a comment..."
+    "WatchButton": {
+        "Watching": {
+            "ru": "Отписаться",
+            "en": "Watching"
         },
-        "Cancel": {
-            "ru": "Отменить",
-            "en": "Cancel"
+        "Watch": {
+            "ru": "Следить",
+            "en": "Watch"
         }
     },
-    "CommentView": {
-        "Copy raw": {
-            "ru": "Скопировать",
-            "en": "Copy raw"
-        },
-        "Edit": {
-            "ru": "Изменить",
-            "en": "Edit"
-        },
-        "Delete": {
-            "ru": "Удалить",
-            "en": "Delete"
-        },
-        "Save": {
-            "ru": "Сохранить",
-            "en": "Save"
-        }
-    },
-    "CriteriaForm": {
-        "This binding is already exist": {
-            "ru": "Такая связка уже существует",
-            "en": ""
-        },
-        "Title must be unique": {
-            "ru": "Название должно быть уникальным",
-            "en": ""
-        },
-        "Title is required": {
-            "ru": "Название обязательно",
-            "en": ""
-        },
-        "Title must be longer than 1 symbol": {
-            "ru": "Название должно быть 1 или более символов",
-            "en": ""
-        },
-        "Weight must be an integer": {
-            "ru": "Вес должен быть числом",
-            "en": ""
-        },
-        "Passed weight is not in range": {
-            "ru": "Вес критерия должен быть от 1 до {upTo}",
-            "en": "Weight must be between 1 and {upTo}"
-        },
-        "Weight": {
-            "ru": "Вес",
-            "en": ""
-        },
-        "Weight out of": {
-            "ru": "из {upTo}",
-            "en": "out of {upTo}"
-        },
-        "Criteria title": {
-            "ru": "Заголовок критерия",
-            "en": ""
-        },
-        "Simple": {
-            "ru": "Критерий",
-            "en": ""
-        },
-        "Goal": {
-            "ru": "Цель",
-            "en": ""
-        },
-        "Mode": {
-            "ru": "Тип",
-            "en": ""
-        },
-        "Add weight": {
-            "ru": "Добавить вес",
-            "en": ""
-        },
-        "Save": {
-            "ru": "Сохранить",
-            "en": ""
-        },
-        "Add": {
-            "ru": "Добавить",
-            "en": ""
-        }
-    },
-    "DashboardPage": {
-        "Dashboard": {
-            "ru": "Рабочий стол",
-            "en": "Dashboard"
-        },
-        "This is your personal goals bundle": {
-            "ru": "Здесь будут все созданные вами, назначенные на вас, а также цели, задачи и проекты, за которыми вы следите.",
-            "en": "This is your personal bundle. Created, owned, watching projects, goals and issues are here."
+    "UserSettingsPage": {
+        "Nickname already exists": {
+            "ru": "Логин уже существует",
+            "en": "Nickname already exists"
         },
         "title": {
-            "ru": "Taskany — Рабочий стол",
-            "en": "Taskany — Dashboard"
-        }
-    },
-    "Estimate": {
-        "Date is past": {
-            "ru": "Выбранная дата уже прошла",
-            "en": "Selected date is past"
-        }
-    },
-    "EstimateDate": {
-        "Date title": {
-            "ru": "Дата",
-            "en": "Strict date"
-        },
-        "Date clue": {
-            "ru": "Или можно указать точную дату вручную, если есть строгий дедлайн.",
-            "en": "Or you can choose a date if you have strict deadline."
-        },
-        "Date input mask": {
-            "ru": "99.99.9999",
-            "en": "99/99/9999"
-        },
-        "Date input mask placeholder": {
-            "ru": "dd.mm.yyyy",
-            "en": "mm/dd/yyyy"
-        }
-    },
-    "EstimateQuarter": {
-        "Quarter title": {
-            "ru": "Квартал",
-            "en": "Quarter"
-        },
-        "Quarter clue": {
-            "ru": "Можно указать квартал: Q1, Q2, Q3, Q4. Сейчас {quarter}, заканчивается {end}.",
-            "en": "This is the date shortcut: Q1, Q2, Q3, Q4. Currently is {quarter}. End is {end}."
-        }
-    },
-    "EstimateYear": {
-        "Year title": {
-            "ru": "Год",
-            "en": "Year"
-        },
-        "Year clue": {
-            "ru": "Если выбрать только год, то датой будет выбран конец года, например: {end}.",
-            "en": "If you are selecting only year it means the deadline will be the end of the year. For example: {end}."
-        }
-    },
-    "ExplorePageLayout": {
-        "Top": {
-            "ru": "Топ",
-            "en": "Top"
-        },
-        "Projects": {
-            "ru": "Проекты",
-            "en": "Projects"
-        },
-        "Explore": {
-            "ru": "Обзор",
-            "en": "Explore"
-        },
-        "See what the Taskany community is most excited about today": {
-            "ru": "Смотри, чем пользователи Taskany интересуются сегодня",
-            "en": "See what the Taskany community is most excited about today"
-        }
-    },
-    "ExploreProjectsPage": {
-        "title": {
-            "ru": "Taskany — Обзор — Проекты",
-            "en": "Taskany — Explore — Projects"
-        }
-    },
-    "ExploreTopProjectsPage": {
-        "title": {
-            "ru": "Taskany — Обзор — Проекты",
-            "en": "Taskany — Explore — Projects"
-        }
-    },
-    "FeedbackCreateForm": {
-        "Feedback title": {
-            "ru": "Заголовок заявки",
-            "en": ""
-        },
-        "Feedback description. Say anything what's on your mind": {
-            "ru": "Описание заявки. Расскажите что произошло",
-            "en": ""
-        },
-        "Cancel": {
-            "ru": "Отменить",
-            "en": ""
-        },
-        "Send feedback": {
-            "ru": "Отправить заявку",
-            "en": ""
-        }
-    },
-    "FilterAutoCompleteInput": {
-        "Search...": {
-            "ru": "Поиск...",
-            "en": ""
-        }
-    },
-    "FilterBase": {
-        "Suggestions": {
-            "ru": "Предложения",
-            "en": ""
-        }
-    },
-    "FilterCreateForm": {
-        "Preset title": {
-            "ru": "Название",
-            "en": ""
-        },
-        "Preset description": {
-            "ru": "Описание",
-            "en": ""
-        },
-        "Cancel": {
-            "ru": "Отменить",
-            "en": ""
-        },
-        "Create preset": {
-            "ru": "Сохранить",
-            "en": ""
-        }
-    },
-    "FilterDeleteForm": {
-        "You are trying to delete filters preset": {
-            "ru": "Ты собираешься удалить пресет с фильтрами",
-            "en": "You are trying to delete filters preset"
-        },
-        "Are you sure to delete filters preset {preset}?": {
-            "ru": "Уверен, что хочешь удалить пересет {preset}?",
-            "en": "Are you sure to delete filters preset {preset}?"
-        },
-        "Cancel": {
-            "ru": "Отмена",
-            "en": "Cancel"
-        },
-        "Yes, delete it": {
-            "ru": "Да, удаляем",
-            "en": "Yes, delete it"
-        }
-    },
-    "FilteredPage": {
-        "Preset": {
-            "ru": "Пресет",
-            "en": ""
-        },
-        "Limit": {
-            "ru": "Лимит",
-            "en": ""
-        },
-        "Reset": {
-            "ru": "Сбросить",
-            "en": ""
-        }
-    },
-    "FilterPopup": {
-        "Pro tip!": {
-            "ru": "Совет!",
-            "en": ""
-        },
-        "You can apply and save filters as preset.": {
-            "ru": "Вы можете применить и сохранить фильтры",
-            "en": ""
-        },
-        "Cancel": {
-            "ru": "Отменить",
-            "en": ""
-        },
-        "Apply": {
-            "ru": "Применить",
-            "en": ""
-        }
-    },
-    "FiltersPanel": {
-        "Search": {
-            "ru": "Поиск",
-            "en": "Search"
-        },
-        "Filter": {
-            "ru": "Фильтр",
-            "en": "Filter"
-        },
-        "State": {
-            "ru": "Статус",
-            "en": "State"
-        },
-        "Priority": {
-            "ru": "Приоритет",
-            "en": "Priority"
-        },
-        "Estimate": {
-            "ru": "Срок",
-            "en": "Estimate"
-        },
-        "Project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
-        "Issuer": {
-            "ru": "Автор",
-            "en": "Issuer"
-        },
-        "Owner": {
-            "ru": "Ответственный",
-            "en": "Owner"
-        },
-        "Tags": {
-            "ru": "Теги",
-            "en": "Tags"
-        },
-        "Participant": {
-            "ru": "Участник",
-            "en": "Participant"
-        },
-        "Sort": {
-            "ru": "Сортировка",
-            "en": "Sort"
-        }
-    },
-    "FiltersPanelApplied": {
-        "Priority": {
-            "ru": "Приоритет",
-            "en": "Priority"
-        },
-        "State": {
-            "ru": "Статус",
-            "en": "State"
-        },
-        "Issuer": {
-            "ru": "Автор",
-            "en": "Issuer"
-        },
-        "Owner": {
-            "ru": "Владелец",
-            "en": "Owner"
-        },
-        "Participant": {
-            "ru": "Участник",
-            "en": "Participant"
-        },
-        "Project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
-        "Tag": {
-            "ru": "Тег",
-            "en": "Tag"
-        },
-        "Estimate": {
-            "ru": "Срок",
-            "en": "Estimate"
-        },
-        "Sorted": {
-            "ru": "Отсортировано",
-            "en": "Sorted"
-        }
-    },
-    "FormControlEditor": {
-        "Attach files": {
-            "ru": "Загрузить файл",
-            "en": "Attach files"
-        },
-        "drag'n'drop or pasting also supported": {
-            "ru": "Перетаскивание и вставка из буфера тоже работают",
-            "en": "Drag'n'drop or pasting are also supported"
-        },
-        "Uploading...": {
-            "ru": "Загрузка...",
-            "en": "Uploading..."
-        }
-    },
-    "GlobalSearch": {
-        "Search or jump to...": {
-            "ru": "Найти и/или перейти...",
-            "en": "Search or jump to..."
-        },
-        "Goals": {
-            "ru": "Цели",
-            "en": ""
-        },
-        "Projects": {
-            "ru": "Проекты",
-            "en": ""
-        }
-    },
-    "GoalContentHeader": {
-        "Copy raw": {
-            "ru": "Скопировать",
-            "en": "Copy raw"
-        },
-        "No description provided": {
-            "ru": "Описание отсутствует",
-            "en": "No description provided"
-        }
-    },
-    "GoalCreateForm": {
-        "Create & Go": {
-            "ru": "Создать и перейти",
-            "en": "Create & Go"
-        },
-        "Create and go to the goal page": {
-            "ru": "Создать и перейти на страницу цели",
-            "en": "Create and go to the goal page"
-        },
-        "Create one more": {
-            "ru": "Создать еще",
-            "en": "Create one more"
-        },
-        "Create and open new form for the next goal": {
-            "ru": "Создать и открыть новую форму для следующей цели",
-            "en": "Create and open new form for the next goal"
-        },
-        "Create only": {
-            "ru": "Создать",
-            "en": "Create only"
-        },
-        "Create goal and close form": {
-            "ru": "Создать цель и закрыть форму",
-            "en": "Create goal and close form"
-        },
-        "Cancel": {
-            "ru": "Отмена",
-            "en": "Cancel"
-        }
-    },
-    "GoalCriteria": {
-        "Edit": {
-            "ru": "Изменить",
-            "en": ""
-        },
-        "Create as goal": {
-            "ru": "Создать, как цель",
-            "en": ""
-        },
-        "Delete": {
-            "ru": "Удалить",
-            "en": ""
-        },
-        "Achievement criteria": {
-            "ru": "Критерии достижимости",
-            "en": ""
-        },
-        "Add achievement criteria": {
-            "ru": "Добавить критерий",
-            "en": ""
-        }
-    },
-    "GoalDeleteModal": {
-        "You are trying to archive goal": {
-            "ru": "Вы пытаетесь архивировать цель",
-            "en": ""
-        },
-        "To confirm archiving goal please type goal key below": {
-            "ru": "Чтобы подтвердить архивирование цели {goal}, введите ключ цели ниже.",
-            "en": "To confirm archiving goal {goal} please type goal key below."
-        },
-        "Cancel": {
-            "ru": "Отмена",
-            "en": ""
-        },
-        "Yes, archive it": {
-            "ru": "Архивировать цель",
-            "en": ""
-        }
-    },
-    "GoalDependency": {
-        "blocks": {
-            "ru": "Блокирует",
-            "en": "Blocked by"
-        },
-        "dependsOn": {
-            "ru": "Зависит от",
-            "en": "Depends on"
-        },
-        "relatedTo": {
-            "ru": "Связана с",
-            "en": "Relates to"
-        },
-        "Kind": {
-            "ru": "Вид зависимости",
-            "en": ""
-        }
-    },
-    "GoalEditForm": {
-        "Cancel": {
-            "ru": "Отмена",
-            "en": "Cancel"
-        },
-        "Submit": {
-            "ru": "Сохранить",
-            "en": "Update"
-        }
-    },
-    "GoalForm": {
-        "Goal's title": {
-            "ru": "Название цели",
-            "en": "Goal title"
-        },
-        "And its description": {
-            "ru": "Описание цели",
-            "en": "Goal description"
-        },
-        "Enter project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
-        "Priority": {
-            "ru": "Приоритет",
-            "en": "Priority"
-        },
-        "Assign": {
-            "ru": "Ответственный",
-            "en": "Assign"
-        },
-        "Enter name or email": {
-            "ru": "Имя/Почта",
-            "en": "Name/Email"
-        },
-        "State": {
-            "ru": "Статус",
-            "en": "State"
-        },
-        "Enter tag title": {
-            "ru": "Название тэга",
-            "en": "Enter tag title"
-        }
-    },
-    "GoalPage": {
-        "title": {
-            "ru": "Taskany — Цели — {goal}",
-            "en": "Taskany — Goals — {goal}"
-        },
-        "Edit": {
-            "ru": "Редактировать",
-            "en": "Edit"
-        }
-    },
-    "GoalPreview": {
-        "Edit": {
-            "ru": "Редактировать",
-            "en": "Edit"
-        }
-    },
-    "GoalSidebar": {
-        "blocks": {
-            "ru": "Блокирует",
-            "en": "Blocked by"
-        },
-        "dependsOn": {
-            "ru": "Зависит от",
-            "en": "Depends on"
-        },
-        "relatedTo": {
-            "ru": "Связана с",
-            "en": "Relates to"
-        },
-        "Issuer": {
-            "ru": "Автор",
-            "en": ""
-        },
-        "Assignee": {
-            "ru": "Ответственный",
-            "en": ""
-        },
-        "Type user name or email": {
-            "ru": "Введите имя или email",
-            "en": ""
-        },
-        "Assign": {
-            "ru": "Назначить",
-            "en": ""
-        },
-        "Not assigned yet": {
-            "ru": "Никого не назначили",
-            "en": ""
-        },
-        "Participants": {
-            "ru": "В главных ролях",
-            "en": ""
-        },
-        "Add participant": {
-            "ru": "Добавить участника",
-            "en": ""
-        },
-        "Partnership projects": {
-            "ru": "Партнёрские проекты",
-            "en": ""
-        },
-        "Type project title": {
-            "ru": "Введите название проекта",
-            "en": ""
-        },
-        "Add project": {
-            "ru": "Добавить проект",
-            "en": ""
-        },
-        "Add dependency": {
-            "ru": "Добавить зависимость",
-            "en": ""
-        },
-        "Is the criteria for": {
-            "ru": "Является критерием для",
-            "en": ""
-        },
-        "Connect to goal": {
-            "ru": "Привязать к цели",
-            "en": ""
-        },
-        "Tags": {
-            "ru": "Теги",
-            "en": ""
-        },
-        "Enter tag title": {
-            "ru": "Название тега",
-            "en": ""
-        },
-        "Add tag": {
-            "ru": "Добавить тег",
-            "en": ""
-        },
-        "Transfer goal": {
-            "ru": "Перенести цель",
-            "en": ""
-        },
-        "Archive goal": {
-            "ru": "Архивировать цель",
-            "en": ""
-        }
-    },
-    "GoalsPage": {
-        "These are goals across all projects": {
-            "ru": "Здесь собраны все цели со всех проектов.",
-            "en": "These are goals across all projects."
-        },
-        "title": {
-            "ru": "Taskany — Goals",
-            "en": "Taskany — Goals"
-        },
-        "Goals": {
-            "ru": "Цели",
-            "en": "Goals"
-        },
-        "Ungroup": {
-            "ru": "Разгруппировать",
-            "en": ""
-        },
-        "Group": {
-            "ru": "Сгруппировать",
-            "en": ""
-        }
-    },
-    "HistoryRecord": {
-        "from": {
-            "ru": "с",
-            "en": "from"
-        },
-        "to": {
-            "ru": "на",
-            "en": "to"
-        },
-        "change": {
-            "ru": "изменил(а)",
-            "en": "changed"
-        },
-        "edit": {
-            "ru": "отредактировал(а)",
-            "en": "edited"
-        },
-        "remove": {
-            "ru": "удалил(а)",
-            "en": "removed"
-        },
-        "delete": {
-            "ru": "удалил(а)",
-            "en": "deleted"
-        },
-        "add": {
-            "ru": "добавил(а)",
-            "en": "added"
-        },
-        "replace": {
-            "ru": "заменил(а)",
-            "en": "replaced"
-        },
-        "description": {
-            "ru": "описание",
-            "en": "description"
-        },
-        "project": {
-            "ru": "проект",
-            "en": "project"
-        },
-        "tags": {
-            "ru": "тэги",
-            "en": "tags"
-        },
-        "owner": {
-            "ru": "владельца",
-            "en": "owner"
-        },
-        "participant": {
-            "ru": "участника",
-            "en": "participant"
-        },
-        "state": {
-            "ru": "стейт",
-            "en": "state"
-        },
-        "estimate": {
-            "ru": "срок",
-            "en": "estimate"
-        },
-        "title": {
-            "ru": "заголовок",
-            "en": "title"
-        },
-        "dependencies": {
-            "ru": "зависимости",
-            "en": "dependencies"
-        },
-        "priority": {
-            "ru": "приоритет",
-            "en": "priority"
-        },
-        "criteria": {
-            "ru": "критерий",
-            "en": ""
-        },
-        "partner project": {
-            "ru": "партнерский проект",
-            "en": ""
-        },
-        "goal as criteria": {
-            "ru": "цель",
-            "en": "goal"
-        },
-        "marked criteria": {
-            "ru": "отметил(а) критерий",
-            "en": ""
-        },
-        "goal complete": {
-            "ru": "выполнил(а) цель",
-            "en": "completed goal"
-        },
-        "goal in progress": {
-            "ru": "вернул(а) цель в работу",
-            "en": "returns goal to work"
-        },
-        "as criteria": {
-            "ru": "как критерий",
-            "en": ""
-        },
-        "author and more made changes in": {
-            "ru": "{author} и еще {count} внесли изменения в {subject}",
-            "en": "{author} and {count} more made changes in {subject}"
-        },
-        "author and the other author made changes in": {
-            "ru": "{author} и {oneMoreAuthor} внесли изменения в {subject}",
-            "en": "{author} and {oneMoreAuthor} made changes in {subject}"
-        },
-        "author made changes in": {
-            "ru": "{author} внес(ла) изменения в {subject}",
-            "en": "{author} made changes in {subject}"
-        }
-    },
-    "HotkeysModal": {
-        "Available hotkeys": {
-            "ru": "Доступные горячие клавиши",
-            "en": "Available hotkeys"
-        },
-        "Any hotkey available on any page": {
-            "ru": "Все горячие клавиши достпны на любых страницах. Разделитель в виде запятой значит последовательное нажатие.",
-            "en": "Any hotkey available on any page. Comma separator means sequential pressing."
-        },
-        "create project": {
-            "ru": "создать проект",
-            "en": "create project"
-        },
-        "create goal": {
-            "ru": "создать цель",
-            "en": "create goal"
-        },
-        "create issue": {
-            "ru": "создать задачу",
-            "en": "create issue"
-        },
-        "invite user": {
-            "ru": "пригласить пользователя",
-            "en": "invite user"
-        },
-        "home page": {
-            "ru": "главная страница",
-            "en": "home page"
-        },
-        "goals page": {
-            "ru": "цели",
-            "en": "goals page"
-        },
-        "shows this instruction": {
-            "ru": "показывает эту инструкцию",
-            "en": "shows this instruction"
-        }
-    },
-    "InlineCreateGoalControl": {
-        "Create goal": {
-            "ru": "Создать цель",
-            "en": ""
-        }
-    },
-    "LoadMoreButton": {
-        "Load more...": {
-            "ru": "Показать ещё...",
-            "en": "Load more..."
-        }
-    },
-    "OfflineBanner": {
-        "You are currently offline. Check connection.": {
-            "ru": "Вы сейчас не в сети. Проверьте подключение.",
-            "en": ""
-        }
-    },
-    "PageFooter": {
-        "Terms": {
-            "ru": "Условия",
-            "en": "Terms"
-        },
-        "Docs": {
-            "ru": "Документация",
-            "en": "Docs"
-        },
-        "Contact Taskany": {
-            "ru": "Контакты",
-            "en": "Contact Taskany"
-        },
-        "API": {
-            "ru": "API",
-            "en": "API"
-        },
-        "About": {
-            "ru": "О нас",
-            "en": "About"
-        },
-        "Feedback": {
-            "ru": "Обратная связь",
-            "en": "Feedback"
-        }
-    },
-    "PageHeader": {
-        "Goals": {
-            "ru": "Цели",
-            "en": "Goals"
-        },
-        "Explore": {
-            "ru": "Обзор",
-            "en": "Explore"
-        }
-    },
-    "PageHeaderActionButton": {
-        "Create goal": {
-            "ru": "Цель",
-            "en": "Goal"
-        },
-        "Create personal goal": {
-            "ru": "Персональная цель",
-            "en": "Personal goal"
-        },
-        "Create project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
-        "Create": {
-            "ru": "Создать",
-            "en": "Create"
-        }
-    },
-    "PageTitlePreset": {
-        "created by": {
-            "ru": "автор",
-            "en": "created by"
-        }
-    },
-    "PriorityText": {
-        "High": {
-            "ru": "Высокий",
-            "en": "High"
-        },
-        "Highest": {
-            "ru": "Критический",
-            "en": "Highest"
-        },
-        "Medium": {
-            "ru": "Средний",
-            "en": "Medium"
-        },
-        "Low": {
-            "ru": "Низкий",
-            "en": "Low"
-        }
-    },
-    "PrivateDepsWarning": {
-        "Goal has private dependencies": {
-            "ru": "У цели есть приватные зависимости",
-            "en": "Goal has private dependencies"
-        }
-    },
-    "ProjectAccessUser": {
-        "Access": {
-            "ru": "Доступ",
-            "en": "Access"
-        },
-        "Add user": {
-            "ru": "Добавить пользователя",
-            "en": "Add user"
-        }
-    },
-    "ProjectCreateForm": {
-        "Perfect! Issues and goals will look like": {
-            "ru": "{perfect} Задачи и цели будут выглядеть примерно так: {issueKeyOne}, {issueKeyTwo}.",
-            "en": "{perfect} Issues and goals will look like: {issueKeyOne}, {issueKeyTwo}"
-        },
-        "Perfect": {
-            "ru": "Супер!",
-            "en": "Perfect!"
-        },
-        "issue key one": {
-            "ru": "#{key}-42",
-            "en": "#{key}-42"
-        },
-        "issue key two": {
-            "ru": "#{key}-911",
-            "en": "#{key}-911"
-        },
-        "Key already exists": {
-            "ru": "Ключ {key} уже существует. Попробуй другой.",
-            "en": "Key {key} already exists. Please, try to use another key."
-        },
-        "Key must be 3 or longer characters": {
-            "ru": "Ключ не может быть короче 3 символов",
-            "en": "Key must be 3 or longer characters"
-        },
-        "Project title": {
-            "ru": "Название проекта",
-            "en": "Project title"
-        },
-        "Short description": {
-            "ru": "Короткое описание",
-            "en": "Short description"
-        },
-        "Flow": {
-            "ru": "Флоу",
-            "en": "Flow"
-        },
-        "Flow or state title": {
-            "ru": "Модель или статус",
-            "en": "Flow or state title"
-        },
-        "Cancel": {
-            "ru": "Отмена",
-            "en": "Cancel"
-        },
-        "Create": {
-            "ru": "Создать",
-            "en": "Create"
-        }
-    },
-    "ProjectPage": {
-        "Projects": {
-            "ru": "Проекты",
-            "en": "Projects"
-        },
-        "title": {
-            "ru": "Taskany — {project}",
-            "en": "Taskany — {project}"
-        }
-    },
-    "ProjectPageTabs": {
-        "Goals": {
-            "ru": "Цели",
-            "en": "Goals"
+            "ru": "Taskany — {user} — Настройки",
+            "en": "Taskany — {user} — Settings"
         },
         "Settings": {
             "ru": "Настройки",
             "en": "Settings"
         },
-        "Team": {
-            "ru": "Команда",
-            "en": "Team"
-        }
-    },
-    "ProjectParticipants": {
-        "Participants": {
-            "ru": "Участники",
+        "General": {
+            "ru": "Основные",
+            "en": "General"
+        },
+        "Email": {
+            "ru": "Почта",
+            "en": "Email"
+        },
+        "Name": {
+            "ru": "Имя",
+            "en": "Name"
+        },
+        "Nickname": {
+            "ru": "Логин",
+            "en": "Nickname"
+        },
+        "Save": {
+            "ru": "Сохранить",
+            "en": "Save"
+        },
+        "Appearance": {
+            "ru": "Интерфейс",
+            "en": "Appearance"
+        },
+        "You are hero": {
+            "ru": "Ты наш герой",
             "en": ""
         },
-        "Add participant": {
-            "ru": "Добавить участника",
+        "Beta features": {
+            "ru": "Участвовать в бета-тестировании",
             "en": ""
+        },
+        "Danger zone": {
+            "ru": "Опасная зона",
+            "en": "Danger zone"
+        },
+        "Clear local cache": {
+            "ru": "Очистить кэш",
+            "en": "Clear local cache"
+        },
+        "Sign out": {
+            "ru": "Выйти",
+            "en": "Sign out"
+        }
+    },
+    "UserInviteForm": {
+        "User email is required": {
+            "ru": "Указание почты обязательно",
+            "en": "Incorrect email"
+        },
+        "Invite new users": {
+            "ru": "Пригласить пользователей",
+            "en": "Invite new users"
+        },
+        "Start typing users emails": {
+            "ru": "Начни вводить почту, а потом жми {key1} или {key2}.",
+            "en": "Start typing users emails. Press {key1} or {key2} then."
+        },
+        "Users emails": {
+            "ru": "Адреса почты",
+            "en": "Users emails"
+        },
+        "Send invites": {
+            "ru": "Отправить приглашение",
+            "en": "Send invites"
+        }
+    },
+    "UserFilter": {
+        "You": {
+            "ru": "Это вы",
+            "en": "You"
+        }
+    },
+    "UserEditableList": {
+        "Type user name or email": {
+            "ru": "Введите имя или email",
+            "en": ""
+        }
+    },
+    "StarredFilter": {
+        "Starred": {
+            "ru": "Избранное",
+            "en": "Starred"
+        }
+    },
+    "StarButton": {
+        "Starred": {
+            "ru": "Избранное",
+            "en": "Starred"
+        },
+        "Stars": {
+            "ru": "В избранное",
+            "en": "Stars"
+        }
+    },
+    "SortFilter": {
+        "title": {
+            "ru": "Название",
+            "en": "Title"
+        },
+        "state": {
+            "ru": "Статус",
+            "en": "State"
+        },
+        "priority": {
+            "ru": "Приоритет",
+            "en": "Priority"
+        },
+        "project": {
+            "ru": "Проект",
+            "en": "Project"
+        },
+        "activity": {
+            "ru": "Автор",
+            "en": "Issuer"
+        },
+        "owner": {
+            "ru": "Ответственный",
+            "en": "Owner"
+        },
+        "updatedAt": {
+            "ru": "Обновлено",
+            "en": "Updated"
+        },
+        "createdAt": {
+            "ru": "Создано",
+            "en": "Created"
+        }
+    },
+    "RotatableTip": {
+        "Pro tip!": {
+            "ru": "Держи совет!",
+            "en": "Pro tip!"
+        }
+    },
+    "RelativeTime": {
+        "created": {
+            "ru": "создано",
+            "en": "created"
+        },
+        "updated": {
+            "ru": "обновлено",
+            "en": "updated"
+        },
+        "Created": {
+            "ru": "Создано",
+            "en": "Created"
+        },
+        "Updated": {
+            "ru": "Обновлено",
+            "en": "Updated"
+        }
+    },
+    "Reactions": {
+        "and {count} more": {
+            "ru": " и еще {count}",
+            "en": " and {count} more"
+        }
+    },
+    "ProjectTeamPage": {
+        "title": {
+            "ru": "Taskany — {project} — Настройки",
+            "en": "Taskany — {project} — Settings"
+        },
+        "Add team": {
+            "ru": "Добавить команду",
+            "en": "Add team"
+        },
+        "Enter the title": {
+            "ru": "Введите название команды",
+            "en": "Enter the title"
         }
     },
     "ProjectSettingsPage": {
@@ -1161,226 +337,1054 @@
             "en": "Ok, got it"
         }
     },
-    "ProjectTeamPage": {
-        "title": {
-            "ru": "Taskany — {project} — Настройки",
-            "en": "Taskany — {project} — Settings"
+    "ProjectParticipants": {
+        "Participants": {
+            "ru": "Участники",
+            "en": ""
         },
-        "Add team": {
-            "ru": "Добавить команду",
-            "en": "Add team"
-        },
-        "enter the title": {
-            "ru": "",
+        "Add participant": {
+            "ru": "Добавить участника",
             "en": ""
         }
     },
-    "Reactions": {
-        "and {count} more": {
-            "ru": " и еще {count}",
-            "en": " and {count} more"
-        }
-    },
-    "RelativeTime": {
-        "created": {
-            "ru": "создано",
-            "en": "created"
+    "ProjectPageTabs": {
+        "Goals": {
+            "ru": "Цели",
+            "en": "Goals"
         },
-        "updated": {
-            "ru": "обновлено",
-            "en": "updated"
-        },
-        "Created": {
-            "ru": "Создано",
-            "en": "Created"
-        },
-        "Updated": {
-            "ru": "Обновлено",
-            "en": "Updated"
-        }
-    },
-    "RotatableTip": {
-        "Pro tip!": {
-            "ru": "Держи совет!",
-            "en": "Pro tip!"
-        }
-    },
-    "SortFilter": {
-        "title": {
-            "ru": "Название",
-            "en": "Title"
-        },
-        "state": {
-            "ru": "Статус",
-            "en": "State"
-        },
-        "priority": {
-            "ru": "Приоритет",
-            "en": "Priority"
-        },
-        "project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
-        "activity": {
-            "ru": "Автор",
-            "en": "Issuer"
-        },
-        "owner": {
-            "ru": "Ответственный",
-            "en": "Owner"
-        },
-        "updatedAt": {
-            "ru": "Обновлено",
-            "en": "Updated"
-        },
-        "createdAt": {
-            "ru": "Создано",
-            "en": "Created"
-        }
-    },
-    "StarButton": {
-        "Starred": {
-            "ru": "Избранное",
-            "en": "Starred"
-        },
-        "Stars": {
-            "ru": "В избранное",
-            "en": "Stars"
-        }
-    },
-    "StarredFilter": {
-        "Starred": {
-            "ru": "Избранное",
-            "en": "Starred"
-        }
-    },
-    "TeamListItem": {
-        "delete": {
-            "ru": "удалить",
-            "en": "delete"
-        }
-    },
-    "UserEditableList": {
-        "Type user name or email": {
-            "ru": "Введите имя или email",
-            "en": ""
-        }
-    },
-    "UserFilter": {
-        "You": {
-            "ru": "Это вы",
-            "en": "You"
-        }
-    },
-    "UserInviteForm": {
-        "User email is required": {
-            "ru": "Указание почты обязательно",
-            "en": "Incorrect email"
-        },
-        "Invite new users": {
-            "ru": "Пригласить пользователей",
-            "en": "Invite new users"
-        },
-        "Start typing users emails": {
-            "ru": "Начни вводить почту, а потом жми {key1} или {key2}.",
-            "en": "Start typing users emails. Press {key1} or {key2} then."
-        },
-        "Users emails": {
-            "ru": "Адреса почты",
-            "en": "Users emails"
-        },
-        "Send invites": {
-            "ru": "Отправить приглашение",
-            "en": "Send invites"
-        }
-    },
-    "UserSettingsPage": {
-        "Nickname already exists": {
-            "ru": "Логин уже существует",
-            "en": "Nickname already exists"
-        },
-        "title": {
-            "ru": "Taskany — {user} — Настройки",
-            "en": "Taskany — {user} — Settings"
+        "Resources": {
+            "ru": "Ресурсы",
+            "en": "Resources"
         },
         "Settings": {
             "ru": "Настройки",
             "en": "Settings"
+        }
+    },
+    "ProjectPage": {
+        "Projects": {
+            "ru": "Проекты",
+            "en": "Projects"
         },
-        "General": {
-            "ru": "Основные",
-            "en": "General"
+        "title": {
+            "ru": "Taskany — {project}",
+            "en": "Taskany — {project}"
+        }
+    },
+    "ProjectCreateForm": {
+        "Perfect! Issues and goals will look like": {
+            "ru": "{perfect} Задачи и цели будут выглядеть примерно так: {issueKeyOne}, {issueKeyTwo}.",
+            "en": "{perfect} Issues and goals will look like: {issueKeyOne}, {issueKeyTwo}"
         },
-        "Email": {
-            "ru": "Почта",
-            "en": "Email"
+        "Perfect": {
+            "ru": "Супер!",
+            "en": "Perfect!"
         },
-        "Name": {
-            "ru": "Имя",
-            "en": "Name"
+        "issue key one": {
+            "ru": "#{key}-42",
+            "en": "#{key}-42"
         },
-        "Nickname": {
-            "ru": "Логин",
-            "en": "Nickname"
+        "issue key two": {
+            "ru": "#{key}-911",
+            "en": "#{key}-911"
+        },
+        "Key already exists": {
+            "ru": "Ключ {key} уже существует. Попробуй другой.",
+            "en": "Key {key} already exists. Please, try to use another key."
+        },
+        "Key must be 3 or longer characters": {
+            "ru": "Ключ не может быть короче 3 символов",
+            "en": "Key must be 3 or longer characters"
+        },
+        "Project title": {
+            "ru": "Название проекта",
+            "en": "Project title"
+        },
+        "Short description": {
+            "ru": "Короткое описание",
+            "en": "Short description"
+        },
+        "Flow": {
+            "ru": "Флоу",
+            "en": "Flow"
+        },
+        "Flow or state title": {
+            "ru": "Модель или статус",
+            "en": "Flow or state title"
+        },
+        "Cancel": {
+            "ru": "Отмена",
+            "en": "Cancel"
+        },
+        "Create": {
+            "ru": "Создать",
+            "en": "Create"
+        }
+    },
+    "ProjectAccessUser": {
+        "Access": {
+            "ru": "Доступ",
+            "en": "Access"
+        },
+        "Add user": {
+            "ru": "Добавить пользователя",
+            "en": "Add user"
+        }
+    },
+    "PrivateDepsWarning": {
+        "Goal has private dependencies": {
+            "ru": "У цели есть приватные зависимости",
+            "en": "Goal has private dependencies"
+        }
+    },
+    "PriorityText": {
+        "High": {
+            "ru": "Высокий",
+            "en": "High"
+        },
+        "Highest": {
+            "ru": "Критический",
+            "en": "Highest"
+        },
+        "Medium": {
+            "ru": "Средний",
+            "en": "Medium"
+        },
+        "Low": {
+            "ru": "Низкий",
+            "en": "Low"
+        }
+    },
+    "PageTitlePreset": {
+        "created by": {
+            "ru": "автор",
+            "en": "created by"
+        }
+    },
+    "PageHeaderActionButton": {
+        "Create goal": {
+            "ru": "Цель",
+            "en": "Goal"
+        },
+        "Create personal goal": {
+            "ru": "Персональная цель",
+            "en": "Personal goal"
+        },
+        "Create project": {
+            "ru": "Проект",
+            "en": "Project"
+        },
+        "Create": {
+            "ru": "Создать",
+            "en": "Create"
+        }
+    },
+    "PageHeader": {
+        "Dashboard": {
+            "ru": "Главная",
+            "en": ""
+        },
+        "Goals": {
+            "ru": "Цели",
+            "en": ""
+        },
+        "Explore": {
+            "ru": "Обзор",
+            "en": ""
+        }
+    },
+    "PageFooter": {
+        "Terms": {
+            "ru": "Условия",
+            "en": "Terms"
+        },
+        "Docs": {
+            "ru": "Документация",
+            "en": "Docs"
+        },
+        "Contact Taskany": {
+            "ru": "Контакты",
+            "en": "Contact Taskany"
+        },
+        "API": {
+            "ru": "API",
+            "en": "API"
+        },
+        "About": {
+            "ru": "О нас",
+            "en": "About"
+        },
+        "Feedback": {
+            "ru": "Обратная связь",
+            "en": "Feedback"
+        }
+    },
+    "OfflineBanner": {
+        "You are currently offline. Check connection.": {
+            "ru": "Вы сейчас не в сети. Проверьте подключение.",
+            "en": ""
+        }
+    },
+    "NewGoalCriteria": {
+        "Achievement criteria": {
+            "ru": "Критерии достижимости",
+            "en": "Achievement criteria"
+        },
+        "Loading ...": {
+            "ru": "Загрузка ...",
+            "en": "Loading ..."
+        }
+    },
+    "LoadMoreButton": {
+        "Load more...": {
+            "ru": "Показать ещё...",
+            "en": "Load more..."
+        }
+    },
+    "InlineCreateGoalControl": {
+        "Create goal": {
+            "ru": "Создать цель",
+            "en": ""
+        }
+    },
+    "HotkeysModal": {
+        "Available hotkeys": {
+            "ru": "Доступные горячие клавиши",
+            "en": "Available hotkeys"
+        },
+        "Any hotkey available on any page": {
+            "ru": "Все горячие клавиши достпны на любых страницах. Разделитель в виде запятой значит последовательное нажатие.",
+            "en": "Any hotkey available on any page. Comma separator means sequential pressing."
+        },
+        "create project": {
+            "ru": "создать проект",
+            "en": "create project"
+        },
+        "create goal": {
+            "ru": "создать цель",
+            "en": "create goal"
+        },
+        "create issue": {
+            "ru": "создать задачу",
+            "en": "create issue"
+        },
+        "invite user": {
+            "ru": "пригласить пользователя",
+            "en": "invite user"
+        },
+        "home page": {
+            "ru": "главная страница",
+            "en": "home page"
+        },
+        "goals page": {
+            "ru": "цели",
+            "en": "goals page"
+        },
+        "shows this instruction": {
+            "ru": "показывает эту инструкцию",
+            "en": "shows this instruction"
+        }
+    },
+    "HistoryRecord": {
+        "from": {
+            "ru": "с",
+            "en": "from"
+        },
+        "to": {
+            "ru": "на",
+            "en": "to"
+        },
+        "change": {
+            "ru": "изменил(а)",
+            "en": "changed"
+        },
+        "edit": {
+            "ru": "отредактировал(а)",
+            "en": "edited"
+        },
+        "remove": {
+            "ru": "удалил(а)",
+            "en": "removed"
+        },
+        "delete": {
+            "ru": "удалил(а)",
+            "en": "deleted"
+        },
+        "add": {
+            "ru": "добавил(а)",
+            "en": "added"
+        },
+        "replace": {
+            "ru": "заменил(а)",
+            "en": "replaced"
+        },
+        "description": {
+            "ru": "описание",
+            "en": "description"
+        },
+        "project": {
+            "ru": "проект",
+            "en": "project"
+        },
+        "tags": {
+            "ru": "тэги",
+            "en": "tags"
+        },
+        "owner": {
+            "ru": "владельца",
+            "en": "owner"
+        },
+        "participant": {
+            "ru": "участника",
+            "en": "participant"
+        },
+        "state": {
+            "ru": "стейт",
+            "en": "state"
+        },
+        "estimate": {
+            "ru": "срок",
+            "en": "estimate"
+        },
+        "title": {
+            "ru": "заголовок",
+            "en": "title"
+        },
+        "dependencies": {
+            "ru": "зависимости",
+            "en": "dependencies"
+        },
+        "priority": {
+            "ru": "приоритет",
+            "en": "priority"
+        },
+        "criteria": {
+            "ru": "критерий",
+            "en": ""
+        },
+        "partner project": {
+            "ru": "партнерский проект",
+            "en": ""
+        },
+        "goal as criteria": {
+            "ru": "цель",
+            "en": "goal"
+        },
+        "marked criteria": {
+            "ru": "отметил(а) критерий",
+            "en": ""
+        },
+        "goal complete": {
+            "ru": "выполнил(а) цель",
+            "en": "completed goal"
+        },
+        "goal in progress": {
+            "ru": "вернул(а) цель в работу",
+            "en": "returns goal to work"
+        },
+        "as criteria": {
+            "ru": "как критерий",
+            "en": ""
+        },
+        "author and more made changes in": {
+            "ru": "{author} и еще {count} внесли изменения в {subject}",
+            "en": "{author} and {count} more made changes in {subject}"
+        },
+        "author and the other author made changes in": {
+            "ru": "{author} и {oneMoreAuthor} внесли изменения в {subject}",
+            "en": "{author} and {oneMoreAuthor} made changes in {subject}"
+        },
+        "author made changes in": {
+            "ru": "{author} внес(ла) изменения в {subject}",
+            "en": "{author} made changes in {subject}"
+        }
+    },
+    "GoalsPage": {
+        "These are goals across all projects": {
+            "ru": "Здесь собраны все цели со всех проектов.",
+            "en": "These are goals across all projects."
+        },
+        "title": {
+            "ru": "Taskany — Goals",
+            "en": "Taskany — Goals"
+        },
+        "Goals": {
+            "ru": "Цели",
+            "en": "Goals"
+        },
+        "Ungroup": {
+            "ru": "Разгруппировать",
+            "en": ""
+        },
+        "Group": {
+            "ru": "Сгруппировать",
+            "en": ""
+        }
+    },
+    "GoalSidebar": {
+        "blocks": {
+            "ru": "Блокирует",
+            "en": "Blocked by"
+        },
+        "dependsOn": {
+            "ru": "Зависит от",
+            "en": "Depends on"
+        },
+        "relatedTo": {
+            "ru": "Связана с",
+            "en": "Relates to"
+        },
+        "Issuer": {
+            "ru": "Автор",
+            "en": ""
+        },
+        "Assignee": {
+            "ru": "Ответственный",
+            "en": ""
+        },
+        "Type user name or email": {
+            "ru": "Введите имя или email",
+            "en": ""
+        },
+        "Assign": {
+            "ru": "Назначить",
+            "en": ""
+        },
+        "Not assigned yet": {
+            "ru": "Никого не назначили",
+            "en": ""
+        },
+        "Participants": {
+            "ru": "В главных ролях",
+            "en": ""
+        },
+        "Add participant": {
+            "ru": "Добавить участника",
+            "en": ""
+        },
+        "Partnership projects": {
+            "ru": "Партнёрские проекты",
+            "en": ""
+        },
+        "Type project title": {
+            "ru": "Введите название проекта",
+            "en": ""
+        },
+        "Add project": {
+            "ru": "Добавить проект",
+            "en": ""
+        },
+        "Add dependency": {
+            "ru": "Добавить зависимость",
+            "en": ""
+        },
+        "Is the criteria for": {
+            "ru": "Является критерием для",
+            "en": ""
+        },
+        "Connect to goal": {
+            "ru": "Привязать к цели",
+            "en": ""
+        },
+        "Tags": {
+            "ru": "Теги",
+            "en": ""
+        },
+        "Enter tag title": {
+            "ru": "Название тега",
+            "en": ""
+        },
+        "Add tag": {
+            "ru": "Добавить тег",
+            "en": ""
+        },
+        "Transfer goal": {
+            "ru": "Перенести цель",
+            "en": ""
+        },
+        "Archive goal": {
+            "ru": "Архивировать цель",
+            "en": ""
+        }
+    },
+    "GoalPreview": {
+        "Edit": {
+            "ru": "Редактировать",
+            "en": "Edit"
+        }
+    },
+    "GoalPage": {
+        "title": {
+            "ru": "Taskany — Цели — {goal}",
+            "en": "Taskany — Goals — {goal}"
+        },
+        "Edit": {
+            "ru": "Редактировать",
+            "en": "Edit"
+        }
+    },
+    "GoalForm": {
+        "Goal's title": {
+            "ru": "Название цели",
+            "en": "Goal title"
+        },
+        "And its description": {
+            "ru": "Описание цели",
+            "en": "Goal description"
+        },
+        "Enter project": {
+            "ru": "Проект",
+            "en": "Project"
+        },
+        "Priority": {
+            "ru": "Приоритет",
+            "en": "Priority"
+        },
+        "Assign": {
+            "ru": "Ответственный",
+            "en": "Assign"
+        },
+        "Enter name or email": {
+            "ru": "Имя/Почта",
+            "en": "Name/Email"
+        },
+        "State": {
+            "ru": "Статус",
+            "en": "State"
+        },
+        "Enter tag title": {
+            "ru": "Название тэга",
+            "en": "Enter tag title"
+        }
+    },
+    "GoalEditForm": {
+        "Cancel": {
+            "ru": "Отмена",
+            "en": "Cancel"
+        },
+        "Submit": {
+            "ru": "Сохранить",
+            "en": "Update"
+        }
+    },
+    "GoalDependency": {
+        "blocks": {
+            "ru": "Блокирует",
+            "en": "Blocked by"
+        },
+        "dependsOn": {
+            "ru": "Зависит от",
+            "en": "Depends on"
+        },
+        "relatedTo": {
+            "ru": "Связана с",
+            "en": "Relates to"
+        },
+        "Kind": {
+            "ru": "Вид зависимости",
+            "en": ""
+        }
+    },
+    "GoalDeleteModal": {
+        "You are trying to archive goal": {
+            "ru": "Вы пытаетесь архивировать цель",
+            "en": ""
+        },
+        "To confirm archiving goal please type goal key below": {
+            "ru": "Чтобы подтвердить архивирование цели {goal}, введите ключ цели ниже.",
+            "en": "To confirm archiving goal {goal} please type goal key below."
+        },
+        "Cancel": {
+            "ru": "Отмена",
+            "en": ""
+        },
+        "Yes, archive it": {
+            "ru": "Архивировать цель",
+            "en": ""
+        }
+    },
+    "GoalCriteria": {
+        "Edit": {
+            "ru": "Изменить",
+            "en": ""
+        },
+        "Create as goal": {
+            "ru": "Создать, как цель",
+            "en": ""
+        },
+        "Delete": {
+            "ru": "Удалить",
+            "en": ""
+        },
+        "Achievement criteria": {
+            "ru": "Критерии достижимости",
+            "en": ""
+        },
+        "Add achievement criteria": {
+            "ru": "Добавить критерий",
+            "en": ""
+        }
+    },
+    "GoalCreateForm": {
+        "Create & Go": {
+            "ru": "Создать и перейти",
+            "en": "Create & Go"
+        },
+        "Create and go to the goal page": {
+            "ru": "Создать и перейти на страницу цели",
+            "en": "Create and go to the goal page"
+        },
+        "Create one more": {
+            "ru": "Создать еще",
+            "en": "Create one more"
+        },
+        "Create and open new form for the next goal": {
+            "ru": "Создать и открыть новую форму для следующей цели",
+            "en": "Create and open new form for the next goal"
+        },
+        "Create only": {
+            "ru": "Создать",
+            "en": "Create only"
+        },
+        "Create goal and close form": {
+            "ru": "Создать цель и закрыть форму",
+            "en": "Create goal and close form"
+        },
+        "Cancel": {
+            "ru": "Отмена",
+            "en": "Cancel"
+        }
+    },
+    "GoalContentHeader": {
+        "Copy raw": {
+            "ru": "Скопировать",
+            "en": "Copy raw"
+        },
+        "No description provided": {
+            "ru": "Описание отсутствует",
+            "en": "No description provided"
+        }
+    },
+    "GlobalSearch": {
+        "Search...": {
+            "ru": "Поиск...",
+            "en": ""
+        },
+        "Goals": {
+            "ru": "Цели",
+            "en": ""
+        },
+        "Projects": {
+            "ru": "Проекты",
+            "en": ""
+        }
+    },
+    "FormControlEditor": {
+        "Attach files": {
+            "ru": "Загрузить файл",
+            "en": "Attach files"
+        },
+        "drag'n'drop or pasting also supported": {
+            "ru": "Перетаскивание и вставка из буфера тоже работают",
+            "en": "Drag'n'drop or pasting are also supported"
+        },
+        "Uploading...": {
+            "ru": "Загрузка...",
+            "en": "Uploading..."
+        }
+    },
+    "FiltersPanelApplied": {
+        "Priority": {
+            "ru": "Приоритет",
+            "en": "Priority"
+        },
+        "State": {
+            "ru": "Статус",
+            "en": "State"
+        },
+        "Issuer": {
+            "ru": "Автор",
+            "en": "Issuer"
+        },
+        "Owner": {
+            "ru": "Владелец",
+            "en": "Owner"
+        },
+        "Participant": {
+            "ru": "Участник",
+            "en": "Participant"
+        },
+        "Project": {
+            "ru": "Проект",
+            "en": "Project"
+        },
+        "Tag": {
+            "ru": "Тег",
+            "en": "Tag"
+        },
+        "Estimate": {
+            "ru": "Срок",
+            "en": "Estimate"
+        },
+        "Sorted": {
+            "ru": "Отсортировано",
+            "en": "Sorted"
+        }
+    },
+    "FiltersPanel": {
+        "Filter": {
+            "ru": "Фильтр",
+            "en": "Filter"
+        },
+        "State": {
+            "ru": "Статус",
+            "en": "State"
+        },
+        "Priority": {
+            "ru": "Приоритет",
+            "en": "Priority"
+        },
+        "Estimate": {
+            "ru": "Срок",
+            "en": "Estimate"
+        },
+        "Project": {
+            "ru": "Проект",
+            "en": "Project"
+        },
+        "Issuer": {
+            "ru": "Автор",
+            "en": "Issuer"
+        },
+        "Owner": {
+            "ru": "Ответственный",
+            "en": "Owner"
+        },
+        "Tags": {
+            "ru": "Теги",
+            "en": "Tags"
+        },
+        "Participant": {
+            "ru": "Участник",
+            "en": "Participant"
+        },
+        "Sort": {
+            "ru": "Сортировка",
+            "en": "Sort"
+        }
+    },
+    "FilteredPage": {
+        "Preset": {
+            "ru": "Пресет",
+            "en": ""
+        },
+        "Limit": {
+            "ru": "Лимит",
+            "en": ""
+        },
+        "Reset": {
+            "ru": "Сбросить",
+            "en": ""
+        }
+    },
+    "FilterPopup": {
+        "Pro tip!": {
+            "ru": "Совет!",
+            "en": ""
+        },
+        "You can apply and save filters as preset.": {
+            "ru": "Вы можете применить и сохранить фильтры",
+            "en": ""
+        },
+        "Cancel": {
+            "ru": "Отменить",
+            "en": ""
+        },
+        "Apply": {
+            "ru": "Применить",
+            "en": ""
+        }
+    },
+    "FilterDeleteForm": {
+        "You are trying to delete filters preset": {
+            "ru": "Ты собираешься удалить пресет с фильтрами",
+            "en": "You are trying to delete filters preset"
+        },
+        "Are you sure to delete filters preset {preset}?": {
+            "ru": "Уверен, что хочешь удалить пересет {preset}?",
+            "en": "Are you sure to delete filters preset {preset}?"
+        },
+        "Cancel": {
+            "ru": "Отмена",
+            "en": "Cancel"
+        },
+        "Yes, delete it": {
+            "ru": "Да, удаляем",
+            "en": "Yes, delete it"
+        }
+    },
+    "FilterCreateForm": {
+        "Preset title": {
+            "ru": "Название",
+            "en": ""
+        },
+        "Preset description": {
+            "ru": "Описание",
+            "en": ""
+        },
+        "Cancel": {
+            "ru": "Отменить",
+            "en": ""
+        },
+        "Create preset": {
+            "ru": "Сохранить",
+            "en": ""
+        }
+    },
+    "FilterBase": {
+        "Suggestions": {
+            "ru": "Предложения",
+            "en": ""
+        }
+    },
+    "FilterAutoCompleteInput": {
+        "Search...": {
+            "ru": "Поиск...",
+            "en": ""
+        }
+    },
+    "FeedbackCreateForm": {
+        "Feedback title": {
+            "ru": "Заголовок заявки",
+            "en": ""
+        },
+        "Feedback description. Say anything what's on your mind": {
+            "ru": "Описание заявки. Расскажите что произошло",
+            "en": ""
+        },
+        "Cancel": {
+            "ru": "Отменить",
+            "en": ""
+        },
+        "Send feedback": {
+            "ru": "Отправить заявку",
+            "en": ""
+        }
+    },
+    "ExploreTopProjectsPage": {
+        "title": {
+            "ru": "Taskany — Обзор — Проекты",
+            "en": "Taskany — Explore — Projects"
+        }
+    },
+    "ExploreProjectsPage": {
+        "title": {
+            "ru": "Taskany — Обзор — Проекты",
+            "en": "Taskany — Explore — Projects"
+        }
+    },
+    "ExplorePageLayout": {
+        "Top": {
+            "ru": "Топ",
+            "en": "Top"
+        },
+        "Projects": {
+            "ru": "Проекты",
+            "en": "Projects"
+        },
+        "Explore": {
+            "ru": "Обзор",
+            "en": "Explore"
+        },
+        "See what the Taskany community is most excited about today": {
+            "ru": "Смотри, чем пользователи Taskany интересуются сегодня",
+            "en": "See what the Taskany community is most excited about today"
+        }
+    },
+    "EstimateYear": {
+        "Year title": {
+            "ru": "Год",
+            "en": "Year"
+        },
+        "Year clue": {
+            "ru": "Если выбрать только год, то датой будет выбран конец года, например: {end}.",
+            "en": "If you are selecting only year it means the deadline will be the end of the year. For example: {end}."
+        }
+    },
+    "EstimateQuarter": {
+        "Quarter title": {
+            "ru": "Квартал",
+            "en": "Quarter"
+        },
+        "Quarter clue": {
+            "ru": "Можно указать квартал: Q1, Q2, Q3, Q4. Сейчас {quarter}, заканчивается {end}.",
+            "en": "This is the date shortcut: Q1, Q2, Q3, Q4. Currently is {quarter}. End is {end}."
+        }
+    },
+    "EstimateDate": {
+        "Date title": {
+            "ru": "Дата",
+            "en": "Strict date"
+        },
+        "Date clue": {
+            "ru": "Или можно указать точную дату вручную, если есть строгий дедлайн.",
+            "en": "Or you can choose a date if you have strict deadline."
+        },
+        "Date input mask": {
+            "ru": "99.99.9999",
+            "en": "99/99/9999"
+        },
+        "Date input mask placeholder": {
+            "ru": "dd.mm.yyyy",
+            "en": "mm/dd/yyyy"
+        }
+    },
+    "Estimate": {
+        "Date is past": {
+            "ru": "Выбранная дата уже прошла",
+            "en": "Selected date is past"
+        }
+    },
+    "DashboardPage": {
+        "Dashboard": {
+            "ru": "Рабочий стол",
+            "en": "Dashboard"
+        },
+        "This is your personal goals bundle": {
+            "ru": "Здесь будут все созданные вами, назначенные на вас, а также цели, задачи и проекты, за которыми вы следите.",
+            "en": "This is your personal bundle. Created, owned, watching projects, goals and issues are here."
+        },
+        "title": {
+            "ru": "Taskany — Рабочий стол",
+            "en": "Taskany — Dashboard"
+        }
+    },
+    "CriteriaForm": {
+        "This binding is already exist": {
+            "ru": "Такая связка уже существует",
+            "en": ""
+        },
+        "Title must be unique": {
+            "ru": "Название должно быть уникальным",
+            "en": ""
+        },
+        "Title is required": {
+            "ru": "Название обязательно",
+            "en": ""
+        },
+        "Title must be longer than 1 symbol": {
+            "ru": "Название должно быть 1 или более символов",
+            "en": ""
+        },
+        "Weight must be an integer": {
+            "ru": "Вес должен быть числом",
+            "en": ""
+        },
+        "Passed weight is not in range": {
+            "ru": "Вес критерия должен быть от 1 до {upTo}",
+            "en": "Weight must be between 1 and {upTo}"
+        },
+        "Weight": {
+            "ru": "Вес",
+            "en": ""
+        },
+        "Weight out of": {
+            "ru": "из {upTo}",
+            "en": "out of {upTo}"
+        },
+        "Criteria title": {
+            "ru": "Заголовок критерия",
+            "en": ""
+        },
+        "Simple": {
+            "ru": "Критерий",
+            "en": ""
+        },
+        "Goal": {
+            "ru": "Цель",
+            "en": ""
+        },
+        "Mode": {
+            "ru": "Тип",
+            "en": ""
+        },
+        "Add weight": {
+            "ru": "Добавить вес",
+            "en": ""
+        },
+        "Save": {
+            "ru": "Сохранить",
+            "en": ""
+        },
+        "Add": {
+            "ru": "Добавить",
+            "en": ""
+        }
+    },
+    "CommentView": {
+        "Copy raw": {
+            "ru": "Скопировать",
+            "en": "Copy raw"
+        },
+        "Edit": {
+            "ru": "Изменить",
+            "en": "Edit"
+        },
+        "Delete": {
+            "ru": "Удалить",
+            "en": "Delete"
         },
         "Save": {
             "ru": "Сохранить",
             "en": "Save"
-        },
-        "Appearance": {
-            "ru": "Интерфейс",
-            "en": "Appearance"
-        },
-        "You are hero": {
-            "ru": "Ты наш герой",
-            "en": ""
-        },
-        "Beta features": {
-            "ru": "Участвовать в бета-тестировании",
-            "en": ""
-        },
-        "Danger zone": {
-            "ru": "Опасная зона",
-            "en": "Danger zone"
-        },
-        "Clear local cache": {
-            "ru": "Очистить кэш",
-            "en": "Clear local cache"
-        },
-        "Sign out": {
-            "ru": "Выйти",
-            "en": "Sign out"
         }
     },
-    "WatchButton": {
-        "Watching": {
-            "ru": "Отписаться",
-            "en": "Watching"
+    "CommentForm": {
+        "Leave a comment": {
+            "ru": "Оставить комментарий...",
+            "en": "Leave a comment..."
         },
-        "Watch": {
-            "ru": "Следить",
-            "en": "Watch"
+        "Cancel": {
+            "ru": "Отменить",
+            "en": "Cancel"
         }
     },
-    "WatchingFilter": {
-        "Watching": {
-            "ru": "Подписки",
-            "en": "Watching"
+    "CommentCreateForm": {
+        "Comment": {
+            "ru": "Написать",
+            "en": "Comment"
+        },
+        "Update state": {
+            "ru": "Обновить статус",
+            "en": "Update state"
         }
     },
-    "WhatsNew": {
-        "What's New!": {
-            "ru": "Мы обновились!",
+    "AdminPage": {
+        "This page is protected AdminPanel": {
+            "ru": "",
             "en": ""
         },
-        "Dismiss": {
-            "ru": "Прочту позже",
+        "Only admin users can see this page.": {
+            "ru": "",
             "en": ""
+        }
+    },
+    "AccessUserDeleteErrorModal": {
+        "Cannot delete person now": {
+            "ru": "Невозможно удалить пользователя",
+            "en": "Cannot delete person now"
         },
-        "Awesome! Thank you!": {
-            "ru": "Круто! Спасибо!",
-            "en": ""
+        "The user has actual goals": {
+            "ru": "У пользователя есть незакрытые цели",
+            "en": "The user has actual goals"
+        },
+        "Before deleting, you must move this goals to another person:": {
+            "ru": "Перед удалением назначьте эти цели другим пользователям:",
+            "en": "Before deleting, you must move this goals to another person:"
+        },
+        "Ok, got it": {
+            "ru": "Хорошо, сделаю",
+            "en": "Ok, got it"
         }
     },
     "schema": {

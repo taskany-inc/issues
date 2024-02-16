@@ -56,6 +56,7 @@ import { prepareRecipients } from '../../src/utils/prepareRecipients';
 import { updateProjectUpdatedAt } from '../../src/utils/db/updateProjectUpdatedAt';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 import { createComment } from '../../src/utils/db/createComment';
+import { getShortId } from '../../src/utils/getShortId';
 
 export const goal = router({
     suggestions: protectedProcedure
@@ -336,7 +337,7 @@ export const goal = router({
                         ...rest,
                         goal: {
                             ...goal,
-                            _shortId: `${goal.projectId}-${goal.scopeId}`,
+                            _shortId: getShortId(goal),
                         },
                     })),
 
@@ -346,7 +347,7 @@ export const goal = router({
                             criteriaGoal != null
                                 ? {
                                       ...criteriaGoal,
-                                      _shortId: `${criteriaGoal.projectId}-${criteriaGoal.scopeId}`,
+                                      _shortId: getShortId(criteriaGoal),
                                   }
                                 : null,
                     })),
@@ -1772,10 +1773,45 @@ export const goal = router({
                             goalAchiveCriteriaFilter(activityId, role),
                         ],
                     },
-                    include: { criteriaGoal: true },
+                    include: {
+                        criteriaGoal: {
+                            include: {
+                                state: true,
+                            },
+                        },
+                    },
                 });
 
-                return criteriaList;
+                const sorted = criteriaList.reduce<Record<'done' | 'undone', Array<(typeof criteriaList)[number]>>>(
+                    (acc, criteria) => {
+                        if (criteria.isDone) {
+                            acc.done.push(criteria);
+                        } else {
+                            acc.undone.push(criteria);
+                        }
+                        return acc;
+                    },
+                    {
+                        done: [],
+                        undone: [],
+                    },
+                );
+
+                return sorted.done.concat(sorted.undone).map(({ criteriaGoal, ...criteria }) => {
+                    if (criteriaGoal) {
+                        criteriaGoal.scopeId;
+                        criteriaGoal.projectId;
+                        return {
+                            ...criteria,
+                            criteriaGoal: {
+                                ...criteriaGoal,
+                                _shortId: getShortId(criteriaGoal),
+                            },
+                        };
+                    }
+
+                    return { ...criteria, criteriaGoal: null };
+                });
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message, cause: error });
             }
