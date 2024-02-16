@@ -1,4 +1,4 @@
-import { Badge, CircleProgressBar, State, Table, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
+import { Badge, State, Table, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
 import { MouseEventHandler, useMemo } from 'react';
 import { Link, ListViewItem, nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
@@ -14,6 +14,7 @@ import { NextLink } from '../NextLink';
 import { routes } from '../../hooks/router';
 import { TagsList } from '../TagsList';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
+import { GoalCriteriaPreview } from '../NewGoalCriteria/NewGoalCriteria';
 
 import s from './GoalTableList.module.css';
 
@@ -41,7 +42,14 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     {
                         content: (
                             <>
-                                <Text>{goal.title}</Text>
+                                <Link
+                                    as={NextLink}
+                                    href={routes.goal(goal?._shortId as string)}
+                                    inline
+                                    onClick={onGoalPreviewShow(goal)}
+                                >
+                                    <Text>{goal.title}</Text>
+                                </Link>
                                 {nullable(goal.tags, (tags) => (
                                     <TagsList>
                                         {tags.map((tag) => (
@@ -120,38 +128,36 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                         width: 90,
                     },
                     {
-                        content: nullable(goal._achivedCriteriaWeight, (weight) => (
-                            <CircleProgressBar value={weight} />
-                        )),
+                        content: goal._achivedCriteriaWeight != null && goal.id != null && (
+                            <GoalCriteriaPreview achievedWeight={goal._achivedCriteriaWeight} goalId={goal.id} />
+                        ),
                         width: 24,
                     },
                 ],
             })),
-        [goals, locale, onTagClick],
+        [goals, locale, onGoalPreviewShow, onTagClick],
     );
 
     return (
         <Table {...attrs}>
             {data.map((row) => (
-                <Link key={row.goal.id} as={NextLink} href={routes.goal(row.goal?._shortId as string)} inline>
-                    <ListViewItem
-                        value={row.goal}
-                        renderItem={({ active, hovered: _, ...props }) => (
-                            <TableListItem
-                                onClick={onGoalPreviewShow(row.goal)}
-                                selected={selectedGoalResolver?.(row.goal?.id as string)}
-                                hovered={active}
-                                {...props}
-                            >
-                                {row.list.map(({ content, width, className }, index) => (
-                                    <TableListItemElement key={index} width={width} className={className}>
-                                        {content}
-                                    </TableListItemElement>
-                                ))}
-                            </TableListItem>
-                        )}
-                    />
-                </Link>
+                <ListViewItem
+                    key={row.goal.id}
+                    value={row.goal}
+                    renderItem={({ active, hovered: _, ...props }) => (
+                        <TableListItem
+                            selected={selectedGoalResolver?.(row.goal?.id as string)}
+                            hovered={active}
+                            {...props}
+                        >
+                            {row.list.map(({ content, width, className }, index) => (
+                                <TableListItemElement key={index} width={width} className={className}>
+                                    {content}
+                                </TableListItemElement>
+                            ))}
+                        </TableListItem>
+                    )}
+                />
             ))}
         </Table>
     );

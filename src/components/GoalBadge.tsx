@@ -5,8 +5,8 @@ import { Badge } from './Badge';
 import { NextLink } from './NextLink';
 import { StateDot } from './StateDot';
 
-interface GoalBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'color'> {
-    title: string;
+interface GoalBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'color' | 'title'> {
+    title: React.ReactNode;
     href?: string;
     color?: number;
     children?: React.ReactNode;
