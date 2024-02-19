@@ -224,6 +224,10 @@
             "ru": "Описание заявки. Расскажите что произошло",
             "en": ""
         },
+        "Cancel": {
+            "ru": "Отменить",
+            "en": ""
+        },
         "Send feedback": {
             "ru": "Отправить заявку",
             "en": ""
@@ -284,6 +288,10 @@
         },
         "Limit": {
             "ru": "Лимит",
+            "en": ""
+        },
+        "Reset": {
+            "ru": "Сбросить",
             "en": ""
         }
     },
@@ -389,14 +397,14 @@
             "en": "Sorted"
         }
     },
-    "FormEditor": {
+    "FormControlEditor": {
         "Attach files": {
             "ru": "Загрузить файл",
             "en": "Attach files"
         },
         "drag'n'drop or pasting also supported": {
-            "ru": "— перетаскивание и вставка из буфера тоже работает",
-            "en": "— drag'n'drop or pasting are also supported"
+            "ru": "Перетаскивание и вставка из буфера тоже работают",
+            "en": "Drag'n'drop or pasting are also supported"
         },
         "Uploading...": {
             "ru": "Загрузка...",
@@ -673,6 +681,14 @@
         "Goals": {
             "ru": "Цели",
             "en": "Goals"
+        },
+        "Ungroup": {
+            "ru": "Разгруппировать",
+            "en": ""
+        },
+        "Group": {
+            "ru": "Сгруппировать",
+            "en": ""
         }
     },
     "HistoryRecord": {
@@ -839,6 +855,12 @@
             "en": "Load more..."
         }
     },
+    "OfflineBanner": {
+        "You are currently offline. Check connection.": {
+            "ru": "Вы сейчас не в сети. Проверьте подключение.",
+            "en": ""
+        }
+    },
     "PageFooter": {
         "Terms": {
             "ru": "Условия",
@@ -876,10 +898,6 @@
         }
     },
     "PageHeaderActionButton": {
-        "Create": {
-            "ru": "Создать",
-            "en": "Create"
-        },
         "Create goal": {
             "ru": "Цель",
             "en": "Goal"
@@ -891,6 +909,10 @@
         "Create project": {
             "ru": "Проект",
             "en": "Project"
+        },
+        "Create": {
+            "ru": "Создать",
+            "en": "Create"
         }
     },
     "PageTitlePreset": {
@@ -919,8 +941,8 @@
     },
     "PrivateDepsWarning": {
         "Goal has private dependencies": {
-            "ru": "",
-            "en": ""
+            "ru": "У цели есть приватные зависимости",
+            "en": "Goal has private dependencies"
         }
     },
     "ProjectAccessUser": {
@@ -1067,7 +1089,7 @@
             "en": ""
         },
         "What happens when you delete a project": {
-            "ru": "What happens when you delete a project",
+            "ru": "Что произойдет, если вы удалите проект",
             "en": "What happens when you delete a project"
         },
         "All active goals will be archived": {

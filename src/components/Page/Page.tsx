@@ -18,6 +18,7 @@ import { PageHeader } from '../PageHeader/PageHeader';
 import { PageFooter } from '../PageFooter/PageFooter';
 import { ModalContext } from '../ModalOnEvent';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
+import { OfflineBanner } from '../OfflineBanner/OfflineBanner';
 
 import s from './Page.module.css';
 
@@ -64,6 +65,8 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
                 <title>{title}</title>
                 <link rel="stylesheet" id="themeVariables" href={`/theme/${theme}.css`} />
             </Head>
+
+            <OfflineBanner />
 
             <TextStyle />
 
