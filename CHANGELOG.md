@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.21.0](https://github.com/taskany-inc/issues/compare/v2.20.0...v2.21.0) (2024-02-19)
+
+
+### Features
+
+* update FormEditors to harmony view ([96af498](https://github.com/taskany-inc/issues/commit/96af498cd38b9df2bc77127be9e3b513d0ab3a58))
+
 ## [2.20.0](https://github.com/taskany-inc/issues/compare/v2.19.2...v2.20.0) (2024-02-15)
 
 
