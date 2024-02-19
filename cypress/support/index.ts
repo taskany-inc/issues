@@ -101,7 +101,7 @@ Cypress.Commands.addAll({
         cy.get(comboboxInput.query).type(projectTitle.slice(0, 4));
         cy.get(comboboxItem.query).click();
 
-        cy.get(projectsCombobox.query).contains(keyPredictor(projectTitle));
+        cy.get(projectsCombobox.query).contains(projectTitle);
 
         cy.wait(50);
         cy.get(goalActionCreateOnly.query).should('exist').and('be.visible').and('be.enabled');
@@ -252,6 +252,18 @@ Cypress.Commands.addAll({
         cy.fixture('langs.json').then((content) => {
             Cypress.env('translations', content);
         });
+    },
+    getMultipleFields: (selectors: string[]) => {
+        const values = {};
+        selectors.forEach((selector) => {
+            cy.get(selector)
+                .invoke('attr', 'value')
+                .then((s) => {
+                    values[selector] = s;
+                });
+        });
+
+        return cy.wrap(values);
     },
 });
 

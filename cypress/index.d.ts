@@ -79,6 +79,7 @@ declare global {
             waitEditor(): Chainable<void>;
             loadLangFile(): Chainable<void>;
             getErrorTooltip(errorMessage: string): Chainable<JQuery<HTMLElement>>;
+            getMultipleFields<T extends string>(selector: T[]): Chainable<Record<keyof T, string>>;
         }
         interface Cypress {
             env(): {
