@@ -1,0 +1,4 @@
+.TagComboBox {
+    display: flex;
+    gap: var(--gap-xs);
+}
