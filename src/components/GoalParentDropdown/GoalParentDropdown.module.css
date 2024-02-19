@@ -1,0 +1,28 @@
+.DropdownTrigger {
+    min-width: 180px;
+}
+
+.DropdownPanelItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-s);
+    width: 100%;
+}
+
+.DropdownPanelItem_id {
+    color: var(--text-secondary);
+}
+
+.DropdownTriggerValue {
+    display: inline-block;
+    white-space: nowrap;
+    width: 130px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.CreateProjectButton {
+    margin-bottom: var(--gap-xs);
+    color: var(--text-secondary);
+}
