@@ -1,15 +1,9 @@
 import React, { ChangeEvent, ComponentProps, ReactNode, useCallback } from 'react';
-import styled from 'styled-components';
 import { nullable } from '@taskany/bricks';
 import { FormControl, FormControlError, FormControlInput } from '@taskany/bricks/harmony';
 import { IconSearchOutline } from '@taskany/icons';
-import { gapS } from '@taskany/colors';
 
 import { tr } from './FilterAutoCompleteInput.i18n';
-
-const StyledFormControl = styled(FormControl)`
-    margin-bottom: ${gapS};
-`;
 
 interface FilterAutoCompleteInputProps extends Omit<React.ComponentProps<typeof FormControlInput>, 'onChange'> {
     onChange: (value: string) => void;
@@ -32,7 +26,7 @@ export const FilterAutoCompleteInput: React.FC<FilterAutoCompleteInputProps> = (
     );
 
     return (
-        <StyledFormControl>
+        <FormControl>
             <FormControlInput
                 outline
                 autoFocus
@@ -44,6 +38,6 @@ export const FilterAutoCompleteInput: React.FC<FilterAutoCompleteInputProps> = (
             {nullable(error?.message, (message) => (
                 <FormControlError error={{ message }} />
             ))}
-        </StyledFormControl>
+        </FormControl>
     );
 };
