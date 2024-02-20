@@ -2,7 +2,6 @@ import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import '../utils/wdyr';
 import '@taskany/bricks/harmony/style.css';
 import { PageLoadProgress } from '@taskany/bricks';
-import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -35,23 +34,17 @@ const App = ({ Component, pageProps, router }: AppProps) => {
     useWebTelemetryMonitoringInit();
 
     return (
-        <>
-            <Head>
-                <link rel="icon" href="/favicon.png" />
-            </Head>
-
-            <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
-                <ThemeProvider themes={defaultThemes}>
-                    <ThemeSetter>
-                        <GoalPreviewProvider>
-                            <PageLoadProgress height={2} ref={pageLoadRef} />
-                            <Component {...pageProps} />
-                            <ReactQueryDevtools />
-                        </GoalPreviewProvider>
-                    </ThemeSetter>
-                </ThemeProvider>
-            </SessionProvider>
-        </>
+        <SessionProvider session={pageProps.session} refetchOnWindowFocus={true}>
+            <ThemeProvider themes={defaultThemes}>
+                <ThemeSetter>
+                    <GoalPreviewProvider>
+                        <PageLoadProgress height={2} ref={pageLoadRef} />
+                        <Component {...pageProps} />
+                        <ReactQueryDevtools />
+                    </GoalPreviewProvider>
+                </ThemeSetter>
+            </ThemeProvider>
+        </SessionProvider>
     );
 };
 
