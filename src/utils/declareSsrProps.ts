@@ -7,6 +7,7 @@ import { routes } from '../hooks/router';
 import { trpcRouter } from '../../trpc/router';
 import type { TrpcRouter } from '../../trpc/router';
 
+import { Config, fetchConfig } from './db';
 import { transformer } from './transformer';
 
 export interface SSRProps<P = { [key: string]: string }> {
@@ -16,6 +17,7 @@ export interface SSRProps<P = { [key: string]: string }> {
     query: Record<string, string | string[] | undefined>;
     ssrTime: number;
     ssrHelpers: DecoratedProcedureSSGRecord<TrpcRouter>;
+    config?: Config;
 }
 
 export interface ExternalPageProps<P = { [key: string]: string }> extends SSRProps<P> {
@@ -30,6 +32,7 @@ export function declareSsrProps<T = ExternalPageProps>(
     return async ({ locale, req, params = {}, query }: GetServerSidePropsContext) => {
         // FIXME: getServerSession. Problem with serialazing createdAt, updatedAt
         const session = await getSession({ req });
+        const config = await fetchConfig();
 
         if (options?.private && !session) {
             return {
@@ -61,6 +64,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                   query,
                   ssrTime,
                   ssrHelpers,
+                  config,
               })
             : {};
 
@@ -78,6 +82,7 @@ export function declareSsrProps<T = ExternalPageProps>(
                 user: session ? session.user : null,
                 ssrTime,
                 trpcState: ssrHelpers.dehydrate(),
+                config,
             },
         };
     };

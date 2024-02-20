@@ -404,3 +404,8 @@ model Team {
   externalTeamId String    @unique
   projects       Project[] @relation("projects")
 }
+
+model AppConfig {
+  id   String @id @default(cuid())
+  logo String?
+}

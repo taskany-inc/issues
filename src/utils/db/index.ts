@@ -636,3 +636,13 @@ export const updateLinkedGoalsByProject = async (projectId: string, activityId: 
         }
     }
 };
+
+export const fetchConfig = async () => {
+    try {
+        return await prisma.appConfig.findFirst();
+    } catch (e) {
+        return null;
+    }
+};
+
+export type Config = Awaited<ReturnType<typeof fetchConfig>>;
