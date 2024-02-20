@@ -89,11 +89,9 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
                 {nullable(focused, () => (
                     <FormActions>
-                        <FormAction left inline>
-                            <div className={s.FormHelpButton}>
-                                <HelpButton slug="comments" />
-                            </div>
-                        </FormAction>
+                        <div className={s.FormHelpButton}>
+                            <HelpButton slug="comments" />
+                        </div>
                         <FormAction right inline>
                             {nullable(!busy, () => (
                                 <Button text={tr('Cancel')} onClick={onCommentCancel} />

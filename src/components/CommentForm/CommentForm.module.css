@@ -1,8 +1,7 @@
 .FormHelpButton {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding-top: var(--gap-m);
+    margin-right: auto;
 }
 
 .CommentFormWrapper {
