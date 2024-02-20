@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { gapM } from '@taskany/colors';
 import { nullable } from '@taskany/bricks';
 import { IconEditOutline } from '@taskany/icons';
 import { Button } from '@taskany/bricks/harmony';
@@ -34,7 +33,7 @@ import { tr } from './GoalPage.i18n';
 const GoalContent = styled(PageContent)`
     display: grid;
     grid-template-columns: 7fr 5fr;
-    gap: ${gapM};
+    gap: var(--gap-m);
 `;
 
 export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {

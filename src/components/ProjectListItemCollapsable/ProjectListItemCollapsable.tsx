@@ -1,7 +1,6 @@
 import React, { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import { gapS, gapXs } from '@taskany/colors';
 import { Text, TreeView, TreeViewNode, nullable } from '@taskany/bricks';
 import { IconServersOutline } from '@taskany/icons';
 
@@ -14,12 +13,12 @@ import { TableRowItem, Title } from '../Table';
 const StyledProjectIcons = styled.div`
     display: flex;
     align-items: center;
-    gap: ${gapXs};
+    gap: var(--gap-xs);
 `;
 
 const StyledTitleWrapper = styled(StyledProjectIcons)`
     justify-content: space-between;
-    margin-right: ${gapS};
+    margin-right: var(--gap-s);
 `;
 
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {

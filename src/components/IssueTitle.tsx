@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { gapS } from '@taskany/colors';
 import { Text, Link } from '@taskany/bricks';
 
 import { goalPageHeaderTitle } from '../utils/domObjects';
@@ -14,8 +13,8 @@ interface IssueTitleProps {
 }
 
 const StyledIssueTitleText = styled(({ forwardRef, ...props }) => <Text forwardRef={forwardRef} {...props} />)`
-    padding-top: ${gapS};
-    padding-bottom: ${gapS};
+    padding-top: var(--gap-s);
+    padding-bottom: var(--gap-s);
 `;
 
 export const IssueTitle = React.forwardRef<HTMLDivElement, IssueTitleProps>(({ title, href, size = 'xxl' }, ref) => {

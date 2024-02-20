@@ -1,19 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Checkbox, CheckboxInput, CheckboxLabel, Text, nullable } from '@taskany/bricks';
-import { gapS, gapSm, gapXs, gray4, radiusS } from '@taskany/colors';
 
 const StyledCheckboxLabel = styled(CheckboxLabel)`
     display: inline-flex;
-    gap: ${gapSm};
+    gap: var(--gap-sm);
     align-items: center;
-    margin-left: ${gapS};
+    margin-left: var(--gap-s);
 `;
 
 const StyledCheckbox = styled(Checkbox)<{ focused?: boolean }>`
-    padding: ${gapXs} 0;
-    border-radius: ${radiusS};
-    ${({ focused }) => focused && `background-color: ${gray4};`}
+    padding: var(--gap-xs) 0;
+    border-radius: var(--radius-s);
+    ${({ focused }) => focused && 'background-color: var(--gray4);'}
 `;
 
 const StyledChekboxInput = styled(CheckboxInput)`

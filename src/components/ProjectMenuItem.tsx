@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { gapS, gapXs, gray4, radiusM } from '@taskany/colors';
 import { Text } from '@taskany/bricks';
 
 import { comboboxItem } from '../utils/domObjects';
@@ -13,11 +12,11 @@ interface ProjectMenuItemProps {
 
 const StyledProjectCard = styled.div<{ focused?: boolean }>`
     box-sizing: border-box;
-    padding: ${gapXs} ${gapS};
-    margin-bottom: ${gapS};
+    padding: var(--gap-xs) var(--gap-s);
+    margin-bottom: var(--gap-s);
     min-width: 200px;
 
-    border-radius: ${radiusM};
+    border-radius: var(--radius-m);
 
     cursor: pointer;
 
@@ -26,13 +25,13 @@ const StyledProjectCard = styled.div<{ focused?: boolean }>`
     }
 
     &:hover {
-        background-color: ${gray4};
+        background-color: var(--gray4);
     }
 
     ${({ focused }) =>
         focused &&
         `
-            background-color: ${gray4};
+            background-color: var(--gray4);
         `}
 `;
 

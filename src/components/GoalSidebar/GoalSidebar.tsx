@@ -2,7 +2,6 @@ import { ComponentProps, FC, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
-import { gapXs } from '@taskany/colors';
 
 import { IssueMeta } from '../IssueMeta';
 import { UserBadge } from '../UserBadge';
@@ -37,14 +36,14 @@ import { tr } from './GoalSidebar.i18n';
 const tagsLimit = 5;
 
 const StyledInlineInput = styled.div`
-    margin-top: ${gapXs};
+    margin-top: var(--gap-xs);
     height: 28px; // Input height
 `;
 
 const StyledTextList = styled(TextList).attrs({
     listStyle: 'none',
 })`
-    padding-left: ${gapXs};
+    padding-left: var(--gap-xs);
 `;
 
 interface GoalSidebarProps {

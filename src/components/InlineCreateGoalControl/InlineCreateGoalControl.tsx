@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { gapS } from '@taskany/colors';
 import { IconPlusCircleOutline } from '@taskany/icons';
 
 import { InlineTrigger } from '../InlineTrigger';
@@ -17,7 +16,7 @@ interface InlineCreateGoalControl extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const StyledInlineTriggerWrapper = styled.div`
-    padding: ${gapS};
+    padding: var(--gap-s);
     width: fit-content;
 `;
 

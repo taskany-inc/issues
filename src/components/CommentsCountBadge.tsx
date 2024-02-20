@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Text } from '@taskany/bricks';
 import { IconChatTypingAltOutline } from '@taskany/icons';
-import { gapXs } from '@taskany/colors';
 
 export interface CommentsCountBadgeProps {
     count: number;
@@ -11,7 +10,7 @@ export interface CommentsCountBadgeProps {
 const StyledCommentsCountBadge = styled.span`
     display: flex;
     align-items: center;
-    gap: ${gapXs};
+    gap: var(--gap-xs);
 `;
 
 const StyledIconChatTypingAltOutline = styled(IconChatTypingAltOutline)`

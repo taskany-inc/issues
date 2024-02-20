@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Popup, nullable } from '@taskany/bricks';
-import { gapXs } from '@taskany/colors';
 
 import { ReactionsMap } from '../../types/reactions';
 import { ReactionsButton } from '../ReactionsButton';
@@ -17,7 +16,7 @@ interface ReactionsProps {
 
 const StyledReactions = styled.div`
     display: flex;
-    gap: ${gapXs};
+    gap: var(--gap-xs);
 `;
 
 export const Reactions = React.memo(({ reactions, children, onClick }: ReactionsProps) => {

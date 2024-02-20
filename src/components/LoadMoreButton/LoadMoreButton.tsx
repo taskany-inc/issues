@@ -1,11 +1,10 @@
 import styled from 'styled-components';
-import { gapM, gapS } from '@taskany/colors';
 import { Button } from '@taskany/bricks/harmony';
 
 import { tr } from './LoadMoreButton.i18n';
 
 const StyledLoadContainer = styled.div`
-    padding: ${gapM} ${gapS};
+    padding: var(--gap-m) var(--gap-s);
 `;
 
 export const LoadMoreButton = (props: React.ComponentProps<typeof Button>) => (

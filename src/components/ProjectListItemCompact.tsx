@@ -2,7 +2,6 @@ import React, { MouseEventHandler } from 'react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import { TableRow, TableCell, nullable } from '@taskany/bricks';
-import { gapS, gapXs, radiusM } from '@taskany/colors';
 import { IconUsersOutline } from '@taskany/icons';
 
 import { routes } from '../hooks/router';
@@ -23,8 +22,8 @@ interface ProjectListItemCompactProps {
 }
 
 const StyledRow = styled(TableRow)`
-    padding: ${gapXs} ${gapS};
-    border-radius: ${radiusM};
+    padding: var(--gap-xs) var(--gap-s);
+    border-radius: var(--radius-m);
     cursor: pointer;
 `;
 

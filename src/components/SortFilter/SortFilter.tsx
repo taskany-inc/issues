@@ -1,7 +1,6 @@
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Tab, Text, nullable } from '@taskany/bricks';
-import { gapXs, gray8 } from '@taskany/colors';
 
 import { FilterTabLabel } from '../FilterTabLabel';
 import { FilterBase } from '../FilterBase/FilterBase';
@@ -44,12 +43,12 @@ const sortParams: SortableProps[] = [
 ];
 
 const StyledSortItem = styled(Text)`
-    padding: ${gapXs} 0;
+    padding: var(--gap-xs) 0;
     display: flex;
     align-items: baseline;
     flex-wrap: nowrap;
 
-    gap: ${gapXs};
+    gap: var(--gap-xs);
 `;
 
 const StyledDirectionText = styled(Text)`
@@ -81,7 +80,7 @@ const SortFilterItem: FC<{ text: I18nKey; direction: SortDirection; onClick: () 
         <StyledSortItem onClick={onClick}>
             {getSortParamText(text)}
             {nullable(direction, (dir) => (
-                <StyledDirectionText weight="bold" size="xs" color={gray8}>
+                <StyledDirectionText weight="bold" size="xs" color="var(--gray8)">
                     {dir}
                 </StyledDirectionText>
             ))}

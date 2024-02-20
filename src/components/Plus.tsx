@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { textColor, backgroundColor, colorPrimary, brandColor, gray9 } from '@taskany/colors';
 
 interface PlusProps {
     action?: boolean;
@@ -20,14 +19,14 @@ const StyledPlus = styled(({ action, forwardRef, ...props }) => <span ref={forwa
     text-align: center;
     font-weight: 400;
 
-    border: 1px solid ${gray9};
-    color: ${gray9};
+    border: 1px solid var(--gray9);
+    color: var(--gray9);
 
     ${({ action }) =>
         action &&
         `
-            border: 1px solid ${colorPrimary};
-            color: ${brandColor};
+            border: 1px solid var(--color-primary);
+            color: var(--brand-color);
         `}
 
     border-radius: 100%;
@@ -40,15 +39,15 @@ const StyledPlus = styled(({ action, forwardRef, ...props }) => <span ref={forwa
         font-weight: 500;
         font-size: 14px;
 
-        border-color: ${textColor};
-        color: ${textColor};
+        border-color: var(--text-color);
+        color: var(--text-color);
 
         ${({ action }) =>
             action &&
             `
-                border-color: ${colorPrimary}
-                background-color: ${colorPrimary};
-                color: ${backgroundColor};
+                border-color: var(--color-primary)
+                background-color: var(--color-primary);
+                color: var(--background-color);
             `}
     }
 `;

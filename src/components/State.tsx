@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { gapS, gapXs, radiusXl } from '@taskany/colors';
 import dynamic from 'next/dynamic';
 
 import { stateBg, stateBgHover, stateStroke, stateStrokeHover } from './StateWrapper';
@@ -21,7 +20,7 @@ const StyledState = styled.div<{
     display: inline-block;
     padding: 6px 14px;
 
-    border-radius: ${radiusXl};
+    border-radius: var(--radius-xl);
 
     font-size: 14px;
     line-height: 14px;
@@ -51,7 +50,7 @@ const StyledState = styled.div<{
     ${({ size }) =>
         size === 's' &&
         `
-            padding: calc(${gapXs}/2) ${gapS};
+            padding: calc(var(--gap-xs)/2) var(--gap-s);
             font-size: 12px;
             border: 2px solid ${stateStroke};
             font-weight: 500;

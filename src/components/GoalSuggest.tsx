@@ -1,7 +1,6 @@
 import { forwardRef, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { ComboBox, Table } from '@taskany/bricks';
-import { radiusM, gapS, gapXs } from '@taskany/colors';
 import { State as StateType } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
@@ -19,8 +18,8 @@ interface GoalSuggestProps {
 }
 
 const StyledGoalListItemCompact = styled(GoalListItemCompact)`
-    border-radius: ${radiusM};
-    padding: ${gapXs} ${gapS};
+    border-radius: var(--radius-m);
+    padding: var(--gap-xs) var(--gap-s);
 `;
 
 interface GoalSuggestItemProps {
