@@ -1,0 +1,14 @@
+.GroupHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-sizing: border-box;
+
+    padding-bottom: var(--gap-xs);
+    margin: 0 var(--gap-s);
+
+    max-width: 392px;
+
+    border-bottom: 1px solid var(--gray-900);
+}

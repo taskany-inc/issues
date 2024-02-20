@@ -154,11 +154,7 @@ export const FiltersPanel: FC<{
                 <FiltersPanelContainer className={s.FiltersPanel} loading={loading} {...filtersPanel.attr}>
                     <FiltersPanelContent>
                         <FiltersSearchContainer>
-                            <SearchFilter
-                                placeholder={tr('Search')}
-                                defaultValue={queryState?.query}
-                                onChange={onSearchChange}
-                            />
+                            <SearchFilter defaultValue={queryState?.query} onChange={onSearchChange} />
                         </FiltersSearchContainer>
                         <FiltersCounterContainer>
                             <FiltersCounter total={total} counter={counter} />

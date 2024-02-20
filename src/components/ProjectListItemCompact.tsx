@@ -18,6 +18,7 @@ interface ProjectListItemCompactProps {
     focused?: boolean;
     icon?: boolean;
     className?: string;
+    interactive?: boolean;
     onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
@@ -28,10 +29,10 @@ const StyledRow = styled(TableRow)`
 `;
 
 export const ProjectListItemCompact: React.FC<ProjectListItemCompactProps> = React.memo(
-    ({ id, owner, title, icon, ...attrs }) => {
+    ({ id, owner, title, icon, interactive, ...attrs }) => {
         return (
             <NextLink href={routes.project(id)} passHref legacyBehavior>
-                <StyledRow interactive align="center" gap={10} {...attrs}>
+                <StyledRow interactive={interactive} align="center" gap={10} {...attrs}>
                     {nullable(icon, () => (
                         <TableCell min>
                             <IconUsersOutline size="s" />

@@ -1,10 +1,8 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState, useCallback } from 'react';
-import styled from 'styled-components';
 import NextLink from 'next/link';
-import { Text, Table, nullable, ListView, ListViewItem, GlobalSearch as TaskanyGlobalSearch } from '@taskany/bricks';
+import { Table, nullable, ListView, ListViewItem } from '@taskany/bricks';
+import { GlobalSearch as TaskanyGlobalSearch, MenuItem, Link, Text } from '@taskany/bricks/harmony';
 import { IconTargetOutline, IconUsersOutline } from '@taskany/icons';
-import { gapS, gapXs, gray4, radiusM } from '@taskany/colors';
 
 import { trpc } from '../../utils/trpcClient';
 import { routes, useRouter } from '../../hooks/router';
@@ -12,107 +10,9 @@ import { GoalListItemCompact } from '../GoalListItemCompact';
 import { ProjectListItemCompact } from '../ProjectListItemCompact';
 
 import { tr } from './GlobalSearch.i18n';
+import s from './GlobalSearch.module.css';
 
 type ListViewItemValue = ['goal' | 'project', string];
-
-// TODO: https://github.com/taskany-inc/issues/issues/1568
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledGoalListItemCompact = styled(({ hovered, ...props }) => <GoalListItemCompact {...props} />)<{
-    hovered?: boolean;
-}>`
-    padding: ${gapXs} ${gapS};
-    border-radius: ${radiusM};
-    cursor: pointer;
-
-    &:hover {
-        background-color: transparent;
-    }
-
-    ${({ hovered }) =>
-        hovered &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-
-    ${({ hovered, focused }) =>
-        hovered &&
-        focused &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-
-    ${({ focused }) =>
-        focused &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-`;
-
-// TODO: https://github.com/taskany-inc/issues/issues/1568
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledProjectListItemCompact = styled(({ hovered, ...props }) => <ProjectListItemCompact {...props} />)<{
-    hovered?: boolean;
-}>`
-    ${({ hovered }) =>
-        hovered &&
-        `
-
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-
-    ${({ hovered, focused }) =>
-        hovered &&
-        focused &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-
-    ${({ focused }) =>
-        focused &&
-        `
-        &:hover {
-            background-color: ${gray4};
-        }
-
-        background-color: ${gray4};
-    `}
-`;
-
-const StyledGroupHeader = styled(Text)`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    box-sizing: border-box;
-
-    padding-top: ${gapS};
-    padding-bottom: ${gapXs};
-    margin: 0 ${gapS};
-
-    max-width: 392px;
-
-    border-bottom: 1px solid ${gray4};
-`;
 
 const tableWidth = 700;
 
@@ -136,18 +36,19 @@ export const GlobalSearch = () => {
 
     return (
         <TaskanyGlobalSearch
-            query={query}
-            setQuery={setQuery}
+            value={query}
+            onChange={setQuery}
             searchResultExists={resultsExists}
-            placeholder={tr('Search or jump to...')}
+            placeholder={tr('Search...')}
+            outline
         >
             {resultsExists && (
                 <ListView onKeyboardClick={onKeyboardNavigate}>
                     {nullable(suggestions.data?.goals?.length, () => (
                         <>
-                            <StyledGroupHeader size="m" weight="bolder">
+                            <Text size="m" weight="bolder" className={s.GroupHeader}>
                                 {tr('Goals')} <IconTargetOutline size="s" />
-                            </StyledGroupHeader>
+                            </Text>
                             <Table width={tableWidth}>
                                 {suggestions.data?.goals.map((item) => {
                                     const value: ListViewItemValue = ['goal', item._shortId];
@@ -158,27 +59,29 @@ export const GlobalSearch = () => {
                                             value={value}
                                             renderItem={({ active, ...props }) => (
                                                 <NextLink passHref href={routes.goal(item._shortId)} legacyBehavior>
-                                                    <StyledGoalListItemCompact
-                                                        focused={active}
-                                                        align="center"
-                                                        gap={10}
-                                                        item={item}
-                                                        columns={[
-                                                            { name: 'title', columnProps: { col: 3 } },
-                                                            {
-                                                                name: 'state',
-                                                                columnProps: { col: 1, justify: 'end' },
-                                                            },
-                                                            {
-                                                                name: 'priority',
-                                                                columnProps: { width: '12ch' },
-                                                            },
-                                                            { name: 'projectId', columnProps: { col: 3 } },
-                                                            { name: 'issuers' },
-                                                            { name: 'estimate', columnProps: { width: '8ch' } },
-                                                        ]}
-                                                        {...props}
-                                                    />
+                                                    <Link>
+                                                        <MenuItem {...props} hovered={active}>
+                                                            <GoalListItemCompact
+                                                                align="center"
+                                                                gap={10}
+                                                                item={item}
+                                                                columns={[
+                                                                    { name: 'title', columnProps: { col: 3 } },
+                                                                    {
+                                                                        name: 'state',
+                                                                        columnProps: { col: 1, justify: 'end' },
+                                                                    },
+                                                                    {
+                                                                        name: 'priority',
+                                                                        columnProps: { width: '12ch' },
+                                                                    },
+                                                                    { name: 'projectId', columnProps: { col: 3 } },
+                                                                    { name: 'issuers' },
+                                                                    { name: 'estimate', columnProps: { width: '8ch' } },
+                                                                ]}
+                                                            />
+                                                        </MenuItem>
+                                                    </Link>
                                                 </NextLink>
                                             )}
                                         />
@@ -189,22 +92,22 @@ export const GlobalSearch = () => {
                     ))}
                     {nullable(suggestions.data?.projects?.length, () => (
                         <>
-                            <StyledGroupHeader size="m" weight="bolder">
+                            <Text size="m" weight="bolder" className={s.GroupHeader}>
                                 {tr('Projects')} <IconUsersOutline size="s" />
-                            </StyledGroupHeader>
+                            </Text>
                             <Table width={tableWidth}>
                                 {suggestions.data?.projects?.map((item) => (
                                     <ListViewItem
                                         key={item.id}
                                         value={['project', item.id]}
                                         renderItem={({ active, ...props }) => (
-                                            <StyledProjectListItemCompact
-                                                id={item.id}
-                                                title={item.title}
-                                                owner={item.activity}
-                                                focused={active}
-                                                {...props}
-                                            />
+                                            <MenuItem {...props} hovered={active}>
+                                                <ProjectListItemCompact
+                                                    id={item.id}
+                                                    title={item.title}
+                                                    owner={item.activity}
+                                                />
+                                            </MenuItem>
                                         )}
                                     />
                                 ))}

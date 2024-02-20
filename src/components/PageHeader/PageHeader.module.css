@@ -7,6 +7,10 @@
     margin-left: var(--gap-m);
 }
 
+.PageHeaderSearch {
+    width: 400px;
+}
+
 .PageHeader .PageHeaderNav {
     display: flex;
     align-items: center;

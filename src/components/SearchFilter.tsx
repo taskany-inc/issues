@@ -1,27 +1,18 @@
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 import { debounce } from 'throttle-debounce';
-import { FormControl, FormControlInput } from '@taskany/bricks/harmony';
+import { FormControl } from '@taskany/bricks/harmony';
+
+import { FilterAutoCompleteInput } from './FilterAutoCompleteInput/FilterAutoCompleteInput';
 
 export const SearchFilter: FC<{
-    placeholder?: string;
     defaultValue?: string;
     onChange: (search: string) => void;
-}> = ({ placeholder, defaultValue, onChange }) => {
+}> = ({ defaultValue, onChange }) => {
     const debouncedSearchHandler = debounce(200, onChange);
 
-    const onSearchInputChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => debouncedSearchHandler(e.currentTarget.value),
-        [debouncedSearchHandler],
-    );
     return (
         <FormControl>
-            <FormControlInput
-                outline
-                size="xs"
-                placeholder={placeholder}
-                defaultValue={defaultValue}
-                onChange={onSearchInputChange}
-            />
+            <FilterAutoCompleteInput defaultValue={defaultValue} onChange={debouncedSearchHandler} />
         </FormControl>
     );
 };
