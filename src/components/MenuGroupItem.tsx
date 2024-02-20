@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { gapS, gapXs, gray4, gray7 } from '@taskany/colors';
 import { Text } from '@taskany/bricks';
 
 interface MenuGroupItemProps {
@@ -20,12 +19,12 @@ const StyledMenuGroupItem = styled.div`
 `;
 
 const StyledMenuGroupItemTitle = styled(Text)`
-    color: ${gray7};
+    color: var(--gray7);
 
-    border-bottom: 1px solid ${gray4};
+    border-bottom: 1px solid var(--gray4);
 
-    padding-bottom: ${gapXs};
-    margin-bottom: ${gapS};
+    padding-bottom: var(--gap-xs);
+    margin-bottom: var(--gap-s);
 `;
 
 export const MenuGroupItem: React.FC<MenuGroupItemProps> = ({ title, children }) => (

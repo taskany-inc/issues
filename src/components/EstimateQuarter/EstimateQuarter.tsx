@@ -1,5 +1,4 @@
 import { nullable } from '@taskany/bricks';
-import { gapXs } from '@taskany/colors';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { Button } from '@taskany/bricks/harmony';
@@ -16,13 +15,13 @@ import { tr } from './EstimateQuarter.i18n';
 const StyledItems = styled.div<{ column: number }>`
     display: grid;
     grid-template-columns: repeat(${({ column }) => column}, 1fr);
-    gap: ${gapXs};
+    gap: var(--gap-xs);
 `;
 
 const StyledButtonGroupsWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    gap: ${gapXs};
+    gap: var(--gap-xs);
 `;
 
 interface EstimateQuarterProps {

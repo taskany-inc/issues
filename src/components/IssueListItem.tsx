@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import { gapM, gapS, gapXs } from '@taskany/colors';
 import { Text, Link, nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
@@ -23,7 +22,7 @@ interface IssueListItemProps {
 }
 
 const StyledIssueListItem = styled.div`
-    padding: ${gapS} ${gapM} ${gapS} 0;
+    padding: var(--gap-s) var(--gap-m) var(--gap-s) 0;
     display: flex;
     align-items: top;
 `;
@@ -38,8 +37,8 @@ const StyledLink = styled(Link)`
 `;
 
 const StyledDotWrapper = styled.div<{ size: IssueListItemProps['size'] }>`
-    padding-top: ${gapXs};
-    padding-right: ${({ size }) => (size === 'xs' ? gapXs : gapS)};
+    padding-top: var(--gap-xs);
+    padding-right: ${({ size }) => (size === 'xs' ? 'var(--gap-xs)' : 'var(--gap-s)')};
 `;
 
 export const IssueListItem: React.FC<IssueListItemProps> = ({ issue, className, size = 's', strike }) => {

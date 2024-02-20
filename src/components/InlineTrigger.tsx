@@ -1,5 +1,4 @@
 import { Text } from '@taskany/bricks';
-import { gapS, gray8, textColor } from '@taskany/colors';
 import { forwardRef } from 'react';
 import styled from 'styled-components';
 
@@ -20,16 +19,16 @@ const StyledInlineTrigger = styled(Text)`
 
     cursor: pointer;
 
-    color: ${gray8};
+    color: var(--gray8);
 
     &:hover {
-        color: ${textColor};
+        color: var(--text-color);
     }
 `;
 
 const StyledInlineTriggerText = styled.span`
     display: flex;
-    padding-left: ${gapS};
+    padding-left: var(--gap-s);
 `;
 
 const StyledIconContainer = styled.span`

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FormTitle, ModalContent, ModalHeader, nullable } from '@taskany/bricks';
-import { gapM, gapS } from '@taskany/colors';
 import dynamic from 'next/dynamic';
 import { Button } from '@taskany/bricks/harmony';
 
@@ -29,10 +28,10 @@ const StyledIframe = styled.iframe<{ visible?: boolean }>`
 `;
 
 const StyledFooter = styled.div`
-    padding-top: ${gapM};
+    padding-top: var(--gap-m);
     display: flex;
     justify-content: end;
-    gap: ${gapS};
+    gap: var(--gap-s);
 `;
 
 const WhatsNew = () => {

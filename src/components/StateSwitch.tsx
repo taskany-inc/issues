@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { gapM } from '@taskany/colors';
 import { KeyCode, useKeyPress, useKeyboard, Popup } from '@taskany/bricks';
 import { StateType } from '@prisma/client';
 
@@ -23,7 +22,7 @@ interface StateSwitchProps {
 }
 
 const StyledStates = styled.div`
-    padding: 0 ${gapM};
+    padding: 0 var(--gap-m);
     display: inline-flex;
     flex-wrap: nowrap;
     gap: 6px;

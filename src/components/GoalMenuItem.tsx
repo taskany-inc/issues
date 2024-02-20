@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { gapXs, gray4, gray7, gray8, radiusM } from '@taskany/colors';
 import { Text } from '@taskany/bricks';
 
 import { IssueKey } from './IssueKey';
@@ -22,8 +21,8 @@ const StyledGoalMenuItem = styled.div<{ focused?: boolean }>`
     padding: 6px;
     margin-bottom: 4px;
 
-    border: 1px solid ${gray7};
-    border-radius: ${radiusM};
+    border: 1px solid var(--gray7);
+    border-radius: var(--radius-m);
 
     cursor: pointer;
 
@@ -32,20 +31,20 @@ const StyledGoalMenuItem = styled.div<{ focused?: boolean }>`
     }
 
     &:hover {
-        border-color: ${gray8};
-        background-color: ${gray4};
+        border-color: var(--gray8);
+        background-color: var(--gray4);
     }
 
     ${({ focused }) =>
         focused &&
         `
-            border-color: ${gray8};
-            background-color: ${gray4};
+            border-color: var(--gray8);
+            background-color: var(--gray4);
         `}
 `;
 
 const StyledGoalMenuItemTitleText = styled(Text)`
-    padding-top: ${gapXs};
+    padding-top: var(--gap-xs);
 `;
 
 export const GoalMenuItem: React.FC<GoalMenuItemProps> = ({ id, title, focused, onClick }) => (

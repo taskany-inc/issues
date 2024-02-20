@@ -1,9 +1,8 @@
 import styled from 'styled-components';
-import { gapL, gapM, gray5 } from '@taskany/colors';
 
 export const ActivityFeed = styled.div`
     display: grid;
-    row-gap: ${gapM};
+    row-gap: var(--gap-m);
     padding-bottom: 250px;
     position: relative;
 `;
@@ -11,7 +10,7 @@ export const ActivityFeed = styled.div`
 export const ActivityFeedItem = styled.div`
     display: grid;
     grid-template-columns: 32px minmax(0, 1fr);
-    column-gap: ${gapM};
+    column-gap: var(--gap-m);
     position: relative;
 
     :first-child {
@@ -21,10 +20,10 @@ export const ActivityFeedItem = styled.div`
     :first-child::before {
         content: '';
         position: absolute;
-        height: ${gapL};
+        height: var(--gap-l);
         left: 15px;
         top: 0;
-        border-left: 1px solid ${gray5};
+        border-left: 1px solid var(--gray5);
         z-index: 0;
         transform: translateY(-100%);
     }
@@ -32,9 +31,9 @@ export const ActivityFeedItem = styled.div`
     ::after {
         content: '';
         position: absolute;
-        height: calc(100% + ${gapM});
+        height: calc(100% + var(--gap-m));
         left: 15px;
-        border-left: 1px solid ${gray5};
+        border-left: 1px solid var(--gray5);
         z-index: 0;
     }
 

@@ -2,7 +2,6 @@ import { ComponentProps, FC } from 'react';
 import styled from 'styled-components';
 import { nullable } from '@taskany/bricks';
 import { IconXCircleSolid } from '@taskany/icons';
-import { gapXs } from '@taskany/colors';
 import { User } from '@prisma/client';
 
 import { safeUserData } from '../../utils/getUserName';
@@ -16,7 +15,7 @@ import { tr } from './UserEditableList.i18n';
 const inputHeight = '28px';
 
 const StyledInputContainer = styled.div`
-    margin-top: ${gapXs};
+    margin-top: var(--gap-xs);
     height: ${inputHeight};
 `;
 

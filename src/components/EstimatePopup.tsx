@@ -1,7 +1,6 @@
 import React, { ReactNode, useRef, useState, useCallback, ComponentProps } from 'react';
 import styled from 'styled-components';
 import { useClickOutside, Popup, nullable } from '@taskany/bricks';
-import { gapS, danger10, radiusM } from '@taskany/colors';
 
 import { combobox, comboboxErrorDot } from '../utils/domObjects';
 
@@ -15,15 +14,15 @@ const StyledErrorTrigger = styled.div`
     width: 6px;
     height: 6px;
     border-radius: 100%;
-    background-color: ${danger10};
+    background-color: var(--danger10);
     top: -2px;
     right: 0px;
     z-index: 1;
 `;
 
 const StyledPopup = styled(Popup)`
-    border-radius: ${radiusM};
-    padding: ${gapS};
+    border-radius: var(--radius-m);
+    padding: var(--gap-s);
 `;
 
 export interface EstimatePopupProps extends Omit<EstimateProps, 'children'> {

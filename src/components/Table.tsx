@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { gapS, gray9, radiusM, textColor } from '@taskany/colors';
 import { TableRow, Text } from '@taskany/bricks';
 import { MouseEventHandler, ReactNode } from 'react';
 
@@ -8,7 +7,7 @@ export const Title = styled(Text).attrs((props) => ({ weight: 'bold', ...props }
 export const TextItem = styled(Text).attrs({
     size: 's',
     weight: 'bold',
-    color: gray9,
+    color: 'var(--gray9)',
 })``;
 
 const TableRowWrapper = styled(TableRow)`
@@ -17,9 +16,9 @@ const TableRowWrapper = styled(TableRow)`
     align-items: center;
     flex: 1;
 
-    color: ${textColor};
-    padding: ${gapS};
-    border-radius: ${radiusM};
+    color: var(--text-color);
+    padding: var(--gap-s);
+    border-radius: var(--radius-m);
 `;
 
 interface TableRowItemProps extends Omit<React.ComponentProps<typeof TableRow>, 'interactive'> {
