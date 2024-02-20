@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { gapM } from '@taskany/colors';
 
 import { useForkedRef } from '../hooks/useForkedRef';
@@ -22,6 +22,11 @@ interface StyledShadeProps {
 
 const shadeWidth = 2;
 
+const extendArea = css`
+    margin: calc(-1 * var(--gap-m));
+    padding: var(--gap-m);
+`;
+
 const StyledScrollWrapper = styled.div<OverflowScrollProps>`
     position: relative;
     z-index: 1;
@@ -29,12 +34,14 @@ const StyledScrollWrapper = styled.div<OverflowScrollProps>`
     overflow: hidden;
 
     scrollbar-width: none;
+    ${extendArea};
 `;
 
 const StyledScrollContainer = styled.div`
     overflow-y: hidden;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    ${extendArea};
 `;
 
 const StyledShade = styled.span<StyledShadeProps>`
