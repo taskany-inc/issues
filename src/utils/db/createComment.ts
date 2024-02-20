@@ -46,14 +46,16 @@ export const createComment = async ({
     if (!commentAuthor) return null;
     if (!actualGoal) return null;
 
-    const { _isEditable, _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
+    const { _isEditable, _shortId, _isParticipant } = addCalculatedGoalsFields(actualGoal, activityId, role);
+
+    const canEdit = _isEditable || _isParticipant;
 
     const commentCreateOperation = prisma.comment.create({
         data: {
             description,
             activityId: commentAuthor.id,
             goalId,
-            stateId: _isEditable ? stateId : undefined,
+            stateId: canEdit ? stateId : undefined,
         },
         include: {
             activity: {
@@ -71,19 +73,19 @@ export const createComment = async ({
                       where: { id: goalId },
                       data: {
                           id: goalId,
-                          stateId: _isEditable ? pushState?.id : actualGoal.stateId,
+                          stateId: canEdit ? pushState?.id : actualGoal.stateId,
                           goalInCriteria: {
                               updateMany: {
                                   where: {
                                       id: { in: actualGoal.goalInCriteria.map(({ id }) => id) },
                                   },
                                   data: {
-                                      isDone: _isEditable && pushState?.type && pushState?.type === StateType.Completed,
+                                      isDone: canEdit && pushState?.type && pushState?.type === StateType.Completed,
                                   },
                               },
                           },
                           history:
-                              _isEditable && stateId && stateId !== actualGoal.stateId
+                              canEdit && stateId && stateId !== actualGoal.stateId
                                   ? {
                                         create: {
                                             subject: 'state',
@@ -110,7 +112,7 @@ export const createComment = async ({
 
     await updateProjectUpdatedAt(updatedGoal.projectId);
 
-    if (_isEditable && stateId && stateId !== updatedGoal.stateId) {
+    if (canEdit && stateId && stateId !== updatedGoal.stateId) {
         await recalculateCriteriaScore(updatedGoal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
     }
 
