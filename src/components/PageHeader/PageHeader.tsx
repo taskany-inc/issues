@@ -28,6 +28,10 @@ export const PageHeader: FC = () => {
 
     const links = [
         {
+            href: routes.index(),
+            title: tr('Dashboard'),
+        },
+        {
             href: routes.goals(),
             title: tr('Goals'),
             attr: headerMenuGoals.attr,
