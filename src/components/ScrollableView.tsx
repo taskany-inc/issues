@@ -1,6 +1,5 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { gapM } from '@taskany/colors';
 
 import { useForkedRef } from '../hooks/useForkedRef';
 
@@ -48,8 +47,8 @@ const StyledShade = styled.span<StyledShadeProps>`
     position: absolute;
     z-index: 1;
 
-    top: calc(${gapM} * -1);
-    bottom: calc(${gapM} * -1);
+    top: calc(var(--gap-m) * -1);
+    bottom: calc(var(--gap-m) * -1);
     width: ${shadeWidth}px;
     border-radius: 75%;
 

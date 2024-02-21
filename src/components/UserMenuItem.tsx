@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { gray4, gray6, radiusM, textColor } from '@taskany/colors';
 import { UserPic } from '@taskany/bricks';
 
 interface UserMenuItemProps {
@@ -23,7 +22,7 @@ const StyledUserCard = styled.div<Pick<UserMenuItemProps, 'focused' | 'checked'>
     padding: 6px;
     margin-bottom: 4px;
 
-    border-radius: ${radiusM};
+    border-radius: var(--radius-m);
 
     cursor: pointer;
 
@@ -32,19 +31,19 @@ const StyledUserCard = styled.div<Pick<UserMenuItemProps, 'focused' | 'checked'>
     }
 
     &:hover {
-        background-color: ${gray4};
+        background-color: var(--gray4);
     }
 
     ${({ focused }) =>
         focused &&
         `
-            background-color: ${gray6};
+            background-color: var(--gray6);
         `}
 
     ${({ checked }) =>
         checked &&
         `
-            background-color: ${gray4};
+            background-color: var(--gray4);
         `}
 `;
 
@@ -59,7 +58,7 @@ const StyledUserName = styled.div`
 
 const StyledUserEmail = styled.div`
     font-size: 12px;
-    color: ${textColor};
+    color: var(--text-color);
 `;
 
 const StyledUserPick = styled(UserPic)`

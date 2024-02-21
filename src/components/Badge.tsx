@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Text, nullable } from '@taskany/bricks';
-import { gapM, gapS, gapXs, gray8, gray9 } from '@taskany/colors';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
     icon: React.ReactNode;
@@ -16,10 +15,10 @@ const StyledBadgeIconContainer = styled.span`
 
     visibility: hidden;
 
-    color: ${gray8};
+    color: var(--gray8);
 
     &:hover {
-        color: ${gray9};
+        color: var(--gray9);
     }
 `;
 
@@ -32,10 +31,10 @@ const StyledBadge = styled.span`
     position: relative;
     display: grid;
     grid-template-columns: min-content auto min-content;
-    grid-template-rows: minmax(max-content, calc(${gapM} + ${gapXs})) minmax(0, 1fr);
+    grid-template-rows: minmax(max-content, calc(var(--gap-m) + var(--gap-xs))) minmax(0, 1fr);
     align-items: center;
 
-    padding: ${gapXs} 0;
+    padding: var(--gap-xs) 0;
 
     width: fit-content;
 
@@ -49,11 +48,11 @@ const StyledBadge = styled.span`
 `;
 
 const StyledText = styled(Text).attrs({
-    color: gray9,
+    color: 'var(--gray9)',
     size: 's',
     ellipsis: true,
 })`
-    padding: 0 ${gapXs} 0 ${gapS};
+    padding: 0 var(--gap-xs) 0 var(--gap-s);
     grid-row: span 2;
 `;
 

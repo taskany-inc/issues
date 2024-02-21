@@ -1,7 +1,6 @@
 import { Button } from '@taskany/bricks/harmony';
 import { useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import { gapS, gapXs } from '@taskany/colors';
 
 import { createLocaleDate, createYearRange, getYearFromDate } from '../../utils/dateTime';
 import { useLocale } from '../../hooks/useLocale';
@@ -14,13 +13,13 @@ import { tr } from './EstimateYear.i18n';
 const StyledTriggerWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    gap: ${gapS};
+    gap: var(--gap-s);
 `;
 
 const StyledItems = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: ${gapXs};
+    gap: var(--gap-xs);
 `;
 
 const currentYear = getYearFromDate(new Date());

@@ -1,10 +1,9 @@
 import { useState, useRef, FC, ReactNode, MutableRefObject, useCallback, ComponentProps } from 'react';
 import styled from 'styled-components';
 import { KeyCode, Popup, nullable, useKeyboard } from '@taskany/bricks';
-import { gapXs } from '@taskany/colors';
 
 const StyledWrapper = styled.div`
-    padding: ${gapXs};
+    padding: var(--gap-xs);
 `;
 
 interface GoalFormPopupTriggerProps {

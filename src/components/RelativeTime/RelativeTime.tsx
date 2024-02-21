@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { nullable, useMounted } from '@taskany/bricks';
-import { gapXs } from '@taskany/colors';
 
 import { dateAgo, createLocaleDate, parseLocaleDate } from '../../utils/dateTime';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -20,7 +19,7 @@ interface RelativeTimeProps {
 }
 
 const StyledKind = styled.span`
-    padding-right: ${gapXs};
+    padding-right: var(--gap-xs);
 `;
 
 const StyledRelativeTime = styled.span`
