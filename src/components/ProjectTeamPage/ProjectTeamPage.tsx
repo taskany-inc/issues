@@ -1,5 +1,5 @@
-import { nullable, TreeView, TreeViewElement, TreeViewNode } from '@taskany/bricks';
-import { Link, Table } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
+import { Link, Table, TreeView, TreeViewElement, TreeViewNode } from '@taskany/bricks/harmony';
 import { useCallback, useMemo } from 'react';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
