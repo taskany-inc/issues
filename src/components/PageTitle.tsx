@@ -32,7 +32,7 @@ export const PageTitle: React.FC<PageTitleProps> = ({ title, subtitle, info, onC
 
         {subtitle && (
             <>
-                {':'}
+                :
                 <StyledText as="span" size="xxl" weight="bolder" color={onClick ? gray4 : gray7} onClick={onClick}>
                     {subtitle}
                 </StyledText>

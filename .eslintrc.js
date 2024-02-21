@@ -7,7 +7,7 @@ module.exports = {
         'plugin:@typescript-eslint/recommended',
     ],
     parser: '@typescript-eslint/parser',
-    plugins: ['import', 'prettier', '@taskany/rules'],
+    plugins: ['import', 'prettier', '@taskany/rules', 'react'],
     rules: {
         '@taskany/rules/prefer-interface': 'error',
         '@typescript-eslint/no-empty-function': 'off',
@@ -88,6 +88,13 @@ module.exports = {
                         message: 'Use the trpc procedures inferred types instead',
                     },
                 ],
+            },
+        ],
+        'react/jsx-curly-brace-presence': [
+            'error',
+            {
+                props: 'never',
+                children: 'never',
             },
         ],
     },
