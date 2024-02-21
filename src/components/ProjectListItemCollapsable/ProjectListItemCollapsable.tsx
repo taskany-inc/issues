@@ -1,7 +1,8 @@
 import React, { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import { Text, TreeView, TreeViewNode, nullable } from '@taskany/bricks';
+import { Text, nullable } from '@taskany/bricks';
+import { TreeView, TreeViewNode } from '@taskany/bricks/harmony';
 import { IconServersOutline } from '@taskany/icons';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';

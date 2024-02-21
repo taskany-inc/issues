@@ -1,5 +1,6 @@
 import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import { ListView, nullable, TreeViewElement } from '@taskany/bricks';
+import { ListView, nullable } from '@taskany/bricks';
+import { TreeViewElement } from '@taskany/bricks/harmony';
 
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';

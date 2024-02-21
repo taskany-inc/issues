@@ -1,5 +1,6 @@
 import { FC, useMemo, useEffect, ComponentProps, MouseEventHandler } from 'react';
-import { TreeViewElement, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { TreeViewElement } from '@taskany/bricks/harmony';
 
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';
