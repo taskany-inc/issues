@@ -1,0 +1,7 @@
+.ProjectListItemIcons {
+    justify-content: space-between;   
+}
+
+.ProjectListItemRow {
+    gap: var(--gap-s);
+}

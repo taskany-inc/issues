@@ -1,19 +1,21 @@
-import React, { MouseEventHandler, useMemo } from 'react';
-import styled, { css } from 'styled-components';
-import { nullable, Dropdown, MenuItem, TableRow, TableCell, TableRowProps, TableCellProps } from '@taskany/bricks';
+import React, { ComponentProps, FC, MouseEventHandler, useMemo } from 'react';
+import cn from 'classnames';
+import { nullable, Dropdown, MenuItem } from '@taskany/bricks';
+import { TableRow, TableCell } from '@taskany/bricks/harmony';
 import { IconMoreVerticalOutline, IconTargetOutline } from '@taskany/icons';
 import type { State as StateType } from '@prisma/client';
 
-import { DateType } from '../types/date';
-import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
-import { formateEstimate } from '../utils/dateTime';
-import { useLocale } from '../hooks/useLocale';
-import { Priority } from '../types/priority';
+import { DateType } from '../../types/date';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
+import { formateEstimate } from '../../utils/dateTime';
+import { useLocale } from '../../hooks/useLocale';
+import { Priority } from '../../types/priority';
+import { getPriorityText } from '../PriorityText/PriorityText';
+import { UserGroup } from '../UserGroup';
+import { TableRowItemText, TableRowItemTitle } from '../TableRowItem/TableRowItem';
+import { StateDot } from '../StateDot';
 
-import { getPriorityText } from './PriorityText/PriorityText';
-import { UserGroup } from './UserGroup';
-import { Title, TextItem } from './Table';
-import { StateDot } from './StateDot';
+import s from './GoalListItemCompact.module.css';
 
 interface CommonGoalListItemCompactProps {
     shortId: string;
@@ -38,10 +40,16 @@ type ColumnRenderProps<T extends Record<string, any>> = T &
         issuers: Array<ActivityByIdReturnType>;
     };
 
+type Justify = 'start' | 'center' | 'end';
+type TableCellProps = ComponentProps<typeof TableCell> & {
+    forIcon?: boolean;
+    justify?: Justify;
+};
+
 type GoalListItemCompactColumnProps<T = any> = {
     name: 'icon' | 'title' | 'state' | 'priority' | 'projectId' | 'issuers' | 'estimate' | string;
     renderColumn?: (props: T) => React.ReactElement<T>;
-    columnProps?: TableCellProps & { forIcon?: boolean };
+    columnProps?: TableCellProps;
 };
 
 interface GoalItemAction {
@@ -68,9 +76,7 @@ interface GoalListItemCompactCustomizeProps<T extends Record<string, any>> {
 }
 
 interface GoalListItemCompactCustomizeRender {
-    <T extends Record<string, any>>(
-        props: GoalListItemCompactCustomizeProps<T> & Omit<TableRowProps, 'interactive'>,
-    ): React.ReactElement<T>;
+    <T extends Record<string, any>>(props: GoalListItemCompactCustomizeProps<T>): React.ReactElement<T>;
 }
 
 interface RenderColumnProps<T> {
@@ -82,30 +88,24 @@ interface ColumnRender {
     <T extends GoalListItemCompactProps>(props: RenderColumnProps<T>): React.ReactNode;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledCell = styled(({ forIcon, ...props }: TableCellProps & { forIcon?: boolean }) => <TableCell {...props} />)`
-    ${({ forIcon }) =>
-        forIcon &&
-        css`
-            margin-top: 3px;
-            &:last-child {
-                margin-left: auto;
-            }
-        `}
-`;
+const justifyCns: Record<Justify, string> = {
+    start: s.GoalListItemCompactCellStart,
+    center: s.GoalListItemCompactCellCenter,
+    end: s.GoalListItemCompactCellEnd,
+};
 
-const StyledDropdown = styled(Dropdown)`
-    position: relative;
-    z-index: 1;
-    max-width: 300px;
-    width: 100%;
-`;
-
-const StyledActionsWrapper = styled.div`
-    display: flex;
-    position: relative;
-    z-index: 1;
-`;
+export const CustomCell: FC<TableCellProps> = ({ forIcon, justify = 'start', className, ...props }) => (
+    <TableCell
+        className={cn(
+            className,
+            {
+                [s.GoalListItemCompactCellforIcon]: forIcon,
+            },
+            justifyCns[justify],
+        )}
+        {...props}
+    />
+);
 
 const Column: ColumnRender = ({ col, componentProps }) => {
     const locale = useLocale();
@@ -130,35 +130,35 @@ const Column: ColumnRender = ({ col, componentProps }) => {
 
     switch (col.name) {
         case 'title':
-            content = <Title size="s">{title}</Title>;
+            content = <TableRowItemTitle size="s">{title}</TableRowItemTitle>;
             break;
         case 'state':
             content = nullable(state, (s) => <StateDot size="m" title={s?.title} hue={s?.hue} />);
             break;
         case 'priority':
-            content = nullable(priority, (p) => <TextItem>{getPriorityText(p.title)}</TextItem>);
+            content = nullable(priority, (p) => <TableRowItemText>{getPriorityText(p.title)}</TableRowItemText>);
             break;
         case 'projectId':
-            content = nullable(projectId, (id) => <TextItem>{id}</TextItem>);
+            content = nullable(projectId, (id) => <TableRowItemText>{id}</TableRowItemText>);
             break;
         case 'issuers':
             content = nullable(issuers, (list) => <UserGroup users={list} />);
             break;
         case 'estimate':
             content = nullable(estimate, (e) => (
-                <TextItem>
+                <TableRowItemText>
                     {formateEstimate(e, {
                         type: estimateType === 'Year' ? estimateType : 'Quarter',
                         locale,
                     })}
-                </TextItem>
+                </TableRowItemText>
             ));
             break;
         default:
             return null;
     }
 
-    return nullable(content, (c) => <StyledCell {...columnProps}>{c}</StyledCell>);
+    return nullable(content, (c) => <CustomCell {...columnProps}>{c}</CustomCell>);
 };
 
 export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
@@ -167,26 +167,24 @@ export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
     icon,
     rawIcon = <IconTargetOutline size="s" />,
     item,
-    gap = 7,
-    align,
-    justify,
     onActionClick,
     ...attrs
 }) => {
     return (
-        <TableRow interactive={attrs.focused != null} gap={gap} align={align} justify={justify} {...attrs}>
+        <TableRow className={s.GoalListItemCompactRow} {...attrs}>
             {nullable(icon, () => (
-                <StyledCell key="icon" forIcon min>
+                <CustomCell key="icon" forIcon>
                     {rawIcon}
-                </StyledCell>
+                </CustomCell>
             ))}
             {columns.map((col) => (
                 <Column key={col.name} col={col} componentProps={item} />
             ))}
             {nullable(actions, (list) => (
-                <StyledCell key="actions" forIcon min>
-                    <StyledActionsWrapper>
-                        <StyledDropdown
+                <CustomCell key="actions" forIcon>
+                    <div className={s.GoalListItemCompactDropdownWrapper}>
+                        <Dropdown
+                            className={s.GoalListItemCompactDropdown}
                             onChange={onActionClick}
                             renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
                             placement="right"
@@ -203,11 +201,9 @@ export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
                                 </MenuItem>
                             )}
                         />
-                    </StyledActionsWrapper>
-                </StyledCell>
+                    </div>
+                </CustomCell>
             ))}
         </TableRow>
     );
 };
-
-export const CustomCell = StyledCell;

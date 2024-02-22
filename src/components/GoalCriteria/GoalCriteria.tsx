@@ -1,6 +1,6 @@
 import React, { ComponentProps, useCallback, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
-import { Text, nullable, Table, MenuItem, TableRow, Dropdown } from '@taskany/bricks';
+import cn from 'classnames';
+import { Text, nullable, MenuItem, Dropdown } from '@taskany/bricks';
 import {
     IconTargetOutline,
     IconCircleOutline,
@@ -10,7 +10,8 @@ import {
     IconEdit1Outline,
     IconMoreVerticalOutline,
 } from '@taskany/icons';
-import { backgroundColor, brandColor, gray10, danger0, gray8, gray9, gapS } from '@taskany/colors';
+import { Table, TableRow } from '@taskany/bricks/harmony';
+import { backgroundColor, danger0, gray9 } from '@taskany/colors';
 
 import { ActivityFeedItem } from '../ActivityFeed';
 import { Circle } from '../Circle';
@@ -21,43 +22,10 @@ import { AddInlineTrigger } from '../AddInlineTrigger';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { routes } from '../../hooks/router';
-import { CustomCell } from '../GoalListItemCompact';
+import { CustomCell } from '../GoalListItemCompact/GoalListItemCompact';
 
 import { tr } from './GoalCriteria.i18n';
-
-const StyledIssueMeta = styled(IssueMeta)`
-    display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: minmax(32px, 100%);
-    align-items: center;
-    gap: ${gapS};
-    max-width: 520px;
-`;
-
-const StyledCircleIcon = styled(IconCircleOutline)`
-    color: ${gray8};
-
-    &:hover {
-        color: ${gray10};
-    }
-`;
-
-const StyledTickIcon = styled(IconTickCircleOutline)`
-    color: ${brandColor};
-    fill: ${backgroundColor};
-`;
-
-const StyledCheckboxWrapper = styled.span<{ canEdit: boolean }>`
-    display: inline-flex;
-    cursor: pointer;
-
-    ${({ canEdit }) =>
-        !canEdit &&
-        css`
-            pointer-events: none;
-            cursor: default;
-        `}
-`;
+import s from './GoalCriteria.module.css';
 
 interface CriteriaActionItem {
     label: string;
@@ -73,11 +41,18 @@ interface GoalCriteriaCheckBoxProps {
 }
 
 const GoalCriteriaCheckBox: React.FC<GoalCriteriaCheckBoxProps> = ({ checked, canEdit, onClick }) => {
-    const Icon = !checked ? StyledCircleIcon : StyledTickIcon;
+    const Icon = !checked ? IconCircleOutline : IconTickCircleOutline;
+
     return (
-        <StyledCheckboxWrapper onClick={onClick} canEdit={canEdit}>
+        <span
+            className={cn(s.GoalCriteriaCheckBox, {
+                [s.GoalCriteriaCheckBox_disabled]: !canEdit,
+                [s.GoalCriteriaCheckBox_checked]: checked,
+            })}
+            onClick={onClick}
+        >
             <Icon size="s" />
-        </StyledCheckboxWrapper>
+        </span>
     );
 };
 
@@ -177,8 +152,8 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
 
     return (
         <>
-            <TableRow key={criteria.id} align="baseline">
-                <CustomCell>
+            <TableRow key={criteria.id}>
+                <CustomCell className={s.GoalCriteriaItemTitle}>
                     {nullable(
                         criteria.criteriaGoal,
                         (goal) => (
@@ -201,14 +176,14 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
                         />,
                     )}
                 </CustomCell>
-                <CustomCell col={1} justify="end">
+                <CustomCell width={40} justify="end">
                     {nullable(criteria.weight > 0, () => (
                         <Text size="s" color={gray9}>
                             {criteria.weight}
                         </Text>
                     ))}
                 </CustomCell>
-                <CustomCell col={1} justify="end" forIcon>
+                <CustomCell width={40} justify="end" forIcon>
                     <Dropdown
                         onChange={handleChange}
                         renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
@@ -300,7 +275,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
             <Circle size={32}>
                 <IconMessageTickOutline size="s" color={backgroundColor} />
             </Circle>
-            <StyledIssueMeta title={tr('Achievement criteria')}>
+            <IssueMeta className={s.GoalCriteriaIssueMeta} title={tr('Achievement criteria')}>
                 <Table>
                     {sortedCriteriaItems.map((criteria) => (
                         <CriteriaItem
@@ -339,7 +314,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
                         />
                     </GoalFormPopupTrigger>
                 ))}
-            </StyledIssueMeta>
+            </IssueMeta>
         </ActivityFeedItem>
     );
 };

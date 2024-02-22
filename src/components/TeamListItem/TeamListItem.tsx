@@ -1,9 +1,10 @@
 import { FC, useCallback } from 'react';
-import { Button, Text } from '@taskany/bricks/harmony';
+import { Button, Text, TableCell, TableRow } from '@taskany/bricks/harmony';
 import { IconBinOutline } from '@taskany/icons';
-import { TableCell, TableRow } from '@taskany/bricks';
 
-import { TableRowItem } from './Table';
+import { TableRowItem } from '../TableRowItem/TableRowItem';
+
+import s from './TeamListItem.module.css';
 
 interface TeamListItemProps {
     name: string;
@@ -21,9 +22,9 @@ export const TeamListItem: FC<TeamListItemProps> = ({ name, units, onRemoveClick
     );
     return (
         <TableRowItem title={<Text size="l">{name}</Text>}>
-            <TableRow>
-                <TableCell justify="end">{units}</TableCell>
-                <TableCell justify="end" width={65}>
+            <TableRow className={s.TeamListItemRow}>
+                <TableCell className={s.TeamListItemColumn}>{units}</TableCell>
+                <TableCell className={s.TeamListItemColumn} width={60}>
                     <Button onClick={onClick} size="xs" iconLeft={<IconBinOutline size="xs" />} />
                 </TableCell>
             </TableRow>

@@ -1,0 +1,38 @@
+.GoalListItemCompactRow {
+    align-items: center;
+    width: 100%;
+    gap: var(--gap-s);
+}
+
+.GoalListItemCompactDropdownWrapper {
+    display: flex;
+    position: relative;
+    z-index: 1;
+}
+
+.GoalListItemCompactDropdown {
+    position: relative;
+    z-index: 1;
+    max-width: 300px;
+    width: 100%;
+}
+
+.GoalListItemCompactCellforIcon {
+    margin-top: 3px;
+}
+
+.GoalListItemCompactCellforIcon:last-child {
+    margin-left: auto;
+}
+
+.GoalListItemCompactCellStart {
+    justify-content: flex-start;
+}
+
+.GoalListItemCompactCellCenter {
+    justify-content: center;
+}
+
+.GoalListItemCompactCellEnd {
+    justify-content: flex-end;
+}

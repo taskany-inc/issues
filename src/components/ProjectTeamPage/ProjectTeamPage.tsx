@@ -10,7 +10,7 @@ import { pageHeader } from '../../utils/domObjects';
 import { PageContent } from '../PageContent/PageContent';
 import { Page } from '../Page/Page';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
-import { TeamListItem } from '../TeamListItem';
+import { TeamListItem } from '../TeamListItem/TeamListItem';
 import { TeamComboBox } from '../TeamComboBox/TeamComboBox';
 import { CommonHeader } from '../CommonHeader';
 import { PageSep } from '../PageSep';

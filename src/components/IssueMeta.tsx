@@ -8,6 +8,7 @@ interface IssueMetaProps {
     children?: React.ReactNode;
 
     onEdit?: () => void | null;
+    className?: string;
 }
 
 const StyledIssueMeta = styled.div`

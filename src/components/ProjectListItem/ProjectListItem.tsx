@@ -1,33 +1,33 @@
-import { CircleProgressBar, nullable, TableCell, TableRowProps, TableRow } from '@taskany/bricks';
+import { CircleProgressBar, nullable } from '@taskany/bricks';
+import { TableCell, TableRow } from '@taskany/bricks/harmony';
+import cn from 'classnames';
 import { IconStarSolid, IconEyeOutline } from '@taskany/icons';
+import { ComponentProps } from 'react';
 
-import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
+import { UserGroup } from '../UserGroup';
 
-import { UserGroup } from './UserGroup';
+import s from './ProjectListItem.module.css';
 
 interface ProjectListItemProps {
     owner?: ActivityByIdReturnType;
     participants?: ActivityByIdReturnType[];
     starred?: boolean;
     watching?: boolean;
-    className?: string;
     averageScore: number | null;
 }
 
-export const ProjectListItem: React.FC<ProjectListItemProps & Omit<TableRowProps, 'title'>> = ({
+export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typeof TableRow>> = ({
     owner,
     participants,
     starred,
     watching,
     averageScore,
     className,
-    gap = 10,
-    align = 'center',
-    justify = 'start',
     ...attrs
 }) => {
     return (
-        <TableRow className={className} gap={gap} align={align} justify={justify} interactive {...attrs}>
+        <TableRow className={cn(s.ProjectListItemRow, className)} {...attrs}>
             {nullable(owner, (o) => (
                 <TableCell width={26}>
                     <UserGroup users={[o]} />
@@ -45,8 +45,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps & Omit<TableRowProps
                     <CircleProgressBar value={score} />
                 </TableCell>
             ))}
-
-            <TableCell width={40} justify="between">
+            <TableCell width={40} className={s.ProjectListItemIcons}>
                 {nullable(starred, () => (
                     <IconStarSolid size="s" />
                 ))}
