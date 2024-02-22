@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.22.0](https://github.com/taskany-inc/issues/compare/v2.21.0...v2.22.0) (2024-02-22)
+
+
+### Features
+
+* **ESLint:** add rules for curly braces ([db3f588](https://github.com/taskany-inc/issues/commit/db3f58866714746a15df9e749f13ae9c961f3dc1))
+* teams page with crew integration ([1d94908](https://github.com/taskany-inc/issues/commit/1d949082cf809b82705a904423110a0e49a2bbeb))
+
+
+### Bug Fixes
+
+* bring inputs to one view ([c95940f](https://github.com/taskany-inc/issues/commit/c95940f3259f51fca4c387ccf857b32662d5969d))
+* **Harmony:** add shadow to GoalListItem when theme is light ([b1b64ff](https://github.com/taskany-inc/issues/commit/b1b64ff0dcefa3e1471fa758f5e7e33e8d1aa2ef))
+* participants can change state of goals ([6ba1390](https://github.com/taskany-inc/issues/commit/6ba1390271d7e172d9a2e3fdb4f339615beda676))
+* return dashboard link to header ([1c51b72](https://github.com/taskany-inc/issues/commit/1c51b728aefa1055836c35f717bf716b603c45b2))
+* token to private env ([2488d3a](https://github.com/taskany-inc/issues/commit/2488d3acd94f9e5620879e80fc778bd7ce77fc9d))
+
 ## [2.21.0](https://github.com/taskany-inc/issues/compare/v2.20.0...v2.21.0) (2024-02-19)
 
 
