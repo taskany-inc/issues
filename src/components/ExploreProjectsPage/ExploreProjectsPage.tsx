@@ -1,4 +1,5 @@
-import { Table, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { Table } from '@taskany/bricks/harmony';
 import NextLink from 'next/link';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -7,10 +8,10 @@ import { Page } from '../Page/Page';
 import { PageContent } from '../PageContent/PageContent';
 import { PageSep } from '../PageSep';
 import { ExplorePageLayout } from '../ExplorePageLayout/ExplorePageLayout';
-import { ProjectListItem } from '../ProjectListItem';
+import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
+import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { WrappedRowLink } from '../WrappedRowLink';
 import { trpc } from '../../utils/trpcClient';
-import { TableRowItem, Title } from '../Table';
 
 import { tr } from './ExploreProjectsPage.i18n';
 
@@ -30,7 +31,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             nullable(project, (p) => (
                                 <NextLink key={p.id} href={routes.project(p.id)} passHref legacyBehavior>
                                     <WrappedRowLink>
-                                        <TableRowItem title={<Title size="l">{p.title}</Title>}>
+                                        <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
                                             <ProjectListItem
                                                 owner={p.activity}
                                                 starred={p._isStarred}

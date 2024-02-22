@@ -1,0 +1,8 @@
+.ProjectListItemCompactRow {
+    width: 100%;
+    align-items: center;
+    gap: var(--gap-s);
+    padding: var(--gap-xs) var(--gap-s);
+    border-radius: var(--radius-m);
+    cursor: pointer;
+}

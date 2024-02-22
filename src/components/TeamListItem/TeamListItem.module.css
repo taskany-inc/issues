@@ -1,0 +1,7 @@
+.TeamListItemRow {
+    gap: var(--gap-s);
+    justify-content: end;
+}
+.TeamListItemColumn {
+    justify-content: end;
+}

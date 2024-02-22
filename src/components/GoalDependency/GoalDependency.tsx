@@ -1,13 +1,12 @@
 import { FC, useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
 import { AutoCompleteRadioGroup, CheckboxInput } from '@taskany/bricks';
 import { Goal } from '@prisma/client';
 
 import { trpc } from '../../utils/trpcClient';
 import { ToggleGoalDependency, dependencyKind } from '../../schema/goal';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
-import { CustomCell, GoalListItemCompact } from '../GoalListItemCompact';
-import { Title } from '../Table';
+import { CustomCell, GoalListItemCompact } from '../GoalListItemCompact/GoalListItemCompact';
+import { TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { UserGroup } from '../UserGroup';
 import { GoalSelect } from '../GoalSelect';
 import {
@@ -17,10 +16,7 @@ import {
 } from '../../utils/domObjects';
 
 import { tr } from './GoalDependency.i18n';
-
-const StyledCheckboxInput = styled(CheckboxInput)`
-    margin: 0;
-`;
+import s from './GoalDependency.module.css';
 
 interface GoalDependencyProps {
     id: string;
@@ -79,36 +75,38 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
             renderItem={(props) => (
                 <GoalListItemCompact
                     icon
-                    rawIcon={<StyledCheckboxInput checked={props.checked} value={props.item.id} />}
+                    rawIcon={
+                        <CheckboxInput
+                            className={s.GoalDependencyCheckbox}
+                            checked={props.checked}
+                            value={props.item.id}
+                        />
+                    }
                     item={props.item}
                     columns={[
                         {
                             name: 'title',
                             renderColumn: (values) => (
-                                <CustomCell col={6}>
-                                    <Title size="s" {...goalDependenciesSuggestionItemTitle.attr}>
+                                <CustomCell width="50%">
+                                    <TableRowItemTitle size="s" {...goalDependenciesSuggestionItemTitle.attr}>
                                         {values.title}
-                                    </Title>
+                                    </TableRowItemTitle>
                                 </CustomCell>
                             ),
                         },
                         {
                             name: 'state',
                             columnProps: {
-                                min: true,
                                 forIcon: true,
                             },
                         },
                         {
                             name: 'projectId',
-                            columnProps: {
-                                col: 1,
-                            },
                         },
                         {
                             name: 'issuers',
                             renderColumn: (values) => (
-                                <CustomCell align="start" width={45}>
+                                <CustomCell width={45}>
                                     <UserGroup users={values.issuers} size={18} />
                                 </CustomCell>
                             ),

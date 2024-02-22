@@ -1,20 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import NextLink from 'next/link';
-import { Table, nullable, ListView, ListViewItem } from '@taskany/bricks';
-import { GlobalSearch as TaskanyGlobalSearch, MenuItem, Link, Text } from '@taskany/bricks/harmony';
+import { nullable, ListView, ListViewItem } from '@taskany/bricks';
+import { GlobalSearch as TaskanyGlobalSearch, MenuItem, Link, Text, Table } from '@taskany/bricks/harmony';
 import { IconTargetOutline, IconUsersOutline } from '@taskany/icons';
 
 import { trpc } from '../../utils/trpcClient';
 import { routes, useRouter } from '../../hooks/router';
-import { GoalListItemCompact } from '../GoalListItemCompact';
-import { ProjectListItemCompact } from '../ProjectListItemCompact';
+import { GoalListItemCompact } from '../GoalListItemCompact/GoalListItemCompact';
+import { ProjectListItemCompact } from '../ProjectListItemCompact/ProjectListItemCompact';
 
 import { tr } from './GlobalSearch.i18n';
 import s from './GlobalSearch.module.css';
 
 type ListViewItemValue = ['goal' | 'project', string];
-
-const tableWidth = 700;
 
 export const GlobalSearch = () => {
     const [query, setQuery] = useState('');
@@ -49,7 +47,7 @@ export const GlobalSearch = () => {
                             <Text size="m" weight="bolder" className={s.GroupHeader}>
                                 {tr('Goals')} <IconTargetOutline size="s" />
                             </Text>
-                            <Table width={tableWidth}>
+                            <Table className={s.GlobalSearchTable}>
                                 {suggestions.data?.goals.map((item) => {
                                     const value: ListViewItemValue = ['goal', item._shortId];
 
@@ -62,22 +60,28 @@ export const GlobalSearch = () => {
                                                     <Link>
                                                         <MenuItem {...props} hovered={active}>
                                                             <GoalListItemCompact
-                                                                align="center"
-                                                                gap={10}
                                                                 item={item}
                                                                 columns={[
-                                                                    { name: 'title', columnProps: { col: 3 } },
+                                                                    { name: 'title', columnProps: { width: '32%' } },
                                                                     {
                                                                         name: 'state',
-                                                                        columnProps: { col: 1, justify: 'end' },
                                                                     },
                                                                     {
                                                                         name: 'priority',
                                                                         columnProps: { width: '12ch' },
                                                                     },
-                                                                    { name: 'projectId', columnProps: { col: 3 } },
+                                                                    {
+                                                                        name: 'projectId',
+                                                                        columnProps: { width: '25%' },
+                                                                    },
                                                                     { name: 'issuers' },
-                                                                    { name: 'estimate', columnProps: { width: '8ch' } },
+                                                                    {
+                                                                        name: 'estimate',
+                                                                        columnProps: {
+                                                                            width: '8ch',
+                                                                            justify: 'end',
+                                                                        },
+                                                                    },
                                                                 ]}
                                                             />
                                                         </MenuItem>
@@ -95,7 +99,7 @@ export const GlobalSearch = () => {
                             <Text size="m" weight="bolder" className={s.GroupHeader}>
                                 {tr('Projects')} <IconUsersOutline size="s" />
                             </Text>
-                            <Table width={tableWidth}>
+                            <Table className={s.GlobalSearchTable}>
                                 {suggestions.data?.projects?.map((item) => (
                                     <ListViewItem
                                         key={item.id}

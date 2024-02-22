@@ -6,10 +6,10 @@ import { TreeView, TreeViewNode } from '@taskany/bricks/harmony';
 import { IconServersOutline } from '@taskany/icons';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
-import { ProjectListItem } from '../ProjectListItem';
+import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
 import { WrappedRowLink } from '../WrappedRowLink';
 import { projectListItem, projectListItemTitle } from '../../utils/domObjects';
-import { TableRowItem, Title } from '../Table';
+import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 
 const StyledProjectIcons = styled.div`
     display: flex;
@@ -46,9 +46,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         <TableRowItem
             title={
                 <StyledTitleWrapper>
-                    <Title size={titleSize} {...projectListItemTitle.attr}>
+                    <TableRowItemTitle size={titleSize} {...projectListItemTitle.attr}>
                         {project.title}
-                    </Title>
+                    </TableRowItemTitle>
                     {nullable(project.children.length, (length) => (
                         <StyledProjectIcons>
                             <IconServersOutline size="xs" />
