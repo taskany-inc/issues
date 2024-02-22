@@ -7,7 +7,7 @@ import { Team } from '../../src/types/crew';
 import { protectedProcedure, router } from '../trpcBackend';
 
 const getToken = () => {
-    const authorization = process.env.NEXT_PUBLIC_CREW_API_TOKEN;
+    const authorization = process.env.CREW_API_TOKEN;
 
     if (!authorization) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'No api token for crew' });
