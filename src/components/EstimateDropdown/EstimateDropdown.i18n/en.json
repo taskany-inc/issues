@@ -1,0 +1,12 @@
+{
+    "Year": "",
+    "Choose year": "",
+    "Quarter": "",
+    "Choose quarter": "",
+    "Strict Date": "",
+    "Set date": "",
+    "or type the strict date": "",
+    "hint": "If only the year is selected, the date will be the end of the year, for example: {date}",
+    "Reset": "",
+    "warning": "Selected date is past"
+}
