@@ -28,7 +28,7 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'>> = ({ title, isDone, we
         <TableCell width={350}>
             <Checkbox
                 className={classes.NewGoalCriteriaItemCheckbox}
-                defaultChecked={isDone}
+                checked={isDone}
                 readOnly
                 view="rounded"
                 label={
