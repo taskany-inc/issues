@@ -1,10 +1,9 @@
 {
     "Goal's title": "Goal title",
     "And its description": "Goal description",
-    "Assign": "Assign",
     "Enter name or email": "Name/Email",
     "Enter project": "Project",
-    "State": "State",
     "Enter tag title": "Enter tag title",
-    "Priority": "Priority"
+    "Personal goal": "",
+    "Project goal": ""
 }

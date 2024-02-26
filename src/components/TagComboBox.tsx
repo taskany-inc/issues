@@ -9,7 +9,7 @@ import { notifyPromise } from '../utils/notifyPromise';
 import { comboboxInput, comboboxItem, tagsCombobox } from '../utils/domObjects';
 import { TagObject } from '../types/tag';
 
-import { TagsList } from './TagsList';
+import { TagsList } from './TagsList/TagsList';
 
 interface TagComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];

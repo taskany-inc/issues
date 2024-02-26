@@ -1,10 +1,9 @@
 {
-    "Assign": "Ответственный",
     "Enter name or email": "Имя/Почта",
     "Enter project": "Проект",
-    "State": "Статус",
     "Enter tag title": "Название тэга",
     "Goal's title": "Название цели",
     "And its description": "Описание цели",
-    "Priority": "Приоритет"
+    "Personal goal": "Личная цель",
+    "Project goal": "Проектная цель"
 }

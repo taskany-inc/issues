@@ -1,0 +1,14 @@
+.Circle {
+    display: flex;
+}
+
+.Icon.Icon {
+    background-color: var(--text-secondary);
+    color: var(--gray-900);
+    transition: color var(--transition-time) var(--transition-func);
+    border-radius: 100%;
+}
+
+.Icon:hover {
+    color: var(--input-fill-focused-borderless);
+}

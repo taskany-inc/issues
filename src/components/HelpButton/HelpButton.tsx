@@ -1,29 +1,19 @@
-import React from 'react';
-import styled from 'styled-components';
-import NextLink from 'next/link';
-import { Link, Text } from '@taskany/bricks';
-import { gray9 } from '@taskany/colors';
-import { IconQuestionCircleOutline, iconSizesMap } from '@taskany/icons';
+import React, { ComponentProps } from 'react';
+import { Link } from '@taskany/bricks/harmony';
+import { IconQuestionCircleSolid } from '@taskany/icons';
 
 import { routes } from '../../hooks/router';
 import { AvailableHelpPages } from '../../types/help';
 
+import s from './HelpButton.module.css';
+
 interface HelpButtonProps {
     slug: AvailableHelpPages;
-    size?: keyof typeof iconSizesMap | number;
-    color?: string;
+    size?: ComponentProps<typeof IconQuestionCircleSolid>['size'];
 }
 
-const StyledIconQuestionCircleOutline = styled(IconQuestionCircleOutline)`
-    display: flex;
-`;
-
-export const HelpButton = React.memo(({ slug, size = 's', color = gray9 }: HelpButtonProps) => (
-    <Text color={color}>
-        <NextLink passHref href={routes.help(slug)} legacyBehavior>
-            <Link inline>
-                <StyledIconQuestionCircleOutline size={size} />
-            </Link>
-        </NextLink>
-    </Text>
+export const HelpButton = React.memo(({ slug, size = 20 }: HelpButtonProps) => (
+    <Link href={routes.help(slug)} className={s.Circle}>
+        <IconQuestionCircleSolid size={size} className={s.Icon} />
+    </Link>
 ));

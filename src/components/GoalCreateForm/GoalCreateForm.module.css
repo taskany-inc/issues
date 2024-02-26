@@ -1,0 +1,9 @@
+.FormControl {
+    display: flex;
+    align-items: center;
+}
+
+.MenuItem {
+    text-align: left;
+    max-width: 240px;
+}

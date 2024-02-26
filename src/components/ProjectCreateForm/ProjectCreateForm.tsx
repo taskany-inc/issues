@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import { Text, Form, FormAction, ModalContent, nullable, setRefs } from '@taskany/bricks';
+import { Text, Form, ModalContent, nullable, setRefs } from '@taskany/bricks';
 import { Button, FormControl, FormControlInput, FormControlError, Textarea, Tooltip } from '@taskany/bricks/harmony';
 
 import { keyPredictor } from '../../utils/keyPredictor';
@@ -137,59 +137,65 @@ const ProjectCreateForm: React.FC = () => {
     return (
         <>
             <ModalContent>
-                <Form onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined} {...projectCreateForm.attr}>
-                    <div className={s.ProjectTitleContainer}>
-                        <FormControl className={s.FormControl}>
-                            <FormControlInput
-                                {...register('title')}
-                                onChange={titleChangeHandler}
-                                disabled={busy}
-                                placeholder={tr('Project title')}
-                                brick="bottom"
-                                size="m"
-                                {...projectTitleInput.attr}
-                            />
-                            {nullable(errorsResolver('title'), (error) => (
-                                <FormControlError error={error} />
-                            ))}
-                        </FormControl>
+                <Form
+                    className={s.Form}
+                    onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined}
+                    {...projectCreateForm.attr}
+                >
+                    <div>
+                        <div className={s.ProjectTitleContainer}>
+                            <FormControl className={s.FormControl}>
+                                <FormControlInput
+                                    {...register('title')}
+                                    onChange={titleChangeHandler}
+                                    disabled={busy}
+                                    placeholder={tr('Project title')}
+                                    brick="bottom"
+                                    size="m"
+                                    {...projectTitleInput.attr}
+                                />
+                                {nullable(errorsResolver('title'), (error) => (
+                                    <FormControlError error={error} />
+                                ))}
+                            </FormControl>
 
-                        {nullable(titleWatcher, () => (
-                            <Controller
-                                name="id"
-                                control={control}
-                                render={({ field }) => (
-                                    <KeyInput
-                                        disabled={busy}
-                                        available={isKeyUnique && isKeyEnoughLength}
-                                        tooltip={tooltip}
-                                        onDirty={onKeyDirty}
-                                        error={errorsResolver('id')}
-                                        {...field}
-                                    />
-                                )}
-                            />
+                            {nullable(titleWatcher, () => (
+                                <Controller
+                                    name="id"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <KeyInput
+                                            disabled={busy}
+                                            available={isKeyUnique && isKeyEnoughLength}
+                                            tooltip={tooltip}
+                                            onDirty={onKeyDirty}
+                                            error={errorsResolver('id')}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            ))}
+                        </div>
+
+                        <Textarea
+                            {...register('description')}
+                            brick="center"
+                            disabled={busy}
+                            height={200}
+                            placeholder={tr('Short description')}
+                            ref={setRefs(errorRef, register('description').ref)}
+                            view={error && 'danger'}
+                            {...projectDescriptionInput.attr}
+                        />
+                        {nullable(error, (err) => (
+                            <Tooltip reference={errorRef} view="danger">
+                                {err.message}
+                            </Tooltip>
                         ))}
                     </div>
 
-                    <Textarea
-                        {...register('description')}
-                        brick="center"
-                        disabled={busy}
-                        height={200}
-                        placeholder={tr('Short description')}
-                        ref={setRefs(errorRef, register('description').ref)}
-                        view={error && 'danger'}
-                        {...projectDescriptionInput.attr}
-                    />
-                    {nullable(error, (err) => (
-                        <Tooltip reference={errorRef} view="danger">
-                            {err.message}
-                        </Tooltip>
-                    ))}
-
-                    <FormActions>
-                        <FormAction left inline>
+                    <FormActions className={s.FormActions}>
+                        <div className={s.FormAction}>
                             <Controller
                                 name="flow"
                                 control={control}
@@ -205,14 +211,12 @@ const ProjectCreateForm: React.FC = () => {
                             />
 
                             <HelpButton slug="projects" />
-                        </FormAction>
+                        </div>
                     </FormActions>
 
-                    <FormActions>
-                        <FormAction left>
-                            <RotatableTip context="project" />
-                        </FormAction>
-                        <FormAction right inline>
+                    <FormActions className={s.FormActions}>
+                        <RotatableTip context="project" />
+                        <div className={s.FormAction}>
                             <Button
                                 text={tr('Cancel')}
                                 onClick={dispatchModalEvent(ModalEvent.ProjectCreateModal)}
@@ -225,7 +229,7 @@ const ProjectCreateForm: React.FC = () => {
                                 text={tr('Create')}
                                 {...projectSubmitButton.attr}
                             />
-                        </FormAction>
+                        </div>
                     </FormActions>
                 </Form>
             </ModalContent>

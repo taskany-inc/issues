@@ -42,6 +42,7 @@ export const StateWrapper: FC<PropsWithChildren<{ hue?: number; className?: stri
     hue = 0,
     className,
     children,
+    ...props
 }) => {
     const { themeId } = usePageContext();
     const [colors, setColors] = useState<CSSObject>({
@@ -68,7 +69,7 @@ export const StateWrapper: FC<PropsWithChildren<{ hue?: number; className?: stri
     }, [themeId, hue]);
 
     return (
-        <StyledWrapper className={className} style={colors}>
+        <StyledWrapper className={className} style={colors} {...props}>
             {children}
         </StyledWrapper>
     );

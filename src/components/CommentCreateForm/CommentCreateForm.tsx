@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, MutableRefObject } from 'react';
 import styled from 'styled-components';
-import { State } from '@prisma/client';
+import { State as StateType } from '@prisma/client';
 import { UserPic, nullable } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
-import { Button, Dropdown, DropdownPanel, DropdownTrigger } from '@taskany/bricks/harmony';
+import { Button, State } from '@taskany/bricks/harmony';
 
 import { commentFormSubmitButton } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -11,14 +11,15 @@ import { GoalCommentFormSchema } from '../../schema/goal';
 import { CommentSchema } from '../../schema/comment';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
-import { ColorizedMenuItem } from '../ColorizedMenuItem';
 import { StateDot } from '../StateDot';
 import { useLatest } from '../../hooks/useLatest';
+import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
+import { StateWrapper } from '../StateWrapper';
 
 import { tr } from './CommentCreateForm.i18n';
 
 interface CommentCreateFormProps extends Omit<React.ComponentProps<typeof CommentForm>, 'actionButton'> {
-    states?: State[];
+    states?: StateType[];
     stateId?: string | null;
 
     onSubmit: (comment: GoalCommentFormSchema) => void;
@@ -42,7 +43,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     const statesMap = useMemo(() => {
         if (!states) return {};
 
-        return states.reduce<Record<string, State>>((acc, cur) => {
+        return states.reduce<Record<string, StateType>>((acc, cur) => {
             acc[cur.id] = cur;
             return acc;
         }, {});
@@ -94,7 +95,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     }, [onCancel, stateId, statesMap]);
 
     const onStateSelect = useCallback(
-        (state: State) => {
+        (state: StateType) => {
             setPushState((prev) => {
                 const newState = state.id === prev?.id ? undefined : state;
                 onChange?.({ description: descriptionRef.current, stateId: newState?.id });
@@ -149,13 +150,13 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                     iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
                                     {...commentFormSubmitButton.attr}
                                 />
-                                <Dropdown hideOnClick>
+                                <Dropdown>
                                     <DropdownTrigger
-                                        arrow={false}
                                         renderTrigger={(props) => (
                                             <Button
                                                 brick="left"
                                                 type="button"
+                                                onClick={props.onClick}
                                                 iconRight={
                                                     props.isOpen ? (
                                                         <IconUpSmallSolid size="s" />
@@ -163,23 +164,24 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                                         <IconDownSmallSolid size="s" />
                                                     )
                                                 }
-                                                ref={props.ref}
-                                                onClick={props.onClick}
+                                                ref={props.ref as MutableRefObject<HTMLButtonElement>}
                                             />
                                         )}
                                     />
-                                    <DropdownPanel placement="top-end" arrow>
-                                        {list.map((state) => (
-                                            <ColorizedMenuItem
-                                                key={state.id}
-                                                hue={state.hue}
-                                                checked={state.id === pushState?.id}
-                                                onClick={() => onStateSelect(state)}
-                                            >
-                                                {state.title}
-                                            </ColorizedMenuItem>
-                                        ))}
-                                    </DropdownPanel>
+                                    <DropdownPanel
+                                        placement="top-end"
+                                        items={list}
+                                        onChange={onStateSelect}
+                                        renderItem={(props) => (
+                                            <StateWrapper hue={props.item?.hue}>
+                                                <State
+                                                    color="var(--state-stroke)"
+                                                    title={props.item?.title}
+                                                    onClick={() => onStateSelect(props.item)}
+                                                />
+                                            </StateWrapper>
+                                        )}
+                                    />
                                 </Dropdown>
                             </StyledStateUpdate>
                         ))}

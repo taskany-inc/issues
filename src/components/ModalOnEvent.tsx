@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, createContext } from 'react';
 import tinykeys from 'tinykeys';
-import { Modal } from '@taskany/bricks';
+import { Modal } from '@taskany/bricks/harmony';
 
 import { ModalEvent, MapModalToComponentProps } from '../utils/dispatchModal';
 import { createHotkeys } from '../utils/hotkeys';
@@ -10,22 +10,14 @@ interface ModalOnEventProps {
     children: React.ComponentProps<typeof Modal>['children'];
     hotkeys?: string[];
     visible?: boolean;
-    view?: React.ComponentProps<typeof Modal>['view'];
+    view?: 'default' | 'warn' | 'danger';
     onShow?: React.ComponentProps<typeof Modal>['onShow'];
     onClose?: React.ComponentProps<typeof Modal>['onClose'];
 }
 
 export const ModalContext = createContext<{ [K in ModalEvent]?: MapModalToComponentProps[K] }>({});
 
-const ModalOnEvent: React.FC<ModalOnEventProps> = ({
-    event,
-    hotkeys,
-    visible = false,
-    view,
-    children,
-    onShow,
-    onClose,
-}) => {
+const ModalOnEvent: React.FC<ModalOnEventProps> = ({ event, hotkeys, visible = false, children, onShow, onClose }) => {
     const [modalVisible, setModalVisibility] = useState(visible);
     const [modalProps, setModalProps] = useState<MapModalToComponentProps[typeof event] | null>(null);
     const onModalClose = useCallback(() => {
@@ -57,7 +49,7 @@ const ModalOnEvent: React.FC<ModalOnEventProps> = ({
     }, [event, modalVisible]);
 
     return (
-        <Modal view={view} visible={modalVisible} onShow={onShow} onClose={onModalClose}>
+        <Modal visible={modalVisible} onShow={onShow} onClose={onModalClose} width={830}>
             <ModalContext.Provider value={{ [event]: modalProps }}>{children}</ModalContext.Provider>
         </Modal>
     );

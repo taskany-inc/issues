@@ -1,21 +1,11 @@
-import React, { useCallback, useState, ChangeEvent, FC, ComponentProps, useRef, useEffect } from 'react';
-import {
-    Input,
-    Button,
-    Dropdown,
-    DropdownPanel,
-    DropdownTrigger,
-    DropdownContext,
-    MenuItem,
-} from '@taskany/bricks/harmony';
+import React, { useCallback, useState, FC, MutableRefObject } from 'react';
+import { Button } from '@taskany/bricks/harmony';
 import { IconPlusCircleOutline } from '@taskany/icons';
-import { ListView, ListViewItem, nullable } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { ProjectByIdReturnType, TeamSuggetionsReturnType } from '../../../trpc/inferredTypes';
-
-import s from './TeamComboBox.module.css';
+import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 interface TeamComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -23,18 +13,6 @@ interface TeamComboBoxProps {
     disabled?: boolean;
     project: NonNullable<ProjectByIdReturnType>;
 }
-
-const TeamComboBoxInput: FC<ComponentProps<typeof Input>> = ({ autoFocus, ...attr }) => {
-    const inputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (autoFocus) {
-            inputRef.current?.focus();
-        }
-    }, [autoFocus]);
-
-    return <Input ref={inputRef} {...attr} />;
-};
 
 export const TeamComboBox: FC<TeamComboBoxProps & React.HTMLAttributes<HTMLDivElement>> = ({
     text,
@@ -71,10 +49,6 @@ export const TeamComboBox: FC<TeamComboBoxProps & React.HTMLAttributes<HTMLDivEl
         [updateProjectTeams, project],
     );
 
-    const onSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.currentTarget.value);
-    }, []);
-
     return (
         <Dropdown {...attrs}>
             <DropdownTrigger
@@ -83,7 +57,7 @@ export const TeamComboBox: FC<TeamComboBoxProps & React.HTMLAttributes<HTMLDivEl
                         view="ghost"
                         text={text}
                         disabled={disabled}
-                        ref={ref}
+                        ref={ref as MutableRefObject<HTMLButtonElement>}
                         iconLeft={<IconPlusCircleOutline size="s" />}
                         onClick={(e) => {
                             e.preventDefault();
@@ -92,47 +66,15 @@ export const TeamComboBox: FC<TeamComboBoxProps & React.HTMLAttributes<HTMLDivEl
                     />
                 )}
             />
-            <DropdownContext.Consumer>
-                {({ toggle, isOpen }) => (
-                    <DropdownPanel placement="bottom-start" arrow>
-                        {nullable(isOpen, () => (
-                            <ListView onKeyboardClick={onChange}>
-                                <TeamComboBoxInput
-                                    outline
-                                    className={s.TeamComboBoxSearch}
-                                    autoFocus={isOpen}
-                                    disabled={disabled}
-                                    placeholder={placeholder}
-                                    onChange={onSearchChange}
-                                    value={search}
-                                />
-                                {nullable(data, () => (
-                                    <div className={s.TeamComboBoxList}>
-                                        {data.map((item) => (
-                                            <ListViewItem
-                                                key={item.id}
-                                                value={item}
-                                                renderItem={({ active, ...props }) => (
-                                                    <MenuItem
-                                                        onClick={() => {
-                                                            onChange(item);
-                                                            toggle();
-                                                        }}
-                                                        selected={active}
-                                                        {...props}
-                                                    >
-                                                        {item.name}
-                                                    </MenuItem>
-                                                )}
-                                            />
-                                        ))}
-                                    </div>
-                                ))}
-                            </ListView>
-                        ))}
-                    </DropdownPanel>
-                )}
-            </DropdownContext.Consumer>
+            <DropdownPanel
+                placement="bottom-start"
+                setInputState={setSearch}
+                onChange={onChange}
+                inputState={search}
+                items={data}
+                renderItem={(props) => props.item.name}
+                placeholder={placeholder}
+            />
         </Dropdown>
     );
 };
