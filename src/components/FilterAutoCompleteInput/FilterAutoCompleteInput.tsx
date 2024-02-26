@@ -27,14 +27,7 @@ export const FilterAutoCompleteInput: React.FC<FilterAutoCompleteInputProps> = (
 
     return (
         <FormControl>
-            <FormControlInput
-                outline
-                autoFocus
-                placeholder={placeholder}
-                iconLeft={icon}
-                onChange={onChangeHandler}
-                {...props}
-            />
+            <FormControlInput outline placeholder={placeholder} iconLeft={icon} onChange={onChangeHandler} {...props} />
             {nullable(error?.message, (message) => (
                 <FormControlError error={{ message }} />
             ))}
