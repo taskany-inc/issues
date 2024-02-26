@@ -136,7 +136,7 @@
     "prisma": "4.16.1",
     "tsx": "4.7.1",
     "typescript": "5.1.3",
-    "webpack": "5.90.1"
+    "webpack": "5.90.3"
   },
   "nextBundleAnalysis": {
     "budget": null,
