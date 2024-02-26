@@ -42,14 +42,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     {
                         content: (
                             <>
-                                <Link
-                                    as={NextLink}
-                                    href={routes.goal(goal?._shortId as string)}
-                                    inline
-                                    onClick={onGoalPreviewShow(goal)}
-                                >
-                                    <Text>{goal.title}</Text>
-                                </Link>
+                                <Text>{goal.title}</Text>
                                 {nullable(goal.tags, (tags) => (
                                     <TagsList>
                                         {tags.map((tag) => (
@@ -135,29 +128,36 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     },
                 ],
             })),
-        [goals, locale, onGoalPreviewShow, onTagClick],
+        [goals, locale, onTagClick],
     );
 
     return (
         <Table {...attrs}>
             {data.map((row) => (
-                <ListViewItem
+                <Link
                     key={row.goal.id}
-                    value={row.goal}
-                    renderItem={({ active, hovered: _, ...props }) => (
-                        <TableListItem
-                            selected={selectedGoalResolver?.(row.goal?.id as string)}
-                            hovered={active}
-                            {...props}
-                        >
-                            {row.list.map(({ content, width, className }, index) => (
-                                <TableListItemElement key={index} width={width} className={className}>
-                                    {content}
-                                </TableListItemElement>
-                            ))}
-                        </TableListItem>
-                    )}
-                />
+                    as={NextLink}
+                    href={routes.goal(row.goal?._shortId as string)}
+                    onClick={onGoalPreviewShow(row.goal)}
+                    inline
+                >
+                    <ListViewItem
+                        value={row.goal}
+                        renderItem={({ active, hovered: _, ...props }) => (
+                            <TableListItem
+                                selected={selectedGoalResolver?.(row.goal?.id as string)}
+                                hovered={active}
+                                {...props}
+                            >
+                                {row.list.map(({ content, width, className }, index) => (
+                                    <TableListItemElement key={index} width={width} className={className}>
+                                        {content}
+                                    </TableListItemElement>
+                                ))}
+                            </TableListItem>
+                        )}
+                    />
+                </Link>
             ))}
         </Table>
     );

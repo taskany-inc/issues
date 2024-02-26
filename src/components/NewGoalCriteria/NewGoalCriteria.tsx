@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { MouseEvent, useCallback, useRef, useState } from 'react';
 import { Checkbox, CircleProgressBar, Table, TableCell, TableRow, Text, Popup, Badge } from '@taskany/bricks/harmony';
 import { Spinner, nullable, useClickOutside } from '@taskany/bricks';
 import classNames from 'classnames';
@@ -151,11 +151,20 @@ export const GoalCriteriaPreview: React.FC<GoalCriteriaPreviewProps> = ({ achiev
         }
     });
 
-    const handleOpen = useCallback(() => {
-        if (!popupVisible) {
-            setPopupVisible(true);
-        }
-    }, [popupVisible]);
+    const handleOpen = useCallback(
+        (e: MouseEvent<HTMLSpanElement>) => {
+            // block following a link that hangs on the entire table row
+            e.preventDefault();
+
+            // block opening GoalPreview
+            e.stopPropagation();
+
+            if (!popupVisible) {
+                setPopupVisible(true);
+            }
+        },
+        [popupVisible],
+    );
 
     return (
         <>
@@ -169,6 +178,10 @@ export const GoalCriteriaPreview: React.FC<GoalCriteriaPreviewProps> = ({ achiev
                 offset={[10, 10]}
                 arrow={false}
                 onClickCapture={() => setPopupVisible(false)}
+                onClick={(e) => {
+                    // block opening GoalPreview
+                    e.stopPropagation();
+                }}
             >
                 <div className={classes.NewGoalCriteria} ref={wrapperRef}>
                     <Text className={classes.NewGoalCriteriaTitle} as="h4">
