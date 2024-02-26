@@ -142,6 +142,12 @@
             "ru": "Название",
             "en": "Title"
         },
+        "Dropdown": {
+            "Not chosen": {
+                "ru": "Не выбрано",
+                "en": ""
+            }
+        },
         "state": {
             "ru": "Статус",
             "en": "State"
@@ -161,6 +167,48 @@
         "owner": {
             "ru": "Ответственный",
             "en": "Owner"
+        },
+        "EstimateDropdown": {
+            "Year": {
+                "ru": "Год",
+                "en": ""
+            },
+            "Choose year": {
+                "ru": "Выбрать год",
+                "en": ""
+            },
+            "Quarter": {
+                "ru": "Квартал",
+                "en": ""
+            },
+            "Choose quarter": {
+                "ru": "Выбрать квартал",
+                "en": ""
+            },
+            "Strict Date": {
+                "ru": "Дата",
+                "en": ""
+            },
+            "Set date": {
+                "ru": "Установить дату",
+                "en": ""
+            },
+            "or type the strict date": {
+                "ru": "или выберите точную дату",
+                "en": ""
+            },
+            "hint": {
+                "ru": "подсказка",
+                "en": ""
+            },
+            "Reset": {
+                "ru": "Сбросить",
+                "en": ""
+            },
+            "warning": {
+                "ru": "Выбранная дата уже прошла",
+                "en": "Selected date is past"
+            }
         },
         "updatedAt": {
             "ru": "Обновлено",
@@ -474,14 +522,36 @@
             "ru": "Проект",
             "en": "Project"
         },
-        "Create": {
-            "ru": "Создать",
-            "en": "Create"
+        "Enter name or email": {
+            "ru": "Имя/Почта",
+            "en": "Name/Email"
+        },
+        "Enter tag title": {
+            "ru": "Название тэга",
+            "en": "Enter tag title"
         }
     },
-    "PageHeader": {
-        "Dashboard": {
-            "ru": "Главная",
+    "GoalParentDropdown": {
+        "Suggestions": {
+            "ru": "Предложения",
+            "en": ""
+        }
+    },
+    "GoalSidebar": {
+        "blocks": {
+            "ru": "Блокирует",
+            "en": "Blocked by"
+        },
+        "dependsOn": {
+            "ru": "Зависит от",
+            "en": "Depends on"
+        },
+        "relatedTo": {
+            "ru": "Связана с",
+            "en": "Relates to"
+        },
+        "Issuer": {
+            "ru": "Автор",
             "en": ""
         },
         "Goals": {
@@ -1237,6 +1307,18 @@
         "Date input mask placeholder": {
             "ru": "dd.mm.yyyy",
             "en": "mm/dd/yyyy"
+        }
+    },
+    "TagComboBox": {
+        "Add tag": {
+            "ru": "Добавить тег",
+            "en": ""
+        }
+    },
+    "UserDropdown": {
+        "Suggestions": {
+            "ru": "Предложения",
+            "en": ""
         }
     },
     "Estimate": {

@@ -26,16 +26,12 @@ import {
     goalPageEditButton,
     goalPageDeleteButton,
     tagsCombobox,
-    goalTagList,
     goalTagListItem,
     goalTagListItemClean,
     goalTitleInputError,
     estimateQuarterTrigger,
-    estimateQuarterItem,
     estimateYearTrigger,
     estimateStrictDateTrigger,
-    estimateYearItem,
-    estimateStrictDateInput,
 } from '../../src/utils/domObjects';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { exactUrl } from '../helpers';
@@ -57,6 +53,22 @@ const testGoalTitle = 'my awesome test goal title';
 const testGoalDescription = 'my awesome test goal description';
 const testTag = 'test tag for goal';
 const testTagForManualCreate = 'manual tag';
+
+const dateFragments = {
+    day: 'day',
+    month: 'month',
+    year: 'year',
+} as const;
+
+const inputNames = {
+    'date-picker-year': 'date-picker-year',
+    'date-picker-quarters': 'date-picker-quarter-',
+    'date-picker-strict-date': {
+        [dateFragments.day]: `date-picker-strict-date-${dateFragments.day}`,
+        [dateFragments.month]: `date-picker-strict-date-${dateFragments.month}`,
+        [dateFragments.year]: `date-picker-strict-date-${dateFragments.year}`,
+    },
+} as const;
 
 before(() => {
     cy.task('db:create:user', testUser).then((u) => {
@@ -129,14 +141,15 @@ describe('Goals', () => {
             it('should have clean fields', (done) => {
                 const translations = getTranslation({
                     GoalCreateForm: ['Create only'],
+                    Dropdown: ['Not chosen'],
                 });
 
                 cy.get(goalTitleInput.query).should('have.value', '');
                 cy.get(goalDescriptionInput.query).should('have.value', '');
-                cy.get(projectsCombobox.query).should('have.value', '');
-                cy.get(priorityCombobox.query).contains(Cypress.env('defaultPriority'));
-                cy.get(estimateCombobox.query).should('have.text', '');
-                cy.get(stateCombobox.query).should('be.disabled');
+                cy.get(projectsCombobox.query).should('contain', translations.Dropdown['Not chosen']());
+                cy.get(priorityCombobox.query).should('contain', Cypress.env('defaultPriority'));
+                cy.get(estimateCombobox.query).should('contain', translations.Dropdown['Not chosen']());
+                cy.get(stateCombobox.query).should('contain', translations.Dropdown['Not chosen']());
                 cy.get(goalActionCreateOnly.query)
                     .should('be.enabled')
                     .contains(translations.GoalCreateForm['Create only']());
@@ -168,10 +181,11 @@ describe('Goals', () => {
 
                 cy.get(goalActionCreateOnly.query).should('exist').and('be.visible').click();
 
+                cy.get(goalTitleInput.query).trigger('mouseenter');
                 cy.get(goalTitleInputError.query)
                     .should('exist')
                     .and('be.visible')
-                    .getErrorTooltip(translates.schema["Goal's title must be longer than 10 symbols"]());
+                    .should('contain', translates.schema["Goal's title must be longer than 10 symbols"]());
             });
 
             it('state control is enabled after choose project', () => {
@@ -179,9 +193,10 @@ describe('Goals', () => {
                 cy.get(comboboxInput.query).should('have.value', '');
                 cy.get(comboboxInput.query).type(testProjectForGoals);
                 cy.get(comboboxItem.query).click();
-                cy.get(projectsCombobox.query).contains(projectKey);
-                cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');
+                cy.get(projectsCombobox.query).contains(testProjectForGoals);
+                cy.get(stateCombobox.query).should('contain', 'Draft');
             });
+
             it('can change priority value', () => {
                 const translations = getTranslation({
                     PriorityText: ['Low', 'Medium'],
@@ -208,9 +223,12 @@ describe('Goals', () => {
                 }
 
                 beforeEach(() => {
+                    const translations = getTranslation({
+                        Dropdown: ['Not chosen'],
+                    });
                     cy.clock(now, ['Date']);
 
-                    cy.get(estimateCombobox.query).should('have.text', '').click();
+                    cy.get(estimateCombobox.query).contains(translations.Dropdown['Not chosen']()).click();
                     cy.get(estimateYearTrigger.query).should('be.visible');
                     cy.get(estimateQuarterTrigger.query).should('be.visible');
                     cy.get(estimateStrictDateTrigger.query).should('be.visible');
@@ -219,37 +237,51 @@ describe('Goals', () => {
                 afterEach(() => {
                     cy.clock().invoke('restore');
                 });
-                it('set estimate year', () => {
-                    cy.get(estimateYearTrigger.query).click();
-                    cy.get(estimateYearItem.query)
+
+                it('set estimate year', (done) => {
+                    cy.get(estimateYearTrigger.query)
+                        .click()
+                        .get(`input[name=${inputNames['date-picker-year']}]`)
                         .should('be.visible')
                         .and('be.enabled')
-                        .each((el) => {
-                            cy.wrap(el).its('[0].innerText').should('be.oneOf', years);
+                        .invoke('val')
+                        .then((value) => {
+                            expect(`${currentYear}` === value).to.be.true;
+
+                            done();
                         });
 
-                    cy.get(estimateCombobox.query).should('have.text', `${currentYear}`).click();
+                    cy.get(estimateCombobox.query).should('have.text', `${currentYear}`);
                 });
+
                 it('set estimate quarter', () => {
                     cy.get(estimateQuarterTrigger.query).click();
-                    cy.get(estimateQuarterItem.query)
+                    cy.get(`button[name^=${inputNames['date-picker-quarters']}]`)
                         .should('be.visible')
                         .and('be.enabled')
                         .each((el) => {
                             cy.wrap(el).its('[0].innerText').should('be.oneOf', quarters);
                         });
 
-                    cy.get(estimateCombobox.query).should('have.text', `${currentQuarter}/${currentYear}`).click();
+                    cy.get(estimateCombobox.query).contains(`${currentQuarter}/${currentYear}`);
                 });
 
                 it('set estimate strict date', () => {
                     cy.get(estimateStrictDateTrigger.query).click();
-                    cy.get(estimateStrictDateInput.query)
-                        .should('be.visible')
-                        .and('be.enabled')
-                        .and('have.value', currentDate);
+                    const selectors = Object.values(inputNames['date-picker-strict-date']).map(
+                        (selector) => `input[name=${selector}]`,
+                    );
 
-                    cy.get(estimateCombobox.query).should('have.text', currentDate).click();
+                    const dateArr = currentDate.split('/');
+
+                    cy.getMultipleFields(selectors).then((obj) => {
+                        selectors.forEach((selector) => {
+                            const value = obj[selector];
+                            expect(dateArr.includes(value.length === 1 ? `0${value}` : value)).to.be.true;
+                        });
+                    });
+
+                    cy.get(estimateCombobox.query).contains(currentDate);
                 });
             });
 
@@ -257,41 +289,28 @@ describe('Goals', () => {
                 it('select from early created and remove them', () => {
                     cy.get(tagsCombobox.query).click();
                     cy.get(comboboxInput.query).type(testTag.slice(0, 5));
-
                     cy.wait('@gettingTags');
-
                     cy.get(comboboxItem.query).should('exist').and('have.length', 1);
                     cy.get(comboboxItem.query).first().contains(Cypress.env('tag').title).click();
-
-                    cy.get(goalTagList.query).should('be.visible').its('[0].children').should('have.length', 1);
                     cy.get(goalTagListItem.query).contains(Cypress.env('tag').title);
-                    cy.get(goalTagListItemClean.query).should('exist').and('not.be.visible');
-
-                    cy.get(goalTagListItem.query).first().realHover();
-                    cy.get(goalTagListItemClean.query).should('be.visible').click();
+                    cy.get(goalTagListItemClean.query).should('exist').and('be.visible').click();
                     cy.get(goalTagListItem.query).should('not.exist');
                 });
                 it.only('create and set', () => {
                     cy.get(tagsCombobox.query).click();
                     cy.get(comboboxInput.query).type(testTagForManualCreate);
-
                     cy.wait('@gettingTags');
-
                     cy.get(comboboxItem.query).should('exist').and('have.length', 1);
                     cy.get(comboboxItem.query).first().contains(testTagForManualCreate).click();
-                    cy.get(goalTagList.query).should('be.visible').its('[0].children').should('have.length', 1);
                     cy.get(goalTagListItem.query).contains(testTagForManualCreate);
-                    cy.get(goalTagListItemClean.query).should('exist').and('not.be.visible');
+                    cy.get(goalTagListItemClean.query).should('exist').and('be.visible');
                 });
             });
 
             it('can choose the other user', (done) => {
                 cy.get(usersCombobox.query).should('exist').click();
                 cy.get(comboboxInput.query).clear().type(testUser.name);
-                cy.get(comboboxItem.query)
-                    .should('contain.text', testUser.name)
-                    .and('contain.text', testUser.email)
-                    .click();
+                cy.get(comboboxItem.query).should('contain.text', testUser.name).click();
                 cy.get(usersCombobox.query)
                     .should('exist')
                     .then(($el) => {
@@ -320,8 +339,8 @@ describe('Goals', () => {
                 cy.get(createSelectButton.query).click();
                 cy.get(createGoalItem.query).click();
                 cy.get(goalForm.query).should('exist').and('be.visible');
-                cy.get(projectsCombobox.query).contains(projectKey);
-                cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');
+                cy.get(projectsCombobox.query).contains(testProjectForGoals);
+                cy.get(stateCombobox.query).contains('Draft');
                 cy.get(priorityCombobox.query).contains(Cypress.env('defaultPriority'));
             });
         });
@@ -341,8 +360,8 @@ describe('Goals', () => {
                 cy.get(projectsCombobox.query).click();
                 cy.get(comboboxInput.query).type(testProjectForGoals.slice(0, 4));
                 cy.get(comboboxItem.query).click();
-                cy.get(projectsCombobox.query).contains(projectKey);
-                cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');
+                cy.get(projectsCombobox.query).contains(testProjectForGoals);
+                cy.get(stateCombobox.query).contains('Draft');
             });
 
             afterEach(() => {
@@ -352,13 +371,13 @@ describe('Goals', () => {
             it('create and create on more', () => {
                 cy.get(createActionToggle.query).should('exist').and('be.enabled').click();
                 cy.get(goalActionCreateOneMore.query).should('exist').and('be.visible').click();
-                cy.get(goalActionCreateOneMore.query).should('be.enabled').click();
+                cy.get(goalActionCreateOneMore.query).click();
 
                 cy.wait('@lastCreatedGoal');
 
                 cy.get(goalForm.query).should('exist').and('be.visible');
-                cy.get(projectsCombobox.query).contains(projectKey);
-                cy.get(stateCombobox.query).should('be.enabled').and('have.text', 'Draft');
+                cy.get(projectsCombobox.query).contains(testProjectForGoals);
+                cy.get(stateCombobox.query).contains('Draft');
                 cy.get(priorityCombobox.query).contains(Cypress.env('defaultPriority'));
                 cy.get(goalTitleInput.query).should('have.value', '');
                 cy.get(goalDescriptionInput.query).should('have.value', '');
