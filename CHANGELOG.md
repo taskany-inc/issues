@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.23.0](https://github.com/taskany-inc/issues/compare/v2.22.0...v2.23.0) (2024-02-26)
+
+
+### Features
+
+* custom logo ([cc93506](https://github.com/taskany-inc/issues/commit/cc93506bd88bbb2de0419b4f1cdf556f32ea81ce))
+* **NewGoalCriteria:** preview in goal lists ([578a4c9](https://github.com/taskany-inc/issues/commit/578a4c9ac8d1fd3efd3a22f417ad1e1b0050c7e5))
+* **OfflineBanner:** update offline banner from bricks ([9892306](https://github.com/taskany-inc/issues/commit/9892306ebd228ea3485091676407a52d14d820ea))
+* team units ([85e56ef](https://github.com/taskany-inc/issues/commit/85e56efa557d18be62f2e033ac2c635ba1207901))
+
+
+### Bug Fixes
+
+* **FilterAutoCompleteInput:** remove autofocus ([cb2c38d](https://github.com/taskany-inc/issues/commit/cb2c38db62533b9dd9038a10301f2b493e8fd129))
+* goalPreview open when clicked in an empty area inside GoalListItem ([2d8b5a0](https://github.com/taskany-inc/issues/commit/2d8b5a04e0b67f129463a0fa56da0ae9b319961f))
+* **NewGoalCriteria:** criteria should be checked when isDone is passed ([d9d2aa7](https://github.com/taskany-inc/issues/commit/d9d2aa7976ed5a9a90db1760542005ceedbb7191))
+
 ## [2.22.0](https://github.com/taskany-inc/issues/compare/v2.21.0...v2.22.0) (2024-02-22)
 
 
