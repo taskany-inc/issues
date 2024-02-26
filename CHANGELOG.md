@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.23.0](https://github.com/taskany-inc/issues/compare/v2.22.0...v2.23.0) (2024-02-26)
+
+
+### Features
+
+* **NewGoalCriteria:** preview in goal lists ([578a4c9](https://github.com/taskany-inc/issues/commit/578a4c9ac8d1fd3efd3a22f417ad1e1b0050c7e5))
+* **OfflineBanner:** update offline banner from bricks ([9892306](https://github.com/taskany-inc/issues/commit/9892306ebd228ea3485091676407a52d14d820ea))
+
 ## [2.22.0](https://github.com/taskany-inc/issues/compare/v2.21.0...v2.22.0) (2024-02-22)
 
 
