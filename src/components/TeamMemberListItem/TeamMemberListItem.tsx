@@ -1,5 +1,6 @@
 import { FC } from 'react';
-import { Text } from '@taskany/bricks/harmony';
+import { CircleProgressBar, Text } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
 
 import { CrewUserRole } from '../../types/crew';
 import { UserBadge } from '../UserBadge';
@@ -25,7 +26,9 @@ export const TeamMemberListItem: FC<TeamMemberListItemProps> = ({ email, image, 
                 <Text size="xs">{roles.map((role) => role.name).join(', ')}</Text>
             </TableListItemElement>
             <TableListItemElement width={30}>
-                <Text size="s">{percentage}</Text>
+                {nullable(percentage, (p) => (
+                    <CircleProgressBar value={p} />
+                ))}
             </TableListItemElement>
         </TableListItem>
     );

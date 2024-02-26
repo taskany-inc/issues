@@ -47,6 +47,15 @@ export const crew = router({
 
             const data: Team[] = await response.json();
 
-            return data;
+            return data.map((team) => {
+                const units = Number(
+                    team.memberships.reduce((acum, { percentage = 0 }) => acum + percentage / 100, 0).toFixed(2),
+                );
+
+                return {
+                    ...team,
+                    units,
+                };
+            });
         }),
 });

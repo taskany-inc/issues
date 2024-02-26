@@ -85,7 +85,7 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
                                         href={routes.crewTeam(t.id)}
                                         target="_blank"
                                     >
-                                        <TeamListItem name={t.name} onRemoveClick={() => onRemove(t)} />
+                                        <TeamListItem name={t.name} units={t.units} onRemoveClick={() => onRemove(t)} />
                                     </Link>
                                 }
                                 key={t.id}
