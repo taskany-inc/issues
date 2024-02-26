@@ -1,7 +1,6 @@
-import { FC, useCallback, useMemo } from 'react';
-import { MenuItem } from '@taskany/bricks';
+import { FC, MutableRefObject, useCallback, useMemo } from 'react';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
-import { Button, Dropdown, DropdownPanel, DropdownTrigger } from '@taskany/bricks/harmony';
+import { Button, Text } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import {
@@ -11,6 +10,7 @@ import {
     createSelectButton,
     createPersonalGoalItem,
 } from '../../utils/domObjects';
+import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import { tr } from './PageHeaderActionButton.i18n';
 
@@ -22,12 +22,14 @@ export const PageHeaderActionButton: FC = () => {
     const options = useMemo(() => {
         return [
             {
+                id: tr('Create goal'),
                 title: tr('Create goal'),
                 event: ModalEvent.GoalCreateModal,
                 params: {},
                 attrs: createGoalItem.attr,
             },
             {
+                id: tr('Create personal goal'),
                 title: tr('Create personal goal'),
                 event: ModalEvent.GoalCreateModal,
                 params: {
@@ -36,6 +38,7 @@ export const PageHeaderActionButton: FC = () => {
                 attrs: createPersonalGoalItem.attr,
             },
             {
+                id: tr('Create project'),
                 title: tr('Create project'),
                 event: ModalEvent.ProjectCreateModal,
                 params: {},
@@ -53,33 +56,29 @@ export const PageHeaderActionButton: FC = () => {
                 onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
                 {...createFastButton.attr}
             />
-            <Dropdown hideOnClick>
+            <Dropdown>
                 <DropdownTrigger
-                    arrow={false}
                     renderTrigger={(props) => (
                         <Button
                             view="primary"
                             brick="left"
                             iconRight={props.isOpen ? <IconUpSmallSolid size="s" /> : <IconDownSmallSolid size="s" />}
-                            ref={props.ref}
+                            ref={props.ref as MutableRefObject<HTMLButtonElement>}
                             onClick={props.onClick}
                             {...createSelectButton.attr}
                         />
                     )}
                 />
-                <DropdownPanel placement="top-end" arrow>
-                    {options.map((option) => (
-                        <MenuItem
-                            key={option.title}
-                            onClick={() => onMenuItemClick(option)}
-                            view="primary"
-                            ghost
-                            {...option.attrs}
-                        >
-                            {option.title}
-                        </MenuItem>
-                    ))}
-                </DropdownPanel>
+                <DropdownPanel
+                    placement="top-end"
+                    items={options}
+                    onChange={onMenuItemClick}
+                    renderItem={(props) => (
+                        <Text size="s" onClick={() => onMenuItemClick(props.item)} {...props.item.attrs}>
+                            {props.item.title}
+                        </Text>
+                    )}
+                />
             </Dropdown>
         </>
     );

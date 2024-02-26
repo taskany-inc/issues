@@ -10,7 +10,7 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { getDateStringFromEstimate } from '../../utils/dateTime';
 import { goalForm, goalUpdateButton } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent, useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import RotatableTip from '../RotatableTip/RotatableTip';
+import { FormActions } from '../FormActions/FormActions';
 
 import { tr } from './GoalEditForm.i18n';
 
@@ -96,18 +96,18 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             estimate={estimateValue}
             onSubmit={updateGoal}
             actionButton={
-                <>
-                    <Button text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} />
+                <FormActions>
+                    <Button text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} size="m" />
                     <Button
                         view="primary"
                         disabled={busy}
                         type="submit"
                         text={tr('Submit')}
+                        size="m"
                         {...goalUpdateButton.attr}
                     />
-                </>
+                </FormActions>
             }
-            tip={<RotatableTip context="goal" />}
             {...goalForm.attr}
         />
     );

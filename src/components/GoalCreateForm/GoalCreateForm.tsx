@@ -1,9 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import { MutableRefObject, useCallback, useMemo, useState } from 'react';
 import { gray9 } from '@taskany/colors';
-import { MenuItem, Text } from '@taskany/bricks';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
-import { Button, Dropdown, DropdownPanel, DropdownTrigger } from '@taskany/bricks/harmony';
+import { Button, Text } from '@taskany/bricks/harmony';
+import { KeyCode, useKeyboard } from '@taskany/bricks';
 
 import { useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -23,14 +22,11 @@ import {
     goalCancelButton,
     goalForm,
 } from '../../utils/domObjects';
-import RotatableTip from '../RotatableTip/RotatableTip';
+import { FormActions } from '../FormActions/FormActions';
+import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import { tr } from './GoalCreateForm.i18n';
-
-const StyledMenuItem = styled(MenuItem)`
-    text-align: left;
-    max-width: 240px;
-`;
+import s from './GoalCreateForm.module.css';
 
 interface GoalCreateFormProps {
     project?: {
@@ -56,21 +52,25 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
     const { goalCreate } = useGoalResource({});
     const { data: priorities } = trpc.priority.getAll.useQuery();
     const defaultPriority = useMemo(() => priorities?.filter((priority) => priority.default)[0], [priorities]);
+    const [isOpen, setIsOpen] = useState(false);
 
     const createOptions = [
         {
+            id: '1',
             title: tr('Create & Go'),
             clue: tr('Create and go to the goal page'),
             value: 1,
             attr: goalActionCreateAndGo.attr,
         },
         {
+            id: '2',
             title: tr('Create one more'),
             clue: tr('Create and open new form for the next goal'),
             value: 2,
             attr: goalActionCreateOneMore.attr,
         },
         {
+            id: '3',
             title: tr('Create only'),
             clue: tr('Create goal and close form'),
             value: 3,
@@ -133,6 +133,14 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
         onGoalCreate?.(res);
     };
 
+    const onCloseActions = useCallback(() => {
+        setIsOpen(false);
+    }, []);
+
+    const [onESC] = useKeyboard([KeyCode.Escape], () => {
+        onCloseActions();
+    });
+
     return (
         <GoalForm
             busy={busy}
@@ -144,30 +152,35 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
             onSubmit={createGoal}
             title={title}
             actionButton={
-                <>
+                <FormActions>
                     <Button
                         text={tr('Cancel')}
+                        size="m"
                         onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
                         {...goalCancelButton.attr}
                     />
-                    <>
+                    <div className={s.FormControl} {...combobox.attr}>
                         <Button
                             view="primary"
                             disabled={busy}
                             type="submit"
                             brick="right"
+                            size="m"
                             text={createOptions[createGoalType - 1].title}
                             {...createOptions[createGoalType - 1].attr}
                         />
-                        <Dropdown {...combobox.attr} hideOnClick>
+                        <Dropdown isOpen={isOpen} onClose={onCloseActions}>
                             <DropdownTrigger
-                                arrow={false}
                                 renderTrigger={(props) => (
                                     <Button
                                         view="primary"
                                         brick="left"
-                                        ref={props.ref}
-                                        onClick={props.onClick}
+                                        size="m"
+                                        ref={props.ref as MutableRefObject<HTMLButtonElement>}
+                                        onClick={() => {
+                                            setIsOpen(true);
+                                            props.onClick();
+                                        }}
                                         iconRight={
                                             props.isOpen ? (
                                                 <IconUpSmallSolid size="s" />
@@ -175,33 +188,30 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
                                                 <IconDownSmallSolid size="s" />
                                             )
                                         }
+                                        {...(isOpen ? onESC : {})}
                                         {...createActionToggle.attr}
                                     />
                                 )}
                             />
-                            <DropdownPanel placement="top-end" arrow>
-                                {createOptions.map((option) => (
-                                    <StyledMenuItem
-                                        view="primary"
-                                        key={option.title}
-                                        ghost
-                                        {...option.attr}
-                                        onClick={() => onCreateTypeChange(option)}
-                                    >
-                                        <Text>{option.title}</Text>
-                                        {option.clue && (
-                                            <Text size="xs" color={gray9}>
-                                                {option.clue}
+                            <DropdownPanel
+                                placement="top-end"
+                                items={createOptions}
+                                onChange={onCreateTypeChange}
+                                renderItem={(props) => (
+                                    <div onClick={() => onCreateTypeChange(props.item)} className={s.MenuItem}>
+                                        <Text size="m">{props.item.title}</Text>
+                                        {props.item.clue && (
+                                            <Text size="s" color={gray9}>
+                                                {props.item.clue}
                                             </Text>
                                         )}
-                                    </StyledMenuItem>
-                                ))}
-                            </DropdownPanel>
+                                    </div>
+                                )}
+                            />
                         </Dropdown>
-                    </>
-                </>
+                    </div>
+                </FormActions>
             }
-            tip={<RotatableTip context="goal" />}
             {...goalForm.attr}
         />
     );

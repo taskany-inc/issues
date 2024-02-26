@@ -1,22 +1,26 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
 import { State, Tag as TagModel } from '@prisma/client';
-import { Form, FormAction, ModalContent, Tag, TagCleanButton, nullable } from '@taskany/bricks';
-import { IconCalendarTickOutline } from '@taskany/icons';
-import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import { Form, nullable } from '@taskany/bricks';
+import {
+    FormControl,
+    FormControlInput,
+    FormControlError,
+    Tag,
+    TagCleanButton,
+    ModalContent,
+    Switch,
+    SwitchControl,
+} from '@taskany/bricks/harmony';
 
 import { FormControlEditor } from '../FormControlEditor/FormControlEditor';
 import { errorsProvider } from '../../utils/forms';
-import { formateEstimate } from '../../utils/dateTime';
 import { DateType } from '../../types/date';
-import { useLocale } from '../../hooks/useLocale';
-import { UserComboBox } from '../UserComboBox';
-import { GoalParentComboBox } from '../GoalParentComboBox';
-import { TagComboBox } from '../TagComboBox';
-import { StateDropdown } from '../StateDropdown';
-import { PriorityDropdown } from '../PriorityDropdown';
+import { TagComboBox } from '../TagComboBox/TagComboBox';
+import { StateDropdown } from '../StateDropdown/StateDropdown';
+import { PriorityDropdown } from '../PriorityDropdown/PriorityDropdown';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { HelpButton } from '../HelpButton/HelpButton';
 import {
@@ -28,13 +32,24 @@ import {
     goalTagListItemClean,
     goalTitleInput,
     goalTitleInputError,
+    priorityCombobox,
+    projectsCombobox,
+    stateCombobox,
+    usersCombobox,
 } from '../../utils/domObjects';
-import { TagsList } from '../TagsList';
+import { TagsList } from '../TagsList/TagsList';
+import { GoalParentDropdown } from '../GoalParentDropdown/GoalParentDropdown';
+import { UserDropdown } from '../UserDropdown/UserDropdown';
+import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';
 import { FormActions } from '../FormActions/FormActions';
 
-import { GoalFormEstimate } from './GoalFormEstimate';
 import { tr } from './GoalForm.i18n';
 import s from './GoalForm.module.css';
+
+const goalTypeMap = {
+    personal: 'personal',
+    default: 'default',
+} as const;
 
 const tagsLimit = 5;
 interface GoalFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -82,7 +97,9 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     personal,
     ...attrs
 }) => {
-    const locale = useLocale();
+    const [goalType, setGoalType] = useState<keyof typeof goalTypeMap>(
+        personal ? goalTypeMap.personal : goalTypeMap.default,
+    );
     const {
         control,
         register,
@@ -125,6 +142,19 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         [setValue, tagsWatcher],
     );
 
+    const onSwitchGoalType = useCallback(() => {
+        setValue('state', undefined);
+
+        if (goalType === goalTypeMap.default) {
+            setValue('parent', null);
+            setGoalType(goalTypeMap.personal);
+            return;
+        }
+
+        setValue('parent', parent);
+        setGoalType(goalTypeMap.default);
+    }, [setValue, goalType, parent]);
+
     return (
         <ModalContent {...attrs}>
             <Form onSubmit={handleSubmit(onSubmit)} className={s.Form}>
@@ -152,7 +182,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 <FormControlEditor
                                     placeholder={tr('And its description')}
                                     disabled={busy}
-                                    brick="center"
+                                    brick="top"
                                     height={200}
                                     {...field}
                                     {...goalDescriptionInput.attr}
@@ -165,137 +195,129 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                     />
                 </div>
 
-                <FormActions>
-                    <FormAction left inline>
-                        {nullable(!id && !personal, () => (
-                            <Controller
-                                name="parent"
-                                control={control}
-                                render={({ field }) => (
-                                    <GoalParentComboBox
-                                        text={tr('Enter project')}
-                                        placeholder={tr('Enter project')}
-                                        error={errorsResolver(field.name)}
-                                        disabled={busy}
-                                        {...field}
-                                    />
-                                )}
-                            />
+                {nullable(tip || !id, () => (
+                    <FormActions>
+                        {nullable(!id, () => (
+                            <div className={s.SwitchGoalType}>
+                                <Switch value={goalType} onChange={onSwitchGoalType}>
+                                    <SwitchControl text={tr('Project goal')} value={goalTypeMap.default} />
+                                    <SwitchControl text={tr('Personal goal')} value={goalTypeMap.personal} />
+                                </Switch>
+                                <HelpButton slug="goals" />
+                            </div>
                         ))}
+                        {nullable(tip, () => (
+                            <div className={s.FormTip}>{tip}</div>
+                        ))}
+                    </FormActions>
+                ))}
 
+                <FormActions className={s.FormActions} {...combobox.attr}>
+                    {nullable(!id && goalType === 'default', () => (
                         <Controller
-                            name="priority"
+                            name="parent"
                             control={control}
                             render={({ field }) => (
-                                <PriorityDropdown
-                                    text={tr('Priority')}
+                                <GoalParentDropdown
+                                    label="Project"
+                                    placeholder={tr('Enter project')}
                                     error={errorsResolver(field.name)}
                                     disabled={busy}
                                     {...field}
+                                    {...projectsCombobox.attr}
                                 />
                             )}
                         />
+                    ))}
 
-                        <Controller
-                            name="owner"
-                            control={control}
-                            render={({ field }) => (
-                                <UserComboBox
-                                    text={tr('Assign')}
-                                    placeholder={tr('Enter name or email')}
+                    <Controller
+                        name="owner"
+                        control={control}
+                        render={({ field }) => (
+                            <UserDropdown
+                                label="Owner"
+                                placeholder={tr('Enter name or email')}
+                                error={errorsResolver(field.name)}
+                                disabled={busy}
+                                {...usersCombobox.attr}
+                                {...field}
+                            />
+                        )}
+                    />
+
+                    <Controller
+                        name="priority"
+                        control={control}
+                        render={({ field }) => (
+                            <PriorityDropdown
+                                label="Priority"
+                                error={errorsResolver(field.name)}
+                                disabled={busy}
+                                {...priorityCombobox.attr}
+                                {...field}
+                            />
+                        )}
+                    />
+
+                    <Controller
+                        name="state"
+                        control={control}
+                        render={({ field }) => (
+                            <StateDropdown
+                                label="State"
+                                flowId={parentWatcher?.flowId}
+                                error={errorsResolver(field.name)}
+                                disabled={(goalType === 'default' && !parentWatcher?.flowId) || busy}
+                                {...stateCombobox.attr}
+                                {...field}
+                            />
+                        )}
+                    />
+
+                    <Controller
+                        name="estimate"
+                        control={control}
+                        render={({ field }) => {
+                            return (
+                                <EstimateDropdown
+                                    label="Estimate"
                                     error={errorsResolver(field.name)}
-                                    disabled={busy}
                                     {...field}
+                                    {...estimateCombobox.attr}
                                 />
-                            )}
-                        />
+                            );
+                        }}
+                    />
+                </FormActions>
 
-                        <Controller
-                            name="estimate"
-                            control={control}
-                            render={({ field }) => {
-                                return (
-                                    <GoalFormEstimate
-                                        placement="top"
-                                        renderTrigger={(props) => (
-                                            <Button
-                                                onClick={props.onClick}
-                                                disabled={busy}
-                                                text={
-                                                    field.value
-                                                        ? formateEstimate(new Date(field.value.date), {
-                                                              locale,
-                                                              type: field.value.type,
-                                                          })
-                                                        : ''
-                                                }
-                                                iconLeft={<IconCalendarTickOutline size="xs" />}
-                                                {...estimateCombobox.attr}
-                                            />
-                                        )}
-                                        error={errorsResolver(field.name)}
-                                        {...field}
-                                    />
-                                );
-                            }}
-                        />
-
-                        <Controller
-                            name="state"
-                            control={control}
-                            render={({ field }) => (
-                                <StateDropdown
-                                    text={tr('State')}
-                                    flowId={parentWatcher?.flowId}
-                                    error={errorsResolver(field.name)}
-                                    disabled={(!personal && !parentWatcher?.flowId) || busy}
-                                    {...combobox.attr}
-                                    {...field}
-                                />
-                            )}
-                        />
-
+                <FormActions className={s.FormActions}>
+                    <TagsList {...goalTagList.attr}>
+                        {tagsWatcher.map((tag) => (
+                            <Tag
+                                key={tag.id}
+                                {...goalTagListItem.attr}
+                                action={
+                                    <TagCleanButton onClick={onTagDeleteProvider(tag)} {...goalTagListItemClean.attr} />
+                                }
+                            >
+                                {tag.title}
+                            </Tag>
+                        ))}
                         <Controller
                             name="tags"
                             control={control}
                             render={({ field }) => (
                                 <TagComboBox
-                                    disabled={busy || (tagsWatcher || []).length >= tagsLimit}
                                     placeholder={tr('Enter tag title')}
-                                    error={errorsResolver(field.name)}
+                                    disabled={busy || (tagsWatcher || []).length >= tagsLimit}
                                     {...combobox.attr}
                                     {...field}
                                 />
                             )}
                         />
+                    </TagsList>
 
-                        <HelpButton slug="goals" />
-                    </FormAction>
-                </FormActions>
-
-                <FormActions>
-                    <FormAction left>
-                        {nullable(
-                            tagsWatcher,
-                            (tags) => (
-                                <TagsList {...goalTagList.attr}>
-                                    {tags.map((tag) => (
-                                        <Tag key={tag.id} {...goalTagListItem.attr}>
-                                            <TagCleanButton
-                                                onClick={onTagDeleteProvider(tag)}
-                                                {...goalTagListItemClean.attr}
-                                            />
-                                            {tag.title}
-                                        </Tag>
-                                    ))}
-                                </TagsList>
-                            ),
-                            tip,
-                        )}
-                    </FormAction>
-                    <FormAction right inline>
-                        {actionButton}
-                    </FormAction>
+                    {actionButton}
                 </FormActions>
             </Form>
         </ModalContent>

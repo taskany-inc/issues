@@ -1,3 +1,9 @@
+.Form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+}
+
 .FormControl {
     flex: 1;
 }
@@ -5,4 +11,15 @@
 .ProjectTitleContainer {
     display: flex;
     align-items: center;
+}
+
+.FormActions {
+    align-items: center;
+    justify-content: space-between;
+}
+
+.FormAction {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
 }

@@ -1,5 +1,4 @@
 .FormActions {
-    display: grid;
-    grid-template-columns: 8fr 4fr;
-    align-items: center;
+    display: flex;
+    gap: var(--gap-sm);
 }

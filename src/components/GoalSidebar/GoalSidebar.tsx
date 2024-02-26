@@ -25,7 +25,7 @@ import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
 import { GoalList } from '../GoalList';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 import { GoalDependency } from '../GoalDependency/GoalDependency';
-import { TagsList } from '../TagsList';
+import { TagsList } from '../TagsList/TagsList';
 import { dependencyKind } from '../../schema/goal';
 import { UserEditableList } from '../UserEditableList/UserEditableList';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';

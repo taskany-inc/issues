@@ -22,7 +22,7 @@ import { Button, FormControl, FormControlInput, FormControlError } from '@taskan
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { HelpButton } from '../HelpButton/HelpButton';
-import { TagsList } from '../TagsList';
+import { TagsList } from '../TagsList/TagsList';
 import RotatableTip from '../RotatableTip/RotatableTip';
 
 import { tr } from './UserInviteForm.i18n';

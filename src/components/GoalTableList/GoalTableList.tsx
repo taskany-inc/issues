@@ -12,7 +12,7 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 import { useLocale } from '../../hooks/useLocale';
 import { NextLink } from '../NextLink';
 import { routes } from '../../hooks/router';
-import { TagsList } from '../TagsList';
+import { TagsList } from '../TagsList/TagsList';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { GoalCriteriaPreview } from '../NewGoalCriteria/NewGoalCriteria';
 
