@@ -140,7 +140,9 @@ const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
     ({ error, maxValue, value, onChange, name }, ref) => {
         return (
             <FormControl className={s.FormControl}>
-                <FormControlLabel color={gray7}>{tr('Weight')}</FormControlLabel>
+                <FormControlLabel size="s" color={gray7}>
+                    {tr('Weight')}
+                </FormControlLabel>
                 <FormControlInput
                     outline
                     size="xs"
