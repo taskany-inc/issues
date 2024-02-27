@@ -180,7 +180,6 @@ interface CriteriaTitleFieldProps
     };
     mode: CriteriaFormMode;
     selectedItem?: SuggestItem | null;
-    isEditMode?: boolean;
 }
 
 const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
@@ -190,7 +189,6 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
     value,
     name,
     errors = {},
-    isEditMode,
 }) => {
     const { selected, title } = errors;
 
@@ -228,7 +226,6 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
             value={value}
             error={error}
             onChange={onChange}
-            disabled={isEditMode}
             placeholder={mode === 'simple' ? tr('Criteria title') : undefined}
         />
     );
@@ -355,7 +352,6 @@ export const CriteriaForm = ({
                         render={({ field, formState }) => (
                             <CriteriaTitleField
                                 mode={mode}
-                                isEditMode={isEditMode}
                                 selectedItem={selected}
                                 {...field}
                                 errors={formState.errors}
