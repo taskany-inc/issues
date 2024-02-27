@@ -644,5 +644,3 @@ export const fetchConfig = async () => {
         return null;
     }
 };
-
-export type Config = Awaited<ReturnType<typeof fetchConfig>>;

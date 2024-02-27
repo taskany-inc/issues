@@ -19,7 +19,6 @@ import { PageFooter } from '../PageFooter/PageFooter';
 import { ModalContext } from '../ModalOnEvent';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { OfflineBanner } from '../OfflineBanner/OfflineBanner';
-import { Config } from '../../utils/db';
 
 import s from './Page.module.css';
 
@@ -39,14 +38,14 @@ interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     ssrTime: number;
     title?: string;
     children?: React.ReactNode;
-    config?: Config;
 }
 
 const mapThemeOnId = { light: 0, dark: 1 } as const;
 
-export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, config, ...attrs }) => {
+export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, ...attrs }) => {
     const { setPreview } = useGoalPreview();
     const { data: userSettings = user?.settings } = trpc.user.settings.useQuery();
+    const { data: config } = trpc.appConfig.get.useQuery();
 
     useHotkeys();
 
