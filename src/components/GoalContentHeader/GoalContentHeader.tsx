@@ -1,26 +1,19 @@
-import { Card, CardComment, CardInfo, Dropdown, MenuItem, Text, nullable, useCopyToClipboard } from '@taskany/bricks';
+import { Card, CardComment, CardInfo, Dropdown, MenuItem, nullable, useCopyToClipboard } from '@taskany/bricks';
+import { Text } from '@taskany/bricks/harmony';
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
-import { gray7, textColor } from '@taskany/colors';
 import dynamic from 'next/dynamic';
 import { IconClipboardOutline, IconMoreVerticalOutline } from '@taskany/icons';
-import styled from 'styled-components';
 import * as Sentry from '@sentry/nextjs';
 
-import { CardHeader } from '../CardHeader';
+import { CardHeader } from '../CardHeader/CardHeader';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { notifyPromise } from '../../utils/notifyPromise';
-import { Light } from '../Light';
 
 import { tr } from './GoalContentHeader.i18n';
+import s from './GoalContentHeader.module.css';
 
 const Md = dynamic(() => import('../Md'));
-
-const StyledCardInfo = styled(CardInfo)`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-`;
 
 interface GoalContentHeaderProps extends Pick<ComponentProps<typeof RelativeTime>, 'date' | 'kind'> {
     name?: string | null;
@@ -53,8 +46,8 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
     }, [onCopyDescription]);
 
     return (
-        <Card>
-            <StyledCardInfo onClick={onDateViewTypeChange}>
+        <Card className={s.Card}>
+            <CardInfo className={s.CardInfo} onClick={onDateViewTypeChange}>
                 <CardHeader
                     name={name}
                     timeAgo={<RelativeTime kind={kind} isRelativeTime={isRelative} date={date} />}
@@ -63,9 +56,12 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
                     <Dropdown
                         items={dropdownItems}
                         renderTrigger={({ ref, onClick }) => (
-                            <Light color={textColor} ref={ref} onClick={onClick}>
-                                <IconMoreVerticalOutline size="xs" />
-                            </Light>
+                            <IconMoreVerticalOutline
+                                size="xs"
+                                ref={ref}
+                                onClick={onClick}
+                                className={s.DropdownTrigger}
+                            />
                         )}
                         renderItem={({ item }) => (
                             <MenuItem key={item.label} ghost icon={item.icon} onClick={item.onClick}>
@@ -74,13 +70,13 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
                         )}
                     />
                 ))}
-            </StyledCardInfo>
+            </CardInfo>
 
             <CardComment>
                 {description ? (
                     <Md>{description}</Md>
                 ) : (
-                    <Text size="s" color={gray7} weight="thin">
+                    <Text size="s" weight="thin" className={s.CardCommentEmptyDescription}>
                         {tr('No description provided')}
                     </Text>
                 )}
