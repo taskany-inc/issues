@@ -1,5 +1,4 @@
 import React, { FC, useCallback, useRef } from 'react';
-import styled from 'styled-components';
 import { Dot, ModalContent, ModalHeader, ModalPreview, nullable } from '@taskany/bricks';
 import { IconEditOutline } from '@taskany/icons';
 import { Button } from '@taskany/bricks/harmony';
@@ -16,6 +15,7 @@ import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
 
 import { dispatchPreviewDeleteEvent, dispatchPreviewUpdateEvent, useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
+import s from './GoalPreview.module.css';
 
 interface GoalPreviewProps {
     shortId: string;
@@ -24,30 +24,6 @@ interface GoalPreviewProps {
     onClose?: () => void;
     onDelete?: () => void;
 }
-
-const StyledModalWrapper = styled.div`
-    display: grid;
-    grid-template-columns: 1fr 250px;
-    overflow: auto;
-`;
-
-const StyledModalHeader = styled(ModalHeader)`
-    top: 0;
-    position: sticky;
-
-    box-shadow: 0 2px 5px 2px rgb(0 0 0 / 10%);
-    z-index: 3; // modal header must be upper than content
-`;
-
-const StyledModalContent = styled(ModalContent)`
-    z-index: auto; // needed that popups do not overlap each other
-`;
-
-const StyledModalPreview = styled(ModalPreview)`
-    width: 850px;
-    display: flex;
-    flex-direction: column;
-`;
 
 const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults, onClose, onDelete }) => {
     const { setPreview } = useGoalPreview();
@@ -77,8 +53,8 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
     );
 
     return (
-        <StyledModalPreview visible onClose={onPreviewClose}>
-            <StyledModalHeader>
+        <ModalPreview visible onClose={onPreviewClose} className={s.ModalPreview}>
+            <ModalHeader className={s.ModalHeader}>
                 <GoalHeader
                     goal={goal || defaults}
                     size="xl"
@@ -108,9 +84,9 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                         <IssueParent as="span" mode="compact" parent={project} size="m" />
                     ))}
                 </GoalHeader>
-            </StyledModalHeader>
-            <StyledModalWrapper>
-                <StyledModalContent>
+            </ModalHeader>
+            <div className={s.ModalWrapper}>
+                <ModalContent className={s.ModalContent}>
                     {nullable(goal, (g) => (
                         <GoalContentHeader date={g.createdAt} description={g.description} />
                     ))}
@@ -124,14 +100,14 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                             onInvalidate={dispatchPreviewUpdateEvent}
                         />
                     ))}
-                </StyledModalContent>
-                <StyledModalContent>
+                </ModalContent>
+                <ModalContent className={s.ModalContent}>
                     {nullable(goal, (g) => (
                         <GoalSidebar goal={g} onGoalTransfer={(goal) => setPreview(goal._shortId, goal)} />
                     ))}
-                </StyledModalContent>
-            </StyledModalWrapper>
-        </StyledModalPreview>
+                </ModalContent>
+            </div>
+        </ModalPreview>
     );
 };
 

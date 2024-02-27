@@ -1,22 +1,20 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import styled from 'styled-components';
-import { backgroundColor, brandColor, danger0, gapM, gapS, gray4, gray9, textColor } from '@taskany/colors';
+import { danger0 } from '@taskany/colors';
 import {
     Card,
     CardComment,
     CardInfo,
     Dropdown,
     MenuItem,
-    Text,
     UserPic,
     nullable,
-    Link,
     useCopyToClipboard,
 } from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import * as Sentry from '@sentry/nextjs';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, Text, Link } from '@taskany/bricks/harmony';
+import cn from 'classnames';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
 import {
@@ -38,15 +36,14 @@ import { Circle } from '../Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { StateDot } from '../StateDot';
 import { getUserName } from '../../utils/getUserName';
-import { CardHeader } from '../CardHeader';
+import { CardHeader } from '../CardHeader/CardHeader';
 import { useLatest } from '../../hooks/useLatest';
 import { notifyPromise } from '../../utils/notifyPromise';
-import { Light } from '../Light';
 import { ReactionsMap } from '../../types/reactions';
-import { NextLink } from '../NextLink';
 import { profileUrl } from '../../utils/config';
 
 import { tr } from './CommentView.i18n';
+import s from './CommentView.module.css';
 
 const Md = dynamic(() => import('../Md'));
 const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
@@ -72,91 +69,6 @@ interface CommentViewProps {
     onCancel?: () => void;
     onDelete?: () => void;
 }
-
-const StyledCommentActions = styled.div`
-    display: flex;
-    align-items: center;
-    justify-self: end;
-
-    margin-right: -10px;
-
-    & > span + span {
-        margin-left: ${gapS};
-    }
-`;
-
-const StyledCommentCard = styled(Card)<Pick<CommentViewProps, 'highlight'>>`
-    position: relative;
-    min-height: 60px;
-
-    transition: border-color 200ms ease-in-out;
-
-    ${({ highlight }) =>
-        highlight &&
-        `
-            border-color: ${brandColor};
-        `}
-
-    &::before {
-        position: absolute;
-        z-index: 0;
-
-        content: '';
-
-        width: 14px;
-        height: 14px;
-
-        background-color: ${gray4};
-
-        border-left: 1px solid ${gray4};
-        border-top: 1px solid ${gray4};
-        border-radius: 2px;
-
-        transform: rotate(-45deg);
-        transition: border-color 200ms ease-in-out;
-
-        top: 8px;
-        left: -6px;
-
-        ${({ highlight }) =>
-            highlight &&
-            `
-                border-color: ${brandColor};
-            `}
-    }
-`;
-
-const StyledCardInfo = styled(CardInfo)`
-    display: flex;
-    justify-content: space-between;
-`;
-
-const StyledCardComment = styled(CardComment)`
-    display: flex;
-    flex-direction: column;
-    gap: ${gapM};
-    word-break: keep-all;
-`;
-
-const StyledTimestamp = styled.div`
-    display: flex;
-    align-items: center;
-    gap: ${gapS};
-`;
-
-const StyledMd = styled(Md)`
-    overflow-x: auto;
-`;
-
-const StyledStateDot = styled(StateDot)`
-    position: absolute;
-    bottom: -50%;
-    right: -50%;
-    transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    border: 4px solid ${backgroundColor};
-`;
 
 export const CommentView: FC<CommentViewProps> = ({
     id,
@@ -263,13 +175,13 @@ export const CommentView: FC<CommentViewProps> = ({
                 {pin ? (
                     <>
                         <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />
-                        <StyledStateDot hue={hue} />
+                        <StateDot hue={hue} className={s.StateDot} />
                     </>
                 ) : (
                     nullable(
                         profileUrl && author,
                         ({ email, image, name }) => (
-                            <Link as={NextLink} href={`${profileUrl}/${encodeURIComponent(email)}`} inline>
+                            <Link href={`${profileUrl}/${encodeURIComponent(email)}`} view="secondary">
                                 <UserPic size={32} src={image} email={email} name={name} />
                             </Link>
                         ),
@@ -298,8 +210,11 @@ export const CommentView: FC<CommentViewProps> = ({
                     }
                 />
             ) : (
-                <StyledCommentCard highlight={highlight} onClick={canEdit ? onCommentDoubleClick : undefined}>
-                    <StyledCardInfo onClick={onDateViewTypeChange}>
+                <Card
+                    className={cn(s.CommentCard, { [s.CommentCard_highlighted]: highlight })}
+                    onClick={canEdit ? onCommentDoubleClick : undefined}
+                >
+                    <CardInfo onClick={onDateViewTypeChange} className={s.CardInfo}>
                         {nullable(author, (data) => (
                             <CardHeader
                                 name={getUserName(data)}
@@ -307,16 +222,20 @@ export const CommentView: FC<CommentViewProps> = ({
                                 href={`#comment-${id}`}
                             />
                         ))}
-                        <StyledCommentActions>
+                        <div className={s.CommentActions}>
                             {nullable(!reactionsProps.limited, () => (
                                 <ReactionsDropdown view="icon" onClick={onReactionToggle} />
                             ))}
                             <Dropdown
                                 items={dropdownItems}
                                 renderTrigger={({ ref, onClick }) => (
-                                    <Light color={textColor} ref={ref} onClick={onClick} {...commentDropdown.attr}>
-                                        <IconMoreVerticalOutline size="xs" />
-                                    </Light>
+                                    <IconMoreVerticalOutline
+                                        size="xs"
+                                        className={s.DropdownTrigger}
+                                        ref={ref}
+                                        onClick={onClick}
+                                        {...commentDropdown.attr}
+                                    />
                                 )}
                                 renderItem={({ item, cursor, index }) => (
                                     <MenuItem
@@ -331,28 +250,28 @@ export const CommentView: FC<CommentViewProps> = ({
                                     </MenuItem>
                                 )}
                             />
-                        </StyledCommentActions>
-                    </StyledCardInfo>
+                        </div>
+                    </CardInfo>
 
-                    <StyledCardComment>
+                    <CardComment className={s.CardComment}>
                         {nullable(hue, (h) => (
-                            <StyledTimestamp>
+                            <div className={s.CommentTimestamp}>
                                 {nullable(!pin, () => (
                                     <StateDot hue={h} />
                                 ))}
-                                <Text size="m" weight="bolder" color={gray9}>
-                                    {createLocaleDate(createdAt, { locale })}
-                                </Text>
-                            </StyledTimestamp>
+                                <Text weight="bolder">{createLocaleDate(createdAt, { locale })}</Text>
+                            </div>
                         ))}
 
-                        <StyledMd {...commentDescriptionDO.attr}>{commentDescription.description}</StyledMd>
+                        <Md className={s.Markdown} {...commentDescriptionDO.attr}>
+                            {commentDescription.description}
+                        </Md>
 
                         {nullable(Object.keys(reactions), () => (
                             <Reactions reactions={reactions} onClick={onReactionToggle} />
                         ))}
-                    </StyledCardComment>
-                </StyledCommentCard>
+                    </CardComment>
+                </Card>
             )}
         </ActivityFeedItem>
     );

@@ -1,0 +1,7 @@
+.CardHeader {
+    display: inline-flex;
+}
+
+.CardHeaderSeparator {
+    margin: 0 var(--gap-xs);
+}

@@ -1,6 +1,7 @@
-import { nullable, Link, Text } from '@taskany/bricks';
-import { gapXs, gray8 } from '@taskany/colors';
-import styled from 'styled-components';
+import { nullable } from '@taskany/bricks';
+import { Link, Text } from '@taskany/bricks/harmony';
+
+import s from './CardHeader.module.css';
 
 interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
     name?: string | null;
@@ -8,29 +9,21 @@ interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
     href?: string;
 }
 
-const StyledCardHeader = styled.div`
-    display: inline-flex;
-`;
-
-const StyledSeparator = styled.span`
-    margin: 0 ${gapXs};
-`;
-
 export const CardHeader: React.FC<CardHeaderProps> = ({ name, timeAgo, href, ...attrs }) => {
     return (
-        <StyledCardHeader {...attrs}>
+        <div className={s.CardHeader} {...attrs}>
             {nullable(name, (n) => (
-                <Text size="xs" color={gray8} weight="bold">
+                <Text size="xs" weight="bold">
                     {n}
                 </Text>
             ))}
             {nullable(timeAgo, (node) => (
                 <>
                     {nullable(name, () => (
-                        <StyledSeparator>—</StyledSeparator>
+                        <span className={s.CardHeaderSeparator}>—</span>
                     ))}
                     {href ? (
-                        <Link inline href={href}>
+                        <Link view="secondary" href={href}>
                             {node}
                         </Link>
                     ) : (
@@ -38,6 +31,6 @@ export const CardHeader: React.FC<CardHeaderProps> = ({ name, timeAgo, href, ...
                     )}
                 </>
             ))}
-        </StyledCardHeader>
+        </div>
     );
 };
