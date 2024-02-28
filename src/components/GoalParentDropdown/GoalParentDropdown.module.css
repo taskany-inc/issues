@@ -1,7 +1,3 @@
-.DropdownTrigger {
-    min-width: 180px;
-}
-
 .DropdownPanelItem {
     display: flex;
     align-items: center;
@@ -15,11 +11,7 @@
 }
 
 .DropdownTriggerValue {
-    display: inline-block;
     white-space: nowrap;
-    width: 130px;
-    text-overflow: ellipsis;
-    overflow: hidden;
 }
 
 .CreateProjectButton {

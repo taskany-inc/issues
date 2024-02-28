@@ -20,3 +20,24 @@
     max-width: 380px;
     margin-left: auto;
 }
+
+.GoalFormPriorityDropdown {
+    min-width: 120px;
+    max-width: 170px;
+}
+
+.GoalFormStateDropdown {
+    max-width: 170px;
+}
+
+.GoalFormEstimateDropdown {
+    max-width: 170px;
+}
+
+.GoalFormParentDropdown {
+    min-width: 190px;
+}
+
+.GoalFormUserDropdown {
+    min-width: 190px;
+}

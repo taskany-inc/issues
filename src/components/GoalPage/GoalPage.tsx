@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import styled from 'styled-components';
 import { nullable } from '@taskany/bricks';
-import { IconEditOutline } from '@taskany/icons';
+import { IconEdit1Outline } from '@taskany/icons';
 import { Button } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -22,19 +21,14 @@ import { refreshInterval } from '../../utils/config';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
 import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
-import { GoalHeader } from '../GoalHeader';
+import { GoalHeader } from '../GoalHeader/GoalHeader';
 import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
 import { GoalActivityFeed } from '../GoalActivityFeed';
-import { IssueParent } from '../IssueParent';
 import { goalPage, goalPageEditButton } from '../../utils/domObjects';
+import { RelativeTime } from '../RelativeTime/RelativeTime';
 
 import { tr } from './GoalPage.i18n';
-
-const GoalContent = styled(PageContent)`
-    display: grid;
-    grid-template-columns: 7fr 5fr;
-    gap: var(--gap-m);
-`;
+import s from './GoalPage.module.css';
 
 export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ id: string }>) => {
     const router = useRouter();
@@ -117,36 +111,30 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                 />
                             </PageActions>
 
-                            <PageActions>
-                                <IssueKey id={id} />
-                                {nullable(goal._isEditable, () => (
-                                    <Button
-                                        text={tr('Edit')}
-                                        iconLeft={<IconEditOutline size="xs" />}
-                                        onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
-                                        {...goalPageEditButton.attr}
-                                    />
+                            <div className={s.GoalPageActionsWrapper}>
+                                <PageActions>
+                                    <IssueKey id={id} />
+                                    {nullable(goal._isEditable, () => (
+                                        <Button
+                                            text={tr('Edit')}
+                                            iconLeft={<IconEdit1Outline size="xs" />}
+                                            onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
+                                            {...goalPageEditButton.attr}
+                                        />
+                                    ))}
+                                </PageActions>
+                                {nullable(goal?.updatedAt, (date) => (
+                                    <RelativeTime kind="updated" date={date} />
                                 ))}
-                            </PageActions>
+                            </div>
                         </>
                     }
-                >
-                    {Boolean(project?.parent?.length) &&
-                        nullable(project?.parent, (parent) => (
-                            <>
-                                <IssueParent size="m" parent={parent} />
-                            </>
-                        ))}
-
-                    {nullable(project, (project) => (
-                        <IssueParent parent={project} />
-                    ))}
-                </GoalHeader>
+                />
             </PageContent>
 
             <PageSep />
 
-            <GoalContent>
+            <PageContent className={s.GoalContent}>
                 <div>
                     <GoalContentHeader date={goal.createdAt} description={goal.description} />
 
@@ -166,7 +154,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         onGoalClick={onGoalClick}
                     />
                 </div>
-            </GoalContent>
+            </PageContent>
         </Page>
     );
 };

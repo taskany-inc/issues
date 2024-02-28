@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { nullable, useMounted } from '@taskany/bricks';
+import { Text } from '@taskany/bricks/harmony';
+import cn from 'classnames';
 
 import { dateAgo, createLocaleDate, parseLocaleDate } from '../../utils/dateTime';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './RelativeTime.i18n';
+import s from './RelativeTime.module.css';
 
 type RelativeTimeKindCommon = 'created' | 'updated';
 type RelativeTimeKind = RelativeTimeKindCommon | Capitalize<RelativeTimeKindCommon>;
@@ -17,15 +19,6 @@ interface RelativeTimeProps {
     isRelativeTime?: boolean;
     className?: string;
 }
-
-const StyledKind = styled.span`
-    padding-right: var(--gap-xs);
-`;
-
-const StyledRelativeTime = styled.span`
-    display: flex;
-    align-items: center;
-`;
 
 export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true, className }) => {
     const { ssrTime } = usePageContext();
@@ -56,11 +49,11 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelati
     const timeValue = isRelativeTime ? dateAgo(localeDate, time, { locale }) : createLocaleDate(localeDate, { locale });
 
     return (
-        <StyledRelativeTime className={className}>
+        <Text size="s" className={cn(s.RelativeTime, className)}>
             {nullable(kind, (k) => (
-                <StyledKind>{map[k]}</StyledKind>
+                <span className={s.RelativeTimeKind}>{map[k]}</span>
             ))}
             <span title={createLocaleDate(localeDate, { locale })}>{timeValue}</span>
-        </StyledRelativeTime>
+        </Text>
     );
 };

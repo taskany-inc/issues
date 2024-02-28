@@ -2,7 +2,6 @@
     display: grid;
     grid-template-columns: 1fr 250px;
     overflow: auto;
-    background-color: var(--layer);
 }
 
 /* Order of styles on page: SC, CSS Modules */
@@ -25,7 +24,15 @@
 
 /* Order of styles on page: SC, CSS Modules */
 .ModalPreview.ModalPreview {
-    width: 850px;
+    width: 890px;
     display: flex;
     flex-direction: column;
+    background-color: var(--layer);
+}
+
+.GoalPreviewActionsWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: var(--gap-xs);
 }

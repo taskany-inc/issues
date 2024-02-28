@@ -1,0 +1,17 @@
+.GoalContent {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: var(--gap-m);
+}
+
+.GoalPageProjects {
+    display: flex;
+    align-items: center;
+}
+
+.GoalPageActionsWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: var(--gap-xs);
+}

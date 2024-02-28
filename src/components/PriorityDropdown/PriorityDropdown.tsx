@@ -10,20 +10,23 @@ import { getPriorityText } from '../PriorityText/PriorityText';
 interface PriorityDropdownProps {
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     label?: ComponentProps<typeof DropdownTrigger>['label'];
+    view?: ComponentProps<typeof DropdownTrigger>['view'];
     value?: Priority;
+    className?: string;
     disabled?: boolean;
+    readOnly?: boolean;
 
     onChange?: (priority: Priority) => void;
 }
 
-export const PriorityDropdown = ({ label, value, disabled, onChange, ...props }: PriorityDropdownProps) => {
+export const PriorityDropdown = ({ value, onChange, ...props }: PriorityDropdownProps) => {
     const { data: priorities = [] } = trpc.priority.getAll.useQuery();
 
     return (
         <Dropdown>
-            <DropdownTrigger label={label} {...props} readOnly={disabled}>
+            <DropdownTrigger {...props}>
                 {nullable(value, ({ title }) => (
-                    <Text size="s" as="span">
+                    <Text size="s" ellipsis>
                         {getPriorityText(title)}
                     </Text>
                 ))}

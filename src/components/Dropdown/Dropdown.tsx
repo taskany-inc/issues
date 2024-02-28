@@ -81,6 +81,7 @@ export const DropdownTrigger = ({
     children,
     className,
     error,
+    view = 'fill',
     renderTrigger,
     ...props
 }: DropdownTriggerProps) => {
@@ -90,7 +91,7 @@ export const DropdownTrigger = ({
         <>
             <DropdownTriggerBricks
                 label={nullable(label, (l) => tr(l))}
-                view="fill"
+                view={view}
                 onClick={toggle}
                 className={className}
                 error={Boolean(error)}
@@ -105,7 +106,7 @@ export const DropdownTrigger = ({
                     {nullable(
                         children,
                         () => children,
-                        <Text size="s" as="span" className={cn({ [s.DropdownTriggerLabel_default]: !error })}>
+                        <Text size="s" ellipsis className={cn({ [s.DropdownTriggerLabel_default]: !error })}>
                             {tr('Not chosen')}
                         </Text>,
                     )}

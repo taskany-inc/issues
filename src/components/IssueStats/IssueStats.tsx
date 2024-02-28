@@ -1,122 +1,104 @@
-import { useMemo } from 'react';
-import styled from 'styled-components';
-import { gapXs, gray8 } from '@taskany/colors';
-import { Dot, Text, Link, nullable, CircleProgressBar } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { CircleProgressBar, Link } from '@taskany/bricks/harmony';
 
-import { formateEstimate } from '../../utils/dateTime';
 import { DateType } from '../../types/date';
-import { useLocale } from '../../hooks/useLocale';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-import { getPriorityText } from '../PriorityText/PriorityText';
-import { UserGroup } from '../UserGroup';
-import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { CommentsCountBadge } from '../CommentsCountBadge';
 import { PrivateDepsWarning } from '../PrivateDepsWarning/PrivateDepsWarning';
+import { UserDropdown } from '../UserDropdown/UserDropdown';
+import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';
+import { PriorityDropdown } from '../PriorityDropdown/PriorityDropdown';
+import { Priority } from '../../types/priority';
+import { getDateString } from '../../utils/dateTime';
+
+import s from './IssueStats.module.css';
 
 interface IssueStatsProps {
-    updatedAt: Date;
     comments: number;
     owner?: ActivityByIdReturnType | null;
-    issuer?: ActivityByIdReturnType | null;
     estimate?: Date | null;
     estimateType?: DateType | null;
-    priority?: string | null;
+    priority?: Priority | null;
     achivedCriteriaWeight?: number | null;
     hasPrivateDeps?: boolean;
-    mode?: 'compact' | 'default';
+    stateReadOnly?: boolean;
     onCommentsClick?: () => void;
 }
 
-const StyledIssueStats = styled(Text)<Pick<IssueStatsProps, 'mode'>>`
-    display: flex;
-    align-items: center;
-
-    ${({ mode }) =>
-        mode === 'default' &&
-        `
-            padding-left: ${gapXs};
-        `}
-`;
-
-const StyledDotSep = styled.span`
-    display: flex;
-    align-items: center;
-`;
-
-const DotSep: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <StyledDotSep>
-        <Dot />
+const Separator: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <>
+        <div className={s.Separator} />
         {children}
-    </StyledDotSep>
+    </>
 );
 
 export const IssueStats: React.FC<IssueStatsProps> = ({
-    issuer,
     owner,
     estimate,
     estimateType,
     priority,
     comments,
     achivedCriteriaWeight,
-    updatedAt,
     hasPrivateDeps,
-    mode,
+    stateReadOnly,
     onCommentsClick,
 }) => {
-    const locale = useLocale();
-
-    const issuers = useMemo(() => {
-        if (issuer && owner && owner.id === issuer.id) {
-            return [owner];
-        }
-
-        return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
-    }, [issuer, owner]);
-
     return (
-        <StyledIssueStats mode={mode} as="span" size="m" color={gray8}>
-            {nullable(issuers.length, () => (
-                <DotSep>
-                    <UserGroup users={issuers} />
-                </DotSep>
+        <div className={s.IssueStats}>
+            {nullable(owner, (o) =>
+                nullable(
+                    stateReadOnly,
+                    () => (
+                        <Separator>
+                            <UserDropdown value={o} label="Owner" view="default" readOnly />
+                        </Separator>
+                    ),
+                    <UserDropdown value={o} label="Owner" view="default" readOnly />,
+                ),
+            )}
+
+            {nullable(priority, (p) => (
+                <Separator>
+                    <PriorityDropdown label="Priority" value={p} view="default" readOnly />
+                </Separator>
             ))}
 
             {nullable(estimate, (e) => (
-                <DotSep>
-                    {formateEstimate(e, {
-                        type: estimateType ?? 'Strict',
-                        locale,
-                    })}
-                </DotSep>
-            ))}
-
-            {nullable(priority, (p) => (
-                <DotSep>{getPriorityText(p)}</DotSep>
+                <Separator>
+                    <EstimateDropdown
+                        value={{ date: getDateString(e), type: estimateType ?? 'Strict' }}
+                        label="Estimate"
+                        view="default"
+                        readOnly
+                    />
+                </Separator>
             ))}
 
             {achivedCriteriaWeight != null && (
-                <DotSep>
-                    <CircleProgressBar value={achivedCriteriaWeight} />
-                </DotSep>
+                <Separator>
+                    <div className={s.IssueComponentContainer}>
+                        <CircleProgressBar value={achivedCriteriaWeight} size="l" />
+                    </div>
+                </Separator>
             )}
 
-            <DotSep>
-                <RelativeTime kind={mode === 'compact' ? undefined : 'updated'} date={updatedAt} />
-            </DotSep>
-
             {nullable(comments, () => (
-                <DotSep>
-                    <Link inline onClick={onCommentsClick}>
-                        <CommentsCountBadge count={comments} />
-                    </Link>
-                </DotSep>
+                <Separator>
+                    <div className={s.IssueComponentContainer}>
+                        <Link view="secondary" onClick={onCommentsClick} className={s.CommentsCountLink}>
+                            <CommentsCountBadge count={comments} />
+                        </Link>
+                    </div>
+                </Separator>
             ))}
 
             {nullable(hasPrivateDeps, () => (
-                <DotSep>
-                    <PrivateDepsWarning />
-                </DotSep>
+                <Separator>
+                    <div className={s.IssueComponentContainer}>
+                        <PrivateDepsWarning />
+                    </div>
+                </Separator>
             ))}
-        </StyledIssueStats>
+        </div>
     );
 };

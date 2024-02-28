@@ -16,6 +16,7 @@ interface GoalParentDropdownProps {
     label?: ComponentProps<typeof DropdownTrigger>['label'];
     value?: { id: string; title: string };
     query?: string;
+    className?: string;
     placeholder?: string;
     disabled?: boolean;
     onChange?: (project: { id: string; title: string }) => void;
@@ -65,9 +66,9 @@ export const GoalParentDropdown = ({
 
     return (
         <Dropdown>
-            <DropdownTrigger label={label} className={s.DropdownTrigger} {...props} readOnly={disabled}>
+            <DropdownTrigger label={label} {...props} readOnly={disabled}>
                 {nullable(value, ({ title }) => (
-                    <Text size="s" as="span" className={s.DropdownTriggerValue} title={title}>
+                    <Text size="s" ellipsis className={s.DropdownTriggerValue} title={title}>
                         {title}
                     </Text>
                 ))}

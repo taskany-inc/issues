@@ -24,11 +24,15 @@ interface EstimateState {
 interface EstimateDropdownProps {
     label?: ComponentProps<typeof DropdownTrigger>['label'];
     error?: ComponentProps<typeof DropdownTrigger>['error'];
-    onChange: (date: Estimate | null) => void;
+    view?: ComponentProps<typeof DropdownTrigger>['view'];
+    disabled?: boolean;
+    readOnly?: boolean;
+    className?: string;
+    onChange?: (date: Estimate | null) => void;
     value?: Estimate;
 }
 
-export const EstimateDropdown = ({ onChange, value, label, ...props }: EstimateDropdownProps) => {
+export const EstimateDropdown = ({ onChange, value, ...props }: EstimateDropdownProps) => {
     const locale = useLocale();
     const [estimate, setEstimate] = useState<EstimateState | undefined>(
         value
@@ -41,7 +45,7 @@ export const EstimateDropdown = ({ onChange, value, label, ...props }: EstimateD
 
     const onChangeHandler = useCallback(
         (value?: EstimateState) => {
-            onChange(
+            onChange?.(
                 value
                     ? {
                           date: getDateString(value.range.end),
@@ -88,7 +92,7 @@ export const EstimateDropdown = ({ onChange, value, label, ...props }: EstimateD
 
     return (
         <Dropdown>
-            <DropdownTrigger label={label} {...props}>
+            <DropdownTrigger {...props}>
                 {nullable(value, (v) => (
                     <Text size="s" as="span">
                         {formateEstimate(new Date(v.date), {

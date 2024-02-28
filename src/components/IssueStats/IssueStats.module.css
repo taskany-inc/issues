@@ -1,0 +1,23 @@
+.IssueStats {
+    display: flex;
+    align-items: center;
+}
+
+.IssueStats_default {
+    padding-left: var(--gap-xs);
+}
+
+.Separator {
+    background-color: var(--gray-900);
+    width: 1px;
+    height: calc(var(--gap-m) + var(--gap-s));
+    margin: 0 var(--gap-xs);
+}
+
+.IssueComponentContainer {
+    padding: 0 var(--gap-s);
+}
+
+.CommentsCountLink {
+    cursor: pointer;
+}

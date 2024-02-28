@@ -223,6 +223,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     placeholder={tr('Enter project')}
                                     error={errorsResolver(field.name)}
                                     disabled={busy}
+                                    className={s.GoalFormParentDropdown}
                                     {...field}
                                     {...projectsCombobox.attr}
                                 />
@@ -239,6 +240,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 placeholder={tr('Enter name or email')}
                                 error={errorsResolver(field.name)}
                                 disabled={busy}
+                                className={s.GoalFormUserDropdown}
                                 {...usersCombobox.attr}
                                 {...field}
                             />
@@ -253,6 +255,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 label="Priority"
                                 error={errorsResolver(field.name)}
                                 disabled={busy}
+                                className={s.GoalFormPriorityDropdown}
                                 {...priorityCombobox.attr}
                                 {...field}
                             />
@@ -268,6 +271,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 flowId={parentWatcher?.flowId}
                                 error={errorsResolver(field.name)}
                                 disabled={(goalType === 'default' && !parentWatcher?.flowId) || busy}
+                                className={s.GoalFormStateDropdown}
                                 {...stateCombobox.attr}
                                 {...field}
                             />
@@ -282,6 +286,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 <EstimateDropdown
                                     label="Estimate"
                                     error={errorsResolver(field.name)}
+                                    className={s.GoalFormEstimateDropdown}
                                     {...field}
                                     {...estimateCombobox.attr}
                                 />
