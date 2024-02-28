@@ -57,7 +57,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         },
     );
 
-    const { preview, setPreview, on } = useGoalPreview();
+    const { setPreview, on } = useGoalPreview();
 
     useEffect(() => {
         const unsubUpdate = on('on:goal:update', () => {
@@ -85,8 +85,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
             },
         [setPreview],
     );
-
-    const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
 
     useEffect(() => {
         if (!project || project.personal) return;
@@ -177,7 +175,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                             project={p}
                             onTagClick={setTagsFilterOutside}
                             onClickProvider={onGoalPreviewShow}
-                            selectedResolver={selectedGoalResolver}
                             queryState={queryState}
                         />
                     ))}

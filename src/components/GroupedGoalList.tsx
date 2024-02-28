@@ -19,7 +19,7 @@ interface GroupedGoalListProps {
 export const projectsSize = 20;
 
 export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, onTagClick }) => {
-    const { preview, setPreview, on } = useGoalPreview();
+    const { setPreview, on } = useGoalPreview();
     const utils = trpc.useContext();
     const { data, fetchNextPage, hasNextPage } = trpc.project.getAll.useInfiniteQuery(
         {
@@ -62,8 +62,6 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, on
         [setPreview],
     );
 
-    const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
-
     const projectsOnScreen = useMemo(() => {
         const pages = data?.pages || [];
 
@@ -84,7 +82,6 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, on
                     key={project.id}
                     project={project}
                     onClickProvider={onGoalPreviewShow}
-                    selectedResolver={selectedGoalResolver}
                     queryState={queryState}
                     onTagClick={onTagClick}
                 />

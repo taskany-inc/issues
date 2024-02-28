@@ -95,8 +95,6 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         [setPreview],
     );
 
-    const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
-
     const onFilterStar = useCallback(async () => {
         await utils.filter.getById.invalidate();
     }, [utils]);
@@ -149,11 +147,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                             href={routes.project(project.id)}
                             goals={nullable(goals, (g) => (
                                 <TreeViewElement>
-                                    <GoalTableList
-                                        goals={g}
-                                        selectedGoalResolver={selectedGoalResolver}
-                                        onGoalPreviewShow={onGoalPreviewShow}
-                                    />
+                                    <GoalTableList goals={g} onGoalPreviewShow={onGoalPreviewShow} />
                                 </TreeViewElement>
                             ))}
                         >
