@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { ComponentProps, FC, useCallback } from 'react';
 import NextLink from 'next/link';
 import {
     Header,
@@ -22,7 +22,7 @@ import { BetaBadge } from '../BetaBadge';
 import { tr } from './PageHeader.i18n';
 import s from './PageHeader.module.css';
 
-export const PageHeader: FC = () => {
+export const PageHeader: FC<{ logo?: ComponentProps<typeof PageHeaderLogo>['logo'] }> = ({ logo }) => {
     const { userSettings, signIn } = useRouter();
     const { user } = usePageContext();
 
@@ -52,7 +52,7 @@ export const PageHeader: FC = () => {
             className={s.PageHeader}
             logo={
                 <HeaderLogo>
-                    <PageHeaderLogo />
+                    <PageHeaderLogo logo={logo} />
                 </HeaderLogo>
             }
             menu={

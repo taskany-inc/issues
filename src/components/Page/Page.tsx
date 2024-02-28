@@ -63,7 +63,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
     return (
         <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], ssrTime }}>
             <Head>
-                <link rel="icon" href={config?.logo || '/favicon.png'} />
+                <link rel="icon" href={config?.favicon || '/favicon.png'} />
                 <title>{title}</title>
                 <link rel="stylesheet" id="themeVariables" href={`/theme/${theme}.css`} />
             </Head>
@@ -83,7 +83,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
                 position="bottom-right"
             />
 
-            <PageHeader />
+            <PageHeader logo={config?.logo ?? undefined} />
 
             <main className={s.PageMain} {...attrs}>
                 {children}

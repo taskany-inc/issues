@@ -1,14 +1,10 @@
 import NextLink from 'next/link';
-import { TaskanyLogo } from '@taskany/bricks';
+import { TaskanyLogo } from '@taskany/bricks/harmony';
 
 import { routes } from '../hooks/router';
 
-export const PageHeaderLogo: React.FC = () => {
-    // TODO: resolve custom logo from settings in db
-
-    return (
-        <NextLink href={routes.index()} passHref>
-            <TaskanyLogo />
-        </NextLink>
-    );
-};
+export const PageHeaderLogo: React.FC<{ logo?: string }> = ({ logo }) => (
+    <NextLink href={routes.index()} passHref>
+        <TaskanyLogo src={logo} />
+    </NextLink>
+);
