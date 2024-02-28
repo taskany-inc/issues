@@ -65,8 +65,6 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, onTagClick }
         if (isGoalDeletedAlready) setPreview(null);
     }, [goalsOnScreen, preview, setPreview]);
 
-    const selectedGoalResolver = useCallback((id: string) => id === preview?.id, [preview]);
-
     const onGoalPreviewShow = useCallback(
         (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
             (e) => {
@@ -88,12 +86,7 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, onTagClick }
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {nullable(goalsOnScreen, (goals) => (
-                <GoalTableList
-                    goals={goals}
-                    onTagClick={onTagClick}
-                    selectedGoalResolver={selectedGoalResolver}
-                    onGoalPreviewShow={onGoalPreviewShow}
-                />
+                <GoalTableList goals={goals} onTagClick={onTagClick} onGoalPreviewShow={onGoalPreviewShow} />
             ))}
 
             {nullable(hasNextPage, () => (

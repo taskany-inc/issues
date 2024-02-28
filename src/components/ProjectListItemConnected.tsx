@@ -16,7 +16,6 @@ import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     queryState?: Partial<QueryState>;
     onClickProvider?: (g: Partial<GoalByIdReturnType>) => MouseEventHandler<HTMLElement>;
-    selectedResolver?: (id: string) => boolean;
     onTagClick?: ComponentProps<typeof GoalTableList>['onTagClick'];
 }
 
@@ -32,7 +31,6 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     queryState,
     project,
     onClickProvider,
-    selectedResolver,
     onTagClick,
     ...props
 }) => {
@@ -85,7 +83,6 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     <GoalTableList
                         goals={goals}
                         onTagClick={onTagClick}
-                        selectedGoalResolver={selectedResolver}
                         onGoalPreviewShow={(goal) => (e) => {
                             onClickProvider?.(goal)(e);
                             onProjectClickHandler(e);
@@ -107,7 +104,6 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     project={p}
                     queryState={queryState}
                     onClickProvider={onClickProvider}
-                    selectedResolver={selectedResolver}
                     titleSize="m"
                 />
             ))}

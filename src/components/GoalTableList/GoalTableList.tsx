@@ -15,24 +15,24 @@ import { routes } from '../../hooks/router';
 import { TagsList } from '../TagsList/TagsList';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { GoalCriteriaPreview } from '../NewGoalCriteria/NewGoalCriteria';
+import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 
 import s from './GoalTableList.module.css';
 
 interface GoalTableListProps<T> {
     goals: T[];
-    selectedGoalResolver?: (id: string) => boolean;
     onGoalPreviewShow: (goal: T) => MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
 }
 
 export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>>({
     goals,
-    selectedGoalResolver,
     onGoalPreviewShow,
     onTagClick,
     ...attrs
 }: GoalTableListProps<T>) => {
     const locale = useLocale();
+    const { shortId, preview } = useGoalPreview();
 
     const data = useMemo(
         () =>
@@ -145,7 +145,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                         value={row.goal}
                         renderItem={({ active, hovered: _, ...props }) => (
                             <TableListItem
-                                selected={selectedGoalResolver?.(row.goal?.id as string)}
+                                selected={row.goal._shortId === shortId || row.goal.id === preview?.id}
                                 hovered={active}
                                 {...props}
                             >
