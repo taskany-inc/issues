@@ -1,0 +1,9 @@
+.RelativeTime {
+    display: flex;
+    align-items: center;
+    color: var(--text-ghost);
+}
+
+.RelativeTimeKind {
+    padding-right: var(--gap-xs);
+}

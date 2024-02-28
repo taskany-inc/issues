@@ -1,7 +1,6 @@
 import { ComponentProps, useState } from 'react';
 import { User } from '@taskany/bricks/harmony';
 import { nullable } from '@taskany/bricks';
-import cn from 'classnames';
 
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { safeUserData } from '../../utils/getUserName';
@@ -14,25 +13,19 @@ import { tr } from './UserDropdown.i18n';
 interface UserDropdownProps {
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     label?: ComponentProps<typeof DropdownTrigger>['label'];
+    view?: ComponentProps<typeof DropdownTrigger>['view'];
+    className?: string;
     query?: string;
     value?: Partial<NonNullable<ActivityByIdReturnType>>;
     disabled?: boolean;
+    readOnly?: boolean;
     placeholder?: string;
     filter?: string[];
 
     onChange?: (activity: NonNullable<ActivityByIdReturnType>) => void;
 }
 
-export const UserDropdown = ({
-    label,
-    query = '',
-    value,
-    filter,
-    disabled,
-    placeholder,
-    onChange,
-    ...props
-}: UserDropdownProps) => {
+export const UserDropdown = ({ query = '', value, filter, placeholder, onChange, ...props }: UserDropdownProps) => {
     const [inputState, setInputState] = useState(query);
 
     const { data: suggestions = [] } = trpc.user.suggestions.useQuery(
@@ -49,7 +42,7 @@ export const UserDropdown = ({
 
     return (
         <Dropdown>
-            <DropdownTrigger label={label} {...props} readOnly={disabled} className={s.DropdownTrigger}>
+            <DropdownTrigger {...props}>
                 {nullable(safeUserData(value), (user) => (
                     <User name={user.name} src={user.image} email={user.email} className={s.Owner} inheritColor />
                 ))}
@@ -66,12 +59,7 @@ export const UserDropdown = ({
                 onChange={onChange}
                 renderItem={(props) =>
                     nullable(safeUserData(props.item), (user) => (
-                        <User
-                            name={user.name}
-                            src={user.image}
-                            email={user.email}
-                            className={cn(s.Owner, s.OwnerSuggest)}
-                        />
+                        <User name={user.name} src={user.image} email={user.email} className={s.Owner} />
                     ))
                 }
             />

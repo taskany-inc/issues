@@ -1,14 +1,5 @@
-.DropdownTrigger {
-    min-width: 180px;
-}
-
 .Owner {
     white-space: nowrap;
-    max-width: 130px;
-}
-
-.OwnerSuggest {
-    max-width: 200px;
 }
 
 .ListView {

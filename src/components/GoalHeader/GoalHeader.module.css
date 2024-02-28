@@ -1,0 +1,49 @@
+.GoalHeaderTitle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-bottom: var(--gap-sm);
+}
+
+.GoalHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+}
+
+.GoalHeaderStats {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+}
+
+.GoalHeaderInfo_align_left {
+    justify-self: left;
+}
+
+.GoalHeaderInfo_align_right {
+    display: grid;
+    justify-items: end;
+    align-content: space-between;
+}
+
+.GoalPageActionsWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: var(--gap-xs);
+}
+
+.GoalHeaderParents {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.GoalHeaderParentDot {
+    background-color: var(--text-secondary);
+}
+
+.GoalHeaderStateDropdown_readOnly {
+    /* shift left to align with title when dropdown is not fill */
+    margin-left: calc(-1 * var(--gap-sm));
+}

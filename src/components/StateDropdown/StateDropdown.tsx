@@ -10,15 +10,18 @@ import { StateWrapper } from '../StateWrapper';
 interface StateDropdownProps {
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     label?: ComponentProps<typeof DropdownTrigger>['label'];
+    view?: ComponentProps<typeof DropdownTrigger>['view'];
     disabled?: boolean;
+    readOnly?: boolean;
+    className?: string;
     value?: Partial<StateType>;
     flowId?: string;
 
     onChange?: (state: StateType) => void;
 }
 
-export const StateDropdown = ({ label, value, flowId, disabled, onChange, ...props }: StateDropdownProps) => {
-    const defaultFlowEnabled = !flowId && !disabled;
+export const StateDropdown = ({ value, flowId, onChange, ...props }: StateDropdownProps) => {
+    const defaultFlowEnabled = !flowId && !props.disabled;
 
     const onStateChange = useCallback(
         (s: Partial<StateType>) => {
@@ -49,7 +52,7 @@ export const StateDropdown = ({ label, value, flowId, disabled, onChange, ...pro
 
     return (
         <Dropdown>
-            <DropdownTrigger label={label} {...props} readOnly={disabled}>
+            <DropdownTrigger {...props}>
                 {nullable(value, ({ hue, title }) => (
                     <StateWrapper hue={hue}>
                         <State color="var(--state-stroke)" title={title} />

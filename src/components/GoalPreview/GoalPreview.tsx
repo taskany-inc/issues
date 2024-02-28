@@ -1,17 +1,17 @@
 import React, { FC, useCallback, useRef } from 'react';
-import { Dot, ModalContent, ModalHeader, ModalPreview, nullable } from '@taskany/bricks';
-import { IconEditOutline } from '@taskany/icons';
+import { ModalContent, ModalHeader, ModalPreview, nullable } from '@taskany/bricks';
+import { IconEdit1Outline } from '@taskany/icons';
 import { Button } from '@taskany/bricks/harmony';
 
 import { routes } from '../../hooks/router';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
-import { GoalHeader } from '../GoalHeader';
+import { GoalHeader } from '../GoalHeader/GoalHeader';
 import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
 import { GoalActivityFeed } from '../GoalActivityFeed';
-import { IssueParent } from '../IssueParent';
 import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
+import { RelativeTime } from '../RelativeTime/RelativeTime';
 
 import { dispatchPreviewDeleteEvent, dispatchPreviewUpdateEvent, useGoalPreview } from './GoalPreviewProvider';
 import { tr } from './GoalPreview.i18n';
@@ -61,29 +61,24 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                     href={routes.goal(shortId)}
                     onCommentsClick={onCommentsClick}
                     onGoalStateChange={onGoalStateChange}
-                    actions={nullable(goal?._isEditable, () => (
+                    actions={
                         <>
                             <div />
-                            <Button
-                                text={tr('Edit')}
-                                iconLeft={<IconEditOutline size="xs" />}
-                                onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
-                            />
+                            <div className={s.GoalPreviewActionsWrapper}>
+                                {nullable(goal?._isEditable, () => (
+                                    <Button
+                                        text={tr('Edit')}
+                                        iconLeft={<IconEdit1Outline size="xs" />}
+                                        onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
+                                    />
+                                ))}
+                                {nullable(goal?.updatedAt, (date) => (
+                                    <RelativeTime kind="updated" date={date} />
+                                ))}
+                            </div>
                         </>
-                    ))}
-                >
-                    {Boolean(goal?.project?.parent?.length) &&
-                        nullable(goal?.project?.parent, (parent) => (
-                            <>
-                                <IssueParent as="span" mode="compact" parent={parent} size="m" />
-                                <Dot />
-                            </>
-                        ))}
-
-                    {nullable(goal?.project, (project) => (
-                        <IssueParent as="span" mode="compact" parent={project} size="m" />
-                    ))}
-                </GoalHeader>
+                    }
+                />
             </ModalHeader>
             <div className={s.ModalWrapper}>
                 <ModalContent className={s.ModalContent}>

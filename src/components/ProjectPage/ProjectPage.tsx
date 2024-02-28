@@ -20,7 +20,7 @@ import { StarButton } from '../StarButton/StarButton';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { safeGetUserName } from '../../utils/getUserName';
 import { FilteredPage } from '../FilteredPage/FilteredPage';
-import { IssueParent } from '../IssueParent';
+import { IssueParent } from '../IssueParent/IssueParent';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -133,7 +133,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 title={title}
                 description={description}
                 preTitle={nullable(project?.parent, (parent) => (
-                    <IssueParent parent={parent} mode="compact" />
+                    <IssueParent parent={parent} />
                 ))}
                 actions={nullable(id, () => (
                     <>
