@@ -1,5 +1,8 @@
-.SubmitButton {
+.FormControlButtons {
     margin-left: auto;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: var(--gap-xs);
 }
 
 .FormRow {
