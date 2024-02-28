@@ -406,6 +406,7 @@ model Team {
 }
 
 model AppConfig {
-  id   String @id @default(cuid())
-  logo String?
+  id      String  @id @default(cuid())
+  favicon String?
+  logo    String?
 }
