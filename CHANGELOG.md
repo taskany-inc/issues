@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.23.0](https://github.com/taskany-inc/issues/compare/v2.22.0...v2.23.0) (2024-02-28)
+
+
+### Features
+
+* custom logo ([cc93506](https://github.com/taskany-inc/issues/commit/cc93506bd88bbb2de0419b4f1cdf556f32ea81ce))
+* **Dropdown:** create component ([668aae3](https://github.com/taskany-inc/issues/commit/668aae3ee210d36bce21f3a48f791e065703345e))
+* **EstimateDropdown:** create component ([b36bc3c](https://github.com/taskany-inc/issues/commit/b36bc3c395f2e4bbc95991853e666daa437ad859))
+* **GoalForm:** harmony vision ([deead26](https://github.com/taskany-inc/issues/commit/deead26c30fa39bddf937c36852aa6876ad6b1a1))
+* **GoalParentDropdown:** create component ([73794f9](https://github.com/taskany-inc/issues/commit/73794f907dc77a46d3db83872f7c729319e21e09))
+* **GoalPreview:** background color updated ([0c7ddb2](https://github.com/taskany-inc/issues/commit/0c7ddb21b0dc4b9924b01bb0d7cba96848229d71))
+* **NewGoalCriteria:** preview in goal lists ([578a4c9](https://github.com/taskany-inc/issues/commit/578a4c9ac8d1fd3efd3a22f417ad1e1b0050c7e5))
+* **OfflineBanner:** update offline banner from bricks ([9892306](https://github.com/taskany-inc/issues/commit/9892306ebd228ea3485091676407a52d14d820ea))
+* **PriorityDropdown:** create component ([ec2b249](https://github.com/taskany-inc/issues/commit/ec2b249095809cd1e7ece571c8069ace9b3da273))
+* **StateDropdown:** create component ([1cc1216](https://github.com/taskany-inc/issues/commit/1cc12167f9711889f10ae689bec65753234c37b2))
+* **TagCombobox:** create component ([f1f1fe3](https://github.com/taskany-inc/issues/commit/f1f1fe35e6dfbe49afdd8a62a9c44caf6957c8f4))
+* team units ([85e56ef](https://github.com/taskany-inc/issues/commit/85e56efa557d18be62f2e033ac2c635ba1207901))
+* **UserDropdown:** create component ([eccad83](https://github.com/taskany-inc/issues/commit/eccad83d2e0238d29cf7171b729255c9547a1ada))
+
+
+### Bug Fixes
+
+* app config seed ([5413c20](https://github.com/taskany-inc/issues/commit/5413c2052c1f01aaba1b3ade4213b1f26f7bb802))
+* appConfig prefetch ([0248d24](https://github.com/taskany-inc/issues/commit/0248d244a5487c4d27fc48019280e7c3dd50b198))
+* **CriteriaForm:** `Weight` label size ([6d80dd8](https://github.com/taskany-inc/issues/commit/6d80dd82b6a8fe04f04375b0e33a1909173d7fdf))
+* **CriteriaForm:** enable title edit ([6a205af](https://github.com/taskany-inc/issues/commit/6a205af0b46d5e0db17a22c1cfa3196fb1fa6c5c))
+* **FilterAutoCompleteInput:** remove autofocus ([cb2c38d](https://github.com/taskany-inc/issues/commit/cb2c38db62533b9dd9038a10301f2b493e8fd129))
+* **GoalCriteria:** reset form action ([978ac2a](https://github.com/taskany-inc/issues/commit/978ac2aa45d79ca26d118a681f87d1c91fc14128))
+* goalPreview open when clicked in an empty area inside GoalListItem ([2d8b5a0](https://github.com/taskany-inc/issues/commit/2d8b5a04e0b67f129463a0fa56da0ae9b319961f))
+* **NewGoalCriteria:** criteria should be checked when isDone is passed ([d9d2aa7](https://github.com/taskany-inc/issues/commit/d9d2aa7976ed5a9a90db1760542005ceedbb7191))
+
 ## [2.22.0](https://github.com/taskany-inc/issues/compare/v2.21.0...v2.22.0) (2024-02-22)
 
 
