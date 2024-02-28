@@ -126,6 +126,7 @@ interface CriteriaFormProps {
 
     setMode: (mode: CriteriaFormMode) => void;
     onSubmit: (values: CriteriaFormValues) => void;
+    onReset: () => void;
     onItemChange?: (item?: SuggestItem) => void;
     onInputChange?: (value?: string) => void;
     validateBindingsFor: (selectedId: string) => Promise<null>;
@@ -237,22 +238,23 @@ export const CriteriaForm = ({
     onInputChange,
     onItemChange,
     onSubmit,
+    onReset,
     items,
     withModeSwitch,
     validityData,
     validateBindingsFor,
     values,
     value,
-    mode,
+    mode: defaultMode,
     setMode,
 }: CriteriaFormProps) => {
     const [showWeightInput, setShowWeightInput] = useState(Boolean(values?.title));
 
-    const { control, watch, setValue, register, resetField, handleSubmit, setError, trigger } =
+    const { control, watch, setValue, register, resetField, handleSubmit, setError, trigger, reset } =
         useForm<CriteriaFormValues>({
             resolver: zodResolver(patchZodSchema(validityData, validateBindingsFor, values)),
             defaultValues: {
-                mode,
+                mode: defaultMode,
                 title: '',
                 weight: '',
             },
@@ -270,6 +272,7 @@ export const CriteriaForm = ({
 
     const title = watch('title');
     const selected = watch('selected');
+    const mode = watch('mode');
 
     useEffect(() => {
         const sub = watch((currentValues, { name, type }) => {
@@ -337,8 +340,25 @@ export const CriteriaForm = ({
         return false;
     }, [mode, title, selected?.id]);
 
+    const resetHandler = useCallback(() => {
+        if (!isEditMode) {
+            setShowWeightInput(false);
+        }
+
+        reset(values);
+        onReset();
+    }, [reset, onReset, isEditMode, values]);
+
+    const onFormSubmit = useCallback<typeof onSubmit>(
+        (values) => {
+            onSubmit(values);
+            resetHandler();
+        },
+        [onSubmit, resetHandler],
+    );
+
     return (
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form onSubmit={handleSubmit(onFormSubmit)} onReset={resetHandler}>
             <GoalSelect
                 items={items}
                 value={value}
@@ -367,6 +387,7 @@ export const CriteriaForm = ({
                             control={control}
                             render={({ field }) => (
                                 <AutoCompleteRadioGroup
+                                    key={field.value}
                                     title={tr('Mode')}
                                     items={radios}
                                     {...field}
@@ -403,12 +424,10 @@ export const CriteriaForm = ({
                             />
                         ))}
 
-                        <Button
-                            type="submit"
-                            text={isEditMode ? tr('Save') : tr('Add')}
-                            view="primary"
-                            className={s.SubmitButton}
-                        />
+                        <div className={s.FormControlButtons}>
+                            <Button type="reset" text={tr('Reset')} view="default" />
+                            <Button type="submit" text={isEditMode ? tr('Save') : tr('Add')} view="primary" />
+                        </div>
                     </div>
                 </>
             </GoalSelect>

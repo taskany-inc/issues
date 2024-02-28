@@ -66,7 +66,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
             {
                 id: versa ? selectedGoal?.id : id,
             },
-            { enabled: selectedGoal != null, cacheTime: 0 },
+            { cacheTime: 0, enabled: versa ? selectedGoal?.id != null : !!id },
         ),
     ]);
 
@@ -122,6 +122,12 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
         [id, versa, validateGoalCriteriaBindings],
     );
 
+    const handleReset = useCallback(() => {
+        setQuery('');
+        setSelectedGoal(values?.selected);
+        setMode(defaultMode);
+    }, [values, defaultMode]);
+
     return (
         <CriteriaForm
             mode={mode}
@@ -131,6 +137,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
             onInputChange={setQuery}
             onItemChange={handleGoalChange}
             onSubmit={onSubmit}
+            onReset={handleReset}
             items={itemsToRender}
             value={selectedGoals}
             validityData={validityData}
