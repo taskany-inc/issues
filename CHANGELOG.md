@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.24.0](https://github.com/taskany-inc/issues/compare/v2.23.0...v2.24.0) (2024-02-29)
+
+
+### Features
+
+* change goal preview header to harmony view ([50ac406](https://github.com/taskany-inc/issues/commit/50ac406803cbf2124ef52a3bf3a8e2efe8eca9f7))
+* config logo ([6089542](https://github.com/taskany-inc/issues/commit/6089542860d647685727caa41056c6fdc6e6576d))
+
+
+### Bug Fixes
+
+* **GoalTableList:** immediatly mark opening goal in preview ([2581e17](https://github.com/taskany-inc/issues/commit/2581e17d37e8841df1c1c561343c9b8ed8f3f816))
+* **GoalTableList:** move open preview click handler inside `<GoalTableList />` ([77746e5](https://github.com/taskany-inc/issues/commit/77746e5a7cd4982394d8a8a55f8e5d3081a7eb1f))
+
 ## [2.23.0](https://github.com/taskany-inc/issues/compare/v2.22.0...v2.23.0) (2024-02-28)
 
 
