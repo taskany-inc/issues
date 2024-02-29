@@ -1,4 +1,4 @@
-import { ComponentProps, MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
+import { ComponentProps, useCallback, useEffect, useMemo } from 'react';
 import { ListView, nullable } from '@taskany/bricks';
 
 import { QueryState } from '../hooks/useUrlFilterParams';
@@ -51,17 +51,6 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, on
 
     useFMPMetric(!!data);
 
-    const onGoalPreviewShow = useCallback(
-        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
-            (e) => {
-                if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
-
-                e.preventDefault();
-                setPreview(goal._shortId, goal);
-            },
-        [setPreview],
-    );
-
     const projectsOnScreen = useMemo(() => {
         const pages = data?.pages || [];
 
@@ -81,7 +70,6 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, on
                 <ProjectListItemConnected
                     key={project.id}
                     project={project}
-                    onClickProvider={onGoalPreviewShow}
                     queryState={queryState}
                     onTagClick={onTagClick}
                 />
