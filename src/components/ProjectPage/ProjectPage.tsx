@@ -1,4 +1,4 @@
-import { MouseEventHandler, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { ListView, nullable } from '@taskany/bricks';
 
 import { Page } from '../Page/Page';
@@ -74,17 +74,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
             unsubDelete();
         };
     }, [on, utils.project.getDeepInfo, utils.project.getById]);
-
-    const onGoalPreviewShow = useCallback(
-        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
-            (e) => {
-                if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
-
-                e.preventDefault();
-                setPreview(goal._shortId, goal);
-            },
-        [setPreview],
-    );
 
     useEffect(() => {
         if (!project || project.personal) return;
@@ -174,7 +163,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                             visible
                             project={p}
                             onTagClick={setTagsFilterOutside}
-                            onClickProvider={onGoalPreviewShow}
                             queryState={queryState}
                         />
                     ))}

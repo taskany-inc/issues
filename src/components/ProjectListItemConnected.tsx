@@ -30,7 +30,6 @@ const onProjectClickHandler = (e: React.MouseEvent) => {
 export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     queryState,
     project,
-    onClickProvider,
     onTagClick,
     ...props
 }) => {
@@ -80,14 +79,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
             project={project}
             goals={nullable(projectDeepInfo?.goals, (goals) => (
                 <TreeViewElement>
-                    <GoalTableList
-                        goals={goals}
-                        onTagClick={onTagClick}
-                        onGoalPreviewShow={(goal) => (e) => {
-                            onClickProvider?.(goal)(e);
-                            onProjectClickHandler(e);
-                        }}
-                    />
+                    <GoalTableList goals={goals} onTagClick={onTagClick} onGoalClick={onProjectClickHandler} />
                 </TreeViewElement>
             ))}
             {...props}
@@ -99,13 +91,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                 )}
             </TreeViewElement>
             {childrenProjects.map((p) => (
-                <ProjectListItemConnected
-                    key={p.id}
-                    project={p}
-                    queryState={queryState}
-                    onClickProvider={onClickProvider}
-                    titleSize="m"
-                />
+                <ProjectListItemConnected key={p.id} project={p} queryState={queryState} titleSize="m" />
             ))}
         </ProjectListItemCollapsable>
     );

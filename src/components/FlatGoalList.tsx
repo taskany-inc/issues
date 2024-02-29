@@ -1,4 +1,4 @@
-import { ComponentProps, MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
+import { ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import { ListView, nullable } from '@taskany/bricks';
 
 import { QueryState } from '../hooks/useUrlFilterParams';
@@ -20,7 +20,7 @@ const pageSize = 20;
 
 export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, onTagClick }) => {
     const utils = trpc.useContext();
-    const { preview, setPreview, on } = useGoalPreview();
+    const { setPreview, on } = useGoalPreview();
 
     const [, setPage] = useState(0);
     const { data, fetchNextPage, hasNextPage } = trpc.goal.getBatch.useInfiniteQuery(
@@ -59,23 +59,6 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, onTagClick }
         setPage((prev) => prev++);
     }, [fetchNextPage]);
 
-    useEffect(() => {
-        const isGoalDeletedAlready = preview && !goalsOnScreen?.some((g) => g.id === preview.id);
-
-        if (isGoalDeletedAlready) setPreview(null);
-    }, [goalsOnScreen, preview, setPreview]);
-
-    const onGoalPreviewShow = useCallback(
-        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
-            (e) => {
-                if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
-
-                e.preventDefault();
-                setPreview(goal._shortId, goal);
-            },
-        [setPreview],
-    );
-
     const handleItemEnter = useCallback(
         (goal: NonNullable<GoalByIdReturnType>) => {
             setPreview(goal._shortId, goal);
@@ -86,7 +69,7 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ queryState, onTagClick }
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {nullable(goalsOnScreen, (goals) => (
-                <GoalTableList goals={goals} onTagClick={onTagClick} onGoalPreviewShow={onGoalPreviewShow} />
+                <GoalTableList goals={goals} onTagClick={onTagClick} />
             ))}
 
             {nullable(hasNextPage, () => (

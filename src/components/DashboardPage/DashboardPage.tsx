@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { ListView, nullable } from '@taskany/bricks';
 import { TreeViewElement } from '@taskany/bricks/harmony';
 
@@ -61,7 +61,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
     useFMPMetric(!!data);
 
-    const { setPreview, preview, on } = useGoalPreview();
+    const { setPreview, on } = useGoalPreview();
 
     useEffect(() => {
         const unsubUpdate = on('on:goal:update', () => {
@@ -77,23 +77,6 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             unsubDelete();
         };
     }, [on, utils.project.getUserProjectsWithGoals]);
-
-    useEffect(() => {
-        const isGoalDeletedAlready = preview && !goals?.some((g) => g.id === preview.id);
-
-        if (isGoalDeletedAlready) setPreview(null);
-    }, [goals, preview, setPreview]);
-
-    const onGoalPreviewShow = useCallback(
-        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
-            (e) => {
-                if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
-
-                e.preventDefault();
-                setPreview(goal._shortId, goal);
-            },
-        [setPreview],
-    );
 
     const onFilterStar = useCallback(async () => {
         await utils.filter.getById.invalidate();
@@ -147,7 +130,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                             href={routes.project(project.id)}
                             goals={nullable(goals, (g) => (
                                 <TreeViewElement>
-                                    <GoalTableList goals={g} onGoalPreviewShow={onGoalPreviewShow} />
+                                    <GoalTableList goals={g} />
                                 </TreeViewElement>
                             ))}
                         >

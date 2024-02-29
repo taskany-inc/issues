@@ -1,5 +1,5 @@
 import { Badge, State, Table, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
-import { MouseEventHandler, useMemo } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { Link, ListViewItem, nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
@@ -21,18 +21,44 @@ import s from './GoalTableList.module.css';
 
 interface GoalTableListProps<T> {
     goals: T[];
-    onGoalPreviewShow: (goal: T) => MouseEventHandler<HTMLAnchorElement>;
+    onGoalPreviewShow?: (goal: T) => MouseEventHandler<HTMLAnchorElement>;
+    onGoalClick?: MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
 }
 
 export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>>({
     goals,
-    onGoalPreviewShow,
+    onGoalClick,
     onTagClick,
     ...attrs
 }: GoalTableListProps<T>) => {
     const locale = useLocale();
-    const { shortId, preview } = useGoalPreview();
+    const { shortId, preview, setPreview, on } = useGoalPreview();
+
+    useEffect(() => {
+        const unsubDelete = on('on:goal:delete', (updatedId) => {
+            const idInList = goals.find(({ _shortId }) => _shortId === updatedId);
+            if (idInList) {
+                setPreview(null);
+            }
+        });
+
+        return () => {
+            unsubDelete();
+        };
+    }, [goals, preview, setPreview, on]);
+
+    const onGoalPreviewShow = useCallback(
+        (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
+            (e) => {
+                if (e.metaKey || e.ctrlKey || !goal?._shortId) return;
+
+                e.preventDefault();
+                setPreview(goal._shortId, goal);
+                onGoalClick?.(e);
+            },
+        [setPreview, onGoalClick],
+    );
 
     const data = useMemo(
         () =>
