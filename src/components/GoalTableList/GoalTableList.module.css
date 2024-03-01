@@ -1,4 +1,4 @@
-.Title {
+.TableListItemTitle {
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
@@ -9,6 +9,10 @@
     flex-shrink: 1;
 }
 
+.GoalTitle {
+    color: var(--text-primary);
+}
+
 .Owner {
     max-width: var(--table-cell-width);
     white-space: nowrap;
@@ -16,4 +20,8 @@
 
 .RelativeTime {
     font-size: var(--font-size-xs);
+}
+
+.GoalTableColumnSecondary {
+    color: var(--text-secondary);
 }

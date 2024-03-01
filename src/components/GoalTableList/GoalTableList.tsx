@@ -68,7 +68,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     {
                         content: (
                             <>
-                                <Text>{goal.title}</Text>
+                                <Text className={s.GoalTitle}>{goal.title}</Text>
                                 {nullable(goal.tags, (tags) => (
                                     <TagsList>
                                         {tags.map((tag) => (
@@ -87,12 +87,11 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                                 )}
                             </>
                         ),
-                        className: s.Title,
+                        className: s.TableListItemTitle,
                     },
                     {
                         content: nullable(goal._count?.comments, (count) => (
                             <Badge
-                                color="inherit"
                                 size="s"
                                 weight="regular"
                                 text={count?.toString()}
@@ -100,6 +99,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                             />
                         )),
                         width: 40,
+                        className: s.GoalTableColumnSecondary,
                     },
                     {
                         content: (
@@ -120,6 +120,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                             />
                         )),
                         width: 172,
+                        className: s.GoalTableColumnSecondary,
                     },
                     {
                         content: nullable(goal.participants?.map(safeUserData).filter(Boolean), (participants) => (
@@ -129,7 +130,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     },
                     {
                         content: nullable(goal.estimate, (estimate) => (
-                            <Text size="s" color="inherit">
+                            <Text size="s">
                                 {formateEstimate(estimate, {
                                     type: goal.estimateType === 'Year' ? goal.estimateType : 'Quarter',
                                     locale,
@@ -137,14 +138,14 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                             </Text>
                         )),
                         width: 95,
+                        className: s.GoalTableColumnSecondary,
                     },
                     {
                         content: nullable(goal.priority?.title, (title) => (
-                            <Text size="s" color="inherit">
-                                {getPriorityText(title)}
-                            </Text>
+                            <Text size="s">{getPriorityText(title)}</Text>
                         )),
                         width: 90,
+                        className: s.GoalTableColumnSecondary,
                     },
                     {
                         content: goal._achivedCriteriaWeight != null && goal.id != null && (
