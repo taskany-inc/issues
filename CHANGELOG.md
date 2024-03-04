@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.24.1](https://github.com/taskany-inc/issues/compare/v2.24.0...v2.24.1) (2024-03-04)
+
+
+### Bug Fixes
+
+* **GoalListItem): feat(GoalTableList:** set title color to primary ([58d09e2](https://github.com/taskany-inc/issues/commit/58d09e259a879f4212e699f4706b0a7e79385f44))
+
 ## [2.24.0](https://github.com/taskany-inc/issues/compare/v2.23.0...v2.24.0) (2024-02-29)
 
 
