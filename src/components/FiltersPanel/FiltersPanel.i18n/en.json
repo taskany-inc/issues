@@ -10,5 +10,6 @@
     "Sort": "Sort",
     "Issuer": "Issuer",
     "Participant": "Participant",
-    "Filter": "Filter"
+    "Filter": "Filter",
+    "Reset": "Reset"
 }

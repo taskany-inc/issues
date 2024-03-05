@@ -6,10 +6,8 @@ import { trpc } from '../../utils/trpcClient';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { Page } from '../Page/Page';
-import { CommonHeader } from '../CommonHeader';
-import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
-import { safeGetUserName } from '../../utils/getUserName';
 import { FilteredPage } from '../FilteredPage/FilteredPage';
+import { getPageTitle } from '../../utils/getPageTitle';
 import { GroupedGoalList } from '../GroupedGoalList';
 import { FlatGoalList } from '../FlatGoalList';
 
@@ -18,11 +16,11 @@ import { tr } from './GoalsPage.i18n';
 export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const utils = trpc.useContext();
 
-    const { preset, shadowPreset, userFilters } = useFiltersPreset({
+    const { preset, userFilters } = useFiltersPreset({
         defaultPresetFallback,
     });
 
-    const { currentPreset, queryState, groupBy, setTagsFilterOutside, setPreset, setGroupBy } = useUrlFilterParams({
+    const { currentPreset, queryState, groupBy, setTagsFilterOutside, setGroupBy } = useUrlFilterParams({
         preset,
     });
 
@@ -34,33 +32,16 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         await utils.filter.getById.invalidate();
     }, [utils]);
 
-    const description =
-        currentPreset && currentPreset.description
-            ? currentPreset.description
-            : tr('These are goals across all projects');
-
     const groupedView = groupBy === 'project';
 
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
-            <CommonHeader
-                title={
-                    <PageTitlePreset
-                        activityId={user.activityId}
-                        currentPresetActivityId={currentPreset?.activityId}
-                        currentPresetActivityUserName={safeGetUserName(currentPreset?.activity)}
-                        currentPresetTitle={currentPreset?.title}
-                        shadowPresetActivityId={shadowPreset?.activityId}
-                        shadowPresetActivityUserName={safeGetUserName(shadowPreset?.activity)}
-                        shadowPresetId={shadowPreset?.id}
-                        shadowPresetTitle={shadowPreset?.title}
-                        title={tr('Goals')}
-                        setPreset={setPreset}
-                    />
-                }
-                description={description}
-            />
             <FilteredPage
+                title={getPageTitle({
+                    title: tr('Goals'),
+                    shadowPresetTitle: currentPreset?.title,
+                    currentPresetTitle: currentPreset?.title,
+                })}
                 total={data?.count || 0}
                 counter={data?.filtered || 0}
                 filterPreset={currentPreset}

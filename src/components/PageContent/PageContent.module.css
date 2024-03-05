@@ -1,3 +1,4 @@
 .PageContent {
-    padding: 10px 40px 0 40px;
+    margin: 10px var(--gap-sm) 0;
+    padding: var(--gap-m) var(--gap-s);
 }

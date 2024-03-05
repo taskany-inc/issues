@@ -20,7 +20,7 @@ import { tr } from './FilterPopup.i18n';
 interface FilterPopupProps {
     visible: boolean;
     switchVisible: (val: boolean) => void;
-    filterRef: React.RefObject<HTMLSpanElement>;
+    filterTriggerRef: React.RefObject<HTMLSpanElement>;
     onApplyClick: () => void;
     activeTab?: string;
 }
@@ -81,7 +81,7 @@ const StyledPopupOverlay = styled.div`
 
 export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = ({
     activeTab,
-    filterRef,
+    filterTriggerRef,
     visible,
     switchVisible,
     onApplyClick,
@@ -89,7 +89,7 @@ export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = 
 }) => {
     const popupWrapperRef = useRef<HTMLDivElement>(null);
 
-    useClickOutside(filterRef, ({ target }) => {
+    useClickOutside(filterTriggerRef, ({ target }) => {
         if (visible && !popupWrapperRef.current?.contains(target as HTMLElement)) {
             switchVisible(false);
         }
@@ -107,12 +107,12 @@ export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = 
                 <>
                     <StyledPopupOverlay />
                     <StyledPopup
-                        reference={filterRef}
+                        reference={filterTriggerRef}
                         interactive
                         placement="bottom-start"
                         visible={visible}
                         {...onESC}
-                        offset={[-5, 0]}
+                        offset={[0, 10]}
                     >
                         <StyledPopupWrapper key={String(visible)} ref={popupWrapperRef}>
                             <StyledTabs active={activeTab} layout="vertical">

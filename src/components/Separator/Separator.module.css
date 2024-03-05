@@ -1,0 +1,12 @@
+.Separator {
+    display: flex;
+    height: 100%;
+    box-sizing: border-box;
+    padding: var(--gap-xs) 0;
+}
+
+.Separator:after {
+    content: '';
+    height: 100%;
+    border-right: 1px solid var(--gray-900);
+}

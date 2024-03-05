@@ -5,22 +5,15 @@ import { Page } from '../Page/Page';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
+import { getPageTitle } from '../../utils/getPageTitle';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { trpc } from '../../utils/trpcClient';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
-import { PageTitlePreset } from '../PageTitlePreset/PageTitlePreset';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { CommonHeader } from '../CommonHeader';
-import { useProjectResource } from '../../hooks/useProjectResource';
-import { WatchButton } from '../WatchButton/WatchButton';
-import { StarButton } from '../StarButton/StarButton';
-import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
-import { safeGetUserName } from '../../utils/getUserName';
 import { FilteredPage } from '../FilteredPage/FilteredPage';
-import { IssueParent } from '../IssueParent/IssueParent';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -31,9 +24,9 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
     const utils = trpc.useContext();
 
-    const { preset, shadowPreset, userFilters } = useFiltersPreset({ defaultPresetFallback });
+    const { preset, userFilters } = useFiltersPreset({ defaultPresetFallback });
 
-    const { currentPreset, queryState, setTagsFilterOutside, setPreset } = useUrlFilterParams({
+    const { currentPreset, queryState, setTagsFilterOutside } = useUrlFilterParams({
         preset,
     });
 
@@ -94,24 +87,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         await utils.filter.getById.invalidate();
     }, [utils]);
 
-    const title = (
-        <PageTitlePreset
-            activityId={user.activityId}
-            currentPresetActivityId={currentPreset?.activityId}
-            currentPresetActivityUserName={safeGetUserName(currentPreset?.activity)}
-            currentPresetTitle={currentPreset?.title}
-            shadowPresetActivityId={shadowPreset?.activityId}
-            shadowPresetActivityUserName={safeGetUserName(shadowPreset?.activity)}
-            shadowPresetId={shadowPreset?.id}
-            shadowPresetTitle={shadowPreset?.title}
-            title={project?.title || tr('Projects')}
-            setPreset={setPreset}
-        />
-    );
-    const description = currentPreset && currentPreset.description ? currentPreset.description : project?.description;
-
-    const { toggleProjectWatching, toggleProjectStar } = useProjectResource(id);
-
     const handleItemEnter = useCallback(
         (goal: NonNullable<GoalByIdReturnType>) => {
             setPreview(goal._shortId, goal);
@@ -129,26 +104,20 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 })
                 .join('')}
         >
-            <CommonHeader
-                title={title}
-                description={description}
-                preTitle={nullable(project?.parent, (parent) => (
-                    <IssueParent parent={parent} />
-                ))}
-                actions={nullable(id, () => (
-                    <>
-                        <WatchButton watcher={project?._isWatching} onToggle={toggleProjectWatching} />
-                        <StarButton
-                            stargizer={project?._isStarred}
-                            count={project?._count.stargizers}
-                            onToggle={toggleProjectStar}
-                        />
-                    </>
-                ))}
-            >
-                <ProjectPageTabs id={id} editable={project?._isEditable} />
-            </CommonHeader>
+            {/* <>
+                <WatchButton watcher={project?._isWatching} onToggle={toggleProjectWatching} />
+                <StarButton
+                    stargizer={project?._isStarred}
+                    count={project?._count.stargizers}
+                    onToggle={toggleProjectStar}
+                />
+            </> */}
             <FilteredPage
+                title={getPageTitle({
+                    title: project?.title || tr('Projects'),
+                    shadowPresetTitle: currentPreset?.title,
+                    currentPresetTitle: currentPreset?.title,
+                })}
                 total={projectDeepInfo?.meta?.count}
                 counter={projectDeepInfo?.goals?.length}
                 filterPreset={currentPreset}
