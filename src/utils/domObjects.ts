@@ -13,6 +13,7 @@ export const createGoalItem = header.add('createGoalItem');
 export const createPersonalGoalItem = header.add('createPersonalGoalItem');
 
 export const filtersPanel = DO('filtersPanel');
+export const filtersPanelTitle = filtersPanel.add('title');
 export const filtersPanelResetButton = filtersPanel.add('resetButton');
 
 export const projectCreateForm = DO('projectCreateForm');

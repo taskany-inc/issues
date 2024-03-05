@@ -9,17 +9,15 @@ import {
     projectKeyPredictorError,
     projectKeyPredictorHint,
     projectKeyPredictorInput,
-    pageDescription,
-    pageTitle,
     projectSubmitButton,
     projectTitleInput,
     projectListItemTitle,
     projectListItem,
-    pageActiveTabItem,
     createGoalInlineControl,
     goalForm,
     filtersPanelResetButton,
     projectsCombobox,
+    filtersPanelTitle,
 } from '../../src/utils/domObjects';
 import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
@@ -213,13 +211,8 @@ describe('Projects', () => {
             cy.get(projectListItemTitle.query).should('contain.text', testProjectTitle);
             cy.get(projectListItemTitle.query).filter(`:contains(${testProjectTitle})`).last().click({ force: true });
             // wait for correct page
-            cy.get(pageTitle.query).should('contain', testProjectTitle);
+            cy.get(filtersPanelTitle.query).should('contain', testProjectTitle);
             cy.url().should('equal', exactUrl(routes.project(testProjectKey)));
-        });
-
-        it('should contains correct data', () => {
-            cy.get(pageDescription.query).should('contain', testProjectDescription);
-            cy.get(pageActiveTabItem.query).contains('Goals');
         });
 
         it('should visible create goal control', () => {

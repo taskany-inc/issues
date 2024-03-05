@@ -1,18 +1,9 @@
-import { FC, ReactNode, useCallback, memo, useRef, useState, useEffect, useMemo } from 'react';
-import {
-    FiltersCounter,
-    FiltersCounterContainer,
-    FiltersMenuContainer,
-    FiltersMenuItem,
-    FiltersPanelContainer,
-    FiltersPanelContent,
-    FiltersSearchContainer,
-} from '@taskany/bricks';
-import styled from 'styled-components';
+import { FC, useCallback, memo, useState, useEffect, useMemo, useRef } from 'react';
+import { Button } from '@taskany/bricks/harmony';
+import { IconAddOutline } from '@taskany/icons';
 
 import { filtersTakeCount } from '../../utils/filters';
 import { FilterQueryState, QueryState, buildURLSearchParams } from '../../hooks/useUrlFilterParams';
-import { SearchFilter } from '../SearchFilter';
 import { ProjectFilter } from '../ProjectFilter';
 import { TagFilter } from '../TagFilter';
 import { EstimateFilter } from '../EstimateFilter';
@@ -25,17 +16,24 @@ import { trpc } from '../../utils/trpcClient';
 import { SortFilter } from '../SortFilter/SortFilter';
 import { FilterPopup } from '../FilterPopup/FilterPopup';
 import { getUserName, prepareUserDataFromActivity } from '../../utils/getUserName';
-import { filtersPanel } from '../../utils/domObjects';
+import { filtersPanel, filtersPanelTitle, filtersPanelResetButton } from '../../utils/domObjects';
+import {
+    FilterBarCounter,
+    FiltersBarLayoutSwitch,
+    FiltersBarControlGroup,
+    FiltersBarViewDropdown,
+    FiltersBar,
+    FiltersBarItem,
+    FiltersBarTitle,
+    LayoutType,
+    layoutType,
+} from '../FiltersBar/FiltersBar';
+import { SearchFilter } from '../SearchFilter';
+import { Separator } from '../Separator/Separator';
 
 import { tr } from './FiltersPanel.i18n';
-import s from './FiltersPanel.module.css';
 
 type Users = React.ComponentProps<typeof UserFilter>['users'];
-
-const StyledFiltersMenuContainer = styled(FiltersMenuContainer)`
-    display: flex;
-    align-items: center;
-`;
 
 function mapUserToView(list: ActivityByIdReturnType[]): Users {
     return list.reduce<Users>((acc, activity) => {
@@ -58,23 +56,25 @@ const useQueryOptions = {
 };
 
 export const FiltersPanel: FC<{
-    children?: ReactNode;
-    loading?: boolean;
+    title: string;
     total?: number;
     counter?: number;
+    loading?: boolean;
     queryState?: QueryState;
     queryFilterState?: FilterQueryState;
     onSearchChange: (search: string) => void;
     onFilterApply?: (state: Partial<QueryState>) => void;
+    onFilterReset: () => void;
 }> = memo(
-    ({ children, loading, total = 0, counter = 0, queryState, queryFilterState, onSearchChange, onFilterApply }) => {
-        const filterNodeRef = useRef<HTMLSpanElement>(null);
+    ({ title, total = 0, counter = 0, onSearchChange, onFilterReset, queryState, queryFilterState, onFilterApply }) => {
+        const [layout] = useState<LayoutType>(layoutType.table);
+        const filterTriggerRef = useRef<HTMLButtonElement>(null);
+        const [filterVisible, setFilterVisible] = useState(false);
         const [ownersQuery, setOwnersQuery] = useState('');
         const [issuersQuery, setIssuersQuery] = useState('');
         const [participantsQuery, setParticipantsQuery] = useState('');
         const [projectsQuery, setProjectsQuery] = useState('');
         const [tagsQuery, setTagsQuery] = useState('');
-        const [filterVisible, setFilterVisible] = useState(false);
         const [filterQuery, setFilterQuery] = useState<Partial<FilterQueryState> | undefined>(queryFilterState);
 
         useEffect(() => {
@@ -144,6 +144,11 @@ export const FiltersPanel: FC<{
             onFilterApply?.({ ...filterQuery });
         }, [filterQuery, onFilterApply]);
 
+        const onResetClick = useCallback(() => {
+            setFilterVisible(false);
+            onFilterReset();
+        }, [onFilterReset]);
+
         const isFiltersEmpty = useMemo(
             () => !queryFilterState || !Array.from(buildURLSearchParams(queryFilterState)).length,
             [queryFilterState],
@@ -151,27 +156,42 @@ export const FiltersPanel: FC<{
 
         return (
             <>
-                <FiltersPanelContainer className={s.FiltersPanel} loading={loading} {...filtersPanel.attr}>
-                    <FiltersPanelContent>
-                        <FiltersSearchContainer>
-                            <SearchFilter defaultValue={queryState?.query} onChange={onSearchChange} />
-                        </FiltersSearchContainer>
-                        <FiltersCounterContainer>
-                            <FiltersCounter total={total} counter={counter} />
-                        </FiltersCounterContainer>
-                        <StyledFiltersMenuContainer>
-                            <FiltersMenuItem
-                                ref={filterNodeRef}
-                                active={!isFiltersEmpty}
-                                onClick={() => setFilterVisible((p) => !p)}
-                            >
-                                {tr('Filter')}
-                            </FiltersMenuItem>
-
-                            {children}
-                        </StyledFiltersMenuContainer>
-                    </FiltersPanelContent>
-                </FiltersPanelContainer>
+                <FiltersBar {...filtersPanel.attr}>
+                    <FiltersBarItem>
+                        <FiltersBarTitle {...filtersPanelTitle.attr}>{title}</FiltersBarTitle>
+                    </FiltersBarItem>
+                    <Separator />
+                    <FiltersBarItem layout="fill">
+                        <FiltersBarControlGroup>
+                            {isFiltersEmpty ? (
+                                <Button
+                                    key="filter"
+                                    ref={filterTriggerRef}
+                                    text={tr('Filter')}
+                                    onClick={() => setFilterVisible((val) => !val)}
+                                    iconLeft={<IconAddOutline size="xxs" />}
+                                />
+                            ) : (
+                                <Button
+                                    key="resetFilter"
+                                    onClick={onResetClick}
+                                    text={tr('Reset')}
+                                    {...filtersPanelResetButton.attr}
+                                />
+                            )}
+                            <FilterBarCounter total={total} counter={counter} />
+                        </FiltersBarControlGroup>
+                        <FiltersBarLayoutSwitch value={layout} />
+                    </FiltersBarItem>
+                    <Separator />
+                    <FiltersBarItem>
+                        <FiltersBarViewDropdown />
+                    </FiltersBarItem>
+                    <Separator />
+                    <FiltersBarItem>
+                        <SearchFilter defaultValue={queryState?.query} onChange={onSearchChange} />
+                    </FiltersBarItem>
+                </FiltersBar>
                 <FiltersPanelApplied
                     queryState={queryState}
                     states={states}
@@ -184,7 +204,7 @@ export const FiltersPanel: FC<{
                 <FilterPopup
                     visible={filterVisible}
                     onApplyClick={onApplyClick}
-                    filterRef={filterNodeRef}
+                    filterTriggerRef={filterTriggerRef}
                     switchVisible={setFilterVisible}
                     activeTab="state"
                 >

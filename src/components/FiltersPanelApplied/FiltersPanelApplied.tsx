@@ -13,6 +13,7 @@ import { SortableProps, sortFilterTr } from '../SortFilter/SortFilter';
 import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './FiltersPanelApplied.i18n';
+import s from './FiltersPanelApplied.module.css';
 
 interface FiltersPanelAppliedProps {
     queryState?: QueryState;
@@ -136,7 +137,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }
 
     return (
-        <FiltersApplied size="s" weight="bold" color={gray7}>
+        <FiltersApplied className={s.FiltersPanelApplied} size="s" weight="bold" color={gray7}>
             {infoString}
         </FiltersApplied>
     );

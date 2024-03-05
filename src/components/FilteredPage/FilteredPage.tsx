@@ -1,32 +1,23 @@
 import { useCallback } from 'react';
-import styled from 'styled-components';
-import { FiltersAction, nullable } from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { IconStarOutline, IconStarSolid } from '@taskany/icons';
 
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
-import { useFilterResource } from '../../hooks/useFilterResource';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
-import { filtersPanelResetButton } from '../../utils/domObjects';
 import { FilterById } from '../../../trpc/inferredTypes';
 import { PageContent } from '../PageContent/PageContent';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { PresetDropdown } from '../PresetDropdown';
-import { LimitDropdown } from '../LimitDropdown';
-import { StarredFilter } from '../StarredFilter/StarredFilter';
-import { WatchingFilter } from '../WatchingFilter/WatchingFilter';
 import { ScrollableView } from '../ScrollableView';
-
-import { tr } from './FilteredPage.i18n';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));
 const FilterDeleteForm = dynamic(() => import('../FilterDeleteForm/FilterDeleteForm'));
 
 interface FilteredPageProps {
+    title: string;
     isLoading: boolean;
     counter?: number;
     total?: number;
@@ -36,61 +27,44 @@ interface FilteredPageProps {
     filterControls?: React.ReactNode;
 }
 
-const StyledFilterControls = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    flex: 1 0 0;
-`;
-
-const StyledButton = styled(Button)`
-    margin-left: auto;
-`;
-
 export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> = ({
+    title,
     counter,
     total,
     children,
     isLoading,
-    onFilterStar,
     filterPreset,
-    userFilters,
-    filterControls,
 }) => {
     const router = useRouter();
-    const { toggleFilterStar } = useFilterResource();
 
     const {
         currentPreset,
         queryState,
         queryString,
-        setStarredFilter,
-        setWatchingFilter,
-        setFulltextFilter,
         resetQueryState,
+        setFulltextFilter,
         setPreset,
         batchQueryState,
-        setLimitFilter,
         queryFilterState,
     } = useUrlFilterParams({
         preset: filterPreset,
     });
 
-    const filterStarHandler = useCallback(async () => {
-        if (currentPreset) {
-            if (currentPreset._isOwner) {
-                dispatchModalEvent(ModalEvent.FilterDeleteModal)();
-            } else {
-                await toggleFilterStar({
-                    id: currentPreset.id,
-                    direction: !currentPreset._isStarred,
-                });
-                await onFilterStar();
-            }
-        } else {
-            dispatchModalEvent(ModalEvent.FilterCreateModal)();
-        }
-    }, [currentPreset, toggleFilterStar, onFilterStar]);
+    // const filterStarHandler = useCallback(async () => {
+    //     if (currentPreset) {
+    //         if (currentPreset._isOwner) {
+    //             dispatchModalEvent(ModalEvent.FilterDeleteModal)();
+    //         } else {
+    //             await toggleFilterStar({
+    //                 id: currentPreset.id,
+    //                 direction: !currentPreset._isStarred,
+    //             });
+    //             await onFilterStar();
+    //         }
+    //     } else {
+    //         dispatchModalEvent(ModalEvent.FilterCreateModal)();
+    //     }
+    // }, [currentPreset, toggleFilterStar, onFilterStar]);
 
     const onFilterCreated = useCallback(
         (id: string) => {
@@ -114,52 +88,16 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
     return (
         <>
             <FiltersPanel
-                loading={isLoading}
+                title={title}
                 total={total}
                 counter={counter}
+                onSearchChange={setFulltextFilter}
+                loading={isLoading}
                 queryState={queryState}
                 queryFilterState={queryFilterState}
-                onSearchChange={setFulltextFilter}
                 onFilterApply={batchQueryState}
-            >
-                <StyledFilterControls>
-                    {filterControls}
-
-                    <StarredFilter value={queryState?.starred} onChange={setStarredFilter} />
-
-                    <WatchingFilter value={queryState?.watching} onChange={setWatchingFilter} />
-
-                    {nullable(userFilters, (presets) => (
-                        <PresetDropdown
-                            text={tr('Preset')}
-                            value={filterPreset}
-                            presets={presets}
-                            onChange={setPreset}
-                        />
-                    ))}
-
-                    {nullable(queryState?.limit, (lf) => (
-                        <LimitDropdown text={tr('Limit')} value={[String(lf)]} onChange={setLimitFilter} />
-                    ))}
-
-                    {((Boolean(queryString) && !filterPreset) ||
-                        (filterPreset && !filterPreset._isOwner && !filterPreset._isStarred)) &&
-                        !filterPreset?.default && (
-                            <FiltersAction onClick={filterStarHandler}>
-                                <IconStarOutline size="s" />
-                            </FiltersAction>
-                        )}
-
-                    {filterPreset && (filterPreset._isOwner || filterPreset._isStarred) && (
-                        <FiltersAction onClick={filterStarHandler}>
-                            <IconStarSolid size="s" />
-                        </FiltersAction>
-                    )}
-                    {nullable(queryString || filterPreset, () => (
-                        <StyledButton text={tr('Reset')} onClick={resetQueryState} {...filtersPanelResetButton.attr} />
-                    ))}
-                </StyledFilterControls>
-            </FiltersPanel>
+                onFilterReset={resetQueryState}
+            />
 
             <PageContent>
                 <ScrollableView>{children}</ScrollableView>

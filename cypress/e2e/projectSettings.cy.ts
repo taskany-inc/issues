@@ -1,6 +1,5 @@
 import '../support';
 import {
-    pageTabs,
     projectSettingsCancelDeleteProjectButton,
     projectSettingsCancelTransferProjectButton,
     projectSettingsConfirmDeleteProjectButton,
@@ -286,14 +285,6 @@ describe('ProjectSettings', () => {
                 cy.signInViaEmail({ email: userEmail, password: userPassword });
             });
 
-            it('going via tab from project page', () => {
-                cy.visit(routes.project(id));
-
-                cy.get(pageTabs.query)
-                    .find(`[href="${routes.projectSettings(id)}"]`)
-                    .should('not.exist');
-            });
-
             it('going via exact url from project page', () => {
                 cy.visit(routes.projectSettings(id));
                 cy.url().should('equal', exactUrl(routes.project(id)));
@@ -382,15 +373,6 @@ describe('ProjectSettings', () => {
                 cy.signInViaEmail({ email: userEmail, password: userPassword });
             });
 
-            it('going via tab from project page', () => {
-                cy.visit(routes.project(id));
-
-                cy.get(pageTabs.query)
-                    .find(`[href="${routes.projectSettings(id)}"]`)
-                    .click();
-                cy.url().should('equal', exactUrl(routes.projectSettings(id)));
-            });
-
             it('going via exact url from project page', () => {
                 cy.visit(routes.projectSettings(id));
                 cy.url().should('equal', exactUrl(routes.projectSettings(id)));
@@ -401,15 +383,6 @@ describe('ProjectSettings', () => {
             beforeEach(() => {
                 cy.signInViaEmail();
                 cy.visit(routes.projectSettings(id));
-            });
-
-            it('going via tab from project page', () => {
-                cy.visit(routes.project(id));
-
-                cy.get(pageTabs.query)
-                    .find(`[href="${routes.projectSettings(id)}"]`)
-                    .click();
-                cy.url().should('equal', exactUrl(routes.projectSettings(id)));
             });
 
             it('going via exact url from project page', () => {
