@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { FiltersMenuItem, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
@@ -20,7 +20,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         defaultPresetFallback,
     });
 
-    const { currentPreset, queryState, groupBy, setTagsFilterOutside, setGroupBy } = useUrlFilterParams({
+    const { currentPreset, queryState, groupBy, setTagsFilterOutside } = useUrlFilterParams({
         preset,
     });
 
@@ -48,15 +48,6 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 userFilters={userFilters}
                 onFilterStar={onFilterStar}
                 isLoading={false}
-                filterControls={nullable(
-                    groupedView,
-                    () => (
-                        <FiltersMenuItem active onClick={() => setGroupBy(undefined)}>
-                            {tr('Ungroup')}
-                        </FiltersMenuItem>
-                    ),
-                    <FiltersMenuItem onClick={() => setGroupBy('project')}>{tr('Group')}</FiltersMenuItem>,
-                )}
             >
                 {nullable(
                     groupedView,

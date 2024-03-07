@@ -22,7 +22,6 @@ import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@
 import { Button, FormControl, FormControlInput, FormControlLabel, FormControlError } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
-import { PageSep } from '../PageSep';
 import { useRouter } from '../../hooks/router';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
@@ -192,11 +191,9 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
-            <CommonHeader title={project.data.title} description={project.data.description} {...pageHeader.attr}>
+            <CommonHeader title={project.data.title} {...pageHeader.attr}>
                 <ProjectPageTabs id={id} editable />
             </CommonHeader>
-
-            <PageSep />
 
             <SettingsContent {...projectSettingsContent.attr}>
                 <SettingsCard>

@@ -18,7 +18,6 @@ import {
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
 import { Page } from '../Page/Page';
-import { PageSep } from '../PageSep';
 import { CommonHeader } from '../CommonHeader';
 import { SettingsCard, SettingsContent } from '../SettingsContent';
 import { UpdateUser, updateUserSchema } from '../../schema/user';
@@ -168,9 +167,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle} {...userSettings.attr}>
-            <CommonHeader preTitle={`Id: ${user.id}`} title={tr('Settings')} />
-
-            <PageSep />
+            <CommonHeader title={`${tr('Settings')} id: ${user.id}`} />
 
             <SettingsContent>
                 <SettingsCard>

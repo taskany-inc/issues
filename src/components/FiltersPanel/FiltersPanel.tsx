@@ -1,4 +1,4 @@
-import { FC, useCallback, memo, useState, useEffect, useMemo, useRef } from 'react';
+import { FC, useCallback, memo, useState, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { Button } from '@taskany/bricks/harmony';
 import { IconAddOutline } from '@taskany/icons';
 
@@ -65,8 +65,19 @@ export const FiltersPanel: FC<{
     onSearchChange: (search: string) => void;
     onFilterApply?: (state: Partial<QueryState>) => void;
     onFilterReset: () => void;
+    children?: ReactNode;
 }> = memo(
-    ({ title, total = 0, counter = 0, onSearchChange, onFilterReset, queryState, queryFilterState, onFilterApply }) => {
+    ({
+        children,
+        title,
+        total = 0,
+        counter = 0,
+        onSearchChange,
+        onFilterReset,
+        queryState,
+        queryFilterState,
+        onFilterApply,
+    }) => {
         const [layout] = useState<LayoutType>(layoutType.table);
         const filterTriggerRef = useRef<HTMLButtonElement>(null);
         const [filterVisible, setFilterVisible] = useState(false);
@@ -161,6 +172,7 @@ export const FiltersPanel: FC<{
                         <FiltersBarTitle {...filtersPanelTitle.attr}>{title}</FiltersBarTitle>
                     </FiltersBarItem>
                     <Separator />
+                    {children}
                     <FiltersBarItem layout="fill">
                         <FiltersBarControlGroup>
                             {isFiltersEmpty ? (
@@ -181,6 +193,8 @@ export const FiltersPanel: FC<{
                             )}
                             <FilterBarCounter total={total} counter={counter} />
                         </FiltersBarControlGroup>
+                    </FiltersBarItem>
+                    <FiltersBarItem>
                         <FiltersBarLayoutSwitch value={layout} />
                     </FiltersBarItem>
                     <Separator />

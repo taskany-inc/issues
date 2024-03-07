@@ -30,7 +30,8 @@ export const pageHeader = DO('pageHeader');
 export const pageTitle = pageHeader.add('title');
 export const pageDescription = pageHeader.add('description');
 export const pageBreadcrumbs = pageHeader.add('breadcrumbs');
-export const pageTabs = pageHeader.add('tabs');
+
+export const pageTabs = DO('pageTabs');
 export const pageActiveTabItem = pageTabs.add('activeTabItem');
 
 export const projectListItem = DO('projectListItem');

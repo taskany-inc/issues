@@ -13,7 +13,6 @@ import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { TeamListItem } from '../TeamListItem/TeamListItem';
 import { TeamComboBox } from '../TeamComboBox/TeamComboBox';
 import { CommonHeader } from '../CommonHeader';
-import { PageSep } from '../PageSep';
 import { TeamMemberListItem } from '../TeamMemberListItem/TeamMemberListItem';
 import { Team } from '../../types/crew';
 
@@ -63,11 +62,9 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle}>
-            <CommonHeader title={project.title} description={project.description} {...pageHeader.attr}>
+            <CommonHeader title={project.title} {...pageHeader.attr}>
                 <ProjectPageTabs id={id} editable={project?._isEditable} />
             </CommonHeader>
-
-            <PageSep />
 
             <PageContent>
                 {nullable(project._isEditable, () => (
