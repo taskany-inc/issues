@@ -1,7 +1,8 @@
 import { FC, useMemo } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { TabsMenu, TabsMenuItem, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { Link, Switch, SwitchControl } from '@taskany/bricks/harmony';
 
 import { routes } from '../../hooks/router';
 import { pageTabs, pageActiveTabItem } from '../../utils/domObjects';
@@ -22,21 +23,21 @@ export const ProjectPageTabs: FC<{ id: string; editable?: boolean }> = ({ id, ed
     const nextRouter = useRouter();
 
     return (
-        <TabsMenu {...pageTabs.attr}>
+        <Switch value={nextRouter.asPath.split('?')[0]} animated={false} {...pageTabs.attr}>
             {tabsMenuOptions.map(([title, href, ownerOnly]) =>
                 nullable(ownerOnly ? editable : true, () => {
                     const isActive = nextRouter.asPath.split('?')[0] === href;
                     const activeAttrs = isActive ? pageActiveTabItem.attr : null;
 
                     return (
-                        <NextLink key={title} href={href} passHref legacyBehavior>
-                            <TabsMenuItem active={isActive} {...activeAttrs}>
-                                {title}
-                            </TabsMenuItem>
+                        <NextLink key={title} href={href} legacyBehavior passHref>
+                            <Link>
+                                <SwitchControl value={href} text={title} {...activeAttrs} />
+                            </Link>
                         </NextLink>
                     );
                 }),
             )}
-        </TabsMenu>
+        </Switch>
     );
 };

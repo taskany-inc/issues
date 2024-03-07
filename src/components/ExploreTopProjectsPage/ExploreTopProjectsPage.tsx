@@ -6,7 +6,6 @@ import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { routes } from '../../hooks/router';
 import { Page } from '../Page/Page';
 import { PageContent } from '../PageContent/PageContent';
-import { PageSep } from '../PageSep';
 import { ExplorePageLayout } from '../ExplorePageLayout/ExplorePageLayout';
 import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
 import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
@@ -23,8 +22,6 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')}>
             <ExplorePageLayout>
-                <PageSep />
-
                 <PageContent>
                     <Table>
                         {projects.data.map((project) =>

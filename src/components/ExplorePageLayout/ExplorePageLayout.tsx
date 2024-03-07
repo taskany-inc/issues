@@ -1,7 +1,7 @@
 import React from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { TabsMenu, TabsMenuItem } from '@taskany/bricks';
+import { Link, Switch, SwitchControl } from '@taskany/bricks/harmony';
 
 import { routes } from '../../hooks/router';
 import { CommonHeader } from '../CommonHeader';
@@ -22,17 +22,16 @@ export const ExplorePageLayout: React.FC<ExplorePageLayoutProps> = ({ children }
 
     return (
         <>
-            <CommonHeader
-                title={tr('Explore')}
-                description={tr('See what the Taskany community is most excited about today')}
-            >
-                <TabsMenu>
+            <CommonHeader title={tr('Explore')}>
+                <Switch value={router.asPath}>
                     {tabsMenuOptions.map(([title, href]) => (
-                        <NextLink key={href} href={href} passHref>
-                            <TabsMenuItem active={router.asPath === href}>{title}</TabsMenuItem>
+                        <NextLink key={href} href={href} passHref legacyBehavior>
+                            <Link>
+                                <SwitchControl value={href} text={title} />
+                            </Link>
                         </NextLink>
                     ))}
-                </TabsMenu>
+                </Switch>
             </CommonHeader>
 
             {children}

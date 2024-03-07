@@ -34,6 +34,7 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
     children,
     isLoading,
     filterPreset,
+    filterControls,
 }) => {
     const router = useRouter();
 
@@ -97,7 +98,9 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                 queryFilterState={queryFilterState}
                 onFilterApply={batchQueryState}
                 onFilterReset={resetQueryState}
-            />
+            >
+                {filterControls}
+            </FiltersPanel>
 
             <PageContent>
                 <ScrollableView>{children}</ScrollableView>

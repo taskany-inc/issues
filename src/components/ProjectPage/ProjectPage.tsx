@@ -5,7 +5,6 @@ import { Page } from '../Page/Page';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { refreshInterval } from '../../utils/config';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
-import { getPageTitle } from '../../utils/getPageTitle';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
@@ -14,6 +13,8 @@ import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { FilteredPage } from '../FilteredPage/FilteredPage';
+import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
+import { FiltersBarItem } from '../FiltersBar/FiltersBar';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -104,26 +105,19 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 })
                 .join('')}
         >
-            {/* <>
-                <WatchButton watcher={project?._isWatching} onToggle={toggleProjectWatching} />
-                <StarButton
-                    stargizer={project?._isStarred}
-                    count={project?._count.stargizers}
-                    onToggle={toggleProjectStar}
-                />
-            </> */}
             <FilteredPage
-                title={getPageTitle({
-                    title: project?.title || tr('Projects'),
-                    shadowPresetTitle: currentPreset?.title,
-                    currentPresetTitle: currentPreset?.title,
-                })}
+                title={project?.title || tr('Projects')}
                 total={projectDeepInfo?.meta?.count}
                 counter={projectDeepInfo?.goals?.length}
                 filterPreset={currentPreset}
                 userFilters={userFilters}
                 onFilterStar={onFilterStar}
                 isLoading={isLoadingDeepInfoProject}
+                filterControls={
+                    <FiltersBarItem>
+                        <ProjectPageTabs id={id} editable={project?._isEditable} />
+                    </FiltersBarItem>
+                }
             >
                 <ListView onKeyboardClick={handleItemEnter}>
                     {nullable(project, (p) => (
