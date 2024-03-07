@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.25.0](https://github.com/taskany-inc/issues/compare/v2.24.1...v2.25.0) (2024-03-07)
+
+
+### Features
+
+* new topbar ([c364da1](https://github.com/taskany-inc/issues/commit/c364da1691e4b631167b9f6b7838bcbaa2b360ec))
+
 ## [2.24.1](https://github.com/taskany-inc/issues/compare/v2.24.0...v2.24.1) (2024-03-04)
 
 
