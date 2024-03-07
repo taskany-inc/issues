@@ -1,5 +1,4 @@
 import { TRPCError } from '@trpc/server';
-import { stringify } from 'querystring';
 import { z } from 'zod';
 
 import { getGroupListSchema } from '../../src/schema/crew';
@@ -18,11 +17,13 @@ const getToken = () => {
 
 export const crew = router({
     teamSuggetions: protectedProcedure.input(getGroupListSchema).query(async ({ input }) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_CREW_URL}/api/rest/groups/list?${stringify(input)}`, {
-            method: 'GET',
+        const response = await fetch(`${process.env.NEXT_PUBLIC_CREW_URL}/api/rest/groups/list`, {
+            method: 'POST',
             headers: {
                 authorization: getToken(),
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify(input),
         });
 
         const data: Omit<Team, 'memberships'>[] = await response.json();
