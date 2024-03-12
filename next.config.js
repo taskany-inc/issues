@@ -94,6 +94,9 @@ module.exports =
     process.env.ANALYZE === 'true'
         ? require('@next/bundle-analyzer')({})(configWithPlugins)
         : withSentryConfig(configWithPlugins, {
+              errorHandler: (err, invokeErr, compilation) => {
+                  compilation.warnings.push(`@sentry/nextjs: ${err.message}`);
+              },
               silent: true,
               hideSourcemaps: true,
               ignore: ['node_modules'],
