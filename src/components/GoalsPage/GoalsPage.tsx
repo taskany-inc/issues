@@ -20,7 +20,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         defaultPresetFallback,
     });
 
-    const { currentPreset, queryState, groupBy, setTagsFilterOutside } = useUrlFilterParams({
+    const { currentPreset, queryState, groupBy, setTagsFilterOutside, setGroupBy } = useUrlFilterParams({
         preset,
     });
 
@@ -48,6 +48,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
                 userFilters={userFilters}
                 onFilterStar={onFilterStar}
                 isLoading={false}
+                setGroupBy={setGroupBy}
             >
                 {nullable(
                     groupedView,

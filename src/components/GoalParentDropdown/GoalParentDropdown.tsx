@@ -65,7 +65,7 @@ export const GoalParentDropdown = ({
     }, []);
 
     return (
-        <Dropdown>
+        <Dropdown arrow>
             <DropdownTrigger label={label} {...props} readOnly={disabled}>
                 {nullable(value, ({ title }) => (
                     <Text size="s" ellipsis className={s.DropdownTriggerValue} title={title}>

@@ -1,7 +1,7 @@
-import { FC, HTMLAttributes } from 'react';
+import { ComponentProps, FC, HTMLAttributes, ReactNode, useState } from 'react';
 import cn from 'classnames';
 import { nullable } from '@taskany/bricks';
-import { Text, Button, Switch, SwitchControl } from '@taskany/bricks/harmony';
+import { Text, Switch, SwitchControl, Dropdown, DropdownPanel, DropdownTrigger } from '@taskany/bricks/harmony';
 import { IconAdjustHorizontalSolid, IconAlignTopSolid, IconListUnorderedOutline } from '@taskany/icons';
 
 import s from './FiltersBar.module.css';
@@ -83,11 +83,32 @@ export const FiltersBarControlGroup: FC<HTMLAttributes<HTMLDivElement>> = ({ chi
     </div>
 );
 
-export const FiltersBarViewDropdown: FC = () => (
-    <Button
-        disabled
-        text={tr('View')}
-        className={s.FiltersBarButton}
-        iconLeft={<IconAdjustHorizontalSolid size="xxs" />}
-    />
-);
+export const FiltersBarViewDropdown: FC<{ children?: ReactNode }> = ({ children }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <Dropdown isOpen={isOpen} onClose={() => setIsOpen(false)}>
+            <DropdownTrigger className={s.FiltersBarViewDropdownDrigger} view="fill" onClick={() => setIsOpen(true)}>
+                <div className={s.FiltersBarViewDropdownDrigger}>
+                    <IconAdjustHorizontalSolid size="xxs" />
+                    <Text size="s">{tr('View')}</Text>
+                </div>
+            </DropdownTrigger>
+            <DropdownPanel width={335} placement="bottom-start" className={s.FiltersBarDropdownPanel}>
+                <div className={s.FiltersBarDropdownPanelContainer}>{children}</div>
+            </DropdownPanel>
+        </Dropdown>
+    );
+};
+
+export const FiltersBarDropdownTitle: FC<ComponentProps<typeof Text>> = ({ children }) => {
+    return (
+        <Text className={s.FiltersBarDropdownTitle} weight="bold">
+            {children}
+        </Text>
+    );
+};
+
+export const FiltersBarDropdownContent: FC<HTMLAttributes<HTMLDivElement>> = ({ children }) => {
+    return <div className={s.FiltersBarDropdownContent}>{children}</div>;
+};

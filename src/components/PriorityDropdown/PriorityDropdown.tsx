@@ -23,7 +23,7 @@ export const PriorityDropdown = ({ value, onChange, ...props }: PriorityDropdown
     const { data: priorities = [] } = trpc.priority.getAll.useQuery();
 
     return (
-        <Dropdown>
+        <Dropdown arrow>
             <DropdownTrigger {...props}>
                 {nullable(value, ({ title }) => (
                     <Text size="s" ellipsis>

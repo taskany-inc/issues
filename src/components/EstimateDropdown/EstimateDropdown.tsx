@@ -91,7 +91,7 @@ export const EstimateDropdown = ({ onChange, value, ...props }: EstimateDropdown
     );
 
     return (
-        <Dropdown>
+        <Dropdown arrow>
             <DropdownTrigger {...props}>
                 {nullable(value, (v) => (
                     <Text size="s" as="span">

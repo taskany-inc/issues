@@ -25,6 +25,7 @@ interface FilteredPageProps {
     filterPreset?: FilterById;
     userFilters?: React.ComponentProps<typeof PresetDropdown>['presets'];
     filterControls?: React.ReactNode;
+    setGroupBy?: React.ComponentProps<typeof FiltersPanel>['setGroupBy'];
 }
 
 export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> = ({
@@ -35,6 +36,7 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
     isLoading,
     filterPreset,
     filterControls,
+    setGroupBy,
 }) => {
     const router = useRouter();
 
@@ -47,6 +49,7 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
         setPreset,
         batchQueryState,
         queryFilterState,
+        groupBy,
     } = useUrlFilterParams({
         preset: filterPreset,
     });
@@ -98,6 +101,8 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                 queryFilterState={queryFilterState}
                 onFilterApply={batchQueryState}
                 onFilterReset={resetQueryState}
+                setGroupBy={setGroupBy}
+                groupBy={groupBy}
             >
                 {filterControls}
             </FiltersPanel>

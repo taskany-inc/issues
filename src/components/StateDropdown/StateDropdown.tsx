@@ -51,7 +51,7 @@ export const StateDropdown = ({ value, flowId, onChange, ...props }: StateDropdo
     }, [flow, onStateChange, value]);
 
     return (
-        <Dropdown>
+        <Dropdown arrow>
             <DropdownTrigger {...props}>
                 {nullable(value, ({ hue, title }) => (
                     <StateWrapper hue={hue}>
