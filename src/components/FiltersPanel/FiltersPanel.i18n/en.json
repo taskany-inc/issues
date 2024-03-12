@@ -11,5 +11,6 @@
     "Issuer": "Issuer",
     "Participant": "Participant",
     "Filter": "Filter",
-    "Reset": "Reset"
+    "Reset": "Reset",
+    "Grouping": "Grouping"
 }

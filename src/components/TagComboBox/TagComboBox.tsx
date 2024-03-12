@@ -113,7 +113,7 @@ export const TagComboBox = ({
 
     return (
         <div className={s.TagComboBox} ref={comboboxRef} {...props}>
-            <Dropdown isOpen={isOpen} onClose={onClose}>
+            <Dropdown isOpen={isOpen} onClose={onClose} arrow>
                 <DropdownTrigger
                     renderTrigger={(props) => (
                         <>

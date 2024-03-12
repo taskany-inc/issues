@@ -41,7 +41,7 @@ export const UserDropdown = ({ query = '', value, filter, placeholder, onChange,
     );
 
     return (
-        <Dropdown>
+        <Dropdown arrow>
             <DropdownTrigger {...props}>
                 {nullable(safeUserData(value), (user) => (
                     <User name={user.name} src={user.image} email={user.email} className={s.Owner} inheritColor />

@@ -1,6 +1,7 @@
 import { FC, useCallback, memo, useState, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { Button } from '@taskany/bricks/harmony';
 import { IconAddOutline } from '@taskany/icons';
+import { nullable } from '@taskany/bricks';
 
 import { filtersTakeCount } from '../../utils/filters';
 import { FilterQueryState, QueryState, buildURLSearchParams } from '../../hooks/useUrlFilterParams';
@@ -27,6 +28,8 @@ import {
     FiltersBarTitle,
     LayoutType,
     layoutType,
+    FiltersBarDropdownTitle,
+    FiltersBarDropdownContent,
 } from '../FiltersBar/FiltersBar';
 import { SearchFilter } from '../SearchFilter';
 import { Separator } from '../Separator/Separator';
@@ -65,6 +68,8 @@ export const FiltersPanel: FC<{
     onSearchChange: (search: string) => void;
     onFilterApply?: (state: Partial<QueryState>) => void;
     onFilterReset: () => void;
+    setGroupBy?: (groupBy: QueryState['groupBy']) => void;
+    groupBy?: QueryState['groupBy'];
     children?: ReactNode;
 }> = memo(
     ({
@@ -77,6 +82,8 @@ export const FiltersPanel: FC<{
         queryState,
         queryFilterState,
         onFilterApply,
+        setGroupBy,
+        groupBy,
     }) => {
         const [layout] = useState<LayoutType>(layoutType.table);
         const filterTriggerRef = useRef<HTMLButtonElement>(null);
@@ -165,6 +172,8 @@ export const FiltersPanel: FC<{
             [queryFilterState],
         );
 
+        const groupedByProject = groupBy === 'project';
+
         return (
             <>
                 <FiltersBar {...filtersPanel.attr}>
@@ -198,10 +207,24 @@ export const FiltersPanel: FC<{
                         <FiltersBarLayoutSwitch value={layout} />
                     </FiltersBarItem>
                     <Separator />
-                    <FiltersBarItem>
-                        <FiltersBarViewDropdown />
-                    </FiltersBarItem>
-                    <Separator />
+                    {nullable(setGroupBy, (setter) => (
+                        <>
+                            <FiltersBarItem>
+                                <FiltersBarViewDropdown>
+                                    <FiltersBarDropdownTitle>{tr('Grouping')}</FiltersBarDropdownTitle>
+                                    <FiltersBarDropdownContent>
+                                        <Button
+                                            text={tr('Project')}
+                                            view={groupedByProject ? 'checked' : 'default'}
+                                            onClick={() => setter(groupedByProject ? undefined : 'project')}
+                                        />
+                                    </FiltersBarDropdownContent>
+                                </FiltersBarViewDropdown>
+                            </FiltersBarItem>
+                            <Separator />
+                        </>
+                    ))}
+
                     <FiltersBarItem>
                         <SearchFilter defaultValue={queryState?.query} onChange={onSearchChange} />
                     </FiltersBarItem>
