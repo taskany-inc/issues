@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, MutableRefObject } from 'react';
 import styled from 'styled-components';
 import { State as StateType } from '@prisma/client';
-import { UserPic, nullable } from '@taskany/bricks';
+import { UserPic, nullable, useLatest } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
 import { Button, State } from '@taskany/bricks/harmony';
 
@@ -12,7 +12,6 @@ import { CommentSchema } from '../../schema/comment';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { StateDot } from '../StateDot';
-import { useLatest } from '../../hooks/useLatest';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 import { StateWrapper } from '../StateWrapper';
 

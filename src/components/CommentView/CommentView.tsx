@@ -10,6 +10,7 @@ import {
     UserPic,
     nullable,
     useCopyToClipboard,
+    useLatest,
 } from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import * as Sentry from '@sentry/nextjs';
@@ -37,7 +38,6 @@ import { CommentForm } from '../CommentForm/CommentForm';
 import { StateDot } from '../StateDot';
 import { getUserName } from '../../utils/getUserName';
 import { CardHeader } from '../CardHeader/CardHeader';
-import { useLatest } from '../../hooks/useLatest';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { ReactionsMap } from '../../types/reactions';
 import { profileUrl } from '../../utils/config';

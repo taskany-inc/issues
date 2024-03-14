@@ -1,8 +1,7 @@
 import { MutableRefObject, useCallback, useState } from 'react';
+import { useLatest } from '@taskany/bricks';
 
 import { safelyParseJson } from '../utils/safelyParseJson';
-
-import { useLatest } from './useLatest';
 
 export type LastOrCurrentProject = {
     id: string;

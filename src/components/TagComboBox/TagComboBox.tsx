@@ -1,4 +1,4 @@
-import { KeyCode, nullable, useClickOutside, useKeyboard } from '@taskany/bricks';
+import { KeyCode, nullable, useClickOutside, useKeyboard, useLatest } from '@taskany/bricks';
 import { Button, Input, Text } from '@taskany/bricks/harmony';
 import { IconAddSmallOutline, IconXSmallOutline } from '@taskany/icons';
 import { ChangeEvent, MutableRefObject, useCallback, useMemo, useRef, useState } from 'react';
@@ -7,7 +7,6 @@ import { TagObject } from '../../types/tag';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { trpc } from '../../utils/trpcClient';
 import { comboboxInput, tagsCombobox } from '../../utils/domObjects';
-import { useLatest } from '../../hooks/useLatest';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import s from './TagComboBox.module.css';
