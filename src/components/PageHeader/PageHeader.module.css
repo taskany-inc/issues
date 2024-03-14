@@ -9,7 +9,8 @@
 }
 
 .PageHeaderSearch {
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
 }
 
 .PageHeader .PageHeaderNav {
