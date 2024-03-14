@@ -4,6 +4,7 @@ import { pageHeader, pageTitle } from '../utils/domObjects';
 
 import { FiltersBar, FiltersBarItem, FiltersBarTitle } from './FiltersBar/FiltersBar';
 import { Separator } from './Separator/Separator';
+import { PageUserMenu } from './PageUserMenu';
 
 interface CommonHeaderProps {
     title: React.ReactNode;
@@ -14,11 +15,12 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({ title, children }) =
         <FiltersBarItem>
             <FiltersBarTitle {...pageTitle.attr}>{title}</FiltersBarTitle>
         </FiltersBarItem>
-        {nullable(children, (ch) => (
-            <>
-                <Separator />
-                <FiltersBarItem layout="fill">{ch}</FiltersBarItem>
-            </>
+        {nullable(children, () => (
+            <Separator />
         ))}
+        <FiltersBarItem layout="fill">{children}</FiltersBarItem>
+        <FiltersBarItem>
+            <PageUserMenu />
+        </FiltersBarItem>
     </FiltersBar>
 );

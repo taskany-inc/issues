@@ -14,11 +14,12 @@ import { ModalEvent } from '../../utils/dispatchModal';
 import { trpc } from '../../utils/trpcClient';
 import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../../utils/hotkeys';
 import { Theme } from '../Theme';
-import { PageHeader } from '../PageHeader/PageHeader';
 import { PageFooter } from '../PageFooter/PageFooter';
 import { ModalContext } from '../ModalOnEvent';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { OfflineBanner } from '../OfflineBanner/OfflineBanner';
+import { PageNavigation } from '../PageNavigation/PageNavigation';
+import { pageContent } from '../../utils/domObjects';
 
 import s from './Page.module.css';
 
@@ -37,12 +38,13 @@ interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     user: Session['user'];
     ssrTime: number;
     title?: string;
+    header: React.ReactNode;
     children?: React.ReactNode;
 }
 
 const mapThemeOnId = { light: 0, dark: 1 } as const;
 
-export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, ...attrs }) => {
+export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, header, ...attrs }) => {
     const { setPreview } = useGoalPreview();
     const { data: userSettings = user?.settings } = trpc.user.settings.useQuery();
     const { data: config } = trpc.appConfig.get.useQuery();
@@ -83,11 +85,19 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
                 position="bottom-right"
             />
 
-            <PageHeader logo={config?.logo ?? undefined} />
+            <div className={s.PageLayout}>
+                <aside className={s.PageAside}>
+                    <PageNavigation logo={config?.logo ?? undefined} />
+                </aside>
 
-            <main className={s.PageMain} {...attrs}>
-                {children}
-            </main>
+                <main className={s.PageMain} {...attrs}>
+                    {header}
+                    <div className={s.PageContent} {...pageContent.attr}>
+                        {children}
+                    </div>
+                    <PageFooter />
+                </main>
+            </div>
 
             <ModalOnEvent event={ModalEvent.ProjectCreateModal} hotkeys={createProjectKeys}>
                 <ProjectCreateForm />
@@ -120,8 +130,6 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
             <NotificationsHub />
 
             <WhatsNew />
-
-            <PageFooter />
         </pageContext.Provider>
     );
 };

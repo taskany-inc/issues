@@ -7,7 +7,6 @@ import { routes } from '../../hooks/router';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { trpc } from '../../utils/trpcClient';
 import { pageHeader } from '../../utils/domObjects';
-import { PageContent } from '../PageContent/PageContent';
 import { Page } from '../Page/Page';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { TeamListItem } from '../TeamListItem/TeamListItem';
@@ -61,57 +60,60 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
         .join('');
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
-            <CommonHeader title={project.title} {...pageHeader.attr}>
-                <ProjectPageTabs id={id} editable={project?._isEditable} />
-            </CommonHeader>
-
-            <PageContent>
-                {nullable(project._isEditable, () => (
-                    <div className={s.ProjectTeamPageActions}>
-                        <TeamComboBox project={project} text={tr('Add team')} placeholder={tr('Enter the title')} />
-                    </div>
-                ))}
-                {nullable(teams, (ts) => (
-                    <TreeView>
-                        {ts.map((t) => (
-                            <TreeViewNode
-                                title={
-                                    <Link
-                                        className={s.ProjectTeamPageTeamLink}
-                                        href={routes.crewTeam(t.id)}
-                                        target="_blank"
-                                    >
-                                        <TeamListItem name={t.name} units={t.units} onRemoveClick={() => onRemove(t)} />
-                                    </Link>
-                                }
-                                key={t.id}
-                                visible
-                            >
-                                <TreeViewElement>
-                                    <Table>
-                                        {t.memberships.map(({ user, roles, percentage }) => (
-                                            <Link
-                                                key={user.id}
-                                                className={s.ProjectTeamPageTeamLink}
-                                                target="_blank"
-                                                href={routes.crewUser(user.id)}
-                                            >
-                                                <TeamMemberListItem
-                                                    roles={roles}
-                                                    name={user.name}
-                                                    email={user.email}
-                                                    percentage={percentage}
-                                                />
-                                            </Link>
-                                        ))}
-                                    </Table>
-                                </TreeViewElement>
-                            </TreeViewNode>
-                        ))}
-                    </TreeView>
-                ))}
-            </PageContent>
+        <Page
+            user={user}
+            ssrTime={ssrTime}
+            title={pageTitle}
+            header={
+                <CommonHeader title={project.title} {...pageHeader.attr}>
+                    <ProjectPageTabs id={id} editable={project?._isEditable} />
+                </CommonHeader>
+            }
+        >
+            {nullable(project._isEditable, () => (
+                <div className={s.ProjectTeamPageActions}>
+                    <TeamComboBox project={project} text={tr('Add team')} placeholder={tr('Enter the title')} />
+                </div>
+            ))}
+            {nullable(teams, (ts) => (
+                <TreeView>
+                    {ts.map((t) => (
+                        <TreeViewNode
+                            title={
+                                <Link
+                                    className={s.ProjectTeamPageTeamLink}
+                                    href={routes.crewTeam(t.id)}
+                                    target="_blank"
+                                >
+                                    <TeamListItem name={t.name} units={t.units} onRemoveClick={() => onRemove(t)} />
+                                </Link>
+                            }
+                            key={t.id}
+                            visible
+                        >
+                            <TreeViewElement>
+                                <Table>
+                                    {t.memberships.map(({ user, roles, percentage }) => (
+                                        <Link
+                                            key={user.id}
+                                            className={s.ProjectTeamPageTeamLink}
+                                            target="_blank"
+                                            href={routes.crewUser(user.id)}
+                                        >
+                                            <TeamMemberListItem
+                                                roles={roles}
+                                                name={user.name}
+                                                email={user.email}
+                                                percentage={percentage}
+                                            />
+                                        </Link>
+                                    ))}
+                                </Table>
+                            </TreeViewElement>
+                        </TreeViewNode>
+                    ))}
+                </TreeView>
+            ))}
         </Page>
     );
 };

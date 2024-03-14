@@ -5,6 +5,6 @@ import { routes } from '../hooks/router';
 
 export const PageHeaderLogo: React.FC<{ logo?: string }> = ({ logo }) => (
     <NextLink href={routes.index()} passHref>
-        <TaskanyLogo src={logo} />
+        <TaskanyLogo src={logo} size="m" />
     </NextLink>
 );
