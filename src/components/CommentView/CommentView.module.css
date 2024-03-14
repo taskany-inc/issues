@@ -53,9 +53,8 @@
 .CommentCard.CommentCard {
     position: relative;
     min-height: 60px;
-    border: none;
     background-color: var(--layer-hover);
-
+    border-color: var(--comment-card-border);
     transition: border var(--transition-time) var(--transition-func);
 }
 
