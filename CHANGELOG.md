@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.26.0](https://github.com/taskany-inc/issues/compare/v2.25.0...v2.26.0) (2024-03-14)
+
+
+### Features
+
+* add FiltersBarViewDropdown ([96881b0](https://github.com/taskany-inc/issues/commit/96881b05348d732a6f2ce2805cf73467fa198785))
+
+
+### Bug Fixes
+
+* comment border color ([71ecd57](https://github.com/taskany-inc/issues/commit/71ecd57b1a5269d26ff9025495d767179c2176f6))
+* **GLobalSearch:** change hard width to max-width ([18d2379](https://github.com/taskany-inc/issues/commit/18d2379aa559f47524cdce3c8b1cb70c4004e80f))
+
 ## [2.25.0](https://github.com/taskany-inc/issues/compare/v2.24.1...v2.25.0) (2024-03-11)
 
 
