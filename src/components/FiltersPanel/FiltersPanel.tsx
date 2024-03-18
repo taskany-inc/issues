@@ -40,6 +40,7 @@ import { AppliedGoalParentFilter } from '../AppliedGoalParentFilter/AppliedGoalP
 import { AppliedPriorityFilter } from '../AppliedPriorityFilter/AppliedPriorityFilter';
 import { AppliedStateFilter } from '../AppliedStateFilter/AppliedStateFilter';
 import { AppliedUsersFilter } from '../AppliedUsersFilter/AppliedUsersFilter';
+import { PageUserMenu } from '../PageUserMenu';
 
 import { tr } from './FiltersPanel.i18n';
 
@@ -248,6 +249,9 @@ export const FiltersPanel: FC<{
                 ))}
                 <FiltersBarItem>
                     <SearchFilter defaultValue={queryState?.query} onChange={setFulltextFilter} />
+                </FiltersBarItem>
+                <FiltersBarItem>
+                    <PageUserMenu />
                 </FiltersBarItem>
             </FiltersBar>
             {nullable(!isFiltersEmpty, () => (
