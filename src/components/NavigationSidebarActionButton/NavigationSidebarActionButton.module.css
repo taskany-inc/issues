@@ -1,0 +1,8 @@
+.NavigationSidebarActionButton {
+    width: 100%;
+    display: flex;
+}
+
+.NavigationSidebarActionButtonDefault {
+    flex: 1;
+}

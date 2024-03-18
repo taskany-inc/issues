@@ -12,9 +12,10 @@ import {
 } from '../../utils/domObjects';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
-import { tr } from './PageHeaderActionButton.i18n';
+import s from './NavigationSidebarActionButton.module.css';
+import { tr } from './NavigationSidebarActionButton.i18n';
 
-export const PageHeaderActionButton: FC = () => {
+export const NavigationSidebarActionButton: FC = () => {
     const onMenuItemClick = useCallback(({ event, params }: { event: ModalEvent; params: unknown }) => {
         dispatchModalEvent(event, params)();
     }, []);
@@ -48,10 +49,10 @@ export const PageHeaderActionButton: FC = () => {
     }, []);
 
     return (
-        <>
+        <div className={s.NavigationSidebarActionButton}>
             <Button
+                className={s.NavigationSidebarActionButtonDefault}
                 text={tr('Create')}
-                view="primary"
                 brick="right"
                 onClick={dispatchModalEvent(ModalEvent.GoalCreateModal)}
                 {...createFastButton.attr}
@@ -60,7 +61,6 @@ export const PageHeaderActionButton: FC = () => {
                 <DropdownTrigger
                     renderTrigger={(props) => (
                         <Button
-                            view="primary"
                             brick="left"
                             iconRight={props.isOpen ? <IconUpSmallSolid size="s" /> : <IconDownSmallSolid size="s" />}
                             ref={props.ref as MutableRefObject<HTMLButtonElement>}
@@ -81,6 +81,6 @@ export const PageHeaderActionButton: FC = () => {
                     )}
                 />
             </Dropdown>
-        </>
+        </div>
     );
 };
