@@ -1,0 +1,10 @@
+.FilteredPageControls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1 0 0;
+}
+
+.FilteredPageButton {
+    margin-left: auto;
+}

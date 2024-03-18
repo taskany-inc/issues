@@ -1,0 +1,10 @@
+.InlineInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.TitleWrapper {
+    justify-content: space-between;
+    margin-right: var(--gap-s);
+}

@@ -1,0 +1,16 @@
+.FormBottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    padding: var(--gap-s);
+    padding-bottom: 0;
+}
+
+.TagsList {
+    padding: var(--gap-m) 0;
+}
+
+.TagsListPlaceholder {
+    color: var(--gray7);
+}

@@ -1,0 +1,14 @@
+.TextItem {
+    color: var(--gray9);
+}
+
+.TableRow {
+    display: grid;
+    grid-template-columns: minmax(400px, 1fr) 780px;
+    align-items: center;
+    flex: 1;
+
+    color: var(--text-color);
+    padding: var(--gap-s);
+    border-radius: var(--radius-m);
+}

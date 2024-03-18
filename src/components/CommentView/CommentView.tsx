@@ -32,7 +32,7 @@ import { CommentSchema } from '../../schema/comment';
 import { Reactions } from '../Reactions/Reactions';
 import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
-import { Circle } from '../Circle';
+import { Circle } from '../Circle/Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { StateDot } from '../StateDot/StateDot';
 import { getUserName } from '../../utils/getUserName';

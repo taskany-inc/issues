@@ -12,8 +12,8 @@ import {
 } from '@taskany/icons';
 import { Table, TableRow, Text } from '@taskany/bricks/harmony';
 
-import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
-import { Circle } from '../Circle';
+import { ActivityFeedItem } from '../ActivityFeed';
+import { Circle } from '../Circle/Circle';
 import { GoalBadge } from '../GoalBadge';
 import { Badge } from '../Badge/Badge';
 import { IssueMeta } from '../IssueMeta';

@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
-import { gray4, radiusM, textColor } from '@taskany/colors';
 import { TextStyle, nullable } from '@taskany/bricks';
 
 import { pageContext, PageContext } from '../../utils/pageContext';
@@ -18,10 +17,10 @@ import { PageHeader } from '../PageHeader/PageHeader';
 import { PageFooter } from '../PageFooter/PageFooter';
 import { ModalContext } from '../ModalOnEvent';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { OfflineBanner } from '../OfflineBanner/OfflineBanner';
 
 import s from './Page.module.css';
 
+const OfflineBanner = dynamic(() => import('../OfflineBanner/OfflineBanner'), { ssr: false });
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalPreview = dynamic(() => import('../GoalPreview/GoalPreview'));
 const ProjectCreateForm = dynamic(() => import('../ProjectCreateForm/ProjectCreateForm'));
@@ -78,7 +77,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
 
             <Toaster
                 toastOptions={{
-                    style: { borderRadius: radiusM, background: gray4, color: textColor },
+                    style: { borderRadius: 'var(--radius-m)', background: 'var(--gray4)', color: 'var(--text-color)' },
                 }}
                 position="bottom-right"
             />

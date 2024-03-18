@@ -1,0 +1,9 @@
+.CommentsCountBadge {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.CommentsCountBadgeIcon {
+    display: flex;
+}

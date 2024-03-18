@@ -1,0 +1,13 @@
+.Circle {
+    display: flex;
+    position: relative;
+    z-index: 1;
+
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+
+    text-align: center;
+    border-radius: 50%;
+    background-color: var(--gray7);
+}
