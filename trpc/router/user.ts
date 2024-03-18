@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import { settingsUserSchema, suggestionsUserSchema, updateUserSchema } from '../../src/schema/user';
+import { safeUserData } from '../../src/utils/getUserName';
 
 export const user = router({
     suggestions: protectedProcedure
@@ -149,5 +150,24 @@ export const user = router({
     }),
     getUserByNickname: protectedProcedure.input(z.string()).mutation(async ({ input }) => {
         return prisma.user.findFirst({ where: { nickname: input } });
+    }),
+    getFilterUsersByIds: protectedProcedure.input(z.array(z.string()).optional()).query(async ({ input = [] }) => {
+        const users = await prisma.user.findMany({
+            where: { activityId: { in: input } },
+            include: {
+                activity: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+            },
+        });
+
+        return users.reduce<{ id: string; user: ReturnType<typeof safeUserData> }[]>((acc, cur) => {
+            const userData = safeUserData(cur.activity);
+            if (userData) acc.push({ id: cur.id, user: userData });
+            return acc;
+        }, []);
     }),
 });

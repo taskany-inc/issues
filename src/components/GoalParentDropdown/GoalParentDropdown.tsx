@@ -24,6 +24,7 @@ type GoalParentDropdownProps = {
     className?: string;
     placeholder?: string;
     disabled?: boolean;
+    readOnly?: boolean;
     placement?: ComponentProps<typeof DropdownPanel>['placement'];
     onClose?: () => void;
 } & DropdownGuardedProps<GoalParentValue>;

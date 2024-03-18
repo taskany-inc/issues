@@ -1,0 +1,27 @@
+.AppliedFiltersBar {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--gap-s);
+
+    padding: var(--gap-sm) var(--gap-m);
+    background-color: var(--layer);
+    border-bottom: 1px solid var(--layer-above);
+}
+
+.AppliedFilters {
+    display: flex;
+    gap: var(--gap-s);
+    flex-wrap: wrap;
+    padding: 0 var(--gap-xs);
+}
+
+.AppliedFiltersActions {
+    display: flex;
+    align-items: start;
+    gap: var(--gap-s);
+    padding: 0 var(--gap-xs);
+}
+
+.AppliedFiltersTrash {
+    color: var(--danger-500);
+}
