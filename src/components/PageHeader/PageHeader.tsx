@@ -14,7 +14,7 @@ import {
 import { header, headerMenu, headerMenuExplore, headerMenuGoals } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
 import { routes, useRouter } from '../../hooks/router';
-import { PageHeaderActionButton } from '../PageHeaderActionButton/PageHeaderActionButton';
+import { NavigationSidebarActionButton } from '../NavigationSidebarActionButton/NavigationSidebarActionButton';
 import { PageHeaderLogo } from '../PageHeaderLogo';
 import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
 import { BetaBadge } from '../BetaBadge';
@@ -80,7 +80,7 @@ export const PageHeader: FC<{ logo?: ComponentProps<typeof PageHeaderLogo>['logo
             {...header.attr}
         >
             <HeaderContent>
-                <PageHeaderActionButton />
+                <NavigationSidebarActionButton />
             </HeaderContent>
         </Header>
     );
