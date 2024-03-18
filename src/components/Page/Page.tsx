@@ -38,12 +38,13 @@ interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     user: Session['user'];
     ssrTime: number;
     title?: string;
+    header: React.ReactNode;
     children?: React.ReactNode;
 }
 
 const mapThemeOnId = { light: 0, dark: 1 } as const;
 
-export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, ...attrs }) => {
+export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, header, ...attrs }) => {
     const { setPreview } = useGoalPreview();
     const { data: userSettings = user?.settings } = trpc.user.settings.useQuery();
     const { data: config } = trpc.appConfig.get.useQuery();
@@ -90,6 +91,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
                 </aside>
 
                 <main className={s.PageMain} {...attrs}>
+                    {header}
                     <div className={s.PageContent} {...pageContent.attr}>
                         {children}
                     </div>

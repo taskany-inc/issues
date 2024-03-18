@@ -14,7 +14,7 @@ export const getServerSideProps = declareSsrProps(
             await ssrHelpers.project.getAll.fetchInfinite({
                 limit: pageSize,
                 goalsQuery: queryState,
-                firstLevel: !!queryState.project.length,
+                firstLevel: !!queryState.project?.length,
             });
         } else {
             await ssrHelpers.goal.getBatch.fetchInfinite({

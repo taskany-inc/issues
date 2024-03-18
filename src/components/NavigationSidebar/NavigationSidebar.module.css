@@ -52,3 +52,7 @@
     cursor: pointer;
     user-select: none;
 }
+
+.MenuItem_active {
+    background-color: var(--layer-above);
+}

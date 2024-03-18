@@ -12,9 +12,10 @@ import { trpc } from '../../utils/trpcClient';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { FilteredPage } from '../FilteredPage/FilteredPage';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { FiltersBarItem } from '../FiltersBar/FiltersBar';
+import { PresetModals } from '../PresetModals';
+import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 
 import { tr } from './ProjectPage.i18n';
 
@@ -25,9 +26,9 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
     const utils = trpc.useContext();
 
-    const { preset, userFilters } = useFiltersPreset({ defaultPresetFallback });
+    const { preset } = useFiltersPreset({ defaultPresetFallback });
 
-    const { currentPreset, queryState, setTagsFilterOutside } = useUrlFilterParams({
+    const { queryState, setTagsFilterOutside } = useUrlFilterParams({
         preset,
     });
 
@@ -84,10 +85,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         setCurrentProjectCache(null);
     });
 
-    const onFilterStar = useCallback(async () => {
-        await utils.filter.getById.invalidate();
-    }, [utils]);
-
     const handleItemEnter = useCallback(
         (goal: NonNullable<GoalByIdReturnType>) => {
             setPreview(goal._shortId, goal);
@@ -104,33 +101,32 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                     project: project?.title,
                 })
                 .join('')}
-        >
-            <FilteredPage
-                title={project?.title || tr('Projects')}
-                total={projectDeepInfo?.meta?.count}
-                counter={projectDeepInfo?.goals?.length}
-                filterPreset={currentPreset}
-                userFilters={userFilters}
-                onFilterStar={onFilterStar}
-                isLoading={isLoadingDeepInfoProject}
-                filterControls={
+            header={
+                <FiltersPanel
+                    title={project?.title || tr('Projects')}
+                    total={projectDeepInfo?.meta?.count}
+                    counter={projectDeepInfo?.goals?.length}
+                    filterPreset={preset}
+                    loading={isLoadingDeepInfoProject}
+                >
                     <FiltersBarItem>
                         <ProjectPageTabs id={id} editable={project?._isEditable} />
                     </FiltersBarItem>
-                }
-            >
-                <ListView onKeyboardClick={handleItemEnter}>
-                    {nullable(project, (p) => (
-                        <ProjectListItemConnected
-                            key={p.id}
-                            visible
-                            project={p}
-                            onTagClick={setTagsFilterOutside}
-                            queryState={queryState}
-                        />
-                    ))}
-                </ListView>
-            </FilteredPage>
+                </FiltersPanel>
+            }
+        >
+            <ListView onKeyboardClick={handleItemEnter}>
+                {nullable(project, (p) => (
+                    <ProjectListItemConnected
+                        key={p.id}
+                        visible
+                        project={p}
+                        onTagClick={setTagsFilterOutside}
+                        queryState={queryState}
+                    />
+                ))}
+            </ListView>
+            <PresetModals preset={preset} />
         </Page>
     );
 };

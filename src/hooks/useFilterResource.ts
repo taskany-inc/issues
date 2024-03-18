@@ -24,6 +24,7 @@ export const useFilterResource = () => {
             toggleMutation.mutateAsync(data, {
                 onSuccess: () => {
                     utils.filter.getUserFilters.invalidate();
+                    utils.filter.getById.invalidate();
                 },
             }),
             data.direction ? 'filterStar' : 'filterUnstar',
