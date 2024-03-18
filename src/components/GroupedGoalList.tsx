@@ -25,7 +25,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, on
         {
             limit: projectsSize,
             includePersonal: true,
-            firstLevel: !queryState?.project.length,
+            firstLevel: !queryState?.project?.length,
             goalsQuery: queryState,
         },
         {

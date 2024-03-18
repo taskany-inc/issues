@@ -25,6 +25,7 @@ import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
 import { GoalActivityFeed } from '../GoalActivityFeed';
 import { goalPage, goalPageEditButton } from '../../utils/domObjects';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
+import { CommonHeader } from '../CommonHeader';
 
 import { tr } from './GoalPage.i18n';
 import s from './GoalPage.module.css';
@@ -93,7 +94,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     if (!goal) return null;
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={pageTitle} {...goalPage.attr}>
+        <Page user={user} ssrTime={ssrTime} title={pageTitle} header={<CommonHeader />} {...goalPage.attr}>
             <GoalHeader
                 goal={goal}
                 onCommentsClick={onCommentsClick}

@@ -60,11 +60,16 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
         .join('');
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
-            <CommonHeader title={project.title} {...pageHeader.attr}>
-                <ProjectPageTabs id={id} editable={project?._isEditable} />
-            </CommonHeader>
-
+        <Page
+            user={user}
+            ssrTime={ssrTime}
+            title={pageTitle}
+            header={
+                <CommonHeader title={project.title} {...pageHeader.attr}>
+                    <ProjectPageTabs id={id} editable={project?._isEditable} />
+                </CommonHeader>
+            }
+        >
             {nullable(project._isEditable, () => (
                 <div className={s.ProjectTeamPageActions}>
                     <TeamComboBox project={project} text={tr('Add team')} placeholder={tr('Enter the title')} />
