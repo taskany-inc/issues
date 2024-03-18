@@ -129,19 +129,25 @@ export const parseBaseValues = (query: ParsedUrlQuery): BaseQueryState => ({
     limit: query.limit ? Number(query.limit) : undefined,
 });
 
-export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => ({
-    priority: parseQueryParam(query.priority?.toString()),
-    state: parseQueryParam(query.state?.toString()),
-    stateType: parseQueryParam(query.stateType?.toString()).map((type) => StateTypeEnum.parse(type)),
-    tag: parseQueryParam(query.tag?.toString()),
-    estimate: parseQueryParam(query.estimate?.toString()),
-    issuer: parseQueryParam(query.issuer?.toString()),
-    owner: parseQueryParam(query.owner?.toString()),
-    participant: parseQueryParam(query.participant?.toString()),
-    project: parseQueryParam(query.project?.toString()),
-    query: parseQueryParam(query.query?.toString()).toString(),
-    sort: parseSortQueryParam(query.sort?.toString()),
-});
+export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
+    const queryMap = {} as FilterQueryState;
+
+    if (query.priority) queryMap.priority = parseQueryParam(query.priority?.toString());
+    if (query.state) queryMap.state = parseQueryParam(query.state?.toString());
+    if (query.stateType) {
+        queryMap.stateType = parseQueryParam(query.stateType?.toString()).map((type) => StateTypeEnum.parse(type));
+    }
+    if (query.tag) queryMap.tag = parseQueryParam(query.tag?.toString());
+    if (query.estimate) queryMap.estimate = parseQueryParam(query.estimate?.toString());
+    if (query.issuer) queryMap.issuer = parseQueryParam(query.issuer?.toString());
+    if (query.owner) queryMap.owner = parseQueryParam(query.owner?.toString());
+    if (query.participant) queryMap.participant = parseQueryParam(query.participant?.toString());
+    if (query.project) queryMap.project = parseQueryParam(query.project?.toString());
+    if (query.query) queryMap.query = parseQueryParam(query.query?.toString()).toString();
+    if (query.sort) queryMap.sort = parseSortQueryParam(query.sort?.toString());
+
+    return queryMap;
+};
 
 export const parseQueryState = (query: ParsedUrlQuery) => {
     const queryBaseState = parseBaseValues(query);

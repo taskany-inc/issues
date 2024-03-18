@@ -1,0 +1,16 @@
+.AppliedFilter {
+    padding-right: var(--gap-xs);
+    gap: var(--gap-s);
+}
+
+.AppliedFilterLabel {
+    color: var(--text-secondary);
+}
+
+.AppliedFilterValue {
+    color: var(--text-primary);
+}
+
+.AppliedFilter_readOnly {
+    gap: 0;
+}
