@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { IconBellOutline } from '@taskany/icons';
 import { useRouter } from 'next/router';
 
@@ -22,29 +22,33 @@ interface AppNavigationProps {
     logo?: string;
 }
 
-const goalsRoutes = [
-    {
-        title: tr('My goals'),
-        href: routes.index(),
-        attrs: headerMenuGoals.attr,
-    },
-    {
-        title: tr('All goals'),
-        href: routes.goals(),
-        attrs: headerMenuExplore.attr,
-    },
-];
-
-const projectsRoutes = [
-    {
-        title: tr('All projects'),
-        href: routes.exploreProjects(),
-    },
-];
-
 export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
     const nextRouter = useRouter();
     const activeRoute = nextRouter.asPath.split('?')[0];
+
+    const [goalsRoutes, projectsRoutes] = useMemo(
+        () => [
+            [
+                {
+                    title: tr('My goals'),
+                    href: routes.index(),
+                    attrs: headerMenuGoals.attr,
+                },
+                {
+                    title: tr('All goals'),
+                    href: routes.goals(),
+                    attrs: headerMenuExplore.attr,
+                },
+            ],
+            [
+                {
+                    title: tr('All projects'),
+                    href: routes.exploreProjects(),
+                },
+            ],
+        ],
+        [],
+    );
 
     return (
         <NavigationSidebar {...header.attr}>

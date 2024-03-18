@@ -166,9 +166,13 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
         .join('');
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={pageTitle} {...userSettings.attr}>
-            <CommonHeader title={`${tr('Settings')} id: ${user.id}`} />
-
+        <Page
+            user={user}
+            ssrTime={ssrTime}
+            title={pageTitle}
+            header={<CommonHeader title={`${tr('Settings')} id: ${user.id}`} />}
+            {...userSettings.attr}
+        >
             <SettingsContent>
                 <SettingsCard>
                     <Form onSubmit={handleSubmit(updateUser)}>

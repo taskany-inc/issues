@@ -8,6 +8,7 @@ import { Page } from '../../components/Page/Page';
 import { routes } from '../../hooks/router';
 import { AvailableHelpPages } from '../../types/help';
 import { TLocale } from '../../utils/getLang';
+import { CommonHeader } from '../../components/CommonHeader';
 
 const Md = dynamic(() => import('../../components/Md'));
 
@@ -70,7 +71,7 @@ const HelpPage = ({
     menu,
 }: ExternalPageProps<{ source: string; stat: fs.Stats; yml: YmlProps }>) => {
     return (
-        <Page user={user} ssrTime={ssrTime} title={yml.title}>
+        <Page user={user} ssrTime={ssrTime} header={<CommonHeader />} title={yml.title}>
             Created: {stat.ctime}
             <br />
             Modified: {stat.mtime}

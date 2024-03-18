@@ -14,10 +14,11 @@ import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
-import { FilteredPage } from '../FilteredPage/FilteredPage';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { routes } from '../../hooks/router';
 import { GoalTableList } from '../GoalTableList/GoalTableList';
+import { PresetModals } from '../PresetModals';
+import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -26,7 +27,7 @@ export const projectsLimit = 5;
 export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const utils = trpc.useContext();
 
-    const { preset, userFilters } = useFiltersPreset({ defaultPresetFallback });
+    const { preset } = useFiltersPreset({ defaultPresetFallback });
 
     const { currentPreset, queryState } = useUrlFilterParams({
         preset,
@@ -76,10 +77,6 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         };
     }, [on, utils.project.getUserProjectsWithGoals]);
 
-    const onFilterStar = useCallback(async () => {
-        await utils.filter.getById.invalidate();
-    }, [utils]);
-
     const handleItemEnter = useCallback(
         (goal: NonNullable<GoalByIdReturnType>) => {
             setPreview(goal._shortId, goal);
@@ -88,45 +85,50 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
     );
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={tr('title')}>
-            <FilteredPage
-                title={getPageTitle({
-                    title: tr('Dashboard'),
-                    shadowPresetTitle: currentPreset?.title,
-                    currentPresetTitle: currentPreset?.title,
-                })}
-                total={totalGoalsCount}
-                counter={goals?.length}
-                filterPreset={currentPreset}
-                userFilters={userFilters}
-                onFilterStar={onFilterStar}
-                isLoading={isLoading}
-            >
-                <ListView onKeyboardClick={handleItemEnter}>
-                    {groupsOnScreen?.map(({ project, goals }) => (
-                        <ProjectListItemCollapsable
-                            key={project.id}
-                            interactive={false}
-                            visible
-                            project={project}
-                            href={routes.project(project.id)}
-                            goals={nullable(goals, (g) => (
-                                <TreeViewElement>
-                                    <GoalTableList goals={g} />
-                                </TreeViewElement>
-                            ))}
-                        >
-                            {nullable(!goals.length, () => (
-                                <InlineCreateGoalControl project={project} />
-                            ))}
-                        </ProjectListItemCollapsable>
-                    ))}
-                </ListView>
-
-                {nullable(hasNextPage, () => (
-                    <LoadMoreButton onClick={fetchNextPage as () => void} />
+        <Page
+            user={user}
+            ssrTime={ssrTime}
+            title={tr('title')}
+            header={
+                <FiltersPanel
+                    title={getPageTitle({
+                        title: tr('Dashboard'),
+                        shadowPresetTitle: currentPreset?.title,
+                        currentPresetTitle: currentPreset?.title,
+                    })}
+                    total={totalGoalsCount}
+                    counter={goals?.length}
+                    filterPreset={preset}
+                    loading={isLoading}
+                />
+            }
+        >
+            <ListView onKeyboardClick={handleItemEnter}>
+                {groupsOnScreen?.map(({ project, goals }) => (
+                    <ProjectListItemCollapsable
+                        key={project.id}
+                        interactive={false}
+                        visible
+                        project={project}
+                        href={routes.project(project.id)}
+                        goals={nullable(goals, (g) => (
+                            <TreeViewElement>
+                                <GoalTableList goals={g} />
+                            </TreeViewElement>
+                        ))}
+                    >
+                        {nullable(!goals.length, () => (
+                            <InlineCreateGoalControl project={project} />
+                        ))}
+                    </ProjectListItemCollapsable>
                 ))}
-            </FilteredPage>
+            </ListView>
+
+            {nullable(hasNextPage, () => (
+                <LoadMoreButton onClick={fetchNextPage as () => void} />
+            ))}
+
+            <PresetModals preset={preset} />
         </Page>
     );
 };

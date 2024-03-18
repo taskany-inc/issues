@@ -6,14 +6,16 @@ import { FiltersBar, FiltersBarItem, FiltersBarTitle } from './FiltersBar/Filter
 import { Separator } from './Separator/Separator';
 
 interface CommonHeaderProps {
-    title: React.ReactNode;
+    title?: React.ReactNode;
     children?: React.ReactNode;
 }
 export const CommonHeader: React.FC<CommonHeaderProps> = ({ title, children }) => (
     <FiltersBar {...pageHeader.attr}>
-        <FiltersBarItem>
-            <FiltersBarTitle {...pageTitle.attr}>{title}</FiltersBarTitle>
-        </FiltersBarItem>
+        {nullable(title, (t) => (
+            <FiltersBarItem>
+                <FiltersBarTitle {...pageTitle.attr}>{t}</FiltersBarTitle>
+            </FiltersBarItem>
+        ))}
         {nullable(children, (ch) => (
             <>
                 <Separator />

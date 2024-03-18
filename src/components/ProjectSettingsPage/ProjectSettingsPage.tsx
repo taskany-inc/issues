@@ -190,11 +190,16 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
     if (!project.data) return null;
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={pageTitle}>
-            <CommonHeader title={project.data.title} {...pageHeader.attr}>
-                <ProjectPageTabs id={id} editable />
-            </CommonHeader>
-
+        <Page
+            user={user}
+            ssrTime={ssrTime}
+            title={pageTitle}
+            header={
+                <CommonHeader title={project.data.title} {...pageHeader.attr}>
+                    <ProjectPageTabs id={id} editable />
+                </CommonHeader>
+            }
+        >
             <SettingsContent {...projectSettingsContent.attr}>
                 <SettingsCard>
                     <Form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>

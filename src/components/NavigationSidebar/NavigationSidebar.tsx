@@ -92,7 +92,14 @@ export const NavigationItem: FC<NavigationItemProps> = ({ selected, href, childr
         value={href}
         renderItem={({ hovered, active, ...props }) => (
             <NextLink href={href} legacyBehavior>
-                <MenuItem hovered={active || hovered || selected} selected={active} {...props} {...rest}>
+                <MenuItem
+                    hovered={active || hovered}
+                    className={cn({
+                        [s.MenuItem_active]: selected,
+                    })}
+                    {...props}
+                    {...rest}
+                >
                     {children}
                 </MenuItem>
             </NextLink>
