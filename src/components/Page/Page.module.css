@@ -1,4 +1,24 @@
+.PageLayout {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+}
+
+.PageAside {
+    width: 230px;
+    flex-shrink: 0;
+}
+
 .PageMain {
-    /* presses the footer to the bottom*/
-    min-height: calc(100vh - 160px);
+    display: flex;
+    flex-direction: column;
+    flex:1;
+    overflow: auto;
+}
+
+.PageContent {
+    flex: 1;
+    overflow: auto;
+    margin: var(--gap-xs) var(--gap-sm) 0;
+    padding: var(--gap-m) var(--gap-s);
 }

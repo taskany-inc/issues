@@ -2,11 +2,9 @@ import styled from 'styled-components';
 import { danger0, gapM, gray4, warn0 } from '@taskany/colors';
 import { FormCard } from '@taskany/bricks';
 
-import { PageContent } from './PageContent/PageContent';
-
 type SettingsCardViewType = 'default' | 'warning' | 'danger';
 
-const StyledSettingsContent = styled(PageContent)`
+const StyledSettingsContent = styled.div`
     display: grid;
     grid-template-columns: 7fr 5fr;
 `;
