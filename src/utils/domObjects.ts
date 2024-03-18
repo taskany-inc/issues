@@ -140,3 +140,4 @@ export const goalDependencyKinds = {
     relatedTo: goalDependencyKindRelatedTo,
 };
 export const goalDependencyGoalsListItem = goalDependencies.add('goalsListItem');
+export const pageContent = DO('pageContent');

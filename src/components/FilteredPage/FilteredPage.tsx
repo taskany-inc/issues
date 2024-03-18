@@ -9,7 +9,6 @@ import { FilterQueryState, QueryState, buildURLSearchParams, useUrlFilterParams 
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { createFilterKeys } from '../../utils/hotkeys';
 import { FilterById } from '../../../trpc/inferredTypes';
-import { PageContent } from '../PageContent/PageContent';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { PresetDropdown } from '../PresetDropdown';
 import { ScrollableView } from '../ScrollableView';
@@ -199,9 +198,7 @@ export const FilteredPage: React.FC<React.PropsWithChildren<FilteredPageProps>> 
                 </AppliedFiltersBar>
             ))}
 
-            <PageContent>
-                <ScrollableView>{children}</ScrollableView>
-            </PageContent>
+            <ScrollableView>{children}</ScrollableView>
 
             {nullable(queryString, (params) => (
                 <ModalOnEvent event={ModalEvent.FilterCreateModal} hotkeys={createFilterKeys}>

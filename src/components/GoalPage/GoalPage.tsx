@@ -6,7 +6,6 @@ import { Button } from '@taskany/bricks/harmony';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { Page } from '../Page/Page';
-import { PageContent } from '../PageContent/PageContent';
 import { PageActions } from '../PageActions/PageActions';
 import { PageSep } from '../PageSep';
 import { IssueKey } from '../IssueKey';
@@ -95,46 +94,44 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
 
     return (
         <Page user={user} ssrTime={ssrTime} title={pageTitle} {...goalPage.attr}>
-            <PageContent>
-                <GoalHeader
-                    goal={goal}
-                    onCommentsClick={onCommentsClick}
-                    onGoalStateChange={onGoalStateChange}
-                    actions={
-                        <>
-                            <PageActions>
-                                <WatchButton watcher={Boolean(goal._isWatching)} onToggle={onGoalWatchingToggle} />
-                                <StarButton
-                                    stargizer={Boolean(goal._isStarred)}
-                                    count={goal._count?.stargizers}
-                                    onToggle={onGoalStarToggle}
-                                />
-                            </PageActions>
+            <GoalHeader
+                goal={goal}
+                onCommentsClick={onCommentsClick}
+                onGoalStateChange={onGoalStateChange}
+                actions={
+                    <>
+                        <PageActions>
+                            <WatchButton watcher={Boolean(goal._isWatching)} onToggle={onGoalWatchingToggle} />
+                            <StarButton
+                                stargizer={Boolean(goal._isStarred)}
+                                count={goal._count?.stargizers}
+                                onToggle={onGoalStarToggle}
+                            />
+                        </PageActions>
 
-                            <div className={s.GoalPageActionsWrapper}>
-                                <PageActions>
-                                    <IssueKey id={id} />
-                                    {nullable(goal._isEditable, () => (
-                                        <Button
-                                            text={tr('Edit')}
-                                            iconLeft={<IconEdit1Outline size="xs" />}
-                                            onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
-                                            {...goalPageEditButton.attr}
-                                        />
-                                    ))}
-                                </PageActions>
-                                {nullable(goal?.updatedAt, (date) => (
-                                    <RelativeTime kind="updated" date={date} />
+                        <div className={s.GoalPageActionsWrapper}>
+                            <PageActions>
+                                <IssueKey id={id} />
+                                {nullable(goal._isEditable, () => (
+                                    <Button
+                                        text={tr('Edit')}
+                                        iconLeft={<IconEdit1Outline size="xs" />}
+                                        onClick={dispatchModalEvent(ModalEvent.GoalEditModal)}
+                                        {...goalPageEditButton.attr}
+                                    />
                                 ))}
-                            </div>
-                        </>
-                    }
-                />
-            </PageContent>
+                            </PageActions>
+                            {nullable(goal?.updatedAt, (date) => (
+                                <RelativeTime kind="updated" date={date} />
+                            ))}
+                        </div>
+                    </>
+                }
+            />
 
             <PageSep />
 
-            <PageContent className={s.GoalContent}>
+            <div className={s.GoalContent}>
                 <div>
                     <GoalContentHeader date={goal.createdAt} description={goal.description} />
 
@@ -154,7 +151,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                         onGoalClick={onGoalClick}
                     />
                 </div>
-            </PageContent>
+            </div>
         </Page>
     );
 };

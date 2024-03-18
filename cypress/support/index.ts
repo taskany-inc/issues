@@ -29,6 +29,7 @@ import {
     commentDropdownDelete,
     userSettingsLogoutButton,
     commentFormDescription,
+    pageContent,
 } from '../../src/utils/domObjects';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { SignInFields } from '..';
@@ -170,6 +171,7 @@ Cypress.Commands.addAll({
 
         cy.get(commentFormDescription.query).should('exist').should('be.visible');
         cy.get(commentFormDescription.query).focus().realType(description);
+        cy.get(pageContent.query).scrollTo('bottom');
 
         cy.get(commentFormSubmitButton.query).should('exist').should('be.visible').click();
 
