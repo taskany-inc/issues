@@ -1,0 +1,22 @@
+.EstimateOption {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--gap-xs);
+}
+
+.EstimateOptionContent {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+/* Order of styles on page: SC, CSS Modules */
+.EstimateOptionClue.EstimateOptionClue {
+    color: var(--gray7);
+    padding-bottom: var(--gap-s);
+}
+
+/* Order of styles on page: SC, CSS Modules */
+.EstimateOptionIcon.EstimateOptionIcon {
+    color: var(--gray9);
+}

@@ -22,7 +22,7 @@ import {
 } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
 import { GoalList } from '../GoalList/GoalList';
-import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
+import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList/TagsList';
 import { dependencyKind } from '../../schema/goal';

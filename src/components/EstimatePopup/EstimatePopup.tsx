@@ -1,29 +1,13 @@
 import React, { ReactNode, useRef, useState, useCallback, ComponentProps } from 'react';
-import styled from 'styled-components';
 import { useClickOutside, Popup, nullable } from '@taskany/bricks';
 
-import { combobox, comboboxErrorDot } from '../utils/domObjects';
+import { combobox, comboboxErrorDot } from '../../utils/domObjects';
+import { EstimateProps, Estimate } from '../Estimate/Estimate';
+import { EstimateYear } from '../EstimateYear/EstimateYear';
+import { EstimateQuarter } from '../EstimateQuarter/EstimateQuarter';
+import { EstimateDate } from '../EstimateDate/EstimateDate';
 
-import { EstimateProps, Estimate } from './Estimate/Estimate';
-import { EstimateYear } from './EstimateYear/EstimateYear';
-import { EstimateQuarter } from './EstimateQuarter/EstimateQuarter';
-import { EstimateDate } from './EstimateDate/EstimateDate';
-
-const StyledErrorTrigger = styled.div`
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 100%;
-    background-color: var(--danger10);
-    top: -2px;
-    right: 0px;
-    z-index: 1;
-`;
-
-const StyledPopup = styled(Popup)`
-    border-radius: var(--radius-m);
-    padding: var(--gap-s);
-`;
+import s from './EstimatePopup.module.css';
 
 export interface EstimatePopupProps extends Omit<EstimateProps, 'children'> {
     error?: { message?: string };
@@ -67,7 +51,8 @@ export const EstimatePopup = React.forwardRef<HTMLDivElement, EstimatePopupProps
             <div ref={ref} {...combobox.attr}>
                 {nullable(error, (err) => (
                     <>
-                        <StyledErrorTrigger
+                        <div
+                            className={s.ErrorTrigger}
                             ref={errorRef}
                             onMouseEnter={onMouseEnter}
                             onMouseLeave={onMouseLeave}
@@ -81,20 +66,21 @@ export const EstimatePopup = React.forwardRef<HTMLDivElement, EstimatePopupProps
 
                 <div ref={triggerRef}>{renderTrigger({ onClick: onToggleVisible })}</div>
 
-                <StyledPopup
+                <Popup
                     visible={visible}
                     placement={placement}
                     reference={triggerRef}
                     interactive
                     minWidth={180}
                     maxWidth={180}
+                    className={s.Popup}
                 >
                     <Estimate value={value} onChange={onChange} ref={popupContentRef}>
                         <EstimateYear />
                         <EstimateQuarter />
                         <EstimateDate />
                     </Estimate>
-                </StyledPopup>
+                </Popup>
             </div>
         );
     },

@@ -18,7 +18,7 @@ import { GoalBadge } from '../GoalBadge';
 import { Badge } from '../Badge/Badge';
 import { IssueMeta } from '../IssueMeta';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
-import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
+import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { routes } from '../../hooks/router';
 import { CustomCell } from '../GoalListItemCompact/GoalListItemCompact';
