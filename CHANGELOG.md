@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.26.1](https://github.com/taskany-inc/issues/compare/v2.26.0...v2.26.1) (2024-03-19)
+
+
+### Bug Fixes
+
+* **CommentCreateForm:** selecting state works correctly ([c6cbff9](https://github.com/taskany-inc/issues/commit/c6cbff9a11d65abe072aa16f4492786507db0c96))
+
 ## [2.26.0](https://github.com/taskany-inc/issues/compare/v2.25.0...v2.26.0) (2024-03-14)
 
 
