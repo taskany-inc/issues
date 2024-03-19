@@ -23,7 +23,7 @@ import { Button, FormControl, FormControlInput, FormControlLabel, FormControlErr
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useRouter } from '../../hooks/router';
-import { SettingsCard, SettingsContent } from '../SettingsContent';
+import { SettingsCard, SettingsContent } from '../SettingsContent/SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Page } from '../Page/Page';
 import { useProjectResource } from '../../hooks/useProjectResource';

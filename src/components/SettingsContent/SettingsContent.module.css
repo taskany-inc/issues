@@ -1,0 +1,20 @@
+.SettingsContent {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+}
+
+.SettingsCard:not(:last-child) {
+    margin-bottom: var(--gap-m);
+}
+
+.SettingsCard.SettingsCard_warning {
+    border-color: var(--warn-900);
+}
+
+.SettingsCard.SettingsCard_danger {
+    border-color: var(--danger-500);
+}
+
+.SettingsCard.SettingsCard_default {
+    border-color: var(--gray-900);
+}

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { gapM, gapS, gray3, gray9 } from '@taskany/colors';
 import { ComponentProps } from 'react';
 
-import { SettingsCard } from './SettingsContent';
+import { SettingsCard } from './SettingsContent/SettingsContent';
 import { UserEditableList } from './UserEditableList/UserEditableList';
 
 const StyledTitle = styled(Text)`
