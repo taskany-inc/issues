@@ -32,8 +32,14 @@
 }
 
 .NewGoalCriteriaGoalBadge {
-    padding: 0;
     align-items: baseline;
+    cursor: pointer;
+}
+
+.NewGoalCriteriaItemCheckbox,
+.NewGoalCriteriaGoalBadge {
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .NewGoalCriteriaTrigger {
@@ -44,15 +50,26 @@
     justify-content: center;
 }
 
-.NewGoalCriteriaItemCheckbox {
-    align-items: baseline;
-    /* FIXME: https://github.com/taskany-inc/bricks/issues/868 */
-    cursor: default;
-    pointer-events: none;
+.NewGoalCriteriaActions {
+    display: flex;
+    flex-direction: column;
+    width: max-content;
 }
 
-/* FIXME: https://github.com/taskany-inc/bricks/issues/863 */
-.NewGoalCriteriaGoalBadgeState,
-.NewGoalCriteriaItemCheckbox input[type="checkbox"] {
-    transform: translateY(3px);
+.NewGoalCriteriaActionsItem {
+    padding: var(--gap-xs);
+}
+
+.NewGoalCriteriaActionsItem:hover {
+    background-color: var(--gray-900);
+}
+
+.NewGoalCriteriaIssueMeta.NewGoalCriteriaIssueMeta {
+    max-width: max-content;
+}
+
+/* increasing selector specificity for override SC priority */
+.NewGoalCriteriaIssueMetaReset.NewGoalCriteriaIssueMetaReset {
+    padding: 0;
+    
 }

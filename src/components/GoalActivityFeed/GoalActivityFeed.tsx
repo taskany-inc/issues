@@ -2,32 +2,35 @@ import { nullable } from '@taskany/bricks';
 import { forwardRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
-import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
-import { editGoalKeys } from '../utils/hotkeys';
-import { GoalByIdReturnType } from '../../trpc/inferredTypes';
-import { useGoalResource } from '../hooks/useGoalResource';
-import { usePageContext } from '../hooks/usePageContext';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { editGoalKeys } from '../../utils/hotkeys';
+import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { useGoalResource } from '../../hooks/useGoalResource';
+import { usePageContext } from '../../hooks/usePageContext';
+import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
+import { CommentView } from '../CommentView/CommentView';
+import { GoalActivity } from '../GoalActivity';
+import { GoalCriteriaView } from '../NewGoalCriteria/NewGoalCriteria';
+import { AddInlineTrigger } from '../AddInlineTrigger';
+import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
+import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 
-import { GoalDeleteModal } from './GoalDeleteModal/GoalDeleteModal';
-import { CommentView } from './CommentView/CommentView';
-import { GoalCriteria } from './GoalCriteria/GoalCriteria';
-import { GoalActivity } from './GoalActivity';
+import { tr } from './GoalActivityFeed.i18n';
 
-const ModalOnEvent = dynamic(() => import('./ModalOnEvent'));
-const GoalEditForm = dynamic(() => import('./GoalEditForm/GoalEditForm'));
-const GoalCommentCreateForm = dynamic(() => import('./GoalCommentCreateForm'));
+const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
+const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
+const GoalCommentCreateForm = dynamic(() => import('../GoalCommentCreateForm'));
 
 interface GoalActivityFeedProps {
     goal: NonNullable<GoalByIdReturnType>;
     shortId?: string;
 
-    onGoalClick?: (goal: { _shortId: string }) => void;
     onGoalDeleteConfirm?: () => void;
     onInvalidate?: () => void;
 }
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
-    ({ goal, shortId, onGoalClick, onGoalDeleteConfirm, onInvalidate }, ref) => {
+    ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }, ref) => {
         const { user } = usePageContext();
         const {
             onGoalCommentUpdate,
@@ -86,7 +89,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
         );
 
         const handleUpdateCriteria = useCallback(
-            async (data: { id?: string; title: string; weight: string; selected?: { id?: string } }) => {
+            async (data: { id?: string; title: string; weight?: number; selected?: { id?: string } }) => {
                 if (!data.id) return;
 
                 await onGoalCriteriaUpdate({
@@ -142,18 +145,61 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     header={
                         <>
                             {nullable(goal._criteria?.length || goal._isEditable, () => (
-                                <GoalCriteria
+                                <GoalCriteriaView
                                     goalId={goal.id}
                                     canEdit={goal._isEditable}
-                                    onCreate={handleCreateCriteria}
                                     onUpdate={handleUpdateCriteria}
-                                    onUpdateState={handleUpdateCriteriaState}
-                                    onConvertToGoal={handleConvertCriteriaToGoal}
+                                    onCheck={handleUpdateCriteriaState}
+                                    onConvert={handleConvertCriteriaToGoal}
                                     onRemove={handleRemoveCriteria}
-                                    onGoalClick={onGoalClick}
-                                    validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                                    list={goal._criteria}
-                                />
+                                    list={goal._criteria?.map((criteria) => {
+                                        if (criteria.criteriaGoal) {
+                                            return {
+                                                id: criteria.id,
+                                                goal: {
+                                                    goalId: criteria.criteriaGoal.id,
+                                                    stateColor: criteria.criteriaGoal.state?.hue,
+                                                    shortId: criteria.criteriaGoal._shortId,
+                                                },
+                                                title: criteria.criteriaGoal.title,
+                                                isDone: criteria.isDone,
+                                                weight: criteria.weight,
+                                            };
+                                        }
+
+                                        return {
+                                            title: criteria.title,
+                                            id: criteria.id,
+                                            isDone: criteria.isDone,
+                                            weight: criteria.weight,
+                                        };
+                                    })}
+                                >
+                                    {nullable(goal._isEditable, () => (
+                                        <GoalFormPopupTrigger
+                                            renderTrigger={(props) => (
+                                                <AddInlineTrigger
+                                                    text={tr('Add achievement criteria')}
+                                                    ref={props.ref}
+                                                    onClick={props.onClick}
+                                                    centered={false}
+                                                />
+                                            )}
+                                        >
+                                            <GoalCriteriaSuggest
+                                                id={goal.id}
+                                                withModeSwitch
+                                                defaultMode="simple"
+                                                items={goal._criteria.map((criteria) => ({
+                                                    ...criteria,
+                                                    goal: criteria.criteriaGoal,
+                                                }))}
+                                                onSubmit={handleCreateCriteria}
+                                                validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                                            />
+                                        </GoalFormPopupTrigger>
+                                    ))}
+                                </GoalCriteriaView>
                             ))}
                             {nullable(lastStateComment, (value) => (
                                 <CommentView

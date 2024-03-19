@@ -23,7 +23,7 @@ import { useFMPMetric } from '../../utils/telemetry';
 import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
 import { GoalHeader } from '../GoalHeader/GoalHeader';
 import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
-import { GoalActivityFeed } from '../GoalActivityFeed';
+import { GoalActivityFeed } from '../GoalActivityFeed/GoalActivityFeed';
 import { goalPage, goalPageEditButton } from '../../utils/domObjects';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 
@@ -138,13 +138,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                 <div>
                     <GoalContentHeader date={goal.createdAt} description={goal.description} />
 
-                    <GoalActivityFeed
-                        ref={commentsRef}
-                        goal={goal}
-                        shortId={id}
-                        onGoalClick={onGoalClick}
-                        onGoalDeleteConfirm={router.goals}
-                    />
+                    <GoalActivityFeed ref={commentsRef} goal={goal} shortId={id} onGoalDeleteConfirm={router.goals} />
                 </div>
 
                 <div>
