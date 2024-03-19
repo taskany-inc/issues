@@ -12,11 +12,11 @@ import {
 } from '@taskany/icons';
 import { Table, TableRow, Text } from '@taskany/bricks/harmony';
 
-import { ActivityFeedItem } from '../ActivityFeed';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { Circle } from '../Circle/Circle';
 import { GoalBadge } from '../GoalBadge';
 import { Badge } from '../Badge/Badge';
-import { IssueMeta } from '../IssueMeta';
+import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';

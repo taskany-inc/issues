@@ -4,7 +4,7 @@ import cn from 'classnames';
 
 import s from './State.module.css';
 
-const StateWrapper = dynamic(() => import('../StateWrapper'));
+const StateWrapper = dynamic(() => import('../StateWrapper/StateWrapper'));
 
 interface StateProps {
     title: string;

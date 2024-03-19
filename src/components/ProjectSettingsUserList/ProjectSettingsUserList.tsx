@@ -1,7 +1,7 @@
 import { Text } from '@taskany/bricks/harmony';
 import { ComponentProps } from 'react';
 
-import { SettingsCard } from '../SettingsContent';
+import { SettingsCard } from '../SettingsContent/SettingsContent';
 import { UserEditableList } from '../UserEditableList/UserEditableList';
 
 import s from './ProjectSettingsUserList.module.css';

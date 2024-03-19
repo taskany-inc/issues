@@ -8,6 +8,7 @@
     align-items: center;
     flex: 1;
 
+    gap: var(--gap-s);
     color: var(--text-color);
     padding: var(--gap-s);
     border-radius: var(--radius-m);

@@ -2,7 +2,7 @@ import { ComponentProps, FC, useCallback, useMemo } from 'react';
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
 
-import { IssueMeta } from '../IssueMeta';
+import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { UserBadge } from '../UserBadge';
 import { UserComboBox } from '../UserComboBox';
 import { TagComboBox } from '../TagComboBox';

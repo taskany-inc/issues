@@ -8,8 +8,7 @@ import { Link, Text } from '@taskany/bricks/harmony';
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
 import { projectListItem, projectListItemTitle } from '../../utils/domObjects';
-import { TableRowItem } from '../TableRowItem/TableRowItem';
-import { Title } from '../Table/Table';
+import { Title, TableRowItem } from '../Table/Table';
 
 import s from './ProjectListItemCollapsable.module.css';
 

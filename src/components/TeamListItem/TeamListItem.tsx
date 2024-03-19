@@ -2,7 +2,7 @@ import { FC, useCallback } from 'react';
 import { Button, Text, TableCell, TableRow } from '@taskany/bricks/harmony';
 import { IconBinOutline } from '@taskany/icons';
 
-import { TableRowItem } from '../TableRowItem/TableRowItem';
+import { TableRowItem } from '../Table/Table';
 
 import s from './TeamListItem.module.css';
 

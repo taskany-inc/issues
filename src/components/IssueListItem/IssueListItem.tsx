@@ -4,7 +4,7 @@ import { Text, Link } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 
 import { routes } from '../../hooks/router';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 
 import s from './IssueListItem.module.css';
 

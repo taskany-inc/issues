@@ -21,14 +21,14 @@ import {
 import cn from 'classnames';
 
 import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
-import { IssueListItem } from '../IssueListItem';
+import { IssueListItem } from '../IssueListItem/IssueListItem';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { StateDot } from '../StateDot/StateDot';
 import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
-import { Circle } from '../Circle';
+import { Circle } from '../Circle/Circle';
 import { useLocale } from '../../hooks/useLocale';
 import { getUserName, prepareUserDataFromActivity, safeGetUserName, safeUserData } from '../../utils/getUserName';
 

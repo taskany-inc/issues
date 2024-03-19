@@ -6,7 +6,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';
 import { projectsCombobox, comboboxInput, combobox, comboboxErrorDot } from '../utils/domObjects';
 
-import { ProjectMenuItem } from './ProjectMenuItem';
+import { ProjectMenuItem } from './ProjectMenuItem/ProjectMenuItem';
 
 interface GoalParentComboBoxProps {
     text?: React.ComponentProps<typeof ComboBox>['text'];

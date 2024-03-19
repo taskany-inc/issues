@@ -1,0 +1,26 @@
+.IssueMeta {
+    padding: var(--gap-s) 0;
+    max-width: 300px;
+}
+
+.IssueMetaTitle {
+    color: var(--gray9);
+    border-bottom: 1px solid var(--gray4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: var(--gap-xs);
+}
+
+.IssueMetaEditButton {
+    display: inline-block;
+
+    cursor: pointer;
+
+    transition: color var(--transition-time) var(--transition-func);
+}
+
+.IssueMetaEditButton:hover {
+    color: var(--text-color);
+}

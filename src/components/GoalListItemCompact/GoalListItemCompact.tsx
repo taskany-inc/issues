@@ -12,7 +12,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { Priority } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { UserGroup } from '../UserGroup';
-import { TableRowItemText, TableRowItemTitle } from '../TableRowItem/TableRowItem';
+import { TextItem, Title } from '../Table/Table';
 import { StateDot } from '../StateDot/StateDot';
 
 import s from './GoalListItemCompact.module.css';
@@ -134,28 +134,28 @@ const Column: ColumnRender = ({ col, componentProps }) => {
 
     switch (col.name) {
         case 'title':
-            content = <TableRowItemTitle size="s">{title}</TableRowItemTitle>;
+            content = <Title size="s">{title}</Title>;
             break;
         case 'state':
             content = nullable(state, (s) => <StateDot size="m" title={s?.title} hue={s?.hue} />);
             break;
         case 'priority':
-            content = nullable(priority, (p) => <TableRowItemText>{getPriorityText(p.title)}</TableRowItemText>);
+            content = nullable(priority, (p) => <TextItem>{getPriorityText(p.title)}</TextItem>);
             break;
         case 'projectId':
-            content = nullable(projectId, (id) => <TableRowItemText>{id}</TableRowItemText>);
+            content = nullable(projectId, (id) => <TextItem>{id}</TextItem>);
             break;
         case 'issuers':
             content = nullable(issuers, (list) => <UserGroup users={list} />);
             break;
         case 'estimate':
             content = nullable(estimate, (e) => (
-                <TableRowItemText>
+                <TextItem>
                     {formateEstimate(e, {
                         type: estimateType === 'Year' ? estimateType : 'Quarter',
                         locale,
                     })}
-                </TableRowItemText>
+                </TextItem>
             ));
             break;
         default:
