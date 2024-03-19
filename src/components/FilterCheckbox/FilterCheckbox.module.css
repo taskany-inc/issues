@@ -1,0 +1,20 @@
+.FilterCheckboxLabel {
+    display: inline-flex;
+    gap: var(--gap-sm);
+    align-items: center;
+    margin-left: var(--gap-s);
+}
+
+.FilterCheckbox {
+    padding: var(--gap-xs) 0;
+    border-radius: var(--radius-s);
+}
+
+.FilterCheckbox_focused {
+    background-color: var(--gray4);
+}
+
+.CheckboxInput {
+    /* aligned by icon in input */
+    margin-left: 9.5px;
+}

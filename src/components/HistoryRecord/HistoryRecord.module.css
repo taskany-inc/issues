@@ -1,0 +1,108 @@
+.HistoryRecordWrapper {
+    display: flex;
+    gap: 0.25rem;
+    flex: 1;
+    line-height: 1.5;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+}
+
+.HistoryRecordTextWrapper {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25em;
+    flex: 1;
+}
+
+.HistoryRecordTextWrapper_multiline {
+    align-items: flex-start;
+}
+
+.HistoryActivityFeedItem {
+    align-items: flex-start;
+    grid-template-columns: 24px 1fr;
+    justify-content: flex-start;
+    padding-left: 4px;
+    position: relative;
+}
+
+.Circle {
+    background-color: var(--background-color);
+}
+
+.HistoryActivityFeedItem .Circle {
+    /*
+        no-magic: this negative margin needs for align
+        icon by center of first line in content
+    */
+    margin-top: -3px;
+}
+
+.FlexReset {
+    width: 100%;
+}
+
+.Button {
+    bottom: 5px;
+}
+
+.GroupHeaderWrapper {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: var(--gap-s);
+    position: relative;
+    background-color: var(--background-color);
+    cursor: pointer;
+}
+
+.GroupHeaderWrapper::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    height: 100%;
+    left: 15px;
+    border-left: 1px solid var(--gray5);
+    z-index: 0;
+}
+
+.IssueListItem {
+    padding: 0;
+    font-size: 12px;
+}
+
+.IssueListItem a {
+    display: inline-flex;
+}
+
+.IssueListItem + .IssueListItem::before {
+    content: ',';
+    padding-right: 0.25em;
+}
+
+.Badge {
+    display: inline-flex;
+    min-width: 20px;
+    height: 20px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.GroupHeader {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    border: 1px solid var(--gray7);
+    border-radius: var(--radius-xl);
+    gap: var(--gap-xs);
+    padding: var(--gap-xs) var(--gap-s);
+    padding-right: var(--gap-xs);
+    user-select: none;
+}
+
+.Icon {
+    /* no-magic: this negative margin needs for align icon by center of first line in content */
+    margin-top: -3px;
+}

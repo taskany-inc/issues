@@ -7,8 +7,8 @@ import { Button } from '@taskany/bricks/harmony';
 import { trpc } from '../utils/trpcClient';
 import { stateCombobox } from '../utils/domObjects';
 
-import { StateDot } from './StateDot';
-import { ColorizedMenuItem } from './ColorizedMenuItem';
+import { StateDot } from './StateDot/StateDot';
+import { ColorizedMenuItem } from './ColorizedMenuItem/ColorizedMenuItem';
 
 interface StateDropdownProps {
     text: React.ComponentProps<typeof Button>['text'];

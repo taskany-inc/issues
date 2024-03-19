@@ -26,8 +26,12 @@
     cursor: default;
 }
 
-.GoalCriteriaCheckBox_checked, 
+.GoalCriteriaCheckBox_checked,
 .GoalCriteriaCheckBox_checked:hover {
     color: var(--brand-color);
     fill: var(--background-color);
+}
+
+.GoalCriteriaWeight {
+    color: var(--gray9);
 }

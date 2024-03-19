@@ -1,0 +1,4 @@
+.PrivateDepsWarningIcon {
+    display: flex;
+    color: var(--warn0);
+}

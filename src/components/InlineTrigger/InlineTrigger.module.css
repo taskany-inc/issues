@@ -1,0 +1,28 @@
+.InlineTrigger {
+    display: flex;
+    align-items: center;
+
+    transition: var(--transition-time) var(--transition-func);
+    transition-property: color;
+
+    cursor: pointer;
+
+    color: var(--gray8);
+}
+
+.InlineTrigger:hover {
+    color: var(--text-color);
+}
+
+.InlineTriggerText {
+    display: flex;
+    padding-left: var(--gap-s);
+}
+
+.InlineTriggerIconContainer > span {
+    /*
+        @awinogradov: I'm not sure this is the best decision.
+        Maybe would be better get icon as component via prop and add flex styles.
+    */
+    display: flex;
+}

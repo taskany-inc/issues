@@ -1,13 +1,4 @@
-import {
-    createContext,
-    useContext,
-    useState,
-    SetStateAction,
-    useMemo,
-    useEffect,
-    useCallback,
-    forwardRef,
-} from 'react';
+import { createContext, useContext, useState, SetStateAction, useMemo, useEffect, useCallback } from 'react';
 import {
     User,
     Tag as TagData,
@@ -19,23 +10,22 @@ import {
     Ghost,
     Priority,
 } from '@prisma/client';
-import styled, { css } from 'styled-components';
-import { UserPic, Text, Tag, nullable, Badge } from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { UserPic, Tag, nullable, Badge } from '@taskany/bricks';
+import { Button, Text } from '@taskany/bricks/harmony';
 import {
     IconDoubleCaretRightCircleSolid,
     IconDividerLineOutline,
     IconRightSmallOutline,
     IconDownSmallOutline,
 } from '@taskany/icons';
-import { backgroundColor, gapS, gapXs, gray7, radiusXl } from '@taskany/colors';
+import cn from 'classnames';
 
-import { ActivityFeedItem } from '../ActivityFeed';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { IssueListItem } from '../IssueListItem';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { Circle } from '../Circle';
@@ -43,6 +33,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { getUserName, prepareUserDataFromActivity, safeGetUserName, safeUserData } from '../../utils/getUserName';
 
 import { tr } from './HistoryRecord.i18n';
+import s from './HistoryRecord.module.css';
 
 type WholeSubject =
     | 'title'
@@ -68,123 +59,6 @@ interface HistoryChangeProps<T> {
     from?: T | null;
     to?: T | null;
 }
-
-const StyledActivityFeedItem = styled(ActivityFeedItem)`
-    align-items: flex-start;
-    grid-template-columns: 24px 1fr;
-    justify-content: flex-start;
-    padding-left: 4px;
-    position: relative;
-
-    & ${Circle} {
-        /* no-magic: this negative margin needs for align icon by center of first line in content */
-        margin-top: -3px;
-    }
-`;
-
-const StyledHistoryRecordWrapper = styled.div`
-    display: flex;
-    gap: 0.25rem;
-    flex: 1;
-    line-height: 1.5;
-    align-items: flex-start;
-    flex-wrap: nowrap;
-`;
-
-const StyledIssueListItem = styled(IssueListItem)`
-    padding: 0;
-    font-size: 12px;
-
-    & + &::before {
-        content: ',';
-        padding-right: 0.25em;
-    }
-
-    a {
-        display: inline-flex;
-    }
-`;
-
-const StyledTextWrapper = styled.div<{ multiline?: boolean }>`
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25em;
-    flex: 1;
-
-    ${({ multiline }) =>
-        multiline &&
-        css`
-            align-items: flex-start;
-        `}
-`;
-
-const StyledButton = styled(Button)`
-    bottom: 5px;
-`;
-
-const StyledFlexReset = styled.div`
-    width: 100%;
-`;
-
-const StyledGroupHeaderWrapper = styled.div`
-    display: flex;
-    width: fit-content;
-    align-items: center;
-    gap: ${gapS};
-    position: relative;
-    background-color: ${backgroundColor};
-    cursor: pointer;
-
-    :after {
-        content: '';
-        position: absolute;
-        top: 100%;
-        height: 100%;
-        left: 15px;
-        border-left: 1px solid var(--gray5);
-        z-index: 0;
-    }
-`;
-
-const StyledIcon = styled(
-    forwardRef<
-        HTMLSpanElement,
-        Omit<React.ComponentProps<typeof IconDownSmallOutline & typeof IconRightSmallOutline>, 'size'> & {
-            collapsed?: boolean;
-        }
-    >(({ collapsed, ...props }, ref) => {
-        return nullable(
-            collapsed,
-            () => <IconRightSmallOutline size="s" {...props} ref={ref} />,
-            <IconDownSmallOutline size="s" {...props} ref={ref} />,
-        );
-    }),
-)`
-    /* no-magic: this negative margin needs for align icon by center of first line in content */
-    margin-top: -3px;
-`;
-
-const StyledGroupHeader = styled(Text)`
-    display: flex;
-    width: fit-content;
-    align-items: center;
-    border: 1px solid ${gray7};
-    border-radius: ${radiusXl};
-    gap: ${gapXs};
-    padding: ${gapXs} ${gapS};
-    padding-right: ${gapXs};
-    user-select: none;
-`;
-
-const StyledBadge = styled(Badge)`
-    display: inline-flex;
-    min-width: 20px;
-    height: 20px;
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-`;
 
 interface HistoryRecordContext {
     setActionText: (value: SetStateAction<HistoryRecordAction>) => void;
@@ -226,7 +100,7 @@ const HistoryMultilineRecord: React.FC<{ withPretext?: boolean } & HistoryChange
     to,
     withPretext = true,
 }) => (
-    <StyledFlexReset>
+    <div className={s.FlexReset}>
         {nullable(from, (val) => (
             <div>
                 {nullable(withPretext, () => (
@@ -247,7 +121,7 @@ const HistoryMultilineRecord: React.FC<{ withPretext?: boolean } & HistoryChange
                 {val}
             </div>
         ))}
-    </StyledFlexReset>
+    </div>
 );
 
 const useHistoryTranslates = () => {
@@ -288,15 +162,19 @@ const HistoryRecordInner: React.FC<HistoryRecordInnerProps> = ({ author, subject
     const [subjectText, setSubjectText] = useState(() => subject);
 
     return (
-        <StyledActivityFeedItem>
+        <ActivityFeedItem className={s.HistoryActivityFeedItem}>
             <RecordCtx.Provider value={{ setActionText, setSubjectText }}>
-                <Circle size={24} backgroundColor={backgroundColor}>
-                    <IconDoubleCaretRightCircleSolid size={24} color={gray7} />
+                <Circle size={24} className={s.Circle}>
+                    <IconDoubleCaretRightCircleSolid size={24} color="var(--gray7)" />
                 </Circle>
-                <StyledHistoryRecordWrapper>
+                <div className={s.HistoryRecordWrapper}>
                     {/* FIXME: it must be UserBadge */}
                     <UserPic size={18} src={author?.image} email={author?.email} name={author?.name} />
-                    <StyledTextWrapper multiline={subject.toString() === 'description'}>
+                    <div
+                        className={cn(s.HistoryRecordTextWrapper, {
+                            [s.HistoryRecordTextWrapper_multiline]: subject.toString() === 'description',
+                        })}
+                    >
                         {nullable(author, (data) => (
                             <Text size="xs" weight="bold">
                                 {getUserName(data)}
@@ -312,10 +190,10 @@ const HistoryRecordInner: React.FC<HistoryRecordInnerProps> = ({ author, subject
                         <Text size="xs">
                             <RelativeTime date={createdAt} />
                         </Text>
-                    </StyledTextWrapper>
-                </StyledHistoryRecordWrapper>
+                    </div>
+                </div>
             </RecordCtx.Provider>
-        </StyledActivityFeedItem>
+        </ActivityFeedItem>
     );
 };
 
@@ -325,7 +203,7 @@ const HistoryRecordDependency: React.FC<
     return (
         <>
             {(from || to || []).map((issue) => (
-                <StyledIssueListItem issue={issue} key={issue.id} size="xs" strike={strike} />
+                <IssueListItem className={s.IssueListItem} issue={issue} key={issue.id} size="xs" strike={strike} />
             ))}
         </>
     );
@@ -427,7 +305,8 @@ const HistoryRecordLongTextChange: React.FC<HistoryChangeProps<string>> = ({ fro
 
     return (
         <>
-            <StyledButton
+            <Button
+                className={s.Button}
                 view={!viewDescription ? undefined : 'checked'}
                 iconRight={<IconDividerLineOutline size="xs" />}
                 onClick={handlerViewDescription}
@@ -539,7 +418,8 @@ type CriteriaItem = GoalAchieveCriteria & {
 const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title, strike }) => {
     if (criteriaGoal) {
         return (
-            <StyledIssueListItem
+            <IssueListItem
+                className={s.IssueListItem}
                 strike={strike}
                 size="xs"
                 issue={{
@@ -646,22 +526,28 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ subject, author, a
     );
 };
 
-const HisroryRecordGroupHeader: React.FC<
+const HistoryRecordGroupHeader: React.FC<
     React.PropsWithChildren<{
         createdAt: Date;
         collapsed: boolean;
         onClick: () => void;
     }>
 > = ({ createdAt, onClick, collapsed, children }) => (
-    <StyledGroupHeaderWrapper>
-        <StyledGroupHeader onClick={onClick} size="xs">
-            <StyledIcon collapsed={collapsed} />
+    <div className={s.GroupHeaderWrapper}>
+        <Text className={s.GroupHeader} onClick={onClick} size="xs">
+            {nullable(
+                collapsed,
+                () => (
+                    <IconRightSmallOutline size="s" className={s.Icon} />
+                ),
+                <IconDownSmallOutline size="s" className={s.Icon} />,
+            )}
             {children}
-        </StyledGroupHeader>
+        </Text>
         <Text size="xs">
             <RelativeTime date={createdAt} />
         </Text>
-    </StyledGroupHeaderWrapper>
+    </div>
 );
 
 export const HistoryRecordGroup: React.FC<{
@@ -713,14 +599,16 @@ export const HistoryRecordGroup: React.FC<{
     return (
         <>
             {nullable(showGroupHeader, () => (
-                <HisroryRecordGroupHeader
+                <HistoryRecordGroupHeader
                     onClick={handleToggleCollapse}
                     createdAt={lastRecord.createdAt}
                     collapsed={collapsed}
                 >
                     {heading}
-                    <StyledBadge size="s">{values.length}</StyledBadge>
-                </HisroryRecordGroupHeader>
+                    <Badge className={s.Badge} size="s">
+                        {values.length}
+                    </Badge>
+                </HistoryRecordGroupHeader>
             ))}
 
             {nullable(!collapsed, () => (

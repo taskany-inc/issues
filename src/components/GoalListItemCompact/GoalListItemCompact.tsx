@@ -13,7 +13,7 @@ import { Priority } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { UserGroup } from '../UserGroup';
 import { TableRowItemText, TableRowItemTitle } from '../TableRowItem/TableRowItem';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 
 import s from './GoalListItemCompact.module.css';
 
@@ -78,6 +78,10 @@ interface GoalListItemCompactCustomizeProps<T extends Record<string, any>> {
 interface GoalListItemCompactCustomizeRender {
     <T extends Record<string, any>>(props: GoalListItemCompactCustomizeProps<T>): React.ReactElement<T>;
 }
+
+export const Cell = ({ forIcon, ...props }: ComponentProps<typeof TableCell> & { forIcon?: boolean }) => (
+    <TableCell className={cn({ [s.CellWithIcon]: forIcon })} {...props} />
+);
 
 interface RenderColumnProps<T> {
     col: GoalListItemCompactColumnProps;

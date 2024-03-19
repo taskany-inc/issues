@@ -2,9 +2,9 @@ import { FC, useMemo } from 'react';
 import { Tab } from '@taskany/bricks';
 
 import { getPriorityText } from './PriorityText/PriorityText';
-import { FilterCheckbox } from './FilterCheckbox';
+import { FilterCheckbox } from './FilterCheckbox/FilterCheckbox';
 import { FilterBase } from './FilterBase/FilterBase';
-import { FilterTabLabel } from './FilterTabLabel';
+import { FilterTabLabel } from './FilterTabLabel/FilterTabLabel';
 
 interface Priority {
     id: string;

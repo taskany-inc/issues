@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 interface CircleProps extends React.RefAttributes<HTMLSpanElement> {
     size: number;
     backgroundColor?: string;
+    className?: string;
 }
 
 export const Circle = styled(

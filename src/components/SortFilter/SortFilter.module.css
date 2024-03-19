@@ -1,0 +1,13 @@
+.SortFilterItem {
+    padding: var(--gap-xs) 0;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: nowrap;
+    gap: var(--gap-xs);
+}
+
+.SortFilterDirection {
+    display: inline-flex;
+    line-height: 1;
+    color: var(--gray8);
+}

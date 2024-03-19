@@ -1,0 +1,4 @@
+.InlineTriggerWrapper {
+    padding: var(--gap-s);
+    width: fit-content;
+}

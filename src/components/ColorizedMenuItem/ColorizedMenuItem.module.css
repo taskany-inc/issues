@@ -1,0 +1,4 @@
+/* Order of styles on page: SC, CSS Modules */
+.MarkedListItem.MarkedListItem:hover {
+    background-color: var(--state-bg-hover);
+}

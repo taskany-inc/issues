@@ -84,3 +84,8 @@
 .CommentCard_highlighted::before {
     border: 1px solid var(--brand-color);
 }
+
+/* Order of styles on page: SC, CSS Modules */
+.CommentDelete.CommentDelete {
+    color: var(--danger0);
+}

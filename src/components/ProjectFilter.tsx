@@ -2,8 +2,8 @@ import { Tab } from '@taskany/bricks';
 import { useMemo } from 'react';
 
 import { FilterBase } from './FilterBase/FilterBase';
-import { FilterCheckbox } from './FilterCheckbox';
-import { FilterTabLabel } from './FilterTabLabel';
+import { FilterCheckbox } from './FilterCheckbox/FilterCheckbox';
+import { FilterTabLabel } from './FilterTabLabel/FilterTabLabel';
 import { FilterAutoCompleteInput } from './FilterAutoCompleteInput/FilterAutoCompleteInput';
 
 interface Project {

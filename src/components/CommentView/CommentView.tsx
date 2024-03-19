@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { danger0 } from '@taskany/colors';
 import {
     Card,
     CardComment,
@@ -31,11 +30,11 @@ import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { createLocaleDate } from '../../utils/dateTime';
 import { CommentSchema } from '../../schema/comment';
 import { Reactions } from '../Reactions/Reactions';
-import { ActivityFeedItem } from '../ActivityFeed';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Circle } from '../Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 import { getUserName } from '../../utils/getUserName';
 import { CardHeader } from '../CardHeader/CardHeader';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -159,7 +158,7 @@ export const CommentView: FC<CommentViewProps> = ({
                 },
                 {
                     label: tr('Delete'),
-                    color: danger0,
+                    className: s.CommentDelete,
                     icon: <IconBinOutline size="xxs" {...commentDropdownDelete.attr} />,
                     onClick: onDelete,
                 },
@@ -245,6 +244,7 @@ export const CommentView: FC<CommentViewProps> = ({
                                         focused={cursor === index}
                                         icon={item.icon}
                                         onClick={item.onClick}
+                                        className={item.className}
                                     >
                                         {item.label}
                                     </MenuItem>

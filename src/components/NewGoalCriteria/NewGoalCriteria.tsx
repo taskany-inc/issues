@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { trpc } from '../../utils/trpcClient';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 
 import classes from './NewGoalCriteria.module.css';
 import { tr } from './NewGoalCriteria.i18n';

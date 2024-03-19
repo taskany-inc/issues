@@ -5,7 +5,7 @@ import { nullable } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
 import { Dropdown, DropdownTrigger, DropdownPanel } from '../Dropdown/Dropdown';
-import { StateWrapper } from '../StateWrapper';
+import { StateWrapper } from '../StateWrapper/StateWrapper';
 
 interface StateDropdownProps {
     error?: ComponentProps<typeof DropdownTrigger>['error'];

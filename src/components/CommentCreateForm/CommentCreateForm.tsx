@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo, MutableRefObject } from 'react';
-import styled from 'styled-components';
 import { State as StateType } from '@prisma/client';
 import { UserPic, nullable, useLatest } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
@@ -10,12 +9,13 @@ import { usePageContext } from '../../hooks/usePageContext';
 import { GoalCommentFormSchema } from '../../schema/goal';
 import { CommentSchema } from '../../schema/comment';
 import { CommentForm } from '../CommentForm/CommentForm';
-import { ActivityFeedItem } from '../ActivityFeed';
-import { StateDot } from '../StateDot';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
+import { StateDot } from '../StateDot/StateDot';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
-import { StateWrapper } from '../StateWrapper';
+import { StateWrapper } from '../StateWrapper/StateWrapper';
 
 import { tr } from './CommentCreateForm.i18n';
+import s from './CommentCreateForm.module.css';
 
 interface CommentCreateFormProps extends Omit<React.ComponentProps<typeof CommentForm>, 'actionButton'> {
     states?: StateType[];
@@ -24,11 +24,6 @@ interface CommentCreateFormProps extends Omit<React.ComponentProps<typeof Commen
     onSubmit: (comment: GoalCommentFormSchema) => void;
     onChange?: (comment: GoalCommentFormSchema) => void;
 }
-
-const StyledStateUpdate = styled.div`
-    display: flex;
-    align-items: center;
-`;
 
 const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     states,
@@ -140,7 +135,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                     <>
                         <Button view="primary" disabled={busy} onClick={onCommentСlick} text={tr('Comment')} />
                         {nullable(states, (list) => (
-                            <StyledStateUpdate>
+                            <div className={s.StateUpdate}>
                                 <Button
                                     disabled={busy}
                                     type="submit"
@@ -178,7 +173,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                         )}
                                     />
                                 </Dropdown>
-                            </StyledStateUpdate>
+                            </div>
                         ))}
                     </>
                 }

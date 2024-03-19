@@ -12,7 +12,7 @@ import {
 import { TLocale } from '../utils/getLang';
 import { QuartersAliases } from '../types/date';
 
-import { FilterTabLabel } from './FilterTabLabel';
+import { FilterTabLabel } from './FilterTabLabel/FilterTabLabel';
 import { Estimate, EstimateValue } from './Estimate/Estimate';
 import { EstimateYear } from './EstimateYear/EstimateYear';
 import { EstimateQuarter } from './EstimateQuarter/EstimateQuarter';

@@ -1,5 +1,4 @@
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
 
@@ -12,7 +11,7 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { ActivityByIdReturnType, GoalByIdReturnType, GoalChangeProjectReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
-import { TextList, TextListItem } from '../TextList';
+import { TextList, TextListItem } from '../TextList/TextList';
 import { safeUserData } from '../../utils/getUserName';
 import {
     goalDependencies,
@@ -22,29 +21,19 @@ import {
     goalPageDeleteButton,
 } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
-import { GoalList } from '../GoalList';
+import { GoalList } from '../GoalList/GoalList';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList/TagsList';
 import { dependencyKind } from '../../schema/goal';
 import { UserEditableList } from '../UserEditableList/UserEditableList';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
-import { AddInlineTrigger } from '../AddInlineTrigger';
+import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 
 import { tr } from './GoalSidebar.i18n';
+import s from './GoalSidebar.module.css';
 
 const tagsLimit = 5;
-
-const StyledInlineInput = styled.div`
-    margin-top: var(--gap-xs);
-    height: 28px; // Input height
-`;
-
-const StyledTextList = styled(TextList).attrs({
-    listStyle: 'none',
-})`
-    padding-left: var(--gap-xs);
-`;
 
 interface GoalSidebarProps {
     goal: NonNullable<GoalByIdReturnType>;
@@ -151,7 +140,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                 {nullable(
                     goal._isEditable,
                     () => (
-                        <StyledInlineInput>
+                        <div className={s.InlineInputWrapper}>
                             <UserComboBox
                                 placement="bottom-start"
                                 placeholder={tr('Type user name or email')}
@@ -169,7 +158,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                     )
                                 }
                             />
-                        </StyledInlineInput>
+                        </div>
                     ),
                     nullable(safeUserData(goal.owner), (props) => <UserBadge {...props} />, tr('Not assigned yet')),
                 )}
@@ -190,7 +179,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
 
             {nullable(goal._isEditable || goal.partnershipProjects.length, () => (
                 <IssueMeta title={tr('Partnership projects')}>
-                    <StyledTextList>
+                    <TextList listStyle="none" className={s.TextList}>
                         {goal.partnershipProjects?.map((project) => (
                             <TextListItem key={project.id}>
                                 <ProjectBadge id={project.id} title={project.title}>
@@ -200,10 +189,10 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 </ProjectBadge>
                             </TextListItem>
                         ))}
-                    </StyledTextList>
+                    </TextList>
 
                     {nullable(goal._isEditable, () => (
-                        <StyledInlineInput>
+                        <div className={s.InlineInputWrapper}>
                             <GoalParentComboBox
                                 placement="bottom-start"
                                 placeholder={tr('Type project title')}
@@ -212,7 +201,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                     <AddInlineTrigger text={tr('Add project')} onClick={props.onClick} />
                                 )}
                             />
-                        </StyledInlineInput>
+                        </div>
                     ))}
                 </IssueMeta>
             ))}
@@ -306,7 +295,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     </TagsList>
 
                     {nullable(goal._isEditable, () => (
-                        <StyledInlineInput>
+                        <div className={s.InlineInputWrapper}>
                             <TagComboBox
                                 disabled={(goal.tags || []).length >= tagsLimit}
                                 placeholder={tr('Enter tag title')}
@@ -316,14 +305,14 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                     <AddInlineTrigger text={tr('Add tag')} onClick={props.onClick} />
                                 )}
                             />
-                        </StyledInlineInput>
+                        </div>
                     ))}
                 </IssueMeta>
             ))}
 
             {nullable(goal._isEditable, () => (
                 <IssueMeta>
-                    <StyledInlineInput>
+                    <div className={s.InlineInputWrapper}>
                         <GoalParentComboBox
                             placement="bottom-start"
                             placeholder={tr('Type project title')}
@@ -336,7 +325,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 />
                             )}
                         />
-                    </StyledInlineInput>
+                    </div>
 
                     <AddInlineTrigger
                         icon={<IconBinOutline size="xs" {...goalPageDeleteButton.attr} />}

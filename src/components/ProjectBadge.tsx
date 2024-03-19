@@ -4,7 +4,7 @@ import { Link } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 
-import { Badge } from './Badge';
+import { Badge } from './Badge/Badge';
 import { NextLink } from './NextLink';
 
 interface ProjectBadgeProps {
