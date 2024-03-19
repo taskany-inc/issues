@@ -170,6 +170,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                     <DropdownPanel
                                         placement="top-end"
                                         items={list}
+                                        mode="single"
                                         onChange={onStateSelect}
                                         renderItem={(props) => (
                                             <StateWrapper hue={props.item?.hue}>

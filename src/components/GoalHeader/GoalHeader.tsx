@@ -2,6 +2,7 @@ import { nullable } from '@taskany/bricks';
 import { ComponentProps, FC, ReactNode, useCallback } from 'react';
 import { Dot } from '@taskany/bricks/harmony';
 import cn from 'classnames';
+import { StateType } from '@prisma/client';
 
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { goalPageHeader } from '../../utils/domObjects';
@@ -19,7 +20,7 @@ interface GoalHeaderProps
     goal?: Partial<GoalByIdReturnType>;
     actions?: ReactNode;
 
-    onGoalStateChange?: ComponentProps<typeof StateDropdown>['onChange'];
+    onGoalStateChange?: (value: { title: string; id: string; type: StateType }) => void;
 }
 
 export const GoalHeader: FC<GoalHeaderProps> = ({ goal, actions, href, size, onGoalStateChange, onCommentsClick }) => {
@@ -60,6 +61,7 @@ export const GoalHeader: FC<GoalHeaderProps> = ({ goal, actions, href, size, onG
                         <div className={s.GoalHeaderStats}>
                             {nullable(g?.state, (state) => (
                                 <StateDropdown
+                                    mode="single"
                                     label="State"
                                     value={state}
                                     readOnly={readOnly}

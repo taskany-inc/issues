@@ -72,6 +72,7 @@ export const PageHeaderActionButton: FC = () => {
                 <DropdownPanel
                     placement="top-end"
                     items={options}
+                    mode="single"
                     onChange={onMenuItemClick}
                     renderItem={(props) => (
                         <Text size="s" onClick={() => onMenuItemClick(props.item)} {...props.item.attrs}>

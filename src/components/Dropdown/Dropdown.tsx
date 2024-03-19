@@ -2,11 +2,12 @@ import {
     Dropdown as DropdownBricks,
     DropdownTrigger as DropdownTriggerBricks,
     DropdownPanel as DropdownPanelBricks,
+    DropdownTriggerError as DropdownTriggerErrorBricks,
     Input,
     MenuItem,
-    Tooltip,
-    Text,
-    Dot,
+    AutoCompleteList,
+    AutoComplete,
+    Checkbox,
 } from '@taskany/bricks/harmony';
 import {
     ChangeEvent,
@@ -17,16 +18,14 @@ import {
     useCallback,
     useContext,
     useEffect,
-    useRef,
+    useMemo,
     useState,
 } from 'react';
 import { IconSearchOutline } from '@taskany/icons';
-import { KeyCode, ListView, ListViewItem, nullable, useKeyboard } from '@taskany/bricks';
-import cn from 'classnames';
+import { KeyCode, ListViewItem, nullable, useKeyboard } from '@taskany/bricks';
 
 import { comboboxInput, comboboxItem } from '../../utils/domObjects';
 
-import s from './Dropdown.module.css';
 import { tr, I18nKey } from './Dropdown.i18n';
 
 interface DropdownContextProps {
@@ -86,7 +85,6 @@ export const DropdownTrigger = ({
     ...props
 }: DropdownTriggerProps) => {
     const { toggle } = useContext(DropdownContext);
-    const errorRef = useRef<HTMLDivElement | null>(null);
     return (
         <>
             <DropdownTriggerBricks
@@ -100,44 +98,58 @@ export const DropdownTrigger = ({
                         ? ({ ref, ...props }) => renderTrigger<HTMLElement | null>({ ...props, ref, onClick: toggle })
                         : undefined
                 }
+                placeholder={tr('Not chosen')}
                 {...props}
             >
-                <div ref={errorRef}>
-                    {nullable(
-                        children,
-                        () => children,
-                        <Text size="s" ellipsis className={cn({ [s.DropdownTriggerLabel_default]: !error })}>
-                            {tr('Not chosen')}
-                        </Text>,
-                    )}
-                </div>
+                {children}
             </DropdownTriggerBricks>
             {nullable(error, ({ message }) => (
-                <Tooltip view="danger" reference={errorRef} placement="bottom" offset={[0, 16]}>
-                    {message}
-                </Tooltip>
+                <DropdownTriggerErrorBricks message={message} />
             ))}
         </>
     );
 };
 
-interface DropdownPanelProps<T> extends Omit<ComponentProps<typeof DropdownPanelBricks>, 'onChange'> {
+interface DropdownPanelProps<T, V> extends Omit<ComponentProps<typeof DropdownPanelBricks>, 'onChange'> {
     items?: T[];
-    value?: Partial<T>;
+    value?: T[];
     width?: ComponentProps<typeof DropdownPanelBricks>['width'];
+    iconLeft?: ComponentProps<typeof MenuItem>['iconLeft'];
     inputState?: string;
     placeholder?: string;
     selectable?: boolean;
     title?: string;
-    onChange?: (item: T) => void;
+    mode?: V;
+    onChange?: V extends 'single' ? (item: T) => void : (items: T[]) => void;
     setInputState?: (value: string) => void;
     renderItem?: (props: Parameters<ComponentProps<typeof ListViewItem>['renderItem']>['0'] & { item: T }) => ReactNode;
 }
 
-export const DropdownPanel = <T extends { id: string }>({
+/**
+ * The definition DropdownGuardedProps<T> defines a type that includes `onChange` & `mode` props.
+ * If the mode property is `single`, the onChange method should accept a single value of type T.
+ * If the mode property is `multiple`, the onChange method should accept an array of values of type T.
+ */
+export type DropdownGuardedProps<T> =
+    | { mode: 'single'; onChange?: (value: T) => void }
+    | { mode: 'multiple'; onChange?: (value: T[]) => void };
+
+function singleGuard<T>(props: Record<string, unknown>): props is {
+    mode: 'single';
+    onChange?: (items: T) => void;
+} {
+    return props?.mode !== 'multiple';
+}
+
+function multipleGuard<T>(props: Record<string, unknown>): props is {
+    mode: 'multiple';
+    onChange?: (items: T[]) => void;
+} {
+    return props?.mode === 'multiple';
+}
+
+export const DropdownPanel = <T extends { id: string }, V extends ComponentProps<typeof AutoComplete>['mode']>({
     placement = 'top-start',
-    offset,
-    width,
     inputState,
     placeholder,
     selectable,
@@ -145,12 +157,11 @@ export const DropdownPanel = <T extends { id: string }>({
     title,
     value,
     children,
-    className,
+    iconLeft,
     setInputState,
-    onChange,
     renderItem,
     ...props
-}: DropdownPanelProps<T>) => {
+}: DropdownPanelProps<T, V>) => {
     const { open, onClose } = useContext(DropdownContext);
 
     const handleInputChange = useCallback(
@@ -160,29 +171,36 @@ export const DropdownPanel = <T extends { id: string }>({
         [setInputState],
     );
 
-    const handleChange = useCallback(
-        (item: T) => {
-            onChange?.(item);
-        },
-        [onChange],
+    const valueMap = useMemo(
+        () => (value || []).reduce<Record<string, boolean>>((acc, cur) => ({ ...acc, [cur.id]: true }), {}),
+        [value],
     );
+    const multiple = props.mode === 'multiple';
 
     const [onESC] = useKeyboard([KeyCode.Escape], () => {
         onClose();
     });
 
+    const handleChange = useCallback(
+        (items: T[]) => {
+            if (multipleGuard<T>(props)) {
+                props.onChange?.(items);
+                return;
+            }
+            if (singleGuard<T>(props)) {
+                props.onChange?.(items[0]);
+            }
+        },
+        [props],
+    );
+
+    const { onChange: _, ...rest } = props;
+
     return (
         // The content component instance remains in memory/mounted across open/closes of the popover.
         // https://github.com/atomiks/tippyjs-react/issues/82
         nullable(open, () => (
-            <DropdownPanelBricks
-                width={width}
-                offset={offset}
-                placement={placement}
-                className={cn(s.DropdownPanel, className)}
-                {...(setInputState ? onESC : {})}
-                {...props}
-            >
+            <DropdownPanelBricks placement={placement} {...(setInputState ? onESC : {})} {...rest}>
                 {children}
                 {nullable(Boolean(setInputState), () => (
                     <>
@@ -197,36 +215,35 @@ export const DropdownPanel = <T extends { id: string }>({
                         />
                     </>
                 ))}
-                {nullable(items.length && title, () => (
-                    <Text size="s" weight="bold" className={s.DropdownSuggestionsTitle}>
-                        {title}
-                    </Text>
-                ))}
 
-                <ListView onKeyboardClick={handleChange}>
-                    {items.map((item) => (
-                        <ListViewItem
-                            key={item.id}
-                            value={item}
-                            renderItem={(props) => (
-                                <MenuItem
-                                    onClick={() => {
-                                        handleChange(item);
-                                        onClose();
-                                    }}
-                                    {...props}
-                                    hovered={props.active}
-                                    iconLeft={nullable(selectable, () => (
-                                        <Dot color={value?.id === item.id ? 'var(--check-checked)' : 'transparent'} />
-                                    ))}
-                                    {...comboboxItem.attr}
-                                >
-                                    {renderItem?.({ ...props, item })}
-                                </MenuItem>
-                            )}
-                        />
-                    ))}
-                </ListView>
+                <AutoComplete
+                    items={items}
+                    mode={props.mode}
+                    onChange={handleChange}
+                    value={value}
+                    renderItem={({ item, isSelected, active, onChange, ...props }) => (
+                        <MenuItem
+                            onClick={() => {
+                                onChange();
+                                if (multiple) return;
+                                onClose?.();
+                            }}
+                            {...props}
+                            multiple={multiple}
+                            hovered={active}
+                            selected={valueMap[item.id]}
+                            selectable={selectable}
+                            iconLeft={nullable(selectable, () => {
+                                return iconLeft || (multiple && <Checkbox id={item.id} defaultChecked={isSelected} />);
+                            })}
+                            {...comboboxItem.attr}
+                        >
+                            {renderItem?.({ ...props, item })}
+                        </MenuItem>
+                    )}
+                >
+                    <AutoCompleteList title={title} />
+                </AutoComplete>
             </DropdownPanelBricks>
         ))
     );
