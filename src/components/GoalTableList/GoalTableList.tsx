@@ -14,7 +14,7 @@ import { NextLink } from '../NextLink';
 import { routes } from '../../hooks/router';
 import { TagsList } from '../TagsList/TagsList';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
-import { GoalCriteriaPreview } from '../NewGoalCriteria/NewGoalCriteria';
+import { GoalCriteriaPreview } from '../GoalCriteria/GoalCriteria';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 
 import s from './GoalTableList.module.css';

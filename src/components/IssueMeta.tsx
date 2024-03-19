@@ -23,6 +23,7 @@ const StyledIssueMetaTitle = styled(Text)`
     justify-content: space-between;
 
     margin-bottom: ${gapXs};
+    max-width: 300px;
 `;
 
 const EditButton = styled.span`
@@ -40,14 +41,16 @@ const EditButton = styled.span`
 export const IssueMeta: React.FC<IssueMetaProps> = ({ title, onEdit, children, ...rest }) => {
     return (
         <StyledIssueMeta {...rest}>
-            <StyledIssueMetaTitle size="s" weight="bold" color={gray9}>
-                {title}{' '}
-                {nullable(onEdit, () => (
-                    <EditButton>
-                        <IconEdgeOutline size="s" onClick={onEdit} />
-                    </EditButton>
-                ))}
-            </StyledIssueMetaTitle>
+            {nullable(title, (t) => (
+                <StyledIssueMetaTitle size="s" weight="bold" color={gray9}>
+                    {t}{' '}
+                    {nullable(onEdit, () => (
+                        <EditButton>
+                            <IconEdgeOutline size="s" onClick={onEdit} />
+                        </EditButton>
+                    ))}
+                </StyledIssueMetaTitle>
+            ))}
 
             {children}
         </StyledIssueMeta>

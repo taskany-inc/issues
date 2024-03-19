@@ -126,10 +126,12 @@ export const goal = router({
             };
 
             if (onlyCurrentUser) {
-                return data.filter(checkEnableGoalByProjectOwner);
+                return data
+                    .filter(checkEnableGoalByProjectOwner)
+                    .map((goal) => ({ ...goal, ...addCalculatedGoalsFields(goal, activityId, role) }));
             }
 
-            return data;
+            return data.map((goal) => ({ ...goal, ...addCalculatedGoalsFields(goal, activityId, role) }));
         }),
     getGoalsCount: protectedProcedure
         .input(batchGoalsSchema.pick({ query: true, baseQuery: true }))

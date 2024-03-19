@@ -56,7 +56,7 @@ export const GoalFormPopupTrigger: FC<GoalFormPopupTriggerProps> = ({
                 interactive
                 minWidth={450}
                 maxWidth={450}
-                arrow
+                arrow={false}
                 {...onESC}
             >
                 {nullable(visible, () => (

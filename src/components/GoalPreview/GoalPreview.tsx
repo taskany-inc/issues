@@ -9,7 +9,7 @@ import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { GoalHeader } from '../GoalHeader/GoalHeader';
 import { GoalContentHeader } from '../GoalContentHeader/GoalContentHeader';
-import { GoalActivityFeed } from '../GoalActivityFeed';
+import { GoalActivityFeed } from '../GoalActivityFeed/GoalActivityFeed';
 import { GoalSidebar } from '../GoalSidebar/GoalSidebar';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 
