@@ -1,15 +1,6 @@
 import { ComponentProps, FC, useCallback } from 'react';
 import NextLink from 'next/link';
-import {
-    Header,
-    HeaderContent,
-    HeaderLogo,
-    HeaderMenu,
-    HeaderNav,
-    HeaderNavLink,
-    UserMenu,
-    nullable,
-} from '@taskany/bricks';
+import { Header, HeaderContent, HeaderLogo, HeaderMenu, HeaderNav, HeaderNavLink, UserMenu } from '@taskany/bricks';
 
 import { header, headerMenu, headerMenuExplore, headerMenuGoals } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -17,7 +8,6 @@ import { routes, useRouter } from '../../hooks/router';
 import { PageHeaderActionButton } from '../PageHeaderActionButton/PageHeaderActionButton';
 import { PageHeaderLogo } from '../PageHeaderLogo';
 import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
-import { BetaBadge } from '../BetaBadge';
 
 import { tr } from './PageHeader.i18n';
 import s from './PageHeader.module.css';
@@ -35,13 +25,11 @@ export const PageHeader: FC<{ logo?: ComponentProps<typeof PageHeaderLogo>['logo
             href: routes.goals(),
             title: tr('Goals'),
             attr: headerMenuGoals.attr,
-            beta: false,
         },
         {
             href: routes.exploreTopProjects(),
             title: tr('Explore'),
             attr: headerMenuExplore.attr,
-            beta: false,
         },
     ];
 
@@ -62,14 +50,9 @@ export const PageHeader: FC<{ logo?: ComponentProps<typeof PageHeaderLogo>['logo
             }
             nav={
                 <HeaderNav className={s.PageHeaderNav} {...headerMenu.attr}>
-                    {links.map(({ href, title, beta, attr }) => (
+                    {links.map(({ href, title, attr }) => (
                         <NextLink href={href} passHref key={href} legacyBehavior>
-                            <HeaderNavLink {...attr}>
-                                {title}{' '}
-                                {nullable(beta, () => (
-                                    <BetaBadge />
-                                ))}
-                            </HeaderNavLink>
+                            <HeaderNavLink {...attr}>{title}</HeaderNavLink>
                         </NextLink>
                     ))}
                     <div className={s.PageHeaderSearch}>

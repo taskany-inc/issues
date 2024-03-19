@@ -1,0 +1,21 @@
+.GoalList {
+    margin-top: var(--gap-s);
+    display: flex;
+    flex-direction: column;
+}
+
+.ModalActions {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.Tip {
+    padding: var(--gap-s) 0;
+}
+
+/* Order of styles on page: SC, CSS Modules */
+.FormTitle.FormTitle {
+    color: var(--warn0);
+}
