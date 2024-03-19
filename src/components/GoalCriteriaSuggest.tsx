@@ -8,6 +8,7 @@ interface Goal {
     id: string;
     title: string;
     state?: { hue?: number } | null;
+    _shortId: string;
 }
 
 interface GoalCriteriaComboBoxProps {
@@ -75,10 +76,11 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
             return [];
         }
 
-        return goals.map(({ id, title, state }) => ({
+        return goals.map(({ id, title, state, _shortId }) => ({
             id,
             title,
             stateColor: state?.hue,
+            _shortId,
         }));
     }, [goals, selectedGoal, query, mode]);
 

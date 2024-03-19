@@ -19,6 +19,7 @@ interface SuggestItem {
     id: string;
     title: string;
     stateColor?: number;
+    _shortId: string;
 }
 
 interface ValidityData {
@@ -434,6 +435,7 @@ export const CriteriaForm = ({
 
             <input type="hidden" {...register('id')} />
             <input type="hidden" {...register('selected.id')} />
+            <input type="hidden" {...register('selected._shortId')} />
             <input type="hidden" {...register('selected.title')} />
         </Form>
     );

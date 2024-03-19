@@ -1,33 +1,75 @@
+.GoalCriteria {
+    /* for non-interactive popups allow inner events */
+    pointer-events: all;
+    width: 400px;
+}
+
+.GoalCriteriaTitle {
+    color: var(--text-secondary);
+    padding-bottom: var(--gap-xs);
+    border-bottom: 1px solid var(--gray-900);
+}
+
+.GoalCriteriaTable {
+    margin-top: var(--gap-sm);
+}
+
 .GoalCriteriaItemTitle {
-    flex: 1;
+    line-height: 24px;
 }
 
-.GoalCriteriaIssueMeta {
-    display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: minmax(32px, 100%);
-    align-items: center;
-    gap: var(--gap-s);
-    max-width: 520px;
+.GoalCriteriaItemTitleStrike,
+.GoalCriteriaItemWeight {
+    color: var(--text-secondary);
 }
 
-.GoalCriteriaCheckBox {
-    display: inline-flex;
+.GoalCriteriaWeightColumn {
+    text-align: right;
+}
+
+.GoalCriteriaTableRow {
+    align-items: baseline;
+}
+
+.GoalCriteriaGoalBadge {
+    align-items: baseline;
     cursor: pointer;
-    color: var(--gray-800)
 }
 
-.GoalCriteriaCheckBox:hover {
-    color: var(--gray-500)
+.GoalCriteriaItemCheckbox,
+.GoalCriteriaGoalBadge {
+    padding-left: 0;
+    padding-right: 0;
 }
 
-.GoalCriteriaCheckBox_disabled {
-    pointer-events: none;
-    cursor: default;
+.GoalCriteriaTrigger {
+    cursor: pointer;
+}
+.GoalCriteriaLoader {
+    display: flex;
+    justify-content: center;
 }
 
-.GoalCriteriaCheckBox_checked, 
-.GoalCriteriaCheckBox_checked:hover {
-    color: var(--brand-color);
-    fill: var(--background-color);
+.GoalCriteriaActions {
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+}
+
+.GoalCriteriaActionsItem {
+    padding: var(--gap-xs);
+}
+
+.GoalCriteriaActionsItem:hover {
+    background-color: var(--gray-900);
+}
+
+.GoalCriteriaIssueMeta.GoalCriteriaIssueMeta {
+    max-width: max-content;
+}
+
+/* increasing selector specificity for override SC priority */
+.GoalCriteriaIssueMetaReset.GoalCriteriaIssueMetaReset {
+    padding: 0;
+    
 }

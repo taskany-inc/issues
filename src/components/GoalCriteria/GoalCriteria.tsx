@@ -1,31 +1,165 @@
-import React, { ComponentProps, useCallback, useMemo, useState } from 'react';
-import cn from 'classnames';
-import { Text, nullable, MenuItem, Dropdown } from '@taskany/bricks';
+import React, { MouseEvent, forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 import {
-    IconTargetOutline,
-    IconCircleOutline,
-    IconMessageTickOutline,
-    IconTickCircleOutline,
+    Checkbox,
+    CircleProgressBar,
+    Table,
+    TableCell,
+    TableRow,
+    Text,
+    Popup,
+    Badge,
+    Dropdown,
+    DropdownTrigger,
+    DropdownPanel,
+    MenuItem,
+} from '@taskany/bricks/harmony';
+import { backgroundColor, danger0 } from '@taskany/colors';
+import { Spinner, nullable, useClickOutside } from '@taskany/bricks';
+import {
     IconBinOutline,
     IconEdit1Outline,
+    IconMessageTickOutline,
     IconMoreVerticalOutline,
+    IconTargetOutline,
 } from '@taskany/icons';
-import { Table, TableRow } from '@taskany/bricks/harmony';
-import { backgroundColor, danger0, gray9 } from '@taskany/colors';
+import classNames from 'classnames';
 
-import { ActivityFeedItem } from '../ActivityFeed';
-import { Circle } from '../Circle';
-import { GoalBadge } from '../GoalBadge';
-import { Badge } from '../Badge';
-import { IssueMeta } from '../IssueMeta';
-import { AddInlineTrigger } from '../AddInlineTrigger';
-import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
+import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
+import { trpc } from '../../utils/trpcClient';
+import { StateDot } from '../StateDot';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
-import { routes } from '../../hooks/router';
-import { CustomCell } from '../GoalListItemCompact/GoalListItemCompact';
+import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
+import { useGoalResource } from '../../hooks/useGoalResource';
+import { ActivityFeedItem } from '../ActivityFeed';
+import { IssueMeta } from '../IssueMeta';
+import { Circle } from '../Circle';
 
+import classes from './GoalCriteria.module.css';
 import { tr } from './GoalCriteria.i18n';
-import s from './GoalCriteria.module.css';
+
+type GoalCriteriaSuggestProps = React.ComponentProps<typeof GoalCriteriaSuggest>;
+
+interface CriteriaProps {
+    title: string;
+    weight?: number;
+    id: string;
+    isDone: boolean;
+}
+
+interface GoalCriteriaProps extends CriteriaProps {
+    goal: {
+        goalId: string;
+        shortId: string;
+        stateColor?: number;
+    };
+}
+
+type UnionCriteria = CriteriaProps | GoalCriteriaProps;
+
+interface GoalCriteriaEditableApi<T = UnionCriteria> {
+    onCreate?: (val: T) => void;
+    onUpdate?: (val: T) => void;
+    onConvert?: (val: T) => void;
+    onRemove?: (val: T) => void;
+    onCheck?: (val: T) => void;
+    goalId: string;
+}
+
+export function mapCriteria<
+    T extends CriteriaProps,
+    G extends { id: string; _shortId: string; title: string; state: { hue: number } | null },
+>(criteria: T, connectedGoal: G | null): UnionCriteria {
+    if (connectedGoal) {
+        return {
+            id: criteria.id,
+            goal: {
+                goalId: connectedGoal.id,
+                stateColor: connectedGoal.state?.hue,
+                shortId: connectedGoal._shortId,
+            },
+            title: connectedGoal.title,
+            isDone: criteria.isDone,
+            weight: criteria.weight,
+        };
+    }
+
+    return {
+        title: criteria.title,
+        id: criteria.id,
+        isDone: criteria.isDone,
+        weight: criteria.weight,
+    };
+}
+
+interface OnCheckCriteriaCallback {
+    onCheck?: () => void;
+}
+
+const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallback> = ({
+    title,
+    isDone,
+    weight,
+    onCheck,
+}) => (
+    <TableRow className={classes.GoalCriteriaTableRow}>
+        <TableCell width={350}>
+            <Checkbox
+                className={classes.GoalCriteriaItemCheckbox}
+                defaultChecked={isDone}
+                readOnly={!onCheck}
+                onClick={onCheck}
+                strike={isDone}
+                lines={2}
+                ellipsis
+                view="rounded"
+                label={title}
+            />
+        </TableCell>
+        <TableCell width="3ch" className={classes.GoalCriteriaWeightColumn}>
+            {nullable((weight ?? 0) > 0, () => (
+                <Text as="span" size="s" weight="regular" className={classes.GoalCriteriaItemWeight}>
+                    {weight}
+                </Text>
+            ))}
+        </TableCell>
+    </TableRow>
+);
+
+const GoalCriteria = forwardRef<HTMLSpanElement, Omit<GoalCriteriaProps, 'id'>>(({ title, goal, weight }, ref) => {
+    const { setPreview } = useGoalPreview();
+
+    const handleGoalCriteriaClick = useCallback(() => {
+        setPreview(goal.shortId, { title, id: goal.goalId });
+    }, [setPreview, title, goal]);
+
+    return (
+        <>
+            <TableCell width={350}>
+                <Badge
+                    ref={ref}
+                    iconLeft={
+                        <StateDot
+                            view="stroke"
+                            hue={goal.stateColor}
+                            size="s"
+                            className={classes.GoalCriteriaGoalBadgeState}
+                        />
+                    }
+                    className={classes.GoalCriteriaGoalBadge}
+                    onClick={handleGoalCriteriaClick}
+                    text={title}
+                />
+            </TableCell>
+            <TableCell width="3ch" className={classes.GoalCriteriaWeightColumn}>
+                {nullable((weight ?? 0) > 0, () => (
+                    <Text as="span" size="s" weight="regular" className={classes.GoalCriteriaItemWeight}>
+                        {weight}
+                    </Text>
+                ))}
+            </TableCell>
+        </>
+    );
+});
 
 interface CriteriaActionItem {
     label: string;
@@ -34,25 +168,296 @@ interface CriteriaActionItem {
     icon: React.ReactNode;
 }
 
-interface GoalCriteriaCheckBoxProps {
-    checked: boolean;
-    canEdit: boolean;
-    onClick: () => void;
-}
+const CriteriaActions: React.FC<{ actions: CriteriaActionItem[] }> = ({ actions }) => {
+    const [visible, setVisible] = useState(false);
 
-const GoalCriteriaCheckBox: React.FC<GoalCriteriaCheckBoxProps> = ({ checked, canEdit, onClick }) => {
-    const Icon = !checked ? IconCircleOutline : IconTickCircleOutline;
+    const handleActionClick = useCallback((handler: CriteriaActionItem['handler']) => {
+        return () => {
+            handler();
+            setVisible(false);
+        };
+    }, []);
 
     return (
-        <span
-            className={cn(s.GoalCriteriaCheckBox, {
-                [s.GoalCriteriaCheckBox_disabled]: !canEdit,
-                [s.GoalCriteriaCheckBox_checked]: checked,
-            })}
-            onClick={onClick}
-        >
-            <Icon size="s" />
-        </span>
+        <Dropdown isOpen={visible} onClose={() => setVisible(false)}>
+            <DropdownTrigger
+                renderTrigger={({ ref }) => (
+                    <div ref={ref}>
+                        <Badge text={<IconMoreVerticalOutline size="xs" />} onClick={() => setVisible(!visible)} />
+                    </div>
+                )}
+            />
+            <DropdownPanel placement="bottom-start">
+                <div className={classes.GoalCriteriaActions}>
+                    {actions.map(({ icon, label, handler, color }) => (
+                        <MenuItem
+                            key={label}
+                            className={classes.GoalCriteriaActionsItem}
+                            onClick={handleActionClick(handler)}
+                        >
+                            <Badge iconLeft={icon} text={label} color={color} weight="regular" />
+                        </MenuItem>
+                    ))}
+                </div>
+            </DropdownPanel>
+        </Dropdown>
+    );
+};
+
+function criteriaAsGoal(props: UnionCriteria): props is GoalCriteriaProps {
+    return 'goal' in props && props.goal != null;
+}
+
+export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
+    onConvert,
+    onRemove,
+    onUpdate,
+    onCheck,
+    ...props
+}) => {
+    const [mode, setMode] = useState<'read' | 'edit'>('read');
+    const { validateGoalCriteriaBindings } = useGoalResource({});
+
+    const availableActions = useMemo<CriteriaActionItem[] | undefined>(() => {
+        const actions: CriteriaActionItem[] = [];
+
+        if (onUpdate) {
+            actions.push({
+                label: tr('Edit'),
+                icon: <IconEdit1Outline size="xs" />,
+                handler: () => setMode('edit'),
+            });
+        }
+
+        if (!criteriaAsGoal(props) && onConvert) {
+            actions.push({
+                label: tr('Create as goal'),
+                icon: <IconTargetOutline size="xs" />,
+                handler: () => onConvert(props),
+            });
+        }
+
+        if (onRemove) {
+            actions.push({
+                label: tr('Delete'),
+                icon: <IconBinOutline size="xs" color={danger0} />,
+                color: danger0,
+                handler: () => onRemove(props),
+            });
+        }
+
+        return actions;
+    }, [onConvert, onRemove, onUpdate, props]);
+
+    const handleCriteriaCheck = useCallback(() => {
+        if (onCheck) {
+            return () => {
+                onCheck({ ...props, isDone: !props.isDone });
+            };
+        }
+
+        return undefined;
+    }, [props, onCheck]);
+
+    const [defaultMode, values]: ['simple' | 'goal', React.ComponentProps<typeof GoalCriteriaSuggest>['values']] =
+        useMemo(() => {
+            if (criteriaAsGoal(props)) {
+                return [
+                    'goal',
+                    {
+                        id: props.id,
+                        mode: 'goal',
+                        title: props.title,
+                        weight: props.weight ? `${props.weight}` : '',
+                        selected: {
+                            id: props.goal.goalId,
+                            title: props.title,
+                            stateColor: props.goal.stateColor || 0,
+                            _shortId: props.goal.shortId,
+                        },
+                    },
+                ];
+            }
+
+            return [
+                'simple',
+                {
+                    id: props.id,
+                    mode: 'simple',
+                    title: props.title,
+                    weight: props.weight ? `${props.weight}` : '',
+                },
+            ];
+        }, [props]);
+
+    const handleCriteriaUpdate = useCallback<GoalCriteriaSuggestProps['onSubmit']>(
+        (values) => {
+            const valuesToUpdate: UnionCriteria = {
+                id: props.id,
+                title: values.title,
+                weight: Number(values.weight),
+                isDone: props.isDone,
+            };
+
+            if (values.selected?.id != null) {
+                (valuesToUpdate as GoalCriteriaProps).goal = {
+                    goalId: values.selected.id,
+                    shortId: values.selected._shortId,
+                    stateColor: values.selected.stateColor,
+                };
+                valuesToUpdate.title = values.selected.title;
+            }
+
+            if (onUpdate) {
+                onUpdate(valuesToUpdate);
+            }
+        },
+        [onUpdate, props.id, props.isDone],
+    );
+
+    return (
+        <TableRow className={classes.GoalCriteriaTableRow}>
+            {criteriaAsGoal(props) ? (
+                <GoalCriteria title={props.title} weight={props.weight} isDone={props.isDone} goal={props.goal} />
+            ) : (
+                <SimpleCriteria
+                    title={props.title}
+                    isDone={props.isDone}
+                    weight={props.weight}
+                    onCheck={handleCriteriaCheck()}
+                />
+            )}
+            {nullable(availableActions, (actions) => (
+                <TableCell width="3rem">
+                    <CriteriaActions actions={actions} />
+                </TableCell>
+            ))}
+            {nullable(mode === 'edit', () => (
+                <GoalFormPopupTrigger
+                    defaultVisible
+                    renderTrigger={({ ref }) => <div ref={ref} />}
+                    onCancel={() => setMode('read')}
+                >
+                    <GoalCriteriaSuggest
+                        id={props.goalId}
+                        defaultMode={defaultMode}
+                        values={values}
+                        onSubmit={handleCriteriaUpdate}
+                        validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                        editMode
+                    />
+                </GoalFormPopupTrigger>
+            ))}
+        </TableRow>
+    );
+};
+
+interface CriteriaListProps extends GoalCriteriaEditableApi {
+    list?: Array<CriteriaProps | GoalCriteriaProps>;
+    className?: string;
+}
+
+export const CriteriaList: React.FC<CriteriaListProps> = ({
+    list = [],
+    onConvert,
+    onUpdate,
+    onRemove,
+    onCheck,
+    goalId,
+    className,
+}) => {
+    return (
+        <Table className={className}>
+            {list.map((criteria) => (
+                <Criteria
+                    goalId={goalId}
+                    key={criteria.id}
+                    {...criteria}
+                    onConvert={onConvert}
+                    onUpdate={onUpdate}
+                    onRemove={onRemove}
+                    onCheck={onCheck}
+                />
+            ))}
+        </Table>
+    );
+};
+
+interface GoalCriteriaPreviewProps {
+    achievedWeight: number;
+    goalId: string;
+}
+
+export const GoalCriteriaPreview: React.FC<GoalCriteriaPreviewProps> = ({ achievedWeight, goalId }) => {
+    const [popupVisible, setPopupVisible] = useState(false);
+    const triggerRef = useRef<HTMLSpanElement>(null);
+    const wrapperRef = useRef<HTMLDivElement>(null);
+
+    const { data, status } = trpc.goal.getGoalCriteriaList.useQuery({ id: goalId }, { enabled: popupVisible });
+
+    useClickOutside(wrapperRef, ({ target }) => {
+        if (!popupVisible) {
+            return;
+        }
+
+        if (target instanceof HTMLElement) {
+            if (!wrapperRef.current?.contains(target)) {
+                setPopupVisible(false);
+            }
+        }
+    });
+
+    const handleOpen = useCallback(
+        (e: MouseEvent<HTMLSpanElement>) => {
+            // block following a link that hangs on the entire table row
+            e.preventDefault();
+
+            // block opening GoalPreview
+            e.stopPropagation();
+
+            if (!popupVisible) {
+                setPopupVisible(true);
+            }
+        },
+        [popupVisible],
+    );
+
+    return (
+        <>
+            <span ref={triggerRef} className={classes.GoalCriteriaTrigger} onClick={handleOpen}>
+                <CircleProgressBar value={achievedWeight} />
+            </span>
+            <Popup
+                reference={triggerRef}
+                visible={popupVisible}
+                placement="bottom-end"
+                offset={[10, 10]}
+                arrow={false}
+                onClickCapture={() => setPopupVisible(false)}
+                onClick={(e) => {
+                    // block opening GoalPreview
+                    e.stopPropagation();
+                }}
+            >
+                <div className={classes.GoalCriteria} ref={wrapperRef}>
+                    <Text className={classes.GoalCriteriaTitle} as="h4">
+                        {tr('Achievement criteria')}
+                    </Text>
+                    {nullable(status === 'success', () => (
+                        <CriteriaList
+                            className={classes.GoalCriteriaTable}
+                            goalId={goalId}
+                            list={data?.map((criteria) => mapCriteria(criteria, criteria.criteriaGoal))}
+                        />
+                    ))}
+                    {nullable(status === 'loading', () => (
+                        <div className={classes.GoalCriteriaLoader}>
+                            <Badge iconLeft={<Spinner size="s" />} text={tr('Loading ...')} />
+                        </div>
+                    ))}
+                </div>
+            </Popup>
+        </>
     );
 };
 
@@ -71,187 +476,24 @@ interface CriteriaItemValue {
     } | null;
 }
 
-interface CriteriaItemProps {
+interface GoalCriteriaViewProps extends GoalCriteriaEditableApi<CriteriaItemValue> {
     goalId: string;
-    criteria: CriteriaItemValue;
+    list: Array<CriteriaProps | GoalCriteriaProps>;
     canEdit: boolean;
-    onClick?: (goal: { _shortId: string }) => void;
-    onUpdateState: (value: CriteriaItemValue) => void;
-    onRemove: (value: CriteriaItemValue) => void;
-    onConvertGoal: (value: CriteriaItemValue) => void;
-    onUpdate: ComponentProps<typeof GoalCriteriaSuggest>['onSubmit'];
-    validateGoalCriteriaBindings: ComponentProps<typeof GoalCriteriaSuggest>['validateGoalCriteriaBindings'];
-}
-
-const CriteriaItem: React.FC<CriteriaItemProps> = ({
-    goalId,
-    criteria,
-    canEdit,
-    onUpdateState,
-    onConvertGoal,
-    onRemove,
-    onClick,
-    onUpdate,
-    validateGoalCriteriaBindings,
-}) => {
-    const [mode, setMode] = useState<'view' | 'edit'>('view');
-
-    const availableActions = useMemo<CriteriaActionItem[] | undefined>(() => {
-        if (!canEdit) {
-            return;
-        }
-
-        const actions: CriteriaActionItem[] = [
-            {
-                label: tr('Edit'),
-                icon: <IconEdit1Outline size="xxs" />,
-                handler: () => setMode('edit'),
-            },
-        ];
-
-        if (!criteria.criteriaGoal && onConvertGoal) {
-            actions.push({
-                label: tr('Create as goal'),
-                icon: <IconTargetOutline size="xxs" />,
-                handler: () => onConvertGoal(criteria),
-            });
-        }
-
-        actions.push({
-            label: tr('Delete'),
-            icon: <IconBinOutline size="xxs" />,
-            color: danger0,
-            handler: () => onRemove(criteria),
-        });
-
-        return actions;
-    }, [canEdit, criteria, onConvertGoal, onRemove]);
-
-    const handleChange = useCallback((val: CriteriaActionItem) => {
-        val.handler();
-    }, []);
-
-    const [defaultMode, values]: ['goal' | 'simple', ComponentProps<typeof GoalCriteriaSuggest>['values']] =
-        useMemo(() => {
-            const mode = criteria.criteriaGoal ? 'goal' : 'simple';
-            return [
-                mode,
-                {
-                    id: criteria.id,
-                    mode,
-                    title: criteria.title,
-                    weight: criteria.weight ? `${criteria.weight}` : '',
-                    selected: {
-                        id: criteria.criteriaGoal?.id || '',
-                        title: criteria.criteriaGoal?.title || '',
-                        stateColor: criteria.criteriaGoal?.state?.hue,
-                    },
-                },
-            ];
-        }, [criteria]);
-
-    return (
-        <>
-            <TableRow key={criteria.id}>
-                <CustomCell className={s.GoalCriteriaItemTitle}>
-                    {nullable(
-                        criteria.criteriaGoal,
-                        (goal) => (
-                            <GoalBadge
-                                title={goal.title}
-                                color={goal.state?.hue}
-                                href={routes.goal(goal._shortId)}
-                                onClick={() => onClick?.(goal)}
-                            />
-                        ),
-                        <Badge
-                            icon={
-                                <GoalCriteriaCheckBox
-                                    checked={criteria.isDone}
-                                    canEdit={canEdit}
-                                    onClick={() => onUpdateState({ ...criteria, isDone: !criteria.isDone })}
-                                />
-                            }
-                            text={criteria.title}
-                        />,
-                    )}
-                </CustomCell>
-                <CustomCell width={40} justify="end">
-                    {nullable(criteria.weight > 0, () => (
-                        <Text size="s" color={gray9}>
-                            {criteria.weight}
-                        </Text>
-                    ))}
-                </CustomCell>
-                <CustomCell width={40} justify="end" forIcon>
-                    <Dropdown
-                        onChange={handleChange}
-                        renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
-                        placement="right"
-                        items={availableActions}
-                        renderItem={(props) => (
-                            <MenuItem
-                                key={props.index}
-                                onClick={props.onClick}
-                                icon={props.item.icon}
-                                ghost
-                                color={props.item.color}
-                            >
-                                {props.item.label}
-                            </MenuItem>
-                        )}
-                    />
-                </CustomCell>
-            </TableRow>
-
-            {nullable(mode === 'edit', () => (
-                <GoalFormPopupTrigger
-                    defaultVisible
-                    renderTrigger={({ ref }) => <div ref={ref} />}
-                    onCancel={() => setMode('view')}
-                >
-                    <GoalCriteriaSuggest
-                        id={goalId}
-                        defaultMode={defaultMode}
-                        values={values}
-                        onSubmit={onUpdate}
-                        validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                        editMode
-                    />
-                </GoalFormPopupTrigger>
-            ))}
-        </>
-    );
-};
-
-interface GoalCriteriaProps {
-    goalId: string;
-    list: CriteriaItemValue[];
-    canEdit: boolean;
-    onRemove: (values: CriteriaItemValue) => Promise<void>;
-    onConvertToGoal: (values: CriteriaItemValue) => Promise<void>;
-    onUpdateState: (values: CriteriaItemValue) => Promise<void>;
     onClick?: (values: CriteriaItemValue) => void;
-    onUpdate: CriteriaItemProps['onUpdate'];
-    onCreate: CriteriaItemProps['onUpdate'];
-    onGoalClick?: CriteriaItemProps['onClick'];
-    validateGoalCriteriaBindings: CriteriaItemProps['validateGoalCriteriaBindings'];
 }
 
-export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
+export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaViewProps>> = ({
     goalId,
     list,
-    canEdit,
-    onGoalClick,
-    onCreate,
     onUpdate,
     onRemove,
-    onUpdateState,
-    onConvertToGoal,
-    validateGoalCriteriaBindings,
+    onCheck,
+    onConvert,
+    children,
 }) => {
     const sortedCriteriaItems = useMemo(() => {
-        const sorted = list.reduce<Record<'done' | 'undone', CriteriaItemValue[]>>(
+        const sorted = list.reduce<Record<'done' | 'undone', UnionCriteria[]>>(
             (acc, criteria) => {
                 if (criteria.isDone) {
                     acc.done.push(criteria);
@@ -270,50 +512,54 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
         return sorted.done.concat(sorted.undone);
     }, [list]);
 
+    const mapCriteriaValueWrapper = useCallback((fn?: (val: CriteriaItemValue) => void | Promise<void>) => {
+        if (fn) {
+            return (data: UnionCriteria) => {
+                const returnedItem: CriteriaItemValue = {
+                    id: data.id,
+                    title: data.title,
+                    weight: Number(data.weight),
+                    isDone: data.isDone,
+                    criteriaGoal: null,
+                };
+
+                if (criteriaAsGoal(data)) {
+                    returnedItem.criteriaGoal = {
+                        id: data.goal.goalId,
+                        title: data.title,
+                        _shortId: data.goal.shortId,
+                        state: {
+                            hue: data.goal.stateColor || 0,
+                        },
+                    };
+                }
+                return fn(returnedItem);
+            };
+        }
+    }, []);
+
     return (
         <ActivityFeedItem>
             <Circle size={32}>
                 <IconMessageTickOutline size="s" color={backgroundColor} />
             </Circle>
-            <IssueMeta className={s.GoalCriteriaIssueMeta} title={tr('Achievement criteria')}>
-                <Table>
-                    {sortedCriteriaItems.map((criteria) => (
-                        <CriteriaItem
-                            goalId={goalId}
-                            canEdit={canEdit}
-                            key={criteria.id}
-                            criteria={criteria}
-                            onClick={onGoalClick}
-                            onUpdateState={onUpdateState}
-                            onUpdate={onUpdate}
-                            onConvertGoal={onConvertToGoal}
-                            onRemove={onRemove}
-                            validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                        />
-                    ))}
-                </Table>
-
-                {nullable(canEdit, () => (
-                    <GoalFormPopupTrigger
-                        renderTrigger={(props) => (
-                            <AddInlineTrigger
-                                text={tr('Add achievement criteria')}
-                                ref={props.ref}
-                                onClick={props.onClick}
-                                centered={false}
-                            />
-                        )}
-                    >
-                        <GoalCriteriaSuggest
-                            id={goalId}
-                            withModeSwitch
-                            defaultMode="simple"
-                            items={list.map((criteria) => ({ ...criteria, goal: criteria.criteriaGoal }))}
-                            onSubmit={onCreate}
-                            validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                        />
-                    </GoalFormPopupTrigger>
+            <IssueMeta
+                className={classNames(classes.GoalCriteriaIssueMeta, {
+                    [classes.GoalCriteriaIssueMetaReset]: sortedCriteriaItems.length === 0,
+                })}
+                title={sortedCriteriaItems.length ? tr('Achievement criteria') : undefined}
+            >
+                {nullable(sortedCriteriaItems, (list) => (
+                    <CriteriaList
+                        goalId={goalId}
+                        onConvert={mapCriteriaValueWrapper(onConvert)}
+                        onRemove={mapCriteriaValueWrapper(onRemove)}
+                        onUpdate={mapCriteriaValueWrapper(onUpdate)}
+                        onCheck={mapCriteriaValueWrapper(onCheck)}
+                        list={list}
+                    />
                 ))}
+                {children}
             </IssueMeta>
         </ActivityFeedItem>
     );

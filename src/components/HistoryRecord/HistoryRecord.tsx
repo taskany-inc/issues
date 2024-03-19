@@ -159,10 +159,7 @@ const StyledIcon = styled(
             <IconDownSmallOutline size="s" {...props} ref={ref} />,
         );
     }),
-)`
-    /* no-magic: this negative margin needs for align icon by center of first line in content */
-    margin-top: -3px;
-`;
+)``;
 
 const StyledGroupHeader = styled(Text)`
     display: flex;

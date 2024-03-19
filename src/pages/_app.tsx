@@ -13,6 +13,8 @@ import { GoalPreviewProvider } from '../components/GoalPreview/GoalPreviewProvid
 import { getTelemetryInstanceSingleton, useWebTelemetryMonitoringInit } from '../utils/telemetry';
 import { ThemeSetter } from '../components/ThemeSetter';
 
+import '@taskany/icons/style.css';
+
 import './_app.css';
 
 const defaultThemes = ['light', 'dark'];
