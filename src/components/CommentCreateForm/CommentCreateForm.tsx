@@ -173,11 +173,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                         onChange={onStateSelect}
                                         renderItem={(props) => (
                                             <StateWrapper hue={props.item?.hue}>
-                                                <State
-                                                    color="var(--state-stroke)"
-                                                    title={props.item?.title}
-                                                    onClick={() => onStateSelect(props.item)}
-                                                />
+                                                <State color="var(--state-stroke)" title={props.item?.title} />
                                             </StateWrapper>
                                         )}
                                     />
