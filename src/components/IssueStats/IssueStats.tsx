@@ -10,6 +10,7 @@ import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown/PriorityDropdown';
 import { Priority } from '../../types/priority';
 import { getDateString } from '../../utils/dateTime';
+import { safeUserData } from '../../utils/getUserName';
 
 import s from './IssueStats.module.css';
 
@@ -45,21 +46,22 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
 }) => {
     return (
         <div className={s.IssueStats}>
-            {nullable(owner, (o) =>
-                nullable(
+            {nullable(owner, ({ id, ...rest }) => {
+                const owner = { id, user: safeUserData(rest) };
+                return nullable(
                     stateReadOnly,
                     () => (
                         <Separator>
-                            <UserDropdown value={o} label="Owner" view="default" readOnly />
+                            <UserDropdown mode="single" value={owner} label="Owner" view="default" readOnly />
                         </Separator>
                     ),
-                    <UserDropdown value={o} label="Owner" view="default" readOnly />,
-                ),
-            )}
+                    <UserDropdown mode="single" value={owner} label="Owner" view="default" readOnly />,
+                );
+            })}
 
             {nullable(priority, (p) => (
                 <Separator>
-                    <PriorityDropdown label="Priority" value={p} view="default" readOnly />
+                    <PriorityDropdown mode="single" label="Priority" value={p} view="default" readOnly />
                 </Separator>
             ))}
 

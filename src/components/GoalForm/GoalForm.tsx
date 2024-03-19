@@ -219,6 +219,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             control={control}
                             render={({ field }) => (
                                 <GoalParentDropdown
+                                    mode="single"
                                     label="Project"
                                     placeholder={tr('Enter project')}
                                     error={errorsResolver(field.name)}
@@ -236,6 +237,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         control={control}
                         render={({ field }) => (
                             <UserDropdown
+                                mode="single"
                                 label="Owner"
                                 placeholder={tr('Enter name or email')}
                                 error={errorsResolver(field.name)}
@@ -252,6 +254,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         control={control}
                         render={({ field }) => (
                             <PriorityDropdown
+                                mode="single"
                                 label="Priority"
                                 error={errorsResolver(field.name)}
                                 disabled={busy}
@@ -267,7 +270,9 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         control={control}
                         render={({ field }) => (
                             <StateDropdown
+                                mode="single"
                                 label="State"
+                                setDefault
                                 flowId={parentWatcher?.flowId}
                                 error={errorsResolver(field.name)}
                                 disabled={(goalType === 'default' && !parentWatcher?.flowId) || busy}
@@ -285,6 +290,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                             return (
                                 <EstimateDropdown
                                     label="Estimate"
+                                    placement="top-end"
                                     error={errorsResolver(field.name)}
                                     className={s.GoalFormEstimateDropdown}
                                     {...field}

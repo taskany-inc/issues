@@ -69,6 +69,7 @@ export const TeamComboBox: FC<TeamComboBoxProps & React.HTMLAttributes<HTMLDivEl
             <DropdownPanel
                 placement="bottom-start"
                 setInputState={setSearch}
+                mode="single"
                 onChange={onChange}
                 inputState={search}
                 items={data}

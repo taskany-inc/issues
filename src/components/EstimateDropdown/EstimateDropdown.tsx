@@ -28,11 +28,13 @@ interface EstimateDropdownProps {
     disabled?: boolean;
     readOnly?: boolean;
     className?: string;
+    value?: Estimate | null;
+    placement?: ComponentProps<typeof DropdownPanel>['placement'];
     onChange?: (date: Estimate | null) => void;
-    value?: Estimate;
+    onClose?: () => void;
 }
 
-export const EstimateDropdown = ({ onChange, value, ...props }: EstimateDropdownProps) => {
+export const EstimateDropdown = ({ value, onChange, onClose, placement, ...props }: EstimateDropdownProps) => {
     const locale = useLocale();
     const [estimate, setEstimate] = useState<EstimateState | undefined>(
         value
@@ -49,7 +51,7 @@ export const EstimateDropdown = ({ onChange, value, ...props }: EstimateDropdown
                 value
                     ? {
                           date: getDateString(value.range.end),
-                          type: value.type,
+                          ...value,
                       }
                     : null,
             );
@@ -91,7 +93,7 @@ export const EstimateDropdown = ({ onChange, value, ...props }: EstimateDropdown
     );
 
     return (
-        <Dropdown arrow>
+        <Dropdown arrow onClose={onClose}>
             <DropdownTrigger {...props}>
                 {nullable(value, (v) => (
                     <Text size="s" as="span">
@@ -102,7 +104,7 @@ export const EstimateDropdown = ({ onChange, value, ...props }: EstimateDropdown
                     </Text>
                 ))}
             </DropdownTrigger>
-            <DropdownPanel width={330} placement="top-end" className={s.EstimateDropdownPanel}>
+            <DropdownPanel width={330} placement={placement} className={s.EstimateDropdownPanel}>
                 <DatePicker translates={translates.default} value={estimate} onChange={onChangeHandler}>
                     <DatePickerYear translates={translates.year} {...estimateYearTrigger.attr} />
                     <DatePickerQuarter translates={translates.quarter} {...estimateQuarterTrigger.attr} />

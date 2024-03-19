@@ -1,34 +1,28 @@
 import { State as StateType } from '@prisma/client';
-import { ComponentProps, useCallback, useEffect } from 'react';
-import { State } from '@taskany/bricks/harmony';
+import { ComponentProps, useEffect, useMemo } from 'react';
+import { State, StateGroup } from '@taskany/bricks/harmony';
 import { nullable } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
-import { Dropdown, DropdownTrigger, DropdownPanel } from '../Dropdown/Dropdown';
-import { StateWrapper } from '../StateWrapper';
+import { Dropdown, DropdownTrigger, DropdownPanel, DropdownGuardedProps } from '../Dropdown/Dropdown';
+import { usePageContext } from '../../hooks/usePageContext';
 
-interface StateDropdownProps {
+type StateDropdownProps = {
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     label?: ComponentProps<typeof DropdownTrigger>['label'];
     view?: ComponentProps<typeof DropdownTrigger>['view'];
     disabled?: boolean;
     readOnly?: boolean;
+    setDefault?: boolean;
     className?: string;
-    value?: Partial<StateType>;
+    value?: StateType | StateType[];
     flowId?: string;
+    onClose?: () => void;
+} & DropdownGuardedProps<StateType>;
 
-    onChange?: (state: StateType) => void;
-}
-
-export const StateDropdown = ({ value, flowId, onChange, ...props }: StateDropdownProps) => {
+export const StateDropdown = ({ value, flowId, mode, setDefault, onChange, onClose, ...props }: StateDropdownProps) => {
+    const { theme } = usePageContext();
     const defaultFlowEnabled = !flowId && !props.disabled;
-
-    const onStateChange = useCallback(
-        (s: Partial<StateType>) => {
-            onChange?.(s as StateType);
-        },
-        [onChange],
-    );
 
     const { data: flowById } = trpc.flow.getById.useQuery(flowId, {
         enabled: !!flowId,
@@ -45,30 +39,47 @@ export const StateDropdown = ({ value, flowId, onChange, ...props }: StateDropdo
     const flow = defaultFlowEnabled ? defaultFlow : flowById;
 
     useEffect(() => {
-        if (value) return;
+        if (value || !setDefault) return;
+
         const defaultState = flow?.states.find((state) => state.default === true);
-        defaultState && onStateChange(defaultState);
-    }, [flow, onStateChange, value]);
+        if (!defaultState) return;
+
+        if (mode === 'single') onChange?.(defaultState);
+        if (mode === 'multiple') onChange?.([defaultState]);
+    }, [flow, mode, onChange, setDefault, value]);
+
+    const values = useMemo(() => {
+        const res: StateType[] = [];
+        return res.concat(value || []).reduce<(StateType & { color?: string })[]>((acc, cur) => {
+            if (cur) {
+                acc.push({ ...cur, color: cur[`${theme}Foreground`] || undefined });
+            }
+            return acc;
+        }, []);
+    }, [theme, value]);
 
     return (
-        <Dropdown arrow>
+        <Dropdown arrow onClose={onClose}>
             <DropdownTrigger {...props}>
-                {nullable(value, ({ hue, title }) => (
-                    <StateWrapper hue={hue}>
-                        <State color="var(--state-stroke)" title={title} />
-                    </StateWrapper>
-                ))}
+                {nullable(
+                    mode === 'multiple' && values.length > 1,
+                    () => (
+                        <StateGroup items={values} />
+                    ),
+                    nullable(values, ([{ title, ...props }]) => (
+                        <State color={props[`${theme}Foreground`] || undefined} title={title} />
+                    )),
+                )}
             </DropdownTrigger>
             <DropdownPanel
                 width={160}
-                value={value}
+                value={values}
                 items={flow?.states}
                 selectable
-                onChange={onStateChange}
+                mode={mode}
+                onChange={onChange}
                 renderItem={(props) => (
-                    <StateWrapper hue={props.item?.hue}>
-                        <State color="var(--state-stroke)" title={props.item?.title} />
-                    </StateWrapper>
+                    <State color={props.item[`${theme}Foreground`] || undefined} title={props.item?.title} />
                 )}
             />
         </Dropdown>

@@ -1,34 +1,41 @@
-import { Text, Button } from '@taskany/bricks/harmony';
+import { Text, Button, Counter } from '@taskany/bricks/harmony';
 import { useState, useEffect, useMemo, ComponentProps, useCallback } from 'react';
 import { nullable } from '@taskany/bricks';
 import { IconAddOutline } from '@taskany/icons';
 
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { trpc } from '../../utils/trpcClient';
-import { Dropdown, DropdownTrigger, DropdownPanel } from '../Dropdown/Dropdown';
+import { Dropdown, DropdownTrigger, DropdownPanel, DropdownGuardedProps } from '../Dropdown/Dropdown';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 
 import s from './GoalParentDropdown.module.css';
 import { tr } from './GoalParentDropdown.i18n';
 
-interface GoalParentDropdownProps {
+interface GoalParentValue {
+    id: string;
+    title: string;
+}
+
+type GoalParentDropdownProps = {
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     label?: ComponentProps<typeof DropdownTrigger>['label'];
-    value?: { id: string; title: string };
+    value?: GoalParentValue | GoalParentValue[];
     query?: string;
     className?: string;
     placeholder?: string;
     disabled?: boolean;
-    onChange?: (project: { id: string; title: string }) => void;
-}
+    placement?: ComponentProps<typeof DropdownPanel>['placement'];
+    onClose?: () => void;
+} & DropdownGuardedProps<GoalParentValue>;
 
 export const GoalParentDropdown = ({
-    label,
     query = '',
     value,
     placeholder,
-    disabled,
+    mode,
+    placement,
     onChange,
+    onClose,
     ...props
 }: GoalParentDropdownProps) => {
     const [inputState, setInputState] = useState(query);
@@ -54,30 +61,64 @@ export const GoalParentDropdown = ({
         .slice(0, 10) // top 10
         .map((p) => p.cache);
 
-    const items = useMemo<typeof recentProjects | typeof data>(
+    const suggestions = useMemo<typeof recentProjects | typeof data>(
         () => (data && data?.length > 0 ? data : recentProjects),
         [data, recentProjects],
     );
+
+    const values = useMemo(() => {
+        const res: GoalParentValue[] = [];
+        return res.concat(value || []);
+    }, [value]);
+
+    const valuesMap = useMemo(() => {
+        return values.reduce<Record<string, boolean>>((acc, cur) => {
+            acc[cur.id] = true;
+            return acc;
+        }, {});
+    }, [values]);
+
+    const items = useMemo(() => {
+        if (mode === 'single') {
+            return suggestions;
+        }
+
+        return suggestions?.filter((suggest) => valuesMap[suggest.id]);
+    }, [mode, suggestions, valuesMap]);
 
     const handleCreateProject = useCallback(() => {
         dispatchModalEvent(ModalEvent.GoalCreateModal)();
         dispatchModalEvent(ModalEvent.ProjectCreateModal)();
     }, []);
 
+    const handleClose = useCallback(() => {
+        onClose?.();
+        setInputState('');
+    }, [onClose]);
+
     return (
-        <Dropdown arrow>
-            <DropdownTrigger label={label} {...props} readOnly={disabled}>
-                {nullable(value, ({ title }) => (
-                    <Text size="s" ellipsis className={s.DropdownTriggerValue} title={title}>
-                        {title}
-                    </Text>
-                ))}
+        <Dropdown arrow onClose={handleClose}>
+            <DropdownTrigger {...props}>
+                {nullable(
+                    mode === 'multiple' && values.length > 1,
+                    () => (
+                        <Counter count={values.length} />
+                    ),
+                    nullable(values, ([{ title }]) => (
+                        <Text size="s" ellipsis className={s.DropdownTriggerValue} title={title}>
+                            {title}
+                        </Text>
+                    )),
+                )}
             </DropdownTrigger>
             <DropdownPanel
                 width={320}
-                value={value}
+                value={values}
                 title={tr('Suggestions')}
                 items={items}
+                placement={placement}
+                mode={mode}
+                selectable
                 placeholder={placeholder}
                 inputState={inputState}
                 setInputState={setInputState}

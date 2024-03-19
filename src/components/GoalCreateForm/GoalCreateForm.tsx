@@ -196,6 +196,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
                             <DropdownPanel
                                 placement="top-end"
                                 items={createOptions}
+                                mode="single"
                                 onChange={onCreateTypeChange}
                                 renderItem={(props) => (
                                     <div onClick={() => onCreateTypeChange(props.item)} className={s.MenuItem}>
