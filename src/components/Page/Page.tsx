@@ -30,7 +30,7 @@ const HotkeysModal = dynamic(() => import('../HotkeysModal/HotkeysModal'));
 const NotificationsHub = dynamic(() => import('../NotificationsHub/NotificationsHub'));
 const FeedbackCreateForm = dynamic(() => import('../FeedbackCreateForm/FeedbackCreateForm'));
 const WhatsNew = dynamic(() => import('../WhatsNew/WhatsNew'));
-const ImageFullScreen = dynamic(() => import('../ImageFullScreen'));
+const ImageFullScreen = dynamic(() => import('../ImageFullScreen/ImageFullScreen'));
 
 interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     user: Session['user'];

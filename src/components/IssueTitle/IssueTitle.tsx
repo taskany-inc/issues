@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, Link } from '@taskany/bricks/harmony';
 import { nullable } from '@taskany/bricks';
 
-import { goalPageHeaderTitle } from '../utils/domObjects';
+import { goalPageHeaderTitle } from '../../utils/domObjects';
 
 interface IssueTitleProps {
     title: string;

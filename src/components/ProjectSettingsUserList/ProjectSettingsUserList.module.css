@@ -1,0 +1,9 @@
+.ListContainer {
+    background-color: var(--gray3);
+    padding: var(--gap-s) var(--gap-m);
+}
+
+.Title {
+    padding: var(--gap-s) var(--gap-m) var(--gap-m);
+    color: var(--gray9);
+}

@@ -1,0 +1,10 @@
+.Image {
+    cursor: pointer;
+    width: 100vh;
+}
+
+.ImageWrapper {
+    display: flex;
+    justify-content: center;
+    outline: none;
+}
