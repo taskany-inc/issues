@@ -1,0 +1,9 @@
+/* Order of styles on page: SC, CSS Modules */
+.FooterItem.FooterItem {
+    transition: color var(--transition-time) var(--transition-func);
+    cursor: pointer;
+}
+
+.FooterItem.FooterItem:hover {
+    color: var(--text-color);
+}

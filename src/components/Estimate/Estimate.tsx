@@ -1,7 +1,6 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { gapXs, warn0 } from '@taskany/colors';
-import { nullable, Text } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { Text } from '@taskany/bricks/harmony';
 import { IconExclamationCircleSolid } from '@taskany/icons';
 
 import { createDateRange, isPastDate, getQuarterFromDate, getYearFromDate, getDateString } from '../../utils/dateTime';
@@ -10,22 +9,7 @@ import { estimateComboboxWrongDateMessage } from '../../utils/domObjects';
 
 import { tr } from './Estimate.i18n';
 import { EstimateContextProvider } from './EstimateProvider';
-
-const StyledWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: ${gapXs};
-`;
-
-const StyledWarningWrapper = styled.div`
-    display: flex;
-    gap: ${gapXs};
-    align-items: center;
-`;
-
-const StyledIconExclamationCircleSolid = styled(IconExclamationCircleSolid)`
-    display: flex;
-`;
+import s from './Estimate.module.css';
 
 export interface EstimateValue {
     type: DateType;
@@ -127,17 +111,15 @@ export const Estimate = React.forwardRef<HTMLDivElement, EstimateProps>(({ value
     );
 
     return (
-        <StyledWrapper ref={ref}>
+        <div className={s.EstimateWrapper} ref={ref}>
             {nullable(warning, (warn) => (
-                <StyledWarningWrapper {...estimateComboboxWrongDateMessage.attr}>
-                    <StyledIconExclamationCircleSolid size="xs" color={warn0} />
-                    <Text color={warn0} size="xs">
-                        {warn.message}
-                    </Text>
-                </StyledWarningWrapper>
+                <div className={s.EstimateWarningWrapper} {...estimateComboboxWrongDateMessage.attr}>
+                    <IconExclamationCircleSolid className={s.EstimateIcon} size="xs" />
+                    <Text size="xs">{warn.message}</Text>
+                </div>
             ))}
 
             <EstimateContextProvider value={context}>{children}</EstimateContextProvider>
-        </StyledWrapper>
+        </div>
     );
 });

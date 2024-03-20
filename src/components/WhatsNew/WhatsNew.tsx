@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { FormTitle, ModalContent, ModalHeader, nullable } from '@taskany/bricks';
 import dynamic from 'next/dynamic';
 import { Button } from '@taskany/bricks/harmony';
+import cn from 'classnames';
 
 import { routes } from '../../hooks/router';
 import { useLocale } from '../../hooks/useLocale';
@@ -10,29 +10,9 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { trpc } from '../../utils/trpcClient';
 
 import { tr } from './WhatsNew.i18n';
+import s from './WhatsNew.module.css';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
-
-const StyledIframe = styled.iframe<{ visible?: boolean }>`
-    width: 100%;
-    height: 400px;
-    border: 0;
-
-    visibility: hidden;
-
-    ${({ visible }) =>
-        visible &&
-        `
-        visibility: visible;
-    `}
-`;
-
-const StyledFooter = styled.div`
-    padding-top: var(--gap-m);
-    display: flex;
-    justify-content: end;
-    gap: var(--gap-s);
-`;
 
 const WhatsNew = () => {
     const locale = useLocale();
@@ -82,13 +62,17 @@ const WhatsNew = () => {
             </ModalHeader>
             <ModalContent>
                 {nullable(data?.version, (v) => (
-                    <StyledIframe src={routes.whatsnew(v, locale)} onLoad={onIframeLoad} visible={iframeReady} />
+                    <iframe
+                        className={cn(s.WhatsNewIframe, { [s.WhatsNewIframe_visible]: iframeReady })}
+                        src={routes.whatsnew(v, locale)}
+                        onLoad={onIframeLoad}
+                    />
                 ))}
 
-                <StyledFooter>
+                <div className={s.WhatsNewFooter}>
                     <Button text={tr('Dismiss')} onClick={onDelayClick} />
                     <Button view="primary" text={tr('Awesome! Thank you!')} onClick={onReadClick} />
-                </StyledFooter>
+                </div>
             </ModalContent>
         </ModalOnEvent>
     );

@@ -1,0 +1,22 @@
+.ProjectMenuItem {
+    box-sizing: border-box;
+    padding: var(--gap-xs) var(--gap-s);
+    margin-bottom: var(--gap-s);
+    min-width: 200px;
+
+    border-radius: var(--radius-m);
+
+    cursor: pointer;
+}
+
+.ProjectMenuItem:last-child {
+    margin-bottom: 0;
+}
+
+.ProjectMenuItem:hover {
+    background-color: var(--gray4);
+}
+
+.ProjectMenuItem_focused {
+    background-color: var(--gray4);
+}

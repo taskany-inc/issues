@@ -1,0 +1,4 @@
+/* Order of styles on page: SC, CSS Modules */
+.FormTitle.FormTitle {
+    color: var(--danger0);
+}

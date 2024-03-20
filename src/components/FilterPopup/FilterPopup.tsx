@@ -1,21 +1,10 @@
 import { useRef } from 'react';
-import styled from 'styled-components';
-import {
-    useKeyboard,
-    useClickOutside,
-    KeyCode,
-    Popup,
-    Tabs,
-    TabContent,
-    TabsMenu,
-    Tip,
-    nullable,
-} from '@taskany/bricks';
-import { gray10, gapS, gapXs, textColor, gapM, radiusM } from '@taskany/colors';
+import { useKeyboard, useClickOutside, KeyCode, Popup, Tabs, Tip, nullable } from '@taskany/bricks';
 import { IconBulbOnOutline } from '@taskany/icons';
 import { Button } from '@taskany/bricks/harmony';
 
 import { tr } from './FilterPopup.i18n';
+import s from './FilterPopup.module.css';
 
 interface FilterPopupProps {
     visible: boolean;
@@ -24,60 +13,6 @@ interface FilterPopupProps {
     onApplyClick: () => void;
     activeTab?: string;
 }
-
-const StyledPopupWrapper = styled.div`
-    padding: ${gapXs};
-`;
-
-const StyledTabs = styled(Tabs)`
-    width: 500px;
-    min-height: 200px;
-
-    gap: ${gapM};
-
-    ${TabsMenu} {
-        width: 200px;
-        max-width: 100%;
-        flex-basis: auto;
-    }
-
-    ${TabContent} {
-        display: block;
-        flex: 1;
-    }
-`;
-
-const StyledPopup = styled(Popup)`
-    border-radius: ${radiusM};
-`;
-
-const StyledFilterPanelPopupFooter = styled.div`
-    display: flex;
-    padding: ${gapXs} ${gapS};
-    margin-top: ${gapXs};
-    align-items: center;
-    gap: ${gapS};
-`;
-
-const StyledActionWrapper = styled.div`
-    display: flex;
-    flex-wrap: nowrap;
-    margin-left: auto;
-    gap: ${gapS};
-`;
-
-const StyledTip = styled(Tip)`
-    color: ${gray10};
-`;
-
-const StyledPopupOverlay = styled.div`
-    position: fixed;
-    z-index: 101;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-`;
 
 export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = ({
     activeTab,
@@ -105,8 +40,9 @@ export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = 
         <>
             {nullable(visible, () => (
                 <>
-                    <StyledPopupOverlay />
-                    <StyledPopup
+                    <div className={s.FilterPopupOverlay} />
+                    <Popup
+                        className={s.FilterPopup}
                         reference={filterTriggerRef}
                         interactive
                         placement="bottom-start"
@@ -114,25 +50,26 @@ export const FilterPopup: React.FC<React.PropsWithChildren<FilterPopupProps>> = 
                         {...onESC}
                         offset={[0, 10]}
                     >
-                        <StyledPopupWrapper key={String(visible)} ref={popupWrapperRef}>
-                            <StyledTabs active={activeTab} layout="vertical">
+                        <div className={s.FilterPopupContent} key={String(visible)} ref={popupWrapperRef}>
+                            <Tabs className={s.Tabs} active={activeTab} layout="vertical">
                                 {children}
-                            </StyledTabs>
-                            <StyledFilterPanelPopupFooter>
-                                <StyledTip
+                            </Tabs>
+                            <div className={s.FilterPopupFooter}>
+                                <Tip
+                                    className={s.FilterPopupTip}
                                     title={tr('Pro tip!')}
                                     size="xs"
-                                    icon={<IconBulbOnOutline size="xs" color={textColor} />}
+                                    icon={<IconBulbOnOutline size="xs" className={s.FilterPopupTipIcon} />}
                                 >
                                     {tr('You can apply and save filters as preset.')}
-                                </StyledTip>
-                                <StyledActionWrapper>
+                                </Tip>
+                                <div className={s.FilterPopupActions}>
                                     <Button text={tr('Cancel')} onClick={() => switchVisible(false)} />
                                     <Button view="primary" text={tr('Apply')} onClick={onApplyClick} />
-                                </StyledActionWrapper>
-                            </StyledFilterPanelPopupFooter>
-                        </StyledPopupWrapper>
-                    </StyledPopup>
+                                </div>
+                            </div>
+                        </div>
+                    </Popup>
                 </>
             ))}
         </>

@@ -1,0 +1,18 @@
+.PageTitleText {
+    padding-left: var(--gap-s);
+    transition: color var(--transition-time) var(--transition-func);
+    color: var(--gray7);
+}
+
+.PageTitleText_hovered {
+    color: var(--gray4);
+}
+
+.PageTitleText_hovered:hover {
+    cursor: pointer;
+    color: var(--gray7);
+}
+
+.PageTitleInfo {
+    color: var(--gray6);
+}

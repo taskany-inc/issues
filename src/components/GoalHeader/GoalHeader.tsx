@@ -7,7 +7,7 @@ import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { goalPageHeader } from '../../utils/domObjects';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { IssueStats } from '../IssueStats/IssueStats';
-import { IssueTitle } from '../IssueTitle';
+import { IssueTitle } from '../IssueTitle/IssueTitle';
 import { StateDropdown } from '../StateDropdown/StateDropdown';
 import { IssueParent } from '../IssueParent/IssueParent';
 

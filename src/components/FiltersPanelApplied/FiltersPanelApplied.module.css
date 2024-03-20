@@ -2,4 +2,5 @@
 .FiltersPanelApplied.FiltersPanelApplied {
     margin: 0 var(--gap-sm);
     padding: var(--gap-m) var(--gap-s) 0;
+    color: var(--gray7);
 }

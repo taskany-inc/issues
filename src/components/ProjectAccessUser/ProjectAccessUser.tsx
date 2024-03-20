@@ -3,7 +3,7 @@ import { FC, useCallback, useMemo } from 'react';
 import { ActivityByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { ProjectSettingsUserList } from '../ProjectSettingsUserList';
+import { ProjectSettingsUserList } from '../ProjectSettingsUserList/ProjectSettingsUserList';
 
 import { tr } from './ProjectAccessUser.i18n';
 

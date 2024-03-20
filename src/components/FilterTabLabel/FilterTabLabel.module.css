@@ -1,0 +1,11 @@
+.LabelWrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: var(--gap-xs);
+    width: 100%;
+}
+
+.LabelText {
+    color: var(--gray9);
+}

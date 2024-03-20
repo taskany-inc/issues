@@ -3,7 +3,7 @@ import { CircleProgressBar, Link } from '@taskany/bricks/harmony';
 
 import { DateType } from '../../types/date';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-import { CommentsCountBadge } from '../CommentsCountBadge';
+import { CommentsCountBadge } from '../CommentsCountBadge/CommentsCountBadge';
 import { PrivateDepsWarning } from '../PrivateDepsWarning/PrivateDepsWarning';
 import { UserDropdown } from '../UserDropdown/UserDropdown';
 import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';

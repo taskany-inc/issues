@@ -3,9 +3,9 @@ import { StateType } from '@prisma/client';
 import { Tab } from '@taskany/bricks';
 
 import { FilterBase } from './FilterBase/FilterBase';
-import { FilterCheckbox } from './FilterCheckbox';
-import { StateDot } from './StateDot';
-import { FilterTabLabel } from './FilterTabLabel';
+import { FilterCheckbox } from './FilterCheckbox/FilterCheckbox';
+import { StateDot } from './StateDot/StateDot';
+import { FilterTabLabel } from './FilterTabLabel/FilterTabLabel';
 
 interface State {
     id: string;

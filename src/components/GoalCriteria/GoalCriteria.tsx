@@ -1,6 +1,6 @@
 import React, { ComponentProps, useCallback, useMemo, useState } from 'react';
 import cn from 'classnames';
-import { Text, nullable, MenuItem, Dropdown } from '@taskany/bricks';
+import { nullable, MenuItem, Dropdown } from '@taskany/bricks';
 import {
     IconTargetOutline,
     IconCircleOutline,
@@ -10,16 +10,15 @@ import {
     IconEdit1Outline,
     IconMoreVerticalOutline,
 } from '@taskany/icons';
-import { Table, TableRow } from '@taskany/bricks/harmony';
-import { backgroundColor, danger0, gray9 } from '@taskany/colors';
+import { Table, TableRow, Text } from '@taskany/bricks/harmony';
 
-import { ActivityFeedItem } from '../ActivityFeed';
-import { Circle } from '../Circle';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
+import { Circle } from '../Circle/Circle';
 import { GoalBadge } from '../GoalBadge';
-import { Badge } from '../Badge';
-import { IssueMeta } from '../IssueMeta';
-import { AddInlineTrigger } from '../AddInlineTrigger';
-import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
+import { Badge } from '../Badge/Badge';
+import { IssueMeta } from '../IssueMeta/IssueMeta';
+import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
+import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { routes } from '../../hooks/router';
 import { CustomCell } from '../GoalListItemCompact/GoalListItemCompact';
@@ -120,7 +119,7 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
         actions.push({
             label: tr('Delete'),
             icon: <IconBinOutline size="xxs" />,
-            color: danger0,
+            color: 'var(--danger0)',
             handler: () => onRemove(criteria),
         });
 
@@ -178,7 +177,7 @@ const CriteriaItem: React.FC<CriteriaItemProps> = ({
                 </CustomCell>
                 <CustomCell width={40} justify="end">
                     {nullable(criteria.weight > 0, () => (
-                        <Text size="s" color={gray9}>
+                        <Text size="s" className={s.GoalCriteriaWeight}>
                             {criteria.weight}
                         </Text>
                     ))}
@@ -273,7 +272,7 @@ export const GoalCriteria: React.FC<GoalCriteriaProps> = ({
     return (
         <ActivityFeedItem>
             <Circle size={32}>
-                <IconMessageTickOutline size="s" color={backgroundColor} />
+                <IconMessageTickOutline size="s" color="var(--background-color)" />
             </Circle>
             <IssueMeta className={s.GoalCriteriaIssueMeta} title={tr('Achievement criteria')}>
                 <Table>

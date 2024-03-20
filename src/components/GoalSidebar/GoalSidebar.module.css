@@ -1,0 +1,9 @@
+.InlineInputWrapper {
+    margin-top: var(--gap-xs);
+    height: 32px; /* Input height */
+}
+
+/* Order of styles on page: SC, CSS Modules */
+.TextList.TextList {
+    padding-left: var(--gap-xs);
+}

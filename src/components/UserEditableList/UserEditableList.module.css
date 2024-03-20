@@ -1,0 +1,6 @@
+.InputContainer {
+    margin-top: var(--gap-xs);
+
+    /* height of input */
+    height: 28px;
+}

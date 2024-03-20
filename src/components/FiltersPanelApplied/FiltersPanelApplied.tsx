@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { FiltersApplied } from '@taskany/bricks';
-import { gray7 } from '@taskany/colors';
 
 import { QueryState } from '../../hooks/useUrlFilterParams';
 import { getPriorityText } from '../PriorityText/PriorityText';
@@ -137,7 +136,7 @@ export const FiltersPanelApplied: React.FC<FiltersPanelAppliedProps> = ({
     }
 
     return (
-        <FiltersApplied className={s.FiltersPanelApplied} size="s" weight="bold" color={gray7}>
+        <FiltersApplied className={s.FiltersPanelApplied} size="s" weight="bold">
             {infoString}
         </FiltersApplied>
     );

@@ -6,7 +6,7 @@ import { trpc } from '../../utils/trpcClient';
 import { ToggleGoalDependency, dependencyKind } from '../../schema/goal';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { CustomCell, GoalListItemCompact } from '../GoalListItemCompact/GoalListItemCompact';
-import { TableRowItemTitle } from '../TableRowItem/TableRowItem';
+import { Title } from '../Table/Table';
 import { UserGroup } from '../UserGroup';
 import { GoalSelect } from '../GoalSelect';
 import {
@@ -88,9 +88,9 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
                             name: 'title',
                             renderColumn: (values) => (
                                 <CustomCell width="50%">
-                                    <TableRowItemTitle size="s" {...goalDependenciesSuggestionItemTitle.attr}>
+                                    <Title size="s" {...goalDependenciesSuggestionItemTitle.attr}>
                                         {values.title}
-                                    </TableRowItemTitle>
+                                    </Title>
                                 </CustomCell>
                             ),
                         },

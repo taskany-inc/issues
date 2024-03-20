@@ -1,5 +1,4 @@
 import { MutableRefObject, useCallback, useMemo, useState } from 'react';
-import { gray9 } from '@taskany/colors';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 import { Button, Text } from '@taskany/bricks/harmony';
 import { KeyCode, useKeyboard } from '@taskany/bricks';
@@ -201,7 +200,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
                                     <div onClick={() => onCreateTypeChange(props.item)} className={s.MenuItem}>
                                         <Text size="m">{props.item.title}</Text>
                                         {props.item.clue && (
-                                            <Text size="s" color={gray9}>
+                                            <Text size="s" color="var(--gray9)">
                                                 {props.item.clue}
                                             </Text>
                                         )}

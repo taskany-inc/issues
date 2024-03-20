@@ -1,11 +1,12 @@
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { Tab, Text, nullable } from '@taskany/bricks';
+import { Tab, nullable } from '@taskany/bricks';
+import { Text } from '@taskany/bricks/harmony';
 
-import { FilterTabLabel } from '../FilterTabLabel';
+import { FilterTabLabel } from '../FilterTabLabel/FilterTabLabel';
 import { FilterBase } from '../FilterBase/FilterBase';
 
 import { tr, I18nKey } from './SortFilter.i18n';
+import s from './SortFilter.module.css';
 
 export const sortFilterTr = tr;
 
@@ -42,20 +43,6 @@ const sortParams: SortableProps[] = [
     'updatedAt',
 ];
 
-const StyledSortItem = styled(Text)`
-    padding: var(--gap-xs) 0;
-    display: flex;
-    align-items: baseline;
-    flex-wrap: nowrap;
-
-    gap: var(--gap-xs);
-`;
-
-const StyledDirectionText = styled(Text)`
-    display: inline-flex;
-    line-height: 1;
-`;
-
 const getSortParamText = (key: I18nKey) => {
     const map: Record<I18nKey, string> = {
         title: tr('title'),
@@ -77,14 +64,14 @@ const SortFilterItem: FC<{ text: I18nKey; direction: SortDirection; onClick: () 
     onClick,
 }) => {
     return (
-        <StyledSortItem onClick={onClick}>
+        <Text className={s.SortFilterItem} onClick={onClick}>
             {getSortParamText(text)}
             {nullable(direction, (dir) => (
-                <StyledDirectionText weight="bold" size="xs" color="var(--gray8)">
+                <Text weight="bold" size="xs" className={s.SortFilterDirection}>
                     {dir}
-                </StyledDirectionText>
+                </Text>
             ))}
-        </StyledSortItem>
+        </Text>
     );
 };
 

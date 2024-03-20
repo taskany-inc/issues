@@ -2,3 +2,8 @@
 .FiltersPanel.FiltersPanel {
     background-color: var(--layer);
 }
+
+.FiltersPanelMenuContainer {
+    display: flex;
+    align-items: center;
+}

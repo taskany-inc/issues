@@ -5,8 +5,8 @@ import assert from 'assert';
 
 import { usePageContext } from '../../hooks/usePageContext';
 import { FilterBase } from '../FilterBase/FilterBase';
-import { FilterCheckbox } from '../FilterCheckbox';
-import { FilterTabLabel } from '../FilterTabLabel';
+import { FilterCheckbox } from '../FilterCheckbox/FilterCheckbox';
+import { FilterTabLabel } from '../FilterTabLabel/FilterTabLabel';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { getUserName } from '../../utils/getUserName';
 

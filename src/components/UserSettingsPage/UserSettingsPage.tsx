@@ -19,7 +19,7 @@ import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { trpc } from '../../utils/trpcClient';
 import { Page } from '../Page/Page';
 import { CommonHeader } from '../CommonHeader';
-import { SettingsCard, SettingsContent } from '../SettingsContent';
+import { SettingsCard, SettingsContent } from '../SettingsContent/SettingsContent';
 import { UpdateUser, updateUserSchema } from '../../schema/user';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { dispatchErrorNotification, dispatchSuccessNotification } from '../../utils/dispatchNotification';

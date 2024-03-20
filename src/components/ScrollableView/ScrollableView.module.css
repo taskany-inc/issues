@@ -1,0 +1,48 @@
+.ExtendArea {
+    margin: calc(-1 * var(--gap-m));
+    padding: var(--gap-m);
+}
+
+.ScrollWrapper {
+    position: relative;
+    z-index: 1;
+
+    overflow: hidden;
+
+    scrollbar-width: none;
+}
+
+.ScrollContainer {
+    overflow-y: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.Shade {
+    position: absolute;
+    z-index: 1;
+
+    top: calc(var(--gap-m) * -1);
+    bottom: calc(var(--gap-m) * -1);
+    width: 2px;
+    border-radius: 75%;
+
+    visibility: hidden;
+    opacity: 0;
+}
+
+.ShadeLeft {
+    margin-left: -1px;
+    left: 0;
+}
+
+.ShadeRight {
+    margin-right: -1px;
+    right: 0;
+}
+
+.Shade_visible {
+    visibility: visible;
+    opacity: 1;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
+}

@@ -1,0 +1,20 @@
+.Hotkeys {
+    padding: var(--gap-m) 0;
+    display: grid;
+    grid-template-columns: 6fr 6fr;
+    align-items: center;
+    justify-content: start;
+}
+
+.HotkeysTitle {
+    padding-bottom: var(--gap-s);
+}
+
+.HotkeysDescription {
+    color: var(--gray8);
+}
+
+.HotkeysRow {
+    padding-top: var(--gap-m);
+    color: var(--gray9);
+}

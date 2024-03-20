@@ -1,0 +1,19 @@
+.IssueListItem {
+    padding: var(--gap-s) var(--gap-m) var(--gap-s) 0;
+    display: flex;
+    align-items: top;
+}
+
+.IssueListItemTitle {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.DotWrapper {
+    padding-top: var(--gap-xs);
+    padding-right: var(--gap-s);
+}
+
+.DotWrapper_size_xs {
+    padding-right: var(--gap-xs);
+}

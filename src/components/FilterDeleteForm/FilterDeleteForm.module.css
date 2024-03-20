@@ -1,0 +1,4 @@
+/* Order of styles on page: SC, CSS Modules */
+.FilterFormTitle.FilterFormTitle {
+    color: var(--warn0);
+}

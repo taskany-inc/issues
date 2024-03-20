@@ -10,7 +10,7 @@ import { FilterById } from '../../../trpc/inferredTypes';
 import { PageContent } from '../PageContent/PageContent';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { PresetDropdown } from '../PresetDropdown';
-import { ScrollableView } from '../ScrollableView';
+import { ScrollableView } from '../ScrollableView/ScrollableView';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const FilterCreateForm = dynamic(() => import('../FilterCreateForm/FilterCreateForm'));

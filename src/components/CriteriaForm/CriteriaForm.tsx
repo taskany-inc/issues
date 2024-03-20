@@ -1,16 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AutoCompleteRadioGroup, nullable, Form, Text } from '@taskany/bricks';
-import { gray7 } from '@taskany/colors';
+import { AutoCompleteRadioGroup, nullable, Form } from '@taskany/bricks';
 import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button, FormControl, FormControlLabel, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import {
+    Text,
+    Button,
+    FormControl,
+    FormControlLabel,
+    FormControlInput,
+    FormControlError,
+} from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect';
 import { GoalBadge } from '../GoalBadge';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
-import { AddInlineTrigger } from '../AddInlineTrigger';
-import { StateDot } from '../StateDot';
+import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
+import { StateDot } from '../StateDot/StateDot';
 
 import { tr } from './CriteriaForm.i18n';
 import s from './CriteriaForm.module.css';
@@ -141,9 +147,7 @@ const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
     ({ error, maxValue, value, onChange, name }, ref) => {
         return (
             <FormControl className={s.FormControl}>
-                <FormControlLabel size="s" color={gray7}>
-                    {tr('Weight')}
-                </FormControlLabel>
+                <FormControlLabel color={s.CriteriaWeightLabel}>{tr('Weight')}</FormControlLabel>
                 <FormControlInput
                     outline
                     size="xs"
@@ -159,7 +163,7 @@ const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
                 {nullable(error, (err) => (
                     <FormControlError error={err} />
                 ))}
-                <Text size="s" color={gray7}>
+                <Text size="s" className={s.CriteriaFormWeightWarning}>
                     {tr.raw('Weight out of', {
                         upTo: maxPossibleWeight - maxValue,
                     })}

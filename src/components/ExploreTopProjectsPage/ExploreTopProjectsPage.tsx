@@ -1,5 +1,5 @@
 import { nullable } from '@taskany/bricks';
-import { Table } from '@taskany/bricks/harmony';
+import { Table, Link } from '@taskany/bricks/harmony';
 import NextLink from 'next/link';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -8,9 +8,8 @@ import { Page } from '../Page/Page';
 import { PageContent } from '../PageContent/PageContent';
 import { ExplorePageLayout } from '../ExplorePageLayout/ExplorePageLayout';
 import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
-import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { trpc } from '../../utils/trpcClient';
-import { WrappedRowLink } from '../WrappedRowLink';
+import { TableRowItem, Title } from '../Table/Table';
 
 import { tr } from './ExploreTopProjectsPage.i18n';
 
@@ -27,8 +26,8 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                         {projects.data.map((project) =>
                             nullable(project, (p) => (
                                 <NextLink key={p.id} href={routes.project(p.id)} passHref>
-                                    <WrappedRowLink>
-                                        <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
+                                    <Link>
+                                        <TableRowItem title={<Title size="l">{p.title}</Title>}>
                                             <ProjectListItem
                                                 owner={p.activity}
                                                 starred={p._isStarred}
@@ -37,7 +36,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                                 averageScore={p.averageScore}
                                             />
                                         </TableRowItem>
-                                    </WrappedRowLink>
+                                    </Link>
                                 </NextLink>
                             )),
                         )}
