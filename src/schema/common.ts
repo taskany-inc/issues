@@ -53,6 +53,7 @@ export type SuggestionsQuerySchema = z.infer<typeof suggestionsQuerySchema>;
 
 export const batchGoalsSchema = z.object({
     query: queryWithFiltersSchema.optional(),
+    baseQuery: queryWithFiltersSchema.optional(),
     limit: z.number(),
     cursor: z.string().nullish(),
     skip: z.number().optional(),

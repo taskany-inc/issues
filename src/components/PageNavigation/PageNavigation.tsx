@@ -35,6 +35,14 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
                     attrs: headerMenuGoals.attr,
                 },
                 {
+                    title: tr('Starred'),
+                    href: routes.goalsStarred(),
+                },
+                {
+                    title: tr('Watching'),
+                    href: routes.goalsWatching(),
+                },
+                {
                     title: tr('All goals'),
                     href: routes.goals(),
                     attrs: headerMenuExplore.attr,
