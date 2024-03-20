@@ -131,30 +131,33 @@ export const goal = router({
 
             return data;
         }),
-    getGoalsCount: protectedProcedure.input(batchGoalsSchema.pick({ query: true })).query(async ({ input, ctx }) => {
-        const { query } = input;
-        const { activityId, role } = ctx.session.user;
-        const projectAccessFilter = getProjectAccessFilter(activityId, role);
-        const baseWhere = {
-            ...nonArchivedPartialQuery,
-            project: {
-                ...projectAccessFilter,
-            },
-        };
+    getGoalsCount: protectedProcedure
+        .input(batchGoalsSchema.pick({ query: true, baseQuery: true }))
+        .query(async ({ input, ctx }) => {
+            const { query, baseQuery = {} } = input;
+            const { activityId, role } = ctx.session.user;
+            const projectAccessFilter = getProjectAccessFilter(activityId, role);
+            const baseWhere = {
+                ...nonArchivedPartialQuery,
+                ...goalsFilter(baseQuery, activityId, role).where,
+                project: {
+                    ...projectAccessFilter,
+                },
+            };
 
-        const [count, filtered] = await Promise.all([
-            prisma.goal.count({
-                where: baseWhere,
-            }),
-            prisma.goal.count({
-                where: query ? goalsFilter(query, activityId, role).where : baseWhere,
-            }),
-        ]);
-        return {
-            count,
-            filtered,
-        };
-    }),
+            const [count, filtered] = await Promise.all([
+                prisma.goal.count({
+                    where: baseWhere,
+                }),
+                prisma.goal.count({
+                    where: query ? goalsFilter(query, activityId, role).where : baseWhere,
+                }),
+            ]);
+            return {
+                count,
+                filtered,
+            };
+        }),
     getBatch: protectedProcedure
         .input(batchGoalsSchema)
         .query(async ({ ctx, input: { query, limit, skip, cursor } }) => {

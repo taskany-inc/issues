@@ -11,6 +11,8 @@ export const routes = {
     projectTeam: (id: string) => `/projects/${id}/team`,
 
     goals: () => '/goals',
+    goalsStarred: () => '/goals/starred',
+    goalsWatching: () => '/goals/watching',
     goal: (shortId: string) => `/goals/${shortId}`,
 
     signIn: () => '/api/auth/signin',
