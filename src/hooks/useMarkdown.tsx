@@ -63,7 +63,6 @@ const ssrRenderOptions: UseRemarkSyncOptions = {
 
     rehypeReactOptions: {
         components: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             a: (props: React.ComponentProps<typeof Link>) => <Link {...props} target="_blank" view="inline" />,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             img: (props: any) => (
@@ -74,6 +73,31 @@ const ssrRenderOptions: UseRemarkSyncOptions = {
                     style={{ cursor: 'pointer' }}
                 />
             ),
+            p: ({ children }: React.PropsWithChildren) => {
+                if (Array.isArray(children)) {
+                    return (
+                        <>
+                            {children.map((c) => {
+                                if (typeof c === 'string') {
+                                    return (
+                                        <p
+                                            key={c}
+                                            // React drops the `\n\r` symbols, escapes the html tags
+                                            dangerouslySetInnerHTML={{
+                                                __html: c.replaceAll('\n', '<br />'),
+                                            }}
+                                        />
+                                    );
+                                }
+
+                                return <p key={c}>{c}</p>;
+                            })}
+                        </>
+                    );
+                }
+
+                return <p>{children}</p>;
+            },
         },
     },
 };
