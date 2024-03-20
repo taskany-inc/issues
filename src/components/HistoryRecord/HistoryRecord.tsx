@@ -1,4 +1,4 @@
-import {
+import React, {
     createContext,
     useContext,
     useState,
@@ -133,7 +133,6 @@ const StyledGroupHeaderWrapper = styled.div`
     align-items: center;
     gap: ${gapS};
     position: relative;
-    background-color: ${backgroundColor};
     cursor: pointer;
 
     :after {
@@ -664,6 +663,10 @@ const HisroryRecordGroupHeader: React.FC<
     </StyledGroupHeaderWrapper>
 );
 
+const StyledInlineText = styled.span`
+    display: inline;
+`;
+
 export const HistoryRecordGroup: React.FC<{
     subject: OuterSubjects;
     groupped?: boolean;
@@ -692,6 +695,7 @@ export const HistoryRecordGroup: React.FC<{
                 author: <b>{first}</b>,
                 count: rest.length,
                 subject: translates[subject],
+                space: String.fromCharCode(0xa0), // non-breakable space between preposition and letter
             });
         }
 
@@ -700,10 +704,15 @@ export const HistoryRecordGroup: React.FC<{
                 author: <b>{first}</b>,
                 oneMoreAuthor: <b>{rest[0]}</b>,
                 subject: translates[subject],
+                space: String.fromCharCode(0xa0), // non-breakable space between preposition and letter
             });
         }
 
-        return tr.raw('author made changes in', { subject: translates[subject], author: <b>{first}</b> });
+        return tr.raw('author made changes in', {
+            subject: translates[subject],
+            author: <b>{first}</b>,
+            space: String.fromCharCode(0xa0), // non-breakable space between preposition and letter
+        });
     }, [values, translates, subject]);
 
     const handleToggleCollapse = useCallback(() => setCollapsed((prev) => !prev), []);
@@ -718,16 +727,32 @@ export const HistoryRecordGroup: React.FC<{
                     createdAt={lastRecord.createdAt}
                     collapsed={collapsed}
                 >
-                    {heading}
+                    <StyledInlineText>
+                        {/* fix react key warning */}
+                        {heading.map((part, index) => {
+                            let key = `${index}`;
+
+                            if (typeof part === 'string') {
+                                key = `${part}.${index}`;
+                            } else if (React.isValidElement(part)) {
+                                key = `HeadingComponent.${index}`;
+                            }
+
+                            return <React.Fragment key={key}>{part}</React.Fragment>;
+                        })}
+                    </StyledInlineText>
+
                     <StyledBadge size="s">{values.length}</StyledBadge>
                 </HisroryRecordGroupHeader>
             ))}
 
             {nullable(!collapsed, () => (
                 <>
-                    {values.map(({ ...item }) => (
-                        <HistoryRecord {...item} subject={item.subject} key={item.id} />
-                    ))}
+                    {values.map((value) => {
+                        return (
+                            <HistoryRecord {...value} subject={value.subject} key={`${value.id}.${value.subject}`} />
+                        );
+                    })}
                 </>
             ))}
         </>

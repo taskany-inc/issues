@@ -26,7 +26,7 @@
     "goal complete": "выполнил(а) цель",
     "goal in progress": "вернул(а) цель в работу",
     "partner project": "партнерский проект",
-    "author and more made changes in": "{author} и еще {count} внесли изменения в {subject}",
-    "author and the other author made changes in": "{author} и {oneMoreAuthor} внесли изменения в {subject}",
-    "author made changes in": "{author} внес(ла) изменения в {subject}"
+    "author and more made changes in": "{author} и еще {count} внесли изменения в{space}{subject}",
+    "author and the other author made changes in": "{author} и {oneMoreAuthor} внесли изменения в{space}{subject}",
+    "author made changes in": "{author} внес(ла) изменения в{space}{subject}"
 }
