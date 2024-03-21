@@ -68,7 +68,6 @@ export const filter = router({
                             },
                         },
                     },
-                    { mode: 'Global' },
                 ],
             },
             include: {

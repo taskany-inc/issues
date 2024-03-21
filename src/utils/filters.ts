@@ -48,7 +48,6 @@ export const filtersPanelSsrInit = async ({ query, ssrHelpers, req }: SSRProps) 
             include: queryState.tag,
         }),
         ssrHelpers.state.all.fetch(),
-        ssrHelpers.filter.getUserFilters.fetch(),
     ]);
 
     return {
