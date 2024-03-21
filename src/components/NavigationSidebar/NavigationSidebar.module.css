@@ -27,12 +27,18 @@
     flex-direction: column;
     padding: var(--gap-sm);
     gap: var(--gap-sm);
+    flex: 1;
+    overflow: auto;
 }
 
 .Navigation {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-s)
+    gap: var(--gap-s);
+    flex: 1;
+    overflow: auto;
+    padding-right: var(--gap-sm);
+    margin-right: calc(var(--gap-sm)* -1);
 }
 
 .NavigationSection {

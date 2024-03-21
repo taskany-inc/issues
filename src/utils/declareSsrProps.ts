@@ -50,6 +50,7 @@ export function declareSsrProps<T = ExternalPageProps>(
         });
 
         await ssrHelpers.appConfig.get.fetch();
+        await ssrHelpers.project.getUserProjects.fetch();
 
         const ssrTime = Date.now();
 

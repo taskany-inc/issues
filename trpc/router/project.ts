@@ -26,6 +26,44 @@ import { getProjectAccessFilter } from '../queries/access';
 import { prepareRecipients } from '../../src/utils/prepareRecipients';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 
+const getUserItemsWhereSchema = ({ type, activityId }: { type: 'goal' | 'project'; activityId: string }) => {
+    return [
+        {
+            // all projects / goals where the user is a participant
+            participants: {
+                some: {
+                    id: activityId,
+                },
+            },
+        },
+        {
+            // all projects / goals where the user is a watcher
+            watchers: {
+                some: {
+                    id: activityId,
+                },
+            },
+        },
+        {
+            stargizers: {
+                some: {
+                    id: activityId,
+                },
+            },
+        },
+        {
+            // all projects / goals where the user is issuer
+            activityId,
+        },
+        type === 'goal'
+            ? {
+                  // all goals where the user is owner
+                  ownerId: activityId,
+              }
+            : {},
+    ];
+};
+
 export const project = router({
     suggestions: protectedProcedure
         .input(projectSuggestionsSchema)
@@ -89,6 +127,46 @@ export const project = router({
 
             return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
         }),
+    getUserProjects: protectedProcedure.query(async ({ ctx }) => {
+        const { activityId, role } = ctx.session.user;
+        const accessFilter = getProjectAccessFilter(activityId, role);
+        const whereProjectsSchema = getUserItemsWhereSchema({ type: 'project', activityId });
+        const whereGoalsSchema = getUserItemsWhereSchema({ type: 'goal', activityId });
+
+        const projectsSchema = getProjectSchema({
+            role,
+            activityId,
+            whereQuery: {
+                OR: [
+                    ...whereProjectsSchema,
+                    {
+                        parent: {
+                            some: {
+                                OR: whereProjectsSchema,
+                            },
+                        },
+                    },
+                    {
+                        goals: {
+                            some: {
+                                AND: [
+                                    {
+                                        OR: whereGoalsSchema,
+                                    },
+                                    nonArchivedPartialQuery,
+                                ],
+                            },
+                        },
+                    },
+                ],
+                ...accessFilter,
+            },
+        });
+
+        return prisma.project
+            .findMany(projectsSchema)
+            .then((projects) => projects.map((p) => addCalculatedProjectFields(p, activityId, role)));
+    }),
     getUserProjectsWithGoals: protectedProcedure
         .input(
             z.object({
@@ -102,55 +180,18 @@ export const project = router({
             const { activityId, role } = ctx.session.user;
             const { limit = 10, cursor, skip, goalsQuery } = input;
 
-            const requestSchema = ({ withOwner }: { withOwner: boolean }) => {
-                return [
-                    {
-                        // all projects / goals where the user is a participant
-                        participants: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    {
-                        // all projects / goals where the user is a watcher
-                        watchers: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    {
-                        stargizers: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                    {
-                        // all projects / goals where the user is issuer
-                        activityId,
-                    },
-                    withOwner
-                        ? {
-                              // all goals where the user is owner
-                              ownerId: activityId,
-                          }
-                        : {},
-                ];
-            };
-
-            const requestSchemaWithoutOwner = requestSchema({ withOwner: false });
+            const whereProjectsSchema = getUserItemsWhereSchema({ type: 'project', activityId });
+            const whereGoalsSchema = getUserItemsWhereSchema({ type: 'goal', activityId });
 
             const accessFilter = getProjectAccessFilter(activityId, role);
             const projectIds = await prisma.project.findMany({
                 where: {
                     OR: [
-                        ...requestSchemaWithoutOwner,
+                        ...whereProjectsSchema,
                         {
                             parent: {
                                 some: {
-                                    OR: requestSchemaWithoutOwner,
+                                    OR: whereProjectsSchema,
                                 },
                             },
                         },
@@ -192,7 +233,7 @@ export const project = router({
                                 some: {
                                     AND: [
                                         {
-                                            OR: requestSchema({ withOwner: true }),
+                                            OR: whereGoalsSchema,
                                         },
                                         goalsFilters,
                                         nonArchivedPartialQuery,
@@ -221,7 +262,7 @@ export const project = router({
                                     goalsFilters,
                                     {
                                         OR: [
-                                            ...requestSchema({ withOwner: true }),
+                                            ...whereGoalsSchema,
                                             {
                                                 projectId: {
                                                     in: projectIdsArray,
@@ -244,7 +285,7 @@ export const project = router({
                                     goalsFilters,
                                     {
                                         OR: [
-                                            ...requestSchema({ withOwner: true }),
+                                            ...whereGoalsSchema,
                                             {
                                                 projectId: {
                                                     in: projectIdsArray,
