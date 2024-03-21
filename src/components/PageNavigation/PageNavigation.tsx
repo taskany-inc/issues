@@ -14,6 +14,7 @@ import {
 } from '../NavigationSidebar/NavigationSidebar';
 import { NavigationSidebarActionButton } from '../NavigationSidebarActionButton/NavigationSidebarActionButton';
 import { routes } from '../../hooks/router';
+import { trpc } from '../../utils/trpcClient';
 import { header, headerMenuExplore, headerMenuGoals } from '../../utils/domObjects';
 
 import { tr } from './PageNavigation.i18n';
@@ -25,6 +26,8 @@ interface AppNavigationProps {
 export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
     const nextRouter = useRouter();
     const activeRoute = nextRouter.asPath.split('?')[0];
+
+    const { data: projects = [] } = trpc.project.getUserProjects.useQuery();
 
     const [goalsRoutes, projectsRoutes] = useMemo(
         () => [
@@ -41,13 +44,17 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
                 },
             ],
             [
+                ...projects.map((p) => ({
+                    title: p.title,
+                    href: routes.project(p.id),
+                })),
                 {
                     title: tr('All projects'),
                     href: routes.exploreProjects(),
                 },
             ],
         ],
-        [],
+        [projects],
     );
 
     return (
