@@ -30,10 +30,10 @@ import {
     FiltersBarDropdownTitle,
     FiltersBarDropdownContent,
 } from '../FiltersBar/FiltersBar';
-import { SearchFilter } from '../SearchFilter';
+import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
 import { Separator } from '../Separator/Separator';
-import { useFilterResource } from '../../hooks/useFilterResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { useFilterResource } from '../../hooks/useFilterResource';
 import { AppliedFiltersBar } from '../AppliedFiltersBar/AppliedFiltersBar';
 import { AppliedEstimateFilter } from '../AppliedEstimateFilter/AppliedEstimateFilter';
 import { AppliedGoalParentFilter } from '../AppliedGoalParentFilter/AppliedGoalParentFilter';
@@ -75,12 +75,13 @@ export const FiltersPanel: FC<{
     enableViewToggle?: boolean;
     children?: ReactNode;
 }> = memo(({ children, title, total = 0, counter = 0, enableViewToggle, filterPreset }) => {
+    const { toggleFilterStar } = useFilterResource();
+
     const {
         currentPreset,
         queryString,
         queryState,
         resetQueryState,
-        setFulltextFilter,
         batchQueryState,
         queryFilterState,
         groupBy,
@@ -88,8 +89,6 @@ export const FiltersPanel: FC<{
     } = useUrlFilterParams({
         preset: filterPreset,
     });
-
-    const { toggleFilterStar } = useFilterResource();
 
     const [layout] = useState<LayoutType>(layoutType.table);
     const filterTriggerRef = useRef<HTMLButtonElement>(null);
@@ -248,7 +247,7 @@ export const FiltersPanel: FC<{
                     </>
                 ))}
                 <FiltersBarItem>
-                    <SearchFilter defaultValue={queryState?.query} onChange={setFulltextFilter} />
+                    <GlobalSearch />
                 </FiltersBarItem>
                 <FiltersBarItem>
                     <PageUserMenu />

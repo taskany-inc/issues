@@ -3,6 +3,7 @@ import { nullable } from '@taskany/bricks';
 import { pageHeader, pageTitle } from '../utils/domObjects';
 
 import { FiltersBar, FiltersBarItem, FiltersBarTitle } from './FiltersBar/FiltersBar';
+import { GlobalSearch } from './GlobalSearch/GlobalSearch';
 import { Separator } from './Separator/Separator';
 import { PageUserMenu } from './PageUserMenu';
 
@@ -21,6 +22,9 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({ title, children }) =
             <Separator />
         ))}
         <FiltersBarItem layout="fill">{children}</FiltersBarItem>
+        <FiltersBarItem>
+            <GlobalSearch />
+        </FiltersBarItem>
         <FiltersBarItem>
             <PageUserMenu />
         </FiltersBarItem>
