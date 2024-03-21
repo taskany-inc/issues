@@ -38,6 +38,8 @@ export const GlobalSearch = () => {
             onChange={setQuery}
             searchResultExists={resultsExists}
             placeholder={tr('Search...')}
+            placement="bottom-end"
+            offset={[8, -40]}
             outline
         >
             {resultsExists && (
