@@ -41,7 +41,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "0.48.0",
     "@opentelemetry/resources": "1.22.0",
     "@opentelemetry/sdk-node": "0.45.1",
-    "@opentelemetry/sdk-trace-node": "1.18.1",
+    "@opentelemetry/sdk-trace-node": "1.22.0",
     "@opentelemetry/semantic-conventions": "1.22.0",
     "@react-email/components": "0.0.14",
     "@react-email/render": "0.0.12",
