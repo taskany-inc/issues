@@ -121,8 +121,6 @@ export const goalUpdateSchema = z.object({
     owner: z.object({
         id: z.string(),
         user: z.object({
-            nickname: z.string().nullable(),
-            name: z.string().nullable(),
             email: z.string(),
         }),
     }),
