@@ -41,6 +41,7 @@ import { AppliedPriorityFilter } from '../AppliedPriorityFilter/AppliedPriorityF
 import { AppliedStateFilter } from '../AppliedStateFilter/AppliedStateFilter';
 import { AppliedUsersFilter } from '../AppliedUsersFilter/AppliedUsersFilter';
 import { PageUserMenu } from '../PageUserMenu';
+import { AppliedTagFilter } from '../AppliedTagFilter/AppliedTagFilter';
 
 import { tr } from './FiltersPanel.i18n';
 
@@ -285,6 +286,9 @@ export const FiltersPanel: FC<{
                     ))}
                     {nullable(Boolean(queryFilterState?.project), () => (
                         <AppliedGoalParentFilter label={tr('Project')} value={queryFilterState?.project} readOnly />
+                    ))}
+                    {nullable(Boolean(queryFilterState?.tag), () => (
+                        <AppliedTagFilter label={tr('Tags')} value={queryFilterState?.tag} readOnly />
                     ))}
                     <Button
                         ref={filterTriggerRef}
