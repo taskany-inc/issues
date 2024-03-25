@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -47,6 +48,15 @@ export const tag = router({
             data: {
                 ...input,
                 activityId: ctx.session.user.activityId,
+            },
+        });
+    }),
+    getByIds: protectedProcedure.input(z.array(z.string())).query(({ input }) => {
+        return prisma.tag.findMany({
+            where: {
+                id: {
+                    in: input,
+                },
             },
         });
     }),
