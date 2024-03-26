@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { StateType } from '@prisma/client';
 import { Tab } from '@taskany/bricks';
+
+import { StateType } from '../../trpc/inferredTypes';
 
 import { FilterBase } from './FilterBase/FilterBase';
 import { FilterCheckbox } from './FilterCheckbox';

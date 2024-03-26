@@ -4,10 +4,6 @@ import { gray6 } from '@taskany/colors';
 
 import { usePageContext } from '../hooks/usePageContext';
 
-type StatesGlobalVars = Record<string, number>;
-
-export type StateType = keyof StatesGlobalVars;
-
 function calcSaturation(hue: number, forDarkTheme = false) {
     // eslint-disable-next-line no-nested-ternary
     return hue > 1 ? (forDarkTheme ? '80%' : '90%') : '0%';
