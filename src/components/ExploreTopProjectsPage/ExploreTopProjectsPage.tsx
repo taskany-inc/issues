@@ -1,5 +1,5 @@
 import { nullable } from '@taskany/bricks';
-import { Table } from '@taskany/bricks/harmony';
+import { Table, Link } from '@taskany/bricks/harmony';
 import NextLink from 'next/link';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -9,7 +9,6 @@ import { ExplorePageHeader } from '../ExplorePageHeader/ExplorePageHeader';
 import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
 import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { trpc } from '../../utils/trpcClient';
-import { WrappedRowLink } from '../WrappedRowLink';
 
 import { tr } from './ExploreTopProjectsPage.i18n';
 
@@ -24,7 +23,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 {projects.data.map((project) =>
                     nullable(project, (p) => (
                         <NextLink key={p.id} href={routes.project(p.id)} passHref>
-                            <WrappedRowLink>
+                            <Link>
                                 <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
                                     <ProjectListItem
                                         owner={p.activity}
@@ -34,7 +33,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                         averageScore={p.averageScore}
                                     />
                                 </TableRowItem>
-                            </WrappedRowLink>
+                            </Link>
                         </NextLink>
                     )),
                 )}

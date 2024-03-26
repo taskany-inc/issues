@@ -1,19 +1,11 @@
 import React from 'react';
 import { StateDot as StateDotBricks, StateDotProps, nullable } from '@taskany/bricks';
 import { IconTargetOutline } from '@taskany/icons';
-import styled from 'styled-components';
 
-import { StateWrapper, stateStrokeHover } from './StateWrapper';
+import { StateWrapper } from '../StateWrapper/StateWrapper';
 
-const StyledDot = styled(StateDotBricks)`
-    background-color: ${stateStrokeHover};
-`;
+import s from './StateDot.module.css';
 
-const StyledIcon = styled(IconTargetOutline)`
-    color: ${stateStrokeHover};
-`;
-
-// eslint-disable-next-line react/display-name
 export const StateDot: React.FC<
     Omit<StateDotProps & { hue?: number; view?: 'solid' | 'stroke' }, 'hoverColor' | 'color'>
 > = React.memo(({ hue = 1, view = 'solid', ...props }) => {
@@ -22,9 +14,9 @@ export const StateDot: React.FC<
             {nullable(
                 view === 'solid',
                 () => (
-                    <StyledDot {...props} />
+                    <StateDotBricks className={s.StateDot} {...props} />
                 ),
-                <StyledIcon size="s" {...props} />,
+                <IconTargetOutline className={s.StateIcon} size="s" {...props} />,
             )}
         </StateWrapper>
     );

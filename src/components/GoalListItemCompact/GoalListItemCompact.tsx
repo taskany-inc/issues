@@ -13,7 +13,7 @@ import { Priority } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { UserGroup } from '../UserGroup';
 import { TableRowItemText, TableRowItemTitle } from '../TableRowItem/TableRowItem';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 
 import s from './GoalListItemCompact.module.css';
 

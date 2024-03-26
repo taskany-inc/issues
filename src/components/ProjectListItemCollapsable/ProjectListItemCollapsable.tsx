@@ -1,13 +1,12 @@
 import React, { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 import styled from 'styled-components';
 import NextLink from 'next/link';
-import { Text, nullable } from '@taskany/bricks';
-import { TreeView, TreeViewNode } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
+import { TreeView, TreeViewNode, Text, Link } from '@taskany/bricks/harmony';
 import { IconServersOutline } from '@taskany/icons';
 
 import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
-import { WrappedRowLink } from '../WrappedRowLink';
 import { projectListItem, projectListItemTitle } from '../../utils/domObjects';
 import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 
@@ -77,7 +76,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                     href,
                     (h) => (
                         <NextLink href={h} passHref legacyBehavior>
-                            <WrappedRowLink>{projectComponent}</WrappedRowLink>
+                            <Link>{projectComponent}</Link>
                         </NextLink>
                     ),
                     projectComponent,
