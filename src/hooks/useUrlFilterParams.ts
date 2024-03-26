@@ -1,9 +1,8 @@
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
-import { StateType } from '@prisma/client';
 
-import { FilterById } from '../../trpc/inferredTypes';
+import { FilterById, StateType } from '../../trpc/inferredTypes';
 import { SortDirection, SortableProps } from '../components/SortFilter/SortFilter';
 import { StateTypeEnum } from '../schema/common';
 import { setCookie } from '../utils/cookies';

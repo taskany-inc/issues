@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { KeyCode, useKeyPress, useKeyboard, Popup } from '@taskany/bricks';
-import { StateType } from '@prisma/client';
 
 import { trpc } from '../utils/trpcClient';
+import { StateType } from '../../trpc/inferredTypes';
 
 import { State } from './State';
 

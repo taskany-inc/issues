@@ -2,9 +2,8 @@ import { nullable } from '@taskany/bricks';
 import { ComponentProps, FC, ReactNode, useCallback } from 'react';
 import { Dot } from '@taskany/bricks/harmony';
 import cn from 'classnames';
-import { StateType } from '@prisma/client';
 
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { GoalByIdReturnType, StateType } from '../../../trpc/inferredTypes';
 import { goalPageHeader } from '../../utils/domObjects';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { IssueStats } from '../IssueStats/IssueStats';
