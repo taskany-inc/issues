@@ -1,0 +1,41 @@
+.BadgeIconContainer {
+    display: flex;
+    align-items: center;
+
+    visibility: hidden;
+
+    color: var(--gray8);
+}
+
+.BadgeIconContainer:hover {
+    color: var(--gray9);
+}
+
+.BadgeText {
+    padding: 0 var(--gap-xs) 0 var(--gap-s);
+    grid-row: span 2;
+    color: var(--gray9);
+}
+
+/*
+    First row has height equal to the height of the first text line.
+    If the content (like icons) is larger than the first text line, then it expands the first row.
+    Suitable for text sizes 'xs', 's', 'm', 'l'.
+*/
+
+.Badge {
+    position: relative;
+    display: grid;
+    grid-template-columns: min-content auto min-content;
+    grid-template-rows: minmax(max-content, calc(var(--gap-m) + var(--gap-xs))) minmax(0, 1fr);
+    align-items: center;
+
+    padding: var(--gap-xs) 0;
+
+    width: fit-content;
+}
+
+.Badge:hover .BadgeIconContainer {
+    visibility: visible;
+    cursor: pointer;
+}

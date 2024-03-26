@@ -13,12 +13,12 @@ import {
 import { Table, TableRow } from '@taskany/bricks/harmony';
 import { backgroundColor, danger0, gray9 } from '@taskany/colors';
 
-import { ActivityFeedItem } from '../ActivityFeed';
-import { Circle } from '../Circle';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
+import { Circle } from '../Circle/Circle';
 import { GoalBadge } from '../GoalBadge';
-import { Badge } from '../Badge';
+import { Badge } from '../Badge/Badge';
 import { IssueMeta } from '../IssueMeta';
-import { AddInlineTrigger } from '../AddInlineTrigger';
+import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { routes } from '../../hooks/router';

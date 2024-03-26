@@ -10,7 +10,7 @@ import { usePageContext } from '../../hooks/usePageContext';
 import { GoalCommentFormSchema } from '../../schema/goal';
 import { CommentSchema } from '../../schema/comment';
 import { CommentForm } from '../CommentForm/CommentForm';
-import { ActivityFeedItem } from '../ActivityFeed';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { StateDot } from '../StateDot';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 import { StateWrapper } from '../StateWrapper';
