@@ -35,7 +35,7 @@ import { IssueListItem } from '../IssueListItem';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { Circle } from '../Circle';

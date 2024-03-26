@@ -4,7 +4,7 @@ import { Text, Link, nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
 
-import { StateDot } from './StateDot';
+import { StateDot } from './StateDot/StateDot';
 
 interface IssueListItemProps {
     issue: {
