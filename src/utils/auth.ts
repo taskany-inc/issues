@@ -128,6 +128,7 @@ export const authOptions: NextAuthOptions = {
                     role: token?.role || user.role,
                     name: dbUser?.name,
                     nickname: dbUser?.nickname,
+                    email: dbUser?.email,
                     activityId: dbUserActivity?.id,
                     settings: dbUserActivity?.settings,
                 },
