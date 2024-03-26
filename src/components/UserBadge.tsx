@@ -1,7 +1,7 @@
 import React from 'react';
 import { UserPic } from '@taskany/bricks';
 
-import { Badge } from './Badge';
+import { Badge } from './Badge/Badge';
 
 interface UserBadgeProps {
     name: string;

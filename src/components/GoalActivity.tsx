@@ -4,7 +4,7 @@ import { nullable } from '@taskany/bricks';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { safeUserData } from '../utils/getUserName';
 
-import { ActivityFeed } from './ActivityFeed';
+import { ActivityFeed } from './ActivityFeed/ActivityFeed';
 import { HistoryRecordGroup } from './HistoryRecord/HistoryRecord';
 import type { CommentView } from './CommentView/CommentView';
 
