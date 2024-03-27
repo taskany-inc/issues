@@ -1,0 +1,9 @@
+.Image {
+    width: 100%;
+}
+
+.ImageWrapper {
+    display: flex;
+    justify-content: center;
+    outline: none;
+}

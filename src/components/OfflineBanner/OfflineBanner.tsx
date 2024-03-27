@@ -17,3 +17,5 @@ export const OfflineBanner = () => {
         <OfflineBannerBricks text={tr('You are currently offline. Check connection.')} />
     ));
 };
+
+export default OfflineBanner;

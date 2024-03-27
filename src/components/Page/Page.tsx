@@ -17,12 +17,12 @@ import { Theme } from '../Theme';
 import { PageFooter } from '../PageFooter/PageFooter';
 import { ModalContext } from '../ModalOnEvent';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { OfflineBanner } from '../OfflineBanner/OfflineBanner';
 import { PageNavigation } from '../PageNavigation/PageNavigation';
 import { pageContent } from '../../utils/domObjects';
 
 import s from './Page.module.css';
 
+const OfflineBanner = dynamic(() => import('../OfflineBanner/OfflineBanner'), { ssr: false });
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalPreview = dynamic(() => import('../GoalPreview/GoalPreview'));
 const ProjectCreateForm = dynamic(() => import('../ProjectCreateForm/ProjectCreateForm'));
@@ -32,7 +32,7 @@ const HotkeysModal = dynamic(() => import('../HotkeysModal/HotkeysModal'));
 const NotificationsHub = dynamic(() => import('../NotificationsHub/NotificationsHub'));
 const FeedbackCreateForm = dynamic(() => import('../FeedbackCreateForm/FeedbackCreateForm'));
 const WhatsNew = dynamic(() => import('../WhatsNew/WhatsNew'));
-const ImageFullScreen = dynamic(() => import('../ImageFullScreen'));
+const ImageFullScreen = dynamic(() => import('../ImageFullScreen/ImageFullScreen'));
 
 interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     user: Session['user'];

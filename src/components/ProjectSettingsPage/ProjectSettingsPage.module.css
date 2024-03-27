@@ -42,3 +42,12 @@
 .Tag:not(:last-of-type) {
     margin-right: var(--gap-xs);
 }
+
+.FormAction {
+    color: var(--gray9);
+    padding-left: var(--gap-s);
+}
+
+.ModalHeaderTitle {
+    color: var(--warn0);
+}
