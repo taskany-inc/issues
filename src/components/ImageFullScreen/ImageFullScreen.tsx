@@ -1,22 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { KeyCode, ModalContent, useClickOutside, useKeyboard } from '@taskany/bricks';
-import styled from 'styled-components';
 
-import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+
+import s from './ImageFullScreen.module.css';
 
 interface ImageFullScreenProps {
     src?: string;
     alt?: string;
 }
-const StyledImage = styled.img`
-    cursor: pointer;
-    width: 100vh;
-`;
-const StyledWrapperImage = styled.div`
-    display: flex;
-    justify-content: center;
-    outline: none;
-`;
+
 const ImageFullScreen: React.FC<ImageFullScreenProps> = ({ src = '', alt = '' }) => {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -34,9 +27,9 @@ const ImageFullScreen: React.FC<ImageFullScreenProps> = ({ src = '', alt = '' })
 
     return (
         <ModalContent>
-            <StyledWrapperImage ref={ref} tabIndex={1} {...onESC}>
-                <StyledImage src={src} alt={alt} onClick={dispatchModalEvent(ModalEvent.ImageFullScreen)} />
-            </StyledWrapperImage>
+            <div className={s.ImageWrapper} ref={ref} tabIndex={1} {...onESC}>
+                <img className={s.Image} src={src} alt={alt} onClick={dispatchModalEvent(ModalEvent.ImageFullScreen)} />
+            </div>
         </ModalContent>
     );
 };

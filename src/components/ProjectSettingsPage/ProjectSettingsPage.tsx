@@ -2,9 +2,7 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import { gapS, gray9, warn0 } from '@taskany/colors';
 import {
-    Text,
     Fieldset,
     Form,
     FormAction,
@@ -19,11 +17,18 @@ import {
     Tip,
 } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
-import { Button, FormControl, FormControlInput, FormControlLabel, FormControlError } from '@taskany/bricks/harmony';
+import {
+    Text,
+    Button,
+    FormControl,
+    FormControlInput,
+    FormControlLabel,
+    FormControlError,
+} from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useRouter } from '../../hooks/router';
-import { SettingsCard, SettingsContent } from '../SettingsContent';
+import { SettingsCard, SettingsContent } from '../SettingsContent/SettingsContent';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Page } from '../Page/Page';
 import { useProjectResource } from '../../hooks/useProjectResource';
@@ -316,9 +321,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                         <Fieldset title={tr('Danger zone')} view="warning">
                             <FormActions flat="top">
                                 <FormAction left inline>
-                                    <Text color={gray9} style={{ paddingLeft: gapS }}>
-                                        {tr('Be careful — all data will be lost')}
-                                    </Text>
+                                    <Text className={s.FormAction}>{tr('Be careful — all data will be lost')}</Text>
                                 </FormAction>
                                 <FormAction right inline>
                                     <Button
@@ -332,9 +335,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                             <FormActions flat="top">
                                 <FormAction left>
-                                    <Text color={gray9} style={{ paddingLeft: gapS }}>
-                                        {tr('Transfer project to other person')}
-                                    </Text>
+                                    <Text className={s.FormAction}>{tr('Transfer project to other person')}</Text>
                                 </FormAction>
                                 <FormAction right inline>
                                     <Button
@@ -354,13 +355,13 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
             <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
                 <ModalHeader>
-                    <FormTitle color={warn0}>{tr('You are trying to delete project')}</FormTitle>
+                    <FormTitle className={s.ModalHeaderTitle}>{tr('You are trying to delete project')}</FormTitle>
                 </ModalHeader>
 
                 <ModalContent>
                     <SettingsCard view="warning">
                         <Tip className={s.Tip} view="warning" icon={<IconExclamationCircleSolid size="s" />}>
-                            <Text as="span" weight="bold" size="s" color="inherit">
+                            <Text as="span" weight="bold" size="s">
                                 {tr('What happens when you delete a project')}:
                             </Text>
                         </Tip>
@@ -434,7 +435,9 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
             <ModalOnEvent view="warn" event={ModalEvent.ProjectTransferModal}>
                 <ModalHeader>
-                    <FormTitle color={warn0}>{tr('You are trying to transfer project ownership')}</FormTitle>
+                    <FormTitle className={s.ModalHeaderTitle}>
+                        {tr('You are trying to transfer project ownership')}
+                    </FormTitle>
                 </ModalHeader>
 
                 <ModalContent>
@@ -505,7 +508,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
             <ModalOnEvent view="warn" event={ModalEvent.ProjectCannotDeleteModal}>
                 <ModalHeader>
-                    <FormTitle color={warn0}>{tr('Cannot delete project now')}</FormTitle>
+                    <FormTitle className={s.ModalHeaderTitle}>{tr('Cannot delete project now')}</FormTitle>
                 </ModalHeader>
                 <ModalContent>
                     <Tip className={s.Tip} view="warning" icon={<IconExclamationCircleSolid size="s" />}>

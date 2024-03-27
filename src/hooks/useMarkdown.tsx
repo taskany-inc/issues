@@ -70,7 +70,6 @@ const ssrRenderOptions: UseRemarkSyncOptions = {
                 <img
                     {...props}
                     onClick={dispatchModalEvent(ModalEvent.ImageFullScreen, { src: props.src, alt: props.alt })}
-                    style={{ cursor: 'pointer' }}
                 />
             ),
             p: ({ children }: React.PropsWithChildren) => {
