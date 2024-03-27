@@ -324,7 +324,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
                     title={props.title}
                     isDone={props.isDone}
                     weight={props.weight}
-                    onCheck={handleCriteriaCheck()}
+                    onCheck={onCheck ? handleCriteriaCheck() : undefined}
                 />
             )}
             {nullable(availableActions, (actions) => (
@@ -335,8 +335,9 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
             {nullable(mode === 'edit', () => (
                 <GoalFormPopupTrigger
                     defaultVisible
-                    renderTrigger={({ ref }) => <div ref={ref} />}
+                    renderTrigger={({ ref }) => <div ref={ref} className={classes.GoalFormPopupTrigger} />}
                     onCancel={() => setMode('read')}
+                    placement="bottom-end"
                 >
                     <GoalCriteriaSuggest
                         id={props.goalId}
@@ -491,6 +492,7 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
     onCheck,
     onConvert,
     children,
+    canEdit,
 }) => {
     const sortedCriteriaItems = useMemo(() => {
         const sorted = list.reduce<Record<'done' | 'undone', UnionCriteria[]>>(
@@ -538,6 +540,19 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
         }
     }, []);
 
+    const editableProps = useMemo(
+        () =>
+            canEdit
+                ? {
+                      onConvert: mapCriteriaValueWrapper(onConvert),
+                      onRemove: mapCriteriaValueWrapper(onRemove),
+                      onUpdate: mapCriteriaValueWrapper(onUpdate),
+                      onCheck: mapCriteriaValueWrapper(onCheck),
+                  }
+                : {},
+        [onConvert, onRemove, onUpdate, onCheck, canEdit, mapCriteriaValueWrapper],
+    );
+
     return (
         <ActivityFeedItem>
             <Circle size={32}>
@@ -550,14 +565,7 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
                 title={sortedCriteriaItems.length ? tr('Achievement criteria') : undefined}
             >
                 {nullable(sortedCriteriaItems, (list) => (
-                    <CriteriaList
-                        goalId={goalId}
-                        onConvert={mapCriteriaValueWrapper(onConvert)}
-                        onRemove={mapCriteriaValueWrapper(onRemove)}
-                        onUpdate={mapCriteriaValueWrapper(onUpdate)}
-                        onCheck={mapCriteriaValueWrapper(onCheck)}
-                        list={list}
-                    />
+                    <CriteriaList goalId={goalId} list={list} {...editableProps} />
                 ))}
                 {children}
             </IssueMeta>
