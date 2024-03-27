@@ -89,7 +89,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
         );
 
         const handleUpdateCriteria = useCallback(
-            async (data: { id?: string; title: string; weight?: number; selected?: { id?: string } }) => {
+            async (data: { id?: string; title: string; weight?: number; criteriaGoal?: { id?: string } }) => {
                 if (!data.id) return;
 
                 await onGoalCriteriaUpdate({
@@ -97,9 +97,9 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     title: data.title,
                     weight: String(data.weight),
                     goalId: goal.id,
-                    criteriaGoal: data.selected?.id
+                    criteriaGoal: data.criteriaGoal?.id
                         ? {
-                              id: data.selected.id,
+                              id: data.criteriaGoal.id,
                           }
                         : undefined,
                 });
