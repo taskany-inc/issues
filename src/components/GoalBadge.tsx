@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 
 import { Badge } from './Badge';
 import { NextLink } from './NextLink';
@@ -29,10 +29,10 @@ export const GoalBadge: React.FC<GoalBadgeProps> = ({
             icon={<StateDot view="stroke" hue={color} size="s" />}
             text={nullable(
                 href,
-                () => (
-                    <Link as={NextLink} href={href} inline onClick={onClick}>
+                (h) => (
+                    <NextLink href={h} view="inline" onClick={onClick}>
                         {title}
-                    </Link>
+                    </NextLink>
                 ),
                 title,
             )}

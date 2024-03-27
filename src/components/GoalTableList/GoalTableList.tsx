@@ -1,6 +1,6 @@
 import { Badge, State, Table, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
 import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import { Link, ListViewItem, nullable } from '@taskany/bricks';
+import { ListViewItem, nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
@@ -161,12 +161,11 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
     return (
         <Table {...attrs}>
             {data.map((row) => (
-                <Link
+                <NextLink
                     key={row.goal.id}
-                    as={NextLink}
                     href={routes.goal(row.goal?._shortId as string)}
                     onClick={onGoalPreviewShow(row.goal)}
-                    inline
+                    view="inline"
                 >
                     <ListViewItem
                         value={row.goal}
@@ -184,7 +183,7 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                             </TableListItem>
                         )}
                     />
-                </Link>
+                </NextLink>
             ))}
         </Table>
     );
