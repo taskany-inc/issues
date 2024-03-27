@@ -477,11 +477,10 @@ interface CriteriaItemValue {
     } | null;
 }
 
-interface GoalCriteriaViewProps extends GoalCriteriaEditableApi<CriteriaItemValue> {
+interface GoalCriteriaViewProps extends GoalCriteriaEditableApi<UnionCriteria> {
     goalId: string;
     list: Array<CriteriaProps | GoalCriteriaProps>;
     canEdit: boolean;
-    onClick?: (values: CriteriaItemValue) => void;
 }
 
 export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaViewProps>> = ({
@@ -535,6 +534,7 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
                         },
                     };
                 }
+
                 return fn(returnedItem);
             };
         }
