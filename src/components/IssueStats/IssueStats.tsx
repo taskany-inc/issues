@@ -1,9 +1,9 @@
 import { nullable } from '@taskany/bricks';
-import { CircleProgressBar, Link } from '@taskany/bricks/harmony';
+import { Badge, CircleProgressBar, Link } from '@taskany/bricks/harmony';
+import { IconChatTypingAltOutline } from '@taskany/icons';
 
 import { DateType } from '../../types/date';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-import { CommentsCountBadge } from '../CommentsCountBadge';
 import { PrivateDepsWarning } from '../PrivateDepsWarning/PrivateDepsWarning';
 import { UserDropdown } from '../UserDropdown/UserDropdown';
 import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';
@@ -88,7 +88,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
                 <Separator>
                     <div className={s.IssueComponentContainer}>
                         <Link view="secondary" onClick={onCommentsClick} className={s.CommentsCountLink}>
-                            <CommentsCountBadge count={comments} />
+                            <Badge iconLeft={<IconChatTypingAltOutline size="xs" />} text={comments} />
                         </Link>
                     </div>
                 </Separator>

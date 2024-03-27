@@ -1,0 +1,23 @@
+.ReactionsIcon {
+    transition: color var(--transition-time) var(--transition-func);
+}
+
+.ReactionsIcon:hover {
+    color: var(--text-color);
+}
+
+.Picker.Picker {
+    --background-color: var(--background-color);
+    --secondary-background-color: var(--background-color);
+    --border-color: transparent;
+    --category-name-background-color: var(--background-color);
+    --category-name-text-color: var(--gray8);
+    --hover-background-color: var(--gray6);
+    --focus-indicator-color: var(--gray6);
+    --focus-indicator-background-color: var(--gray6);
+    --text-color: var(--text-color);
+    --search-background-color: var(--gray4);
+    --search-focus-background-color: var(--gray3);
+    --search-placeholder-color: var(--gray7);
+    --search-icon-color: var(--gray7);
+}

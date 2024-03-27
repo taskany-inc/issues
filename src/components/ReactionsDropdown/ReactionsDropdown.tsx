@@ -1,39 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
 import type { EmojiSelection, EmojiPicker } from 'picmo';
-import { backgroundColor, gray3, gray4, gray6, gray7, gray8, textColor } from '@taskany/colors';
 import { Popup } from '@taskany/bricks';
 import { IconMoodTongueOutline } from '@taskany/icons';
 
-import { PageContext } from '../utils/pageContext';
-import { usePageContext } from '../hooks/usePageContext';
+import { PageContext } from '../../utils/pageContext';
+import { usePageContext } from '../../hooks/usePageContext';
+import { ReactionsButton } from '../ReactionsButton';
 
-import { ReactionsButton } from './ReactionsButton';
-import { Light } from './Light';
+import s from './ReactionsDropdown.module.css';
 
 interface ReactionsDropdownProps {
     view?: 'button' | 'icon';
 
     onClick?: (emoji?: string) => void;
 }
-
-const StyledPicker = styled.div`
-    .taskany-picker {
-        --background-color: ${backgroundColor};
-        --secondary-background-color: ${backgroundColor};
-        --border-color: transparent;
-        --category-name-background-color: ${backgroundColor};
-        --category-name-text-color: ${gray8};
-        --hover-background-color: ${gray6};
-        --focus-indicator-color: ${gray6};
-        --focus-indicator-background-color: ${gray6};
-        --text-color: ${textColor};
-        --search-background-color: ${gray4};
-        --search-focus-background-color: ${gray3};
-        --search-placeholder-color: ${gray7};
-        --search-icon-color: ${gray7};
-    }
-`;
 
 const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps) => {
     const { theme } = usePageContext();
@@ -68,7 +48,7 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
 
                 picker.current = picmo.createPicker({
                     rootElement: rootElement.current,
-                    className: 'taskany-picker',
+                    className: s.Picker,
                     theme: mapThemeOnPicmoTheme[theme],
                     renderer: new picmo.NativeRenderer(),
                     emojiSize: '20px',
@@ -101,11 +81,7 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
 
     const viewModeMap: Record<'button' | 'icon', React.ReactNode> = {
         button: <ReactionsButton ref={buttonRef} onClick={onButtonClick} />,
-        icon: (
-            <Light color={textColor} ref={buttonRef} onClick={onButtonClick}>
-                <IconMoodTongueOutline size="xs" />
-            </Light>
-        ),
+        icon: <IconMoodTongueOutline size="xs" className={s.ReactionsIcon} ref={buttonRef} onClick={onButtonClick} />,
     };
 
     return (
@@ -123,7 +99,7 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
                 maxWidth={280}
                 offset={[0, 4]}
             >
-                <StyledPicker ref={rootElement} />
+                <div ref={rootElement} />
             </Popup>
         </>
     );

@@ -46,7 +46,7 @@ import { tr } from './CommentView.i18n';
 import s from './CommentView.module.css';
 
 const Md = dynamic(() => import('../Md'));
-const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown'));
+const ReactionsDropdown = dynamic(() => import('../ReactionsDropdown/ReactionsDropdown'));
 
 interface CommentViewProps {
     id: string;
