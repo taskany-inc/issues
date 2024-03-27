@@ -1,8 +1,10 @@
 import React from 'react';
-import { Text, Link } from '@taskany/bricks/harmony';
+import { Text } from '@taskany/bricks/harmony';
 import { nullable } from '@taskany/bricks';
 
 import { goalPageHeaderTitle } from '../utils/domObjects';
+
+import { NextLink } from './NextLink';
 
 interface IssueTitleProps {
     title: string;
@@ -16,9 +18,9 @@ export const IssueTitle = React.forwardRef<HTMLDivElement, IssueTitleProps>(({ t
             {nullable(
                 href,
                 (h) => (
-                    <Link href={h} view="primary">
+                    <NextLink href={h} view="primary">
                         {title}
-                    </Link>
+                    </NextLink>
                 ),
                 title,
             )}
