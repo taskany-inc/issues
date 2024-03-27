@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.29.0](https://github.com/taskany-inc/issues/compare/v2.28.0...v2.29.0) (2024-03-27)
+
+
+### Features
+
+* add stars and watched pages ([a7f71c2](https://github.com/taskany-inc/issues/commit/a7f71c2605257cc269b86b94d8d56b6544aff195))
+* **emails:** new components for emails ([cca936e](https://github.com/taskany-inc/issues/commit/cca936e231c4b0fc7c992d56624d976a6c358ee2))
+* my projects in sidebar ([8ed7819](https://github.com/taskany-inc/issues/commit/8ed781963a92ee87e267c41dbba2c8ebe6add5e5))
+* **NewGoalCriteria:** use harmony components for similar view in popup and goal preview ([92e5b1e](https://github.com/taskany-inc/issues/commit/92e5b1ecf96d38f8f45061edf62eae2cc8c0e4cd))
+
+
+### Bug Fixes
+
+* get user email from database ([9a25bd9](https://github.com/taskany-inc/issues/commit/9a25bd93d246321432c7704736a41ccf644667d2))
+* **OfflineBanner:** infinity requests ([37f0db5](https://github.com/taskany-inc/issues/commit/37f0db5410bfa5b2c1c6bc382d33a3722d3e21ec))
+
 ## [2.28.0](https://github.com/taskany-inc/issues/compare/v2.27.0...v2.28.0) (2024-03-25)
 
 
