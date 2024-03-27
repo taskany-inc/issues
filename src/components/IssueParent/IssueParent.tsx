@@ -1,9 +1,10 @@
 import React, { ComponentProps } from 'react';
 import { nullable } from '@taskany/bricks';
-import { Text, Link } from '@taskany/bricks/harmony';
+import { Text } from '@taskany/bricks/harmony';
 
 import { routes } from '../../hooks/router';
 import { goalPageHeaderParent } from '../../utils/domObjects';
+import { NextLink } from '../NextLink';
 
 import s from './IssueParent.module.css';
 
@@ -25,9 +26,9 @@ export const IssueParent = ({ parent, size = 'l', ...props }: IssueParentProps) 
             {normalizedParent.map((p, i) =>
                 nullable(p.id, (id) => (
                     <span key={id} {...goalPageHeaderParent.attr}>
-                        <Link href={routes.project(id)} view="secondary">
+                        <NextLink href={routes.project(id)} view="secondary">
                             {p.title}
-                        </Link>
+                        </NextLink>
                         {i < normalizedParent.length - 1 ? ', ' : ''}
                     </span>
                 )),
