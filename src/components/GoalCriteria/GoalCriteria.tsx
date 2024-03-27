@@ -33,6 +33,8 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { IssueMeta } from '../IssueMeta';
 import { Circle } from '../Circle';
+import { routes } from '../../hooks/router';
+import { NextLink } from '../NextLink';
 
 import classes from './GoalCriteria.module.css';
 import { tr } from './GoalCriteria.i18n';
@@ -128,9 +130,14 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
 const GoalCriteria = forwardRef<HTMLSpanElement, Omit<GoalCriteriaProps, 'id'>>(({ title, goal, weight }, ref) => {
     const { setPreview } = useGoalPreview();
 
-    const handleGoalCriteriaClick = useCallback(() => {
-        setPreview(goal.shortId, { title, id: goal.goalId });
-    }, [setPreview, title, goal]);
+    const handleGoalCriteriaClick = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
+        (event) => {
+            if (event.metaKey || event.ctrlKey || !goal?.shortId) return;
+            event.preventDefault();
+            setPreview(goal.shortId, { title, id: goal.goalId });
+        },
+        [setPreview, title, goal],
+    );
 
     return (
         <>
@@ -146,8 +153,11 @@ const GoalCriteria = forwardRef<HTMLSpanElement, Omit<GoalCriteriaProps, 'id'>>(
                         />
                     }
                     className={classes.GoalCriteriaGoalBadge}
-                    onClick={handleGoalCriteriaClick}
-                    text={title}
+                    text={
+                        <NextLink href={routes.goal(goal.shortId)} onClick={handleGoalCriteriaClick}>
+                            {title}
+                        </NextLink>
+                    }
                 />
             </TableCell>
             <TableCell width="3ch" className={classes.GoalCriteriaWeightColumn}>
