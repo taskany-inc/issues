@@ -1,6 +1,6 @@
 .TableRowItem {
     display: grid;
-    grid-template-columns: minmax(400px, 1fr) 780px;
+    grid-template-columns: minmax(300px, 1fr) 680px;
     align-items: center;
     flex: 1;
 

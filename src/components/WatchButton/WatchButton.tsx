@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import { IconEyeOutline, IconEyeClosedSolid } from '@taskany/icons';
 import { Button } from '@taskany/bricks/harmony';
 
@@ -21,7 +21,10 @@ const Icon: React.FC<IconProps> = ({ watching }) => {
 };
 
 export const WatchButton: React.FC<WatchButtonProps> = ({ watcher, onToggle }) => {
-    const onClick = () => {
+    const onClick = (e: MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         onToggle(watcher);
     };
 

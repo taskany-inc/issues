@@ -2,6 +2,12 @@
     justify-content: space-between;   
 }
 
+.ProjectListItemIcons_editable {
+    flex: 1;
+    justify-content: end;
+    gap: var(--gap-sm)
+}
+
 .ProjectListItemRow {
     gap: var(--gap-s);
 }
