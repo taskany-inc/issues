@@ -6,10 +6,14 @@ import { ComponentProps } from 'react';
 
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { UserGroup } from '../UserGroup';
+import { ProjectSubscriptionButtons } from '../ProjectSubscriptionButtons';
 
 import s from './ProjectListItem.module.css';
 
 interface ProjectListItemProps {
+    id: string;
+    stargizers: Pick<ActivityByIdReturnType, 'id'>[];
+    editable?: boolean;
     owner?: ActivityByIdReturnType;
     participants?: ActivityByIdReturnType[];
     starred?: boolean;
@@ -18,12 +22,15 @@ interface ProjectListItemProps {
 }
 
 export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typeof TableRow>> = ({
+    id,
     owner,
     participants,
+    stargizers,
     starred,
     watching,
     averageScore,
     className,
+    editable,
     ...attrs
 }) => {
     return (
@@ -45,13 +52,31 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
                     <CircleProgressBar value={score} />
                 </TableCell>
             ))}
-            <TableCell width={40} className={s.ProjectListItemIcons}>
-                {nullable(starred, () => (
-                    <IconStarSolid size="s" />
-                ))}
-                {nullable(watching, () => (
-                    <IconEyeOutline size="s" />
-                ))}
+            <TableCell
+                width={40}
+                className={cn(s.ProjectListItemIcons, {
+                    [s.ProjectListItemIcons_editable]: editable,
+                })}
+            >
+                {nullable(
+                    editable,
+                    () => (
+                        <ProjectSubscriptionButtons
+                            id={id}
+                            starred={starred}
+                            watching={watching}
+                            stargizersCounter={stargizers.length}
+                        />
+                    ),
+                    <>
+                        {nullable(starred, () => (
+                            <IconStarSolid size="s" />
+                        ))}
+                        {nullable(watching, () => (
+                            <IconEyeOutline size="s" />
+                        ))}
+                    </>,
+                )}
             </TableCell>
         </TableRow>
     );

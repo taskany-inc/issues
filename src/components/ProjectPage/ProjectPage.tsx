@@ -120,6 +120,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                     <ProjectListItemConnected
                         key={p.id}
                         visible
+                        editable
                         project={p}
                         onTagClick={setTagsFilterOutside}
                         queryState={queryState}
