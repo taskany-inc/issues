@@ -24,7 +24,18 @@ const StyledTitleWrapper = styled(StyledProjectIcons)`
 
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
-    project: Omit<NonNullable<ProjectByIdReturnType>, '_count'>;
+    project: Pick<
+        NonNullable<ProjectByIdReturnType>,
+        | 'title'
+        | 'children'
+        | 'activity'
+        | 'participants'
+        | '_isStarred'
+        | '_isWatching'
+        | 'averageScore'
+        | 'id'
+        | 'flowId'
+    >;
     goals?: ReactNode;
     children?: React.ReactNode;
     onClick?: MouseEventHandler<HTMLElement>;
