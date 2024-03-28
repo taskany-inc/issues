@@ -1,21 +1,9 @@
-import { FC, useCallback, memo, useState, useEffect, useMemo, useRef, ReactNode } from 'react';
+import { FC, useCallback, memo, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Button } from '@taskany/bricks/harmony';
-import { IconAddOutline } from '@taskany/icons';
-import { nullable } from '@taskany/bricks';
+import { nullable, useLatest } from '@taskany/bricks';
 
-import { filtersTakeCount } from '../../utils/filters';
-import { FilterQueryState, QueryState, buildURLSearchParams, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
-import { ProjectFilter } from '../ProjectFilter';
-import { TagFilter } from '../TagFilter';
-import { EstimateFilter } from '../EstimateFilter';
-import { UserFilter } from '../UserFilter/UserFilter';
-import { PriorityFilter } from '../PriorityFilter';
-import { StateFilter } from '../StateFilter';
-import { ActivityByIdReturnType, FilterById } from '../../../trpc/inferredTypes';
-import { trpc } from '../../utils/trpcClient';
-import { SortFilter } from '../SortFilter/SortFilter';
-import { FilterPopup } from '../FilterPopup/FilterPopup';
-import { getUserName, prepareUserDataFromActivity } from '../../utils/getUserName';
+import { FilterQueryState, QueryState, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import { FilterById } from '../../../trpc/inferredTypes';
 import { filtersPanel, filtersPanelTitle, filtersPanelResetButton } from '../../utils/domObjects';
 import {
     FilterBarCounter,
@@ -29,6 +17,7 @@ import {
     layoutType,
     FiltersBarDropdownTitle,
     FiltersBarDropdownContent,
+    AddFilterDropdown,
 } from '../FiltersBar/FiltersBar';
 import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
 import { Separator } from '../Separator/Separator';
@@ -44,28 +33,6 @@ import { PageUserMenu } from '../PageUserMenu';
 import { AppliedTagFilter } from '../AppliedTagFilter/AppliedTagFilter';
 
 import { tr } from './FiltersPanel.i18n';
-
-type Users = React.ComponentProps<typeof UserFilter>['users'];
-
-function mapUserToView(list: ActivityByIdReturnType[]): Users {
-    return list.reduce<Users>((acc, activity) => {
-        const data = prepareUserDataFromActivity(activity);
-        if (data && data.activityId) {
-            acc.push({
-                id: data.activityId,
-                name: getUserName(data),
-                email: data.email,
-                image: data.image,
-            });
-        }
-
-        return acc;
-    }, []);
-}
-
-const useQueryOptions = {
-    keepPreviousData: true,
-};
 
 export const FiltersPanel: FC<{
     title: string;
@@ -92,68 +59,15 @@ export const FiltersPanel: FC<{
     });
 
     const [layout] = useState<LayoutType>(layoutType.table);
-    const filterTriggerRef = useRef<HTMLButtonElement>(null);
-    const [filterVisible, setFilterVisible] = useState(false);
-    const [ownersQuery, setOwnersQuery] = useState('');
-    const [issuersQuery, setIssuersQuery] = useState('');
-    const [participantsQuery, setParticipantsQuery] = useState('');
-    const [projectsQuery, setProjectsQuery] = useState('');
-    const [tagsQuery, setTagsQuery] = useState('');
     const [filterQuery, setFilterQuery] = useState<Partial<FilterQueryState> | undefined>(queryFilterState);
+    const filterQueryRef = useLatest(filterQuery);
 
     useEffect(() => {
         setFilterQuery(queryState);
     }, [queryState]);
 
-    const { data: owners = [] } = trpc.user.suggestions.useQuery(
-        {
-            query: ownersQuery,
-            include: queryState?.owner,
-            take: filtersTakeCount,
-        },
-        useQueryOptions,
-    );
-
-    const { data: issuers = [] } = trpc.user.suggestions.useQuery(
-        {
-            query: issuersQuery,
-            include: queryState?.issuer,
-            take: filtersTakeCount,
-        },
-        useQueryOptions,
-    );
-
-    const { data: participants = [] } = trpc.user.suggestions.useQuery(
-        {
-            query: participantsQuery,
-            include: queryState?.participant,
-            take: filtersTakeCount,
-        },
-        useQueryOptions,
-    );
-
-    const { data: projects = [] } = trpc.project.suggestions.useQuery(
-        {
-            query: projectsQuery,
-            include: queryState?.project,
-            take: filtersTakeCount,
-        },
-        useQueryOptions,
-    );
-
-    const { data: tags = [] } = trpc.tag.suggestions.useQuery(
-        {
-            query: tagsQuery,
-            include: queryState?.tag,
-            take: filtersTakeCount,
-        },
-        useQueryOptions,
-    );
-    const { data: states = [] } = trpc.state.all.useQuery();
-    const { data: priorities = [] } = trpc.priority.getAll.useQuery();
-
     const setPartialQueryByKey = useCallback(<K extends keyof QueryState>(key: K) => {
-        return (value: QueryState[K]) => {
+        return (value?: QueryState[K]) => {
             setFilterQuery((prev) => {
                 return {
                     ...prev,
@@ -180,22 +94,69 @@ export const FiltersPanel: FC<{
         });
     }, [currentPreset, toggleFilterStar]);
 
-    const onApplyClick = useCallback(() => {
-        setFilterVisible(false);
-        batchQueryState?.({ ...filterQuery });
-    }, [filterQuery, batchQueryState]);
+    const onApplyClick = useCallback(
+        (key?: keyof Omit<FilterQueryState, 'query' | 'sort'>) => {
+            if (!filterQueryRef.current) return;
+
+            if (key) {
+                filterQueryRef.current[key] = [];
+            }
+
+            if (key === 'state') {
+                filterQueryRef.current.stateType = [];
+            }
+
+            batchQueryState?.({ ...filterQueryRef.current });
+        },
+        [filterQueryRef, batchQueryState],
+    );
 
     const onResetClick = useCallback(() => {
-        setFilterVisible(false);
+        setFilterQuery(undefined);
         resetQueryState();
     }, [resetQueryState]);
 
-    const isFiltersEmpty = useMemo(
-        () => !queryFilterState || !Array.from(buildURLSearchParams(queryFilterState)).length,
-        [queryFilterState],
+    const handleChange = useCallback(
+        (key: keyof FilterQueryState) => (values?: { id: string }[]) => {
+            if (key === 'state') {
+                setPartialQueryByKey('stateType')();
+            }
+
+            setPartialQueryByKey(key)(values?.map(({ id }) => id));
+        },
+        [setPartialQueryByKey],
     );
 
+    const onClearFilter = useCallback(
+        (key: keyof Omit<FilterQueryState, 'query' | 'sort'>) => () => {
+            setPartialQueryByKey(key)();
+            onApplyClick(key);
+        },
+        [onApplyClick, setPartialQueryByKey],
+    );
+
+    const isFiltersEmpty = useMemo(() => Object.values(filterQuery || {}).filter(Boolean).length === 0, [filterQuery]);
     const groupedByProject = groupBy === 'project';
+
+    const filterItems: { id: keyof FilterQueryState; title: string }[] = useMemo(() => {
+        return [
+            { id: 'state', title: tr('State') },
+            { id: 'priority', title: tr('Priority') },
+            { id: 'estimate', title: tr('Estimate') },
+            { id: 'project', title: tr('Project') },
+            { id: 'tag', title: tr('Tag') },
+            { id: 'issuer', title: tr('Issuer') },
+            { id: 'owner', title: tr('Owner') },
+            { id: 'participant', title: tr('Participant') },
+        ];
+    }, []);
+
+    const restFilterItems = useMemo(() => {
+        if (filterQuery && filterQuery.stateType) {
+            filterQuery.state = [];
+        }
+        return filterItems.filter(({ id }) => !filterQuery?.[id]);
+    }, [filterQuery, filterItems]);
 
     return (
         <>
@@ -207,21 +168,20 @@ export const FiltersPanel: FC<{
                 {children}
                 <FiltersBarItem layout="fill">
                     <FiltersBarControlGroup>
-                        {isFiltersEmpty ? (
-                            <Button
-                                key="filter"
-                                ref={filterTriggerRef}
-                                text={tr('Filter')}
-                                onClick={() => setFilterVisible((val) => !val)}
-                                iconLeft={<IconAddOutline size="xxs" />}
-                            />
-                        ) : (
+                        {nullable(
+                            isFiltersEmpty,
+                            () => (
+                                <AddFilterDropdown
+                                    items={restFilterItems}
+                                    onChange={({ id }) => setPartialQueryByKey(id)([])}
+                                />
+                            ),
                             <Button
                                 key="resetFilter"
                                 onClick={onResetClick}
                                 text={tr('Reset')}
                                 {...filtersPanelResetButton.attr}
-                            />
+                            />,
                         )}
                         <FilterBarCounter total={total} counter={counter} />
                     </FiltersBarControlGroup>
@@ -261,111 +221,82 @@ export const FiltersPanel: FC<{
                     onDeletePreset={filterStarHandler}
                     onSavePreset={filterStarHandler}
                 >
-                    {nullable(Boolean(queryFilterState?.state) || Boolean(queryFilterState?.stateType), () => (
+                    {nullable(Boolean(filterQuery?.state) || Boolean(filterQuery?.stateType), () => (
                         <AppliedStateFilter
                             label={tr('State')}
-                            value={queryFilterState?.state}
-                            stateTypes={queryFilterState?.stateType}
-                            readOnly
+                            value={filterQuery?.state}
+                            stateTypes={filterQuery?.stateType}
+                            onChange={handleChange('state')}
+                            onClose={onApplyClick}
+                            onClearFilter={onClearFilter('state')}
                         />
                     ))}
-                    {nullable(Boolean(queryFilterState?.issuer), () => (
-                        <AppliedUsersFilter label={tr('Issuer')} value={queryFilterState?.issuer} readOnly />
+                    {nullable(Boolean(filterQuery?.issuer), () => (
+                        <AppliedUsersFilter
+                            label={tr('Issuer')}
+                            value={filterQuery?.issuer}
+                            onChange={handleChange('issuer')}
+                            onClose={onApplyClick}
+                            onClearFilter={onClearFilter('issuer')}
+                        />
                     ))}
-                    {nullable(Boolean(queryFilterState?.owner), () => (
-                        <AppliedUsersFilter label={tr('Owner')} value={queryFilterState?.owner} readOnly />
+                    {nullable(Boolean(filterQuery?.owner), () => (
+                        <AppliedUsersFilter
+                            label={tr('Owner')}
+                            value={filterQuery?.owner}
+                            onChange={handleChange('owner')}
+                            onClose={onApplyClick}
+                            onClearFilter={onClearFilter('owner')}
+                        />
                     ))}
-                    {nullable(Boolean(queryFilterState?.participant), () => (
-                        <AppliedUsersFilter label={tr('Participant')} value={queryFilterState?.participant} readOnly />
+                    {nullable(Boolean(filterQuery?.participant), () => (
+                        <AppliedUsersFilter
+                            label={tr('Participant')}
+                            value={filterQuery?.participant}
+                            onChange={handleChange('participant')}
+                            onClose={onApplyClick}
+                            onClearFilter={onClearFilter('participant')}
+                        />
                     ))}
-                    {nullable(Boolean(queryFilterState?.estimate), () => (
-                        <AppliedEstimateFilter label={tr('Estimate')} value={queryFilterState?.estimate} readOnly />
+                    {nullable(Boolean(filterQuery?.estimate), () => (
+                        <AppliedEstimateFilter
+                            label={tr('Estimate')}
+                            value={filterQuery?.estimate}
+                            onChange={setPartialQueryByKey('estimate')}
+                            onClose={onApplyClick}
+                            onClearFilter={onClearFilter('estimate')}
+                        />
                     ))}
-                    {nullable(Boolean(queryFilterState?.priority), () => (
-                        <AppliedPriorityFilter label={tr('Priority')} value={queryFilterState?.priority} readOnly />
+                    {nullable(Boolean(filterQuery?.priority), () => (
+                        <AppliedPriorityFilter
+                            label={tr('Priority')}
+                            value={filterQuery?.priority}
+                            onChange={handleChange('priority')}
+                            onClose={onApplyClick}
+                            onClearFilter={onClearFilter('priority')}
+                        />
                     ))}
-                    {nullable(Boolean(queryFilterState?.project), () => (
-                        <AppliedGoalParentFilter label={tr('Project')} value={queryFilterState?.project} readOnly />
+                    {nullable(Boolean(filterQuery?.project), () => (
+                        <AppliedGoalParentFilter
+                            label={tr('Project')}
+                            value={filterQuery?.project}
+                            onChange={handleChange('project')}
+                            onClose={onApplyClick}
+                            onClearFilter={onClearFilter('project')}
+                        />
                     ))}
-                    {nullable(Boolean(queryFilterState?.tag), () => (
-                        <AppliedTagFilter label={tr('Tags')} value={queryFilterState?.tag} readOnly />
+                    {nullable(Boolean(filterQuery?.tag), () => (
+                        <AppliedTagFilter
+                            label={tr('Tag')}
+                            value={filterQuery?.tag}
+                            onChange={handleChange('tag')}
+                            onClose={onApplyClick}
+                            onClearFilter={onClearFilter('tag')}
+                        />
                     ))}
-                    <Button
-                        ref={filterTriggerRef}
-                        text={tr('Filter')}
-                        onClick={() => setFilterVisible((val) => !val)}
-                        iconLeft={<IconAddOutline size="xxs" />}
-                    />
+                    <AddFilterDropdown items={restFilterItems} onChange={({ id }) => setPartialQueryByKey(id)([])} />
                 </AppliedFiltersBar>
             ))}
-            <FilterPopup
-                visible={filterVisible}
-                onApplyClick={onApplyClick}
-                filterTriggerRef={filterTriggerRef}
-                switchVisible={setFilterVisible}
-                activeTab="state"
-            >
-                <StateFilter
-                    text={tr('State')}
-                    value={filterQuery?.state}
-                    stateTypes={filterQuery?.stateType}
-                    states={states}
-                    onStateChange={setPartialQueryByKey('state')}
-                    onStateTypeChange={setPartialQueryByKey('stateType')}
-                />
-                <PriorityFilter
-                    text={tr('Priority')}
-                    value={filterQuery?.priority}
-                    priorities={priorities}
-                    onChange={setPartialQueryByKey('priority')}
-                />
-
-                <EstimateFilter
-                    text={tr('Estimate')}
-                    value={filterQuery?.estimate}
-                    onChange={setPartialQueryByKey('estimate')}
-                />
-
-                <ProjectFilter
-                    text={tr('Project')}
-                    value={filterQuery?.project}
-                    projects={projects}
-                    onChange={setPartialQueryByKey('project')}
-                    onSearchChange={setProjectsQuery}
-                />
-                <UserFilter
-                    tabName="issuer"
-                    text={tr('Issuer')}
-                    users={mapUserToView(issuers)}
-                    value={filterQuery?.issuer}
-                    onChange={setPartialQueryByKey('issuer')}
-                    onSearchChange={setIssuersQuery}
-                />
-                <UserFilter
-                    tabName="owner"
-                    text={tr('Owner')}
-                    users={mapUserToView(owners)}
-                    value={filterQuery?.owner}
-                    onChange={setPartialQueryByKey('owner')}
-                    onSearchChange={setOwnersQuery}
-                />
-                <TagFilter
-                    text={tr('Tags')}
-                    value={filterQuery?.tag}
-                    tags={tags}
-                    onChange={setPartialQueryByKey('tag')}
-                    onSearchChange={setTagsQuery}
-                />
-                <UserFilter
-                    tabName="participant"
-                    text={tr('Participant')}
-                    users={mapUserToView(participants)}
-                    value={filterQuery?.participant}
-                    onChange={setPartialQueryByKey('participant')}
-                    onSearchChange={setParticipantsQuery}
-                />
-                <SortFilter text={tr('Sort')} value={filterQuery?.sort} onChange={setPartialQueryByKey('sort')} />
-            </FilterPopup>
         </>
     );
 });

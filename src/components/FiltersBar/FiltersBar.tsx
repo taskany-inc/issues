@@ -1,8 +1,10 @@
-import { ComponentProps, FC, HTMLAttributes, ReactNode, useState } from 'react';
+import { ComponentProps, FC, HTMLAttributes, ReactNode } from 'react';
 import cn from 'classnames';
 import { nullable } from '@taskany/bricks';
-import { Text, Switch, SwitchControl, Dropdown, DropdownPanel, DropdownTrigger } from '@taskany/bricks/harmony';
-import { IconAdjustHorizontalSolid, IconAlignTopSolid, IconListUnorderedOutline } from '@taskany/icons';
+import { Text, Switch, SwitchControl, Button } from '@taskany/bricks/harmony';
+import { IconAddOutline, IconAdjustHorizontalSolid, IconAlignTopSolid, IconListUnorderedOutline } from '@taskany/icons';
+
+import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import s from './FiltersBar.module.css';
 import { tr } from './FiltersBar.i18n';
@@ -18,9 +20,7 @@ export const FilterBarCounter: FC<FilterBarCounterProps> = ({ counter, total }) 
             counter === undefined || total === counter,
             () => total,
             <>
-                <span key="counter" className={s.FiltersBarCounterActive}>
-                    {counter}
-                </span>
+                <span key="counter">{counter}</span>
                 {`/${total}`}
             </>,
         )}
@@ -84,11 +84,9 @@ export const FiltersBarControlGroup: FC<HTMLAttributes<HTMLDivElement>> = ({ chi
 );
 
 export const FiltersBarViewDropdown: FC<{ children?: ReactNode }> = ({ children }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
     return (
-        <Dropdown isOpen={isOpen} onClose={() => setIsOpen(false)}>
-            <DropdownTrigger className={s.FiltersBarViewDropdownDrigger} view="fill" onClick={() => setIsOpen(true)}>
+        <Dropdown>
+            <DropdownTrigger className={s.FiltersBarViewDropdownDrigger} view="fill">
                 <div className={s.FiltersBarViewDropdownDrigger}>
                     <IconAdjustHorizontalSolid size="xxs" />
                     <Text size="s">{tr('View')}</Text>
@@ -97,6 +95,34 @@ export const FiltersBarViewDropdown: FC<{ children?: ReactNode }> = ({ children 
             <DropdownPanel width={335} placement="bottom-start" className={s.FiltersBarDropdownPanel}>
                 <div className={s.FiltersBarDropdownPanelContainer}>{children}</div>
             </DropdownPanel>
+        </Dropdown>
+    );
+};
+
+interface AddFilterDropdownProps<T> {
+    items: T[];
+    onChange: (value: T) => void;
+}
+export const AddFilterDropdown = <T extends { id: string; title: string }>({
+    items,
+    onChange,
+}: AddFilterDropdownProps<T>) => {
+    return (
+        <Dropdown>
+            <DropdownTrigger
+                renderTrigger={(props) =>
+                    nullable(Boolean(items.length), () => (
+                        <Button text={tr('Filter')} iconLeft={<IconAddOutline size="xxs" />} {...props} />
+                    ))
+                }
+            />
+            <DropdownPanel
+                placement="bottom"
+                items={items}
+                mode="single"
+                onChange={onChange}
+                renderItem={(props) => <Text size="s">{props.item.title}</Text>}
+            />
         </Dropdown>
     );
 };

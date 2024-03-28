@@ -166,7 +166,7 @@ export const user = router({
 
         return users.reduce<{ id: string; user: ReturnType<typeof safeUserData> }[]>((acc, cur) => {
             const userData = safeUserData(cur.activity);
-            if (userData) acc.push({ id: cur.id, user: userData });
+            if (userData && cur.activity) acc.push({ id: cur.activity.id, user: userData });
             return acc;
         }, []);
     }),
