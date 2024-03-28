@@ -3,9 +3,11 @@ import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
 
 import { FilterById, StateType } from '../../trpc/inferredTypes';
-import { SortDirection, SortableProps } from '../components/SortFilter/SortFilter';
 import { StateTypeEnum } from '../schema/common';
 import { setCookie } from '../utils/cookies';
+
+type SortDirection = 'asc' | 'desc' | null;
+type SortableProps = 'title' | 'state' | 'priority' | 'project' | 'activity' | 'owner' | 'updatedAt' | 'createdAt';
 
 export const filtersNoSearchPresetCookie = 'taskany.NoSearchPreset';
 

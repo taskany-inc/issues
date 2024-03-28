@@ -1,4 +1,4 @@
-import React, { useCallback, useState, FC, MutableRefObject } from 'react';
+import React, { useCallback, useState, FC } from 'react';
 import { Button } from '@taskany/bricks/harmony';
 import { IconPlusCircleOutline } from '@taskany/icons';
 
@@ -57,7 +57,7 @@ export const TeamComboBox: FC<TeamComboBoxProps & React.HTMLAttributes<HTMLDivEl
                         view="ghost"
                         text={text}
                         disabled={disabled}
-                        ref={ref as MutableRefObject<HTMLButtonElement>}
+                        ref={ref}
                         iconLeft={<IconPlusCircleOutline size="s" />}
                         onClick={(e) => {
                             e.preventDefault();

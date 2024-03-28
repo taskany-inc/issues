@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 import { Button, Text } from '@taskany/bricks/harmony';
 import { KeyCode, useKeyboard } from '@taskany/bricks';
@@ -190,7 +190,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
                                         view="primary"
                                         brick="left"
                                         size="m"
-                                        ref={props.ref as MutableRefObject<HTMLButtonElement>}
+                                        ref={props.ref}
                                         onClick={() => {
                                             setIsOpen(true);
                                             props.onClick();

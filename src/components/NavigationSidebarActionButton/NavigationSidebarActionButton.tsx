@@ -1,4 +1,4 @@
-import { FC, MutableRefObject, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 import { Button, Text } from '@taskany/bricks/harmony';
 
@@ -63,7 +63,7 @@ export const NavigationSidebarActionButton: FC = () => {
                         <Button
                             brick="left"
                             iconRight={props.isOpen ? <IconUpSmallSolid size="s" /> : <IconDownSmallSolid size="s" />}
-                            ref={props.ref as MutableRefObject<HTMLButtonElement>}
+                            ref={props.ref}
                             onClick={props.onClick}
                             {...createSelectButton.attr}
                         />

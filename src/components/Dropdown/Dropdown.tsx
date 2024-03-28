@@ -67,10 +67,11 @@ interface DropdownTriggerProps extends Omit<DropdownTriggerBricksProps, 'error' 
     error?: { message?: string };
     label?: Exclude<I18nKey, 'not chosen'>;
     className?: string;
-    renderTrigger?: <T>(
+    renderTrigger?: (
         props: Omit<Parameters<NonNullable<DropdownTriggerBricksProps['renderTrigger']>>['0'], 'ref'> & {
             onClick: () => void;
-            ref?: MutableRefObject<T>;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ref?: MutableRefObject<any>;
         },
     ) => ReactNode;
 }
@@ -94,9 +95,7 @@ export const DropdownTrigger = ({
                 className={className}
                 error={Boolean(error)}
                 renderTrigger={
-                    renderTrigger
-                        ? ({ ref, ...props }) => renderTrigger<HTMLElement | null>({ ...props, ref, onClick: toggle })
-                        : undefined
+                    renderTrigger ? ({ ref, ...props }) => renderTrigger({ ...props, ref, onClick: toggle }) : undefined
                 }
                 placeholder={tr('Not chosen')}
                 {...props}
@@ -242,7 +241,16 @@ export const DropdownPanel = <T extends { id: string }, V extends ComponentProps
                         </MenuItem>
                     )}
                 >
-                    <AutoCompleteList title={title} />
+                    {nullable(
+                        multiple,
+                        () => (
+                            <>
+                                <AutoCompleteList selected />
+                                <AutoCompleteList title={title} filterSelected />
+                            </>
+                        ),
+                        <AutoCompleteList title={title} />,
+                    )}
                 </AutoComplete>
             </DropdownPanelBricks>
         ))

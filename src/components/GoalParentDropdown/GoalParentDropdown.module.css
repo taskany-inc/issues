@@ -4,6 +4,7 @@
     justify-content: space-between;
     gap: var(--gap-s);
     width: 100%;
+    white-space: normal;
 }
 
 .DropdownPanelItem_id {
