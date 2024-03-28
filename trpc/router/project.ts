@@ -245,6 +245,11 @@ export const project = router({
                 },
             });
 
+            const goalsSchema = getGoalDeepQuery({
+                activityId,
+                role,
+            });
+
             const { groups, totalGoalsCount } = await prisma.project
                 .findMany({
                     take: limit + 1,
@@ -254,7 +259,26 @@ export const project = router({
                         updatedAt: 'desc',
                     },
                     include: {
-                        ...projectsSchema.include,
+                        stargizers: true,
+                        watchers: true,
+                        children: {
+                            include: {
+                                parent: true,
+                            },
+                            where: accessFilter,
+                        },
+                        activity: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
+                        participants: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
                         goals: {
                             //  all goals with filters
                             where: {
@@ -273,10 +297,21 @@ export const project = router({
                                     nonArchivedPartialQuery,
                                 ],
                             },
-                            include: getGoalDeepQuery({
-                                activityId,
-                                role,
-                            }),
+                            include: {
+                                tags: goalsSchema.tags,
+                                state: goalsSchema.state,
+                                owner: goalsSchema.owner,
+                                participants: goalsSchema.participants,
+                                priority: goalsSchema.priority,
+                                watchers: goalsSchema.watchers,
+                                stargizers: goalsSchema.stargizers,
+                                project: {
+                                    include: {
+                                        parent: true,
+                                    },
+                                },
+                                _count: goalsSchema._count,
+                            },
                         },
                         sharedGoals: {
                             //  all shared goals with filters

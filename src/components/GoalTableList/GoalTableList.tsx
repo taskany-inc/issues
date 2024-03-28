@@ -26,7 +26,24 @@ interface GoalTableListProps<T> {
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
 }
 
-export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>>({
+export const GoalTableList = <
+    T extends Pick<
+        NonNullable<GoalByIdReturnType>,
+        | '_shortId'
+        | 'title'
+        | 'tags'
+        | 'updatedAt'
+        | '_count'
+        | 'state'
+        | 'owner'
+        | 'participants'
+        | 'estimate'
+        | 'estimateType'
+        | 'priority'
+        | '_achivedCriteriaWeight'
+        | 'id'
+    >,
+>({
     goals,
     onGoalClick,
     onTagClick,
