@@ -205,7 +205,7 @@ export const project = router({
             const projectIdsArray = projectIds.map(({ id }) => id);
             const goalsFilters = goalsQuery ? { ...goalsFilter(goalsQuery, activityId, role).where } : {};
 
-            const projectsSchema = getProjectSchema({
+            const { where: projectWhere } = getProjectSchema({
                 role,
                 activityId,
                 goalsQuery,
@@ -245,6 +245,11 @@ export const project = router({
                 },
             });
 
+            const goalsDeepIncludeSchema = getGoalDeepQuery({
+                activityId,
+                role,
+            });
+
             const { groups, totalGoalsCount } = await prisma.project
                 .findMany({
                     take: limit + 1,
@@ -254,7 +259,26 @@ export const project = router({
                         updatedAt: 'desc',
                     },
                     include: {
-                        ...projectsSchema.include,
+                        stargizers: true,
+                        watchers: true,
+                        children: {
+                            include: {
+                                parent: true,
+                            },
+                            where: accessFilter,
+                        },
+                        activity: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
+                        participants: {
+                            include: {
+                                user: true,
+                                ghost: true,
+                            },
+                        },
                         goals: {
                             //  all goals with filters
                             where: {
@@ -273,33 +297,21 @@ export const project = router({
                                     nonArchivedPartialQuery,
                                 ],
                             },
-                            include: getGoalDeepQuery({
-                                activityId,
-                                role,
-                            }),
-                        },
-                        sharedGoals: {
-                            //  all shared goals with filters
-                            where: {
-                                AND: [
-                                    goalsFilters,
-                                    {
-                                        OR: [
-                                            ...whereGoalsSchema,
-                                            {
-                                                projectId: {
-                                                    in: projectIdsArray,
-                                                },
-                                            },
-                                        ],
+                            include: {
+                                tags: goalsDeepIncludeSchema.tags,
+                                state: goalsDeepIncludeSchema.state,
+                                owner: goalsDeepIncludeSchema.owner,
+                                participants: goalsDeepIncludeSchema.participants,
+                                priority: goalsDeepIncludeSchema.priority,
+                                watchers: goalsDeepIncludeSchema.watchers,
+                                stargizers: goalsDeepIncludeSchema.stargizers,
+                                project: {
+                                    include: {
+                                        parent: true,
                                     },
-                                    nonArchivedPartialQuery,
-                                ],
+                                },
+                                _count: goalsDeepIncludeSchema._count,
                             },
-                            include: getGoalDeepQuery({
-                                activityId,
-                                role,
-                            }),
                         },
                         _count: {
                             select: {
@@ -307,14 +319,10 @@ export const project = router({
                                 goals: {
                                     where: nonArchivedPartialQuery,
                                 },
-                                // all shared goals without filters to count the total goals
-                                sharedGoals: {
-                                    where: nonArchivedPartialQuery,
-                                },
                             },
                         },
                     },
-                    where: projectsSchema.where,
+                    where: projectWhere,
                 })
                 .then((res) => ({
                     groups: res.map((project) => {

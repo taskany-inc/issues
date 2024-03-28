@@ -5,7 +5,7 @@ import { nullable } from '@taskany/bricks';
 import { TreeView, TreeViewNode, Text, Link } from '@taskany/bricks/harmony';
 import { IconServersOutline } from '@taskany/icons';
 
-import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { DashboardProject } from '../../../trpc/inferredTypes';
 import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
 import { projectListItem, projectListItemTitle } from '../../utils/domObjects';
 import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
@@ -23,7 +23,7 @@ const StyledTitleWrapper = styled(StyledProjectIcons)`
 
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
-    project: Omit<NonNullable<ProjectByIdReturnType>, '_count'>;
+    project: NonNullable<DashboardProject>;
     goals?: ReactNode;
     children?: React.ReactNode;
     onClick?: MouseEventHandler<HTMLElement>;

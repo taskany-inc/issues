@@ -20,3 +20,5 @@ export type CommentCreateReturnType = RouterOutputs['goal']['createComment'];
 export type PriorityReturnType = RouterOutputs['priority']['getAll'][number];
 export type TeamSuggetionsReturnType = RouterOutputs['crew']['teamSuggetions'][number];
 export type StateType = RouterOutputs['state']['all'][number]['type'];
+export type DashboardProject = RouterOutputs['project']['getUserProjectsWithGoals']['groups'][number]['project'];
+export type DashboardGoal = RouterOutputs['project']['getUserProjectsWithGoals']['groups'][number]['goals'][number];

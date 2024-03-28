@@ -4,8 +4,8 @@ import { ListViewItem, nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { StateWrapper } from '../StateWrapper/StateWrapper';
+import { DashboardGoal } from '../../../trpc/inferredTypes';
 import { safeUserData } from '../../utils/getUserName';
 import { calculateElapsedDays, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
@@ -26,7 +26,7 @@ interface GoalTableListProps<T> {
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
 }
 
-export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>>({
+export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
     goals,
     onGoalClick,
     onTagClick,
@@ -160,30 +160,34 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
 
     return (
         <Table {...attrs}>
-            {data.map((row) => (
-                <NextLink
-                    key={row.goal.id}
-                    href={routes.goal(row.goal?._shortId as string)}
-                    onClick={onGoalPreviewShow(row.goal)}
-                >
-                    <ListViewItem
-                        value={row.goal}
-                        renderItem={({ active, hovered: _, ...props }) => (
-                            <TableListItem
-                                selected={row.goal._shortId === shortId || row.goal.id === preview?.id}
-                                hovered={active}
-                                {...props}
-                            >
-                                {row.list.map(({ content, width, className }, index) => (
-                                    <TableListItemElement key={index} width={width} className={className}>
-                                        {content}
-                                    </TableListItemElement>
-                                ))}
-                            </TableListItem>
-                        )}
-                    />
-                </NextLink>
-            ))}
+            {data.map((row) => {
+                const { project: _, ...goal } = row.goal;
+
+                return (
+                    <NextLink
+                        key={goal.id}
+                        href={routes.goal(goal?._shortId as string)}
+                        onClick={onGoalPreviewShow(goal)}
+                    >
+                        <ListViewItem
+                            value={row.goal}
+                            renderItem={({ active, hovered: _, ...props }) => (
+                                <TableListItem
+                                    selected={goal._shortId === shortId || goal.id === preview?.id}
+                                    hovered={active}
+                                    {...props}
+                                >
+                                    {row.list.map(({ content, width, className }, index) => (
+                                        <TableListItemElement key={index} width={width} className={className}>
+                                            {content}
+                                        </TableListItemElement>
+                                    ))}
+                                </TableListItem>
+                            )}
+                        />
+                    </NextLink>
+                );
+            })}
         </Table>
     );
 };
