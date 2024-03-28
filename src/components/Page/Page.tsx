@@ -19,6 +19,7 @@ import { ModalContext } from '../ModalOnEvent';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { PageNavigation } from '../PageNavigation/PageNavigation';
 import { pageContent } from '../../utils/domObjects';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 import s from './Page.module.css';
 
@@ -49,14 +50,23 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
     const { data: userSettings = user?.settings } = trpc.user.settings.useQuery();
     const { data: config } = trpc.appConfig.get.useQuery();
 
+    const router = useRouter();
+
+    const [_, setCurrentProject] = useLocalStorage('currentProjectCache');
+    useEffect(() => {
+        const { asPath } = router;
+
+        if (!asPath.includes('/projects/')) {
+            setCurrentProject(null);
+        }
+    }, [router, setCurrentProject]);
+
     useHotkeys();
 
     const { resolvedTheme } = useTheme();
     const theme = (
         userSettings?.theme === 'system' ? resolvedTheme || 'dark' : userSettings?.theme || 'light'
     ) as PageContext['theme'];
-
-    const router = useRouter();
 
     useEffect(() => {
         setPreview(null);

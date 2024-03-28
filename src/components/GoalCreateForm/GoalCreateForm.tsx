@@ -29,17 +29,12 @@ import { tr } from './GoalCreateForm.i18n';
 import s from './GoalCreateForm.module.css';
 
 interface GoalCreateFormProps {
-    project?: {
-        id: string;
-        title: string;
-        flowId: string;
-    };
     title?: string;
     onGoalCreate?: (val: GoalCreateReturnType) => void;
     personal?: boolean;
 }
 
-const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, project, personal }) => {
+const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, personal }) => {
     const router = useRouter();
     const { user } = usePageContext();
     const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
@@ -100,14 +95,11 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
 
         if (form.parent) {
             const newRecentProjectsCache = { ...recentProjectsCache };
-            if (newRecentProjectsCache[form.parent.id]) {
-                newRecentProjectsCache[form.parent.id].rate += 1;
-            } else {
-                newRecentProjectsCache[form.parent.id] = {
-                    rate: 1,
-                    cache: form.parent,
-                };
-            }
+            newRecentProjectsCache[form.parent.id] = {
+                rate: Date.now(),
+                cache: form.parent,
+            };
+
             setRecentProjectsCache(newRecentProjectsCache);
             setLastProjectCache(form.parent);
 
@@ -146,7 +138,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pr
             busy={busy}
             validitySchema={goalCommonSchema}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
-            parent={project || currentProjectCache || lastProjectCache || undefined}
+            parent={currentProjectCache || lastProjectCache || undefined}
             personal={personal}
             priority={defaultPriority ?? undefined}
             onSubmit={createGoal}

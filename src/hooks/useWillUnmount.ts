@@ -11,10 +11,20 @@ export function useWillUnmount(callback?: any) {
         mountRef.current = true;
         const { current: currentHandler } = handler;
 
+        const handleUnmount = () => {
+            if (currentHandler && mountRef.current) {
+                currentHandler();
+            }
+        };
+
+        window.addEventListener('beforeunload', handleUnmount);
+
         return () => {
             if (currentHandler && mountRef.current) {
                 currentHandler();
             }
+
+            window.removeEventListener('beforeunload', handleUnmount);
         };
     }, [handler]);
 
