@@ -22,7 +22,7 @@ import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 
 import { tr } from './DashboardPage.i18n';
 
-export const projectsLimit = 5;
+export const projectsLimit = 3;
 
 export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const utils = trpc.useContext();
@@ -33,17 +33,18 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         preset,
     });
 
-    const { data, isLoading, fetchNextPage, hasNextPage } = trpc.project.getUserProjectsWithGoals.useInfiniteQuery(
-        {
-            limit: projectsLimit,
-            goalsQuery: queryState,
-        },
-        {
-            getNextPageParam: (p) => p.nextCursor,
-            keepPreviousData: true,
-            staleTime: refreshInterval,
-        },
-    );
+    const { data, isLoading, isFetching, fetchNextPage, hasNextPage } =
+        trpc.project.getUserProjectsWithGoals.useInfiniteQuery(
+            {
+                limit: projectsLimit,
+                goalsQuery: queryState,
+            },
+            {
+                getNextPageParam: (p) => p.nextCursor,
+                keepPreviousData: true,
+                staleTime: refreshInterval,
+            },
+        );
 
     const pages = useMemo(() => data?.pages || [], [data?.pages]);
 
@@ -125,7 +126,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             </ListView>
 
             {nullable(hasNextPage, () => (
-                <LoadMoreButton onClick={fetchNextPage as () => void} />
+                <LoadMoreButton disabled={isFetching} onClick={fetchNextPage as () => void} />
             ))}
 
             <PresetModals preset={preset} />
