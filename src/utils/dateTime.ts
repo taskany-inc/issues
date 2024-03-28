@@ -262,3 +262,34 @@ export const calculateElapsedDays = (startDate: Date) => {
     const timeDifference = new Date().getTime() - startDate.getTime();
     return Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 };
+
+export const decodeEstimateFromUrl = (value?: string): EstimateValue | undefined => {
+    if (!value) {
+        return undefined;
+    }
+
+    const range = decodeUrlDateRange(value);
+
+    if (!range) {
+        return undefined;
+    }
+
+    return {
+        range,
+        type: getDateTypeFromRange(range),
+        alias: decodeUrlQuarterAlias(value) || undefined,
+    };
+};
+
+interface EstimateValue {
+    type: DateType;
+    range: DateRange;
+    alias?: QuartersAliases;
+}
+export const getEstimateLabel = (estimate: EstimateValue, locale: TLocale): string =>
+    estimate.alias
+        ? estimate.alias
+        : formateEstimate(estimate.range.end, {
+              locale,
+              type: estimate.type,
+          });

@@ -84,7 +84,7 @@ export const GoalParentDropdown = ({
             return suggestions;
         }
 
-        return suggestions?.filter((suggest) => valuesMap[suggest.id]);
+        return suggestions?.filter((suggest) => !valuesMap[suggest.id]);
     }, [mode, suggestions, valuesMap]);
 
     const handleCreateProject = useCallback(() => {
@@ -126,7 +126,7 @@ export const GoalParentDropdown = ({
                 onChange={onChange}
                 renderItem={(props) => (
                     <div className={s.DropdownPanelItem}>
-                        <Text size="s" weight="bold" as="span">
+                        <Text size="s" weight="bold" as="span" ellipsis>
                             {props.item.title}
                         </Text>
                         <Text size="s" as="span" className={s.DropdownPanelItem_id}>

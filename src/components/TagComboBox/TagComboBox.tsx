@@ -1,7 +1,7 @@
 import { KeyCode, nullable, useClickOutside, useKeyboard, useLatest } from '@taskany/bricks';
 import { Button, Input, Text } from '@taskany/bricks/harmony';
 import { IconAddSmallOutline, IconXSmallOutline } from '@taskany/icons';
-import { ChangeEvent, MutableRefObject, useCallback, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 import { TagObject } from '../../types/tag';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -125,7 +125,7 @@ export const TagComboBox = ({
                                     value={inputState}
                                     autoFocus
                                     onChange={handleInputChange}
-                                    ref={props.ref as MutableRefObject<HTMLInputElement>}
+                                    ref={props.ref}
                                     {...(isOpen ? onESC : {})}
                                     {...comboboxInput.attr}
                                 />
