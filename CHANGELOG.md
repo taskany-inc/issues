@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.30.1](https://github.com/taskany-inc/issues/compare/v2.30.0...v2.30.1) (2024-03-28)
+
+
+### Bug Fixes
+
+* **GoalTableList:** remove link underline decoration ([ab3497c](https://github.com/taskany-inc/issues/commit/ab3497cc6f5cb795994794b181589d0c098b2d9a))
+
 ## [2.30.0](https://github.com/taskany-inc/issues/compare/v2.29.0...v2.30.0) (2024-03-28)
 
 
