@@ -3,6 +3,7 @@ import { ListView, nullable } from '@taskany/bricks';
 import { TreeViewElement } from '@taskany/bricks/harmony';
 
 import { refreshInterval } from '../../utils/config';
+import { dashboardLoadMore } from '../../utils/domObjects';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
@@ -126,7 +127,11 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             </ListView>
 
             {nullable(hasNextPage, () => (
-                <LoadMoreButton disabled={isFetching} onClick={fetchNextPage as () => void} />
+                <LoadMoreButton
+                    disabled={isFetching}
+                    onClick={fetchNextPage as () => void}
+                    {...dashboardLoadMore.attr}
+                />
             ))}
 
             <PresetModals preset={preset} />

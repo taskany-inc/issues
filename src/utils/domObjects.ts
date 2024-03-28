@@ -141,3 +141,4 @@ export const goalDependencyKinds = {
 };
 export const goalDependencyGoalsListItem = goalDependencies.add('goalsListItem');
 export const pageContent = DO('pageContent');
+export const dashboardLoadMore = DO('dashboardLoadMore');
