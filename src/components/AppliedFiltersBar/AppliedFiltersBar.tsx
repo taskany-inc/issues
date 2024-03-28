@@ -1,4 +1,4 @@
-import React, { MutableRefObject, ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { Button, Text } from '@taskany/bricks/harmony';
 import { IconBinOutline, IconSaveOutline, IconMoreHorizontalOutline } from '@taskany/icons';
 
@@ -44,7 +44,7 @@ export const AppliedFiltersBar = ({
                             renderTrigger={(props) => (
                                 <Button
                                     iconLeft={<IconMoreHorizontalOutline size="s" />}
-                                    ref={props.ref as MutableRefObject<HTMLButtonElement>}
+                                    ref={props.ref}
                                     onClick={props.onClick}
                                 />
                             )}

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, MutableRefObject } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { State as StateType } from '@prisma/client';
 import { UserPic, nullable, useLatest } from '@taskany/bricks';
@@ -163,7 +163,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                                         <IconDownSmallSolid size="s" />
                                                     )
                                                 }
-                                                ref={props.ref as MutableRefObject<HTMLButtonElement>}
+                                                ref={props.ref}
                                             />
                                         )}
                                     />

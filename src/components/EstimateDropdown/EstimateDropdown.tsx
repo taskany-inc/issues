@@ -16,10 +16,7 @@ interface Estimate {
     type?: DateType;
 }
 
-interface EstimateState {
-    type?: DateType;
-    range: { end: Date };
-}
+type EstimateState = Parameters<ComponentProps<typeof DatePicker>['onChange']>['0'];
 
 interface EstimateDropdownProps {
     label?: ComponentProps<typeof DropdownTrigger>['label'];
@@ -30,7 +27,7 @@ interface EstimateDropdownProps {
     className?: string;
     value?: Estimate | null;
     placement?: ComponentProps<typeof DropdownPanel>['placement'];
-    onChange?: (date: Estimate | null) => void;
+    onChange?: (value: (EstimateState & { date: Estimate['date'] }) | null) => void;
     onClose?: () => void;
 }
 
