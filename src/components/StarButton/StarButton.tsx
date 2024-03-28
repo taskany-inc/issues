@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import { Badge } from '@taskany/bricks';
 import { IconStarOutline, IconStarSolid } from '@taskany/icons';
 import { Button } from '@taskany/bricks/harmony';
@@ -23,7 +23,10 @@ const Icon: React.FC<IconProps> = ({ filled }) => {
 };
 
 export const StarButton: React.FC<StarButtonProps> = ({ stargizer, count, onToggle }) => {
-    const onClick = () => {
+    const onClick = (e: MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         onToggle(stargizer);
     };
 

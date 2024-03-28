@@ -27,6 +27,8 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             <WrappedRowLink>
                                 <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
                                     <ProjectListItem
+                                        id={p.id}
+                                        stargizers={p.stargizers}
                                         owner={p.activity}
                                         starred={p._isStarred}
                                         watching={p._isWatching}
