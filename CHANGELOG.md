@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.30.0](https://github.com/taskany-inc/issues/compare/v2.29.0...v2.30.0) (2024-03-28)
+
+
+### Features
+
+* custom preset in sidebar ([ffcc7fa](https://github.com/taskany-inc/issues/commit/ffcc7fa87bcace1674fc2ea373bf84d5cad7be6e))
+
+
+### Bug Fixes
+
+* criteria popup placement and edit access ([6cec97a](https://github.com/taskany-inc/issues/commit/6cec97af6cda998edcf3df5a2e8b54d302f308dd))
+* **GoalCriteria:** fix navigation ([7986282](https://github.com/taskany-inc/issues/commit/7986282d84613e6edab6e3b835d054d24f910631))
+* **GoalCriteria:** update criteria ([560c5c7](https://github.com/taskany-inc/issues/commit/560c5c73ad82988fb43bd717f0cd2328c1afe386))
+* **GoalHeader/Link:** save locale by navigate ([cfe1e43](https://github.com/taskany-inc/issues/commit/cfe1e43fdec95a650d9587aa4a4c789427723bae))
+* **IssueParent:** fix navigation ([f014fe7](https://github.com/taskany-inc/issues/commit/f014fe7b12ae4fe8551d1577e6aa8bb7787c4934))
+* **NexlLink:** ref link wrapper ([7122f33](https://github.com/taskany-inc/issues/commit/7122f33f9bf51d4550e5a4d4ad739067c2bb4727))
+* other links ([01cf8ef](https://github.com/taskany-inc/issues/commit/01cf8ef0c4c5ffa4578e6f729e30e02554e65408))
+
 ## [2.29.0](https://github.com/taskany-inc/issues/compare/v2.28.0...v2.29.0) (2024-03-27)
 
 
