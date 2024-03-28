@@ -1,10 +1,7 @@
 import React, { useCallback, useState, useRef } from 'react';
 import z from 'zod';
 import { FieldError } from 'react-hook-form';
-import styled from 'styled-components';
-import { gapM, gapS, gray7 } from '@taskany/colors';
 import {
-    Text,
     Form,
     FormAction,
     FormActions,
@@ -17,7 +14,7 @@ import {
     Keyboard,
     nullable,
 } from '@taskany/bricks';
-import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import { Text, Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -26,18 +23,7 @@ import { TagsList } from '../TagsList/TagsList';
 import RotatableTip from '../RotatableTip/RotatableTip';
 
 import { tr } from './UserInviteForm.i18n';
-
-const StyledTagsList = styled(TagsList)`
-    padding: ${gapM} 0;
-`;
-
-const StyledFormBottom = styled.div`
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-
-    padding: ${gapS} ${gapS} 0 ${gapS};
-`;
+import s from './UserInviteForm.module.css';
 
 const schemaProvider = () =>
     z.string().email({
@@ -112,7 +98,7 @@ const UserInviteForm: React.FC = () => {
             </ModalHeader>
 
             <ModalContent>
-                <StyledTagsList>
+                <TagsList className={s.TagsList}>
                     {nullable(
                         isValid,
                         () =>
@@ -122,14 +108,14 @@ const UserInviteForm: React.FC = () => {
                                     {email}
                                 </Tag>
                             )),
-                        <Text size="s" color={gray7}>
+                        <Text size="s" className={s.TagsListPlaceholder}>
                             {tr.raw('Start typing users emails', {
                                 key1: <Keyboard enter />,
                                 key2: <Keyboard space />,
                             })}
                         </Text>,
                     )}
-                </StyledTagsList>
+                </TagsList>
 
                 <Form>
                     <FormControl>
@@ -162,11 +148,11 @@ const UserInviteForm: React.FC = () => {
                     </FormActions>
                 </Form>
 
-                <StyledFormBottom>
+                <div className={s.FormBottom}>
                     <RotatableTip context="invites" />
 
                     <HelpButton slug="users" />
-                </StyledFormBottom>
+                </div>
             </ModalContent>
         </>
     );

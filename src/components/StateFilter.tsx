@@ -5,7 +5,7 @@ import { StateType } from '../../trpc/inferredTypes';
 
 import { FilterBase } from './FilterBase/FilterBase';
 import { FilterCheckbox } from './FilterCheckbox';
-import { StateDot } from './StateDot';
+import { StateDot } from './StateDot/StateDot';
 import { FilterTabLabel } from './FilterTabLabel';
 
 interface State {

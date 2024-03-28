@@ -35,7 +35,7 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Circle } from '../Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 import { getUserName } from '../../utils/getUserName';
 import { CardHeader } from '../CardHeader/CardHeader';
 import { notifyPromise } from '../../utils/notifyPromise';

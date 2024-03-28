@@ -26,7 +26,7 @@ import classNames from 'classnames';
 
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { trpc } from '../../utils/trpcClient';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
 import { useGoalResource } from '../../hooks/useGoalResource';
@@ -144,14 +144,7 @@ const GoalCriteria = forwardRef<HTMLSpanElement, Omit<GoalCriteriaProps, 'id'>>(
             <TableCell width={350}>
                 <Badge
                     ref={ref}
-                    iconLeft={
-                        <StateDot
-                            view="stroke"
-                            hue={goal.stateColor}
-                            size="s"
-                            className={classes.GoalCriteriaGoalBadgeState}
-                        />
-                    }
+                    iconLeft={<StateDot view="stroke" hue={goal.stateColor} size="s" />}
                     className={classes.GoalCriteriaGoalBadge}
                     text={
                         <NextLink href={routes.goal(goal.shortId)} onClick={handleGoalCriteriaClick}>

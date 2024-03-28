@@ -5,7 +5,7 @@ import { IconMessageTextOutline } from '@taskany/icons';
 
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { StateWrapper } from '../StateWrapper';
+import { StateWrapper } from '../StateWrapper/StateWrapper';
 import { safeUserData } from '../../utils/getUserName';
 import { calculateElapsedDays, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';

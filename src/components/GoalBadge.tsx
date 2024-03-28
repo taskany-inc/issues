@@ -3,7 +3,7 @@ import { nullable } from '@taskany/bricks';
 
 import { Badge } from './Badge';
 import { NextLink } from './NextLink';
-import { StateDot } from './StateDot';
+import { StateDot } from './StateDot/StateDot';
 
 interface GoalBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'color' | 'title'> {
     title: React.ReactNode;

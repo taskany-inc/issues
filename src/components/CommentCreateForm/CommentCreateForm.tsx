@@ -11,9 +11,9 @@ import { GoalCommentFormSchema } from '../../schema/goal';
 import { CommentSchema } from '../../schema/comment';
 import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
-import { StateDot } from '../StateDot';
+import { StateDot } from '../StateDot/StateDot';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
-import { StateWrapper } from '../StateWrapper';
+import { StateWrapper } from '../StateWrapper/StateWrapper';
 
 import { tr } from './CommentCreateForm.i18n';
 
