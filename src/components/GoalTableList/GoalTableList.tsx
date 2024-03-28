@@ -165,7 +165,6 @@ export const GoalTableList = <T extends Partial<NonNullable<GoalByIdReturnType>>
                     key={row.goal.id}
                     href={routes.goal(row.goal?._shortId as string)}
                     onClick={onGoalPreviewShow(row.goal)}
-                    view="inline"
                 >
                     <ListViewItem
                         value={row.goal}
