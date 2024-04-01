@@ -348,7 +348,6 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
                         values={values}
                         onSubmit={handleCriteriaUpdate}
                         validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                        editMode
                     />
                 </GoalFormPopupTrigger>
             ))}

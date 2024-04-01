@@ -258,6 +258,7 @@ export const CriteriaForm = ({
                 mode: defaultMode,
                 title: '',
                 weight: '',
+                selected: undefined,
             },
             values,
             mode: 'onChange',
@@ -276,42 +277,41 @@ export const CriteriaForm = ({
     const mode = watch('mode');
 
     useEffect(() => {
-        const sub = watch((currentValues, { name, type }) => {
-            if (type === 'change') {
-                if (name === 'title') {
-                    onInputChange?.(currentValues.title);
+        const subTitle = watch(
+            ({ title, selected = undefined }, { name, type }) => {
+                if (type === 'change') {
+                    if (name === 'title') {
+                        onInputChange?.(title);
 
-                    if (
-                        'selected' in currentValues &&
-                        currentValues.selected != null &&
-                        currentValues.selected.id != null
-                    ) {
-                        resetField('selected');
-                        resetField('weight', { defaultValue: '' });
+                        if (selected != null && selected.id != null) {
+                            setValue('selected', undefined);
+                            setValue('weight', '');
+                        }
                     }
                 }
-
-                return;
-            }
-
-            if (
-                currentValues.mode === 'goal' &&
-                (name === 'selected' || name === 'selected.id' || name === 'selected.title')
-            ) {
-                onItemChange?.(currentValues.selected as Required<SuggestItem>);
+            },
+            { selected: undefined },
+        );
+        const subSelected = watch(({ selected, mode }, { name }) => {
+            if (mode === 'goal' && (name === 'selected' || name === 'selected.id' || name === 'selected.title')) {
+                onItemChange?.(selected as Required<SuggestItem>);
 
                 trigger('selected');
             }
+        });
 
+        const subMode = watch(({ title }, { name }) => {
             if (name === 'mode') {
-                if (currentValues.title) {
+                if (title) {
                     trigger('title');
                 }
             }
         });
 
-        return () => sub.unsubscribe();
-    }, [watch, onInputChange, onItemChange, resetField, setError, trigger]);
+        return () => {
+            [subMode, subSelected, subTitle].forEach((sub) => sub.unsubscribe());
+        };
+    }, [watch, onInputChange, onItemChange, resetField, setError, trigger, setValue]);
 
     const handleSelectItem = useCallback(
         (item: SuggestItem) => {
@@ -351,8 +351,8 @@ export const CriteriaForm = ({
     }, [reset, onReset, isEditMode, values]);
 
     const onFormSubmit = useCallback<typeof onSubmit>(
-        (values) => {
-            onSubmit(values);
+        (formData) => {
+            onSubmit(formData);
             resetHandler();
         },
         [onSubmit, resetHandler],
@@ -361,6 +361,8 @@ export const CriteriaForm = ({
     return (
         <Form onSubmit={handleSubmit(onFormSubmit)} onReset={resetHandler}>
             <GoalSelect
+                mode="single"
+                viewMode="union"
                 items={items}
                 value={value}
                 onClick={handleSelectItem}

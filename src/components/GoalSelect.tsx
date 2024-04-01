@@ -3,7 +3,11 @@ import { MenuItem, nullable } from '@taskany/bricks';
 
 import { FilterBase } from './FilterBase/FilterBase';
 
-interface GoalSelectProps<T> extends Pick<ComponentProps<typeof FilterBase<T>>, 'items' | 'value'> {
+type FilterBaseProps<T> = ComponentProps<typeof FilterBase<T>>;
+
+interface GoalSelectProps<T> extends Pick<FilterBaseProps<T>, 'items' | 'value'> {
+    mode?: FilterBaseProps<T>['mode'];
+    viewMode?: FilterBaseProps<T>['viewMode'];
     children: ReactNode;
     onClick: (item: T) => void;
     renderItem: ComponentProps<typeof FilterBase<T>>['renderItem'];
@@ -15,6 +19,8 @@ export const GoalSelect = <T extends { id: string }>({
     children,
     onClick,
     renderItem,
+    viewMode = 'split',
+    mode = 'multiple',
     ...props
 }: GoalSelectProps<T>) => {
     const onClickHandler = useCallback(
@@ -27,8 +33,8 @@ export const GoalSelect = <T extends { id: string }>({
 
     return (
         <FilterBase
-            mode="multiple"
-            viewMode="split"
+            mode={mode}
+            viewMode={viewMode}
             keyGetter={keyGetter}
             renderItem={(props) =>
                 nullable(!props.checked, () => (
