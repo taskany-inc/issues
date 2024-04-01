@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.30.2](https://github.com/taskany-inc/issues/compare/v2.30.1...v2.30.2) (2024-04-01)
+
+
+### Bug Fixes
+
+* add disable for load more ([8d3095e](https://github.com/taskany-inc/issues/commit/8d3095e83d25ba4f763dc74c41396fb42d42f235))
+* select exact fields ([3024bf3](https://github.com/taskany-inc/issues/commit/3024bf39f29adc302e7a7caca9a856d11d683fca))
+
 ## [2.30.1](https://github.com/taskany-inc/issues/compare/v2.30.0...v2.30.1) (2024-03-28)
 
 
