@@ -1131,7 +1131,7 @@ export const goal = router({
                     }
                 }
 
-                const [updatedCriteria] = await Promise.all([
+                const [updatedCriteria] = await prisma.$transaction([
                     prisma.goalAchieveCriteria.create({
                         data: {
                             title: criteriaTitle,

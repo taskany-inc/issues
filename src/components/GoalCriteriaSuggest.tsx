@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 import { trpc } from '../utils/trpcClient';
 
@@ -17,7 +17,6 @@ interface GoalCriteriaComboBoxProps {
         goal?: Goal | null;
     }[];
     versa?: boolean;
-    editMode?: boolean;
     /** Value allows restrict search results by current user */
     restrictedSearch?: boolean;
     withModeSwitch?: React.ComponentProps<typeof CriteriaForm>['withModeSwitch'];
@@ -33,7 +32,6 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
     withModeSwitch,
     defaultMode = 'simple',
     versa,
-    editMode,
     values,
     onSubmit,
     validateGoalCriteriaBindings,
@@ -54,22 +52,30 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
         }, []);
     }, [items]);
 
-    const [{ data: goals = [] }, { data: criteriaList = [] }] = trpc.useQueries((ctx) => [
+    const [{ data: goals = [] }, { data: criteriaList = [], refetch }] = trpc.useQueries((ctx) => [
         ctx.goal.suggestions(
             {
                 input: query as string,
                 limit: 5,
                 onlyCurrentUser: restrictedSearch,
             },
-            { enabled: mode === 'goal' && !editMode, cacheTime: 0 },
+            { enabled: mode === 'goal', cacheTime: 0 },
         ),
         ctx.goal.getGoalCriteriaList(
             {
                 id: versa ? selectedGoal?.id : id,
             },
-            { cacheTime: 0, enabled: versa ? selectedGoal?.id != null : !!id },
+            { cacheTime: 0, staleTime: 0, enabled: false },
         ),
     ]);
+
+    useEffect(() => {
+        const needFetch = versa ? selectedGoal?.id != null : !!id;
+
+        if (needFetch) {
+            refetch();
+        }
+    }, [refetch, selectedGoal, id, versa]);
 
     const itemsToRender = useMemo(() => {
         if (selectedGoal?.title === query || mode === 'simple') {
@@ -104,7 +110,10 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
 
     const handleGoalChange = useCallback((item: typeof selectedGoal) => {
         setSelectedGoal(item);
-        setQuery(item?.title);
+
+        if (item?.title != null) {
+            setQuery(item.title);
+        }
     }, []);
 
     const validateBindings = useCallback(
