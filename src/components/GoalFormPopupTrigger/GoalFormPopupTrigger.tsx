@@ -1,10 +1,7 @@
 import { useState, useRef, FC, ReactNode, MutableRefObject, useCallback, ComponentProps } from 'react';
-import styled from 'styled-components';
 import { KeyCode, Popup, nullable, useKeyboard } from '@taskany/bricks';
 
-const StyledWrapper = styled.div`
-    padding: var(--gap-xs);
-`;
+import s from './GoalFormPopupTrigger.module.css';
 
 interface GoalFormPopupTriggerProps {
     children: ReactNode;
@@ -60,7 +57,7 @@ export const GoalFormPopupTrigger: FC<GoalFormPopupTriggerProps> = ({
                 {...onESC}
             >
                 {nullable(visible, () => (
-                    <StyledWrapper>{children}</StyledWrapper>
+                    <div className={s.PopupContent}>{children}</div>
                 ))}
             </Popup>
         </>

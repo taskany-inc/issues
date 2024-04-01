@@ -1,28 +1,16 @@
 import { nullable } from '@taskany/bricks';
 import React, { useCallback } from 'react';
-import styled from 'styled-components';
 import { Button } from '@taskany/bricks/harmony';
 
 import { Quarters, QuartersAliases, QuartersKeys } from '../../types/date';
 import { useLocale } from '../../hooks/useLocale';
 import { createLocaleDate, getQuarterFromDate, getRelativeQuarterRange, getYearFromDate } from '../../utils/dateTime';
-import { EstimateOption } from '../EstimateOption';
+import { EstimateOption } from '../EstimateOption/EstimateOption';
 import { useEstimateContext } from '../Estimate/EstimateProvider';
 import { estimateQuarterItem, estimateQuarterTrigger } from '../../utils/domObjects';
 
 import { tr } from './EstimateQuarter.i18n';
-
-const StyledItems = styled.div<{ column: number }>`
-    display: grid;
-    grid-template-columns: repeat(${({ column }) => column}, 1fr);
-    gap: var(--gap-xs);
-`;
-
-const StyledButtonGroupsWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-xs);
-`;
+import s from './EstimateQuarter.module.css';
 
 interface EstimateQuarterProps {
     aliases?: QuartersAliases[];
@@ -47,7 +35,7 @@ const ButtonGroup = <T extends string>({
     );
 
     return (
-        <StyledItems column={items.length}>
+        <div className={s.EstimateQuarterItems} style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
             {items.map((item) => (
                 <Button
                     key={item}
@@ -58,7 +46,7 @@ const ButtonGroup = <T extends string>({
                     {...estimateQuarterItem.attr}
                 />
             ))}
-        </StyledItems>
+        </div>
     );
 };
 
@@ -121,13 +109,13 @@ export const EstimateQuarter: React.FC<EstimateQuarterProps> = ({ aliases }) => 
             onClick={onClick}
             onClose={onClose}
             renderTrigger={() => (
-                <StyledButtonGroupsWrapper>
+                <div className={s.EstimateQuarterButtonGroupsWrapper}>
                     <ButtonGroup items={quartersList} value={quarter} onChange={onQuarterChange} />
 
                     {nullable(aliases, (items) => (
                         <ButtonGroup items={items} value={quarterAlias} onChange={onQuarterAliasesChange} />
                     ))}
-                </StyledButtonGroupsWrapper>
+                </div>
             )}
             {...estimateQuarterTrigger.attr}
         />

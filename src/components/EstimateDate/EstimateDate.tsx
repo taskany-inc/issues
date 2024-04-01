@@ -5,7 +5,7 @@ import InputMask from 'react-input-mask';
 
 import { useLocale } from '../../hooks/useLocale';
 import { currentLocaleDate, parseLocaleDate, createLocaleDate } from '../../utils/dateTime';
-import { EstimateOption } from '../EstimateOption';
+import { EstimateOption } from '../EstimateOption/EstimateOption';
 import { useEstimateContext } from '../Estimate/EstimateProvider';
 import { estimateStrictDateInput, estimateStrictDateTrigger } from '../../utils/domObjects';
 

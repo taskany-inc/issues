@@ -1,0 +1,10 @@
+.EstimateQuarterItems {
+    display: grid;
+    gap: var(--gap-xs);
+}
+
+.EstimateQuarterButtonGroupsWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+}

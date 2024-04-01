@@ -1,26 +1,14 @@
 import { Button } from '@taskany/bricks/harmony';
 import { useEffect, useCallback } from 'react';
-import styled from 'styled-components';
 
 import { createLocaleDate, createYearRange, getYearFromDate } from '../../utils/dateTime';
 import { useLocale } from '../../hooks/useLocale';
-import { EstimateOption } from '../EstimateOption';
+import { EstimateOption } from '../EstimateOption/EstimateOption';
 import { useEstimateContext } from '../Estimate/EstimateProvider';
 import { estimateYearItem, estimateYearTrigger } from '../../utils/domObjects';
 
 import { tr } from './EstimateYear.i18n';
-
-const StyledTriggerWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-s);
-`;
-
-const StyledItems = styled.div`
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--gap-xs);
-`;
+import s from './EstimateYear.module.css';
 
 const currentYear = getYearFromDate(new Date());
 const currentYearRange = createYearRange(currentYear);
@@ -73,8 +61,8 @@ export const EstimateYear: React.FC = () => {
             onClick={onClick}
             onClose={onClose}
             renderTrigger={() => (
-                <StyledTriggerWrapper>
-                    <StyledItems>
+                <div className={s.EstimateYearTriggerWrapper}>
+                    <div className={s.EstimateYearItems}>
                         {years.map((y) => (
                             <Button
                                 key={y}
@@ -85,8 +73,8 @@ export const EstimateYear: React.FC = () => {
                                 {...estimateYearItem.attr}
                             />
                         ))}
-                    </StyledItems>
-                </StyledTriggerWrapper>
+                    </div>
+                </div>
             )}
             {...estimateYearTrigger.attr}
         />

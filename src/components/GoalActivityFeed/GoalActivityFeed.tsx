@@ -13,7 +13,7 @@ import { GoalActivity } from '../GoalActivity';
 import { GoalCriteriaView, mapCriteria } from '../GoalCriteria/GoalCriteria';
 import { AddInlineTrigger } from '../AddInlineTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
-import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
+import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 
 import { tr } from './GoalActivityFeed.i18n';
 

@@ -28,7 +28,7 @@ import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { trpc } from '../../utils/trpcClient';
 import { StateDot } from '../StateDot/StateDot';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
-import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger';
+import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { IssueMeta } from '../IssueMeta';

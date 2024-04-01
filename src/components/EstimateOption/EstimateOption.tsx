@@ -1,24 +1,9 @@
-import { Text, nullable } from '@taskany/bricks';
-import { gapXs, gapS, gray9, gray7 } from '@taskany/colors';
+import { nullable } from '@taskany/bricks';
+import { Text } from '@taskany/bricks/harmony';
 import { IconPlusCircleSolid, IconXCircleSolid } from '@taskany/icons';
 import React, { ReactNode } from 'react';
-import styled from 'styled-components';
 
-const StyledWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    padding-top: ${gapXs};
-`;
-
-const StyledContent = styled.div`
-    display: flex;
-    align-items: center;
-    gap: ${gapS};
-`;
-
-const StyledClue = styled(Text)`
-    padding-bottom: ${gapS};
-`;
+import s from './EstimateOption.module.css';
 
 interface EstimateOptionProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'className'> {
     title?: string;
@@ -39,8 +24,8 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({
     ...attrs
 }) => {
     return (
-        <StyledWrapper>
-            <StyledContent>
+        <div className={s.EstimateOption}>
+            <div className={s.EstimateOptionContent}>
                 {nullable(title, (t) => (
                     <Text size="s">{t}</Text>
                 ))}
@@ -48,19 +33,19 @@ export const EstimateOption: React.FC<EstimateOptionProps> = ({
                 {nullable(
                     readOnly,
                     () => (
-                        <IconPlusCircleSolid size="xs" color={gray9} onClick={onClick} {...attrs} />
+                        <IconPlusCircleSolid size="xs" className={s.EstimateOptionIcon} onClick={onClick} {...attrs} />
                     ),
-                    <IconXCircleSolid size="xs" color={gray9} onClick={onClose} {...attrs} />,
+                    <IconXCircleSolid size="xs" className={s.EstimateOptionIcon} onClick={onClose} {...attrs} />,
                 )}
-            </StyledContent>
+            </div>
 
             {nullable(clue, (c) => (
-                <StyledClue size="xs" color={gray7}>
+                <Text className={s.EstimateOptionClue} size="xs">
                     {c}
-                </StyledClue>
+                </Text>
             ))}
 
             {nullable(!readOnly, () => renderTrigger?.())}
-        </StyledWrapper>
+        </div>
     );
 };

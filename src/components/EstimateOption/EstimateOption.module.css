@@ -1,0 +1,20 @@
+.EstimateOption {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--gap-xs);
+}
+
+.EstimateOptionContent {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.EstimateOptionClue {
+    color: var(--gray7);
+    padding-bottom: var(--gap-s);
+}
+
+.EstimateOptionIcon {
+    color: var(--gray9);
+}
