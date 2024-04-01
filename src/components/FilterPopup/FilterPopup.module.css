@@ -1,0 +1,59 @@
+/* Order of styles on page: SC, CSS Modules */
+.FilterPopup.FilterPopup {
+    border-radius: var(--radius-m);
+}
+
+.FilterPopupContent {
+    padding: var(--gap-xs);
+}
+
+.FilterPopupFooter {
+    display: flex;
+    padding: var(--gap-xs) var(--gap-s);
+    margin-top: var(--gap-xs);
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.FilterPopupActions {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-left: auto;
+    gap: var(--gap-s);
+}
+
+/* Order of styles on page: SC, CSS Modules */
+.FilterPopupTip.FilterPopupTip {
+    color: var(--gray10);
+}
+
+.FilterPopupTipIcon {
+    color: var(--text-color);
+}
+
+.FilterPopupOverlay {
+    position: fixed;
+    z-index: 101;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.Tabs {
+    width: 500px;
+    min-height: 200px;
+
+    gap: var(--gap-m);
+}
+
+.Tabs > *:first-child {
+    width: 200px;
+    max-width: 100%;
+    flex-basis: auto;
+}
+
+.Tabs > *:last-child {
+    display: block;
+    flex: 1;
+}

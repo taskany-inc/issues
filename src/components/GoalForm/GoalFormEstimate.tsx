@@ -2,7 +2,7 @@ import React, { ComponentProps, useCallback, useState } from 'react';
 
 import { DateType } from '../../types/date';
 import { getDateString } from '../../utils/dateTime';
-import { EstimatePopup } from '../EstimatePopup';
+import { EstimatePopup } from '../EstimatePopup/EstimatePopup';
 
 interface Estimate {
     date: string;
