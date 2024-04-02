@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import type { Activity } from '@prisma/client';
+import { TRPCClientError } from '@trpc/client';
 
 import { trpc } from '../utils/trpcClient';
 import { notifyPromise } from '../utils/notifyPromise';
@@ -150,12 +151,28 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     );
 
     const goalCreate = useCallback(
-        async (form: GoalCommon) => {
+        async (form: GoalCommon, errorMessages?: Record<string, string>) => {
             const promise = createGoalMutation.mutateAsync(form);
 
-            notifyPromise(promise, 'goalsCreate');
+            try {
+                notifyPromise(promise, 'goalsCreate', (error) => {
+                    if (errorMessages == null) {
+                        return;
+                    }
 
-            return promise;
+                    if (error instanceof TRPCClientError) {
+                        const { data } = error;
+
+                        if ('httpStatus' in data && data.httpStatus === 412) {
+                            return errorMessages.PROJECT_IS_ARCHIVED;
+                        }
+                    }
+                });
+
+                return promise;
+            } catch (_error) {
+                /* handle error in `try` block */
+            }
         },
         [createGoalMutation],
     );

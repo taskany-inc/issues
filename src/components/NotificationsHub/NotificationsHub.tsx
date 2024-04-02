@@ -25,7 +25,11 @@ const NotificationsHub: React.FC = () => {
             })
             .catch((error) => {
                 toast.dismiss(id);
-                toast.error(tr(e.detail.events.onError as I18nKey));
+                const message =
+                    (e.detail.errorHandler && e.detail.errorHandler(error)) ?? tr(e.detail.events.onError as I18nKey);
+
+                toast.error(message);
+
                 return [null, error];
             });
     };

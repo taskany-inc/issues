@@ -7,13 +7,15 @@ export interface NotificationsEventPromiseData {
         onSuccess?: string;
         onError?: string;
     };
+    errorHandler?: (error: any) => string | void;
 }
 
 export const dispatchPromisedNotificationsEvent = (
     promise: NotificationsEventPromiseData['promise'],
     events: NotificationsEventPromiseData['events'],
+    errorHandler: NotificationsEventPromiseData['errorHandler'],
 ) => {
-    window.dispatchEvent(new CustomEvent('notifyPromise', { detail: { promise, events } }));
+    window.dispatchEvent(new CustomEvent('notifyPromise', { detail: { promise, events, errorHandler } }));
 };
 
 export const dispatchErrorNotification = (key: keyof NotificationMap) => {

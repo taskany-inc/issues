@@ -3,11 +3,19 @@ import { getNotificicationKeyMap, NotificationNamespaces } from '../components/N
 import { NotificationsEventPromiseData, dispatchPromisedNotificationsEvent } from './dispatchNotification';
 
 interface NotifyPromise {
-    <T>(promise: Promise<T>, events: NotificationsEventPromiseData['events']): PromiseLike<[T, null] | [null, T]>;
-    <T>(promise: Promise<T>, namespace: NotificationNamespaces): PromiseLike<[T, null] | [null, T]>;
+    <T>(
+        promise: Promise<T>,
+        events: NotificationsEventPromiseData['events'],
+        errorHandler?: (error: any) => string | void,
+    ): PromiseLike<[T, null] | [null, T]>;
+    <T>(
+        promise: Promise<T>,
+        namespace: NotificationNamespaces,
+        errorHandler?: (error: any) => string | void,
+    ): PromiseLike<[T, null] | [null, T]>;
 }
 
-export const notifyPromise: NotifyPromise = (promise, eventsOrNamespace) => {
+export const notifyPromise: NotifyPromise = (promise, eventsOrNamespace, errorHandler) => {
     let events: NotificationsEventPromiseData['events'];
 
     if (typeof eventsOrNamespace === 'string') {
@@ -22,7 +30,7 @@ export const notifyPromise: NotifyPromise = (promise, eventsOrNamespace) => {
         events = eventsOrNamespace;
     }
 
-    dispatchPromisedNotificationsEvent(promise, events);
+    dispatchPromisedNotificationsEvent(promise, events, errorHandler);
 
     return promise.then(
         (data) => [data, null],

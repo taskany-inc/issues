@@ -385,6 +385,13 @@ export const goal = router({
             return null;
         }
 
+        if (actualProject.archived) {
+            throw new TRPCError({
+                code: 'PRECONDITION_FAILED',
+                message: `Cannot create goal. Project "${actualProject.title} (${actualProject.id})" now is achived`,
+            });
+        }
+
         try {
             const newGoal = await createGoal(input, actualProject.id, activityId, role);
             await updateProjectUpdatedAt(actualProject.id);
