@@ -1,16 +1,7 @@
-.Card {
-    border: 1px solid var(--layer-above);
-}
-
-/* Order of styles on page: SC, CSS Modules */
-.CardInfo.CardInfo {
+.CardInfo {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--layer-above);
-    border-top-left-radius: var(--radius-s);
-    border-top-right-radius: var(--radius-s);
-    color: var(--text-secondary);
 }
 
 .DropdownTrigger {

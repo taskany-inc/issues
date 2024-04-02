@@ -188,7 +188,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     id={value.id}
                                     author={value.author}
                                     description={value.description}
-                                    hue={value.hue}
+                                    state={value.state ?? undefined}
                                     createdAt={value.createdAt}
                                     reactions={value.reactions}
                                     onSubmit={onGoalCommentSubmit(value)}
@@ -211,7 +211,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                             id={value.id}
                             author={value.author}
                             description={value.description}
-                            hue={value.hue}
+                            state={value.state}
                             createdAt={value.createdAt}
                             highlight={value.id === highlightCommentId}
                             reactions={value.reactions}

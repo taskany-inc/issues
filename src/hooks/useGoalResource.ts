@@ -269,7 +269,6 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         return foundResult.stateId === fields.stateId
             ? {
                   ...foundResult,
-                  hue: foundResult.state?.hue,
                   author: safeUserData(foundResult.activity),
               }
             : null;

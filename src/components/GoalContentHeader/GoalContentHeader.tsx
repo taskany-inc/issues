@@ -1,11 +1,10 @@
-import { Card, CardComment, CardInfo, Dropdown, MenuItem, nullable, useCopyToClipboard } from '@taskany/bricks';
-import { Text } from '@taskany/bricks/harmony';
+import { Dropdown, MenuItem, nullable, useCopyToClipboard } from '@taskany/bricks';
+import { Card, CardContent, CardInfo, Text } from '@taskany/bricks/harmony';
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { IconClipboardOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import * as Sentry from '@sentry/nextjs';
 
-import { CardHeader } from '../CardHeader/CardHeader';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -16,11 +15,10 @@ import s from './GoalContentHeader.module.css';
 const Md = dynamic(() => import('../Md'));
 
 interface GoalContentHeaderProps extends Pick<ComponentProps<typeof RelativeTime>, 'date' | 'kind'> {
-    name?: string | null;
     description?: string;
 }
 
-export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, description, date, kind }) => {
+export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ description, date, kind }) => {
     const [isRelative, onDateViewTypeChange] = useClickSwitch();
 
     const onError = useCallback((err: Error) => {
@@ -46,12 +44,9 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
     }, [onCopyDescription]);
 
     return (
-        <Card className={s.Card}>
+        <Card>
             <CardInfo className={s.CardInfo} onClick={onDateViewTypeChange}>
-                <CardHeader
-                    name={name}
-                    timeAgo={<RelativeTime kind={kind} isRelativeTime={isRelative} date={date} />}
-                />
+                <RelativeTime kind={kind} isRelativeTime={isRelative} date={date} />
                 {nullable(description, () => (
                     <Dropdown
                         items={dropdownItems}
@@ -72,7 +67,7 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
                 ))}
             </CardInfo>
 
-            <CardComment>
+            <CardContent view="transparent">
                 {description ? (
                     <Md>{description}</Md>
                 ) : (
@@ -80,7 +75,7 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ name, descriptio
                         {tr('No description provided')}
                     </Text>
                 )}
-            </CardComment>
+            </CardContent>
         </Card>
     );
 };

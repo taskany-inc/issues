@@ -21,3 +21,7 @@
     --search-placeholder-color: var(--gray7);
     --search-icon-color: var(--gray7);
 }
+
+.ReactionsDropdownPopup {
+    padding: 0;
+}

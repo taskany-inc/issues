@@ -50,7 +50,7 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
                         value: {
                             ...current.value,
                             author: safeUserData(current.value.activity),
-                            hue: current.value.state?.hue,
+                            state: current.value.state ?? undefined,
                         },
                     });
                 }

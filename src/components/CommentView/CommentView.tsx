@@ -1,20 +1,9 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { danger0 } from '@taskany/colors';
-import {
-    Card,
-    CardComment,
-    CardInfo,
-    Dropdown,
-    MenuItem,
-    UserPic,
-    nullable,
-    useCopyToClipboard,
-    useLatest,
-} from '@taskany/bricks';
+import { UserPic, nullable, useCopyToClipboard, useLatest } from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import * as Sentry from '@sentry/nextjs';
-import { Button, Text, Link } from '@taskany/bricks/harmony';
+import { Card, CardContent, CardInfo, Button, Link, Text } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
@@ -26,21 +15,21 @@ import {
     commentDropdownEdit,
     commentFormSubmitButton,
 } from '../../utils/domObjects';
-import { useLocale } from '../../hooks/useLocale';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
-import { createLocaleDate } from '../../utils/dateTime';
 import { CommentSchema } from '../../schema/comment';
 import { Reactions } from '../Reactions/Reactions';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { Circle } from '../Circle';
 import { CommentForm } from '../CommentForm/CommentForm';
-import { StateDot } from '../StateDot/StateDot';
 import { getUserName } from '../../utils/getUserName';
-import { CardHeader } from '../CardHeader/CardHeader';
+import { CommentViewHeader } from '../CommentViewHeader/CommentViewHeader';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { ReactionsMap } from '../../types/reactions';
 import { profileUrl } from '../../utils/config';
+import { State } from '../../../trpc/inferredTypes';
+import { usePageContext } from '../../hooks/usePageContext';
+import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import { tr } from './CommentView.i18n';
 import s from './CommentView.module.css';
@@ -60,7 +49,7 @@ interface CommentViewProps {
         image?: string;
     };
     highlight?: boolean;
-    hue?: number;
+    state?: State;
     pin?: boolean;
 
     onReactionToggle?: React.ComponentProps<typeof ReactionsDropdown>['onClick'];
@@ -77,7 +66,7 @@ export const CommentView: FC<CommentViewProps> = ({
     createdAt,
     highlight,
     reactions,
-    hue,
+    state,
     pin,
     onChange,
     onCancel,
@@ -85,7 +74,8 @@ export const CommentView: FC<CommentViewProps> = ({
     onDelete,
     onReactionToggle,
 }) => {
-    const locale = useLocale();
+    const { theme } = usePageContext();
+
     const [editMode, setEditMode] = useState(false);
     const [focused, setFocused] = useState(false);
     const [busy, setBusy] = useState(false);
@@ -141,6 +131,7 @@ export const CommentView: FC<CommentViewProps> = ({
     const dropdownItems = useMemo(() => {
         const items = [
             {
+                id: 'Copy raw',
                 label: tr('Copy raw'),
                 icon: <IconClipboardOutline size="xxs" />,
                 onClick: () => notifyPromise(copyValue(descriptionRef.current), 'copy'),
@@ -150,6 +141,7 @@ export const CommentView: FC<CommentViewProps> = ({
         if (canEdit) {
             return [
                 {
+                    id: 'Edit',
                     label: tr('Edit'),
                     icon: <IconEditOutline size="xxs" {...commentDropdownEdit.attr} />,
                     onClick: () => {
@@ -158,8 +150,9 @@ export const CommentView: FC<CommentViewProps> = ({
                     },
                 },
                 {
+                    id: 'Delete',
                     label: tr('Delete'),
-                    color: danger0,
+                    className: s.CommentActionsItem_danger,
                     icon: <IconBinOutline size="xxs" {...commentDropdownDelete.attr} />,
                     onClick: onDelete,
                 },
@@ -169,14 +162,19 @@ export const CommentView: FC<CommentViewProps> = ({
         return items;
     }, [canEdit, copyValue, descriptionRef, onDelete]);
 
+    const headerColors = useMemo(
+        () => ({
+            backgroundColor: state?.[`${theme}Background`] ?? undefined,
+            foregroundColor: state?.[`${theme}Foreground`] ?? undefined,
+        }),
+        [state, theme],
+    );
+
     return (
         <ActivityFeedItem id={pin ? '' : `comment-${id}`} {...comment.attr}>
             <Circle size={32}>
                 {pin ? (
-                    <>
-                        <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />
-                        <StateDot hue={hue} className={s.StateDot} />
-                    </>
+                    <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />
                 ) : (
                     nullable(
                         profileUrl && author,
@@ -214,63 +212,66 @@ export const CommentView: FC<CommentViewProps> = ({
                     className={cn(s.CommentCard, { [s.CommentCard_highlighted]: highlight })}
                     onClick={canEdit ? onCommentDoubleClick : undefined}
                 >
-                    <CardInfo onClick={onDateViewTypeChange} className={s.CardInfo}>
+                    <CardInfo onClick={onDateViewTypeChange} className={s.CardInfo} corner {...headerColors}>
                         {nullable(author, (data) => (
-                            <CardHeader
+                            <CommentViewHeader
                                 name={getUserName(data)}
-                                timeAgo={<RelativeTime isRelativeTime={isRelative} date={createdAt} />}
+                                timeAgo={
+                                    <RelativeTime
+                                        isRelativeTime={isRelative}
+                                        date={createdAt}
+                                        className={s.CommentTime}
+                                    />
+                                }
                                 href={`#comment-${id}`}
+                                state={state}
                             />
                         ))}
                         <div className={s.CommentActions}>
-                            {nullable(!reactionsProps.limited, () => (
-                                <ReactionsDropdown view="icon" onClick={onReactionToggle} />
-                            ))}
-                            <Dropdown
-                                items={dropdownItems}
-                                renderTrigger={({ ref, onClick }) => (
-                                    <IconMoreVerticalOutline
-                                        size="xs"
-                                        className={s.DropdownTrigger}
-                                        ref={ref}
-                                        onClick={onClick}
-                                        {...commentDropdown.attr}
-                                    />
-                                )}
-                                renderItem={({ item, cursor, index }) => (
-                                    <MenuItem
-                                        key={item.label}
-                                        ghost
-                                        color={item.color}
-                                        focused={cursor === index}
-                                        icon={item.icon}
-                                        onClick={item.onClick}
-                                    >
-                                        {item.label}
-                                    </MenuItem>
-                                )}
-                            />
+                            <Dropdown>
+                                <DropdownTrigger
+                                    renderTrigger={(props) => (
+                                        <Button
+                                            size="xs"
+                                            view="ghost"
+                                            className={s.DropdownTriggerButton}
+                                            iconLeft={
+                                                <IconMoreVerticalOutline
+                                                    size="xs"
+                                                    className={s.DropdownTrigger}
+                                                    {...props}
+                                                    {...commentDropdown.attr}
+                                                />
+                                            }
+                                        />
+                                    )}
+                                />
+                                <DropdownPanel
+                                    placement="bottom-start"
+                                    items={dropdownItems}
+                                    mode="single"
+                                    onChange={(props) => props.onClick?.()}
+                                    renderItem={(props) => (
+                                        <Text className={cn(s.CommentActionsItem, props.item.className)}>
+                                            {props.item.icon}
+                                            {props.item.label}
+                                        </Text>
+                                    )}
+                                />
+                            </Dropdown>
                         </div>
                     </CardInfo>
 
-                    <CardComment className={s.CardComment}>
-                        {nullable(hue, (h) => (
-                            <div className={s.CommentTimestamp}>
-                                {nullable(!pin, () => (
-                                    <StateDot hue={h} />
-                                ))}
-                                <Text weight="bolder">{createLocaleDate(createdAt, { locale })}</Text>
-                            </div>
-                        ))}
-
+                    <CardContent className={s.CardComment}>
                         <Md className={s.Markdown} {...commentDescriptionDO.attr}>
                             {commentDescription.description}
                         </Md>
-
-                        {nullable(Object.keys(reactions), () => (
-                            <Reactions reactions={reactions} onClick={onReactionToggle} />
-                        ))}
-                    </CardComment>
+                        <Reactions reactions={reactions} onClick={onReactionToggle}>
+                            {nullable(!reactionsProps.limited, () => (
+                                <ReactionsDropdown view="button" onClick={onReactionToggle} />
+                            ))}
+                        </Reactions>
+                    </CardContent>
                 </Card>
             )}
         </ActivityFeedItem>

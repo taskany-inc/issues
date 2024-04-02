@@ -1,0 +1,9 @@
+.CommentViewHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.CommentViewHeaderLink {
+    color: inherit;
+}

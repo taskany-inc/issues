@@ -1,9 +1,10 @@
 import { State as StateType } from '@prisma/client';
 import { ComponentProps, useEffect, useMemo } from 'react';
-import { State, StateGroup } from '@taskany/bricks/harmony';
+import { StateGroup } from '@taskany/bricks/harmony';
 import { nullable } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
+import { State } from '../State';
 import { Dropdown, DropdownTrigger, DropdownPanel, DropdownGuardedProps } from '../Dropdown/Dropdown';
 import { usePageContext } from '../../hooks/usePageContext';
 
@@ -66,9 +67,7 @@ export const StateDropdown = ({ value, flowId, mode, setDefault, onChange, onClo
                     () => (
                         <StateGroup items={values} />
                     ),
-                    nullable(values, ([{ title, ...props }]) => (
-                        <State color={props[`${theme}Foreground`] || undefined} title={title} />
-                    )),
+                    nullable(values, ([props]) => <State state={props} />),
                 )}
             </DropdownTrigger>
             <DropdownPanel
@@ -78,9 +77,7 @@ export const StateDropdown = ({ value, flowId, mode, setDefault, onChange, onClo
                 selectable
                 mode={mode}
                 onChange={onChange}
-                renderItem={(props) => (
-                    <State color={props.item[`${theme}Foreground`] || undefined} title={props.item?.title} />
-                )}
+                renderItem={(props) => <State state={props.item} />}
             />
         </Dropdown>
     );
