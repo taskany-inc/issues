@@ -34,6 +34,8 @@ interface GoalCreateFormProps {
     personal?: boolean;
 }
 
+const preconditionErrorCode = 412;
+
 const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, personal }) => {
     const router = useRouter();
     const { user } = usePageContext();
@@ -80,8 +82,29 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
 
     const createGoal = async (form: GoalCommon) => {
         setBusy(true);
+        const res = await goalCreate(
+            form,
+            form.parent != null
+                ? {
+                      PROJECT_IS_ARCHIVED: tr
+                          .raw('Cannot create goal in archived project', {
+                              project: form.parent.title,
+                              key: form.parent.id,
+                          })
+                          .join(''),
+                  }
+                : undefined,
+        ).catch((error: any) => {
+            if (error.data.httpStatus === preconditionErrorCode) {
+                if (form.parent) {
+                    const nextRecentProjectsCache = { ...recentProjectsCache };
 
-        const res = await goalCreate(form);
+                    delete nextRecentProjectsCache[form.parent.id];
+
+                    setRecentProjectsCache(nextRecentProjectsCache);
+                }
+            }
+        });
 
         setBusy(false);
 
