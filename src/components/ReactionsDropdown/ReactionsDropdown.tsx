@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { EmojiSelection, EmojiPicker } from 'picmo';
-import { Popup } from '@taskany/bricks';
+import { Popup } from '@taskany/bricks/harmony';
 import { IconMoodTongueOutline } from '@taskany/icons';
 
 import { PageContext } from '../../utils/pageContext';
@@ -90,7 +90,6 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
 
             <Popup
                 placement="right"
-                overflow="hidden"
                 visible={popupVisible}
                 onClickOutside={onClickOutside}
                 reference={popupRef}
@@ -98,6 +97,7 @@ const ReactionsDropdown = ({ view = 'button', onClick }: ReactionsDropdownProps)
                 minWidth={150}
                 maxWidth={280}
                 offset={[0, 4]}
+                className={s.ReactionsDropdownPopup}
             >
                 <div ref={rootElement} />
             </Popup>

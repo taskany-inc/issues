@@ -1,3 +1,7 @@
+.DropdownTriggerButton:hover {
+    background-color: transparent;
+}
+
 .DropdownTrigger {
     transition: color var(--transition-time) var(--transition-func);
 }
@@ -13,18 +17,15 @@
     margin-right: -10px;
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.CardInfo.CardInfo {
+.CardInfo {
     display: flex;
     justify-content: space-between;
-    background-color: var(--layer-above);
-    color: var(--text-secondary);
 }
 
 .CardComment {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-m);
+    gap: var(--gap-sm);
     word-break: keep-all;
 }
 
@@ -49,38 +50,32 @@
     border: 4px solid var(--layer);
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.CommentCard.CommentCard {
+.CommentCard {
     position: relative;
     min-height: 60px;
-    background-color: var(--layer-hover);
-    border-color: var(--comment-card-border);
     transition: border var(--transition-time) var(--transition-func);
 }
 
-.CommentCard::before {
-    position: absolute;
-    z-index: 0;
-
-    content: '';
-
-    width: 14px;
-    height: 14px;
-
-    background-color: var(--layer-above);
-
-    transform: rotate(-45deg);
-    transition: border var(--transition-time) var(--transition-func);
-
-    top: 8px;
-    left: -6px;
+.CommentTime {
+    color: inherit;
+    font-weight: 600;
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.CommentCard_highlighted.CommentCard_highlighted {
+.CommentCard_highlighted {
     border: 1px solid var(--brand-color);
 }
 
 .CommentCard_highlighted::before {
     border: 1px solid var(--brand-color);
+}
+
+.CommentActionsItem {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-s);
+}
+
+.CommentActionsItem_danger {
+    color: var(--danger-500);
 }
