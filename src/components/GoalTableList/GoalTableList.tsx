@@ -94,7 +94,7 @@ export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
                             <Badge
                                 size="s"
                                 weight="regular"
-                                text={count?.toString()}
+                                text={count}
                                 iconLeft={<IconMessageTextOutline size="s" />}
                             />
                         )),

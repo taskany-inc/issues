@@ -1,9 +1,9 @@
 import React from 'react';
 import { IconUsersOutline } from '@taskany/icons';
+import { Badge } from '@taskany/bricks/harmony';
 
 import { routes } from '../hooks/router';
 
-import { Badge } from './Badge';
 import { NextLink } from './NextLink';
 
 interface ProjectBadgeProps {
@@ -17,13 +17,14 @@ export const ProjectBadge: React.FC<ProjectBadgeProps> = ({ id, title, children,
     return (
         <Badge
             className={className}
-            icon={<IconUsersOutline size="s" />}
+            iconLeft={<IconUsersOutline size="s" />}
+            iconRight={children}
             text={
-                <NextLink href={routes.project(id)} view="inline">
+                <NextLink href={routes.project(id)} view="secondary">
                     {title}
                 </NextLink>
             }
-            action={children}
+            action="dynamic"
         />
     );
 };

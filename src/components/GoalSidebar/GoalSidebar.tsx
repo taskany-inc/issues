@@ -4,7 +4,7 @@ import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
 
 import { IssueMeta } from '../IssueMeta';
-import { UserBadge } from '../UserBadge';
+import { UserBadge } from '../UserBadge/UserBadge';
 import { UserComboBox } from '../UserComboBox';
 import { TagComboBox } from '../TagComboBox';
 import { GoalParentComboBox } from '../GoalParentComboBox';

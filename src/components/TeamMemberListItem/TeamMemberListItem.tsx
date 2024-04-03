@@ -3,7 +3,7 @@ import { CircleProgressBar, Text } from '@taskany/bricks/harmony';
 import { nullable } from '@taskany/bricks';
 
 import { CrewUserRole } from '../../types/crew';
-import { UserBadge } from '../UserBadge';
+import { UserBadge } from '../UserBadge/UserBadge';
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
 
 import s from './TeamMemberListItem.module.css';
