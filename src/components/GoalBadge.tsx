@@ -1,7 +1,7 @@
 import React from 'react';
 import { nullable } from '@taskany/bricks';
+import { Badge } from '@taskany/bricks/harmony';
 
-import { Badge } from './Badge';
 import { NextLink } from './NextLink';
 import { StateDot } from './StateDot/StateDot';
 
@@ -26,17 +26,18 @@ export const GoalBadge: React.FC<GoalBadgeProps> = ({
     return (
         <Badge
             className={className}
-            icon={<StateDot view="stroke" hue={color} size="s" />}
+            iconLeft={<StateDot view="stroke" hue={color} size="s" />}
+            iconRight={children}
             text={nullable(
                 href,
                 (h) => (
-                    <NextLink href={h} view="inline" onClick={onClick}>
+                    <NextLink href={h} view="secondary" onClick={onClick}>
                         {title}
                     </NextLink>
                 ),
                 title,
             )}
-            action={children}
+            action="dynamic"
             {...attrs}
         />
     );

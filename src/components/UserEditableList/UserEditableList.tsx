@@ -6,7 +6,7 @@ import { User } from '@prisma/client';
 
 import { safeUserData } from '../../utils/getUserName';
 import { TextList, TextListItem } from '../TextList';
-import { UserBadge } from '../UserBadge';
+import { UserBadge } from '../UserBadge/UserBadge';
 import { UserComboBox } from '../UserComboBox';
 import { AddInlineTrigger } from '../AddInlineTrigger';
 

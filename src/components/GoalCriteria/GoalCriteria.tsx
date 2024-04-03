@@ -1,4 +1,4 @@
-import React, { MouseEvent, forwardRef, useCallback, useMemo, useRef, useState } from 'react';
+import React, { MouseEvent, useCallback, useMemo, useRef, useState } from 'react';
 import {
     Checkbox,
     CircleProgressBar,
@@ -26,7 +26,6 @@ import classNames from 'classnames';
 
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { trpc } from '../../utils/trpcClient';
-import { StateDot } from '../StateDot/StateDot';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { useGoalResource } from '../../hooks/useGoalResource';
@@ -34,7 +33,7 @@ import { ActivityFeedItem } from '../ActivityFeed';
 import { IssueMeta } from '../IssueMeta';
 import { Circle } from '../Circle';
 import { routes } from '../../hooks/router';
-import { NextLink } from '../NextLink';
+import { GoalBadge } from '../GoalBadge';
 
 import classes from './GoalCriteria.module.css';
 import { tr } from './GoalCriteria.i18n';
@@ -127,7 +126,7 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
     </TableRow>
 );
 
-const GoalCriteria = forwardRef<HTMLSpanElement, Omit<GoalCriteriaProps, 'id'>>(({ title, goal, weight }, ref) => {
+const GoalCriteria = ({ title, goal, weight }: Omit<GoalCriteriaProps, 'id'>) => {
     const { setPreview } = useGoalPreview();
 
     const handleGoalCriteriaClick = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
@@ -142,15 +141,12 @@ const GoalCriteria = forwardRef<HTMLSpanElement, Omit<GoalCriteriaProps, 'id'>>(
     return (
         <>
             <TableCell width={350}>
-                <Badge
-                    ref={ref}
-                    iconLeft={<StateDot view="stroke" hue={goal.stateColor} size="s" />}
+                <GoalBadge
+                    title={title}
+                    color={goal.stateColor}
                     className={classes.GoalCriteriaGoalBadge}
-                    text={
-                        <NextLink href={routes.goal(goal.shortId)} onClick={handleGoalCriteriaClick}>
-                            {title}
-                        </NextLink>
-                    }
+                    href={routes.goal(goal.shortId)}
+                    onClick={handleGoalCriteriaClick}
                 />
             </TableCell>
             <TableCell width="3ch" className={classes.GoalCriteriaWeightColumn}>
@@ -162,7 +158,7 @@ const GoalCriteria = forwardRef<HTMLSpanElement, Omit<GoalCriteriaProps, 'id'>>(
             </TableCell>
         </>
     );
-});
+};
 
 interface CriteriaActionItem {
     label: string;

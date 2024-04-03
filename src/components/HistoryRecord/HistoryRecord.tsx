@@ -20,8 +20,8 @@ import {
     Priority,
 } from '@prisma/client';
 import styled, { css } from 'styled-components';
-import { UserPic, Text, Tag, nullable, Badge } from '@taskany/bricks';
-import { Button } from '@taskany/bricks/harmony';
+import { UserPic, Text, Tag, nullable } from '@taskany/bricks';
+import { Button, Badge } from '@taskany/bricks/harmony';
 import {
     IconDoubleCaretRightCircleSolid,
     IconDividerLineOutline,
@@ -171,15 +171,6 @@ const StyledGroupHeader = styled(Text)`
     padding: ${gapXs} ${gapS};
     padding-right: ${gapXs};
     user-select: none;
-`;
-
-const StyledBadge = styled(Badge)`
-    display: inline-flex;
-    min-width: 20px;
-    height: 20px;
-    padding: 0;
-    align-items: center;
-    justify-content: center;
 `;
 
 interface HistoryRecordContext {
@@ -739,7 +730,7 @@ export const HistoryRecordGroup: React.FC<{
                         })}
                     </StyledInlineText>
 
-                    <StyledBadge size="s">{values.length}</StyledBadge>
+                    <Badge weight="thinner" view="outline" text={values.length} />
                 </HisroryRecordGroupHeader>
             ))}
 
