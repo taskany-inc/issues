@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.32.0](https://github.com/taskany-inc/issues/compare/v2.31.0...v2.32.0) (2024-04-04)
+
+
+### Features
+
+* interactive applied filters ([c420ccc](https://github.com/taskany-inc/issues/commit/c420ccc2c046738ca081202203d1336b6473d19a))
+
+
+### Bug Fixes
+
+* **GoalCreateForm:** cannot create goal into archived project ([c1a339c](https://github.com/taskany-inc/issues/commit/c1a339cc02818ba1adcee968bc3d671741e46d5d))
+* state dots and user gorups ([82467fe](https://github.com/taskany-inc/issues/commit/82467fe536a1cc6758ee11bfa14f37236c3ca61e))
+
 ## [2.31.0](https://github.com/taskany-inc/issues/compare/v2.30.1...v2.31.0) (2024-04-01)
 
 
