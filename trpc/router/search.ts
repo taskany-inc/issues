@@ -5,6 +5,7 @@ import { protectedProcedure, router } from '../trpcBackend';
 import { getGoalDeepQuery } from '../queries/goals';
 import { getProjectAccessFilter } from '../queries/access';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
+import { nonArchivedPartialQuery } from '../queries/project';
 
 export const search = router({
     global: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -66,7 +67,10 @@ export const search = router({
                             },
                         },
                     ],
-                    ...getProjectAccessFilter(activityId, role),
+                    AND: {
+                        ...getProjectAccessFilter(activityId, role),
+                        ...nonArchivedPartialQuery,
+                    },
                 },
                 include: {
                     activity: {
