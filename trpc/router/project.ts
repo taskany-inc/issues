@@ -465,12 +465,14 @@ export const project = router({
         .query(async ({ ctx, input: { id, goalsQuery } }) => {
             const { activityId, role } = ctx.session.user;
 
+            const { include } = getProjectSchema({
+                role,
+                activityId,
+                goalsQuery,
+            });
+
             const project = await prisma.project.findUnique({
-                ...getProjectSchema({
-                    role,
-                    activityId,
-                    goalsQuery,
-                }),
+                include,
                 where: {
                     id,
                 },

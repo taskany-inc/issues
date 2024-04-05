@@ -34,16 +34,17 @@ export const addCalculatedProjectFields = <
     };
 };
 
-export const checkProjectAccess = <T extends { accessUsers: WithId[]; activityId: string }>(
+export const checkProjectAccess = <T extends { accessUsers: WithId[]; activityId: string; archived?: boolean | null }>(
     project: T,
     activityId: string,
     role: Role,
 ) => {
     if (role === 'ADMIN') {
-        return true;
+        return !project.archived;
     }
 
     return (
+        !project.archived ||
         project.activityId === activityId ||
         !project.accessUsers.length ||
         project.accessUsers.some((p) => p.id === activityId)
