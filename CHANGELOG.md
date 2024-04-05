@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.32.1](https://github.com/taskany-inc/issues/compare/v2.32.0...v2.32.1) (2024-04-05)
+
+
+### Bug Fixes
+
+* hide archived project ([1adf6b0](https://github.com/taskany-inc/issues/commit/1adf6b07e683f25c0dbd651b309435490023749f))
+
 ## [2.32.0](https://github.com/taskany-inc/issues/compare/v2.31.0...v2.32.0) (2024-04-04)
 
 
