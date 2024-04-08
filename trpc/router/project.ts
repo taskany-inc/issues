@@ -127,46 +127,6 @@ export const project = router({
 
             return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
         }),
-    getUserProjects: protectedProcedure.query(async ({ ctx }) => {
-        const { activityId, role } = ctx.session.user;
-        const accessFilter = getProjectAccessFilter(activityId, role);
-        const whereProjectsSchema = getUserItemsWhereSchema({ type: 'project', activityId });
-        const whereGoalsSchema = getUserItemsWhereSchema({ type: 'goal', activityId });
-
-        const projectsSchema = getProjectSchema({
-            role,
-            activityId,
-            whereQuery: {
-                OR: [
-                    ...whereProjectsSchema,
-                    {
-                        parent: {
-                            some: {
-                                OR: whereProjectsSchema,
-                            },
-                        },
-                    },
-                    {
-                        goals: {
-                            some: {
-                                AND: [
-                                    {
-                                        OR: whereGoalsSchema,
-                                    },
-                                    nonArchivedPartialQuery,
-                                ],
-                            },
-                        },
-                    },
-                ],
-                ...accessFilter,
-            },
-        });
-
-        return prisma.project
-            .findMany(projectsSchema)
-            .then((projects) => projects.map((p) => addCalculatedProjectFields(p, activityId, role)));
-    }),
     getUserProjectsWithGoals: protectedProcedure
         .input(
             z.object({

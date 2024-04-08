@@ -57,6 +57,8 @@ import { updateProjectUpdatedAt } from '../../src/utils/db/updateProjectUpdatedA
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 import { createComment } from '../../src/utils/db/createComment';
 import { getShortId } from '../../src/utils/getShortId';
+import { criteriaQuery } from '../queries/criteria';
+import { extendQuery } from '../utils';
 
 import { tr } from './router.i18n';
 
@@ -1780,59 +1782,30 @@ export const goal = router({
             const { activityId, role } = ctx.session.user;
 
             try {
-                const criteriaList = await prisma.goalAchieveCriteria.findMany({
-                    where: {
-                        AND: [
-                            { goalId: input.id },
-                            {
-                                OR: [{ deleted: false }, { deleted: null }],
-                            },
-                            goalAchiveCriteriaFilter(activityId, role),
-                        ],
-                    },
-                    include: {
-                        criteriaGoal: {
-                            include: {
-                                state: true,
-                                owner: {
-                                    include: {
-                                        user: true,
-                                        ghost: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                });
-
-                const sorted = criteriaList.reduce<Record<'done' | 'undone', Array<(typeof criteriaList)[number]>>>(
-                    (acc, criteria) => {
-                        if (criteria.isDone) {
-                            acc.done.push(criteria);
-                        } else {
-                            acc.undone.push(criteria);
-                        }
-                        return acc;
-                    },
-                    {
-                        done: [],
-                        undone: [],
-                    },
+                const query = extendQuery(criteriaQuery({ goalId: input.id }), (qb) =>
+                    qb.$if(role === 'USER', (qb) =>
+                        /* check private access to project */
+                        qb.where(({ eb, not, exists, selectFrom }) =>
+                            eb.or([
+                                eb(
+                                    'linkedGoal.projectId',
+                                    'in',
+                                    selectFrom('_projectAccess').select('B').where('A', '=', activityId),
+                                ),
+                                not(
+                                    exists(
+                                        selectFrom('_projectAccess')
+                                            .select('B')
+                                            .where('_projectAccess.A', '=', activityId),
+                                    ),
+                                ),
+                            ]),
+                        ),
+                    ),
                 );
+                const res = await query.execute();
 
-                return sorted.done.concat(sorted.undone).map(({ criteriaGoal, ...criteria }) => {
-                    if (criteriaGoal) {
-                        return {
-                            ...criteria,
-                            criteriaGoal: {
-                                ...criteriaGoal,
-                                _shortId: getShortId(criteriaGoal),
-                            },
-                        };
-                    }
-
-                    return { ...criteria, criteriaGoal: null };
-                });
+                return res;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message, cause: error });
             }

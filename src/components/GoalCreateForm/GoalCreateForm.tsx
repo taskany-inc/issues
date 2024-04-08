@@ -113,7 +113,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
         utils.project.getAll.invalidate();
         utils.goal.getBatch.invalidate();
         utils.project.getUserProjectsWithGoals.invalidate();
-        utils.project.getUserProjects.invalidate();
+        utils.v2.project.userProjects.invalidate();
 
         if (form.parent) {
             utils.project.getDeepInfo.invalidate({ id: form.parent.id });

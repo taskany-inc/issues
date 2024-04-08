@@ -40,7 +40,7 @@ export const GoalParentDropdown = ({
 }: GoalParentDropdownProps) => {
     const [inputState, setInputState] = useState(query);
 
-    const { data: userProjects = [] } = trpc.project.getUserProjects.useQuery(undefined, {
+    const { data: userProjects = [] } = trpc.v2.project.userProjects.useQuery(undefined, {
         keepPreviousData: true,
     });
 

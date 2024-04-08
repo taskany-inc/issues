@@ -38,7 +38,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(value?.title || query);
 
-        const { data: userProjects = [] } = trpc.project.getUserProjects.useQuery(undefined, {
+        const { data: userProjects = [] } = trpc.v2.project.userProjects.useQuery(undefined, {
             keepPreviousData: true,
         });
 
