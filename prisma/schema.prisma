@@ -7,6 +7,12 @@ generator client {
   previewFeatures = ["fullTextSearch"]
 }
 
+generator kysely {
+  provider = "prisma-kysely"
+  output   = "../generated/kysely"
+  fileName = "types.ts"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")

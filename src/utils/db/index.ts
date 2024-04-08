@@ -12,6 +12,7 @@ import { prisma } from '../prisma';
 import { subjectToEnumValue } from '../goalHistory';
 import { safeGetUserEmail, safeGetUserName } from '../getUserName';
 import { calcAchievedWeight } from '../recalculateCriteriaScore';
+import { db } from '../../../trpc/connection/kysely';
 
 import { addCalculatedGoalsFields, addCommonCalculatedGoalFields } from './calculatedGoalsFields';
 
@@ -638,9 +639,11 @@ export const updateLinkedGoalsByProject = async (projectId: string, activityId: 
 };
 
 export const fetchConfig = async () => {
-    try {
-        return await prisma.appConfig.findFirst();
-    } catch (e) {
+    const result = await db.selectFrom('AppConfig').selectAll().executeTakeFirst();
+
+    if (!result) {
         return null;
     }
+
+    return result;
 };

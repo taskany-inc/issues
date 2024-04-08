@@ -6,27 +6,13 @@ import { protectedProcedure, router } from '../trpcBackend';
 import { connectionMap } from '../queries/connections';
 import { createFilterSchema } from '../../src/schema/filter';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
+import { filterQuery } from '../queries/filter';
 
 import { tr } from './router.i18n';
 
-const includeStargizersAndActivity = {
-    stargizers: true,
-    activity: {
-        include: {
-            user: true,
-            ghost: true,
-        },
-    },
-};
-
 export const filter = router({
     getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
-        const filter = await prisma.filter.findUnique({
-            where: {
-                id: input,
-            },
-            include: includeStargizersAndActivity,
-        });
+        const filter = await filterQuery({ id: input }).executeTakeFirst();
 
         if (!filter) {
             throw new TRPCError({ code: 'NOT_FOUND', message: tr('No filter with id', { id: input }) });
@@ -39,12 +25,7 @@ export const filter = router({
         };
     }),
     getDefaultFilter: protectedProcedure.query(async ({ ctx }) => {
-        const filter = await prisma.filter.findFirst({
-            where: {
-                default: true,
-            },
-            include: includeStargizersAndActivity,
-        });
+        const filter = await filterQuery({ isDefault: true }).executeTakeFirst();
 
         if (!filter) {
             throw new TRPCError({ code: 'NOT_FOUND', message: 'No default filters' });
@@ -56,31 +37,10 @@ export const filter = router({
             _isStarred: filter.stargizers.some((stargizer) => stargizer.id === ctx.session.user.activityId),
         };
     }),
-    getUserFilters: protectedProcedure.query(({ ctx }) => {
-        const { activityId } = ctx.session.user;
+    getUserFilters: protectedProcedure.query(async ({ ctx }) => {
+        const filter = await filterQuery({ activityId: ctx.session.user.activityId }).execute();
 
-        return prisma.filter.findMany({
-            where: {
-                OR: [
-                    { activityId },
-                    {
-                        stargizers: {
-                            some: {
-                                id: activityId,
-                            },
-                        },
-                    },
-                ],
-            },
-            include: {
-                activity: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
-            },
-        });
+        return filter;
     }),
     create: protectedProcedure.input(createFilterSchema).mutation(({ ctx, input }) => {
         return prisma.filter.create({ data: { ...input, activityId: ctx.session.user.activityId } });

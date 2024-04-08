@@ -1,6 +1,6 @@
-import { prisma } from '../../src/utils/prisma';
+import { db } from '../connection/kysely';
 import { protectedProcedure, router } from '../trpcBackend';
 
 export const priority = router({
-    getAll: protectedProcedure.query(() => prisma.priority.findMany({ orderBy: { value: 'desc' } })),
+    getAll: protectedProcedure.query(() => db.selectFrom('Priority').selectAll().orderBy('value desc').execute()),
 });

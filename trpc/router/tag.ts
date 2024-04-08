@@ -1,47 +1,30 @@
-import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import { tagCreateSchema, tagSuggestionsSchema } from '../../src/schema/tag';
+import { tagQuery } from '../queries/tag';
 
 export const tag = router({
     suggestions: protectedProcedure
         .input(tagSuggestionsSchema)
         .query(async ({ input: { query, take = 5, include } }) => {
-            const where: Prisma.TagWhereInput = {
-                title: {
-                    contains: query,
-                    mode: 'insensitive',
-                },
-            };
+            const requests = [
+                tagQuery({
+                    title: query,
+                    limit: take,
+                    excludedIds: include,
+                }),
+            ];
 
             if (include) {
-                where.id = {
-                    notIn: include,
-                };
+                requests.push(tagQuery().where('Tag.id', 'in', include));
             }
 
-            const schema = {
-                where,
-                take,
-            };
-
-            const request = [prisma.tag.findMany(schema)];
-
-            if (include) {
-                request.push(
-                    prisma.tag.findMany({
-                        where: {
-                            id: {
-                                in: include,
-                            },
-                        },
-                    }),
-                );
-            }
-
-            return Promise.all(request).then(([suggest, included = []]) => [...included, ...suggest]);
+            return Promise.all(requests.map((req) => req.execute())).then(([suggest, included = []]) => [
+                ...included,
+                ...suggest,
+            ]);
         }),
     create: protectedProcedure.input(tagCreateSchema).mutation(({ ctx, input }) => {
         return prisma.tag.create({
@@ -52,12 +35,6 @@ export const tag = router({
         });
     }),
     getByIds: protectedProcedure.input(z.array(z.string())).query(({ input }) => {
-        return prisma.tag.findMany({
-            where: {
-                id: {
-                    in: input,
-                },
-            },
-        });
+        return tagQuery({ id: input }).execute();
     }),
 });

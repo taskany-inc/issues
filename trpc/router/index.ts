@@ -14,6 +14,7 @@ import { feedback } from './feedback';
 import { whatsnew } from './whatsnew';
 import { crew } from './crew';
 import { appConfig } from './appConfig';
+import { project as projectV2 } from './projectV2';
 
 export const trpcRouter = router({
     filter,
@@ -30,6 +31,9 @@ export const trpcRouter = router({
     priority,
     crew,
     appConfig,
+    v2: router({
+        project: projectV2,
+    }),
 });
 
 export type TrpcRouter = typeof trpcRouter;

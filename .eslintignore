@@ -1,2 +1,4 @@
 /graphql/generated/*
 /public/*
+/generated/*
+
