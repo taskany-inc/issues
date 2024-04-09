@@ -1,9 +1,0 @@
-/* Order of styles on page: SC, CSS Modules */
-.StateDot.StateDot {
-    background-color: var(--state-stroke-hover);
-}
-
-/* Order of styles on page: SC, CSS Modules */
-.StateIcon.StateIcon {
-    color: var(--state-stroke-hover);
-}

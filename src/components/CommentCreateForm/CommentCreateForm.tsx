@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { State as StateType } from '@prisma/client';
 import { UserPic, nullable, useLatest } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
-import { Button, State } from '@taskany/bricks/harmony';
+import { Button } from '@taskany/bricks/harmony';
 
 import { commentFormSubmitButton } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -13,7 +13,7 @@ import { CommentForm } from '../CommentForm/CommentForm';
 import { ActivityFeedItem } from '../ActivityFeed';
 import { StateDot } from '../StateDot/StateDot';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
-import { StateWrapper } from '../StateWrapper/StateWrapper';
+import { State } from '../State';
 
 import { tr } from './CommentCreateForm.i18n';
 
@@ -146,7 +146,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                     type="submit"
                                     brick="right"
                                     text={tr('Update state')}
-                                    iconLeft={pushState ? <StateDot hue={pushState.hue} /> : undefined}
+                                    iconLeft={pushState ? <StateDot state={pushState} size="l" /> : undefined}
                                     {...commentFormSubmitButton.attr}
                                 />
                                 <Dropdown>
@@ -172,11 +172,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                         items={list}
                                         mode="single"
                                         onChange={onStateSelect}
-                                        renderItem={(props) => (
-                                            <StateWrapper hue={props.item?.hue}>
-                                                <State color="var(--state-stroke)" title={props.item?.title} />
-                                            </StateWrapper>
-                                        )}
+                                        renderItem={(props) => <State state={props.item} />}
                                     />
                                 </Dropdown>
                             </StyledStateUpdate>

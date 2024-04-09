@@ -1,10 +1,9 @@
-import { Badge, State, Table, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
+import { Badge, Table, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
 import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { ListViewItem, nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
-import { StateWrapper } from '../StateWrapper/StateWrapper';
 import { DashboardGoal } from '../../../trpc/inferredTypes';
 import { safeUserData } from '../../utils/getUserName';
 import { calculateElapsedDays, formateEstimate } from '../../utils/dateTime';
@@ -14,6 +13,7 @@ import { NextLink } from '../NextLink';
 import { routes } from '../../hooks/router';
 import { TagsList } from '../TagsList/TagsList';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
+import { State } from '../State';
 import { GoalCriteriaPreview } from '../GoalCriteria/GoalCriteria';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 
@@ -102,11 +102,7 @@ export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
                         className: s.GoalTableColumnSecondary,
                     },
                     {
-                        content: (
-                            <StateWrapper hue={goal.state?.hue}>
-                                <State color="var(--state-stroke)" title={goal.state?.title} />
-                            </StateWrapper>
-                        ),
+                        content: nullable(goal.state, (s) => <State state={s} />),
                         width: 130,
                     },
                     {

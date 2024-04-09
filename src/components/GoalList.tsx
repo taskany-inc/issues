@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { nullable } from '@taskany/bricks';
 
 import { routes } from '../hooks/router';
+import { State } from '../../trpc/inferredTypes';
 
 import { GoalBadge } from './GoalBadge';
 import { TextList, TextListItem } from './TextList';
@@ -20,7 +21,7 @@ interface GoalDependencyListByKindProps<T> {
     canEdit?: boolean;
 }
 
-export const GoalList = <T extends Goal & { state?: { hue?: number } | null; _shortId: string }>({
+export const GoalList = <T extends Goal & { state?: State | null; _shortId: string }>({
     goals = [],
     onClick,
     onRemove,
@@ -48,7 +49,7 @@ export const GoalList = <T extends Goal & { state?: { hue?: number } | null; _sh
                 <TextListItem key={goal.id}>
                     <GoalBadge
                         title={goal.title}
-                        color={goal?.state?.hue}
+                        state={goal.state ?? undefined}
                         href={routes.goal(goal._shortId)}
                         onClick={onClickHandler(goal)}
                         {...attrs}
