@@ -1,7 +1,7 @@
-import React, { MouseEvent } from 'react';
+import React, { MouseEvent, useCallback } from 'react';
 import { nullable } from '@taskany/bricks';
 import { IconStarOutline, IconStarSolid } from '@taskany/icons';
-import { Button, Badge } from '@taskany/bricks/harmony';
+import { Button, Counter } from '@taskany/bricks/harmony';
 
 import { tr } from './StarButton.i18n';
 
@@ -23,19 +23,22 @@ const Icon: React.FC<IconProps> = ({ filled }) => {
 };
 
 export const StarButton: React.FC<StarButtonProps> = ({ stargizer, count, onToggle }) => {
-    const onClick = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const onClick = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
 
-        onToggle(stargizer);
-    };
+            onToggle(stargizer);
+        },
+        [onToggle, stargizer],
+    );
 
     return (
         <Button
             text={stargizer ? tr('Starred') : tr('Stars')}
             iconLeft={<Icon filled={!!stargizer} />}
-            iconRight={nullable(String(count), (text) => (
-                <Badge view="outline" text={text} weight="thinner" />
+            iconRight={nullable(String(count), (c) => (
+                <Counter count={Number(c)} />
             ))}
             onClick={onClick}
         />
