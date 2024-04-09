@@ -104,7 +104,7 @@ export const EstimateDropdown = ({ value, onChange, onClose, placement, ...props
             <DropdownPanel width={330} placement={placement} className={s.EstimateDropdownPanel}>
                 <DatePicker translates={translates.default} value={estimate} onChange={onChangeHandler}>
                     <DatePickerYear translates={translates.year} {...estimateYearTrigger.attr} />
-                    <DatePickerQuarter translates={translates.quarter} {...estimateQuarterTrigger.attr} />
+                    <DatePickerQuarter translates={translates.quarter} {...estimateQuarterTrigger.attr} withAliases />
                     <DatePickerStrict
                         translates={translates.strict}
                         dateFragments={dateFragments[locale]}
