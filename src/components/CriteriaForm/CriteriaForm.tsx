@@ -18,7 +18,7 @@ import s from './CriteriaForm.module.css';
 interface SuggestItem {
     id: string;
     title: string;
-    stateColor?: number;
+    state?: ComponentProps<typeof StateDot>['state'] | null;
     _shortId: string;
 }
 
@@ -198,11 +198,9 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
 
     const icon = useMemo(() => {
         if (mode === 'simple') return false;
-        if (!selectedItem || !selectedItem?.stateColor) return;
+        if (!selectedItem || !selectedItem?.state) return;
 
-        const color = selectedItem.stateColor || 1;
-
-        return <StateDot size="s" hue={color} view="stroke" />;
+        return <StateDot size="s" state={selectedItem.state} view="stroke" />;
     }, [mode, selectedItem]);
 
     const error = useMemo(() => {
@@ -367,7 +365,7 @@ export const CriteriaForm = ({
                 value={value}
                 onClick={handleSelectItem}
                 renderItem={(props) => (
-                    <GoalBadge title={props.item.title} color={props.item.stateColor} className={s.GoalBadge} />
+                    <GoalBadge title={props.item.title} state={props.item.state ?? undefined} className={s.GoalBadge} />
                 )}
             >
                 <>
