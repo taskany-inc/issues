@@ -19,7 +19,6 @@ export const UserBadge: React.FC<UserBadgeProps> = ({ name, image, email, childr
             src={image}
             email={email}
             name={name}
-            inheritColor
             iconRight={children}
             action="dynamic"
         />
