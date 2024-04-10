@@ -1,15 +1,6 @@
-import React, {
-    createContext,
-    useContext,
-    useState,
-    SetStateAction,
-    useMemo,
-    useEffect,
-    useCallback,
-    forwardRef,
-} from 'react';
+import React, { createContext, useContext, useState, SetStateAction, useMemo, useEffect, ComponentProps } from 'react';
 import {
-    User,
+    User as UserData,
     Tag as TagData,
     State as StateData,
     Activity,
@@ -19,30 +10,33 @@ import {
     Ghost,
     Priority,
 } from '@prisma/client';
-import styled, { css } from 'styled-components';
-import { UserPic, Text, Tag, nullable } from '@taskany/bricks';
-import { Button, Badge } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
 import {
-    IconDoubleCaretRightCircleSolid,
-    IconDividerLineOutline,
-    IconRightSmallOutline,
-    IconDownSmallOutline,
-} from '@taskany/icons';
-import { backgroundColor, gapS, gapXs, gray7, radiusXl } from '@taskany/colors';
+    Button,
+    HistoryRecord as HistoryRecordBricks,
+    HistoryRecordCollapse as HistoryRecordCollapseBricks,
+    Tag,
+    State,
+    Text,
+} from '@taskany/bricks/harmony';
+import { IconDividerLineOutline } from '@taskany/icons';
+import cn from 'classnames';
 
-import { ActivityFeedItem } from '../ActivityFeed';
-import { IssueListItem } from '../IssueListItem';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { StateDot } from '../StateDot/StateDot';
 import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } from '../../types/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
-import { Circle } from '../Circle';
 import { useLocale } from '../../hooks/useLocale';
-import { getUserName, prepareUserDataFromActivity, safeGetUserName, safeUserData } from '../../utils/getUserName';
+import { getUserName, prepareUserDataFromActivity, safeUserData } from '../../utils/getUserName';
+import { usePageContext } from '../../hooks/usePageContext';
+import { UserBadge } from '../UserBadge/UserBadge';
+import { ProjectBadge } from '../ProjectBadge';
+import { GoalBadge } from '../GoalBadge';
+import { routes } from '../../hooks/router';
 
 import { tr } from './HistoryRecord.i18n';
+import s from './HistoryRecord.module.css';
 
 type WholeSubject =
     | 'title'
@@ -57,7 +51,7 @@ type WholeSubject =
 
 interface HistoryRecordInnerProps {
     id: string;
-    author?: ReturnType<typeof safeUserData>;
+    author: ReturnType<typeof safeUserData>;
     subject: WholeSubject;
     action: HistoryRecordAction;
     children?: React.ReactNode;
@@ -69,109 +63,13 @@ interface HistoryChangeProps<T> {
     to?: T | null;
 }
 
-const StyledActivityFeedItem = styled(ActivityFeedItem)`
-    align-items: flex-start;
-    grid-template-columns: 24px 1fr;
-    justify-content: flex-start;
-    padding-left: 4px;
-    position: relative;
-
-    & ${Circle} {
-        /* no-magic: this negative margin needs for align icon by center of first line in content */
-        margin-top: -3px;
-    }
-`;
-
-const StyledHistoryRecordWrapper = styled.div`
-    display: flex;
-    gap: 0.25rem;
-    flex: 1;
-    line-height: 1.5;
-    align-items: flex-start;
-    flex-wrap: nowrap;
-`;
-
-const StyledIssueListItem = styled(IssueListItem)`
-    padding: 0;
-    font-size: 12px;
-
-    & + &::before {
-        content: ',';
-        padding-right: 0.25em;
-    }
-
-    a {
-        display: inline-flex;
-    }
-`;
-
-const StyledTextWrapper = styled.div<{ multiline?: boolean }>`
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25em;
-    flex: 1;
-
-    ${({ multiline }) =>
-        multiline &&
-        css`
-            align-items: flex-start;
-        `}
-`;
-
-const StyledButton = styled(Button)`
-    bottom: 5px;
-`;
-
-const StyledFlexReset = styled.div`
-    width: 100%;
-`;
-
-const StyledGroupHeaderWrapper = styled.div`
-    display: flex;
-    width: fit-content;
-    align-items: center;
-    gap: ${gapS};
-    position: relative;
-    cursor: pointer;
-
-    :after {
-        content: '';
-        position: absolute;
-        top: 100%;
-        height: 100%;
-        left: 15px;
-        border-left: 1px solid var(--gray5);
-        z-index: 0;
-    }
-`;
-
-const StyledIcon = styled(
-    forwardRef<
-        HTMLSpanElement,
-        Omit<React.ComponentProps<typeof IconDownSmallOutline & typeof IconRightSmallOutline>, 'size'> & {
-            collapsed?: boolean;
-        }
-    >(({ collapsed, ...props }, ref) => {
-        return nullable(
-            collapsed,
-            () => <IconRightSmallOutline size="s" {...props} ref={ref} />,
-            <IconDownSmallOutline size="s" {...props} ref={ref} />,
-        );
-    }),
-)``;
-
-const StyledGroupHeader = styled(Text)`
-    display: flex;
-    width: fit-content;
-    align-items: center;
-    border: 1px solid ${gray7};
-    border-radius: ${radiusXl};
-    gap: ${gapXs};
-    padding: ${gapXs} ${gapS};
-    padding-right: ${gapXs};
-    user-select: none;
-`;
+const HistoryRecordText = ({ children, className, ...props }: ComponentProps<typeof Text>) => {
+    return (
+        <Text as="span" size="xs" className={cn(s.HistoryRecordText, className)} {...props}>
+            {children}
+        </Text>
+    );
+};
 
 interface HistoryRecordContext {
     setActionText: (value: SetStateAction<HistoryRecordAction>) => void;
@@ -192,7 +90,7 @@ const HistorySimplifyRecord: React.FC<{ withPretext?: boolean } & HistoryChangeP
         {nullable(from, (val) => (
             <>
                 {nullable(withPretext, () => (
-                    <Text size="xs">{tr('from')}</Text>
+                    <HistoryRecordText>{tr('from')} </HistoryRecordText>
                 ))}
                 {val}
             </>
@@ -200,7 +98,7 @@ const HistorySimplifyRecord: React.FC<{ withPretext?: boolean } & HistoryChangeP
         {nullable(to, (val) => (
             <>
                 {nullable(withPretext, () => (
-                    <Text size="xs">{tr('to')}</Text>
+                    <HistoryRecordText> {tr('to')} </HistoryRecordText>
                 ))}
                 {val}
             </>
@@ -213,13 +111,11 @@ const HistoryMultilineRecord: React.FC<{ withPretext?: boolean } & HistoryChange
     to,
     withPretext = true,
 }) => (
-    <StyledFlexReset>
+    <div>
         {nullable(from, (val) => (
             <div>
                 {nullable(withPretext, () => (
-                    <Text as="span" size="xs">
-                        {tr('from')}:{' '}
-                    </Text>
+                    <HistoryRecordText>{tr('from')}: </HistoryRecordText>
                 ))}
                 {val}
             </div>
@@ -227,14 +123,12 @@ const HistoryMultilineRecord: React.FC<{ withPretext?: boolean } & HistoryChange
         {nullable(to, (val) => (
             <div>
                 {nullable(withPretext, () => (
-                    <Text as="span" size="xs">
-                        {tr('to')}:{' '}
-                    </Text>
+                    <HistoryRecordText>{tr('to')}: </HistoryRecordText>
                 ))}
                 {val}
             </div>
         ))}
-    </StyledFlexReset>
+    </div>
 );
 
 const useHistoryTranslates = () => {
@@ -268,51 +162,48 @@ const useHistoryTranslates = () => {
     }, []);
 };
 
-const HistoryRecordInner: React.FC<HistoryRecordInnerProps> = ({ author, subject, action, createdAt, children }) => {
+const HistoryRecordInner = ({ author, subject, action, createdAt, children }: HistoryRecordInnerProps) => {
     const translates = useHistoryTranslates();
 
     const [actionText, setActionText] = useState(() => action);
     const [subjectText, setSubjectText] = useState(() => subject);
 
     return (
-        <StyledActivityFeedItem>
-            <RecordCtx.Provider value={{ setActionText, setSubjectText }}>
-                <Circle size={24} backgroundColor={backgroundColor}>
-                    <IconDoubleCaretRightCircleSolid size={24} color={gray7} />
-                </Circle>
-                <StyledHistoryRecordWrapper>
-                    {/* FIXME: it must be UserBadge */}
-                    <UserPic size={18} src={author?.image} email={author?.email} name={author?.name} />
-                    <StyledTextWrapper multiline={subject.toString() === 'description'}>
-                        {nullable(author, (data) => (
-                            <Text size="xs" weight="bold">
-                                {getUserName(data)}
-                            </Text>
-                        ))}
-
-                        <Text size="xs">
-                            {translates[actionText]} {translates[subjectText]}
-                        </Text>
-
-                        {children}
-
-                        <Text size="xs">
-                            <RelativeTime date={createdAt} />
-                        </Text>
-                    </StyledTextWrapper>
-                </StyledHistoryRecordWrapper>
-            </RecordCtx.Provider>
-        </StyledActivityFeedItem>
+        <RecordCtx.Provider value={{ setActionText, setSubjectText }}>
+            {nullable(author, (user) => (
+                <HistoryRecordBricks authors={[user]} title={user.name} date={<RelativeTime date={createdAt} />}>
+                    <HistoryRecordText as="p" weight="thin">
+                        {translates[actionText]} {translates[subjectText]} {children}
+                    </HistoryRecordText>
+                </HistoryRecordBricks>
+            ))}
+        </RecordCtx.Provider>
     );
 };
 
 const HistoryRecordDependency: React.FC<
-    HistoryChangeProps<Array<React.ComponentProps<typeof IssueListItem>['issue']>> & { strike?: boolean }
-> = ({ from, to, strike = false }) => {
+    HistoryChangeProps<
+        {
+            id: string;
+            _shortId: string;
+            title: string;
+            state?: {
+                title: string;
+                hue: number;
+            };
+        }[]
+    >
+> = ({ from, to }) => {
     return (
         <>
             {(from || to || []).map((issue) => (
-                <StyledIssueListItem issue={issue} key={issue.id} size="xs" strike={strike} />
+                <GoalBadge
+                    key={issue.id}
+                    className={s.HistoryBadge}
+                    title={issue.title}
+                    color={issue.state?.hue}
+                    href={routes.goal(issue._shortId)}
+                />
             ))}
         </>
     );
@@ -322,7 +213,7 @@ const HistoryTags: React.FC<{ tags: { title: string; id: string }[] }> = ({ tags
     return (
         <>
             {tags.map((item) => (
-                <Tag key={item.id} size="s">
+                <Tag key={item.id} className={s.HistoryInlineBadge}>
                     {item.title}
                 </Tag>
             ))}
@@ -367,40 +258,41 @@ const HistoryRecordEstimate: React.FC<HistoryChangeProps<string>> = ({ from, to 
     const locale = useLocale();
 
     return (
-        // FIXME: it must be EstimateBadge
         <HistorySimplifyRecord
             withPretext={!!to}
             from={nullable(from ? decodeHistoryEstimate(from) : null, (fe) => (
-                <Tag size="s">{formateEstimate(fe.date, { locale, type: fe.type })}</Tag>
+                <HistoryRecordText className={s.HistoryRecordTextPrimary} strike size="s">
+                    {formateEstimate(fe.date, { locale, type: fe.type })}
+                </HistoryRecordText>
             ))}
             to={nullable(to ? decodeHistoryEstimate(to) : null, (te) => (
-                <Tag size="s">{formateEstimate(te.date, { locale, type: te.type })}</Tag>
+                <HistoryRecordText className={s.HistoryRecordTextPrimary} weight="bold" size="s">
+                    {formateEstimate(te.date, { locale, type: te.type })}
+                </HistoryRecordText>
             ))}
         />
     );
 };
 
 const HistoryRecordProject: React.FC<HistoryChangeProps<Project>> = ({ from, to }) => (
-    // FIXME: it must be ProjectBadge
     <HistorySimplifyRecord
         from={nullable(from, (f) => (
-            <Tag size="s">{f.id}</Tag>
+            <ProjectBadge className={s.HistoryBadge} title={f.title} id={f.id} />
         ))}
         to={nullable(to, (t) => (
-            <Tag size="s">{t.id}</Tag>
+            <ProjectBadge className={s.HistoryBadge} title={t.title} id={t.id} />
         ))}
     />
 );
 
 const HistoryRecordPartnerProject: React.FC<HistoryChangeProps<Project>> = ({ from, to }) => (
-    // FIXME: it must be ProjectBadge
     <HistorySimplifyRecord
         withPretext={false}
         from={nullable(from, (f) => (
-            <Tag size="s">{f.id}</Tag>
+            <ProjectBadge className={s.HistoryBadge} title={f.title} id={f.id} />
         ))}
         to={nullable(to, (t) => (
-            <Tag size="s">{t.id}</Tag>
+            <ProjectBadge className={s.HistoryBadge} title={t.title} id={t.id} />
         ))}
     />
 );
@@ -414,7 +306,8 @@ const HistoryRecordLongTextChange: React.FC<HistoryChangeProps<string>> = ({ fro
 
     return (
         <>
-            <StyledButton
+            <Button
+                className={s.HistoryRecordLongTextChangeButton}
                 view={!viewDescription ? undefined : 'checked'}
                 iconRight={<IconDividerLineOutline size="xs" />}
                 onClick={handlerViewDescription}
@@ -423,14 +316,14 @@ const HistoryRecordLongTextChange: React.FC<HistoryChangeProps<string>> = ({ fro
             {viewDescription && (
                 <HistoryMultilineRecord
                     from={nullable(from, () => (
-                        <Text as="span" size="xs" strike>
+                        <HistoryRecordText className={s.HistoryRecordTextPrimary} strike size="s">
                             {from}
-                        </Text>
+                        </HistoryRecordText>
                     ))}
                     to={nullable(to, () => (
-                        <Text as="span" size="xs">
+                        <HistoryRecordText className={s.HistoryRecordTextPrimary} size="s">
                             {to}
-                        </Text>
+                        </HistoryRecordText>
                     ))}
                 />
             )}
@@ -442,12 +335,14 @@ const HistoryRecordTextChange: React.FC<HistoryChangeProps<string>> = ({ from, t
     return (
         <HistorySimplifyRecord
             from={nullable(from, () => (
-                <Text size="xs" strike>
+                <HistoryRecordText className={s.HistoryRecordTextPrimary} strike size="s">
                     {from}
-                </Text>
+                </HistoryRecordText>
             ))}
             to={nullable(to, () => (
-                <Text size="xs">{to}</Text>
+                <HistoryRecordText className={s.HistoryRecordTextPrimary} size="s">
+                    {to}
+                </HistoryRecordText>
             ))}
         />
     );
@@ -455,65 +350,63 @@ const HistoryRecordTextChange: React.FC<HistoryChangeProps<string>> = ({ from, t
 
 const HistoryRecordPriority: React.FC<HistoryChangeProps<Priority>> = ({ from, to }) => (
     <HistorySimplifyRecord
-        from={
-            from ? (
-                <Text size="xs" weight="bold">
-                    {getPriorityText(from.title)}
-                </Text>
-            ) : null
-        }
-        to={
-            to ? (
-                <Text size="xs" weight="bold">
-                    {getPriorityText(to.title)}
-                </Text>
-            ) : null
-        }
-    />
-);
-
-const HistoryDottedState: React.FC<{ title: string; hue: number }> = ({ title, hue }) => (
-    <>
-        <StateDot hue={hue} size="s" />
-        <Text size="xs">{title}</Text>
-    </>
-);
-
-const HistoryRecordState: React.FC<HistoryChangeProps<StateData>> = ({ from, to }) => (
-    <HistorySimplifyRecord
         from={nullable(from, (f) => (
-            <HistoryDottedState title={f.title} hue={f.hue} />
+            <HistoryRecordText weight="bold" strike size="s" className={s.HistoryRecordTextPrimary}>
+                {getPriorityText(f.title)}
+            </HistoryRecordText>
         ))}
         to={nullable(to, (t) => (
-            <HistoryDottedState title={t.title} hue={t.hue} />
+            <HistoryRecordText weight="bold" size="s" className={s.HistoryRecordTextPrimary}>
+                {getPriorityText(t.title)}
+            </HistoryRecordText>
         ))}
     />
 );
 
-const HistoryParticipant: React.FC<{ name?: string | null; pic?: string | null; email?: string | null }> = ({
-    name = 'unknown',
-    pic,
-    email,
-}) => (
-    <>
-        <UserPic src={pic} size={18} email={email} name={name} />
-        <Text size="xs" weight="bold">
-            {name}
-        </Text>
-    </>
-);
+const HistoryRecordState: React.FC<HistoryChangeProps<StateData>> = ({ from, to }) => {
+    const { theme } = usePageContext();
+    const themedColor = `${theme}Foreground` as const;
 
-const HistoryRecordParticipant: React.FC<HistoryChangeProps<Activity & { user: User | null; ghost: Ghost | null }>> = ({
-    from,
-    to,
-}) => (
+    return (
+        <HistorySimplifyRecord
+            from={nullable(from, (f) => (
+                <State
+                    color={f[themedColor] || undefined}
+                    title={f.title}
+                    className={cn(s.HistoryInlineBadge, s.HistoryBadge)}
+                />
+            ))}
+            to={nullable(to, (t) => (
+                <State
+                    color={t[themedColor] || undefined}
+                    title={t.title}
+                    className={cn(s.HistoryInlineBadge, s.HistoryBadge)}
+                />
+            ))}
+        />
+    );
+};
+
+const HistoryRecordParticipant: React.FC<
+    HistoryChangeProps<Activity & { user: UserData | null; ghost: Ghost | null }>
+> = ({ from, to }) => (
     <HistorySimplifyRecord
         withPretext={Boolean(from) && Boolean(to)}
         from={nullable(prepareUserDataFromActivity(from), (data) => (
-            <HistoryParticipant name={getUserName(data)} email={data.email} pic={data.image} />
+            <UserBadge
+                name={getUserName(data)}
+                email={data.email}
+                image={data.image}
+                className={cn(s.HistoryUserBadge, s.HistoryRecordTextPrimary)}
+            />
         ))}
         to={nullable(prepareUserDataFromActivity(to), (data) => (
-            <HistoryParticipant name={getUserName(data)} email={data.email} pic={data.image} />
+            <UserBadge
+                name={getUserName(data)}
+                email={data.email}
+                image={data.image}
+                className={cn(s.HistoryUserBadge, s.HistoryRecordTextPrimary)}
+            />
         ))}
     />
 );
@@ -526,22 +419,21 @@ type CriteriaItem = GoalAchieveCriteria & {
 const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title, strike }) => {
     if (criteriaGoal) {
         return (
-            <StyledIssueListItem
-                strike={strike}
-                size="xs"
-                issue={{
-                    title: criteriaGoal.title,
-                    _shortId: `${criteriaGoal.projectId}-${criteriaGoal.scopeId}`,
-                    id: criteriaGoal.id,
-                }}
-            />
+            <>
+                <GoalBadge
+                    className={cn(s.HistoryBadge, s.HistoryRecordTextPrimary)}
+                    title={criteriaGoal.title}
+                    color={criteriaGoal.state?.hue}
+                    href={routes.goal(`${criteriaGoal.projectId}-${criteriaGoal.scopeId}`)}
+                />
+            </>
         );
     }
 
     return (
-        <Text size="xs" weight="bold" strike={strike}>
+        <HistoryRecordText weight="bold" size="s" strike={strike} className={s.HistoryRecordTextPrimary}>
             {title}
-        </Text>
+        </HistoryRecordText>
     );
 };
 
@@ -585,9 +477,12 @@ const HistoryRecordCriteria: React.FC<
             to={nullable(to, (val) => (
                 <>
                     <HistoryRecordCriteriaItem {...val} strike={action === 'remove'} />
-                    {val?.criteriaGoal && <Text size="xs">{tr('as criteria')}</Text>}
+                    {val?.criteriaGoal && <HistoryRecordText> {tr('as criteria')}</HistoryRecordText>}
                     {nullable(isChangeAction, () => (
-                        <Text size="xs">{tr(action === 'complete' ? 'as completed' : 'as uncompleted')}</Text>
+                        <HistoryRecordText>
+                            {' '}
+                            {tr(action === 'complete' ? 'as completed' : 'as uncompleted')}
+                        </HistoryRecordText>
                     ))}
                 </>
             ))}
@@ -633,54 +528,36 @@ export const HistoryRecord: React.FC<HistoryRecordProps> = ({ subject, author, a
     );
 };
 
-const HisroryRecordGroupHeader: React.FC<
-    React.PropsWithChildren<{
-        createdAt: Date;
-        collapsed: boolean;
-        onClick: () => void;
-    }>
-> = ({ createdAt, onClick, collapsed, children }) => (
-    <StyledGroupHeaderWrapper>
-        <StyledGroupHeader onClick={onClick} size="xs">
-            <StyledIcon collapsed={collapsed} />
-            {children}
-        </StyledGroupHeader>
-        <Text size="xs">
-            <RelativeTime date={createdAt} />
-        </Text>
-    </StyledGroupHeaderWrapper>
-);
-
-const StyledInlineText = styled.span`
-    display: inline;
-`;
-
 export const HistoryRecordGroup: React.FC<{
     subject: OuterSubjects;
     groupped?: boolean;
     values: HistoryRecordProps[];
 }> = ({ values, subject }) => {
-    const [collapsed, setCollapsed] = useState(() => values.length > 1);
     const showGroupHeader = values.length > 1;
 
     const translates = useHistoryTranslates();
 
-    const heading = useMemo(() => {
+    const authors = useMemo(() => {
         const authorsSet = new Set<string>();
+        const res: NonNullable<HistoryRecordInnerProps['author']>[] = [];
 
         for (const { author } of values) {
-            const name = safeGetUserName({ user: author });
+            const user = safeUserData({ user: author });
 
-            if (name) {
-                authorsSet.add(name);
+            if (user && !authorsSet.has(user.name)) {
+                authorsSet.add(user.name);
+                res.push(user);
             }
         }
 
-        const [first, ...rest] = Array.from(authorsSet);
+        return res;
+    }, [values]);
+
+    const heading = useMemo(() => {
+        const [_, ...rest] = authors;
 
         if (rest.length > 1) {
             return tr.raw('author and more made changes in', {
-                author: <b>{first}</b>,
                 count: rest.length,
                 subject: translates[subject],
                 space: String.fromCharCode(0xa0), // non-breakable space between preposition and letter
@@ -689,8 +566,7 @@ export const HistoryRecordGroup: React.FC<{
 
         if (rest.length) {
             return tr.raw('author and the other author made changes in', {
-                author: <b>{first}</b>,
-                oneMoreAuthor: <b>{rest[0]}</b>,
+                oneMoreAuthor: <b>{rest[0].name}</b>,
                 subject: translates[subject],
                 space: String.fromCharCode(0xa0), // non-breakable space between preposition and letter
             });
@@ -698,51 +574,50 @@ export const HistoryRecordGroup: React.FC<{
 
         return tr.raw('author made changes in', {
             subject: translates[subject],
-            author: <b>{first}</b>,
             space: String.fromCharCode(0xa0), // non-breakable space between preposition and letter
         });
-    }, [values, translates, subject]);
-
-    const handleToggleCollapse = useCallback(() => setCollapsed((prev) => !prev), []);
+    }, [authors, translates, subject]);
 
     const lastRecord = values[values.length - 1];
 
     return (
         <>
-            {nullable(showGroupHeader, () => (
-                <HisroryRecordGroupHeader
-                    onClick={handleToggleCollapse}
-                    createdAt={lastRecord.createdAt}
-                    collapsed={collapsed}
-                >
-                    <StyledInlineText>
-                        {/* fix react key warning */}
-                        {heading.map((part, index) => {
-                            let key = `${index}`;
+            {nullable(
+                showGroupHeader,
+                () => (
+                    <>
+                        {' '}
+                        <HistoryRecordBricks
+                            authors={authors}
+                            title={authors[0].name}
+                            date={<RelativeTime date={lastRecord.createdAt} />}
+                        >
+                            <HistoryRecordText as="p" weight="thin">
+                                {heading.map((part, index) => {
+                                    let key = `${index}`;
 
-                            if (typeof part === 'string') {
-                                key = `${part}.${index}`;
-                            } else if (React.isValidElement(part)) {
-                                key = `HeadingComponent.${index}`;
-                            }
+                                    if (typeof part === 'string') {
+                                        key = `${part}.${index}`;
+                                    } else if (React.isValidElement(part)) {
+                                        key = `HeadingComponent.${index}`;
+                                    }
 
-                            return <React.Fragment key={key}>{part}</React.Fragment>;
-                        })}
-                    </StyledInlineText>
-
-                    <Badge weight="thinner" view="outline" text={values.length} />
-                </HisroryRecordGroupHeader>
-            ))}
-
-            {nullable(!collapsed, () => (
-                <>
-                    {values.map((value) => {
-                        return (
-                            <HistoryRecord {...value} subject={value.subject} key={`${value.id}.${value.subject}`} />
-                        );
-                    })}
-                </>
-            ))}
+                                    return <React.Fragment key={key}>{part}</React.Fragment>;
+                                })}{' '}
+                                {values.length} раз(а)
+                            </HistoryRecordText>
+                        </HistoryRecordBricks>
+                        <HistoryRecordCollapseBricks translates={[tr('Collapse changes'), tr('Expand changes')]}>
+                            {values.map((value) => (
+                                <HistoryRecord {...value} key={`HeadingComponent.${value.id}.${value.subject}`} />
+                            ))}
+                        </HistoryRecordCollapseBricks>
+                    </>
+                ),
+                values.map((value) => (
+                    <HistoryRecord {...value} subject={value.subject} key={`${value.id}.${value.subject}`} />
+                )),
+            )}
         </>
     );
 };

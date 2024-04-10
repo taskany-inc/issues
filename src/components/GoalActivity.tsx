@@ -63,32 +63,34 @@ export const GoalActivity = forwardRef<HTMLDivElement, GoalActivityProps>(
             <ActivityFeed ref={ref}>
                 {header}
 
-                {unionFeed.map((item) =>
-                    nullable(item, ({ type, value }) => {
-                        if (type === 'history') {
-                            return (
-                                <HistoryRecordGroup
-                                    key={`${type}.${value.length}${value.at(-1)?.id ?? ''}`}
-                                    subject={value[value.length - 1].subject}
-                                    groupped={value.length > 1}
-                                    values={value.map(
-                                        ({ id, action, author, subject, nextValue, previousValue, createdAt }) => ({
-                                            author,
-                                            from: previousValue,
-                                            to: nextValue,
-                                            action,
-                                            id,
-                                            subject,
-                                            createdAt,
-                                        }),
-                                    )}
-                                />
-                            );
-                        }
+                <div>
+                    {unionFeed.map((item) =>
+                        nullable(item, ({ type, value }) => {
+                            if (type === 'history') {
+                                return (
+                                    <HistoryRecordGroup
+                                        key={`${type}.${value.length}${value.at(-1)?.id ?? ''}`}
+                                        subject={value[value.length - 1].subject}
+                                        groupped={value.length > 1}
+                                        values={value.map(
+                                            ({ id, action, author, subject, nextValue, previousValue, createdAt }) => ({
+                                                author,
+                                                from: previousValue,
+                                                to: nextValue,
+                                                action,
+                                                id,
+                                                subject,
+                                                createdAt,
+                                            }),
+                                        )}
+                                    />
+                                );
+                            }
 
-                        return <React.Fragment key={value.id}>{renderCommentItem(value)}</React.Fragment>;
-                    }),
-                )}
+                            return <React.Fragment key={value.id}>{renderCommentItem(value)}</React.Fragment>;
+                        }),
+                    )}
+                </div>
 
                 {footer}
             </ActivityFeed>
