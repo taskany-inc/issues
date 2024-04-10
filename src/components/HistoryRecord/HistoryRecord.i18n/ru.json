@@ -21,12 +21,14 @@
     "to": "на",
     "replace": "заменил(а)",
     "as completed": "как выполненный",
-    "as uncompleted": "как не выполненный",
+    "as uncompleted": "как невыполненный",
     "as criteria": "как критерий",
     "goal complete": "выполнил(а) цель",
     "goal in progress": "вернул(а) цель в работу",
     "partner project": "партнерский проект",
     "author and more made changes in": "{author} и еще {count} внесли изменения в{space}{subject}",
     "author and the other author made changes in": "{author} и {oneMoreAuthor} внесли изменения в{space}{subject}",
-    "author made changes in": "{author} внес(ла) изменения в{space}{subject}"
+    "author made changes in": "{author} внес(ла) изменения в{space}{subject}",
+    "Expand changes": "Развернуть изменения",
+    "Collapse changes": "Свернуть изменения"
 }

@@ -1,0 +1,24 @@
+.HistoryRecordLongTextChangeButton {
+    display: inline-block;
+}
+
+.HistoryInlineBadge {
+    display: inline-flex;
+}
+
+.HistoryBadge {
+    line-height: 1;
+}
+
+.HistoryUserBadge {
+    position: relative;
+    bottom: -7px;
+}
+
+.HistoryRecordText {
+    color: var(--text-secondary);
+}
+
+.HistoryRecordTextPrimary {
+    color: var(--text-primary);
+}
