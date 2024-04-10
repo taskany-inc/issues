@@ -9,7 +9,7 @@ import { Button, FormControl, FormControlLabel, FormControlInput, FormControlErr
 import { GoalSelect } from '../GoalSelect';
 import { GoalBadge } from '../GoalBadge';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
-import { AddInlineTrigger } from '../AddInlineTrigger';
+import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { StateDot } from '../StateDot/StateDot';
 
 import { tr } from './CriteriaForm.i18n';

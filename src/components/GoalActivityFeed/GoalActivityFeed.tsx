@@ -11,7 +11,7 @@ import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { CommentView } from '../CommentView/CommentView';
 import { GoalActivity } from '../GoalActivity';
 import { GoalCriteriaView, mapCriteria } from '../GoalCriteria/GoalCriteria';
-import { AddInlineTrigger } from '../AddInlineTrigger';
+import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 

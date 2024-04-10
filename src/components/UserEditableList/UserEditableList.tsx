@@ -8,7 +8,7 @@ import { safeUserData } from '../../utils/getUserName';
 import { TextList, TextListItem } from '../TextList';
 import { UserBadge } from '../UserBadge/UserBadge';
 import { UserComboBox } from '../UserComboBox';
-import { AddInlineTrigger } from '../AddInlineTrigger';
+import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 
 import { tr } from './UserEditableList.i18n';
 

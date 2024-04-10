@@ -29,7 +29,7 @@ import { TagsList } from '../TagsList/TagsList';
 import { dependencyKind } from '../../schema/goal';
 import { UserEditableList } from '../UserEditableList/UserEditableList';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
-import { AddInlineTrigger } from '../AddInlineTrigger';
+import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 
 import { tr } from './GoalSidebar.i18n';
 

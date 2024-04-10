@@ -1,0 +1,8 @@
+.InlineTrigger {
+    margin-top: var(--gap-xs);
+}
+
+.InlineTrigger_centered {
+    /* 24 / 2 - 7 center of UserPic and center of PlusIcon */
+    margin-left: 5px;
+}

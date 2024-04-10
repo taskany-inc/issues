@@ -29,9 +29,9 @@ import { trpc } from '../../utils/trpcClient';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { useGoalResource } from '../../hooks/useGoalResource';
-import { ActivityFeedItem } from '../ActivityFeed';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { IssueMeta } from '../IssueMeta';
-import { Circle } from '../Circle';
+import { Circle } from '../Circle/Circle';
 import { routes } from '../../hooks/router';
 import { GoalBadge } from '../GoalBadge';
 import { State } from '../../../trpc/inferredTypes';
@@ -106,7 +106,6 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
     <TableRow className={classes.GoalCriteriaTableRow}>
         <TableCell width={350}>
             <Checkbox
-                className={classes.GoalCriteriaItemCheckbox}
                 defaultChecked={isDone}
                 readOnly={!onCheck}
                 onClick={onCheck}
@@ -145,7 +144,6 @@ const GoalCriteria = ({ title, goal, weight }: Omit<GoalCriteriaProps, 'id'>) =>
                 <GoalBadge
                     title={title}
                     state={goal.state ?? undefined}
-                    className={classes.GoalCriteriaGoalBadge}
                     href={routes.goal(goal.shortId)}
                     onClick={handleGoalCriteriaClick}
                 />
