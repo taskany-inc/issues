@@ -16,6 +16,7 @@ import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 
 import { tr } from './GoalActivityFeed.i18n';
+import s from './GoalActivityFeed.module.css';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
@@ -194,6 +195,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     onSubmit={onGoalCommentSubmit(value)}
                                     onReactionToggle={onGoalCommentReactionToggle(value.id)}
                                     onDelete={onGoalCommentDelete(value.id)}
+                                    className={s.PinnedComment}
                                 />
                             ))}
                         </>
