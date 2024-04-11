@@ -1,9 +1,12 @@
 import { useCallback, useEffect } from 'react';
+import NextLink from 'next/link';
 import { ListView, nullable } from '@taskany/bricks';
+import { Breadcrumb, Breadcrumbs, Link } from '@taskany/bricks/harmony';
 
 import { Page } from '../Page/Page';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { refreshInterval } from '../../utils/config';
+import { routes } from '../../hooks/router';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
@@ -18,6 +21,7 @@ import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 
 import { tr } from './ProjectPage.i18n';
+import s from './ProjectPage.module.css';
 
 export const projectsSize = 20;
 
@@ -115,6 +119,18 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 </FiltersPanel>
             }
         >
+            {nullable(project?.parent, (p) => (
+                <Breadcrumbs className={s.Breadcrumbs}>
+                    {p.map((item) => (
+                        <Breadcrumb key={item.id}>
+                            <NextLink href={routes.project(item.id)} passHref legacyBehavior>
+                                <Link>{item.title}</Link>
+                            </NextLink>
+                        </Breadcrumb>
+                    ))}
+                </Breadcrumbs>
+            ))}
+
             <ListView onKeyboardClick={handleItemEnter}>
                 {nullable(project, (p) => (
                     <ProjectListItemConnected
@@ -127,6 +143,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                     />
                 ))}
             </ListView>
+
             <PresetModals preset={preset} />
         </Page>
     );
