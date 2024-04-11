@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.33.0](https://github.com/taskany-inc/issues/compare/v2.32.1...v2.33.0) (2024-04-11)
+
+
+### Features
+
+* add breadcrumbs to Project page ([8b91b5f](https://github.com/taskany-inc/issues/commit/8b91b5fdc7e147c5c9dd8928a9e9113da7fdc843))
+* harmony Card support ([2fdf221](https://github.com/taskany-inc/issues/commit/2fdf2217cb71258f394d203d07231289b13960ba))
+* replace HistoryRecord to harmony view ([e60ced3](https://github.com/taskany-inc/issues/commit/e60ced3eb2d90b64273ca67fb163bba5585ec01b))
+
+
+### Bug Fixes
+
+* **EstimateDropdown:** add aliases ([66171e5](https://github.com/taskany-inc/issues/commit/66171e5f5523123301e8efc4fe718a199873aafe))
+* **StarButton:** change Badge to Counter ([4e0a772](https://github.com/taskany-inc/issues/commit/4e0a7729226cecd10951224fa867142158665301))
+
 ## [2.32.1](https://github.com/taskany-inc/issues/compare/v2.32.0...v2.32.1) (2024-04-05)
 
 
