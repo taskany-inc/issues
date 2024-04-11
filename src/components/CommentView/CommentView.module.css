@@ -10,6 +10,13 @@
     color: var(--text-color);
 }
 
+.CommentView {
+    padding-bottom: var(--gap-sm);
+}
+.CommentView:last-child {
+    padding-bottom: 0;
+}
+
 .CommentActions {
     display: flex;
     align-items: center;

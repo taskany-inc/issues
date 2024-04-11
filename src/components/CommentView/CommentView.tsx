@@ -57,6 +57,7 @@ interface CommentViewProps {
     onChange?: (comment: CommentSchema) => void;
     onCancel?: () => void;
     onDelete?: () => void;
+    className?: string;
 }
 
 export const CommentView: FC<CommentViewProps> = ({
@@ -73,6 +74,7 @@ export const CommentView: FC<CommentViewProps> = ({
     onSubmit,
     onDelete,
     onReactionToggle,
+    className,
 }) => {
     const { theme } = usePageContext();
 
@@ -171,7 +173,7 @@ export const CommentView: FC<CommentViewProps> = ({
     );
 
     return (
-        <ActivityFeedItem id={pin ? '' : `comment-${id}`} {...comment.attr}>
+        <ActivityFeedItem className={cn(s.CommentView, className)} id={pin ? '' : `comment-${id}`} {...comment.attr}>
             <Circle size={32}>
                 {pin ? (
                     <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />
