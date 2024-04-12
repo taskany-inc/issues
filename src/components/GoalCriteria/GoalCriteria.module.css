@@ -74,3 +74,12 @@
 .GoalCriteriaCircle {
     color: var(--background-color);
 }
+
+.CritriaGoalOwner {
+    /* align by middle of first line */
+    transform: translateY(0.25em);
+}
+
+.CriteriaGoalProject, .CriteriaIsDone {
+    color: var(--text-secondary);
+}

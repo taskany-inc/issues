@@ -1,5 +1,6 @@
 import { useState, useRef, FC, ReactNode, MutableRefObject, useCallback, ComponentProps } from 'react';
-import { KeyCode, Popup, nullable, useKeyboard } from '@taskany/bricks';
+import { KeyCode, nullable, useKeyboard } from '@taskany/bricks';
+import { Popup } from '@taskany/bricks/harmony';
 
 import s from './GoalFormPopupTrigger.module.css';
 
@@ -9,6 +10,7 @@ interface GoalFormPopupTriggerProps {
     onClick?: () => void;
     onCancel?: () => void;
     placement?: ComponentProps<typeof Popup>['placement'];
+    offset?: ComponentProps<typeof Popup>['offset'];
     defaultVisible?: boolean;
 }
 
@@ -18,6 +20,7 @@ export const GoalFormPopupTrigger: FC<GoalFormPopupTriggerProps> = ({
     onClick,
     onCancel,
     placement = 'bottom-start',
+    offset,
     defaultVisible,
 }) => {
     const [visible, setVisible] = useState(Boolean(defaultVisible));
@@ -47,6 +50,7 @@ export const GoalFormPopupTrigger: FC<GoalFormPopupTriggerProps> = ({
             })}
             <Popup
                 placement={placement}
+                offset={offset}
                 visible={visible}
                 reference={popupRef}
                 onClickOutside={onClickOutside}

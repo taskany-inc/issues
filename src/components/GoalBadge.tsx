@@ -9,6 +9,7 @@ interface GoalBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'co
     title: React.ReactNode;
     href?: string;
     state?: ComponentProps<typeof StateDot>['state'];
+    strike?: boolean;
     children?: React.ReactNode;
     className?: string;
     onClick?: React.MouseEventHandler<HTMLAnchorElement>;
