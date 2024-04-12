@@ -9,8 +9,6 @@ import { Page } from '../Page/Page';
 import { PageActions } from '../PageActions/PageActions';
 import { PageSep } from '../PageSep/PageSep';
 import { IssueKey } from '../IssueKey/IssueKey';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { WatchButton } from '../WatchButton/WatchButton';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { useRouter } from '../../hooks/router';
@@ -38,17 +36,6 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
     });
 
     useFMPMetric(!!goal);
-
-    const { project } = goal || {};
-
-    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
-    useEffect(() => {
-        project && !project.personal && setCurrentProjectCache(project);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    useWillUnmount(() => {
-        setCurrentProjectCache(null);
-    });
 
     const { onGoalStateChange, onGoalWatchingToggle, onGoalStarToggle, invalidate } = useGoalResource(
         { id: goal?.id },

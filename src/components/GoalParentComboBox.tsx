@@ -2,7 +2,6 @@ import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'r
 import { ComboBox, ListView, ListViewItem, nullable } from '@taskany/bricks';
 import { Button, FormControl, FormControlError, FormControlInput, MenuItem } from '@taskany/bricks/harmony';
 
-import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';
 import { projectsCombobox, comboboxInput, combobox, comboboxErrorDot } from '../utils/domObjects';
 
@@ -38,7 +37,10 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
     ) => {
         const [completionVisible, setCompletionVisibility] = useState(false);
         const [inputState, setInputState] = useState(value?.title || query);
-        const [recentProjectsCache] = useLocalStorage('recentProjectsCache', {});
+
+        const { data: userProjects = [] } = trpc.project.getUserProjects.useQuery(undefined, {
+            keepPreviousData: true,
+        });
 
         useEffect(() => {
             setInputState(value?.title || query);
@@ -55,12 +57,10 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
             },
         );
 
-        const recentProjects = Object.values(recentProjectsCache)
-            .sort((a, b) => b.rate - a.rate)
-            .slice(0, 10) // top 10
-            .map((p) => p.cache);
-
-        const items = useMemo(() => (data && data?.length > 0 ? data : recentProjects), [data, recentProjects]);
+        const items = useMemo(
+            () => (data && data?.length > 0 ? data : userProjects.slice(0, 10)),
+            [data, userProjects],
+        );
 
         const onClickOutside = useCallback((cb: () => void) => {
             cb();
