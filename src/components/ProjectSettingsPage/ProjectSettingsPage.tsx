@@ -33,7 +33,6 @@ import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Page } from '../Page/Page';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { errorsProvider } from '../../utils/forms';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { UserComboBox } from '../UserComboBox';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectUpdate, projectUpdateSchema } from '../../schema/project';
@@ -74,10 +73,6 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
-    const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
-    const [currentProjectCache, setCurrentProjectCache] = useLocalStorage('currentProjectCache');
-    const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
-
     const project = trpc.project.getById.useQuery({ id });
 
     const { updateProject, deleteProject, transferOwnership } = useProjectResource(id);
@@ -132,35 +127,6 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         setTransferTo(undefined);
         dispatchModalEvent(ModalEvent.ProjectTransferModal)();
     }, []);
-
-    const onProjectDelete = useCallback(() => {
-        if (!project.data) return;
-
-        const newRecentProjectsCache = { ...recentProjectsCache };
-        if (recentProjectsCache[project.data.id]) {
-            delete newRecentProjectsCache[project.data.id];
-            setRecentProjectsCache(newRecentProjectsCache);
-        }
-
-        if (currentProjectCache?.id === project.data.id) {
-            setCurrentProjectCache(null);
-        }
-
-        if (lastProjectCache?.id === project.data.id) {
-            setLastProjectCache(null);
-        }
-
-        router.exploreProjects();
-    }, [
-        router,
-        project.data,
-        recentProjectsCache,
-        currentProjectCache,
-        lastProjectCache,
-        setRecentProjectsCache,
-        setCurrentProjectCache,
-        setLastProjectCache,
-    ]);
 
     const handleDeleteProjectBtnClick = useCallback(() => {
         if (project.data?.children.length) {
@@ -423,7 +389,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 <Button
                                     view="warning"
                                     disabled={keyConfirmation !== project.data.id}
-                                    onClick={deleteProject(onProjectDelete)}
+                                    onClick={deleteProject()}
                                     text={tr('Yes, delete it')}
                                     {...projectSettingsConfirmDeleteProjectButton.attr}
                                 />

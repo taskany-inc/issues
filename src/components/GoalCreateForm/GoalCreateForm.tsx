@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 import { Button, Text } from '@taskany/bricks/harmony';
 import { KeyCode, useKeyboard } from '@taskany/bricks';
+import { useRouter as useNextRouter } from 'next/router';
 
 import { useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -33,14 +34,13 @@ interface GoalCreateFormProps {
     personal?: boolean;
 }
 
-const preconditionErrorCode = 412;
-
 const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, personal }) => {
     const router = useRouter();
+    const {
+        asPath,
+        query: { id },
+    } = useNextRouter();
     const { user } = usePageContext();
-    const [lastProjectCache, setLastProjectCache] = useLocalStorage('lastProjectCache');
-    const [currentProjectCache] = useLocalStorage('currentProjectCache');
-    const [recentProjectsCache, setRecentProjectsCache] = useLocalStorage('recentProjectsCache', {});
     const [goalCreateFormActionCache, setGoalCreateFormActionCache] = useLocalStorage('goalCreateFormAction');
     const [busy, setBusy] = useState(false);
     const [createGoalType, setСreateGoalType] = useState<number>(goalCreateFormActionCache || 3);
@@ -49,6 +49,15 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
     const { data: priorities } = trpc.priority.getAll.useQuery();
     const defaultPriority = useMemo(() => priorities?.filter((priority) => priority.default)[0], [priorities]);
     const [isOpen, setIsOpen] = useState(false);
+
+    const { data: project } = trpc.project.getById.useQuery(
+        {
+            id: id as string,
+        },
+        {
+            enabled: Boolean(asPath.includes('/projects/') && id),
+        },
+    );
 
     const createOptions = [
         {
@@ -93,17 +102,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
                           .join(''),
                   }
                 : undefined,
-        ).catch((error: any) => {
-            if (error.data.httpStatus === preconditionErrorCode) {
-                if (form.parent) {
-                    const nextRecentProjectsCache = { ...recentProjectsCache };
-
-                    delete nextRecentProjectsCache[form.parent.id];
-
-                    setRecentProjectsCache(nextRecentProjectsCache);
-                }
-            }
-        });
+        );
 
         setBusy(false);
 
@@ -114,17 +113,9 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
         utils.project.getAll.invalidate();
         utils.goal.getBatch.invalidate();
         utils.project.getUserProjectsWithGoals.invalidate();
+        utils.project.getUserProjects.invalidate();
 
         if (form.parent) {
-            const newRecentProjectsCache = { ...recentProjectsCache };
-            newRecentProjectsCache[form.parent.id] = {
-                rate: Date.now(),
-                cache: form.parent,
-            };
-
-            setRecentProjectsCache(newRecentProjectsCache);
-            setLastProjectCache(form.parent);
-
             utils.project.getDeepInfo.invalidate({ id: form.parent.id });
         }
 
@@ -160,7 +151,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
             busy={busy}
             validitySchema={goalCommonSchema}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
-            parent={currentProjectCache || lastProjectCache || undefined}
+            parent={project ?? undefined}
             personal={personal}
             priority={defaultPriority ?? undefined}
             onSubmit={createGoal}

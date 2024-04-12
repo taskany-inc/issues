@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo, ComponentProps, useCallback } from 'react
 import { nullable } from '@taskany/bricks';
 import { IconAddOutline } from '@taskany/icons';
 
-import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { trpc } from '../../utils/trpcClient';
 import { Dropdown, DropdownTrigger, DropdownPanel, DropdownGuardedProps } from '../Dropdown/Dropdown';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
@@ -40,7 +39,10 @@ export const GoalParentDropdown = ({
     ...props
 }: GoalParentDropdownProps) => {
     const [inputState, setInputState] = useState(query);
-    const [recentProjectsCache] = useLocalStorage('recentProjectsCache', {});
+
+    const { data: userProjects = [] } = trpc.project.getUserProjects.useQuery(undefined, {
+        keepPreviousData: true,
+    });
 
     useEffect(() => {
         setInputState(query);
@@ -57,14 +59,9 @@ export const GoalParentDropdown = ({
         },
     );
 
-    const recentProjects = Object.values(recentProjectsCache)
-        .sort((a, b) => b.rate - a.rate)
-        .slice(0, 10) // top 10
-        .map((p) => p.cache);
-
-    const suggestions = useMemo<typeof recentProjects | typeof data>(
-        () => (data && data?.length > 0 ? data : recentProjects),
-        [data, recentProjects],
+    const suggestions = useMemo<GoalParentValue[]>(
+        () => (data && data?.length > 0 ? data : userProjects.slice(0, 10)),
+        [data, userProjects],
     );
 
     const values = useMemo(() => {
@@ -84,7 +81,7 @@ export const GoalParentDropdown = ({
             return suggestions;
         }
 
-        return suggestions?.filter((suggest) => !valuesMap[suggest.id]);
+        return suggestions.filter((suggestion) => !valuesMap[suggestion.id]);
     }, [mode, suggestions, valuesMap]);
 
     const handleCreateProject = useCallback(() => {

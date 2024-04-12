@@ -9,8 +9,6 @@ import { refreshInterval } from '../../utils/config';
 import { routes } from '../../hooks/router';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { trpc } from '../../utils/trpcClient';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { ProjectListItemConnected } from '../ProjectListItemConnected';
@@ -26,8 +24,6 @@ import s from './ProjectPage.module.css';
 export const projectsSize = 20;
 
 export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallback }: ExternalPageProps) => {
-    const [, setCurrentProjectCache] = useLocalStorage('currentProjectCache', null);
-
     const utils = trpc.useContext();
 
     const { preset } = useFiltersPreset({ defaultPresetFallback });
@@ -73,21 +69,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
             unsubDelete();
         };
     }, [on, utils.project.getDeepInfo, utils.project.getById]);
-
-    useEffect(() => {
-        if (!project || project.personal) return;
-
-        setCurrentProjectCache({
-            id: project.id,
-            title: project.title,
-            description: project.description ?? undefined,
-            flowId: project.flowId,
-        });
-    }, [project, setCurrentProjectCache]);
-
-    useWillUnmount(() => {
-        setCurrentProjectCache(null);
-    });
 
     const handleItemEnter = useCallback(
         (goal: NonNullable<GoalByIdReturnType>) => {

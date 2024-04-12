@@ -53,12 +53,12 @@ export const useProjectResource = (id: string) => {
     );
 
     const deleteProject = useCallback(
-        (cb: Callback) => async () => {
+        (cb?: Callback) => async () => {
             const promise = deleteMutation.mutateAsync({ id });
 
             const [res] = await notifyPromise(promise, 'projectDelete');
 
-            res && cb();
+            res && cb?.();
         },
         [id, deleteMutation],
     );
