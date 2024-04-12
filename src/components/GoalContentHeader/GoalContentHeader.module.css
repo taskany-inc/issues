@@ -4,6 +4,10 @@
     align-items: center;
 }
 
+.CardInfoTime {
+    font-weight: 600;
+}
+
 .DropdownTrigger {
     transition: color var(--transition-time) var(--transition-func);
 }

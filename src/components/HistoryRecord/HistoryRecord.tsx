@@ -170,7 +170,11 @@ const HistoryRecordInner = ({ author, subject, action, createdAt, children }: Hi
     return (
         <RecordCtx.Provider value={{ setActionText, setSubjectText }}>
             {nullable(author, (user) => (
-                <HistoryRecordBricks authors={[user]} title={user.name} date={<RelativeTime date={createdAt} />}>
+                <HistoryRecordBricks
+                    authors={[user]}
+                    title={user.name}
+                    date={<RelativeTime date={createdAt} className={s.HistoryRecordTime} />}
+                >
                     <HistoryRecordText as="p" weight="thin">
                         {translates[actionText]} {translates[subjectText]} {children}
                     </HistoryRecordText>
@@ -575,7 +579,7 @@ export const HistoryRecordGroup: React.FC<{
                         <HistoryRecordBricks
                             authors={authors}
                             title={authors[0].name}
-                            date={<RelativeTime date={lastRecord.createdAt} />}
+                            date={<RelativeTime className={s.HistoryRecordTime} date={lastRecord.createdAt} />}
                         >
                             <HistoryRecordText as="p" weight="thin">
                                 {heading.map((part, index) => {
