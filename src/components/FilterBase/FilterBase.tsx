@@ -19,7 +19,10 @@ export function FilterBase<T>({ viewMode, onChange, keyGetter, children, ...prop
     return (
         <AutoComplete {...props} keyGetter={keyGetter} onChange={handleChange}>
             {children}
-            <AutoCompleteList selected={viewMode === 'split'} />
+            <AutoCompleteList
+                selected={viewMode === 'split'}
+                title={viewMode === 'union' ? tr('Suggestions') : undefined}
+            />
             {nullable(viewMode === 'split', () => (
                 <AutoCompleteList filterSelected title={tr('Suggestions')} />
             ))}

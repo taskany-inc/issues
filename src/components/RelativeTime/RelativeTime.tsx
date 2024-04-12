@@ -18,9 +18,16 @@ interface RelativeTimeProps {
     kind?: RelativeTimeKind;
     isRelativeTime?: boolean;
     className?: string;
+    size?: 's' | 'xs';
 }
 
-export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelativeTime = true, className }) => {
+export const RelativeTime: React.FC<RelativeTimeProps> = ({
+    kind,
+    date,
+    isRelativeTime = true,
+    size = 's',
+    className,
+}) => {
     const { ssrTime } = usePageContext();
     const locale = useLocale();
     const [time, setTime] = useState(ssrTime);
@@ -49,7 +56,7 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({ kind, date, isRelati
     const timeValue = isRelativeTime ? dateAgo(localeDate, time, { locale }) : createLocaleDate(localeDate, { locale });
 
     return (
-        <Text size="s" className={cn(s.RelativeTime, className)}>
+        <Text size={size} className={cn(s.RelativeTime, className)}>
             {nullable(kind, (k) => (
                 <span className={s.RelativeTimeKind}>{map[k]}</span>
             ))}

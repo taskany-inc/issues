@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AutoCompleteRadioGroup, nullable, Form } from '@taskany/bricks';
+import { nullable, Form } from '@taskany/bricks';
 import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -9,7 +9,8 @@ import {
     FormControlLabel,
     FormControlInput,
     FormControlError,
-    Text,
+    Switch,
+    SwitchControl,
 } from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect';
@@ -148,29 +149,26 @@ const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
     ({ error, maxValue, value, onChange, name }, ref) => {
         return (
             <FormControl className={s.FormControl}>
-                <FormControlLabel size="s" className={s.CriteriaWeightField}>
+                <FormControlLabel size="s" className={s.FormControlLabel}>
                     {tr('Weight')}
                 </FormControlLabel>
                 <FormControlInput
+                    className={s.FormControlWeigthInput}
                     outline
-                    size="xs"
+                    size="s"
                     value={value}
                     onChange={onChange}
                     ref={ref}
                     autoFocus
+                    autoComplete="off"
                     name={name}
                     disabled={maxPossibleWeight === maxValue}
                     maxLength={3}
-                    style={{ width: error ? '10ch' : '7ch' }}
+                    placeholder={tr.raw('ex: NN%', { val: maxPossibleWeight - maxValue }).join('')}
                 />
                 {nullable(error, (err) => (
                     <FormControlError error={err} />
                 ))}
-                <Text size="s" className={s.CriteriaWeightField}>
-                    {tr.raw('Weight out of', {
-                        upTo: maxPossibleWeight - maxValue,
-                    })}
-                </Text>
             </FormControl>
         );
     },
@@ -304,10 +302,14 @@ export const CriteriaForm = ({
             }
         });
 
-        const subMode = watch(({ title }, { name }) => {
+        const subMode = watch(({ title, mode }, { name }) => {
             if (name === 'mode') {
                 if (title) {
                     trigger('title');
+                }
+
+                if (mode) {
+                    setMode(mode);
                 }
             }
         });
@@ -315,7 +317,7 @@ export const CriteriaForm = ({
         return () => {
             [subMode, subSelected, subTitle].forEach((sub) => sub.unsubscribe());
         };
-    }, [watch, onInputChange, onItemChange, resetField, setError, trigger, setValue]);
+    }, [watch, onInputChange, onItemChange, resetField, setError, trigger, setValue, setMode]);
 
     const handleSelectItem = useCallback(
         (item: SuggestItem) => {
@@ -326,11 +328,10 @@ export const CriteriaForm = ({
     );
 
     const handleChangeMode = useCallback(
-        (mode: CriteriaFormMode) => {
-            setValue('mode', mode);
-            setMode(mode);
+        (_: React.SyntheticEvent<HTMLButtonElement>, active: string) => {
+            setValue('mode', active as CriteriaFormMode);
         },
-        [setMode, setValue],
+        [setValue],
     );
 
     const needShowWeightField = useMemo(() => {
@@ -375,6 +376,25 @@ export const CriteriaForm = ({
                 )}
             >
                 <>
+                    {nullable(withModeSwitch, () => (
+                        <Controller
+                            name="mode"
+                            control={control}
+                            render={({ field }) => (
+                                <Switch className={s.FullWidthSwitch} onChange={handleChangeMode} value={field.value}>
+                                    {radios.map((radio) => (
+                                        <SwitchControl
+                                            className={s.HalfWidthSwitchControl}
+                                            key={radio.value}
+                                            text={radio.title}
+                                            value={radio.value}
+                                        />
+                                    ))}
+                                </Switch>
+                            )}
+                        />
+                    ))}
+
                     <Controller
                         name="title"
                         control={control}
@@ -387,22 +407,6 @@ export const CriteriaForm = ({
                             />
                         )}
                     />
-
-                    {nullable(withModeSwitch, () => (
-                        <Controller
-                            name="mode"
-                            control={control}
-                            render={({ field }) => (
-                                <AutoCompleteRadioGroup
-                                    key={field.value}
-                                    title={tr('Mode')}
-                                    items={radios}
-                                    {...field}
-                                    onChange={(val) => handleChangeMode(val.value)}
-                                />
-                            )}
-                        />
-                    ))}
 
                     <div className={s.FormRow}>
                         {nullable(needShowWeightField, () => (

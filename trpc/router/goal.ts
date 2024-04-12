@@ -1789,6 +1789,12 @@ export const goal = router({
                         criteriaGoal: {
                             include: {
                                 state: true,
+                                owner: {
+                                    include: {
+                                        user: true,
+                                        ghost: true,
+                                    },
+                                },
                             },
                         },
                     },
@@ -1811,8 +1817,6 @@ export const goal = router({
 
                 return sorted.done.concat(sorted.undone).map(({ criteriaGoal, ...criteria }) => {
                     if (criteriaGoal) {
-                        criteriaGoal.scopeId;
-                        criteriaGoal.projectId;
                         return {
                             ...criteria,
                             criteriaGoal: {

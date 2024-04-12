@@ -12,8 +12,9 @@ import {
     DropdownTrigger,
     DropdownPanel,
     MenuItem,
+    Spinner,
 } from '@taskany/bricks/harmony';
-import { Spinner, nullable, useClickOutside } from '@taskany/bricks';
+import { nullable, useClickOutside } from '@taskany/bricks';
 import {
     IconBinOutline,
     IconEdit1Outline,
@@ -33,7 +34,9 @@ import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { Circle } from '../Circle/Circle';
 import { routes } from '../../hooks/router';
 import { GoalBadge } from '../GoalBadge';
-import { State } from '../../../trpc/inferredTypes';
+import { safeUserData } from '../../utils/getUserName';
+import { UserBadge } from '../UserBadge/UserBadge';
+import { ActivityByIdReturnType, State } from '../../../trpc/inferredTypes';
 
 import classes from './GoalCriteria.module.css';
 import { tr } from './GoalCriteria.i18n';
@@ -52,6 +55,8 @@ interface GoalCriteriaProps extends CriteriaProps {
         goalId: string;
         shortId: string;
         state?: State | null;
+        project?: string;
+        owner?: ActivityByIdReturnType;
     };
 }
 
@@ -68,7 +73,14 @@ interface GoalCriteriaEditableApi<T = UnionCriteria> {
 
 export function mapCriteria<
     T extends CriteriaProps,
-    G extends { id: string; _shortId: string; title: string; state?: State | null },
+    G extends {
+        id: string;
+        _shortId: string;
+        title: string;
+        projectId: string | null;
+        owner: ActivityByIdReturnType | null;
+        state: State | null;
+    },
 >(criteria: T, connectedGoal: G | null): UnionCriteria {
     if (connectedGoal) {
         return {
@@ -77,6 +89,8 @@ export function mapCriteria<
                 goalId: connectedGoal.id,
                 state: connectedGoal.state,
                 shortId: connectedGoal._shortId,
+                project: connectedGoal.projectId ?? undefined,
+                owner: connectedGoal.owner ?? undefined,
             },
             title: connectedGoal.title,
             isDone: criteria.isDone,
@@ -105,6 +119,9 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
     <TableRow className={classes.GoalCriteriaTableRow}>
         <TableCell width={350}>
             <Checkbox
+                className={classNames(classes.GoalCriteriaItemCheckbox, {
+                    [classes.CriteriaIsDone]: isDone,
+                })}
                 defaultChecked={isDone}
                 readOnly={!onCheck}
                 onClick={onCheck}
@@ -125,8 +142,9 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
     </TableRow>
 );
 
-const GoalCriteria = ({ title, goal, weight }: Omit<GoalCriteriaProps, 'id'>) => {
+const GoalCriteria = ({ title, goal, weight, isDone }: Omit<GoalCriteriaProps, 'id'>) => {
     const { setPreview } = useGoalPreview();
+    const ownerData = safeUserData(goal.owner);
 
     const handleGoalCriteriaClick = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
         (event) => {
@@ -139,13 +157,31 @@ const GoalCriteria = ({ title, goal, weight }: Omit<GoalCriteriaProps, 'id'>) =>
 
     return (
         <>
-            <TableCell width={350}>
+            <TableCell width={200}>
                 <GoalBadge
                     title={title}
                     state={goal.state ?? undefined}
                     href={routes.goal(goal.shortId)}
                     onClick={handleGoalCriteriaClick}
+                    strike={isDone}
                 />
+            </TableCell>
+            <TableCell width="10ch">
+                <Text className={classes.CriteriaGoalProject} size="s">
+                    {goal.project}
+                </Text>
+            </TableCell>
+            <TableCell width={16}>
+                {nullable(ownerData, (owner) => (
+                    <UserBadge
+                        className={classes.CritriaGoalOwner}
+                        short
+                        name={owner.name}
+                        email={owner.email}
+                        image={owner.image}
+                        size="xs"
+                    />
+                ))}
             </TableCell>
             <TableCell width="3ch" className={classes.GoalCriteriaWeightColumn}>
                 {nullable((weight ?? 0) > 0, () => (
@@ -335,6 +371,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
                     renderTrigger={({ ref }) => <div ref={ref} className={classes.GoalFormPopupTrigger} />}
                     onCancel={() => setMode('read')}
                     placement="bottom-end"
+                    offset={[-45, 0]}
                 >
                     <GoalCriteriaSuggest
                         id={props.goalId}

@@ -159,6 +159,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                 >
                                     {nullable(goal._isEditable, () => (
                                         <GoalFormPopupTrigger
+                                            offset={[-20, 0]}
                                             renderTrigger={(props) => (
                                                 <AddInlineTrigger
                                                     text={tr('Add achievement criteria')}

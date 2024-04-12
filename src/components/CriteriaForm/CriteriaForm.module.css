@@ -25,3 +25,27 @@
 .CriteriaWeightField {
     color: var(--gray7);
 }
+
+.FullWidthSwitch {
+    width: 100%;
+    margin-bottom: var(--gap-s);
+    flex-wrap: nowrap;
+}
+
+.HalfWidthSwitchControl {
+    flex: 1;
+}
+
+.FormControlLabel {
+    color: var(--text-secondary);
+}
+
+.FormControlWeigthInput {
+    width: 8ch;
+    box-sizing: border-box;
+}
+
+.FormControlWeigthInput input {
+    /* 'cause prop doesn't inherits from parent */
+    text-align: center;
+}
