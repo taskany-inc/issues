@@ -1,14 +1,10 @@
-import styled from 'styled-components';
 import { Button } from '@taskany/bricks/harmony';
 
 import { tr } from './LoadMoreButton.i18n';
-
-const StyledLoadContainer = styled.div`
-    padding: var(--gap-m) var(--gap-s);
-`;
+import s from './LoadMoreButton.module.css';
 
 export const LoadMoreButton = (props: React.ComponentProps<typeof Button>) => (
-    <StyledLoadContainer>
+    <div className={s.LoadMoreButtonWrapper}>
         <Button {...props} text={tr('Load more...')} />
-    </StyledLoadContainer>
+    </div>
 );

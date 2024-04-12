@@ -30,7 +30,7 @@ import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
-import { IssueMeta } from '../IssueMeta';
+import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { Circle } from '../Circle/Circle';
 import { routes } from '../../hooks/router';
 import { GoalBadge } from '../GoalBadge';

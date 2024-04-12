@@ -1,0 +1,11 @@
+.ModalContentButton {
+    margin-left: auto;
+}
+
+.ModalContentUserList {
+    margin-top: var(--gap-s);
+}
+
+.ModalContentTip {
+    padding: var(--gap-s) 0;
+}

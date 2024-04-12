@@ -1,12 +1,10 @@
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { ComboBox, nullable } from '@taskany/bricks';
-import { Button, FormControl, FormControlError, FormControlInput } from '@taskany/bricks/harmony';
+import { ComboBox, ListView, ListViewItem, nullable } from '@taskany/bricks';
+import { Button, FormControl, FormControlError, FormControlInput, MenuItem } from '@taskany/bricks/harmony';
 
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { trpc } from '../utils/trpcClient';
 import { projectsCombobox, comboboxInput, combobox, comboboxErrorDot } from '../utils/domObjects';
-
-import { ProjectMenuItem } from './ProjectMenuItem';
 
 interface GoalParentComboBoxProps {
     text?: React.ComponentProps<typeof ComboBox>['text'];
@@ -109,12 +107,19 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                             {...comboboxInput.attr}
                         />
                     )}
+                    renderItems={(children) => <ListView>{children}</ListView>}
                     renderItem={(props) => (
-                        <ProjectMenuItem
-                            key={props.item.id}
-                            title={props.item.title}
-                            focused={props.cursor === props.index}
-                            onClick={props.onClick}
+                        <ListViewItem
+                            value={props.item}
+                            renderItem={(viewProps) => (
+                                <MenuItem
+                                    {...viewProps}
+                                    hovered={viewProps.hovered || viewProps.active}
+                                    onClick={props.onClick}
+                                >
+                                    {props.item.title}
+                                </MenuItem>
+                            )}
                         />
                     )}
                 />

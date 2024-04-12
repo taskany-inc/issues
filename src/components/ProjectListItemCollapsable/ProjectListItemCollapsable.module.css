@@ -1,0 +1,11 @@
+.ProjectIcons {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.ProjectTitleWrapper {
+    display: flex;
+    gap: var(--gap-xs);
+    justify-content: space-between;
+}
