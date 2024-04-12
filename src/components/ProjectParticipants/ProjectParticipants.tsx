@@ -1,7 +1,7 @@
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
 
 import { useProjectResource } from '../../hooks/useProjectResource';
-import { ProjectSettingsUserList } from '../ProjectSettingsUserList';
+import { ProjectSettingsUserList } from '../ProjectSettingsUserList/ProjectSettingsUserList';
 
 import { tr } from './ProjectParticipants.i18n';
 
