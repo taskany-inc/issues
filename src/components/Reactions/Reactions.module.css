@@ -1,0 +1,4 @@
+.Reactions {
+    display: flex;
+    gap: var(--gap-xs);
+}

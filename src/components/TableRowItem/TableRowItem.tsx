@@ -1,18 +1,14 @@
-import styled from 'styled-components';
 import cn from 'classnames';
-import { TableRow } from '@taskany/bricks/harmony';
-import { Text } from '@taskany/bricks';
-import { MouseEventHandler, ReactNode } from 'react';
+import { TableRow, Text } from '@taskany/bricks/harmony';
+import { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 
 import s from './TableRowItem.module.css';
 
-export const TableRowItemTitle = styled(Text).attrs((props) => ({ weight: 'bold', ...props }))``;
+export const TableRowItemTitle = (props: ComponentProps<typeof Text>) => <Text weight="bold" {...props} />;
 
-export const TableRowItemText = styled(Text).attrs({
-    size: 's',
-    weight: 'bold',
-    color: 'var(--gray9)',
-})``;
+export const TableRowItemText = ({ className, ...props }: ComponentProps<typeof Text>) => (
+    <Text className={cn(s.TableRowItemText, className)} size="s" weight="bold" {...props} />
+);
 
 interface TableRowItemProps extends Omit<React.ComponentProps<typeof TableRow>, 'title'> {
     title: ReactNode;

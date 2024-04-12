@@ -1,0 +1,9 @@
+.UserListContainer {
+    background-color: var(--gray3);
+    padding: var(--gap-s) var(--gap-m);
+}
+
+.UserListTitle {
+    padding: var(--gap-s) var(--gap-m) var(--gap-m);
+    color: var(--text-secondary);
+}

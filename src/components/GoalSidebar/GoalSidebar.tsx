@@ -12,7 +12,7 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { ActivityByIdReturnType, GoalByIdReturnType, GoalChangeProjectReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
-import { TextList, TextListItem } from '../TextList';
+import { TextList, TextListItem } from '../TextList/TextList';
 import { safeUserData } from '../../utils/getUserName';
 import {
     goalDependencies,
@@ -22,7 +22,7 @@ import {
     goalPageDeleteButton,
 } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
-import { GoalList } from '../GoalList';
+import { GoalList } from '../GoalList/GoalList';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList/TagsList';

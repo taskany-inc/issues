@@ -1,0 +1,18 @@
+.TextList {
+    margin: 0;
+    padding: 0;
+
+    line-height: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+
+    list-style: var(--list-style);
+}
+
+.TextListItem {
+    padding: 0;
+
+    line-height: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}

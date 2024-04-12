@@ -1,18 +1,14 @@
 import React, { useCallback } from 'react';
 import { Goal } from '@prisma/client';
 import { IconXCircleSolid } from '@taskany/icons';
-import styled from 'styled-components';
 import { nullable } from '@taskany/bricks';
 
-import { routes } from '../hooks/router';
-import { State } from '../../trpc/inferredTypes';
+import { routes } from '../../hooks/router';
+import { State } from '../../../trpc/inferredTypes';
+import { GoalBadge } from '../GoalBadge';
+import { TextList, TextListItem } from '../TextList/TextList';
 
-import { GoalBadge } from './GoalBadge';
-import { TextList, TextListItem } from './TextList';
-
-const StyledTextList = styled(TextList)`
-    margin-left: 5px; // 24 / 2 - 7 center of UserPic and center of PlusIcon
-`;
+import s from './GoalList.module.css';
 
 interface GoalDependencyListByKindProps<T> {
     goals: T[];
@@ -44,7 +40,7 @@ export const GoalList = <T extends Goal & { state?: State | null; _shortId: stri
     );
 
     return (
-        <StyledTextList listStyle="none">
+        <TextList listStyle="none" className={s.GoalListTextList}>
             {goals.map((goal) => (
                 <TextListItem key={goal.id}>
                     <GoalBadge
@@ -60,6 +56,6 @@ export const GoalList = <T extends Goal & { state?: State | null; _shortId: stri
                     </GoalBadge>
                 </TextListItem>
             ))}
-        </StyledTextList>
+        </TextList>
     );
 };

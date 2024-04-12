@@ -13,3 +13,7 @@
 .TableRowItem:hover {
     background-color: var(--gray4);
 }
+
+.TableRowItemText {
+    color: var(--text-secondary);
+}
