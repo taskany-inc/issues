@@ -123,7 +123,7 @@ export const GoalPage = ({ user, ssrTime, params: { id } }: ExternalPageProps<{ 
                                 ))}
                             </PageActions>
                             {nullable(goal?.updatedAt, (date) => (
-                                <RelativeTime kind="updated" date={date} />
+                                <RelativeTime className={s.UpdatedTime} kind="updated" date={date} />
                             ))}
                         </div>
                     </>

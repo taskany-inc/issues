@@ -73,7 +73,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                                     />
                                 ))}
                                 {nullable(goal?.updatedAt, (date) => (
-                                    <RelativeTime kind="updated" date={date} />
+                                    <RelativeTime className={s.UpdatedTime} kind="updated" date={date} />
                                 ))}
                             </div>
                         </>

@@ -46,7 +46,7 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ description, dat
     return (
         <Card>
             <CardInfo className={s.CardInfo} onClick={onDateViewTypeChange}>
-                <RelativeTime kind={kind} isRelativeTime={isRelative} date={date} />
+                <RelativeTime kind={kind} className={s.CardInfoTime} isRelativeTime={isRelative} date={date} />
                 {nullable(description, () => (
                     <Dropdown
                         items={dropdownItems}
