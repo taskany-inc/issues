@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
-import { gray4, radiusM, textColor } from '@taskany/colors';
 import { TextStyle, nullable } from '@taskany/bricks';
 
 import { pageContext, PageContext } from '../../utils/pageContext';
@@ -44,6 +43,18 @@ interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const mapThemeOnId = { light: 0, dark: 1 } as const;
+
+interface ToastOptions {
+    style: Record<string, `var(--${string})`>;
+}
+// Toaster can not get className, only style
+const toastOptions: ToastOptions = {
+    style: {
+        borderRadius: 'var(--radius-m)',
+        background: 'var(--gray4)',
+        color: 'var(--text-color)',
+    },
+};
 
 export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, header, ...attrs }) => {
     const { setPreview } = useGoalPreview();
@@ -88,12 +99,7 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
                 <Theme theme={t} />
             ))}
 
-            <Toaster
-                toastOptions={{
-                    style: { borderRadius: radiusM, background: gray4, color: textColor },
-                }}
-                position="bottom-right"
-            />
+            <Toaster toastOptions={toastOptions} position="bottom-right" />
 
             <div className={s.PageLayout}>
                 <aside className={s.PageAside}>

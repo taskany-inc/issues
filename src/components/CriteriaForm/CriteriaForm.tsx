@@ -1,10 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AutoCompleteRadioGroup, nullable, Form, Text } from '@taskany/bricks';
-import { gray7 } from '@taskany/colors';
+import { AutoCompleteRadioGroup, nullable, Form } from '@taskany/bricks';
 import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button, FormControl, FormControlLabel, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import {
+    Button,
+    FormControl,
+    FormControlLabel,
+    FormControlInput,
+    FormControlError,
+    Text,
+} from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect';
 import { GoalBadge } from '../GoalBadge';
@@ -142,7 +148,7 @@ const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
     ({ error, maxValue, value, onChange, name }, ref) => {
         return (
             <FormControl className={s.FormControl}>
-                <FormControlLabel size="s" color={gray7}>
+                <FormControlLabel size="s" className={s.CriteriaWeightField}>
                     {tr('Weight')}
                 </FormControlLabel>
                 <FormControlInput
@@ -160,7 +166,7 @@ const CriteriaWeightField = forwardRef<HTMLInputElement, WeightFieldProps>(
                 {nullable(error, (err) => (
                     <FormControlError error={err} />
                 ))}
-                <Text size="s" color={gray7}>
+                <Text size="s" className={s.CriteriaWeightField}>
                     {tr.raw('Weight out of', {
                         upTo: maxPossibleWeight - maxValue,
                     })}

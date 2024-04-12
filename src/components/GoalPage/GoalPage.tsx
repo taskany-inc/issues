@@ -8,7 +8,7 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { Page } from '../Page/Page';
 import { PageActions } from '../PageActions/PageActions';
 import { PageSep } from '../PageSep/PageSep';
-import { IssueKey } from '../IssueKey';
+import { IssueKey } from '../IssueKey/IssueKey';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useWillUnmount } from '../../hooks/useWillUnmount';
 import { WatchButton } from '../WatchButton/WatchButton';

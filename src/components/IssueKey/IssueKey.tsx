@@ -1,5 +1,6 @@
-import { gray6 } from '@taskany/colors';
-import { Text } from '@taskany/bricks';
+import { Text } from '@taskany/bricks/harmony';
+
+import s from './IssueKey.module.css';
 
 interface IssueKeyProps {
     id: string;
@@ -9,7 +10,7 @@ interface IssueKeyProps {
 
 export const IssueKey: React.FC<IssueKeyProps> = ({ id, size = 'm', children }) => {
     return (
-        <Text size={size} weight="bold" color={gray6}>
+        <Text size={size} weight="bold" className={s.IssuesKey}>
             #{id} {children}
         </Text>
     );
