@@ -1,0 +1,12 @@
+.IssueMeta {
+    margin-bottom: var(--gap-sm);
+    max-width: 300px;
+}
+
+.IssueMetaTitle {
+    border-bottom: 1px solid var(--gray-900);
+    margin-bottom: var(--gap-xs);
+    max-width: 300px;
+    font-weight: 500;
+    color: var(--text-ghost);
+}

@@ -1,0 +1,5 @@
+/* Order of styles on page: SC, CSS Modules */
+.UpdateStateWrapper.UpdateStateWrapper {
+    display: flex;
+    align-items: center;
+}

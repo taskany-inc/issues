@@ -1,5 +1,4 @@
 import React, { ComponentProps, MouseEventHandler, ReactNode } from 'react';
-import styled from 'styled-components';
 import NextLink from 'next/link';
 import { nullable } from '@taskany/bricks';
 import { TreeView, TreeViewNode, Text, Link } from '@taskany/bricks/harmony';
@@ -10,16 +9,7 @@ import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
 import { projectListItem, projectListItemTitle } from '../../utils/domObjects';
 import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 
-const StyledProjectIcons = styled.div`
-    display: flex;
-    align-items: center;
-    gap: var(--gap-xs);
-`;
-
-const StyledTitleWrapper = styled(StyledProjectIcons)`
-    justify-content: space-between;
-    margin-right: var(--gap-s);
-`;
+import s from './ProjectListItemCollapsable.module.css';
 
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
@@ -46,17 +36,17 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     const projectComponent = (
         <TableRowItem
             title={
-                <StyledTitleWrapper>
+                <div className={s.ProjectTitleWrapper}>
                     <TableRowItemTitle size={titleSize} {...projectListItemTitle.attr}>
                         {project.title}
                     </TableRowItemTitle>
                     {nullable(project.children.length, (length) => (
-                        <StyledProjectIcons>
+                        <div className={s.ProjectIcons}>
                             <IconServersOutline size="xs" />
                             <Text size="xs">{length}</Text>
-                        </StyledProjectIcons>
+                        </div>
                     ))}
-                </StyledTitleWrapper>
+                </div>
             }
             onClick={onClick}
         >

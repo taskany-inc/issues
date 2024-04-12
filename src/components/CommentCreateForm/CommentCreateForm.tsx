@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
 import { State as StateType } from '@prisma/client';
 import { UserPic, nullable, useLatest } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
@@ -16,6 +15,7 @@ import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 import { State } from '../State';
 
 import { tr } from './CommentCreateForm.i18n';
+import s from './CommentCreateForm.module.css';
 
 interface CommentCreateFormProps extends Omit<React.ComponentProps<typeof CommentForm>, 'actionButton'> {
     states?: StateType[];
@@ -24,11 +24,6 @@ interface CommentCreateFormProps extends Omit<React.ComponentProps<typeof Commen
     onSubmit: (comment: GoalCommentFormSchema) => void;
     onChange?: (comment: GoalCommentFormSchema) => void;
 }
-
-const StyledStateUpdate = styled.div`
-    display: flex;
-    align-items: center;
-`;
 
 const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     states,
@@ -140,7 +135,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                     <>
                         <Button view="primary" disabled={busy} onClick={onCommentСlick} text={tr('Comment')} />
                         {nullable(states, (list) => (
-                            <StyledStateUpdate>
+                            <div className={s.UpdateStateWrapper}>
                                 <Button
                                     disabled={busy}
                                     type="submit"
@@ -175,7 +170,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                         renderItem={(props) => <State state={props.item} />}
                                     />
                                 </Dropdown>
-                            </StyledStateUpdate>
+                            </div>
                         ))}
                     </>
                 }

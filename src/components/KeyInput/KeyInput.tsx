@@ -1,14 +1,15 @@
 import React, { useCallback, useRef, useState } from 'react';
-import styled from 'styled-components';
 import { Button, Text, KeyCode, useKeyboard, Popup, FormControl, FormControlInput } from '@taskany/bricks';
 
-import { keyPredictor } from '../utils/keyPredictor';
+import { keyPredictor } from '../../utils/keyPredictor';
 import {
     projectKeyPredictor,
     projectKeyPredictorError,
     projectKeyPredictorHint,
     projectKeyPredictorInput,
-} from '../utils/domObjects';
+} from '../../utils/domObjects';
+
+import s from './KeyInput.module.css';
 
 interface KeyInputProps {
     size?: React.ComponentProps<typeof Button>['size'];
@@ -27,10 +28,6 @@ interface KeyInputProps {
     onDirty?: () => void;
     onBlur?: (key: string) => void;
 }
-
-const StyledButton = styled(Button)`
-    font-weight: 600;
-`;
 
 const KeyInput: React.FC<KeyInputProps> = ({
     size,
@@ -107,7 +104,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                         />
                     </FormControl>
                 ) : (
-                    <StyledButton
+                    <Button
                         disabled={disabled}
                         size={size}
                         text={value}
@@ -117,6 +114,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                         onClick={onButtonClick}
                         onMouseEnter={onMouseEnter}
                         onMouseLeave={onMouseLeave}
+                        className={s.KeyInputButton}
                         {...projectKeyPredictor.attr}
                     />
                 )}

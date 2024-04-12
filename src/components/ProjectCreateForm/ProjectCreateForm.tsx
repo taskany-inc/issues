@@ -27,7 +27,7 @@ import { FormActions } from '../FormActions/FormActions';
 import { tr } from './ProjectCreateForm.i18n';
 import s from './ProjectCreateForm.module.css';
 
-const KeyInput = dynamic(() => import('../KeyInput'));
+const KeyInput = dynamic(() => import('../KeyInput/KeyInput'));
 
 const ProjectCreateForm: React.FC = () => {
     const router = useRouter();
