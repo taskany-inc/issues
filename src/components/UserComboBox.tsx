@@ -1,11 +1,13 @@
 import React, { useState, ChangeEvent, useCallback } from 'react';
-import { UserPic, UserMenuItem, nullable, ComboBox } from '@taskany/bricks';
-import { Button, FormControl, FormControlInput } from '@taskany/bricks/harmony';
+import { UserPic, nullable, ComboBox, ListView, ListViewItem } from '@taskany/bricks';
+import { Button, FormControl, FormControlInput, MenuItem } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
-import { safeGetUserEmail, safeGetUserImage, safeGetUserName, safeUserData } from '../utils/getUserName';
+import { safeGetUserName, safeUserData } from '../utils/getUserName';
 import { comboboxItem, usersCombobox, comboboxInput, combobox } from '../utils/domObjects';
+
+import { UserBadge } from './UserBadge/UserBadge';
 
 interface UserComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
@@ -107,15 +109,22 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                         />
                     </FormControl>
                 )}
+                renderItems={(children) => <ListView>{children}</ListView>}
                 renderItem={(props) => (
-                    <UserMenuItem
-                        key={props.item.id}
-                        name={safeGetUserName(props.item)}
-                        email={safeGetUserEmail(props.item, false)}
-                        image={safeGetUserImage(props.item)}
-                        focused={props.cursor === props.index}
-                        onClick={props.onClick}
-                        {...comboboxItem.attr}
+                    <ListViewItem
+                        value={props.item}
+                        renderItem={({ hovered, active, ...rest }) =>
+                            nullable(safeUserData(props.item), (user) => (
+                                <MenuItem
+                                    hovered={active || hovered}
+                                    onClick={props.onClick}
+                                    {...rest}
+                                    {...comboboxItem.attr}
+                                >
+                                    <UserBadge {...user} key={props.item.id} />
+                                </MenuItem>
+                            ))
+                        }
                     />
                 )}
                 {...combobox.attr}

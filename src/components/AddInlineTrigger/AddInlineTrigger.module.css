@@ -1,5 +1,6 @@
 .InlineTrigger {
     margin-top: var(--gap-xs);
+    height: 26px; /* height of input (28px) - badge's padding (2px) */
 }
 
 .InlineTrigger_centered {

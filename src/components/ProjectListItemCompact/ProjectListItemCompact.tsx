@@ -23,7 +23,7 @@ export const ProjectListItemCompact: React.FC<ProjectListItemCompactProps> = Rea
             <NextLink href={routes.project(id)} passHref legacyBehavior>
                 <TableRow className={cn(s.ProjectListItemCompactRow, className)}>
                     <TableCell width="55%">
-                        <TableRowItemTitle size="s">{title}</TableRowItemTitle>
+                        <TableRowItemTitle>{title}</TableRowItemTitle>
                     </TableCell>
                     <TableCell width="25%">
                         <TableRowItemText>{id}</TableRowItemText>

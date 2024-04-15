@@ -38,7 +38,7 @@ import { UserComboBox } from '../UserComboBox';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectUpdate, projectUpdateSchema } from '../../schema/project';
 import { ActivityByIdReturnType, ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
-import { TextList, TextListItem } from '../TextList';
+import { TextList, TextListItem } from '../TextList/TextList';
 import { CommonHeader } from '../CommonHeader';
 import {
     projectSettingsCancelDeleteProjectButton,

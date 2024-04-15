@@ -1,11 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Popup, nullable } from '@taskany/bricks';
 
 import { ReactionsMap } from '../../types/reactions';
 import { ReactionsButton } from '../ReactionsButton';
 
 import { tr } from './Reactions.i18n';
+import s from './Reactions.module.css';
 
 interface ReactionsProps {
     reactions?: ReactionsMap;
@@ -14,14 +14,9 @@ interface ReactionsProps {
     onClick?: React.ComponentProps<typeof ReactionsButton>['onClick'];
 }
 
-const StyledReactions = styled.div`
-    display: flex;
-    gap: var(--gap-xs);
-`;
-
 export const Reactions = React.memo(({ reactions, children, onClick }: ReactionsProps) => {
     return (
-        <StyledReactions>
+        <div className={s.Reactions}>
             {nullable(reactions, (reactionsMap) =>
                 Object.entries(reactionsMap).map(([reaction, { authors, count, remains }]) => {
                     return (
@@ -41,6 +36,6 @@ export const Reactions = React.memo(({ reactions, children, onClick }: Reactions
             )}
 
             {children}
-        </StyledReactions>
+        </div>
     );
 });

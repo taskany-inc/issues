@@ -1,9 +1,8 @@
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
 import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
 import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
 
-import { IssueMeta } from '../IssueMeta';
+import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { UserBadge } from '../UserBadge/UserBadge';
 import { UserComboBox } from '../UserComboBox';
 import { TagComboBox } from '../TagComboBox';
@@ -12,7 +11,7 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { ActivityByIdReturnType, GoalByIdReturnType, GoalChangeProjectReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
-import { TextList, TextListItem } from '../TextList';
+import { TextList, TextListItem } from '../TextList/TextList';
 import { safeUserData } from '../../utils/getUserName';
 import {
     goalDependencies,
@@ -22,7 +21,7 @@ import {
     goalPageDeleteButton,
 } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent } from '../GoalPreview/GoalPreviewProvider';
-import { GoalList } from '../GoalList';
+import { GoalList } from '../GoalList/GoalList';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList/TagsList';
@@ -32,19 +31,9 @@ import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 
 import { tr } from './GoalSidebar.i18n';
+import s from './GoalSidebar.module.css';
 
 const tagsLimit = 5;
-
-const StyledInlineInput = styled.div`
-    margin-top: var(--gap-xs);
-    height: 28px; // Input height
-`;
-
-const StyledTextList = styled(TextList).attrs({
-    listStyle: 'none',
-})`
-    padding-left: var(--gap-xs);
-`;
 
 interface GoalSidebarProps {
     goal: NonNullable<GoalByIdReturnType>;
@@ -151,25 +140,23 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                 {nullable(
                     goal._isEditable,
                     () => (
-                        <StyledInlineInput>
-                            <UserComboBox
-                                placement="bottom-start"
-                                placeholder={tr('Type user name or email')}
-                                filter={participantsFilter}
-                                onChange={onOwnerChange}
-                                renderTrigger={({ onClick }) =>
-                                    nullable(
-                                        safeUserData(goal.owner),
-                                        (props) => (
-                                            <UserBadge {...props}>
-                                                <IconXCircleSolid size="xs" onClick={onClick} />
-                                            </UserBadge>
-                                        ),
-                                        <AddInlineTrigger text={tr('Assign')} onClick={onClick} />,
-                                    )
-                                }
-                            />
-                        </StyledInlineInput>
+                        <UserComboBox
+                            placement="bottom-start"
+                            placeholder={tr('Type user name or email')}
+                            filter={participantsFilter}
+                            onChange={onOwnerChange}
+                            renderTrigger={({ onClick }) =>
+                                nullable(
+                                    safeUserData(goal.owner),
+                                    (props) => (
+                                        <UserBadge {...props}>
+                                            <IconXCircleSolid size="xs" onClick={onClick} />
+                                        </UserBadge>
+                                    ),
+                                    <AddInlineTrigger text={tr('Assign')} onClick={onClick} />,
+                                )
+                            }
+                        />
                     ),
                     nullable(safeUserData(goal.owner), (props) => <UserBadge {...props} />, tr('Not assigned yet')),
                 )}
@@ -190,7 +177,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
 
             {nullable(goal._isEditable || goal.partnershipProjects.length, () => (
                 <IssueMeta title={tr('Partnership projects')}>
-                    <StyledTextList>
+                    <TextList listStyle="none" className={s.PartnershipProjectsList}>
                         {goal.partnershipProjects?.map((project) => (
                             <TextListItem key={project.id}>
                                 <ProjectBadge id={project.id} title={project.title}>
@@ -200,19 +187,17 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 </ProjectBadge>
                             </TextListItem>
                         ))}
-                    </StyledTextList>
+                    </TextList>
 
                     {nullable(goal._isEditable, () => (
-                        <StyledInlineInput>
-                            <GoalParentComboBox
-                                placement="bottom-start"
-                                placeholder={tr('Type project title')}
-                                onChange={({ id }) => addPartnerProject(id)}
-                                renderTrigger={(props) => (
-                                    <AddInlineTrigger text={tr('Add project')} onClick={props.onClick} />
-                                )}
-                            />
-                        </StyledInlineInput>
+                        <GoalParentComboBox
+                            placement="bottom-start"
+                            placeholder={tr('Type project title')}
+                            onChange={({ id }) => addPartnerProject(id)}
+                            renderTrigger={(props) => (
+                                <AddInlineTrigger text={tr('Add project')} onClick={props.onClick} />
+                            )}
+                        />
                     ))}
                 </IssueMeta>
             ))}
@@ -306,37 +291,31 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     </TagsList>
 
                     {nullable(goal._isEditable, () => (
-                        <StyledInlineInput>
-                            <TagComboBox
-                                disabled={(goal.tags || []).length >= tagsLimit}
-                                placeholder={tr('Enter tag title')}
-                                value={goal.tags}
-                                onChange={onGoalTagAdd}
-                                renderTrigger={(props) => (
-                                    <AddInlineTrigger text={tr('Add tag')} onClick={props.onClick} />
-                                )}
-                            />
-                        </StyledInlineInput>
+                        <TagComboBox
+                            disabled={(goal.tags || []).length >= tagsLimit}
+                            placeholder={tr('Enter tag title')}
+                            value={goal.tags}
+                            onChange={onGoalTagAdd}
+                            renderTrigger={(props) => <AddInlineTrigger text={tr('Add tag')} onClick={props.onClick} />}
+                        />
                     ))}
                 </IssueMeta>
             ))}
 
             {nullable(goal._isEditable, () => (
                 <IssueMeta>
-                    <StyledInlineInput>
-                        <GoalParentComboBox
-                            placement="bottom-start"
-                            placeholder={tr('Type project title')}
-                            onChange={onTranfer}
-                            renderTrigger={(props) => (
-                                <AddInlineTrigger
-                                    icon={<IconArrowRightOutline size="xs" />}
-                                    text={tr('Transfer goal')}
-                                    onClick={props.onClick}
-                                />
-                            )}
-                        />
-                    </StyledInlineInput>
+                    <GoalParentComboBox
+                        placement="bottom-start"
+                        placeholder={tr('Type project title')}
+                        onChange={onTranfer}
+                        renderTrigger={(props) => (
+                            <AddInlineTrigger
+                                icon={<IconArrowRightOutline size="xs" />}
+                                text={tr('Transfer goal')}
+                                onClick={props.onClick}
+                            />
+                        )}
+                    />
 
                     <AddInlineTrigger
                         icon={<IconBinOutline size="xs" {...goalPageDeleteButton.attr} />}

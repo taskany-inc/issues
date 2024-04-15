@@ -1,19 +1,10 @@
-import { Text } from '@taskany/bricks';
-import styled from 'styled-components';
-import { gapM, gapS, gray3, gray9 } from '@taskany/colors';
+import { Text } from '@taskany/bricks/harmony';
 import { ComponentProps } from 'react';
 
-import { SettingsCard } from './SettingsContent/SettingsContent';
-import { UserEditableList } from './UserEditableList/UserEditableList';
+import { SettingsCard } from '../SettingsContent/SettingsContent';
+import { UserEditableList } from '../UserEditableList/UserEditableList';
 
-const StyledTitle = styled(Text)`
-    padding: ${gapS} ${gapM} ${gapM};
-`;
-
-const StyledListContainer = styled.div`
-    background-color: ${gray3};
-    padding: ${gapS} ${gapM};
-`;
+import s from './ProjectSettingsUserList.module.css';
 
 interface ProjectSettingsUserListProps extends ComponentProps<typeof UserEditableList> {
     title: string;
@@ -31,10 +22,10 @@ export const ProjectSettingsUserList = ({
 }: ProjectSettingsUserListProps) => {
     return (
         <SettingsCard {...attrs}>
-            <StyledTitle size="m" weight="bold" color={gray9}>
+            <Text size="m" weight="bold" className={s.UserListTitle}>
                 {title}
-            </StyledTitle>
-            <StyledListContainer>
+            </Text>
+            <div className={s.UserListContainer}>
                 <UserEditableList
                     users={users}
                     filterIds={filterIds}
@@ -43,7 +34,7 @@ export const ProjectSettingsUserList = ({
                     triggerText={triggerText}
                     editable={editable}
                 />
-            </StyledListContainer>
+            </div>
         </SettingsCard>
     );
 };
