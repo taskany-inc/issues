@@ -29,11 +29,12 @@ import { trpc } from '../../utils/trpcClient';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { useGoalResource } from '../../hooks/useGoalResource';
-import { ActivityFeedItem } from '../ActivityFeed';
+import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { IssueMeta } from '../IssueMeta';
-import { Circle } from '../Circle';
+import { Circle } from '../Circle/Circle';
 import { routes } from '../../hooks/router';
 import { GoalBadge } from '../GoalBadge';
+import { State } from '../../../trpc/inferredTypes';
 
 import classes from './GoalCriteria.module.css';
 import { tr } from './GoalCriteria.i18n';
@@ -51,7 +52,7 @@ interface GoalCriteriaProps extends CriteriaProps {
     goal: {
         goalId: string;
         shortId: string;
-        stateColor?: number;
+        state?: State | null;
     };
 }
 
@@ -68,14 +69,14 @@ interface GoalCriteriaEditableApi<T = UnionCriteria> {
 
 export function mapCriteria<
     T extends CriteriaProps,
-    G extends { id: string; _shortId: string; title: string; state: { hue: number } | null },
+    G extends { id: string; _shortId: string; title: string; state?: State | null },
 >(criteria: T, connectedGoal: G | null): UnionCriteria {
     if (connectedGoal) {
         return {
             id: criteria.id,
             goal: {
                 goalId: connectedGoal.id,
-                stateColor: connectedGoal.state?.hue,
+                state: connectedGoal.state,
                 shortId: connectedGoal._shortId,
             },
             title: connectedGoal.title,
@@ -105,7 +106,6 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
     <TableRow className={classes.GoalCriteriaTableRow}>
         <TableCell width={350}>
             <Checkbox
-                className={classes.GoalCriteriaItemCheckbox}
                 defaultChecked={isDone}
                 readOnly={!onCheck}
                 onClick={onCheck}
@@ -143,8 +143,7 @@ const GoalCriteria = ({ title, goal, weight }: Omit<GoalCriteriaProps, 'id'>) =>
             <TableCell width={350}>
                 <GoalBadge
                     title={title}
-                    color={goal.stateColor}
-                    className={classes.GoalCriteriaGoalBadge}
+                    state={goal.state ?? undefined}
                     href={routes.goal(goal.shortId)}
                     onClick={handleGoalCriteriaClick}
                 />
@@ -271,7 +270,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
                         selected: {
                             id: props.goal.goalId,
                             title: props.title,
-                            stateColor: props.goal.stateColor || 0,
+                            state: props.goal.state,
                             _shortId: props.goal.shortId,
                         },
                     },
@@ -302,7 +301,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
                 (valuesToUpdate as GoalCriteriaProps).goal = {
                     goalId: values.selected.id,
                     shortId: values.selected._shortId,
-                    stateColor: values.selected.stateColor,
+                    state: values.selected.state,
                 };
                 valuesToUpdate.title = values.selected.title;
             }
@@ -469,9 +468,7 @@ interface CriteriaItemValue {
         id: string;
         title: string;
         _shortId: string;
-        state?: {
-            hue: number;
-        } | null;
+        state?: State | null;
     } | null;
 }
 
@@ -527,9 +524,7 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
                         id: data.goal.goalId,
                         title: data.title,
                         _shortId: data.goal.shortId,
-                        state: {
-                            hue: data.goal.stateColor || 0,
-                        },
+                        state: data.goal.state,
                     };
                 }
 

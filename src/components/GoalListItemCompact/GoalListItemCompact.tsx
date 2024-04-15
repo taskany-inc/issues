@@ -133,7 +133,7 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             content = <TableRowItemTitle size="s">{title}</TableRowItemTitle>;
             break;
         case 'state':
-            content = nullable(state, (s) => <StateDot size="m" title={s?.title} hue={s?.hue} />);
+            content = nullable(state, (s) => <StateDot state={s} size="l" title={s?.title} />);
             break;
         case 'priority':
             content = nullable(priority, (p) => <TableRowItemText>{getPriorityText(p.title)}</TableRowItemText>);

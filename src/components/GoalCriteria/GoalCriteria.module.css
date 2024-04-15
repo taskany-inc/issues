@@ -31,17 +31,6 @@
     align-items: baseline;
 }
 
-.GoalCriteriaGoalBadge {
-    align-items: baseline;
-    cursor: pointer;
-}
-
-.GoalCriteriaItemCheckbox,
-.GoalCriteriaGoalBadge {
-    padding-left: 0;
-    padding-right: 0;
-}
-
 .GoalCriteriaTrigger {
     cursor: pointer;
 }
@@ -71,7 +60,6 @@
 /* increasing selector specificity for override SC priority */
 .GoalCriteriaIssueMetaReset.GoalCriteriaIssueMetaReset {
     padding: 0;
-    
 }
 
 .GoalFormPopupTrigger {

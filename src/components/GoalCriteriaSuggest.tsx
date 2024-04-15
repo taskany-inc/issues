@@ -1,13 +1,14 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 import { trpc } from '../utils/trpcClient';
+import { State } from '../../trpc/inferredTypes';
 
 import { CriteriaForm } from './CriteriaForm/CriteriaForm';
 
 interface Goal {
     id: string;
     title: string;
-    state?: { hue?: number } | null;
+    state?: State | null;
     _shortId: string;
 }
 
@@ -85,7 +86,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
         return goals.map(({ id, title, state, _shortId }) => ({
             id,
             title,
-            stateColor: state?.hue,
+            state,
             _shortId,
         }));
     }, [goals, selectedGoal, query, mode]);

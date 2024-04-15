@@ -36,3 +36,7 @@
     align-items: end;
     gap: var(--gap-xs);
 }
+
+.UpdatedTime {
+    color: var(--text-ghost)
+}

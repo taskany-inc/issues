@@ -22,3 +22,7 @@
 .HistoryRecordTextPrimary {
     color: var(--text-primary);
 }
+
+.HistoryRecordTime {
+    color: var(--text-ghost);
+}

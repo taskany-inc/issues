@@ -16,7 +16,6 @@ import {
     HistoryRecord as HistoryRecordBricks,
     HistoryRecordCollapse as HistoryRecordCollapseBricks,
     Tag,
-    State,
     Text,
 } from '@taskany/bricks/harmony';
 import { IconDividerLineOutline } from '@taskany/icons';
@@ -29,11 +28,11 @@ import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } 
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { useLocale } from '../../hooks/useLocale';
 import { getUserName, prepareUserDataFromActivity, safeUserData } from '../../utils/getUserName';
-import { usePageContext } from '../../hooks/usePageContext';
 import { UserBadge } from '../UserBadge/UserBadge';
 import { ProjectBadge } from '../ProjectBadge';
 import { GoalBadge } from '../GoalBadge';
 import { routes } from '../../hooks/router';
+import { State } from '../State';
 
 import { tr } from './HistoryRecord.i18n';
 import s from './HistoryRecord.module.css';
@@ -171,7 +170,11 @@ const HistoryRecordInner = ({ author, subject, action, createdAt, children }: Hi
     return (
         <RecordCtx.Provider value={{ setActionText, setSubjectText }}>
             {nullable(author, (user) => (
-                <HistoryRecordBricks authors={[user]} title={user.name} date={<RelativeTime date={createdAt} />}>
+                <HistoryRecordBricks
+                    authors={[user]}
+                    title={user.name}
+                    date={<RelativeTime date={createdAt} className={s.HistoryRecordTime} />}
+                >
                     <HistoryRecordText as="p" weight="thin">
                         {translates[actionText]} {translates[subjectText]} {children}
                     </HistoryRecordText>
@@ -187,10 +190,7 @@ const HistoryRecordDependency: React.FC<
             id: string;
             _shortId: string;
             title: string;
-            state?: {
-                title: string;
-                hue: number;
-            };
+            state?: StateData;
         }[]
     >
 > = ({ from, to }) => {
@@ -201,7 +201,7 @@ const HistoryRecordDependency: React.FC<
                     key={issue.id}
                     className={s.HistoryBadge}
                     title={issue.title}
-                    color={issue.state?.hue}
+                    state={issue.state}
                     href={routes.goal(issue._shortId)}
                 />
             ))}
@@ -364,24 +364,13 @@ const HistoryRecordPriority: React.FC<HistoryChangeProps<Priority>> = ({ from, t
 );
 
 const HistoryRecordState: React.FC<HistoryChangeProps<StateData>> = ({ from, to }) => {
-    const { theme } = usePageContext();
-    const themedColor = `${theme}Foreground` as const;
-
     return (
         <HistorySimplifyRecord
             from={nullable(from, (f) => (
-                <State
-                    color={f[themedColor] || undefined}
-                    title={f.title}
-                    className={cn(s.HistoryInlineBadge, s.HistoryBadge)}
-                />
+                <State state={f} className={cn(s.HistoryInlineBadge, s.HistoryBadge)} />
             ))}
             to={nullable(to, (t) => (
-                <State
-                    color={t[themedColor] || undefined}
-                    title={t.title}
-                    className={cn(s.HistoryInlineBadge, s.HistoryBadge)}
-                />
+                <State state={t} className={cn(s.HistoryInlineBadge, s.HistoryBadge)} />
             ))}
         />
     );
@@ -412,7 +401,7 @@ const HistoryRecordParticipant: React.FC<
 );
 
 type CriteriaItem = GoalAchieveCriteria & {
-    criteriaGoal: (Goal & { state: StateData | null }) | null;
+    criteriaGoal: (Goal & { state?: StateData }) | null;
     strike?: boolean;
 };
 
@@ -423,7 +412,7 @@ const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title
                 <GoalBadge
                     className={cn(s.HistoryBadge, s.HistoryRecordTextPrimary)}
                     title={criteriaGoal.title}
-                    color={criteriaGoal.state?.hue}
+                    state={criteriaGoal.state}
                     href={routes.goal(`${criteriaGoal.projectId}-${criteriaGoal.scopeId}`)}
                 />
             </>
@@ -590,7 +579,7 @@ export const HistoryRecordGroup: React.FC<{
                         <HistoryRecordBricks
                             authors={authors}
                             title={authors[0].name}
-                            date={<RelativeTime date={lastRecord.createdAt} />}
+                            date={<RelativeTime className={s.HistoryRecordTime} date={lastRecord.createdAt} />}
                         >
                             <HistoryRecordText as="p" weight="thin">
                                 {heading.map((part, index) => {

@@ -1,23 +1,24 @@
-import React from 'react';
-import { StateDot as StateDotBricks, StateDotProps, nullable } from '@taskany/bricks';
+import React, { ComponentProps } from 'react';
+import { nullable } from '@taskany/bricks';
+import { Dot } from '@taskany/bricks/harmony';
 import { IconTargetOutline } from '@taskany/icons';
 
-import { StateWrapper } from '../StateWrapper/StateWrapper';
+import { usePageContext } from '../../hooks/usePageContext';
+import { State as StateType } from '../../../trpc/inferredTypes';
 
-import s from './StateDot.module.css';
+interface StateProps extends ComponentProps<typeof Dot> {
+    state: StateType;
+    view?: 'solid' | 'stroke';
+}
 
-export const StateDot: React.FC<
-    Omit<StateDotProps & { hue?: number; view?: 'solid' | 'stroke' }, 'hoverColor' | 'color'>
-> = React.memo(({ hue = 1, view = 'solid', ...props }) => {
-    return (
-        <StateWrapper hue={hue}>
-            {nullable(
-                view === 'solid',
-                () => (
-                    <StateDotBricks className={s.StateDot} {...props} />
-                ),
-                <IconTargetOutline className={s.StateIcon} size="s" {...props} />,
-            )}
-        </StateWrapper>
+export const StateDot: React.FC<StateProps> = React.memo(({ state, view = 'solid', ...props }) => {
+    const { theme } = usePageContext();
+
+    const color = state[`${theme}Foreground`] || undefined;
+
+    return nullable(
+        view === 'solid',
+        () => <Dot color={color} {...props} />,
+        <IconTargetOutline style={{ color }} size="s" {...props} />,
     );
 });
