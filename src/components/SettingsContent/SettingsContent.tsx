@@ -18,7 +18,7 @@ interface SettingsCardProps {
 
 export const SettingsCard = ({ view = 'default', className, children, ...props }: SettingsCardProps) => {
     return (
-        <FormCard className={cn(colorsMap[view], className)} {...props}>
+        <FormCard className={cn(s.SettingsCard, colorsMap[view], className)} {...props}>
             {children}
         </FormCard>
     );
