@@ -13,7 +13,6 @@ import {
     DropdownPanel,
     MenuItem,
 } from '@taskany/bricks/harmony';
-import { backgroundColor, danger0 } from '@taskany/colors';
 import { Spinner, nullable, useClickOutside } from '@taskany/bricks';
 import {
     IconBinOutline,
@@ -162,7 +161,7 @@ const GoalCriteria = ({ title, goal, weight }: Omit<GoalCriteriaProps, 'id'>) =>
 interface CriteriaActionItem {
     label: string;
     handler: () => void;
-    color?: string;
+    className?: string;
     icon: React.ReactNode;
 }
 
@@ -187,13 +186,13 @@ const CriteriaActions: React.FC<{ actions: CriteriaActionItem[] }> = ({ actions 
             />
             <DropdownPanel placement="bottom-start">
                 <div className={classes.GoalCriteriaActions}>
-                    {actions.map(({ icon, label, handler, color }) => (
+                    {actions.map(({ icon, label, handler, className }) => (
                         <MenuItem
                             key={label}
-                            className={classes.GoalCriteriaActionsItem}
+                            className={classNames(classes.GoalCriteriaActionsItem, className)}
                             onClick={handleActionClick(handler)}
                         >
-                            <Badge iconLeft={icon} text={label} color={color} weight="regular" />
+                            <Badge iconLeft={icon} text={label} weight="regular" />
                         </MenuItem>
                     ))}
                 </div>
@@ -238,8 +237,8 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
         if (onRemove) {
             actions.push({
                 label: tr('Delete'),
-                icon: <IconBinOutline size="xs" color={danger0} />,
-                color: danger0,
+                icon: <IconBinOutline size="xs" />,
+                className: classes.GoalCriteriaActionDelete,
                 handler: () => onRemove(props),
             });
         }
@@ -548,8 +547,8 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
 
     return (
         <ActivityFeedItem>
-            <Circle size={32}>
-                <IconMessageTickOutline size="s" color={backgroundColor} />
+            <Circle size={32} className={classes.GoalCriteriaCircle}>
+                <IconMessageTickOutline size="s" />
             </Circle>
             <IssueMeta
                 className={classNames(classes.GoalCriteriaIssueMeta, {

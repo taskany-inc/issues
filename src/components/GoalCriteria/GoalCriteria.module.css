@@ -66,3 +66,11 @@
     height: 100%;
     align-self: center;
 }
+
+.GoalCriteriaActionDelete {
+    color: var(--danger0);
+}
+
+.GoalCriteriaCircle {
+    color: var(--background-color);
+}

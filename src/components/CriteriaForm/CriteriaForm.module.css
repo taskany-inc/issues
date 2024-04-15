@@ -21,3 +21,7 @@
 .GoalBadge.GoalBadge {
     padding: 0;
 }
+
+.CriteriaWeightField {
+    color: var(--gray7);
+}
