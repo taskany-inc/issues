@@ -6,8 +6,16 @@ import { FilterById, StateType } from '../../trpc/inferredTypes';
 import { StateTypeEnum } from '../schema/common';
 import { setCookie } from '../utils/cookies';
 
-type SortDirection = 'asc' | 'desc' | null;
-type SortableProps = 'title' | 'state' | 'priority' | 'project' | 'activity' | 'owner' | 'updatedAt' | 'createdAt';
+export type SortDirection = 'asc' | 'desc' | null;
+export type SortableProps =
+    | 'title'
+    | 'state'
+    | 'priority'
+    | 'project'
+    | 'activity'
+    | 'owner'
+    | 'updatedAt'
+    | 'createdAt';
 
 export const filtersNoSearchPresetCookie = 'taskany.NoSearchPreset';
 
