@@ -6,7 +6,7 @@ import { nullable } from '@taskany/bricks';
 import { routes } from '../../hooks/router';
 import { State } from '../../../trpc/inferredTypes';
 import { GoalBadge } from '../GoalBadge';
-import { TextList, TextListItem } from '../TextList/TextList';
+import { List } from '../List/List';
 
 import s from './GoalList.module.css';
 
@@ -40,22 +40,22 @@ export const GoalList = <T extends Goal & { state?: State | null; _shortId: stri
     );
 
     return (
-        <TextList listStyle="none" className={s.GoalListTextList}>
-            {goals.map((goal) => (
-                <TextListItem key={goal.id}>
-                    <GoalBadge
-                        title={goal.title}
-                        state={goal.state ?? undefined}
-                        href={routes.goal(goal._shortId)}
-                        onClick={onClickHandler(goal)}
-                        {...attrs}
-                    >
-                        {nullable(canEdit, () => (
-                            <IconXCircleSolid size="xs" onClick={onRemoveHandler(goal)} />
-                        ))}
-                    </GoalBadge>
-                </TextListItem>
-            ))}
-        </TextList>
+        <List
+            list={goals}
+            className={s.GoalListTextList}
+            renderItem={(goal) => (
+                <GoalBadge
+                    title={goal.title}
+                    state={goal.state ?? undefined}
+                    href={routes.goal(goal._shortId)}
+                    onClick={onClickHandler(goal)}
+                    {...attrs}
+                >
+                    {nullable(canEdit, () => (
+                        <IconXCircleSolid size="xs" onClick={onRemoveHandler(goal)} />
+                    ))}
+                </GoalBadge>
+            )}
+        ></List>
     );
 };

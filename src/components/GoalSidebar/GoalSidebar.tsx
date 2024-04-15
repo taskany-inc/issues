@@ -11,7 +11,6 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { ActivityByIdReturnType, GoalByIdReturnType, GoalChangeProjectReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
-import { TextList, TextListItem } from '../TextList/TextList';
 import { safeUserData } from '../../utils/getUserName';
 import {
     goalDependencies,
@@ -29,6 +28,7 @@ import { dependencyKind } from '../../schema/goal';
 import { UserEditableList } from '../UserEditableList/UserEditableList';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
+import { List } from '../List/List';
 
 import { tr } from './GoalSidebar.i18n';
 import s from './GoalSidebar.module.css';
@@ -177,17 +177,19 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
 
             {nullable(goal._isEditable || goal.partnershipProjects.length, () => (
                 <IssueMeta title={tr('Partnership projects')}>
-                    <TextList listStyle="none" className={s.PartnershipProjectsList}>
-                        {goal.partnershipProjects?.map((project) => (
-                            <TextListItem key={project.id}>
+                    {nullable(goal.partnershipProjects, (list) => (
+                        <List
+                            list={list}
+                            className={s.PartnershipProjectsList}
+                            renderItem={(project) => (
                                 <ProjectBadge id={project.id} title={project.title}>
                                     {nullable(goal._isEditable, () => (
                                         <IconXCircleSolid size="xs" onClick={() => removePartnerProject(project.id)} />
                                     ))}
                                 </ProjectBadge>
-                            </TextListItem>
-                        ))}
-                    </TextList>
+                            )}
+                        />
+                    ))}
 
                     {nullable(goal._isEditable, () => (
                         <GoalParentComboBox
@@ -203,10 +205,15 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
             ))}
 
             {nullable(relationsGoalsLength || goal._isEditable, () => (
-                <div {...goalDependencies.attr}>
+                <div {...goalDependencies.attr} className={s.GoalRelationKinds}>
                     {goal._relations.map(({ kind, goals }) => {
                         return nullable(goals.length, () => (
-                            <IssueMeta title={heading[kind]} key={kind} {...goalDependencyKinds[kind].attr}>
+                            <IssueMeta
+                                title={heading[kind]}
+                                key={kind}
+                                className={s.GoalRelationsIssueMeta}
+                                {...goalDependencyKinds[kind].attr}
+                            >
                                 <GoalList
                                     canEdit={goal._isEditable}
                                     goals={goals}
@@ -243,15 +250,17 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
 
             {nullable(goal._versaCriteria?.length || goal._isEditable, () => (
                 <IssueMeta title={tr('Is the criteria for')}>
-                    <GoalList
-                        canEdit={goal._isEditable}
-                        goals={goal._versaCriteria.map((criteria) => ({
-                            ...criteria.goal,
-                            criteriaId: criteria.id,
-                        }))}
-                        onClick={onGoalClick ? (goal) => onGoalClick(goal) : undefined}
-                        onRemove={(goal) => onGoalCriteriaRemove({ id: goal.criteriaId, goalId: goal.id })}
-                    />
+                    {nullable(goal._versaCriteria, (list) => (
+                        <GoalList
+                            canEdit={goal._isEditable}
+                            goals={list.map((criteria) => ({
+                                ...criteria.goal,
+                                criteriaId: criteria.id,
+                            }))}
+                            onClick={onGoalClick || undefined}
+                            onRemove={(goal) => onGoalCriteriaRemove({ id: goal.criteriaId, goalId: goal.id })}
+                        />
+                    ))}
 
                     {nullable(goal._isEditable, () => (
                         <GoalFormPopupTrigger
