@@ -83,6 +83,14 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
         setPreview(null);
     }, [router.asPath, setPreview]);
 
+    useEffect(() => {
+        const { asPath, locale, push } = router;
+
+        if (userSettings?.locale && locale !== userSettings.locale) {
+            push(asPath, asPath, { locale: userSettings.locale });
+        }
+    }, [router, userSettings]);
+
     return (
         <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], ssrTime }}>
             <Head>

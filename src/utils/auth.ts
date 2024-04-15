@@ -162,6 +162,7 @@ declare module 'next-auth' {
             settings?: {
                 theme: 'light' | 'dark' | 'system';
                 beta: boolean;
+                locale: string;
             };
         };
     }

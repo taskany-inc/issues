@@ -317,6 +317,7 @@ model Settings {
   flow     Flow?     @relation(fields: [flowId], references: [id])
   flowId   String?
   activity Activity?
+  locale   String    @default("en")
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt

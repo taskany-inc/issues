@@ -24,6 +24,7 @@ import { UpdateUser, updateUserSchema } from '../../schema/user';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { dispatchErrorNotification, dispatchSuccessNotification } from '../../utils/dispatchNotification';
 import { userSettings, userSettingsLogoutButton } from '../../utils/domObjects';
+import { languages } from '../../utils/getLang';
 
 import s from './UserSettingsPage.module.css';
 import { tr } from './UserSettingsPage.i18n';
@@ -115,6 +116,26 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
             if (res && res.theme) {
                 setAppearanceTheme(res.theme);
             }
+        },
+        [updateSettingsMutation, utils.user.settings],
+    );
+
+    const onLocaleChange = useCallback(
+        async (locale?: string) => {
+            if (!locale) return;
+
+            const promise = updateSettingsMutation.mutateAsync(
+                {
+                    locale,
+                },
+                {
+                    onSuccess: () => {
+                        utils.user.settings.invalidate();
+                    },
+                },
+            );
+
+            await notifyPromise(promise, 'userSettingsUpdate');
         },
         [updateSettingsMutation, utils.user.settings],
     );
@@ -242,6 +263,22 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                 <FormRadioInput value="system" label="System" />
                                 <FormRadioInput value="dark" label="Dark" />
                                 <FormRadioInput value="light" label="Light" />
+                            </FormRadio>
+                        </Fieldset>
+                    </Form>
+                </SettingsCard>
+                <SettingsCard>
+                    <Form>
+                        <Fieldset title={tr('Locale')}>
+                            <FormRadio
+                                label="Locale"
+                                name="locale"
+                                value={settings.data?.locale}
+                                onChange={onLocaleChange}
+                            >
+                                {languages.map((language) => (
+                                    <FormRadioInput value={language} label={language} key={language} />
+                                ))}
                             </FormRadio>
                         </Fieldset>
                     </Form>
