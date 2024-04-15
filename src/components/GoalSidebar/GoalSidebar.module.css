@@ -1,3 +1,11 @@
 .PartnershipProjectsList {
     padding-left: var(--gap-xs);
 }
+
+.GoalRelationKinds {
+    margin-bottom: var(--gap-m);
+}
+
+.GoalRelationsIssueMeta:last-of-type {
+    margin-bottom: var(--gap-s);
+}

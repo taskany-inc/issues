@@ -15,7 +15,7 @@ export const IssueMeta: React.FC<IssueMetaProps> = ({ title, children, className
     return (
         <div className={cn(s.IssueMeta, className)} {...rest}>
             {nullable(title, (t) => (
-                <Text size="s" className={s.IssueMetaTitle}>
+                <Text size="m" weight="bold" className={s.IssueMetaTitle}>
                     {t}
                 </Text>
             ))}

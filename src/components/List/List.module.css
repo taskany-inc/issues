@@ -1,0 +1,6 @@
+.List {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    margin-bottom: var(--gap-s);
+}
