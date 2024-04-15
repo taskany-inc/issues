@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.34.0](https://github.com/taskany-inc/issues/compare/v2.33.0...v2.34.0) (2024-04-15)
+
+
+### Features
+
+* change locale in settings ([1575984](https://github.com/taskany-inc/issues/commit/15759841eeb2c2b0f9c332f1dd7851baedda62c6))
+* sorting at filters bar ([7c27d29](https://github.com/taskany-inc/issues/commit/7c27d2907c4d56c2a2d38274fb3fa594f7891cb0))
+
+
+### Bug Fixes
+
+* colors in whats news ([052ea79](https://github.com/taskany-inc/issues/commit/052ea79b49f48dd731e6aacd4921bb88e6073088))
+* comment time color blinking ([6054ebf](https://github.com/taskany-inc/issues/commit/6054ebf1df8891ee7c71b6d215329ea6ce5ac6e5))
+
 ## [2.33.0](https://github.com/taskany-inc/issues/compare/v2.32.1...v2.33.0) (2024-04-11)
 
 
