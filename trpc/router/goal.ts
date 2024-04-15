@@ -170,10 +170,10 @@ export const goal = router({
                     take: limit + 1,
                     skip,
                     cursor: cursor ? { id: cursor } : undefined,
-                    ...(query ? goalsFilter(query, activityId, role) : {}),
                     orderBy: {
                         id: 'asc',
                     },
+                    ...(query ? goalsFilter(query, activityId, role) : {}),
                     include: getGoalDeepQuery({
                         activityId,
                         role,
