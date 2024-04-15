@@ -12,5 +12,6 @@
     "title": "Taskany — {user} — Настройки",
     "You are hero": "Ты наш герой",
     "Beta features": "Участвовать в бета-тестировании",
-    "Nickname already exists": "Логин уже существует"
+    "Nickname already exists": "Логин уже существует",
+    "Locale": "Язык"
 }
