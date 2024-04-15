@@ -255,7 +255,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                     <Form>
                         <Fieldset title={tr('Appearance')}>
                             <FormRadio
-                                label="Theme"
+                                label={tr('Theme')}
                                 name="theme"
                                 value={appearanceTheme}
                                 onChange={onAppearanceThemeChange}
@@ -271,7 +271,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                     <Form>
                         <Fieldset title={tr('Locale')}>
                             <FormRadio
-                                label="Locale"
+                                label={tr('Locale')}
                                 name="locale"
                                 value={settings.data?.locale}
                                 onChange={onLocaleChange}
