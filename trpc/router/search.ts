@@ -6,18 +6,34 @@ import { getGoalDeepQuery } from '../queries/goals';
 import { getProjectAccessFilter } from '../queries/access';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 import { nonArchivedPartialQuery } from '../queries/project';
+import { translit } from '../../src/utils/translit';
 
 export const search = router({
     global: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
         const { activityId, role } = ctx.session.user;
 
+        const translitInput = translit(input);
+
         const [goals, projects] = await Promise.all([
             prisma.goal.findMany({
                 take: 5,
+                orderBy: {
+                    _relevance: {
+                        fields: ['title', 'description'],
+                        search: input,
+                        sort: 'asc',
+                    },
+                },
                 where: {
                     AND: [
                         {
                             OR: [
+                                {
+                                    title: {
+                                        contains: translitInput,
+                                        mode: 'insensitive',
+                                    },
+                                },
                                 {
                                     title: {
                                         contains: input,
@@ -51,9 +67,22 @@ export const search = router({
             }),
             prisma.project.findMany({
                 take: 5,
+                orderBy: {
+                    _relevance: {
+                        fields: ['title', 'description'],
+                        search: input,
+                        sort: 'asc',
+                    },
+                },
                 where: {
                     personal: false,
                     OR: [
+                        {
+                            title: {
+                                contains: translitInput,
+                                mode: 'insensitive',
+                            },
+                        },
                         {
                             title: {
                                 contains: input,
