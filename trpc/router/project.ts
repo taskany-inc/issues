@@ -203,7 +203,7 @@ export const project = router({
                 },
             });
             const projectIdsArray = projectIds.map(({ id }) => id);
-            const goalsFilters = goalsQuery ? { ...goalsFilter(goalsQuery, activityId, role).where } : {};
+            const goalsFilters = goalsQuery ? { ...goalsFilter(goalsQuery, activityId, role) } : undefined;
 
             const { where: projectWhere } = getProjectSchema({
                 role,
@@ -217,11 +217,11 @@ export const project = router({
                                 in: projectIdsArray,
                             },
                             AND: [
-                                goalsQuery
+                                goalsFilters
                                     ? {
                                           goals: {
                                               some: {
-                                                  AND: goalsFilters,
+                                                  AND: goalsFilters.where,
                                               },
                                           },
                                       }
@@ -235,7 +235,7 @@ export const project = router({
                                         {
                                             OR: whereGoalsSchema,
                                         },
-                                        goalsFilters,
+                                        goalsFilters ? goalsFilters.where : null,
                                         nonArchivedPartialQuery,
                                     ],
                                 },
@@ -283,7 +283,7 @@ export const project = router({
                             //  all goals with filters
                             where: {
                                 AND: [
-                                    goalsFilters,
+                                    goalsFilters?.where ?? {},
                                     {
                                         OR: [
                                             ...whereGoalsSchema,
@@ -297,6 +297,7 @@ export const project = router({
                                     nonArchivedPartialQuery,
                                 ],
                             },
+                            orderBy: goalsFilters?.orderBy,
                             include: {
                                 tags: goalsDeepIncludeSchema.tags,
                                 state: goalsDeepIncludeSchema.state,
