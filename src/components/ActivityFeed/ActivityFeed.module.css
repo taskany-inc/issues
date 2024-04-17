@@ -3,6 +3,7 @@
     row-gap: var(--gap-m);
     padding-bottom: 250px;
     position: relative;
+    margin-top: var(--gap-m);
 }
 
 .ActivityFeedItem {
@@ -10,10 +11,6 @@
     grid-template-columns: 32px minmax(0, 1fr);
     column-gap: var(--gap-m);
     position: relative;
-}
-
-.ActivityFeedItem:first-child {
-    padding-top: 20px;
 }
 
 .ActivityFeedItem:first-child::before {

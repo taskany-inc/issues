@@ -19,3 +19,7 @@
 .CardCommentEmptyDescription {
     color: var(--text-secondary);
 }
+
+.GoalContentHeaderCard {
+    margin-bottom: var(--gap-m);
+}
