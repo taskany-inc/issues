@@ -1,16 +1,17 @@
 import { FC, ReactNode, useCallback, useMemo } from 'react';
-import { Keyboard, Tip } from '@taskany/bricks';
-import { BaseIconProps, IconBulbOnOutline } from '@taskany/icons';
+import { Keyboard } from '@taskany/bricks';
+import { IconBulbOnOutline } from '@taskany/icons';
+import { Tip } from '@taskany/bricks/harmony';
 
 import { I18nKey, tr } from './RotatableTip.i18n';
 import s from './RotatableTip.module.css';
 
 type TipContext = 'project' | 'goal' | 'settings' | 'invites';
-interface RotatableTipProps extends Partial<Pick<BaseIconProps, 'size'>> {
+interface RotatableTipProps {
     context?: TipContext;
 }
 
-const RotatableTip: FC<RotatableTipProps> = ({ context, size = 's' }) => {
+const RotatableTip: FC<RotatableTipProps> = ({ context }) => {
     const generateTip = useCallback((key: I18nKey, options?: { ctx?: TipContext } & Record<string, ReactNode>) => {
         return tr.raw(key, {
             key: <Keyboard key="command/enter" command enter />,
@@ -44,7 +45,7 @@ const RotatableTip: FC<RotatableTipProps> = ({ context, size = 's' }) => {
     const randomIndex = useMemo(() => Math.floor(Math.random() * allTips.length), [allTips.length]);
 
     return (
-        <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size={size} className={s.TipIcon} />} size={size}>
+        <Tip title={tr('Pro tip!')} icon={<IconBulbOnOutline size="s" className={s.TipIcon} />}>
             {allTips[randomIndex](context)}
         </Tip>
     );

@@ -10,7 +10,6 @@
     padding: var(--gap-s) 0;
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.ModalHeaderTitle.ModalHeaderTitle {
+.ModalHeaderTitle {
     color: var(--warn0);
 }

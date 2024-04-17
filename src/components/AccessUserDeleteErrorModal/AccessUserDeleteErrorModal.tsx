@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import NextLink from 'next/link';
-import { FormTitle, ModalContent, ModalHeader, Tip } from '@taskany/bricks';
+import { FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
 import { IconExclamationCircleSolid } from '@taskany/icons';
-import { Button, Link, Text } from '@taskany/bricks/harmony';
+import { Button, Link, Text, Tip } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import ModalOnEvent, { ModalContext } from '../ModalOnEvent';
