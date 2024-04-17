@@ -14,10 +14,10 @@ import {
     nullable,
     UserPic,
     Tag,
-    Tip,
 } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
 import {
+    Tip,
     Text,
     Button,
     FormControl,
