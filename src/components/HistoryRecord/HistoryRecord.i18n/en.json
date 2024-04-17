@@ -30,5 +30,6 @@
     "author and the other author made changes in": "{author} and {oneMoreAuthor} made changes in{space}{subject}",
     "author made changes in": "{author} made changes in{space}{subject}",
     "Expand changes": "",
-    "Collapse changes": ""
+    "Collapse changes": "",
+    "records count": "{count} time(s)"
 }

@@ -593,7 +593,7 @@ export const HistoryRecordGroup: React.FC<{
 
                                     return <React.Fragment key={key}>{part}</React.Fragment>;
                                 })}{' '}
-                                {values.length} раз(а)
+                                {tr('records count', { count: values.length })}
                             </HistoryRecordText>
                         </HistoryRecordBricks>
                         <HistoryRecordCollapseBricks translates={[tr('Collapse changes'), tr('Expand changes')]}>
