@@ -44,7 +44,7 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ description, dat
     }, [onCopyDescription]);
 
     return (
-        <Card>
+        <Card className={s.GoalContentHeaderCard}>
             <CardInfo className={s.CardInfo} onClick={onDateViewTypeChange}>
                 <RelativeTime kind={kind} className={s.CardInfoTime} isRelativeTime={isRelative} date={date} />
                 {nullable(description, () => (
