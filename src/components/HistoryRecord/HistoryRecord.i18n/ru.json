@@ -30,5 +30,6 @@
     "author and the other author made changes in": "{author} и {oneMoreAuthor} внесли изменения в{space}{subject}",
     "author made changes in": "{author} внес(ла) изменения в{space}{subject}",
     "Expand changes": "Развернуть изменения",
-    "Collapse changes": "Свернуть изменения"
+    "Collapse changes": "Свернуть изменения",
+    "records count": "{count} раз(а)"
 }
