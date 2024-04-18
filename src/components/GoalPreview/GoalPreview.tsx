@@ -52,6 +52,15 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
         [onDelete],
     );
 
+    const handleOpenPreview = useCallback(
+        <T extends { _shortId: string; [key: string]: unknown }>(goal: T | null) => {
+            if (goal != null) {
+                setPreview(goal._shortId, goal);
+            }
+        },
+        [setPreview],
+    );
+
     return (
         <ModalPreview visible onClose={onPreviewClose} className={s.ModalPreview}>
             <ModalHeader className={s.ModalHeader}>
@@ -98,7 +107,7 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
                 </ModalContent>
                 <ModalContent className={s.ModalContent}>
                     {nullable(goal, (g) => (
-                        <GoalSidebar goal={g} onGoalTransfer={(goal) => setPreview(goal._shortId, goal)} />
+                        <GoalSidebar goal={g} onGoalTransfer={handleOpenPreview} onGoalClick={handleOpenPreview} />
                     ))}
                 </ModalContent>
             </div>
