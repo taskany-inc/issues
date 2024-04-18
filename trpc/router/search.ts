@@ -20,7 +20,8 @@ export const search = router({
                 orderBy: {
                     _relevance: {
                         fields: ['title', 'description'],
-                        search: input,
+                        // https://github.com/prisma/prisma/issues/8939#issuecomment-933990947
+                        search: input.replace(/[\s\n\t]/g, '_'),
                         sort: 'asc',
                     },
                 },
