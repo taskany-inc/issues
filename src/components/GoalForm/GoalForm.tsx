@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
@@ -105,7 +105,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         register,
         handleSubmit,
         watch,
-        setFocus,
         setValue,
         formState: { errors, isSubmitted },
     } = useForm<z.infer<typeof validitySchema>>({
@@ -129,10 +128,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     const parentWatcher = watch('parent');
     const tagsWatcher: TagModel[] = watch('tags');
     const errorsResolver = errorsProvider(errors, isSubmitted);
-
-    useEffect(() => {
-        setTimeout(() => setFocus('title'), 0);
-    }, [setFocus]);
 
     const onTagDeleteProvider = useCallback(
         (tag: Partial<TagModel>) => () => {

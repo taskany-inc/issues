@@ -233,6 +233,7 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
             error={error}
             onChange={onChange}
             placeholder={mode === 'simple' ? tr('Criteria title') : undefined}
+            autoFocus
         />
     );
 };

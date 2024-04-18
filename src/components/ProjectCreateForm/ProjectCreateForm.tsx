@@ -39,7 +39,6 @@ const ProjectCreateForm: React.FC = () => {
         register,
         handleSubmit,
         watch,
-        setFocus,
         setValue,
         control,
         formState: { errors, isSubmitted },
@@ -49,10 +48,6 @@ const ProjectCreateForm: React.FC = () => {
         reValidateMode: 'onChange',
         shouldFocusError: false,
     });
-
-    useEffect(() => {
-        setTimeout(() => setFocus('title'), 0);
-    }, [setFocus]);
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
     const titleWatcher = watch('title');
@@ -152,6 +147,7 @@ const ProjectCreateForm: React.FC = () => {
                                     placeholder={tr('Project title')}
                                     brick="bottom"
                                     size="m"
+                                    autoFocus
                                     {...projectTitleInput.attr}
                                 />
                                 {nullable(errorsResolver('title'), (error) => (

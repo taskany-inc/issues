@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Button, Text, KeyCode, useKeyboard, Popup, FormControl, FormControlInput } from '@taskany/bricks';
+import { Button, Text, KeyCode, useKeyboard, Popup } from '@taskany/bricks';
+import { FormControl, FormControlInput } from '@taskany/bricks/harmony';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import {
@@ -90,7 +91,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
         <>
             <span ref={popupRef} {...onESC}>
                 {editMode ? (
-                    <FormControl variant="outline">
+                    <FormControl>
                         <FormControlInput
                             autoFocus
                             disabled={disabled}
@@ -99,6 +100,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                             onChange={onInputChange}
                             onBlur={onInputBlur}
                             tabIndex={tabIndex}
+                            outline
                             {...onENTER}
                             {...projectKeyPredictorInput.attr}
                         />

@@ -60,6 +60,7 @@ const FeedbackCreateForm: React.FC = () => {
                         size="m"
                         {...register('title')}
                         placeholder={tr('Feedback title')}
+                        autoFocus
                     />
                     {nullable(errorsResolver('title'), (error) => (
                         <FormControlError error={error} />
