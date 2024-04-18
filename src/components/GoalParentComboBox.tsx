@@ -110,13 +110,10 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                     renderItems={(children) => <ListView>{children}</ListView>}
                     renderItem={(props) => (
                         <ListViewItem
+                            key={props.item.title}
                             value={props.item}
-                            renderItem={(viewProps) => (
-                                <MenuItem
-                                    {...viewProps}
-                                    hovered={viewProps.hovered || viewProps.active}
-                                    onClick={props.onClick}
-                                >
+                            renderItem={({ hovered, active, ...viewProps }) => (
+                                <MenuItem {...viewProps} hovered={hovered || active}>
                                     {props.item.title}
                                 </MenuItem>
                             )}

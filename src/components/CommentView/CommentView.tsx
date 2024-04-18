@@ -232,7 +232,7 @@ export const CommentView: FC<CommentViewProps> = ({
                         <div className={s.CommentActions}>
                             <Dropdown>
                                 <DropdownTrigger
-                                    renderTrigger={(props) => (
+                                    renderTrigger={({ onClick, ref }) => (
                                         <Button
                                             size="xs"
                                             view="ghost"
@@ -241,7 +241,8 @@ export const CommentView: FC<CommentViewProps> = ({
                                                 <IconMoreVerticalOutline
                                                     size="xs"
                                                     className={s.DropdownTrigger}
-                                                    {...props}
+                                                    ref={ref}
+                                                    onClick={onClick}
                                                     {...commentDropdown.attr}
                                                 />
                                             }

@@ -175,7 +175,7 @@ const HistoryRecordInner = ({ author, subject, action, createdAt, children }: Hi
                     title={user.name}
                     date={<RelativeTime date={createdAt} className={s.HistoryRecordTime} />}
                 >
-                    <HistoryRecordText as="p" weight="thin">
+                    <HistoryRecordText as="div" weight="thin">
                         {translates[actionText]} {translates[subjectText]} {children}
                     </HistoryRecordText>
                 </HistoryRecordBricks>
