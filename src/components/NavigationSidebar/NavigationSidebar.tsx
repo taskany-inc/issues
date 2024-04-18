@@ -2,7 +2,7 @@ import { ComponentProps, FC, HTMLAttributes, ReactNode, useState } from 'react';
 import NextLink from 'next/link';
 import cn from 'classnames';
 import { ListView, ListViewItem, nullable } from '@taskany/bricks';
-import { MenuItem, TaskanyLogo, Text } from '@taskany/bricks/harmony';
+import { Link, MenuItem, TaskanyLogo, Text } from '@taskany/bricks/harmony';
 import { IconDownSmallOutline, IconUpSmallOutline } from '@taskany/icons';
 
 import s from './NavigationSidebar.module.css';
@@ -92,16 +92,18 @@ export const NavigationItem: FC<NavigationItemProps> = ({ selected, href, childr
         value={href}
         renderItem={({ hovered, active, ...props }) => (
             <NextLink href={href} legacyBehavior>
-                <MenuItem
-                    hovered={active || hovered}
-                    className={cn({
-                        [s.MenuItem_active]: selected,
-                    })}
-                    {...props}
-                    {...rest}
-                >
-                    {children}
-                </MenuItem>
+                <Link view="primary" className={s.NavigationItemLink}>
+                    <MenuItem
+                        hovered={active || hovered}
+                        className={cn({
+                            [s.MenuItem_active]: selected,
+                        })}
+                        {...props}
+                        {...rest}
+                    >
+                        {children}
+                    </MenuItem>
+                </Link>
             </NextLink>
         )}
     />

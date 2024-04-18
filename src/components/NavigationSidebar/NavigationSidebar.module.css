@@ -59,6 +59,10 @@
     user-select: none;
 }
 
+.NavigationItemLink:hover {
+    color: inherit;
+}
+
 .MenuItem_active {
     background-color: var(--layer-above);
 }
