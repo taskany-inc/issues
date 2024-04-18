@@ -38,7 +38,7 @@ export const addCalculatedGoalsFields = (goal: any, activityId: string, role: Ro
     }
     checkParent(goal.project);
 
-    const _isEditable = _isOwner || _isIssuer || parentOwner || role === 'ADMIN';
+    const _isEditable = _isParticipant || _isOwner || _isIssuer || parentOwner || role === 'ADMIN';
 
     return {
         _isOwner,
