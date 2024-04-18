@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Text, Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
 import { Button, FormControl, FormControlInput } from '@taskany/bricks/harmony';
@@ -20,20 +20,6 @@ interface GoalDeleteModalProps {
 
 export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onConfirm, onCancel }) => {
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
-    // FIXME: try to find better way to solve this issue with autoFocus
-    const ref = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        const globalListener = () => {
-            setTimeout(() => ref.current && ref.current.focus(), 0);
-        };
-
-        window.addEventListener(ModalEvent.GoalDeleteModal, globalListener);
-
-        return () => {
-            window.removeEventListener(ModalEvent.GoalDeleteModal, globalListener);
-        };
-    });
 
     const onConfirmationInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setDeleteConfirmation(e.currentTarget.value);
@@ -67,7 +53,6 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
                             placeholder={shortId}
                             autoFocus
                             onChange={onConfirmationInputChange}
-                            ref={ref}
                             size="m"
                             {...goalDeleteShortIdInput.attr}
                         />

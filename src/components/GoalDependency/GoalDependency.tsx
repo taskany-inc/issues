@@ -115,7 +115,7 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
                 />
             )}
         >
-            <FilterAutoCompleteInput onChange={setGoalQuery} {...goalDependenciesInput.attr} />
+            <FilterAutoCompleteInput onChange={setGoalQuery} autoFocus {...goalDependenciesInput.attr} />
             <AutoCompleteRadioGroup
                 title={tr('Kind')}
                 items={radios}
