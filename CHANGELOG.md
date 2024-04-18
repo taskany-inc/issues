@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.35.0](https://github.com/taskany-inc/issues/compare/v2.34.0...v2.35.0) (2024-04-18)
+
+
+### Features
+
+* replace GoalSidebar to harmony view ([72b3c53](https://github.com/taskany-inc/issues/commit/72b3c536f7c4d1815e576914c806695bfd9e8418))
+
+
+### Bug Fixes
+
+* add participants edit access ([2fa915b](https://github.com/taskany-inc/issues/commit/2fa915b1eb544c46d8e44ebbe3c800d968b02f22))
+* **GlobalSearch:** result priority ([2595751](https://github.com/taskany-inc/issues/commit/259575143fa24b30d2ad0b46d2826e3f0c445e41))
+* **HistoryRecord:** records count translation ([6983785](https://github.com/taskany-inc/issues/commit/6983785645b35142c7e1ed3895dc58507df5e3d6))
+* layout GoalActivityFeed ([c50d63c](https://github.com/taskany-inc/issues/commit/c50d63c86ff48283cc132e37721b956097bb13a4))
+* remove unexpected p in markdown ([f84893c](https://github.com/taskany-inc/issues/commit/f84893c91b3c6c5455d9ca605f265785554044d6))
+* return paddings to settings cards ([624de63](https://github.com/taskany-inc/issues/commit/624de63ecfd547d9dc1bf83b7c069330ec74cf12))
+* return sorting to Dasboard page ([a4c634c](https://github.com/taskany-inc/issues/commit/a4c634cd5cfdc17f111d2c07533a8f88ca1b5dce))
+* **UserSettingsPage:** i18n for labels in FormRadio ([3527d06](https://github.com/taskany-inc/issues/commit/3527d0601a8cc9c46e5156fd3518f4442c2907ee))
+
 ## [2.34.0](https://github.com/taskany-inc/issues/compare/v2.33.0...v2.34.0) (2024-04-15)
 
 
