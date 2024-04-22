@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.35.1](https://github.com/taskany-inc/issues/compare/v2.35.0...v2.35.1) (2024-04-22)
+
+
+### Bug Fixes
+
+* **GlobalSearch:** throws 500 ([b3aa0cd](https://github.com/taskany-inc/issues/commit/b3aa0cde027b1deac6385b1b181f0cceaf641a8f))
+* hydration errors and others ([c82235f](https://github.com/taskany-inc/issues/commit/c82235f8178bb58751091399af29c7919fba378a))
+
 ## [2.35.0](https://github.com/taskany-inc/issues/compare/v2.34.0...v2.35.0) (2024-04-18)
 
 
