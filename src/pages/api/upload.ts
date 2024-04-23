@@ -11,6 +11,8 @@ import { promisify } from 'util';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { formFieldName } from '@taskany/bricks';
 
+import { Logger } from '../../utils/logger';
+
 const writeFileAsync = promisify(writeFile);
 
 export const config = {
@@ -30,6 +32,8 @@ interface ResponseObj {
     errorMessage?: string;
 }
 
+const logger = new Logger('Upload');
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 const route = nextConnect({
@@ -46,6 +50,8 @@ const saveFileInPublic = async (filename: string, buffer: Buffer, path = `/publi
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 route.post(upload.array(formFieldName, 10), async (req: any, res: NextApiResponse) => {
+    logger.infoIncomingRequest(req);
+
     const { folder = 'common', uniqueNames = true } = req.body;
 
     let s3Client: S3Client | null = null;

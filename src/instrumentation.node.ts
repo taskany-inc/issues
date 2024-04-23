@@ -3,6 +3,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import { PinoInstrumentation } from '@opentelemetry/instrumentation-pino';
 
 if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
     const sdk = new NodeSDK({
@@ -15,6 +16,14 @@ if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
             [SemanticResourceAttributes.K8S_CLUSTER_NAME]: process.env.CLUSTER_URL,
         }),
         spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
+        instrumentations: [
+            new PinoInstrumentation({
+                logHook: (_, record) => {
+                    record[SemanticResourceAttributes.K8S_POD_NAME] = process.env.HOSTNAME;
+                    record[SemanticResourceAttributes.K8S_CLUSTER_NAME] = process.env.CLUSTER_URL;
+                },
+            }),
+        ],
     });
 
     sdk.start();
