@@ -8,6 +8,7 @@ import { trpcRouter } from '../../trpc/router';
 import type { TrpcRouter } from '../../trpc/router';
 
 import { transformer } from './transformer';
+import { setSSRLocale, TLocale } from './getLang';
 
 export interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];
@@ -30,6 +31,8 @@ export function declareSsrProps<T = ExternalPageProps>(
     return async ({ locale, req, params = {}, query }: GetServerSidePropsContext) => {
         // FIXME: getServerSession. Problem with serialazing createdAt, updatedAt
         const session = await getSession({ req });
+        // set locale for SSR errors
+        setSSRLocale(locale as TLocale);
 
         if (options?.private && !session) {
             return {

@@ -1,0 +1,5 @@
+{
+    "Cannot create goal. Project now is archived": "Cannot create goal. Project {title} ({id}) now is archived",
+    "These bindings is already exist": "These bindings is already exist",
+    "No filter with id": "No filter with id `{id}`"
+}

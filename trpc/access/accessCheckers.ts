@@ -4,6 +4,7 @@ import { addCalculatedProjectFields, checkProjectAccess } from '../queries/proje
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 
 import { CommentEntity, GoalEntity, ProjectEntity } from './accessEntityGetters';
+import { tr } from './access.i18n';
 
 type AccessCheckerResult = Readonly<{ allowed: true } | { allowed: false; errorMessage: string }>;
 
@@ -20,7 +21,7 @@ export const goalAccessChecker = (session: Session, goal: GoalEntity) => {
 
     return goal.project && checkProjectAccess(goal.project, activityId, role)
         ? allowed()
-        : notAllowed('No access to update Goal');
+        : notAllowed(tr('No access to update Goal'));
 };
 
 export const goalEditAccessChecker = (session: Session, goal: GoalEntity) => {
@@ -29,24 +30,24 @@ export const goalEditAccessChecker = (session: Session, goal: GoalEntity) => {
 
     return goal.project && checkProjectAccess(goal.project, activityId, role) && _isEditable
         ? allowed()
-        : notAllowed('No access to update Goal');
+        : notAllowed(tr('No access to update Goal'));
 };
 
 export const goalParticipantEditAccessChecker = (session: Session, goal: GoalEntity) =>
     goalEditAccessChecker(session, goal) && !goal.project?.personal
         ? allowed()
-        : notAllowed('No access to update Goal');
+        : notAllowed(tr('No access to update Goal'));
 
 export const commentAccessChecker = (session: Session, comment: CommentEntity) => {
     const { activityId } = session.user;
 
-    return comment.activityId === activityId ? allowed() : notAllowed('No access to update Comment');
+    return comment.activityId === activityId ? allowed() : notAllowed(tr('No access to update Comment'));
 };
 
 export const projectAccessChecker = (session: Session, project: ProjectEntity) => {
     const { activityId, role } = session.user;
 
-    return checkProjectAccess(project, activityId, role) ? allowed() : notAllowed('No access to update Project');
+    return checkProjectAccess(project, activityId, role) ? allowed() : notAllowed(tr('No access to update Project'));
 };
 
 export const projectEditAccessChecker = (session: Session, project: ProjectEntity) => {
@@ -56,5 +57,5 @@ export const projectEditAccessChecker = (session: Session, project: ProjectEntit
 
     return checkProjectAccess(project, activityId, role) && _isEditable
         ? allowed()
-        : notAllowed('No access to update Project');
+        : notAllowed(tr('No access to update Project'));
 };

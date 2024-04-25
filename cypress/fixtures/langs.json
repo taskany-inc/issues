@@ -27,6 +27,16 @@
             "en": ""
         }
     },
+    "AppliedFiltersBar": {
+        "Delete preset": {
+            "ru": "Удалить пресет",
+            "en": ""
+        },
+        "Save": {
+            "ru": "Сохранить",
+            "en": ""
+        }
+    },
     "CommentCreateForm": {
         "Comment": {
             "ru": "Написать",
@@ -91,12 +101,12 @@
             "en": "Weight must be between 1 and {upTo}"
         },
         "Weight": {
-            "ru": "Вес",
-            "en": ""
+            "ru": "Вес (%)",
+            "en": "Weight (%)"
         },
-        "Weight out of": {
-            "ru": "из {upTo}",
-            "en": "out of {upTo}"
+        "ex: NN%": {
+            "ru": "ex: {val}",
+            "en": "ex: {val}"
         },
         "Criteria title": {
             "ru": "Заголовок критерия",
@@ -104,14 +114,10 @@
         },
         "Simple": {
             "ru": "Критерий",
-            "en": ""
+            "en": "Todo"
         },
         "Goal": {
             "ru": "Цель",
-            "en": ""
-        },
-        "Mode": {
-            "ru": "Тип",
             "en": ""
         },
         "Add weight": {
@@ -229,7 +235,7 @@
             "en": "If you are selecting only year it means the deadline will be the end of the year. For example: {end}."
         }
     },
-    "ExplorePageLayout": {
+    "ExplorePageHeader": {
         "Top": {
             "ru": "Топ",
             "en": "Top"
@@ -321,47 +327,17 @@
             "en": "Yes, delete it"
         }
     },
-    "FilterPopup": {
-        "Pro tip!": {
-            "ru": "Совет!",
-            "en": ""
-        },
-        "You can apply and save filters as preset.": {
-            "ru": "Вы можете применить и сохранить фильтры",
-            "en": ""
-        },
-        "Cancel": {
-            "ru": "Отменить",
-            "en": ""
-        },
-        "Apply": {
-            "ru": "Применить",
-            "en": ""
-        }
-    },
     "FiltersBar": {
         "View": {
             "ru": "Вид",
             "en": "View"
-        }
-    },
-    "FiltersPanel": {
+        },
         "Filter": {
             "ru": "Фильтр",
             "en": "Filter"
-        },
-        "Reset": {
-            "ru": "Сбросить",
-            "en": "Reset"
-        },
-        "Grouping": {
-            "ru": "Группировка",
-            "en": "Grouping"
-        },
-        "Project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
+        }
+    },
+    "FiltersPanel": {
         "State": {
             "ru": "Статус",
             "en": "State"
@@ -373,48 +349,6 @@
         "Estimate": {
             "ru": "Срок",
             "en": "Estimate"
-        },
-        "Issuer": {
-            "ru": "Автор",
-            "en": "Issuer"
-        },
-        "Owner": {
-            "ru": "Ответственный",
-            "en": "Owner"
-        },
-        "Tags": {
-            "ru": "Теги",
-            "en": "Tags"
-        },
-        "Participant": {
-            "ru": "Участник",
-            "en": "Participant"
-        },
-        "Sort": {
-            "ru": "Сортировка",
-            "en": "Sort"
-        }
-    },
-    "FiltersPanelApplied": {
-        "Priority": {
-            "ru": "Приоритет",
-            "en": "Priority"
-        },
-        "State": {
-            "ru": "Статус",
-            "en": "State"
-        },
-        "Issuer": {
-            "ru": "Автор",
-            "en": "Issuer"
-        },
-        "Owner": {
-            "ru": "Владелец",
-            "en": "Owner"
-        },
-        "Participant": {
-            "ru": "Участник",
-            "en": "Participant"
         },
         "Project": {
             "ru": "Проект",
@@ -424,13 +358,45 @@
             "ru": "Тег",
             "en": "Tag"
         },
-        "Estimate": {
-            "ru": "Срок",
-            "en": "Estimate"
+        "Issuer": {
+            "ru": "Автор",
+            "en": "Issuer"
         },
-        "Sorted": {
-            "ru": "Отсортировано",
-            "en": "Sorted"
+        "Owner": {
+            "ru": "Ответственный",
+            "en": "Owner"
+        },
+        "Participant": {
+            "ru": "Участник",
+            "en": "Participant"
+        },
+        "Title": {
+            "ru": "Название",
+            "en": "Title"
+        },
+        "Activity": {
+            "ru": "Автор",
+            "en": "Issuer"
+        },
+        "UpdatedAt": {
+            "ru": "Обновлено",
+            "en": "Updated"
+        },
+        "CreatedAt": {
+            "ru": "Создано",
+            "en": "Created"
+        },
+        "Reset": {
+            "ru": "Сбросить",
+            "en": "Reset"
+        },
+        "Grouping": {
+            "ru": "Группировка",
+            "en": "Grouping"
+        },
+        "Sort": {
+            "ru": "Сортировка",
+            "en": "Sort"
         }
     },
     "FormControlEditor": {
@@ -502,9 +468,35 @@
             "ru": "Создать цель и закрыть форму",
             "en": "Create goal and close form"
         },
+        "Cannot create goal in archived project": {
+            "ru": "Невозможно создать цель. Проект \"{project} ({key})\" теперь не доступен",
+            "en": "Cannot create goal. Project \"{project} ({key})\" now is archived"
+        },
         "Cancel": {
             "ru": "Отмена",
             "en": "Cancel"
+        }
+    },
+    "GoalCriteria": {
+        "Edit": {
+            "ru": "Изменить",
+            "en": "Edit"
+        },
+        "Create as goal": {
+            "ru": "Создать, как цель",
+            "en": "Create as goal"
+        },
+        "Delete": {
+            "ru": "Удалить",
+            "en": "Delete"
+        },
+        "Achievement criteria": {
+            "ru": "Критерии достижимости",
+            "en": "Achievement criteria"
+        },
+        "Loading ...": {
+            "ru": "Загрузка ...",
+            "en": "Loading ..."
         }
     },
     "GoalDeleteModal": {
@@ -807,16 +799,28 @@
             "en": ""
         },
         "author and more made changes in": {
-            "ru": "{author} и еще {count} внесли изменения в {subject}",
-            "en": "{author} and {count} more made changes in {subject}"
+            "ru": "{author} и еще {count} внесли изменения в{space}{subject}",
+            "en": "{author} and {count} more made changes in{space}{subject}"
         },
         "author and the other author made changes in": {
-            "ru": "{author} и {oneMoreAuthor} внесли изменения в {subject}",
-            "en": "{author} and {oneMoreAuthor} made changes in {subject}"
+            "ru": "{author} и {oneMoreAuthor} внесли изменения в{space}{subject}",
+            "en": "{author} and {oneMoreAuthor} made changes in{space}{subject}"
         },
         "author made changes in": {
-            "ru": "{author} внес(ла) изменения в {subject}",
-            "en": "{author} made changes in {subject}"
+            "ru": "{author} внес(ла) изменения в{space}{subject}",
+            "en": "{author} made changes in{space}{subject}"
+        },
+        "records count": {
+            "ru": "{count} раз(а)",
+            "en": "{count} time(s)"
+        },
+        "Collapse changes": {
+            "ru": "Свернуть изменения",
+            "en": ""
+        },
+        "Expand changes": {
+            "ru": "Развернуть изменения",
+            "en": ""
         }
     },
     "HotkeysModal": {
@@ -869,26 +873,22 @@
             "en": "Load more..."
         }
     },
-    "NewGoalCriteria": {
-        "Edit": {
-            "ru": "Изменить",
-            "en": ""
+    "NavigationSidebarActionButton": {
+        "Create goal": {
+            "ru": "Цель",
+            "en": "Goal"
         },
-        "Create as goal": {
-            "ru": "Преобразовать в цель",
-            "en": "Create as goal"
+        "Create personal goal": {
+            "ru": "Личная цель",
+            "en": "Personal goal"
         },
-        "Delete": {
-            "ru": "Удалить",
-            "en": "Delete"
+        "Create project": {
+            "ru": "Проект",
+            "en": "Project"
         },
-        "Achievement criteria": {
-            "ru": "Критерии достижимости",
-            "en": "Achievement criteria"
-        },
-        "Loading ...": {
-            "ru": "Загрузка ...",
-            "en": "Loading ..."
+        "Create": {
+            "ru": "Создать",
+            "en": "Create"
         }
     },
     "OfflineBanner": {
@@ -921,38 +921,44 @@
         "Feedback": {
             "ru": "Обратная связь",
             "en": "Feedback"
+        },
+        "Locale change title": {
+            "ru": "En",
+            "en": "Ru"
         }
     },
-    "PageHeader": {
-        "Dashboard": {
-            "ru": "Главная",
-            "en": ""
+    "PageNavigation": {
+        "My goals": {
+            "ru": "Мои цели",
+            "en": "My goals"
+        },
+        "Starred": {
+            "ru": "Избранное",
+            "en": "Starred"
+        },
+        "Watching": {
+            "ru": "Подписки",
+            "en": "Watching"
+        },
+        "All goals": {
+            "ru": "Все цели",
+            "en": "All goals"
+        },
+        "All projects": {
+            "ru": "Все проекты",
+            "en": "All projects"
         },
         "Goals": {
             "ru": "Цели",
-            "en": ""
+            "en": "Goals"
         },
-        "Explore": {
-            "ru": "Обзор",
-            "en": ""
-        }
-    },
-    "PageHeaderActionButton": {
-        "Create goal": {
-            "ru": "Цель",
-            "en": "Goal"
+        "Preset": {
+            "ru": "Пресеты",
+            "en": "Preset"
         },
-        "Create personal goal": {
-            "ru": "Личная цель",
-            "en": "Personal goal"
-        },
-        "Create project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
-        "Create": {
-            "ru": "Создать",
-            "en": "Create"
+        "Projects": {
+            "ru": "Проекты",
+            "en": "Projects"
         }
     },
     "PriorityText": {
@@ -1239,40 +1245,6 @@
             "en": "Pro tip!"
         }
     },
-    "SortFilter": {
-        "title": {
-            "ru": "Название",
-            "en": "Title"
-        },
-        "state": {
-            "ru": "Статус",
-            "en": "State"
-        },
-        "priority": {
-            "ru": "Приоритет",
-            "en": "Priority"
-        },
-        "project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
-        "activity": {
-            "ru": "Автор",
-            "en": "Issuer"
-        },
-        "owner": {
-            "ru": "Ответственный",
-            "en": "Owner"
-        },
-        "updatedAt": {
-            "ru": "Обновлено",
-            "en": "Updated"
-        },
-        "createdAt": {
-            "ru": "Создано",
-            "en": "Created"
-        }
-    },
     "StarButton": {
         "Starred": {
             "ru": "Избранное",
@@ -1299,6 +1271,12 @@
             "en": ""
         }
     },
+    "TagDropdown": {
+        "Tags": {
+            "ru": "Теги",
+            "en": ""
+        }
+    },
     "UserDropdown": {
         "Suggestions": {
             "ru": "Предложения",
@@ -1309,12 +1287,6 @@
         "Type user name or email": {
             "ru": "Введите имя или email",
             "en": ""
-        }
-    },
-    "UserFilter": {
-        "You": {
-            "ru": "Это вы",
-            "en": "You"
         }
     },
     "UserInviteForm": {
@@ -1375,6 +1347,14 @@
         "Appearance": {
             "ru": "Интерфейс",
             "en": "Appearance"
+        },
+        "Theme": {
+            "ru": "Тема",
+            "en": ""
+        },
+        "Locale": {
+            "ru": "Язык",
+            "en": ""
         },
         "You are hero": {
             "ru": "Ты наш герой",

@@ -12,6 +12,7 @@ import {
     goalParticipantEditAccessChecker,
 } from './accessCheckers';
 import { getComment, getGoal, getGoalByCriteria, getGoalByShortId, getProject } from './accessEntityGetters';
+import { tr } from './access.i18n';
 
 const accessErrorCode = 'FORBIDDEN';
 
@@ -27,14 +28,14 @@ const createEntityCheckMiddleware = <TInput, TId, TEntity>(
         const { session } = ctx;
 
         if (!session) {
-            throw new TRPCError({ code: accessErrorCode, message: 'Not authorized' });
+            throw new TRPCError({ code: accessErrorCode, message: tr('Not authorized') });
         }
 
         const id = getId(input as TInput);
         const entity = await getEntity(id);
 
         if (!entity) {
-            throw new TRPCError({ code: accessErrorCode, message: 'No entity to check access' });
+            throw new TRPCError({ code: accessErrorCode, message: tr('No entity to check access') });
         }
 
         const check = checker(session, entity);

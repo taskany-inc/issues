@@ -58,6 +58,8 @@ import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFiel
 import { createComment } from '../../src/utils/db/createComment';
 import { getShortId } from '../../src/utils/getShortId';
 
+import { tr } from './router.i18n';
+
 export const goal = router({
     suggestions: protectedProcedure
         .input(suggestionsQuerySchema)
@@ -388,7 +390,10 @@ export const goal = router({
         if (actualProject.archived) {
             throw new TRPCError({
                 code: 'PRECONDITION_FAILED',
-                message: `Cannot create goal. Project "${actualProject.title} (${actualProject.id})" now is achived`,
+                message: tr('Cannot create goal. Project now is archived', {
+                    title: actualProject.title,
+                    id: actualProject.id,
+                }),
             });
         }
 
@@ -1853,7 +1858,7 @@ export const goal = router({
             });
 
             if (criteria != null) {
-                throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'These bindings is already exist' });
+                throw new TRPCError({ code: 'PRECONDITION_FAILED', message: tr('These bindings is already exist') });
             }
 
             return null;
