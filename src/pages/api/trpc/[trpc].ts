@@ -1,8 +1,10 @@
 import * as trpcNext from '@trpc/server/adapters/next';
 import * as Sentry from '@sentry/nextjs';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 import { trpcRouter } from '../../../../trpc/router';
 import { createContext } from '../../../../trpc/context';
+import getLang, { TLocale, setSSRLocale } from '../../../utils/getLang';
 
 const errorSubstitution = <T extends { code: string; message: string; stack?: string }>(
     error: T,
@@ -13,7 +15,7 @@ const errorSubstitution = <T extends { code: string; message: string; stack?: st
     delete error.stack;
 };
 
-export default trpcNext.createNextApiHandler({
+const trpcHandler = trpcNext.createNextApiHandler({
     router: trpcRouter,
     createContext,
     onError({ error, ctx, input, path, req }) {
@@ -34,3 +36,12 @@ export default trpcNext.createNextApiHandler({
         }
     },
 });
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+    const currentLocale = req.headers['x-issues-locale'] || getLang();
+
+    setSSRLocale(currentLocale as TLocale);
+    res.setHeader('x-issues-locale', currentLocale);
+
+    return trpcHandler(req, res);
+}

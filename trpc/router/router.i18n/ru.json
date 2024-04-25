@@ -1,0 +1,5 @@
+{
+    "Cannot create goal. Project now is archived": "Невозможно создать цель. Проект {title} ({id}) заархивирован",
+    "These bindings is already exist": "Такая связь уже сущевует",
+    "No filter with id": "Нет фильтра с id `{id}`"
+}

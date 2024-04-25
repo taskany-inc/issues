@@ -3,6 +3,8 @@ import { TRPCError } from '@trpc/server';
 import { prisma } from '../../src/utils/prisma';
 import { goalDeepQuery } from '../queries/goals';
 
+import { tr } from './access.i18n';
+
 export const getGoal = (id: string) =>
     prisma.goal.findUnique({
         where: { id },
@@ -32,7 +34,7 @@ export const getGoalByCriteria = async (id: string) => {
     });
 
     if (!actualCriteria?.goalId) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Criteria not found' });
+        throw new TRPCError({ code: 'NOT_FOUND', message: tr('Criteria not found') });
     }
 
     return getGoal(actualCriteria.goalId);

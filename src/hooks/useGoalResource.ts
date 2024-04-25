@@ -161,10 +161,10 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
                     }
 
                     if (error instanceof TRPCClientError) {
-                        const { data } = error;
+                        const { data, message } = error;
 
                         if ('httpStatus' in data && data.httpStatus === 412) {
-                            return errorMessages.PROJECT_IS_ARCHIVED;
+                            return message ?? errorMessages.PROJECT_IS_ARCHIVED;
                         }
                     }
                 });

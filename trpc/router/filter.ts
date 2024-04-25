@@ -7,6 +7,8 @@ import { connectionMap } from '../queries/connections';
 import { createFilterSchema } from '../../src/schema/filter';
 import { ToggleSubscriptionSchema } from '../../src/schema/common';
 
+import { tr } from './router.i18n';
+
 const includeStargizersAndActivity = {
     stargizers: true,
     activity: {
@@ -27,7 +29,7 @@ export const filter = router({
         });
 
         if (!filter) {
-            throw new TRPCError({ code: 'NOT_FOUND', message: `No filter with id ${input}` });
+            throw new TRPCError({ code: 'NOT_FOUND', message: tr('No filter with id', { id: input }) });
         }
 
         return {

@@ -62,21 +62,22 @@ function patchZodSchema<T extends FormValues>(
                 mode: z.literal('goal'),
                 id: z.string(),
                 selected: z.object({
-                    id: z.string().refine(
-                        async (val) => {
-                            if (defaultValues?.selected?.id === val) {
-                                return true;
-                            }
+                    id: z.string().superRefine(async (val, ctx) => {
+                        if (defaultValues?.selected?.id === val) {
+                            return z.NEVER;
+                        }
 
-                            try {
-                                await checkBindingsBetweenGoals(val);
-                                return true;
-                            } catch (_error) {
-                                return false;
-                            }
-                        },
-                        { message: tr('This binding is already exist'), path: [] },
-                    ),
+                        try {
+                            await checkBindingsBetweenGoals(val);
+                            return z.NEVER;
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        } catch (error: any) {
+                            ctx.addIssue({
+                                code: z.ZodIssueCode.custom,
+                                message: error.message ?? tr('This binding is already exist'),
+                            });
+                        }
+                    }),
                     title: z
                         .string()
                         .refine((val) => !data.title.includes(val), { message: tr('Title must be unique') }),
