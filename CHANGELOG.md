@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.37.0](https://github.com/taskany-inc/issues/compare/v2.36.0...v2.37.0) (2024-04-29)
+
+
+### Features
+
+* **i18n:** backend error translate ([6118e26](https://github.com/taskany-inc/issues/commit/6118e2644015b3ec10feb47379624e202d80e3d3))
+
 ## [2.36.0](https://github.com/taskany-inc/issues/compare/v2.35.1...v2.36.0) (2024-04-25)
 
 
