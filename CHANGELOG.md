@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.37.1](https://github.com/taskany-inc/issues/compare/v2.37.0...v2.37.1) (2024-05-03)
+
+
+### Bug Fixes
+
+* **GoalParentCombobox:** add handler to menu items ([af11c87](https://github.com/taskany-inc/issues/commit/af11c875be4d8480f67987242807d5d56cf3bca3))
+
 ## [2.37.0](https://github.com/taskany-inc/issues/compare/v2.36.0...v2.37.0) (2024-05-02)
 
 
