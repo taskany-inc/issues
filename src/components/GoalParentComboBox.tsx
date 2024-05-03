@@ -113,7 +113,7 @@ export const GoalParentComboBox = React.forwardRef<HTMLDivElement, GoalParentCom
                             key={props.item.title}
                             value={props.item}
                             renderItem={({ hovered, active, ...viewProps }) => (
-                                <MenuItem {...viewProps} hovered={hovered || active}>
+                                <MenuItem {...viewProps} onClick={props.onClick} hovered={hovered || active}>
                                     {props.item.title}
                                 </MenuItem>
                             )}
