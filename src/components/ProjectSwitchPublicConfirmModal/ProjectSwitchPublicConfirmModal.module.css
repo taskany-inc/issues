@@ -1,0 +1,15 @@
+.ProjectSwitchPublicConfirmContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ProjectSwitchPublicConfirmModalNote {
+    flex: 1;
+}
+
+.ProjectSwitchPublicConfirmModalActions {
+    display: flex;
+    gap: var(--gap-s);
+    justify-content: end;
+}

@@ -1,10 +1,14 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
+import { Fieldset, nullable } from '@taskany/bricks';
+import { Switch, SwitchControl } from '@taskany/bricks/harmony';
 
 import { ActivityByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { ProjectSettingsUserList } from '../ProjectSettingsUserList/ProjectSettingsUserList';
+import { SettingsCard, SettingsCardItem } from '../SettingsContent/SettingsContent';
+import { UserEditableList } from '../UserEditableList/UserEditableList';
 
+import s from './ProjectAccessUser.module.css';
 import { tr } from './ProjectAccessUser.i18n';
 
 interface ProjectAccessUserProps {
@@ -13,6 +17,7 @@ interface ProjectAccessUserProps {
 
 export const ProjectAccessUser: FC<ProjectAccessUserProps> = ({ project }) => {
     const filterIds = useMemo(() => project.accessUsers.map(({ id }) => id) ?? [], [project]);
+    const [privacyType, setPrivacyType] = useState<'private' | 'public'>(filterIds.length ? 'private' : 'public');
     const { updateProject, checkActivityGoals } = useProjectResource(project.id);
 
     const onAdd = useCallback(
@@ -44,14 +49,43 @@ export const ProjectAccessUser: FC<ProjectAccessUserProps> = ({ project }) => {
         [checkActivityGoals, project, updateProject],
     );
 
+    const onPublicClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(() => {
+        if (!filterIds.length) {
+            setPrivacyType('public');
+        } else {
+            dispatchModalEvent(ModalEvent.ProjectSwitchPublicConfirmModal, {
+                onConfirm: () => {
+                    updateProject(() => setPrivacyType('public'))({
+                        ...project,
+                        accessUsers: [],
+                    });
+                },
+            })();
+        }
+    }, [filterIds, updateProject, project]);
+
     return (
-        <ProjectSettingsUserList
-            title={tr('Access')}
-            users={project.accessUsers}
-            filterIds={filterIds}
-            onAdd={onAdd}
-            onRemove={onRemove}
-            triggerText={tr('Add user')}
-        />
+        <SettingsCard>
+            <Fieldset title={tr('Access')}>
+                <div className={s.PrivacyTypeSwitch}>
+                    <Switch value={privacyType}>
+                        <SwitchControl onClick={onPublicClick} text={tr('Public')} value="public" />
+                        <SwitchControl onClick={() => setPrivacyType('private')} text={tr('Private')} value="private" />
+                    </Switch>
+                </div>
+                {nullable(privacyType === 'private', () => (
+                    <SettingsCardItem>
+                        <UserEditableList
+                            users={project.accessUsers}
+                            filterIds={filterIds}
+                            onAdd={onAdd}
+                            onRemove={onRemove}
+                            triggerText={tr('Add user')}
+                            editable
+                        />
+                    </SettingsCardItem>
+                ))}
+            </Fieldset>
+        </SettingsCard>
     );
 };

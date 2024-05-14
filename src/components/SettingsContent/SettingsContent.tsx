@@ -1,6 +1,6 @@
-import { FormCard } from '@taskany/bricks';
 import cn from 'classnames';
-import { ReactNode } from 'react';
+import { HTMLAttributes, ReactNode } from 'react';
+import { FormCard } from '@taskany/bricks';
 
 import s from './SettingsContent.module.css';
 
@@ -23,6 +23,12 @@ export const SettingsCard = ({ view = 'default', className, children, ...props }
         </FormCard>
     );
 };
+
+export const SettingsCardItem: React.FC<HTMLAttributes<HTMLDivElement>> = ({ children, className, ...attrs }) => (
+    <div className={cn(className, s.SettingsCardItem)} {...attrs}>
+        {children}
+    </div>
+);
 
 export const SettingsContent: React.FC<{ children: React.ReactNode }> = ({ children, ...attrs }) => {
     return (

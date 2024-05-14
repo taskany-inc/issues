@@ -16,6 +16,7 @@ export enum ModalEvent {
     ImageFullScreen = 'ImageFullScreen',
     GoalPreviewModal = 'GoalPreviewModal',
     AccessUserDeleteError = 'AccessUserDeleteError',
+    ProjectSwitchPublicConfirmModal = 'ProjectSwitchPublicConfirmModal',
 }
 
 export interface MapModalToComponentProps {
@@ -27,6 +28,9 @@ export interface MapModalToComponentProps {
         };
         title?: string;
         onGoalCreate?: (goal: GoalCreateReturnType) => void;
+    };
+    [ModalEvent.ProjectSwitchPublicConfirmModal]: {
+        onConfirm?: () => void;
     };
     [ModalEvent.GoalEditModal]: unknown;
     [ModalEvent.GoalDeleteModal]: unknown;

@@ -21,3 +21,8 @@
 .SettingsCard_view_danger.SettingsCard_view_danger {
     border-color: var(--danger0);
 }
+
+.SettingsCardItem {
+    background-color: var(--gray3);
+    padding: var(--gap-s) var(--gap-m);
+}
