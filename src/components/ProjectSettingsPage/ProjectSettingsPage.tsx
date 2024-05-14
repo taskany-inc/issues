@@ -65,6 +65,7 @@ import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { ProjectAccessUser } from '../ProjectAccessUser/ProjectAccessUser';
 import { AccessUserDeleteErrorModal } from '../AccessUserDeleteErrorModal/AccessUserDeleteErrorModal';
 import { ProjectParticipants } from '../ProjectParticipants/ProjectParticipants';
+import { ProjectSwitchPublicConfirmModal } from '../ProjectSwitchPublicConfirmModal/ProjectSwitchPublicConfirmModal';
 
 import s from './ProjectSettingsPage.module.css';
 import { tr } from './ProjectSettingsPage.i18n';
@@ -318,6 +319,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
             </SettingsContent>
 
             <AccessUserDeleteErrorModal />
+
+            <ProjectSwitchPublicConfirmModal />
 
             <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
                 <ModalHeader>

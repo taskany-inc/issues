@@ -1,13 +1,15 @@
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
+import { Fieldset } from '@taskany/bricks';
 
 import { useProjectResource } from '../../hooks/useProjectResource';
-import { ProjectSettingsUserList } from '../ProjectSettingsUserList/ProjectSettingsUserList';
+import { SettingsCard, SettingsCardItem } from '../SettingsContent/SettingsContent';
+import { UserEditableList } from '../UserEditableList/UserEditableList';
 
 import { tr } from './ProjectParticipants.i18n';
 
 interface ProjectParticipantsProps {
     id: string;
-    participants: ComponentProps<typeof ProjectSettingsUserList>['users'];
+    participants: ComponentProps<typeof UserEditableList>['users'];
 }
 
 export const ProjectParticipants: FC<ProjectParticipantsProps> = ({ id, participants }) => {
@@ -29,13 +31,19 @@ export const ProjectParticipants: FC<ProjectParticipantsProps> = ({ id, particip
     );
 
     return (
-        <ProjectSettingsUserList
-            title={tr('Participants')}
-            users={participants}
-            filterIds={filterIds}
-            onAdd={onAdd}
-            onRemove={onRemove}
-            triggerText={tr('Add participant')}
-        />
+        <SettingsCard>
+            <Fieldset title={tr('Participants')}>
+                <SettingsCardItem>
+                    <UserEditableList
+                        users={participants}
+                        filterIds={filterIds}
+                        onAdd={onAdd}
+                        onRemove={onRemove}
+                        triggerText={tr('Add participant')}
+                        editable
+                    />
+                </SettingsCardItem>
+            </Fieldset>
+        </SettingsCard>
     );
 };

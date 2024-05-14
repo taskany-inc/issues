@@ -1,4 +1,6 @@
 {
     "Add user": "Add user",
-    "Access": "Access"
+    "Access": "Access",
+    "Public": "Public",
+    "Private": "Private"
 }
