@@ -1,4 +1,4 @@
-import { ExploreProjectsPage } from '../../components/ExploreProjectsPage/ExploreProjectsPage';
+import { ExploreProjectsPage } from '../../components/ExploreTopProjectsPage/ExploreTopProjectsPage';
 import { declareSsrProps } from '../../utils/declareSsrProps';
 
 export const getServerSideProps = declareSsrProps(
