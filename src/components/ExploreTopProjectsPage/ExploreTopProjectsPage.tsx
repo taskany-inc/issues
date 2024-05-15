@@ -22,7 +22,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
             <Table>
                 {projects.data.map((project) =>
                     nullable(project, (p) => (
-                        <NextLink key={p.id} href={routes.project(p.id)} passHref>
+                        <NextLink key={p.id} href={routes.project(p.id)} passHref legacyBehavior>
                             <Link>
                                 <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
                                     <ProjectListItem
