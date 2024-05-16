@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { State as StateType } from '@prisma/client';
-import { UserPic, nullable, useLatest } from '@taskany/bricks';
+import { nullable, useLatest } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
-import { Button } from '@taskany/bricks/harmony';
+import { Avatar, Button } from '@taskany/bricks/harmony';
 
 import { commentFormSubmitButton } from '../../utils/domObjects';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -121,7 +121,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
 
     return (
         <ActivityFeedItem>
-            <UserPic size={32} src={user?.image} email={user?.email} name={user?.name} />
+            <Avatar size="m" src={user?.image} email={user?.email} name={user?.name} />
 
             <CommentForm
                 description={description}

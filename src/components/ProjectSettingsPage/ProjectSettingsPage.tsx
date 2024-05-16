@@ -12,7 +12,6 @@ import {
     ModalHeader,
     ModalContent,
     nullable,
-    UserPic,
     Tag,
 } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
@@ -24,6 +23,7 @@ import {
     FormControlInput,
     FormControlLabel,
     FormControlError,
+    Avatar,
 } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -445,7 +445,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                             disabled={props.disabled}
                                             onClick={props.onClick}
                                             iconLeft={nullable(safeUserData(transferTo), ({ image, email, name }) => (
-                                                <UserPic src={image} email={email} name={name} size={16} />
+                                                <Avatar src={image} email={email} name={name} size="xs" />
                                             ))}
                                             {...projectSettingsTransferProjectOwnerButton.attr}
                                         />

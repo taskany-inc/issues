@@ -1,9 +1,9 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { UserPic, nullable, useCopyToClipboard, useLatest } from '@taskany/bricks';
+import { nullable, useCopyToClipboard, useLatest } from '@taskany/bricks';
 import { IconBinOutline, IconClipboardOutline, IconEditOutline, IconMoreVerticalOutline } from '@taskany/icons';
 import * as Sentry from '@sentry/nextjs';
-import { Card, CardContent, CardInfo, Button, Link, Text } from '@taskany/bricks/harmony';
+import { Card, CardContent, CardInfo, Button, Link, Text, Avatar } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 
 import { useReactionsResource } from '../../hooks/useReactionsResource';
@@ -176,16 +176,16 @@ export const CommentView: FC<CommentViewProps> = ({
         <ActivityFeedItem className={cn(s.CommentView, className)} id={pin ? '' : `comment-${id}`} {...comment.attr}>
             <Circle size={32}>
                 {pin ? (
-                    <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />
+                    <Avatar size="m" src={author?.image} email={author?.email} name={author?.name} />
                 ) : (
                     nullable(
                         profileUrl && author,
                         ({ email, image, name }) => (
                             <Link href={`${profileUrl}/${encodeURIComponent(email)}`} view="secondary">
-                                <UserPic size={32} src={image} email={email} name={name} />
+                                <Avatar size="m" src={image} email={email} name={name} />
                             </Link>
                         ),
-                        <UserPic size={32} src={author?.image} email={author?.email} name={author?.name} />,
+                        <Avatar size="m" src={author?.image} email={author?.email} name={author?.name} />,
                     )
                 )}
             </Circle>
