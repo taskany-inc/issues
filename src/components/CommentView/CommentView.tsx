@@ -213,8 +213,9 @@ export const CommentView: FC<CommentViewProps> = ({
                 <Card
                     className={cn(s.CommentCard, { [s.CommentCard_highlighted]: highlight })}
                     onClick={canEdit ? onCommentDoubleClick : undefined}
+                    {...headerColors}
                 >
-                    <CardInfo onClick={onDateViewTypeChange} className={s.CardInfo} corner {...headerColors}>
+                    <CardInfo onClick={onDateViewTypeChange} className={s.CardInfo} corner>
                         {nullable(author, (data) => (
                             <CommentViewHeader
                                 name={getUserName(data)}

@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { HTMLAttributes, ReactNode } from 'react';
-import { FormCard } from '@taskany/bricks';
+import { Card, CardContent } from '@taskany/bricks/harmony';
 
 import s from './SettingsContent.module.css';
 
@@ -18,9 +18,9 @@ interface SettingsCardProps {
 
 export const SettingsCard = ({ view = 'default', className, children, ...props }: SettingsCardProps) => {
     return (
-        <FormCard className={cn(s.SettingsCard, colorsMap[view], className)} {...props}>
-            {children}
-        </FormCard>
+        <Card className={cn(s.SettingsCard, colorsMap[view], className)} {...props}>
+            <CardContent view="transparent">{children}</CardContent>
+        </Card>
     );
 };
 

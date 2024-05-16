@@ -7,22 +7,19 @@
     margin-bottom: var(--gap-m);
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.SettingsCard_view_default.SettingsCard_view_default {
-    border-color: var(--gray4);
-}
-
-/* Order of styles on page: SC, CSS Modules */
-.SettingsCard_view_warning.SettingsCard_view_warning {
-    border-color: var(--warn0);
-}
-
-/* Order of styles on page: SC, CSS Modules */
-.SettingsCard_view_danger.SettingsCard_view_danger {
-    border-color: var(--danger0);
-}
-
 .SettingsCardItem {
     background-color: var(--gray3);
     padding: var(--gap-s) var(--gap-m);
+}
+
+.SettingsCard_view_default {
+    --card-background: var(--gray4);
+}
+
+.SettingsCard_view_warning {
+    --card-background: var(--warn0);
+}
+
+.SettingsCard_view_danger {
+    --card-background: var(--danger0);
 }
