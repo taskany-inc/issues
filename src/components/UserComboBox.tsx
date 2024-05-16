@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, useCallback } from 'react';
-import { UserPic, nullable, ComboBox, ListView, ListViewItem } from '@taskany/bricks';
-import { Button, FormControl, FormControlInput, MenuItem } from '@taskany/bricks/harmony';
+import { nullable, ComboBox, ListView, ListViewItem } from '@taskany/bricks';
+import { Avatar, Button, FormControl, FormControlInput, MenuItem } from '@taskany/bricks/harmony';
 
 import { trpc } from '../utils/trpcClient';
 import { ActivityByIdReturnType } from '../../trpc/inferredTypes';
@@ -87,7 +87,7 @@ export const UserComboBox = React.forwardRef<HTMLDivElement, UserComboBoxProps>(
                             disabled={props.disabled}
                             onClick={props.onClick}
                             iconLeft={nullable(safeUserData(value), (props) => (
-                                <UserPic src={props.image} email={props.email} name={props.name} size={16} />
+                                <Avatar src={props.image} email={props.email} name={props.name} size="xs" />
                             ))}
                             {...usersCombobox.attr}
                         />
