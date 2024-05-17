@@ -524,26 +524,6 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
     children,
     canEdit,
 }) => {
-    const sortedCriteriaItems = useMemo(() => {
-        const sorted = list.reduce<Record<'done' | 'undone', UnionCriteria[]>>(
-            (acc, criteria) => {
-                if (criteria.isDone) {
-                    acc.done.push(criteria);
-                } else {
-                    acc.undone.push(criteria);
-                }
-
-                return acc;
-            },
-            {
-                done: [],
-                undone: [],
-            },
-        );
-
-        return sorted.done.concat(sorted.undone);
-    }, [list]);
-
     const mapCriteriaValueWrapper = useCallback((fn?: (val: CriteriaItemValue) => void | Promise<void>) => {
         if (fn) {
             return (data: UnionCriteria) => {
@@ -589,12 +569,12 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
             </Circle>
             <IssueMeta
                 className={classNames(classes.GoalCriteriaIssueMeta, {
-                    [classes.GoalCriteriaIssueMetaReset]: sortedCriteriaItems.length === 0,
+                    [classes.GoalCriteriaIssueMetaReset]: list.length === 0,
                 })}
-                title={sortedCriteriaItems.length ? tr('Achievement criteria') : undefined}
+                title={list.length ? tr('Achievement criteria') : undefined}
             >
-                {nullable(sortedCriteriaItems, (list) => (
-                    <CriteriaList goalId={goalId} list={list} {...editableProps} />
+                {nullable(list, (l) => (
+                    <CriteriaList goalId={goalId} list={l} {...editableProps} />
                 ))}
                 {children}
             </IssueMeta>

@@ -259,9 +259,7 @@ export const goal = router({
                                     },
                                 },
                             },
-                            orderBy: {
-                                createdAt: 'asc',
-                            },
+                            orderBy: [{ isDone: 'desc' }, { updatedAt: 'desc' }],
                             where: {
                                 AND: goalAchiveCriteriaFilter(activityId, role),
                                 OR: [{ deleted: false }, { deleted: null }],

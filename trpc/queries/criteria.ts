@@ -92,8 +92,7 @@ export const criteriaQuery = (params: CriteriaParams = {}) => {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 qb.where('criteria.goalId', '=', params!.goalId as string),
             )
-            .orderBy('criteria.updatedAt desc')
-            .orderBy('criteria.isDone asc')
+            .orderBy(['criteria.isDone desc', 'criteria.updatedAt desc'])
             .$castTo<Criteria>()
     );
 };
