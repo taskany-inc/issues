@@ -1,12 +1,12 @@
 import { CircleProgressBar, nullable } from '@taskany/bricks';
-import { TableCell, TableRow } from '@taskany/bricks/harmony';
+import { TableCell, TableRow, UserGroup } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 import { IconStarSolid, IconEyeOutline } from '@taskany/icons';
-import { ComponentProps } from 'react';
+import { ComponentProps, useMemo } from 'react';
 
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-import { UserGroup } from '../UserGroup';
 import { ProjectSubscriptionButtons } from '../ProjectSubscriptionButtons';
+import { safeUserData } from '../../utils/getUserName';
 
 import s from './ProjectListItem.module.css';
 
@@ -33,15 +33,18 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
     editable,
     ...attrs
 }) => {
+    const ownerUserGroup = useMemo(() => [owner].map(safeUserData).filter(Boolean), [owner]);
+    const participantUserGroup = useMemo(() => participants?.map(safeUserData).filter(Boolean), [participants]);
+
     return (
         <TableRow className={cn(s.ProjectListItemRow, className)} {...attrs}>
-            {nullable(owner, (o) => (
+            {nullable(ownerUserGroup, (o) => (
                 <TableCell width={26}>
-                    <UserGroup users={[o]} />
+                    <UserGroup users={o} />
                 </TableCell>
             ))}
 
-            {nullable(participants, (p) => (
+            {nullable(participantUserGroup, (p) => (
                 <TableCell width={90}>
                     <UserGroup users={p} />
                 </TableCell>

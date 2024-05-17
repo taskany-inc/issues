@@ -78,13 +78,15 @@ export const UserDropdown = ({
         setInputState('');
     }, [onClose]);
 
+    const userGroup = useMemo(() => values.map(safeUserData).filter(Boolean), [values]);
+
     return (
         <Dropdown arrow onClose={handleClose}>
             <DropdownTrigger {...props}>
                 {nullable(
-                    mode === 'multiple' && values.length > 1,
+                    mode === 'multiple' && userGroup.length > 1,
                     () => (
-                        <UserGroup users={values.map(safeUserData).filter(Boolean)} />
+                        <UserGroup users={userGroup} />
                     ),
                     nullable(safeUserData(values[0]), (user) => (
                         <User name={user.name} src={user.image} email={user.email} className={s.Owner} />

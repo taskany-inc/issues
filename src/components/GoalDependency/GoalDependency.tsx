@@ -1,5 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { AutoCompleteRadioGroup, CheckboxInput } from '@taskany/bricks';
+import { UserGroup } from '@taskany/bricks/harmony';
 import { Goal } from '@prisma/client';
 
 import { trpc } from '../../utils/trpcClient';
@@ -7,7 +8,7 @@ import { ToggleGoalDependency, dependencyKind } from '../../schema/goal';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { CustomCell, GoalListItemCompact } from '../GoalListItemCompact/GoalListItemCompact';
 import { TableRowItemTitle } from '../TableRowItem/TableRowItem';
-import { UserGroup } from '../UserGroup';
+import { safeUserData } from '../../utils/getUserName';
 import { GoalSelect } from '../GoalSelect/GoalSelect';
 import {
     goalDependenciesInput,
@@ -107,7 +108,7 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
                             name: 'issuers',
                             renderColumn: (values) => (
                                 <CustomCell width={45}>
-                                    <UserGroup users={values.issuers} size={18} />
+                                    <UserGroup users={values.issuers.map(safeUserData).filter(Boolean)} size="xs" />
                                 </CustomCell>
                             ),
                         },

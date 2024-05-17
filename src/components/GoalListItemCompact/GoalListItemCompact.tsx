@@ -1,17 +1,17 @@
 import React, { ComponentProps, FC, MouseEventHandler, useMemo } from 'react';
 import cn from 'classnames';
 import { nullable, Dropdown, MenuItem } from '@taskany/bricks';
-import { TableRow, TableCell } from '@taskany/bricks/harmony';
+import { TableRow, TableCell, UserGroup } from '@taskany/bricks/harmony';
 import { IconMoreVerticalOutline, IconTargetOutline } from '@taskany/icons';
 import type { State as StateType } from '@prisma/client';
 
 import { DateType } from '../../types/date';
+import { safeUserData } from '../../utils/getUserName';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { formateEstimate } from '../../utils/dateTime';
 import { useLocale } from '../../hooks/useLocale';
 import { Priority } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { UserGroup } from '../UserGroup';
 import { TableRowItemText, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { StateDot } from '../StateDot/StateDot';
 
@@ -118,6 +118,8 @@ const Column: ColumnRender = ({ col, componentProps }) => {
         return [issuer, owner].filter(Boolean) as NonNullable<ActivityByIdReturnType>[];
     }, [componentProps]);
 
+    const issuersUsers = useMemo(() => issuers.map(safeUserData).filter(Boolean), [issuers]);
+
     if (col.renderColumn != null) {
         return col.renderColumn({ ...componentProps, issuers });
     }
@@ -142,7 +144,7 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             content = nullable(projectId, (id) => <TableRowItemText>{id}</TableRowItemText>);
             break;
         case 'issuers':
-            content = nullable(issuers, (list) => <UserGroup users={list} />);
+            content = nullable(issuersUsers, (users) => <UserGroup users={users} />);
             break;
         case 'estimate':
             content = nullable(estimate, (e) => (
