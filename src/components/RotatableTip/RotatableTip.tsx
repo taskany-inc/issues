@@ -1,7 +1,6 @@
 import { FC, ReactNode, useCallback, useMemo } from 'react';
-import { Keyboard } from '@taskany/bricks';
 import { IconBulbOnOutline } from '@taskany/icons';
-import { Tip } from '@taskany/bricks/harmony';
+import { Tip, Keyboard } from '@taskany/bricks/harmony';
 
 import { I18nKey, tr } from './RotatableTip.i18n';
 import s from './RotatableTip.module.css';

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Modal, ModalContent, Keyboard } from '@taskany/bricks';
-import { Text } from '@taskany/bricks/harmony';
+import { Modal, ModalContent } from '@taskany/bricks';
+import { Text, Keyboard } from '@taskany/bricks/harmony';
 
 import { isEventTargetInputOrTextArea } from '../../utils/hotkeys';
 

@@ -11,10 +11,9 @@ import {
     Tag,
     KeyCode,
     TagCleanButton,
-    Keyboard,
     nullable,
 } from '@taskany/bricks';
-import { Text, Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import { Text, Button, FormControl, Keyboard, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
 
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
