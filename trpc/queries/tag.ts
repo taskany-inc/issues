@@ -11,8 +11,8 @@ export const tagQuery = ({ title = '', excludedIds = [], limit = 5, id = [] }: T
     return db
         .selectFrom('Tag')
         .selectAll()
-        .$if(title?.length > 0, (qb) => qb.where('Tag.title', 'ilike', title))
+        .$if(title?.length > 0, (qb) => qb.where('Tag.title', '~*', title))
         .$if(excludedIds.length > 0, (qb) => qb.where('Tag.id', 'not in', excludedIds))
-        .$if(id.length > 0, (qb) => qb.where('Tag.id', 'in', id))
+        .$if(id.length > 0, (qb) => qb.where('Tag.id', 'in', id ?? []))
         .limit(limit);
 };

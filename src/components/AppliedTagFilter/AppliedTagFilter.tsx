@@ -21,7 +21,9 @@ export const AppliedTagFilter = ({
     onClose,
     onClearFilter,
 }: AppliedTagsFilterProps) => {
-    const { data } = trpc.tag.getByIds.useQuery(value);
+    const { data } = trpc.tag.getByIds.useQuery(value, {
+        enabled: !!value?.length,
+    });
 
     return (
         <AppliedFilter readOnly={readOnly} label={label} action={<TagCleanButton size="s" onClick={onClearFilter} />}>
