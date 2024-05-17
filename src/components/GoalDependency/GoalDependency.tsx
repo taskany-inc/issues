@@ -8,7 +8,7 @@ import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCo
 import { CustomCell, GoalListItemCompact } from '../GoalListItemCompact/GoalListItemCompact';
 import { TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { UserGroup } from '../UserGroup';
-import { GoalSelect } from '../GoalSelect';
+import { GoalSelect } from '../GoalSelect/GoalSelect';
 import {
     goalDependenciesInput,
     goalDependenciesRadios,
@@ -78,7 +78,7 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
                     rawIcon={
                         <CheckboxInput
                             className={s.GoalDependencyCheckbox}
-                            checked={props.checked}
+                            checked={props.active}
                             value={props.item.id}
                         />
                     }

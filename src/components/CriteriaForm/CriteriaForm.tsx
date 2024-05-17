@@ -13,7 +13,7 @@ import {
     SwitchControl,
 } from '@taskany/bricks/harmony';
 
-import { GoalSelect } from '../GoalSelect';
+import { GoalSelect } from '../GoalSelect/GoalSelect';
 import { GoalBadge } from '../GoalBadge';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
@@ -369,7 +369,6 @@ export const CriteriaForm = ({
         <Form onSubmit={handleSubmit(onFormSubmit)} onReset={resetHandler}>
             <GoalSelect
                 mode="single"
-                viewMode="union"
                 items={items}
                 value={value}
                 onClick={handleSelectItem}
