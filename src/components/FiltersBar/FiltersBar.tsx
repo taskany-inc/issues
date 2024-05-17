@@ -112,7 +112,7 @@ export const AddFilterDropdown = <T extends { id: string; title: string }>({
             <DropdownTrigger
                 renderTrigger={(props) =>
                     nullable(Boolean(items.length), () => (
-                        <Button text={tr('Filter')} iconLeft={<IconAddOutline size="xxs" />} {...props} />
+                        <Button text={tr('Filter')} iconLeft={<IconAddOutline size="xxs" />} ref={props.ref} />
                     ))
                 }
             />
