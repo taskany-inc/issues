@@ -17,14 +17,13 @@ export const tag = router({
                 }),
             ];
 
-            if (include) {
-                requests.push(tagQuery().where('Tag.id', 'in', include));
+            if (include?.length) {
+                requests.push(tagQuery({ id: include }));
             }
 
-            return Promise.all(requests.map((req) => req.execute())).then(([suggest, included = []]) => [
-                ...included,
-                ...suggest,
-            ]);
+            return Promise.all(requests.map((req) => req.execute())).then(([suggest, included = []]) =>
+                included.concat(suggest),
+            );
         }),
     create: protectedProcedure.input(tagCreateSchema).mutation(({ ctx, input }) => {
         return prisma.tag.create({

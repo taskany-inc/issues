@@ -15,7 +15,7 @@ interface Tag {
 type TagDropdownProps = {
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     label?: ComponentProps<typeof DropdownTrigger>['label'];
-    value?: Tag | Tag[];
+    value?: Tag[];
     query?: string;
     className?: string;
     placeholder?: string;
@@ -27,7 +27,7 @@ type TagDropdownProps = {
 
 export const TagDropdown = ({
     query = '',
-    value,
+    value = [],
     placeholder,
     mode,
     placement,
@@ -42,33 +42,25 @@ export const TagDropdown = ({
     }, [query]);
 
     const { data: suggestions } = trpc.tag.suggestions.useQuery(
-        { query: inputState },
+        { query: inputState, include: value.map(({ id }) => id) },
         {
             enabled: inputState.length >= 2,
-            cacheTime: 0,
             staleTime: 0,
         },
     );
-
-    const values = useMemo(() => {
-        const res: Tag[] = [];
-        return res.concat(value || []);
-    }, [value]);
-
-    const valuesMap = useMemo(() => {
-        return values.reduce<Record<string, boolean>>((acc, cur) => {
-            acc[cur.id] = true;
-            return acc;
-        }, {});
-    }, [values]);
 
     const items = useMemo(() => {
         if (mode === 'single') {
             return suggestions;
         }
 
+        const valuesMap = value.reduce<Record<string, boolean>>((acc, cur) => {
+            acc[cur.id] = true;
+            return acc;
+        }, {});
+
         return suggestions?.filter((suggest) => !valuesMap[suggest.id]);
-    }, [mode, suggestions, valuesMap]);
+    }, [mode, suggestions, value]);
 
     const handleClose = useCallback(() => {
         onClose?.();
@@ -79,11 +71,11 @@ export const TagDropdown = ({
         <Dropdown arrow onClose={handleClose}>
             <DropdownTrigger {...props}>
                 {nullable(
-                    mode === 'multiple' && values.length > 1,
+                    mode === 'multiple' && value.length > 1,
                     () => (
-                        <Counter count={values.length} />
+                        <Counter count={value.length} />
                     ),
-                    nullable(values, ([{ title }]) => (
+                    nullable(value, ([{ title }]) => (
                         <Text size="s" ellipsis title={title}>
                             {title}
                         </Text>
@@ -92,7 +84,7 @@ export const TagDropdown = ({
             </DropdownTrigger>
             <DropdownPanel
                 width={320}
-                value={values}
+                value={value}
                 title={tr('Tags')}
                 items={items}
                 placement={placement}
