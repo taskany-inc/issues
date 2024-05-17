@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.38.1](https://github.com/taskany-inc/issues/compare/v2.38.0...v2.38.1) (2024-05-17)
+
+
+### Bug Fixes
+
+* **Criteria:** correct sotring ([9edf53b](https://github.com/taskany-inc/issues/commit/9edf53b54c87b1fde6f4a83c17f3f9ac52375875))
+* **TagsFilter:** querying suggests ([cacbe13](https://github.com/taskany-inc/issues/commit/cacbe13f06cfbd3d3495c8a410a84f29741f4015))
+
 ## [2.38.0](https://github.com/taskany-inc/issues/compare/v2.37.1...v2.38.0) (2024-05-16)
 
 
