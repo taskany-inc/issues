@@ -1,5 +1,6 @@
 import React from 'react';
-import { Popup, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { Tooltip } from '@taskany/bricks/harmony';
 
 import { ReactionsMap } from '../../types/reactions';
 import { ReactionsButton } from '../ReactionsButton';
@@ -20,17 +21,16 @@ export const Reactions = React.memo(({ reactions, children, onClick }: Reactions
             {nullable(reactions, (reactionsMap) =>
                 Object.entries(reactionsMap).map(([reaction, { authors, count, remains }]) => {
                     return (
-                        <Popup
+                        <Tooltip
                             key={reaction}
                             target={<ReactionsButton emoji={reaction} count={count} onClick={onClick} />}
-                            tooltip
                             offset={[0, 8]}
                             maxWidth={300}
                             placement="top"
                         >
                             {authors.map(({ name }) => name).join(', ')}
                             {nullable(remains, (count) => tr.raw('and {count} more', { count }))}
-                        </Popup>
+                        </Tooltip>
                     );
                 }),
             )}
