@@ -9,3 +9,7 @@
 .GoalRelationsIssueMeta:last-of-type {
     margin-bottom: var(--gap-s);
 }
+
+.GoalTagList {
+    margin-bottom: var(--gap-s);
+}

@@ -8,12 +8,19 @@ import {
     FormTitle,
     ModalHeader,
     ModalContent,
-    Tag,
     KeyCode,
-    TagCleanButton,
     nullable,
 } from '@taskany/bricks';
-import { Text, Button, FormControl, Keyboard, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import {
+    Text,
+    Button,
+    FormControl,
+    FormControlInput,
+    FormControlError,
+    TagCleanButton,
+    Keyboard,
+    Tag,
+} from '@taskany/bricks/harmony';
 
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -102,8 +109,7 @@ const UserInviteForm: React.FC = () => {
                         isValid,
                         () =>
                             emails.map((email) => (
-                                <Tag key={email}>
-                                    <TagCleanButton onClick={onEmailRemove(email)} />
+                                <Tag key={email} action={<TagCleanButton onClick={onEmailRemove(email)} />}>
                                     {email}
                                 </Tag>
                             )),

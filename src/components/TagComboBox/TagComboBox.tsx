@@ -1,7 +1,7 @@
 import { KeyCode, nullable, useClickOutside, useKeyboard, useLatest } from '@taskany/bricks';
 import { Button, Input, Text } from '@taskany/bricks/harmony';
 import { IconAddSmallOutline, IconXSmallOutline } from '@taskany/icons';
-import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, ComponentProps, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
 import { TagObject } from '../../types/tag';
 import { notifyPromise } from '../../utils/notifyPromise';
@@ -13,21 +13,34 @@ import s from './TagComboBox.module.css';
 import { tr } from './TagComboBox.i18n';
 
 interface TagComboBoxProps {
-    text?: string;
     disabled?: boolean;
     placeholder?: string;
     query?: string;
     value?: TagObject[];
     onChange?: (value: TagObject[]) => void;
+    size?: ComponentProps<typeof Input>['size'];
+    renderAddTrigger?: (props: { onClick: () => void; attrs?: Record<string, string> }) => ReactNode;
 }
+
+const renderAddTriggerDefault: TagComboBoxProps['renderAddTrigger'] = ({ onClick, attrs }) => (
+    <Button
+        text={tr('Add tag')}
+        size="xs"
+        view="ghost"
+        iconLeft={<IconAddSmallOutline size="s" />}
+        onClick={onClick}
+        {...attrs}
+    />
+);
 
 export const TagComboBox = ({
     query = '',
+    size = 'xs',
     value = [],
     disabled,
     placeholder,
-    text = tr('Add tag'),
     onChange,
+    renderAddTrigger = renderAddTriggerDefault,
     ...props
 }: TagComboBoxProps) => {
     const comboboxRef = useRef<HTMLDivElement | null>(null);
@@ -114,36 +127,51 @@ export const TagComboBox = ({
         <div className={s.TagComboBox} ref={comboboxRef} {...props}>
             <Dropdown isOpen={isOpen} onClose={onClose} arrow>
                 <DropdownTrigger
-                    renderTrigger={(props) => (
-                        <>
-                            {nullable(props.isOpen, () => (
-                                <Input
-                                    placeholder={placeholder}
-                                    disabled={disabled}
-                                    outline
-                                    size="xs"
-                                    value={inputState}
-                                    autoFocus
-                                    onChange={handleInputChange}
-                                    ref={props.ref}
-                                    {...(isOpen ? onESC : {})}
-                                    {...comboboxInput.attr}
-                                />
-                            ))}
-                            <Button
-                                text={props.isOpen ? tr('Cancel') : text}
-                                size="xs"
-                                view="ghost"
-                                iconLeft={!props.isOpen && <IconAddSmallOutline size="s" />}
-                                iconRight={props.isOpen && <IconXSmallOutline size="s" />}
-                                onClick={() => {
-                                    props.onClick();
-                                    setIsOpen(true);
-                                }}
-                                {...tagsCombobox.attr}
-                            />
-                        </>
-                    )}
+                    renderTrigger={(props) => {
+                        const onAddClick = () => {
+                            props.onClick();
+                            setIsOpen(true);
+                        };
+
+                        return (
+                            <>
+                                {nullable(
+                                    isOpen,
+                                    () => (
+                                        <>
+                                            <Input
+                                                placeholder={placeholder}
+                                                disabled={disabled}
+                                                outline
+                                                size={size}
+                                                value={inputState}
+                                                autoFocus
+                                                onChange={handleInputChange}
+                                                ref={props.ref}
+                                                {...(isOpen ? onESC : {})}
+                                                {...comboboxInput.attr}
+                                            />
+                                            <Button
+                                                text={tr('Cancel')}
+                                                size={size}
+                                                view="ghost"
+                                                iconRight={<IconXSmallOutline size="s" />}
+                                                onClick={() => {
+                                                    props.onClick();
+                                                    setIsOpen(false);
+                                                }}
+                                                {...tagsCombobox.attr}
+                                            />
+                                        </>
+                                    ),
+                                    renderAddTrigger({
+                                        onClick: onAddClick,
+                                        attrs: tagsCombobox.attr,
+                                    }),
+                                )}
+                            </>
+                        );
+                    }}
                 />
                 <DropdownPanel
                     visible={Boolean(items.length) && Boolean(inputState.length)}
