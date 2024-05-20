@@ -1,11 +1,12 @@
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
-import { Tag, TagCleanButton, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { Tag, TagCleanButton } from '@taskany/bricks/harmony';
 import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
 
 import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { UserBadge } from '../UserBadge/UserBadge';
 import { UserComboBox } from '../UserComboBox';
-import { TagComboBox } from '../TagComboBox';
+import { TagComboBox } from '../TagComboBox/TagComboBox';
 import { GoalParentComboBox } from '../GoalParentComboBox';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { ActivityByIdReturnType, GoalByIdReturnType, GoalChangeProjectReturnType } from '../../../trpc/inferredTypes';
@@ -288,12 +289,14 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
 
             {nullable(goal._isEditable || goal.tags.length, () => (
                 <IssueMeta title={tr('Tags')}>
-                    <TagsList>
+                    <TagsList className={s.GoalTagList}>
                         {goal.tags.map((tag) => (
-                            <Tag key={tag.id}>
-                                {nullable(goal._isEditable, () => (
+                            <Tag
+                                key={tag.id}
+                                action={nullable(goal._isEditable, () => (
                                     <TagCleanButton onClick={onGoalTagRemove(goal.tags, tag)} />
                                 ))}
+                            >
                                 {tag.title}
                             </Tag>
                         ))}
@@ -305,7 +308,10 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                             placeholder={tr('Enter tag title')}
                             value={goal.tags}
                             onChange={onGoalTagAdd}
-                            renderTrigger={(props) => <AddInlineTrigger text={tr('Add tag')} onClick={props.onClick} />}
+                            size="s"
+                            renderAddTrigger={({ onClick, attrs }) => (
+                                <AddInlineTrigger text={tr('Add tag')} onClick={onClick} {...attrs} />
+                            )}
                         />
                     ))}
                 </IssueMeta>

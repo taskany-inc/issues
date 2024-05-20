@@ -12,9 +12,8 @@ import {
     ModalHeader,
     ModalContent,
     nullable,
-    Tag,
 } from '@taskany/bricks';
-import { IconExclamationCircleSolid, IconPlusCircleOutline, IconXSolid } from '@taskany/icons';
+import { IconExclamationCircleSolid, IconPlusCircleOutline } from '@taskany/icons';
 import {
     Tip,
     Text,
@@ -24,6 +23,8 @@ import {
     FormControlLabel,
     FormControlError,
     Avatar,
+    Tag,
+    TagCleanButton,
 } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -248,13 +249,17 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                             </FormControl>
                                         )}
                                         renderItem={(item) => (
-                                            <Tag className={s.Tag} key={item.id}>
+                                            <Tag
+                                                className={s.Tag}
+                                                key={item.id}
+                                                action={
+                                                    <TagCleanButton
+                                                        onClick={item.onClick}
+                                                        {...projectSettingsParentMultiInputTagClean.attr}
+                                                    />
+                                                }
+                                            >
                                                 {item.title}
-                                                <IconXSolid
-                                                    size="xxs"
-                                                    onClick={item.onClick}
-                                                    {...projectSettingsParentMultiInputTagClean.attr}
-                                                />
                                             </Tag>
                                         )}
                                         {...field}
