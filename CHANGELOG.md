@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.38.2](https://github.com/taskany-inc/issues/compare/v2.38.1...v2.38.2) (2024-05-20)
+
+
+### Bug Fixes
+
+* dom warning ([5cfb4db](https://github.com/taskany-inc/issues/commit/5cfb4db9fe4e757ca693d73672fb1aa6b324e132))
+
 ## [2.38.1](https://github.com/taskany-inc/issues/compare/v2.38.0...v2.38.1) (2024-05-17)
 
 
