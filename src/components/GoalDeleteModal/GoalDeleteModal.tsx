@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Text, Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
-import { Button, FormControl, FormControlInput } from '@taskany/bricks/harmony';
+import { Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
+import { Text, Button, FormControl, FormControlInput } from '@taskany/bricks/harmony';
 
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { goalDeleteForm, goalDeleteShortIdInput, goalDeleteSubmitButton } from '../../utils/domObjects';

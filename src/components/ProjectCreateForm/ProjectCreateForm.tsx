@@ -2,8 +2,16 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import { Text, Form, ModalContent, nullable, setRefs } from '@taskany/bricks';
-import { Button, FormControl, FormControlInput, FormControlError, Textarea, Tooltip } from '@taskany/bricks/harmony';
+import { Form, ModalContent, nullable, setRefs } from '@taskany/bricks';
+import {
+    Text,
+    Button,
+    FormControl,
+    FormControlInput,
+    FormControlError,
+    Textarea,
+    Tooltip,
+} from '@taskany/bricks/harmony';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
