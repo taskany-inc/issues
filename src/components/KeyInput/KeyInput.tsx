@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Button, KeyCode, useKeyboard, Popup } from '@taskany/bricks';
-import { FormControl, FormControlInput, Text } from '@taskany/bricks/harmony';
+import { KeyCode, useKeyboard } from '@taskany/bricks';
+import { FormControl, FormControlInput, Button, Tooltip } from '@taskany/bricks/harmony';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import {
@@ -122,18 +122,19 @@ const KeyInput: React.FC<KeyInputProps> = ({
                 )}
             </span>
 
-            <Popup
-                placement="left"
-                visible={(Boolean(tooltip) || error) && popupVisible}
-                view={available === true && !error ? 'primary' : 'danger'}
-                reference={popupRef}
-                interactive
+            <Tooltip
+                arrow
+                offset={[0, 8]}
                 minWidth={200}
                 maxWidth={250}
+                placement="left"
+                visible={(Boolean(tooltip) || error) && popupVisible}
+                reference={popupRef}
+                view={available === true && !error ? 'success' : 'danger'}
                 {...(available === true && !error ? projectKeyPredictorHint.attr : projectKeyPredictorError.attr)}
             >
-                <Text size="s">{error?.message || tooltip}</Text>
-            </Popup>
+                {error?.message || tooltip}
+            </Tooltip>
         </>
     );
 };
