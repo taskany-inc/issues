@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader, Text } from '@taskany/bricks';
+import { Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, Text } from '@taskany/bricks/harmony';
 
 import { FilterById } from '../../../trpc/inferredTypes';
 import { useFilterResource } from '../../hooks/useFilterResource';

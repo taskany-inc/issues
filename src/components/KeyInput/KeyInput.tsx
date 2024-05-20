@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Button, Text, KeyCode, useKeyboard, Popup } from '@taskany/bricks';
-import { FormControl, FormControlInput } from '@taskany/bricks/harmony';
+import { Button, KeyCode, useKeyboard, Popup } from '@taskany/bricks';
+import { FormControl, FormControlInput, Text } from '@taskany/bricks/harmony';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import {
