@@ -23,8 +23,8 @@ export const projectCancelButton = projectCreateForm.add('cancelButton');
 export const projectSubmitButton = projectCreateForm.add('submitButton');
 export const projectKeyPredictor = projectCreateForm.add('keyPredictor');
 export const projectKeyPredictorInput = projectCreateForm.add('keyPredictorInput');
-export const projectKeyPredictorHint = projectCreateForm.add('keyPredictorHint');
-export const projectKeyPredictorError = projectCreateForm.add('keyPredictorError');
+export const projectKeyPredictorHint = DO('keyPredictorHint');
+export const projectKeyPredictorError = DO('keyPredictorError');
 
 export const pageHeader = DO('pageHeader');
 export const pageTitle = pageHeader.add('title');
