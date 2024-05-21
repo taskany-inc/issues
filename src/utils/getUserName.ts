@@ -9,7 +9,7 @@ export interface UserData {
 type UserDataName = Pick<UserData, 'nickname' | 'name' | 'email'>;
 
 export const getUserName = <T extends UserDataName>(user: T): string => {
-    return user.nickname || user.name || user.email;
+    return user.name || user.nickname || user.email;
 };
 
 export const tryGetName = <T extends UserData>(user: T | null | undefined, cb: (val: T) => string) => {
