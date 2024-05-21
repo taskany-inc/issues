@@ -1,8 +1,7 @@
 import { FC } from 'react';
 import NextLink from 'next/link';
-import { FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
 import { IconExclamationCircleSolid } from '@taskany/icons';
-import { Button, Link, Text, Tip } from '@taskany/bricks/harmony';
+import { Button, Link, Text, Tip, ModalHeader, ModalContent } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import ModalOnEvent, { ModalContext } from '../ModalOnEvent';
@@ -13,10 +12,8 @@ import { tr } from './AccessUserDeleteErrorModal.i18n';
 import s from './AccessUserDeleteErrorModal.module.css';
 
 export const AccessUserDeleteErrorModal: FC = () => (
-    <ModalOnEvent view="warn" event={ModalEvent.AccessUserDeleteError}>
-        <ModalHeader>
-            <FormTitle className={s.ModalHeaderTitle}>{tr('Cannot delete person now')}</FormTitle>
-        </ModalHeader>
+    <ModalOnEvent event={ModalEvent.AccessUserDeleteError}>
+        <ModalHeader view="warning">{tr('Cannot delete person now')}</ModalHeader>
         <ModalContent>
             <Tip className={s.ModalContentTip} view="warning" icon={<IconExclamationCircleSolid size="s" />}>
                 {tr('The user has actual goals')}

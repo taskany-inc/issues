@@ -2,17 +2,7 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import {
-    Fieldset,
-    Form,
-    FormAction,
-    FormActions,
-    FormTitle,
-    FormMultiInput,
-    ModalHeader,
-    ModalContent,
-    nullable,
-} from '@taskany/bricks';
+import { Fieldset, Form, FormAction, FormActions, FormMultiInput, nullable } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline } from '@taskany/icons';
 import {
     Tip,
@@ -23,6 +13,8 @@ import {
     FormControlLabel,
     FormControlError,
     Avatar,
+    ModalHeader,
+    ModalContent,
     Tag,
     TagCleanButton,
 } from '@taskany/bricks/harmony';
@@ -327,10 +319,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
             <ProjectSwitchPublicConfirmModal />
 
-            <ModalOnEvent view="warn" event={ModalEvent.ProjectDeleteModal}>
-                <ModalHeader>
-                    <FormTitle className={s.ModalHeaderTitle}>{tr('You are trying to delete project')}</FormTitle>
-                </ModalHeader>
+            <ModalOnEvent event={ModalEvent.ProjectDeleteModal}>
+                <ModalHeader view="warning">{tr('You are trying to delete project')}</ModalHeader>
 
                 <ModalContent>
                     <SettingsCard view="warning">
@@ -407,12 +397,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 </ModalContent>
             </ModalOnEvent>
 
-            <ModalOnEvent view="warn" event={ModalEvent.ProjectTransferModal}>
-                <ModalHeader>
-                    <FormTitle className={s.ModalHeaderTitle}>
-                        {tr('You are trying to transfer project ownership')}
-                    </FormTitle>
-                </ModalHeader>
+            <ModalOnEvent event={ModalEvent.ProjectTransferModal}>
+                <ModalHeader view="warning">{tr('You are trying to transfer project ownership')}</ModalHeader>
 
                 <ModalContent>
                     <Text>
@@ -480,10 +466,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 </ModalContent>
             </ModalOnEvent>
 
-            <ModalOnEvent view="warn" event={ModalEvent.ProjectCannotDeleteModal}>
-                <ModalHeader>
-                    <FormTitle className={s.ModalHeaderTitle}>{tr('Cannot delete project now')}</FormTitle>
-                </ModalHeader>
+            <ModalOnEvent event={ModalEvent.ProjectCannotDeleteModal}>
+                <ModalHeader view="warning">{tr('Cannot delete project now')}</ModalHeader>
                 <ModalContent>
                     <Tip className={s.Tip} view="warning" icon={<IconExclamationCircleSolid size="s" />}>
                         {tr('The project has child projects')}

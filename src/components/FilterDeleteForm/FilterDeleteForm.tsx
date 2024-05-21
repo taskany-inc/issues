@@ -1,13 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
+import { Form, FormAction, FormActions } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
-import { Button, Text } from '@taskany/bricks/harmony';
+import { Button, Text, ModalContent, ModalHeader } from '@taskany/bricks/harmony';
 
 import { FilterById } from '../../../trpc/inferredTypes';
 import { useFilterResource } from '../../hooks/useFilterResource';
 
 import { tr } from './FilterDeleteForm.i18n';
-import s from './FilterDeleteForm.module.css';
 
 interface FilterDeleteFormProps {
     preset: FilterById;
@@ -36,9 +35,7 @@ const FilterDeleteForm: React.FC<FilterDeleteFormProps> = ({ preset, onSubmit, o
 
     return (
         <>
-            <ModalHeader>
-                <FormTitle className={s.FilterFormTitle}>{tr('You are trying to delete filters preset')}</FormTitle>
-            </ModalHeader>
+            <ModalHeader view="warning">{tr('You are trying to delete filters preset')}</ModalHeader>
 
             <ModalContent>
                 <Text>

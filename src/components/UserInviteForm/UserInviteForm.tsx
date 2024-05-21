@@ -1,25 +1,18 @@
 import React, { useCallback, useState, useRef } from 'react';
 import z from 'zod';
 import { FieldError } from 'react-hook-form';
+import { Form, FormAction, FormActions, FormTitle, KeyCode, nullable } from '@taskany/bricks';
 import {
-    Form,
-    FormAction,
-    FormActions,
-    FormTitle,
-    ModalHeader,
-    ModalContent,
-    KeyCode,
-    nullable,
-} from '@taskany/bricks';
-import {
+    Tag,
     Text,
     Button,
     FormControl,
+    Keyboard,
     FormControlInput,
     FormControlError,
+    ModalHeader,
+    ModalContent,
     TagCleanButton,
-    Keyboard,
-    Tag,
 } from '@taskany/bricks/harmony';
 
 import { trpc } from '../../utils/trpcClient';

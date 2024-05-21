@@ -1,13 +1,12 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Form, FormAction, FormActions, FormTitle, ModalContent, ModalHeader } from '@taskany/bricks';
-import { Text, Button, FormControl, FormControlInput } from '@taskany/bricks/harmony';
+import { Form, FormAction, FormActions } from '@taskany/bricks';
+import { Text, Button, FormControl, FormControlInput, ModalContent, ModalHeader } from '@taskany/bricks/harmony';
 
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { goalDeleteForm, goalDeleteShortIdInput, goalDeleteSubmitButton } from '../../utils/domObjects';
 
 import { tr } from './GoalDeleteModal.i18n';
-import s from './GoalDeleteModal.module.css';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
@@ -32,10 +31,8 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
     }, [onCancel]);
 
     return (
-        <ModalOnEvent view="danger" event={ModalEvent.GoalDeleteModal}>
-            <ModalHeader>
-                <FormTitle className={s.FormTitle}>{tr('You are trying to archive goal')}</FormTitle>
-            </ModalHeader>
+        <ModalOnEvent event={ModalEvent.GoalDeleteModal}>
+            <ModalHeader view="danger">{tr('You are trying to archive goal')}</ModalHeader>
 
             <ModalContent>
                 <Text>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { KeyCode, ModalContent, useClickOutside, useKeyboard } from '@taskany/bricks';
+import { KeyCode, useClickOutside, useKeyboard } from '@taskany/bricks';
+import { ModalContent } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 
