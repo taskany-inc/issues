@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormActions, FormAction, FormTextarea, ModalContent, nullable } from '@taskany/bricks';
+import { Form, FormActions, FormAction, FormTextarea, nullable } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
-import { Button, FormControl, FormControlInput, FormControlError } from '@taskany/bricks/harmony';
+import { Button, FormControl, FormControlInput, FormControlError, ModalContent } from '@taskany/bricks/harmony';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFeedbackSchema, CreateFeedback } from '../../schema/feedback';

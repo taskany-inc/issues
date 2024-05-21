@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FormTitle, ModalContent, ModalHeader, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import dynamic from 'next/dynamic';
-import { Button } from '@taskany/bricks/harmony';
+import { Button, ModalContent, ModalHeader } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 
 import { routes } from '../../hooks/router';
@@ -57,9 +57,7 @@ const WhatsNew = () => {
 
     return (
         <ModalOnEvent event={ModalEvent.WhatsNewModal}>
-            <ModalHeader>
-                <FormTitle>{tr("What's New!")}</FormTitle>
-            </ModalHeader>
+            <ModalHeader>{tr("What's New!")}</ModalHeader>
             <ModalContent>
                 {nullable(data?.version, (v) => (
                     <iframe

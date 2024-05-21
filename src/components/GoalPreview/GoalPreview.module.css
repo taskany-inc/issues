@@ -4,8 +4,7 @@
     overflow: auto;
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.ModalHeader.ModalHeader {
+.ModalHeader {
     top: 0;
     position: sticky;
 
@@ -16,14 +15,11 @@
     z-index: 3;
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.ModalContent.ModalContent {
-    /* needed that popups do not overlap each other */
+.ModalContent{
     z-index: auto;
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.ModalPreview.ModalPreview {
+.ModalPreview {
     width: 890px;
     display: flex;
     flex-direction: column;

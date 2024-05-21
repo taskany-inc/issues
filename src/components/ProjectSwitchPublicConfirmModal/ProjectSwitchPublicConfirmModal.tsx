@@ -1,5 +1,5 @@
 import { FC, useCallback } from 'react';
-import { ModalContent, ModalHeader, Tip, Button, Text } from '@taskany/bricks/harmony';
+import { ModalContent, ModalHeader, Tip, Button } from '@taskany/bricks/harmony';
 import { IconExclamationCircleSolid } from '@taskany/icons';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
@@ -24,11 +24,7 @@ const ProjectSwitchPublicConfirm: FC<{
 
     return (
         <>
-            <ModalHeader>
-                <Text size="xl" weight="bolder">
-                    {tr('You are going to make project public')}
-                </Text>
-            </ModalHeader>
+            <ModalHeader view="warning">{tr('You are going to make project public')}</ModalHeader>
             <ModalContent className={s.ProjectSwitchPublicConfirmContent}>
                 <div className={s.ProjectSwitchPublicConfirmModalNote}>
                     <Tip view="warning" icon={<IconExclamationCircleSolid size="s" />}>

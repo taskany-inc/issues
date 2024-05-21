@@ -47,7 +47,3 @@
     color: var(--gray9);
     padding-left: var(--gap-s);
 }
-
-.ModalHeaderTitle {
-    color: var(--warn0);
-}
