@@ -9,6 +9,11 @@
     color: var(--gray8);
 }
 
+.ParentProjects {
+    display: flex;
+    align-items: center;
+}
+
 .FormControl {
     display: flex;
     align-items: center;
@@ -43,7 +48,20 @@
     margin-right: var(--gap-xs);
 }
 
-.FormAction {
+.FormActionText {
     color: var(--gray9);
     padding-left: var(--gap-s);
+    flex: 1;
+}
+
+.DangerZoneContent {
+    padding: var(--gap-s);
+}
+
+.DangerZoneDeleteProject {
+    margin-top: 0;
+}
+
+.FormActionsTransfer {
+    justify-content: space-between;
 }

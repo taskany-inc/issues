@@ -1,9 +1,9 @@
-import { useEffect, useState, useCallback, ChangeEventHandler } from 'react';
+import { useEffect, useState, useCallback, ChangeEventHandler, ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
-import { Fieldset, Form, FormAction, FormActions, FormRadio, FormRadioInput, nullable } from '@taskany/bricks';
+import { Fieldset, nullable } from '@taskany/bricks';
 import { z } from 'zod';
 import dynamic from 'next/dynamic';
 import {
@@ -13,6 +13,9 @@ import {
     FormControlLabel,
     FormControlError,
     Checkbox,
+    RadioGroup,
+    RadioControl,
+    RadioGroupLabel,
 } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -25,6 +28,7 @@ import { notifyPromise } from '../../utils/notifyPromise';
 import { dispatchErrorNotification, dispatchSuccessNotification } from '../../utils/dispatchNotification';
 import { userSettings, userSettingsLogoutButton } from '../../utils/domObjects';
 import { languages } from '../../utils/getLang';
+import { FormAction, FormActions } from '../FormActions/FormActions';
 
 import s from './UserSettingsPage.module.css';
 import { tr } from './UserSettingsPage.i18n';
@@ -97,8 +101,8 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const { resolvedTheme, setTheme } = useTheme();
 
     const onAppearanceThemeChange = useCallback(
-        async (theme?: string) => {
-            if (!theme) return;
+        async (e: ChangeEvent<HTMLInputElement>) => {
+            const theme = e.target.value;
 
             const promise = updateSettingsMutation.mutateAsync(
                 {
@@ -121,8 +125,8 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
     );
 
     const onLocaleChange = useCallback(
-        async (locale?: string) => {
-            if (!locale) return;
+        async (e: ChangeEvent<HTMLInputElement>) => {
+            const locale = e.target.value;
 
             const promise = updateSettingsMutation.mutateAsync(
                 {
@@ -196,7 +200,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
         >
             <SettingsContent>
                 <SettingsCard>
-                    <Form onSubmit={handleSubmit(updateUser)}>
+                    <form onSubmit={handleSubmit(updateUser)}>
                         <Fieldset title={tr('General')}>
                             <FormControl className={s.FormControl}>
                                 <FormControlLabel weight="bold" className={s.FormControlLabel}>
@@ -242,71 +246,68 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             </FormControl>
                         </Fieldset>
 
-                        <FormActions flat="top">
-                            <FormAction left />
-                            <FormAction right inline>
+                        <FormActions>
+                            <FormAction>
                                 <Button view="primary" type="submit" disabled={!formState.isDirty} text={tr('Save')} />
                             </FormAction>
                         </FormActions>
-                    </Form>
+                    </form>
                 </SettingsCard>
 
                 <SettingsCard>
-                    <Form>
-                        <Fieldset title={tr('Appearance')}>
-                            <FormRadio
-                                label={tr('Theme')}
-                                name="theme"
-                                value={appearanceTheme}
-                                onChange={onAppearanceThemeChange}
-                            >
-                                <FormRadioInput value="system" label="System" />
-                                <FormRadioInput value="dark" label="Dark" />
-                                <FormRadioInput value="light" label="Light" />
-                            </FormRadio>
-                        </Fieldset>
-                    </Form>
+                    <Fieldset title={tr('Appearance')}>
+                        <RadioGroup
+                            className={s.FormControl}
+                            name="theme"
+                            value={appearanceTheme}
+                            onChange={onAppearanceThemeChange}
+                        >
+                            <RadioGroupLabel className={s.FormControlLabel}>{tr('Theme')}</RadioGroupLabel>
+                            <RadioControl value="system">System</RadioControl>
+                            <RadioControl value="dark">Dark</RadioControl>
+                            <RadioControl value="light">Light</RadioControl>
+                        </RadioGroup>
+                    </Fieldset>
                 </SettingsCard>
                 <SettingsCard>
-                    <Form>
-                        <Fieldset title={tr('Locale')}>
-                            <FormRadio
-                                label={tr('Locale')}
-                                name="locale"
-                                value={settings.data?.locale}
-                                onChange={onLocaleChange}
-                            >
-                                {languages.map((language) => (
-                                    <FormRadioInput value={language} label={language} key={language} />
-                                ))}
-                            </FormRadio>
-                        </Fieldset>
-                    </Form>
+                    <Fieldset title={tr('Locale')}>
+                        <RadioGroup
+                            className={s.FormControl}
+                            name="locale"
+                            value={settings.data?.locale}
+                            onChange={onLocaleChange}
+                        >
+                            <RadioGroupLabel className={s.FormControlLabel}>{tr('Locale')}</RadioGroupLabel>
+                            {languages.map((language) => (
+                                <RadioControl value={language} key={language}>
+                                    {language}
+                                </RadioControl>
+                            ))}
+                        </RadioGroup>
+                    </Fieldset>
                 </SettingsCard>
 
                 <SettingsCard>
-                    <Form>
-                        <Fieldset title={tr('You are hero')}>
-                            <FormControl className={s.FormControl}>
-                                <FormControlLabel weight="bold" className={s.FormControlLabel}>
-                                    {tr('Beta features')}:
-                                </FormControlLabel>
-                                <Checkbox checked={betaUser} onChange={onBetaUserChange} />
-                            </FormControl>
-                        </Fieldset>
-                    </Form>
+                    <Fieldset title={tr('You are hero')}>
+                        <FormControl className={s.FormControl}>
+                            <FormControlLabel weight="bold" className={s.FormControlLabel}>
+                                {tr('Beta features')}:
+                            </FormControlLabel>
+                            <Checkbox checked={betaUser} onChange={onBetaUserChange} />
+                        </FormControl>
+                    </Fieldset>
                 </SettingsCard>
 
                 <SettingsCard view="warning">
-                    <Form>
-                        <Fieldset title={tr('Danger zone')} view="warning">
-                            <FormActions>
-                                <FormAction left>
+                    <Fieldset title={tr('Danger zone')} view="warning">
+                        <div className={s.FormActionsGroup}>
+                            <FormActions className={s.FormAction} align="left">
+                                <FormAction>
                                     <Button view="warning" text={tr('Clear local cache')} onClick={clearLocalCache} />
                                 </FormAction>
                             </FormActions>
-                            <FormActions>
-                                <FormAction left>
+                            <FormActions className={s.FormAction} align="left">
+                                <FormAction>
                                     <Button
                                         view="warning"
                                         text={tr('Sign out')}
@@ -315,8 +316,8 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                     />
                                 </FormAction>
                             </FormActions>
-                        </Fieldset>
-                    </Form>
+                        </div>
+                    </Fieldset>
                 </SettingsCard>
 
                 <RotatableTip context="settings" />

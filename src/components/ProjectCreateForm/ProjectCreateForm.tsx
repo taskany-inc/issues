@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import { Form, nullable, setRefs } from '@taskany/bricks';
+import { nullable, setRefs } from '@taskany/bricks';
 import {
     Text,
     Button,
@@ -31,7 +31,7 @@ import {
     projectTitleInput,
 } from '../../utils/domObjects';
 import RotatableTip from '../RotatableTip/RotatableTip';
-import { FormActions } from '../FormActions/FormActions';
+import { FormAction, FormActions } from '../FormActions/FormActions';
 
 import { tr } from './ProjectCreateForm.i18n';
 import s from './ProjectCreateForm.module.css';
@@ -94,6 +94,17 @@ const ProjectCreateForm: React.FC = () => {
         [router, createProject],
     );
 
+    const onSubmit = useCallback(
+        (e: FormEvent<HTMLFormElement>) => {
+            e?.preventDefault();
+
+            if (isKeyUnique) {
+                handleSubmit(onCreateProject)(e);
+            }
+        },
+        [isKeyUnique, handleSubmit, onCreateProject],
+    );
+
     const onKeyDirty = useCallback(() => {
         setDirtyKey(true);
     }, []);
@@ -141,11 +152,7 @@ const ProjectCreateForm: React.FC = () => {
     return (
         <>
             <ModalContent>
-                <Form
-                    className={s.Form}
-                    onSubmit={isKeyUnique ? handleSubmit(onCreateProject) : undefined}
-                    {...projectCreateForm.attr}
-                >
+                <form className={s.Form} onSubmit={onSubmit} {...projectCreateForm.attr}>
                     <div>
                         <div className={s.ProjectTitleContainer}>
                             <FormControl className={s.FormControl}>
@@ -199,8 +206,8 @@ const ProjectCreateForm: React.FC = () => {
                         ))}
                     </div>
 
-                    <FormActions className={s.FormActions}>
-                        <div className={s.FormAction}>
+                    <FormActions className={s.FormActions} align="left">
+                        <FormAction className={s.FormAction}>
                             <Controller
                                 name="flow"
                                 control={control}
@@ -216,12 +223,12 @@ const ProjectCreateForm: React.FC = () => {
                             />
 
                             <HelpButton slug="projects" />
-                        </div>
+                        </FormAction>
                     </FormActions>
 
                     <FormActions className={s.FormActions}>
                         <RotatableTip context="project" />
-                        <div className={s.FormAction}>
+                        <FormAction>
                             <Button
                                 text={tr('Cancel')}
                                 onClick={dispatchModalEvent(ModalEvent.ProjectCreateModal)}
@@ -234,9 +241,9 @@ const ProjectCreateForm: React.FC = () => {
                                 text={tr('Create')}
                                 {...projectSubmitButton.attr}
                             />
-                        </div>
+                        </FormAction>
                     </FormActions>
-                </Form>
+                </form>
             </ModalContent>
         </>
     );

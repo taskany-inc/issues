@@ -22,7 +22,7 @@ import {
     goalCancelButton,
     goalForm,
 } from '../../utils/domObjects';
-import { FormActions } from '../FormActions/FormActions';
+import { FormAction } from '../FormActions/FormActions';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import { tr } from './GoalCreateForm.i18n';
@@ -157,7 +157,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
             onSubmit={createGoal}
             title={title}
             actionButton={
-                <FormActions>
+                <FormAction className={s.FormActions}>
                     <Button
                         text={tr('Cancel')}
                         size="m"
@@ -219,7 +219,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
                             />
                         </Dropdown>
                     </div>
-                </FormActions>
+                </FormAction>
             }
             {...goalForm.attr}
         />

@@ -1,4 +1,25 @@
 .FormActions {
     display: flex;
     gap: var(--gap-sm);
+    align-items: end;
+    margin-top: var(--gap-m);
+    align-items: center;
+}
+
+.FormAction {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.FormActions_left {
+    justify-content: start;
+}
+
+.FormActions_right {
+    justify-content: end;
+}
+
+.FormActions_spaceBetween {
+    justify-content: space-between;
 }

@@ -11,3 +11,7 @@
 .FormCreateOptionClue {
     color: var(--gray9);
 }
+
+.FormActions {
+    gap: var(--gap-sm);
+}

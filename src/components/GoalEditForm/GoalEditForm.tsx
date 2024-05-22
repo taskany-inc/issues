@@ -10,8 +10,9 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { getDateStringFromEstimate } from '../../utils/dateTime';
 import { goalForm, goalUpdateButton } from '../../utils/domObjects';
 import { dispatchPreviewUpdateEvent, useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { FormActions } from '../FormActions/FormActions';
+import { FormAction } from '../FormActions/FormActions';
 
+import s from './GoalEditForm.module.css';
 import { tr } from './GoalEditForm.i18n';
 
 interface GoalEditFormProps {
@@ -96,7 +97,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
             estimate={estimateValue}
             onSubmit={updateGoal}
             actionButton={
-                <FormActions>
+                <FormAction className={s.FormActions}>
                     <Button text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.GoalEditModal)} size="m" />
                     <Button
                         view="primary"
@@ -106,7 +107,7 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
                         size="m"
                         {...goalUpdateButton.attr}
                     />
-                </FormActions>
+                </FormAction>
             }
             {...goalForm.attr}
         />

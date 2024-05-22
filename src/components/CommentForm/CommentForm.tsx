@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { Form, FormAction, nullable, useClickOutside } from '@taskany/bricks';
+import React, { FormEvent, useCallback, useRef, useState } from 'react';
+import { nullable, useClickOutside } from '@taskany/bricks';
 import { Button, FormControl, FormControlError } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 
@@ -7,7 +7,7 @@ import { CommentSchema } from '../../schema/comment';
 import { commentForm, commentFormDescription } from '../../utils/domObjects';
 import { FormControlEditor } from '../FormControlEditor/FormControlEditor';
 import { HelpButton } from '../HelpButton/HelpButton';
-import { FormActions } from '../FormActions/FormActions';
+import { FormAction, FormActions } from '../FormActions/FormActions';
 
 import { tr } from './CommentForm.i18n';
 import s from './CommentForm.module.css';
@@ -50,9 +50,13 @@ export const CommentForm: React.FC<CommentFormProps> = ({
         onCancel?.();
     }, [onCancel]);
 
-    const onCommentSubmit = useCallback(() => {
-        onSubmit?.({ description });
-    }, [description, onSubmit]);
+    const onCommentSubmit = useCallback(
+        (e: FormEvent<HTMLFormElement>) => {
+            e?.preventDefault();
+            onSubmit?.({ description });
+        },
+        [description, onSubmit],
+    );
 
     useClickOutside(ref, () => {
         if (description === '') {
@@ -67,7 +71,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
     return (
         <div className={cn(s.CommentFormWrapper, { [s.CommentFormWrapper_focused]: focused })} ref={ref} tabIndex={0}>
-            <Form onSubmit={onCommentSubmit} {...commentForm.attr}>
+            <form onSubmit={onCommentSubmit} {...commentForm.attr}>
                 <FormControl>
                     <FormControlEditor
                         disabled={busy}
@@ -92,7 +96,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         <div className={s.FormHelpButton}>
                             <HelpButton slug="comments" />
                         </div>
-                        <FormAction right inline>
+                        <FormAction>
                             {nullable(!busy, () => (
                                 <Button text={tr('Cancel')} onClick={onCommentCancel} />
                             ))}
@@ -101,7 +105,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         </FormAction>
                     </FormActions>
                 ))}
-            </Form>
+            </form>
         </div>
     );
 };

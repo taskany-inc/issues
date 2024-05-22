@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormActions, FormAction, FormTextarea, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
 import { Button, FormControl, FormControlInput, FormControlError, ModalContent } from '@taskany/bricks/harmony';
 
@@ -10,6 +10,8 @@ import { createFeedbackSchema, CreateFeedback } from '../../schema/feedback';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { notifyPromise } from '../../utils/notifyPromise';
 import { trpc } from '../../utils/trpcClient';
+import { FormControlEditor } from '../FormControlEditor/FormControlEditor';
+import { FormActions, FormAction } from '../FormActions/FormActions';
 
 import { tr } from './FeedbackCreateForm.i18n';
 
@@ -18,11 +20,13 @@ const FeedbackCreateForm: React.FC = () => {
     const createMutation = trpc.feedback.create.useMutation();
 
     const {
+        control,
         register,
         handleSubmit,
         formState: { errors, isSubmitted },
     } = useForm<CreateFeedback>({
         resolver: zodResolver(createFeedbackSchema),
+        disabled: formBusy,
     });
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
@@ -53,7 +57,7 @@ const FeedbackCreateForm: React.FC = () => {
 
     return (
         <ModalContent>
-            <Form disabled={formBusy} onSubmit={handleSubmit(onPending, onError)}>
+            <form onSubmit={handleSubmit(onPending, onError)}>
                 <FormControl>
                     <FormControlInput
                         brick="bottom"
@@ -67,22 +71,30 @@ const FeedbackCreateForm: React.FC = () => {
                     ))}
                 </FormControl>
 
-                <FormTextarea
-                    {...register('description')}
-                    minHeight={100}
-                    placeholder={tr("Feedback description. Say anything what's on your mind")}
-                    flat="both"
-                    error={errorsResolver('description')}
+                <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                        <FormControl>
+                            <FormControlEditor
+                                {...field}
+                                height={100}
+                                placeholder={tr("Feedback description. Say anything what's on your mind")}
+                            />
+                            {nullable(errorsResolver('description'), (error) => (
+                                <FormControlError error={error} />
+                            ))}
+                        </FormControl>
+                    )}
                 />
 
-                <FormActions flat="top">
-                    <FormAction left inline />
-                    <FormAction right inline>
+                <FormActions>
+                    <FormAction>
                         <Button text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)} />
                         <Button view="primary" type="submit" text={tr('Send feedback')} />
                     </FormAction>
                 </FormActions>
-            </Form>
+            </form>
         </ModalContent>
     );
 };
