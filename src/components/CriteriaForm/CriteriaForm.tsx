@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { nullable, Form } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -366,7 +366,7 @@ export const CriteriaForm = ({
     );
 
     return (
-        <Form onSubmit={handleSubmit(onFormSubmit)} onReset={resetHandler}>
+        <form onSubmit={handleSubmit(onFormSubmit)} onReset={resetHandler}>
             <GoalSelect
                 mode="single"
                 items={items}
@@ -448,6 +448,6 @@ export const CriteriaForm = ({
             <input type="hidden" {...register('selected.id')} />
             <input type="hidden" {...register('selected._shortId')} />
             <input type="hidden" {...register('selected.title')} />
-        </Form>
+        </form>
     );
 };

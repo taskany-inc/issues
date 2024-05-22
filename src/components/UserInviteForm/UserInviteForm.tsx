@@ -1,9 +1,8 @@
 import React, { useCallback, useState, useRef } from 'react';
 import z from 'zod';
 import { FieldError } from 'react-hook-form';
-import { Form, FormAction, FormActions, FormTitle, KeyCode, nullable } from '@taskany/bricks';
+import { KeyCode, nullable } from '@taskany/bricks';
 import {
-    Tag,
     Text,
     Button,
     FormControl,
@@ -12,6 +11,7 @@ import {
     FormControlError,
     ModalHeader,
     ModalContent,
+    Tag,
     TagCleanButton,
 } from '@taskany/bricks/harmony';
 
@@ -20,6 +20,7 @@ import { notifyPromise } from '../../utils/notifyPromise';
 import { HelpButton } from '../HelpButton/HelpButton';
 import { TagsList } from '../TagsList/TagsList';
 import RotatableTip from '../RotatableTip/RotatableTip';
+import { FormAction, FormActions } from '../FormActions/FormActions';
 
 import { tr } from './UserInviteForm.i18n';
 import s from './UserInviteForm.module.css';
@@ -92,9 +93,7 @@ const UserInviteForm: React.FC = () => {
 
     return (
         <>
-            <ModalHeader>
-                <FormTitle>{tr('Invite new users')}</FormTitle>
-            </ModalHeader>
+            <ModalHeader>{tr('Invite new users')}</ModalHeader>
 
             <ModalContent>
                 <TagsList className={s.TagsList}>
@@ -115,7 +114,7 @@ const UserInviteForm: React.FC = () => {
                     )}
                 </TagsList>
 
-                <Form>
+                <form>
                     <FormControl>
                         <FormControlInput
                             ref={inputRef}
@@ -132,9 +131,8 @@ const UserInviteForm: React.FC = () => {
                         ))}
                     </FormControl>
 
-                    <FormActions flat="top">
-                        <FormAction left />
-                        <FormAction right inline>
+                    <FormActions>
+                        <FormAction>
                             <Button
                                 view="primary"
                                 type="submit"
@@ -144,7 +142,7 @@ const UserInviteForm: React.FC = () => {
                             />
                         </FormAction>
                     </FormActions>
-                </Form>
+                </form>
 
                 <div className={s.FormBottom}>
                     <RotatableTip context="invites" />

@@ -1,10 +1,10 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Form, FormAction, FormActions } from '@taskany/bricks';
 import { Text, Button, FormControl, FormControlInput, ModalContent, ModalHeader } from '@taskany/bricks/harmony';
 
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { goalDeleteForm, goalDeleteShortIdInput, goalDeleteSubmitButton } from '../../utils/domObjects';
+import { FormAction, FormActions } from '../FormActions/FormActions';
 
 import { tr } from './GoalDeleteModal.i18n';
 
@@ -43,7 +43,7 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
 
                 <br />
 
-                <Form {...goalDeleteForm.attr}>
+                <form {...goalDeleteForm.attr}>
                     <FormControl>
                         <FormControlInput
                             brick="bottom"
@@ -55,9 +55,8 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
                         />
                     </FormControl>
 
-                    <FormActions flat="top">
-                        <FormAction left />
-                        <FormAction right inline>
+                    <FormActions>
+                        <FormAction>
                             <Button text={tr('Cancel')} onClick={onDeleteCancel} />
                             <Button
                                 view="danger"
@@ -68,7 +67,7 @@ export const GoalDeleteModal: React.FC<GoalDeleteModalProps> = ({ shortId, onCon
                             />
                         </FormAction>
                     </FormActions>
-                </Form>
+                </form>
             </ModalContent>
         </ModalOnEvent>
     );

@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
 import { State, Tag as TagModel } from '@prisma/client';
-import { Form, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import {
     FormControl,
     FormControlInput,
@@ -152,7 +152,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
     return (
         <ModalContent {...attrs}>
-            <Form onSubmit={handleSubmit(onSubmit)} className={s.Form}>
+            <form onSubmit={handleSubmit(onSubmit)} className={s.Form}>
                 <div>
                     <FormControl>
                         <FormControlInput
@@ -191,7 +191,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                 </div>
 
                 {nullable(tip || !id, () => (
-                    <FormActions>
+                    <FormActions align="left">
                         {nullable(!id, () => (
                             <div className={s.SwitchGoalType}>
                                 <Switch value={goalType} onChange={onSwitchGoalType}>
@@ -325,7 +325,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
 
                     {actionButton}
                 </FormActions>
-            </Form>
+            </form>
         </ModalContent>
     );
 };

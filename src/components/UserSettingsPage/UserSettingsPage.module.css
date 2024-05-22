@@ -14,3 +14,11 @@
     align-items: center;
     background-color: var(--gray3);
 }
+
+.FormActionsGroup {
+    padding: var(--gap-sm);
+}
+
+.FormAction:first-of-type {
+    margin-top: 0;
+}

@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import { Fieldset, Form, FormAction, FormActions, FormMultiInput, nullable } from '@taskany/bricks';
+import { Fieldset, nullable } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline } from '@taskany/icons';
 import {
     Tip,
@@ -39,7 +39,6 @@ import {
     projectSettingsContent,
     projectSettingsDeleteProjectButton,
     projectSettingsDescriptionInput,
-    projectSettingsParentMultiInput,
     projectSettingsSaveButton,
     projectSettingsTitleInput,
     projectSettingsDeleteForm,
@@ -52,6 +51,7 @@ import {
     projectSettingsParentMultiInputTrigger,
     projectSettingsParentMultiInputTagClean,
     pageHeader,
+    projectSettingsParentMultiInput,
 } from '../../utils/domObjects';
 import { safeUserData } from '../../utils/getUserName';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
@@ -59,6 +59,8 @@ import { ProjectAccessUser } from '../ProjectAccessUser/ProjectAccessUser';
 import { AccessUserDeleteErrorModal } from '../AccessUserDeleteErrorModal/AccessUserDeleteErrorModal';
 import { ProjectParticipants } from '../ProjectParticipants/ProjectParticipants';
 import { ProjectSwitchPublicConfirmModal } from '../ProjectSwitchPublicConfirmModal/ProjectSwitchPublicConfirmModal';
+import { FormAction, FormActions } from '../FormActions/FormActions';
+import { GoalParentComboBox } from '../GoalParentComboBox';
 
 import s from './ProjectSettingsPage.module.css';
 import { tr } from './ProjectSettingsPage.i18n';
@@ -140,12 +142,6 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         router.project(project.data.id);
     }, [router, project.data]);
 
-    const projectParentIds = project.data?.parent?.map((p) => p.id) ?? [];
-    const [parentQuery, setParentQuery] = useState('');
-    const suggestions = trpc.project.suggestions.useQuery({
-        query: parentQuery,
-    });
-
     const pageTitle = tr
         .raw('title', {
             project: project.data?.title,
@@ -167,7 +163,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         >
             <SettingsContent {...projectSettingsContent.attr}>
                 <SettingsCard>
-                    <Form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
+                    <form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
                         <Fieldset title={tr('General')}>
                             <FormControl className={s.FormControl}>
                                 <FormControlLabel className={s.FormControlLabel} weight="bold">
@@ -218,52 +214,58 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 ))}
                             </FormControl>
 
-                            <Controller
-                                name="parent"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormMultiInput
-                                        label={tr('Parent')}
-                                        query={parentQuery}
-                                        // FIXME: move filter to server
-                                        items={suggestions.data?.filter((p) => !projectParentIds.includes(p.id))}
-                                        onInput={(q) => setParentQuery(q)}
-                                        renderTrigger={(props) => (
-                                            <IconPlusCircleOutline
-                                                size="xs"
-                                                onClick={props.onClick}
-                                                {...projectSettingsParentMultiInputTrigger.attr}
-                                            />
-                                        )}
-                                        renderInput={(props) => (
-                                            <FormControl>
-                                                <FormControlInput outline autoFocus {...props} />
-                                            </FormControl>
-                                        )}
-                                        renderItem={(item) => (
-                                            <Tag
-                                                className={s.Tag}
-                                                key={item.id}
-                                                action={
-                                                    <TagCleanButton
-                                                        onClick={item.onClick}
-                                                        {...projectSettingsParentMultiInputTagClean.attr}
-                                                    />
-                                                }
-                                            >
-                                                {item.title}
-                                            </Tag>
-                                        )}
-                                        {...field}
-                                        {...projectSettingsParentMultiInput.attr}
-                                    />
-                                )}
-                            />
+                            <FormControl className={s.FormControl}>
+                                <FormControlLabel className={s.FormControlLabel} weight="bold">
+                                    {tr('Parent')}:
+                                </FormControlLabel>
+
+                                <Controller
+                                    name="parent"
+                                    control={control}
+                                    render={({ field }) => {
+                                        const value = field.value ?? [];
+
+                                        const onProjectRemove = (project: { id: string }) =>
+                                            field.onChange(value.filter((p) => p.id !== project.id) ?? []);
+
+                                        const onProjectAdd = (project: { id: string }) =>
+                                            field.onChange([...value, project]);
+
+                                        return (
+                                            <div className={s.ParentProjects} {...projectSettingsParentMultiInput.attr}>
+                                                {field.value?.map((project) => (
+                                                    <Tag
+                                                        className={s.Tag}
+                                                        key={project.id}
+                                                        action={
+                                                            <TagCleanButton
+                                                                onClick={() => onProjectRemove(project)}
+                                                                {...projectSettingsParentMultiInputTagClean.attr}
+                                                            />
+                                                        }
+                                                    >
+                                                        {project.title}
+                                                    </Tag>
+                                                ))}
+                                                <GoalParentComboBox
+                                                    onChange={onProjectAdd}
+                                                    renderTrigger={(props) => (
+                                                        <IconPlusCircleOutline
+                                                            size="xs"
+                                                            onClick={props.onClick}
+                                                            {...projectSettingsParentMultiInputTrigger.attr}
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                        );
+                                    }}
+                                />
+                            </FormControl>
                         </Fieldset>
 
-                        <FormActions flat="top">
-                            <FormAction left />
-                            <FormAction right inline>
+                        <FormActions>
+                            <FormAction>
                                 <Button
                                     view="primary"
                                     type="submit"
@@ -273,7 +275,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 />
                             </FormAction>
                         </FormActions>
-                    </Form>
+                    </form>
                 </SettingsCard>
 
                 <ProjectAccessUser project={project.data} />
@@ -281,13 +283,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 <ProjectParticipants id={project.data.id} participants={project.data.participants} />
 
                 <SettingsCard view="warning">
-                    <Form>
-                        <Fieldset title={tr('Danger zone')} view="warning">
-                            <FormActions flat="top">
-                                <FormAction left inline>
-                                    <Text className={s.FormAction}>{tr('Be careful — all data will be lost')}</Text>
-                                </FormAction>
-                                <FormAction right inline>
+                    <Fieldset title={tr('Danger zone')} view="warning">
+                        <div className={s.DangerZoneContent}>
+                            <FormActions className={s.DangerZoneDeleteProject}>
+                                <Text className={s.FormActionText}>{tr('Be careful — all data will be lost')}</Text>
+                                <FormAction>
                                     <Button
                                         onClick={handleDeleteProjectBtnClick}
                                         view="warning"
@@ -297,11 +297,9 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 </FormAction>
                             </FormActions>
 
-                            <FormActions flat="top">
-                                <FormAction left>
-                                    <Text className={s.FormAction}>{tr('Transfer project to other person')}</Text>
-                                </FormAction>
-                                <FormAction right inline>
+                            <FormActions>
+                                <Text className={s.FormActionText}>{tr('Transfer project to other person')}</Text>
+                                <FormAction>
                                     <Button
                                         onClick={dispatchModalEvent(ModalEvent.ProjectTransferModal)}
                                         view="warning"
@@ -310,8 +308,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                     />
                                 </FormAction>
                             </FormActions>
-                        </Fieldset>
-                    </Form>
+                        </div>
+                    </Fieldset>
                 </SettingsCard>
             </SettingsContent>
 
@@ -365,7 +363,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                     <br />
 
-                    <Form {...projectSettingsDeleteForm.attr}>
+                    <form {...projectSettingsDeleteForm.attr}>
                         <FormControl>
                             <FormControlInput
                                 size="m"
@@ -376,9 +374,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                             />
                         </FormControl>
 
-                        <FormActions flat="top">
-                            <FormAction left />
-                            <FormAction right inline>
+                        <FormActions>
+                            <FormAction>
                                 <Button
                                     text={tr('Cancel')}
                                     onClick={onDeleteCancel}
@@ -393,7 +390,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 />
                             </FormAction>
                         </FormActions>
-                    </Form>
+                    </form>
                 </ModalContent>
             </ModalOnEvent>
 
@@ -413,7 +410,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
 
                     <br />
 
-                    <Form {...projectSettingsTransferForm.attr}>
+                    <form {...projectSettingsTransferForm.attr}>
                         <FormControl>
                             <FormControlInput
                                 size="m"
@@ -423,8 +420,8 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 {...projectSettingsTransferProjectKeyInput.attr}
                             />
                         </FormControl>
-                        <FormActions flat="top">
-                            <FormAction left>
+                        <FormActions align="space-between">
+                            <FormAction>
                                 <UserComboBox
                                     text={tr('New project owner')}
                                     placeholder={tr('Enter name or email')}
@@ -443,7 +440,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                     )}
                                 />
                             </FormAction>
-                            <FormAction right inline>
+                            <FormAction>
                                 <Button
                                     text={tr('Cancel')}
                                     onClick={onTransferCancel}
@@ -462,7 +459,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 />
                             </FormAction>
                         </FormActions>
-                    </Form>
+                    </form>
                 </ModalContent>
             </ModalOnEvent>
 

@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
-import { Form, FormAction, FormActions } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
 import { Button, Text, ModalContent, ModalHeader } from '@taskany/bricks/harmony';
 
 import { FilterById } from '../../../trpc/inferredTypes';
 import { useFilterResource } from '../../hooks/useFilterResource';
+import { FormAction, FormActions } from '../FormActions/FormActions';
 
 import { tr } from './FilterDeleteForm.i18n';
 
@@ -46,15 +46,12 @@ const FilterDeleteForm: React.FC<FilterDeleteFormProps> = ({ preset, onSubmit, o
 
                 <br />
 
-                <Form>
-                    <FormActions flat="top">
-                        <FormAction left />
-                        <FormAction right inline>
-                            <Button text={tr('Cancel')} onClick={onCancel} />
-                            <Button view="warning" onClick={onSubmitClick} text={tr('Yes, delete it')} />
-                        </FormAction>
-                    </FormActions>
-                </Form>
+                <FormActions>
+                    <FormAction>
+                        <Button text={tr('Cancel')} onClick={onCancel} />
+                        <Button view="warning" onClick={onSubmitClick} text={tr('Yes, delete it')} />
+                    </FormAction>
+                </FormActions>
             </ModalContent>
         </>
     );

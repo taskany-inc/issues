@@ -1,14 +1,22 @@
 import React, { useCallback, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormActions, FormTextarea, FormAction, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import * as Sentry from '@sentry/nextjs';
-import { Button, FormControl, FormControlInput, FormControlError, ModalContent } from '@taskany/bricks/harmony';
+import {
+    ModalContent,
+    Button,
+    FormControl,
+    FormControlInput,
+    FormControlError,
+    FormControlEditor,
+} from '@taskany/bricks/harmony';
 
 import { errorsProvider } from '../../utils/forms';
 import { createFilterSchema, CreateFilter } from '../../schema/filter';
 import { useFilterResource } from '../../hooks/useFilterResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { FormAction, FormActions } from '../FormActions/FormActions';
 
 import { tr } from './FilterCreateForm.i18n';
 
@@ -24,10 +32,12 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
     const [formBusy, setFormBusy] = useState(false);
 
     const {
+        control,
         register,
         handleSubmit,
         formState: { errors, isSubmitted },
     } = useForm<CreateFilter>({
+        disabled: formBusy,
         resolver: zodResolver(createFilterSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -60,7 +70,7 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
     return (
         <>
             <ModalContent>
-                <Form disabled={formBusy} onSubmit={handleSubmit(onPending, onError)}>
+                <form onSubmit={handleSubmit(onPending, onError)}>
                     <FormControl>
                         <FormControlInput
                             brick="bottom"
@@ -73,22 +83,26 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
                         ))}
                     </FormControl>
 
-                    <FormTextarea
-                        {...register('description')}
-                        minHeight={100}
-                        placeholder={tr('Preset description')}
-                        flat="both"
-                        error={errorsResolver('description')}
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field }) => (
+                            <FormControl>
+                                <FormControlEditor {...field} height={100} placeholder={tr('Preset description')} />
+                                {nullable(errorsResolver('description'), (error) => (
+                                    <FormControlError error={error} />
+                                ))}
+                            </FormControl>
+                        )}
                     />
 
-                    <FormActions flat="top">
-                        <FormAction left inline />
-                        <FormAction right inline>
+                    <FormActions>
+                        <FormAction>
                             <Button text={tr('Cancel')} onClick={dispatchModalEvent(ModalEvent.FilterCreateModal)} />
                             <Button view="primary" type="submit" text={tr('Create preset')} />
                         </FormAction>
                     </FormActions>
-                </Form>
+                </form>
             </ModalContent>
         </>
     );
