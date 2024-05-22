@@ -1,4 +1,4 @@
-import { Dropdown, MenuItem, nullable, useCopyToClipboard } from '@taskany/bricks';
+import { nullable, useCopyToClipboard } from '@taskany/bricks';
 import { Card, CardContent, CardInfo, Text } from '@taskany/bricks/harmony';
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
@@ -8,6 +8,7 @@ import * as Sentry from '@sentry/nextjs';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { useClickSwitch } from '../../hooks/useClickSwitch';
 import { notifyPromise } from '../../utils/notifyPromise';
+import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import { tr } from './GoalContentHeader.i18n';
 import s from './GoalContentHeader.module.css';
@@ -36,6 +37,7 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ description, dat
     const dropdownItems = useMemo(() => {
         return [
             {
+                id: 'copy',
                 label: tr('Copy raw'),
                 icon: <IconClipboardOutline size="xxs" />,
                 onClick: onCopyDescription,
@@ -48,22 +50,30 @@ export const GoalContentHeader: FC<GoalContentHeaderProps> = ({ description, dat
             <CardInfo className={s.CardInfo} onClick={onDateViewTypeChange}>
                 <RelativeTime kind={kind} className={s.CardInfoTime} isRelativeTime={isRelative} date={date} />
                 {nullable(description, () => (
-                    <Dropdown
-                        items={dropdownItems}
-                        renderTrigger={({ ref, onClick }) => (
-                            <IconMoreVerticalOutline
-                                size="xs"
-                                ref={ref}
-                                onClick={onClick}
-                                className={s.DropdownTrigger}
-                            />
-                        )}
-                        renderItem={({ item }) => (
-                            <MenuItem key={item.label} ghost icon={item.icon} onClick={item.onClick}>
-                                {item.label}
-                            </MenuItem>
-                        )}
-                    />
+                    <Dropdown>
+                        <DropdownTrigger
+                            renderTrigger={({ onClick, ref }) => (
+                                <IconMoreVerticalOutline
+                                    size="xs"
+                                    ref={ref}
+                                    onClick={onClick}
+                                    className={s.DropdownTrigger}
+                                />
+                            )}
+                        />
+                        <DropdownPanel
+                            placement="bottom-start"
+                            items={dropdownItems}
+                            mode="single"
+                            onChange={(props) => props.onClick?.()}
+                            renderItem={({ item }) => (
+                                <Text key={item.label} className={s.DropdownItem} onClick={item.onClick}>
+                                    {item.icon}
+                                    {item.label}
+                                </Text>
+                            )}
+                        />
+                    </Dropdown>
                 ))}
             </CardInfo>
 

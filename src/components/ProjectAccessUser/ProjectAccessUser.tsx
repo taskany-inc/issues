@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
-import { Fieldset, nullable } from '@taskany/bricks';
-import { Switch, SwitchControl } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
+import { Fieldset, Switch, SwitchControl } from '@taskany/bricks/harmony';
 
 import { ActivityByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { useProjectResource } from '../../hooks/useProjectResource';

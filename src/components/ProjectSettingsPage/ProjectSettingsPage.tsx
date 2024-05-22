@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
-import { Fieldset, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import { IconExclamationCircleSolid, IconPlusCircleOutline } from '@taskany/icons';
 import {
     Tip,
@@ -17,6 +17,7 @@ import {
     ModalContent,
     Tag,
     TagCleanButton,
+    Fieldset,
 } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';

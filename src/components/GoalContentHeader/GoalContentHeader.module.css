@@ -23,3 +23,10 @@
 .GoalContentHeaderCard {
     margin-bottom: var(--gap-m);
 }
+
+.DropdownItem {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-s);
+    color: var(--text-secondary);
+}

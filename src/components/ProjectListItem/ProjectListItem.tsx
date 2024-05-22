@@ -1,5 +1,5 @@
-import { CircleProgressBar, nullable } from '@taskany/bricks';
-import { TableCell, TableRow, UserGroup } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
+import { CircleProgressBar, TableCell, TableRow, UserGroup } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 import { IconStarSolid, IconEyeOutline } from '@taskany/icons';
 import { ComponentProps, useMemo } from 'react';

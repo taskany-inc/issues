@@ -1,5 +1,5 @@
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
-import { Fieldset } from '@taskany/bricks';
+import { Fieldset } from '@taskany/bricks/harmony';
 
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { SettingsCard, SettingsCardItem } from '../SettingsContent/SettingsContent';
