@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
-import { Fieldset, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import { z } from 'zod';
 import dynamic from 'next/dynamic';
 import {
@@ -16,6 +16,7 @@ import {
     RadioGroup,
     RadioControl,
     RadioGroupLabel,
+    Fieldset,
 } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';

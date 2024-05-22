@@ -1,8 +1,8 @@
 import React, { ComponentProps, FC, MouseEventHandler, useMemo } from 'react';
 import cn from 'classnames';
-import { nullable, Dropdown, MenuItem } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import { TableRow, TableCell, UserGroup } from '@taskany/bricks/harmony';
-import { IconMoreVerticalOutline, IconTargetOutline } from '@taskany/icons';
+import { IconTargetOutline } from '@taskany/icons';
 import type { State as StateType } from '@prisma/client';
 
 import { DateType } from '../../types/date';
@@ -52,26 +52,17 @@ type GoalListItemCompactColumnProps<T = any> = {
     columnProps?: TableCellProps;
 };
 
-interface GoalItemAction {
-    label: string;
-    handler: () => void;
-    color?: string;
-    icon: React.ReactNode;
-}
-
 type CanBeNullableValue<T> = { [K in keyof T]?: T[K] | null };
 
 interface GoalListItemCompactCustomizeProps<T extends Record<string, any>> {
     item: T & CanBeNullableValue<CommonGoalListItemCompactProps>;
     icon?: boolean;
     rawIcon?: React.ReactNode;
-    actions?: Array<GoalItemAction>;
     columns: Array<GoalListItemCompactColumnProps<ColumnRenderProps<T>>>;
     focused?: boolean;
     forwardedAs?: keyof JSX.IntrinsicElements;
     className?: string;
 
-    onActionClick?: <A extends NonNullable<GoalListItemCompactCustomizeProps<T>['actions']>[number]>(action: A) => void;
     onClick?: React.MouseEventHandler;
 }
 
@@ -165,11 +156,9 @@ const Column: ColumnRender = ({ col, componentProps }) => {
 
 export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
     columns,
-    actions,
     icon,
     rawIcon = <IconTargetOutline size="s" />,
     item,
-    onActionClick,
     ...attrs
 }) => {
     return (
@@ -181,30 +170,6 @@ export const GoalListItemCompact: GoalListItemCompactCustomizeRender = ({
             ))}
             {columns.map((col) => (
                 <Column key={col.name} col={col} componentProps={item} />
-            ))}
-            {nullable(actions, (list) => (
-                <CustomCell key="actions" forIcon>
-                    <div className={s.GoalListItemCompactDropdownWrapper}>
-                        <Dropdown
-                            className={s.GoalListItemCompactDropdown}
-                            onChange={onActionClick}
-                            renderTrigger={({ onClick }) => <IconMoreVerticalOutline size="xs" onClick={onClick} />}
-                            placement="right"
-                            items={list}
-                            renderItem={(props) => (
-                                <MenuItem
-                                    key={props.index}
-                                    onClick={props.onClick}
-                                    icon={props.item.icon}
-                                    ghost
-                                    color={props.item.color}
-                                >
-                                    {props.item.label}
-                                </MenuItem>
-                            )}
-                        />
-                    </div>
-                </CustomCell>
             ))}
         </TableRow>
     );
