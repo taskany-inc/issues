@@ -127,7 +127,7 @@ export const userSettingsLogoutButton = userSettings.add('logoutButton');
 
 export const goalDependencies = DO('goalDependencies');
 export const goalDependenciesTrigger = goalDependencies.add('trigger');
-export const goalDependenciesRadios = goalDependencies.add('radios');
+export const goalDependenciesSwitch = goalDependencies.add('switch');
 export const goalDependenciesInput = goalDependencies.add('input');
 export const goalDependenciesSuggestions = goalDependencies.add('suggestions');
 export const goalDependenciesSuggestionItemTitle = goalDependencies.add('suggestionItemTitle');
