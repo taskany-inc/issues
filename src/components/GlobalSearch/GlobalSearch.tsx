@@ -1,7 +1,15 @@
 import React, { useState, useCallback } from 'react';
 import NextLink from 'next/link';
-import { nullable, ListView, ListViewItem } from '@taskany/bricks';
-import { GlobalSearch as TaskanyGlobalSearch, MenuItem, Link, Text, Table } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
+import {
+    ListView,
+    ListViewItem,
+    GlobalSearch as TaskanyGlobalSearch,
+    MenuItem,
+    Link,
+    Text,
+    Table,
+} from '@taskany/bricks/harmony';
 import { IconTargetOutline, IconUsersOutline } from '@taskany/icons';
 
 import { trpc } from '../../utils/trpcClient';
@@ -57,10 +65,10 @@ export const GlobalSearch = () => {
                                         <ListViewItem
                                             key={item.id}
                                             value={value}
-                                            renderItem={({ active, ...props }) => (
+                                            renderItem={({ active, hovered, ...props }) => (
                                                 <NextLink passHref href={routes.goal(item._shortId)} legacyBehavior>
                                                     <Link>
-                                                        <MenuItem {...props} hovered={active}>
+                                                        <MenuItem {...props} hovered={active || hovered}>
                                                             <GoalListItemCompact
                                                                 item={item}
                                                                 columns={[

@@ -1,6 +1,6 @@
-import { Badge, Table, Tag, Text, User, UserGroup } from '@taskany/bricks/harmony';
+import { Badge, Table, Tag, Text, User, UserGroup, ListViewItem } from '@taskany/bricks/harmony';
 import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import { ListViewItem, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';

@@ -1,8 +1,8 @@
 import { ComponentProps, FC, HTMLAttributes, ReactNode, useState } from 'react';
 import NextLink from 'next/link';
 import cn from 'classnames';
-import { ListView, ListViewItem, nullable } from '@taskany/bricks';
-import { Link, MenuItem, TaskanyLogo, Text } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
+import { ListView, ListViewItem, Link, MenuItem, TaskanyLogo, Text } from '@taskany/bricks/harmony';
 import { IconDownSmallOutline, IconUpSmallOutline } from '@taskany/icons';
 
 import s from './NavigationSidebar.module.css';

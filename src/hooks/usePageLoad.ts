@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { PageLoadProgressRef } from '@taskany/bricks';
+import { PageLoadProgressRef } from '@taskany/bricks/harmony';
 
 export const usePageLoad = () => {
     const pageLoadingRef = useRef<PageLoadProgressRef>(null);

@@ -1,4 +1,5 @@
 import {
+    ListViewItem,
     Dropdown as DropdownBricks,
     DropdownTrigger as DropdownTriggerBricks,
     DropdownPanel as DropdownPanelBricks,
@@ -22,7 +23,7 @@ import {
     useState,
 } from 'react';
 import { IconSearchOutline } from '@taskany/icons';
-import { KeyCode, ListViewItem, nullable, useKeyboard } from '@taskany/bricks';
+import { KeyCode, nullable, useKeyboard } from '@taskany/bricks';
 
 import { comboboxInput, comboboxItem } from '../../utils/domObjects';
 

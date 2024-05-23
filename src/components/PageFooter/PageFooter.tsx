@@ -1,5 +1,5 @@
 import { FC, useCallback } from 'react';
-import { Footer, Link, FooterItem } from '@taskany/bricks';
+import { Footer, Link, FooterItem, FooterCopyright, FooterMenu, SheepLogo } from '@taskany/bricks/harmony';
 import { useRouter } from 'next/router';
 
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
@@ -43,18 +43,25 @@ export const PageFooter: FC = () => {
 
     return (
         <Footer>
-            <FooterItem onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)} className={s.FooterItem}>
-                {tr('Feedback')}
-            </FooterItem>
+            <FooterCopyright />
+            <FooterMenu>
+                <FooterItem onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)} className={s.FooterItem}>
+                    {tr('Feedback')}
+                </FooterItem>
 
-            {menuItems.map(({ title, url }) => (
-                <Link key={url} href={url} inline>
-                    <FooterItem>{title}</FooterItem>
-                </Link>
-            ))}
-            <Link inline onClick={onLocaleChange}>
-                <FooterItem>{tr('Locale change title')}</FooterItem>
-            </Link>
+                {menuItems.map(({ title, url }) => (
+                    <Link key={url} href={url} view="secondary">
+                        <FooterItem>{title}</FooterItem>
+                    </Link>
+                ))}
+
+                <FooterItem>
+                    <Link onClick={onLocaleChange} view="secondary">
+                        {tr('Locale change title')}{' '}
+                    </Link>
+                </FooterItem>
+            </FooterMenu>
+            <SheepLogo />
         </Footer>
     );
 };
