@@ -2,8 +2,8 @@ import '../support';
 import { routes } from '../../src/hooks/router';
 import {
     goalDependenciesInput,
-    goalDependenciesRadios,
     goalDependenciesSuggestionItemTitle,
+    goalDependenciesSwitch,
     goalDependenciesTrigger,
     goalDependencyGoalsListItem,
     goalDependencyKindBlocks,
@@ -89,7 +89,7 @@ const checkList = (
 
 const addDependency = (title: string, relationKind: keyof typeof dependencyKind) => {
     cy.get(goalDependenciesInput.query).type(title);
-    cy.get(goalDependenciesRadios.query).get(`input[type="radio"][value="${relationKind}"]`).click();
+    cy.get(goalDependenciesSwitch.query).get(`button[value="${relationKind}"]`).click();
 
     cy.get(goalDependenciesSuggestionItemTitle.query)
         .filter(`:contains(${title})`)
@@ -107,12 +107,8 @@ const checkSelectingDependencies = () => {
 
         it('dependencies kind should exist', () => {
             Object.values(dependencyKind).forEach((kind) => {
-                cy.get(goalDependenciesRadios.query).get(`input[type="radio"][value="${kind}"]`).should('exist');
+                cy.get(goalDependenciesSwitch.query).get(`button[value="${kind}"]`).should('exist');
             });
-
-            cy.get(goalDependenciesRadios.query)
-                .get(`input[type="radio"][value="${dependencyKind.blocks}"]`)
-                .should('be.checked');
         });
 
         it('add blocked dependency', () => {

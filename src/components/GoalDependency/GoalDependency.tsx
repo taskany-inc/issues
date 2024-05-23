@@ -1,6 +1,5 @@
 import { FC, useCallback, useMemo, useState } from 'react';
-import { AutoCompleteRadioGroup, CheckboxInput } from '@taskany/bricks';
-import { UserGroup } from '@taskany/bricks/harmony';
+import { UserGroup, Checkbox, Switch, SwitchControl } from '@taskany/bricks/harmony';
 import { Goal } from '@prisma/client';
 
 import { trpc } from '../../utils/trpcClient';
@@ -12,8 +11,8 @@ import { safeUserData } from '../../utils/getUserName';
 import { GoalSelect } from '../GoalSelect/GoalSelect';
 import {
     goalDependenciesInput,
-    goalDependenciesRadios,
     goalDependenciesSuggestionItemTitle,
+    goalDependenciesSwitch,
 } from '../../utils/domObjects';
 
 import { tr } from './GoalDependency.i18n';
@@ -77,11 +76,7 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
                 <GoalListItemCompact
                     icon
                     rawIcon={
-                        <CheckboxInput
-                            className={s.GoalDependencyCheckbox}
-                            checked={props.active}
-                            value={props.item.id}
-                        />
+                        <Checkbox className={s.GoalDependencyCheckbox} checked={props.active} value={props.item.id} />
                     }
                     item={props.item}
                     columns={[
@@ -117,14 +112,16 @@ export const GoalDependency: FC<GoalDependencyProps> = ({ id, items = [], onSubm
             )}
         >
             <FilterAutoCompleteInput onChange={setGoalQuery} autoFocus {...goalDependenciesInput.attr} />
-            <AutoCompleteRadioGroup
-                title={tr('Kind')}
-                items={radios}
-                name="Kind"
-                onChange={({ value }) => setKind(value)}
+            <Switch
+                className={s.DependencyKindSwitch}
                 value={kind}
-                {...goalDependenciesRadios.attr}
-            />
+                onChange={(_, value) => setKind(value as dependencyKind)}
+                {...goalDependenciesSwitch.attr}
+            >
+                {radios.map((item) => (
+                    <SwitchControl key={item.value} value={item.value} text={item.title} />
+                ))}
+            </Switch>
         </GoalSelect>
     );
 };

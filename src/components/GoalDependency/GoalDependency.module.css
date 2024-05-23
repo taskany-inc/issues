@@ -1,3 +1,8 @@
 .GoalDependencyCheckbox {
     margin: 0;
 }
+
+.DependencyKindSwitch {
+    margin: var(--gap-s) 0;
+    display: inline-flex;
+}
