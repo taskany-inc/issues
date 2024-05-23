@@ -1,5 +1,5 @@
 import React from 'react';
-import { Md as Markdown } from '@taskany/bricks';
+import { Md as Markdown } from '@taskany/bricks/harmony';
 
 import { useMarkdown } from '../hooks/useMarkdown';
 

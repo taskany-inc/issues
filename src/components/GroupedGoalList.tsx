@@ -1,5 +1,6 @@
 import { ComponentProps, useCallback, useEffect, useMemo } from 'react';
-import { ListView, nullable } from '@taskany/bricks';
+import { nullable } from '@taskany/bricks';
+import { ListView } from '@taskany/bricks/harmony';
 
 import { QueryState } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';

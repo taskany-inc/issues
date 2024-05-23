@@ -1,6 +1,7 @@
 import { MDXProvider } from '@mdx-js/react';
 import Head from 'next/head';
-import { Md, TextStyle, nullable } from '@taskany/bricks';
+import { TextStyle, nullable } from '@taskany/bricks';
+import { Md } from '@taskany/bricks/harmony';
 import { useTheme } from 'next-themes';
 
 import { PageContext } from '../utils/pageContext';

@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import NextLink from 'next/link';
-import { ListView, nullable } from '@taskany/bricks';
-import { Breadcrumb, Breadcrumbs, Link } from '@taskany/bricks/harmony';
+import { nullable } from '@taskany/bricks';
+import { ListView, Breadcrumb, Breadcrumbs, Link } from '@taskany/bricks/harmony';
 
 import { Page } from '../Page/Page';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
