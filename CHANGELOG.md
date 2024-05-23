@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.39.0](https://github.com/taskany-inc/issues/compare/v2.38.1...v2.39.0) (2024-05-23)
+
+
+### Features
+
+* harmony Fieldset ([b5c05f5](https://github.com/taskany-inc/issues/commit/b5c05f5b9776f4973e405e070965b84d2025de6c))
+* update Card ([aa08eca](https://github.com/taskany-inc/issues/commit/aa08eca36c31e3280b39726c82476d9bf9b73707))
+
+
+### Bug Fixes
+
+* dom warning ([5cfb4db](https://github.com/taskany-inc/issues/commit/5cfb4db9fe4e757ca693d73672fb1aa6b324e132))
+* getUserName should return name before nickname ([e5d768d](https://github.com/taskany-inc/issues/commit/e5d768d592b2b8a088477e8747dac364ccd4a81f))
+
 ## [2.38.1](https://github.com/taskany-inc/issues/compare/v2.38.0...v2.38.1) (2024-05-17)
 
 
