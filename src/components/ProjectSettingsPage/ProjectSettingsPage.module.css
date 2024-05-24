@@ -24,11 +24,9 @@
     margin-left: auto;
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.TextList.TextList {
+.TextList {
     margin-left: var(--gap-m);
 }
-
 
 .TextListItem {
     margin-left: var(--gap-xs);
@@ -38,14 +36,10 @@
     padding: var(--gap-s) 0;
 }
 
-/* Order of styles on page: SC, CSS Modules */
-.Tag.Tag {
+.Tag {
     display: flex;
     gap: var(--gap-xs);
-}
-
-.Tag:not(:last-of-type) {
-    margin-right: var(--gap-xs);
+    margin-right: var(--gap-s);
 }
 
 .FormActionText {

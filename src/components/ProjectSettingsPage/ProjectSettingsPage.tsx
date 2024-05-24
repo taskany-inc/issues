@@ -27,10 +27,9 @@ import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { Page } from '../Page/Page';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { errorsProvider } from '../../utils/forms';
-import { UserComboBox } from '../UserComboBox';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectUpdate, projectUpdateSchema } from '../../schema/project';
-import { ActivityByIdReturnType, ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
+import { ProjectUpdateReturnType } from '../../../trpc/inferredTypes';
 import { TextList, TextListItem } from '../TextList/TextList';
 import { CommonHeader } from '../CommonHeader';
 import {
@@ -54,14 +53,14 @@ import {
     pageHeader,
     projectSettingsParentMultiInput,
 } from '../../utils/domObjects';
-import { safeUserData } from '../../utils/getUserName';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { ProjectAccessUser } from '../ProjectAccessUser/ProjectAccessUser';
 import { AccessUserDeleteErrorModal } from '../AccessUserDeleteErrorModal/AccessUserDeleteErrorModal';
 import { ProjectParticipants } from '../ProjectParticipants/ProjectParticipants';
 import { ProjectSwitchPublicConfirmModal } from '../ProjectSwitchPublicConfirmModal/ProjectSwitchPublicConfirmModal';
 import { FormAction, FormActions } from '../FormActions/FormActions';
-import { GoalParentComboBox } from '../GoalParentComboBox';
+import { GoalParentDropdown } from '../GoalParentDropdown/GoalParentDropdown';
+import { UserDropdown, UserDropdownValue } from '../UserDropdown/UserDropdown';
 
 import s from './ProjectSettingsPage.module.css';
 import { tr } from './ProjectSettingsPage.i18n';
@@ -108,7 +107,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
     );
 
     const [keyConfirmation, setKeyConfirmation] = useState('');
-    const [transferTo, setTransferTo] = useState<NonNullable<ActivityByIdReturnType> | undefined>();
+    const [transferTo, setTransferTo] = useState<UserDropdownValue | undefined>();
 
     const onConfirmationInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setKeyConfirmation(e.currentTarget.value);
@@ -134,9 +133,10 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         dispatchModalEvent(ModalEvent.ProjectDeleteModal)();
     }, [project.data?.children]);
 
-    const onTransferToChange = useCallback((a: NonNullable<ActivityByIdReturnType>) => {
+    const onTransferToChange = useCallback((a: UserDropdownValue) => {
         setTransferTo(a);
     }, []);
+
     const onProjectTransferOwnership = useCallback(() => {
         if (!project.data) return;
 
@@ -248,12 +248,15 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                                         {project.title}
                                                     </Tag>
                                                 ))}
-                                                <GoalParentComboBox
+                                                <GoalParentDropdown
+                                                    mode="single"
+                                                    placement="bottom-start"
                                                     onChange={onProjectAdd}
                                                     renderTrigger={(props) => (
                                                         <IconPlusCircleOutline
                                                             size="xs"
                                                             onClick={props.onClick}
+                                                            ref={props.ref}
                                                             {...projectSettingsParentMultiInputTrigger.attr}
                                                         />
                                                     )}
@@ -423,17 +426,18 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                         </FormControl>
                         <FormActions align="space-between">
                             <FormAction>
-                                <UserComboBox
-                                    text={tr('New project owner')}
+                                <UserDropdown
+                                    mode="single"
+                                    placement="bottom-start"
                                     placeholder={tr('Enter name or email')}
                                     value={transferTo}
                                     onChange={onTransferToChange}
                                     renderTrigger={(props) => (
                                         <Button
-                                            text={props.text}
-                                            disabled={props.disabled}
+                                            text={tr('New project owner')}
+                                            ref={props.ref}
                                             onClick={props.onClick}
-                                            iconLeft={nullable(safeUserData(transferTo), ({ image, email, name }) => (
+                                            iconLeft={nullable(transferTo?.user, ({ image, email, name }) => (
                                                 <Avatar src={image} email={email} name={name} size="xs" />
                                             ))}
                                             {...projectSettingsTransferProjectOwnerButton.attr}

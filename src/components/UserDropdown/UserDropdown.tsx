@@ -14,7 +14,7 @@ interface UserValue {
     email?: string;
     image?: string;
 }
-interface UserDropdownValue {
+export interface UserDropdownValue {
     id: string;
     user?: UserValue;
 }
@@ -23,6 +23,7 @@ type UserDropdownProps = {
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     label?: ComponentProps<typeof DropdownTrigger>['label'];
     view?: ComponentProps<typeof DropdownTrigger>['view'];
+    renderTrigger?: ComponentProps<typeof DropdownTrigger>['renderTrigger'];
     className?: string;
     query?: string;
     value?: UserDropdownValue | UserDropdownValue[];
@@ -31,8 +32,6 @@ type UserDropdownProps = {
     placeholder?: string;
     placement?: ComponentProps<typeof DropdownPanel>['placement'];
     filter?: string[];
-
-    onChange?: (users: UserDropdownValue[]) => void;
     onClose?: () => void;
 } & DropdownGuardedProps<UserDropdownValue>;
 

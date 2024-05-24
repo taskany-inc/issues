@@ -13,12 +13,13 @@ import {
     Tooltip,
     ModalContent,
 } from '@taskany/bricks/harmony';
+import { IconGitPullOutline } from '@taskany/icons';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
 import { useRouter } from '../../hooks/router';
 import { useProjectResource } from '../../hooks/useProjectResource';
-import { FlowComboBox } from '../FlowComboBox';
+import { FlowDropdown } from '../FlowDropdown/FlowDropdown';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectCreate, projectCreateSchema } from '../../schema/project';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
@@ -212,11 +213,19 @@ const ProjectCreateForm: React.FC = () => {
                                 name="flow"
                                 control={control}
                                 render={({ field }) => (
-                                    <FlowComboBox
-                                        disabled
-                                        text={tr('Flow')}
+                                    <FlowDropdown
+                                        mode="single"
                                         placeholder={tr('Flow or state title')}
                                         error={errorsResolver(field.name)}
+                                        renderTrigger={(props) => (
+                                            <Button
+                                                disabled
+                                                view="ghost"
+                                                text={field.value?.title || tr('Flow')}
+                                                onClick={props.onClick}
+                                                iconLeft={<IconGitPullOutline size="s" />}
+                                            />
+                                        )}
                                         {...field}
                                     />
                                 )}
@@ -226,7 +235,7 @@ const ProjectCreateForm: React.FC = () => {
                         </FormAction>
                     </FormActions>
 
-                    <FormActions className={s.FormActions}>
+                    <FormActions className={s.FormActions} align="space-between">
                         <RotatableTip context="project" />
                         <FormAction>
                             <Button

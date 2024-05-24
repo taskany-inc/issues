@@ -2,7 +2,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { nullable } from '@taskany/bricks';
 import { Fieldset, Switch, SwitchControl } from '@taskany/bricks/harmony';
 
-import { ActivityByIdReturnType, ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { SettingsCard, SettingsCardItem } from '../SettingsContent/SettingsContent';
@@ -21,10 +21,10 @@ export const ProjectAccessUser: FC<ProjectAccessUserProps> = ({ project }) => {
     const { updateProject, checkActivityGoals } = useProjectResource(project.id);
 
     const onAdd = useCallback(
-        (user: NonNullable<ActivityByIdReturnType>) => {
+        (id: string) => {
             updateProject()({
                 ...project,
-                accessUsers: [...project.accessUsers, user],
+                accessUsers: [...project.accessUsers, { id }],
             });
         },
         [updateProject, project],

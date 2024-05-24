@@ -5,11 +5,9 @@ import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskan
 
 import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { UserBadge } from '../UserBadge/UserBadge';
-import { UserComboBox } from '../UserComboBox';
 import { TagComboBox } from '../TagComboBox/TagComboBox';
-import { GoalParentComboBox } from '../GoalParentComboBox';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
-import { ActivityByIdReturnType, GoalByIdReturnType, GoalChangeProjectReturnType } from '../../../trpc/inferredTypes';
+import { GoalByIdReturnType, GoalChangeProjectReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import { ProjectBadge } from '../ProjectBadge';
 import { safeUserData } from '../../utils/getUserName';
@@ -30,6 +28,8 @@ import { UserEditableList } from '../UserEditableList/UserEditableList';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { List } from '../List/List';
+import { GoalParentDropdown } from '../GoalParentDropdown/GoalParentDropdown';
+import { UserDropdown } from '../UserDropdown/UserDropdown';
 
 import { tr } from './GoalSidebar.i18n';
 import s from './GoalSidebar.module.css';
@@ -118,8 +118,8 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
     );
 
     const onOwnerChange = useCallback(
-        async (activity?: ActivityByIdReturnType) => {
-            const updatedGoal = await goalOwnerUpdate(activity);
+        async (activity: { id: string }) => {
+            const updatedGoal = await goalOwnerUpdate(activity.id);
 
             if (updatedGoal?.project?.personal) {
                 onGoalTransfer(updatedGoal);
@@ -141,20 +141,20 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                 {nullable(
                     goal._isEditable,
                     () => (
-                        <UserComboBox
+                        <UserDropdown
+                            mode="single"
                             placement="bottom-start"
                             placeholder={tr('Type user name or email')}
-                            filter={participantsFilter}
                             onChange={onOwnerChange}
-                            renderTrigger={({ onClick }) =>
+                            renderTrigger={({ onClick, ref }) =>
                                 nullable(
                                     safeUserData(goal.owner),
                                     (props) => (
-                                        <UserBadge {...props}>
+                                        <UserBadge ref={ref} {...props}>
                                             <IconXCircleSolid size="xs" onClick={onClick} />
                                         </UserBadge>
                                     ),
-                                    <AddInlineTrigger text={tr('Assign')} onClick={onClick} />,
+                                    <AddInlineTrigger text={tr('Assign')} onClick={onClick} ref={ref} />,
                                 )
                             }
                         />
@@ -193,12 +193,13 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     ))}
 
                     {nullable(goal._isEditable, () => (
-                        <GoalParentComboBox
+                        <GoalParentDropdown
+                            mode="single"
                             placement="bottom-start"
                             placeholder={tr('Type project title')}
                             onChange={({ id }) => addPartnerProject(id)}
                             renderTrigger={(props) => (
-                                <AddInlineTrigger text={tr('Add project')} onClick={props.onClick} />
+                                <AddInlineTrigger text={tr('Add project')} onClick={props.onClick} ref={props.ref} />
                             )}
                         />
                     ))}
@@ -319,7 +320,8 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
 
             {nullable(goal._isEditable, () => (
                 <IssueMeta>
-                    <GoalParentComboBox
+                    <GoalParentDropdown
+                        mode="single"
                         placement="bottom-start"
                         placeholder={tr('Type project title')}
                         onChange={onTranfer}
@@ -328,10 +330,11 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 icon={<IconArrowRightOutline size="xs" />}
                                 text={tr('Transfer goal')}
                                 onClick={props.onClick}
+                                ref={props.ref}
                             />
                         )}
                     />
-
+                    <br />
                     <AddInlineTrigger
                         icon={<IconBinOutline size="xs" {...goalPageDeleteButton.attr} />}
                         text={tr('Archive goal')}

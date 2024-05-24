@@ -18,6 +18,7 @@ interface GoalParentValue {
 type GoalParentDropdownProps = {
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     label?: ComponentProps<typeof DropdownTrigger>['label'];
+    renderTrigger?: ComponentProps<typeof DropdownTrigger>['renderTrigger'];
     value?: GoalParentValue | GoalParentValue[];
     query?: string;
     className?: string;

@@ -1,13 +1,13 @@
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import { nullable } from '@taskany/bricks';
 import { IconXCircleSolid } from '@taskany/icons';
 import { User } from '@prisma/client';
 
 import { safeUserData } from '../../utils/getUserName';
 import { UserBadge } from '../UserBadge/UserBadge';
-import { UserComboBox } from '../UserComboBox';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { List } from '../List/List';
+import { UserDropdown } from '../UserDropdown/UserDropdown';
 
 import { tr } from './UserEditableList.i18n';
 
@@ -16,7 +16,7 @@ export const UserEditableList: FC<{
     users: { id: string; user: User | null }[];
     filterIds: string[];
     onRemove: (id: string) => void;
-    onAdd: ComponentProps<typeof UserComboBox>['onChange'];
+    onAdd: (id: string) => void;
     triggerText: string;
 }> = ({ editable, users, filterIds, triggerText, onRemove, onAdd }) => (
     <>
@@ -36,12 +36,15 @@ export const UserEditableList: FC<{
         ))}
 
         {nullable(editable, () => (
-            <UserComboBox
+            <UserDropdown
+                mode="single"
                 placement="bottom-start"
                 placeholder={tr('Type user name or email')}
                 filter={filterIds}
-                onChange={onAdd}
-                renderTrigger={(props) => <AddInlineTrigger text={triggerText} onClick={props.onClick} />}
+                onChange={(user) => onAdd(user.id)}
+                renderTrigger={(props) => (
+                    <AddInlineTrigger text={triggerText} ref={props.ref} onClick={props.onClick} />
+                )}
             />
         ))}
     </>
