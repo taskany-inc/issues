@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { User } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 
@@ -14,17 +14,20 @@ interface UserBadgeProps {
     className?: string;
 }
 
-export const UserBadge: React.FC<UserBadgeProps> = ({ name, image, email, children, short, size = 's', className }) => {
-    return (
-        <User
-            className={cn(s.UserBadge, className)}
-            src={image}
-            email={email}
-            name={name}
-            short={short}
-            iconRight={children}
-            action="dynamic"
-            size={size}
-        />
-    );
-};
+export const UserBadge = forwardRef<HTMLDivElement, UserBadgeProps>(
+    ({ name, image, email, children, short, size = 's', className }, ref) => {
+        return (
+            <User
+                ref={ref}
+                className={cn(s.UserBadge, className)}
+                src={image}
+                email={email}
+                name={name}
+                short={short}
+                iconRight={children}
+                action="dynamic"
+                size={size}
+            />
+        );
+    },
+);

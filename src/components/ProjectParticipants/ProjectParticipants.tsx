@@ -17,8 +17,8 @@ export const ProjectParticipants: FC<ProjectParticipantsProps> = ({ id, particip
     const { onProjectParticipantAdd, onProjectParticipantRemove } = useProjectResource(id);
 
     const onAdd = useCallback(
-        (user: { id: string }) => {
-            onProjectParticipantAdd([user.id]);
+        (id: string) => {
+            onProjectParticipantAdd([id]);
         },
         [onProjectParticipantAdd],
     );

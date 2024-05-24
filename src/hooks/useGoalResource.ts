@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react';
-import type { Activity } from '@prisma/client';
 import { TRPCClientError } from '@trpc/client';
 
 import { trpc } from '../utils/trpcClient';
@@ -369,10 +368,10 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     );
 
     const onGoalParticipantAdd = useCallback(
-        async (activity?: NonNullable<Activity>, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
-            if (!id || !activity) return;
+        async (activityId?: string | null, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
+            if (!id || !activityId) return;
 
-            await notifyPromise(addParticipantMutation.mutateAsync({ id, activityId: activity.id }), 'goalsUpdate');
+            await notifyPromise(addParticipantMutation.mutateAsync({ id, activityId }), 'goalsUpdate');
 
             await invalidate(invalidateKey);
         },
@@ -423,12 +422,12 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     );
 
     const goalOwnerUpdate = useCallback(
-        async (activity?: NonNullable<Activity>) => {
-            if (!id || !activity?.id) return;
+        async (ownerId: string) => {
+            if (!id || !ownerId) return;
 
             const promise = updateGoalOwnerMutation.mutateAsync({
                 id,
-                ownerId: activity?.id,
+                ownerId,
             });
 
             const [data] = await notifyPromise(promise, 'goalsUpdate');

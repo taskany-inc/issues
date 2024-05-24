@@ -31,6 +31,7 @@ export const projectCreateSchema = z.object({
     description: z.string().optional(),
     flow: z.object({
         id: z.string(),
+        title: z.string(),
     }),
 });
 
