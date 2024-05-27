@@ -1,12 +1,7 @@
 import { MDXProvider } from '@mdx-js/react';
 import Head from 'next/head';
-import { TextStyle, nullable } from '@taskany/bricks';
 import { Md } from '@taskany/bricks/harmony';
 import { useTheme } from 'next-themes';
-
-import { PageContext } from '../utils/pageContext';
-
-import { Theme } from './Theme';
 
 interface WhatsNewLayoutProps {
     children: React.ReactNode;
@@ -22,11 +17,6 @@ export const WhatsNewLayout: React.FC<WhatsNewLayoutProps> = ({ children }) => {
             <Head>
                 <link rel="stylesheet" id="themeVariables" href={`/theme/${resolvedTheme}.css`} />
             </Head>
-            <TextStyle />
-
-            {nullable(resolvedTheme as PageContext['theme'], (t) => (
-                <Theme theme={t} />
-            ))}
 
             <Md>{children}</Md>
         </MDXProvider>

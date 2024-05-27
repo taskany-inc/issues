@@ -1,6 +1,6 @@
 import remarkEmoji from 'remark-emoji';
 import { useRemarkSync, UseRemarkSyncOptions } from 'react-remark';
-import { Link } from '@taskany/bricks/harmony';
+import { Link, Text } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 
@@ -76,7 +76,7 @@ const ssrRenderOptions: UseRemarkSyncOptions = {
                 const childrenArray = !Array.isArray(children) ? [children] : children;
 
                 return (
-                    <p>
+                    <Text as="p">
                         {childrenArray.map((c) => {
                             if (typeof c === 'string') {
                                 return c
@@ -87,7 +87,7 @@ const ssrRenderOptions: UseRemarkSyncOptions = {
 
                             return c;
                         })}
-                    </p>
+                    </Text>
                 );
             },
         },
