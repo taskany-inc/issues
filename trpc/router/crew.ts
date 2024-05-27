@@ -2,8 +2,9 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { getGroupListSchema } from '../../src/schema/crew';
-import { Team } from '../../src/types/crew';
+import { CrewUser, Team } from '../../src/types/crew';
 import { protectedProcedure, router } from '../trpcBackend';
+import { prisma } from '../../src/utils/prisma';
 
 const getToken = () => {
     const authorization = process.env.CREW_API_TOKEN;
@@ -58,5 +59,62 @@ export const crew = router({
                     units,
                 };
             });
+        }),
+    getUsers: protectedProcedure
+        .input(
+            z.object({
+                query: z.string(),
+                filter: z.array(z.string()).optional(),
+            }),
+        )
+        .query(async ({ input }): Promise<CrewUser[]> => {
+            const { filter = [] } = input;
+
+            if (!process.env.NEXT_PUBLIC_CREW_URL) {
+                const data = await prisma.user.findMany({
+                    where: {
+                        OR: [
+                            {
+                                name: {
+                                    contains: input.query,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                nickname: {
+                                    contains: input.query,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                email: {
+                                    contains: input.query,
+                                    mode: 'insensitive',
+                                },
+                            },
+                        ],
+                    },
+                });
+                return data.map((user) => ({ ...user, name: user.name || undefined, image: user.image || undefined }));
+            }
+
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_CREW_URL}/api/rest/search/users?query=${input.query}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        authorization: getToken(),
+                        'Content-Type': 'application/json',
+                    },
+                },
+            );
+
+            if (!response.ok) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: response.statusText });
+            }
+
+            const data: CrewUser[] = await response.json();
+
+            return data.filter((user) => !filter.includes(user.email));
         }),
 });

@@ -29,6 +29,7 @@ export const AppliedUsersFilter = ({
                 mode="multiple"
                 placement="bottom"
                 value={data}
+                filter={data.map(({ user }) => user.email)}
                 readOnly={readOnly}
                 onChange={onChange}
                 onClose={onClose}

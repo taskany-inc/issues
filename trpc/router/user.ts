@@ -151,6 +151,9 @@ export const user = router({
     getUserByNickname: protectedProcedure.input(z.string()).mutation(async ({ input }) => {
         return prisma.user.findFirst({ where: { nickname: input } });
     }),
+    getUserById: protectedProcedure.input(z.string().optional()).query(async ({ input }) => {
+        return prisma.user.findUnique({ where: { id: input } });
+    }),
     getFilterUsersByIds: protectedProcedure.input(z.array(z.string()).optional()).query(async ({ input = [] }) => {
         const users = await prisma.user.findMany({
             where: { activityId: { in: input } },
@@ -164,10 +167,48 @@ export const user = router({
             },
         });
 
-        return users.reduce<{ id: string; user: ReturnType<typeof safeUserData> }[]>((acc, cur) => {
+        return users.reduce<{ id: string; user: NonNullable<ReturnType<typeof safeUserData>> }[]>((acc, cur) => {
             const userData = safeUserData(cur.activity);
             if (userData && cur.activity) acc.push({ id: cur.activity.id, user: userData });
             return acc;
         }, []);
     }),
+    сreateUserByCrew: protectedProcedure
+        .input(
+            z.object({
+                email: z.string(),
+                name: z.string().optional(),
+                login: z.string().optional(),
+            }),
+        )
+        .mutation(async ({ input }) => {
+            const user = await prisma.user.findFirst({
+                where: {
+                    OR: [{ nickname: input.login }, { email: input.email }],
+                },
+            });
+
+            if (user) return { ...user, name: user.name || undefined, image: user.image || undefined };
+
+            const newUser = await prisma.user.create({
+                data: {
+                    email: input.email,
+                    name: input.name,
+                    nickname: input.login,
+                    activity: {
+                        create: {
+                            settings: {
+                                create: {},
+                            },
+                        },
+                    },
+                },
+            });
+
+            return {
+                ...newUser,
+                name: newUser.name || undefined,
+                image: newUser.image || undefined,
+            };
+        }),
 });

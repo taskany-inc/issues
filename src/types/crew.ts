@@ -20,4 +20,5 @@ export interface CrewUser {
     email: string;
     name?: string;
     image?: string;
+    login?: string;
 }
