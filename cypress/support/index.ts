@@ -194,6 +194,7 @@ Cypress.Commands.addAll({
         if (description) {
             cy.get(getCommentIdQuery(id, ` ${commentFormDescription.query}`))
                 .should('exist')
+                .scrollIntoView()
                 .should('be.visible')
                 .focus()
                 .type('{selectall}{backspace}')

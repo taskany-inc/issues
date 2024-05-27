@@ -5,14 +5,12 @@ import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { Session } from 'next-auth';
-import { TextStyle, nullable } from '@taskany/bricks';
 
 import { pageContext, PageContext } from '../../utils/pageContext';
 import { useHotkeys } from '../../hooks/useHotkeys';
 import { ModalEvent } from '../../utils/dispatchModal';
 import { trpc } from '../../utils/trpcClient';
 import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../../utils/hotkeys';
-import { Theme } from '../Theme';
 import { PageFooter } from '../PageFooter/PageFooter';
 import { ModalContext } from '../ModalOnEvent';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
@@ -90,12 +88,6 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
             </Head>
 
             <OfflineBanner />
-
-            <TextStyle />
-
-            {nullable(theme, (t) => (
-                <Theme theme={t} />
-            ))}
 
             <Toaster toastOptions={toastOptions} position="bottom-right" />
 
