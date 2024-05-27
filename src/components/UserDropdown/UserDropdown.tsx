@@ -5,13 +5,14 @@ import { nullable } from '@taskany/bricks';
 import { safeUserData } from '../../utils/getUserName';
 import { trpc } from '../../utils/trpcClient';
 import { Dropdown, DropdownTrigger, DropdownPanel, DropdownGuardedProps } from '../Dropdown/Dropdown';
+import { useUserResource } from '../../hooks/useUserResource';
 
 import s from './UserDropdown.module.css';
 import { tr } from './UserDropdown.i18n';
 
 interface UserValue {
     name?: string;
-    email?: string;
+    email: string;
     image?: string;
 }
 export interface UserDropdownValue {
@@ -48,19 +49,17 @@ export const UserDropdown = ({
 }: UserDropdownProps) => {
     const [inputState, setInputState] = useState(query);
 
-    const { data: suggestions = [] } = trpc.user.suggestions.useQuery(
-        {
-            query: inputState,
-            filter: filter || [],
-        },
+    const { createUserByCrew } = useUserResource();
+
+    const { data: crewUsers } = trpc.crew.getUsers.useQuery(
+        { query: inputState, filter },
         {
             enabled: inputState.length >= 2,
             cacheTime: 0,
             staleTime: 0,
             select(data) {
                 return data.reduce<UserDropdownValue[]>((acc, cur) => {
-                    const userData = safeUserData(cur);
-                    if (userData) acc.push({ id: cur.id, user: userData });
+                    acc.push({ id: cur.id, user: cur });
                     return acc;
                 }, []);
             },
@@ -78,6 +77,36 @@ export const UserDropdown = ({
     }, [onClose]);
 
     const userGroup = useMemo(() => values.map(safeUserData).filter(Boolean), [values]);
+    const handleChange = useCallback(
+        async (crewUsers: UserDropdownValue | UserDropdownValue[]) => {
+            const lastAddedUser = Array.isArray(crewUsers) ? crewUsers.pop() : crewUsers;
+
+            if (!lastAddedUser && mode === 'multiple') {
+                onChange?.([]);
+                return;
+            }
+
+            if (!lastAddedUser?.user) return;
+
+            const goalsUser = await createUserByCrew(lastAddedUser.user);
+
+            const newUser = {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                id: goalsUser.activityId!,
+                user: goalsUser,
+            };
+
+            if (mode === 'single') {
+                onChange?.(newUser);
+                return;
+            }
+
+            if (!Array.isArray(crewUsers)) return;
+
+            onChange?.([...crewUsers, newUser]);
+        },
+        [createUserByCrew, mode, onChange],
+    );
 
     return (
         <Dropdown arrow onClose={handleClose}>
@@ -96,14 +125,14 @@ export const UserDropdown = ({
                 width={320}
                 title={tr('Suggestions')}
                 value={values}
-                items={suggestions}
+                items={crewUsers}
                 inputState={inputState}
                 selectable
                 placeholder={placeholder}
                 setInputState={setInputState}
                 mode={mode}
                 placement={placement}
-                onChange={onChange}
+                onChange={handleChange}
                 renderItem={({ item }) =>
                     nullable(item.user, ({ name, image, email }) => (
                         <User name={name} src={image} email={email} className={s.Owner} />
