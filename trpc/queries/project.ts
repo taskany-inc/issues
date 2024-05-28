@@ -20,8 +20,8 @@ export const addCalculatedProjectFields = <
     activityId: string,
     role: Role,
 ) => {
-    const _isWatching = project.watchers?.some((watcher: any) => watcher.id === activityId);
-    const _isStarred = project.stargizers?.some((stargizer: any) => stargizer.id === activityId);
+    const _isWatching = project.watchers?.some((watcher: any) => watcher.id === activityId) || false;
+    const _isStarred = project.stargizers?.some((stargizer: any) => stargizer.id === activityId) || false;
     const _isOwner = project.activityId === activityId;
     const _isEditable = (_isOwner || role === 'ADMIN') && !project.personal;
 

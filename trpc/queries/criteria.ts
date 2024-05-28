@@ -2,7 +2,8 @@ import { jsonBuildObject } from 'kysely/helpers/postgres';
 import { sql } from 'kysely';
 
 import { db } from '../connection/kysely';
-import { Activity, Ghost, Role, State, User } from '../../generated/kysely/types';
+import { Activity, Ghost, Goal, State, User } from '../../generated/kysely/types';
+import { ExtractTypeFromGenerated } from '../utils';
 
 interface CriteriaParams {
     id?: string;
@@ -15,30 +16,16 @@ interface Criteria {
     weight: number;
     isDone: boolean;
     activityId: string;
-    criteriaGoal: {
-        id: string;
-        title: string;
-        projectId: string;
-        _shortId: string;
-        state:
-            | (Omit<State, 'createdAt' | 'updatedAt' | 'hue'> & { createdAt: Date; updatedAt: Date; hue: number })
-            | null;
-        owner: Pick<Activity, 'id'> & {
-            user: Omit<User, 'createdAt' | 'updatedAt' | 'active' | 'emailVerified' | 'role' | 'invitedAt'> & {
-                createdAt: Date;
-                updatedAt: Date;
-                invitedAt: Date | null;
-                active: boolean;
-                emailVerified: Date | null;
-                role: Role;
-            };
-            ghost: Omit<Ghost, 'createdAt' | 'updatedAt'> & { createdAt: Date; updatedAt: Date };
-            createdAt: Date;
-            updatedAt: Date;
-            ghostId: string;
-            settingsId: string;
-        };
-    } | null;
+    criteriaGoal:
+        | (ExtractTypeFromGenerated<Goal> & {
+              state: ExtractTypeFromGenerated<State> | null;
+              owner: ExtractTypeFromGenerated<Activity> & {
+                  user: ExtractTypeFromGenerated<User>;
+                  ghost: ExtractTypeFromGenerated<Ghost>;
+              };
+              _shortId: string;
+          })
+        | null;
 }
 
 export const criteriaQuery = (params: CriteriaParams = {}) => {
@@ -53,11 +40,6 @@ export const criteriaQuery = (params: CriteriaParams = {}) => {
             .leftJoin('Ghost as ghost', 'activity.ghostId', 'ghost.id')
             .selectAll('criteria')
             .select(({ ref, fn, eb }) => [
-                'criteria.id',
-                'criteria.title',
-                'criteria.activityId',
-                'criteria.isDone',
-                'criteria.weight',
                 eb
                     .case()
                     .when('criteria.criteriaGoalId', '=', ref('criteriaGoal.id'))

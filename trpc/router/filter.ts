@@ -12,7 +12,7 @@ import { tr } from './router.i18n';
 
 export const filter = router({
     getById: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
-        const filter = await filterQuery({ id: input }).executeTakeFirst();
+        const filter = await filterQuery({ id: input, activityId: ctx.session.user.activityId }).executeTakeFirst();
 
         if (!filter) {
             throw new TRPCError({ code: 'NOT_FOUND', message: tr('No filter with id', { id: input }) });
@@ -20,12 +20,13 @@ export const filter = router({
 
         return {
             ...filter,
-            _isOwner: filter.activityId === ctx.session.user.activityId,
-            _isStarred: filter.stargizers.some((stargizer) => stargizer.id === ctx.session.user.activityId),
         };
     }),
     getDefaultFilter: protectedProcedure.query(async ({ ctx }) => {
-        const filter = await filterQuery({ isDefault: true }).executeTakeFirst();
+        const filter = await filterQuery({
+            isDefault: true,
+            activityId: ctx.session.user.activityId,
+        }).executeTakeFirst();
 
         if (!filter) {
             throw new TRPCError({ code: 'NOT_FOUND', message: 'No default filters' });
@@ -34,7 +35,6 @@ export const filter = router({
         return {
             ...filter,
             _isOwner: false,
-            _isStarred: filter.stargizers.some((stargizer) => stargizer.id === ctx.session.user.activityId),
         };
     }),
     getUserFilters: protectedProcedure.query(async ({ ctx }) => {

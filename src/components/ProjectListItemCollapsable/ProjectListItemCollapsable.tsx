@@ -40,10 +40,10 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                     <TableRowItemTitle size={titleSize} {...projectListItemTitle.attr}>
                         {project.title}
                     </TableRowItemTitle>
-                    {nullable(project.children.length, (length) => (
+                    {nullable(project._count.children, (count) => (
                         <div className={s.ProjectIcons}>
                             <IconServersOutline size="xs" />
-                            <Text size="xs">{length}</Text>
+                            <Text size="xs">{count}</Text>
                         </div>
                     ))}
                 </div>
@@ -52,7 +52,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         >
             <ProjectListItem
                 id={project.id}
-                stargizers={project.stargizers}
+                stargizers={project._count.stargizers}
                 owner={project.activity}
                 participants={project.participants}
                 starred={project._isStarred}

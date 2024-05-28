@@ -10,13 +10,8 @@ interface FlowQueryParams {
 export const flowQuery = ({ id, title = '' }: FlowQueryParams | void = {}) => {
     return db
         .selectFrom('Flow')
+        .selectAll('Flow')
         .select((eb) => [
-            'Flow.title',
-            'Flow.createdAt',
-            'Flow.id',
-            'Flow.graph',
-            'Flow.recommended',
-            'Flow.updatedAt',
             jsonArrayFrom(
                 eb
                     .selectFrom('State')

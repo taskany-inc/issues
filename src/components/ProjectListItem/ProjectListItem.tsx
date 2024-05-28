@@ -12,7 +12,7 @@ import s from './ProjectListItem.module.css';
 
 interface ProjectListItemProps {
     id: string;
-    stargizers: Pick<ActivityByIdReturnType, 'id'>[];
+    stargizers: number;
     editable?: boolean;
     owner?: ActivityByIdReturnType;
     participants?: ActivityByIdReturnType[];
@@ -68,7 +68,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
                             id={id}
                             starred={starred}
                             watching={watching}
-                            stargizersCounter={stargizers.length}
+                            stargizersCounter={stargizers}
                         />
                     ),
                     <>
