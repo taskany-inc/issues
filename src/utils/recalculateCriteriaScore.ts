@@ -18,8 +18,12 @@ interface GoalCriteria extends GoalAchieveCriteria {
     criteriaGoal: (Goal & { state: State | null }) | null;
 }
 
-// simple calc score value for single goal
-export const calcAchievedWeight = <T extends GoalCriteria>(criteriaList: T[]): number => {
+export const baseCalcCriteriaWeight = <
+    G extends { state: { type: StateType } | null },
+    T extends { deleted: boolean | null; weight: number; isDone: boolean; criteriaGoal: G | null },
+>(
+    criteriaList: T[],
+): number => {
     let achivedWithWeight = 0;
     let comletedWithoutWeight = 0;
     let anyWithoutWeight = 0;
@@ -50,6 +54,11 @@ export const calcAchievedWeight = <T extends GoalCriteria>(criteriaList: T[]): n
         achivedWithWeight + Math.ceil(quantityByWeightlessCriteria * comletedWithoutWeight),
         maxPossibleCriteriaWeight,
     );
+};
+
+// simple calc score value for single goal
+export const calcAchievedWeight = (criteriaList: GoalCriteria[]): number => {
+    return baseCalcCriteriaWeight(criteriaList);
 };
 
 type GoalCalculateScore = Goal & {

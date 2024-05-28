@@ -6,12 +6,12 @@ interface LocaleArg {
     locale: TLocale;
 }
 
-export const createLocaleDate = (date: Date, { locale }: LocaleArg): string =>
+export const createLocaleDate = (date: Date | string, { locale }: LocaleArg): string =>
     new Intl.DateTimeFormat(locale, {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
-    }).format(date);
+    }).format(new Date(date));
 
 export const currentLocaleDate = ({ locale }: LocaleArg): string => createLocaleDate(new Date(), { locale });
 
@@ -45,10 +45,10 @@ export const parseLocaleDate = (date: string | Date, { locale }: LocaleArg): Dat
     return parsers[resolvedLocale](date);
 };
 
-export const getYearFromDate = (date: Date): number => date.getFullYear();
+export const getYearFromDate = (date: Date | string): number => new Date(date).getFullYear();
 
-export const getQuarterFromDate = (date: Date): QuartersKeys =>
-    `Q${Math.floor(date.getMonth() / 3 + 1)}` as QuartersKeys;
+export const getQuarterFromDate = (date: Date | string): QuartersKeys =>
+    `Q${Math.floor(new Date(date).getMonth() / 3 + 1)}` as QuartersKeys;
 
 export const getAvailableYears = (n = 5, currY = new Date().getFullYear()): number[] =>
     Array(n)
@@ -189,18 +189,19 @@ export const dateAgo = (date: Date, pastDate: number, { locale }: LocaleArg): st
     }
 };
 
-export const isPastDate = (date: Date): boolean => new Date(date) < new Date();
+export const isPastDate = (date: Date | string): boolean => new Date(date) < new Date();
 
 // Return string in format yyyy-mm-dd from Estimate value (in UTC timezone)
 
-export const getDateStringFromEstimate = (date: Date) => date.toISOString().split('T')[0];
+export const getDateStringFromEstimate = (date: Date | string) => new Date(date).toISOString().split('T')[0];
+const pad = (num: number) => (num < 10 ? '0' : '') + num;
 
 // Return string in format yyyy-mm-dd from local Date
 
-export const getDateString = (date: Date) => {
-    const pad = (num: number) => (num < 10 ? '0' : '') + num;
+export const getDateString = (date: Date | string) => {
+    const parsedDate = new Date(date);
 
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    return `${parsedDate.getFullYear()}-${pad(parsedDate.getMonth() + 1)}-${pad(parsedDate.getDate())}`;
 };
 
 const urlDateRangeSeparator = '~';
@@ -258,8 +259,9 @@ export const decodeHistoryEstimate = (data: string): { date: Date; type: DateTyp
     }
 };
 
-export const calculateElapsedDays = (startDate: Date) => {
-    const timeDifference = new Date().getTime() - startDate.getTime();
+export const calculateElapsedDays = (startDate: Date | string) => {
+    const date = new Date(startDate);
+    const timeDifference = new Date().getTime() - date.getTime();
     return Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 };
 

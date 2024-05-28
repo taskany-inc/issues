@@ -23,8 +23,6 @@ import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 
 import { tr } from './DashboardPage.i18n';
 
-export const projectsLimit = 3;
-
 export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const utils = trpc.useContext();
 
@@ -35,13 +33,10 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
     });
 
     const { data, isLoading, isFetching, fetchNextPage, hasNextPage } =
-        trpc.project.getUserProjectsWithGoals.useInfiniteQuery(
+        trpc.v2.project.userProjectsWithGoals.useInfiniteQuery(
+            { goalsQuery: queryState },
             {
-                limit: projectsLimit,
-                goalsQuery: queryState,
-            },
-            {
-                getNextPageParam: (p) => p.nextCursor,
+                getNextPageParam: (p) => p.pagiantion.offset,
                 keepPreviousData: true,
                 staleTime: refreshInterval,
             },
@@ -49,7 +44,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
     const pages = useMemo(() => data?.pages || [], [data?.pages]);
 
-    const [groupsOnScreen, goals, totalGoalsCount] = useMemo(() => {
+    const [groupsOnScreen, goalsCount, totalGoalsCount] = useMemo(() => {
         const groups = pages?.[0]?.groups;
 
         const gr = pages.reduce<typeof groups>((acc, cur) => {
@@ -57,7 +52,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             return acc;
         }, []);
 
-        return [gr, gr.flatMap((group) => group.goals), pages?.[0]?.totalGoalsCount];
+        return [gr, gr.flatMap((group) => group.goals).length, pages?.[pages.length - 1].totalGoalsCount ?? 0];
     }, [pages]);
 
     useFMPMetric(!!data);
@@ -99,14 +94,14 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                         currentPresetTitle: currentPreset?.title,
                     })}
                     total={totalGoalsCount}
-                    counter={goals?.length}
+                    counter={goalsCount}
                     filterPreset={preset}
                     loading={isLoading}
                 />
             }
         >
             <ListView onKeyboardClick={handleItemEnter}>
-                {groupsOnScreen?.map(({ project, goals }) => (
+                {groupsOnScreen?.map(({ goals, ...project }) => (
                     <ProjectListItemCollapsable
                         key={project.id}
                         interactive={false}
@@ -119,7 +114,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                             </TreeViewElement>
                         ))}
                     >
-                        {nullable(!goals.length, () => (
+                        {nullable(!goals?.length, () => (
                             <InlineCreateGoalControl project={project} />
                         ))}
                     </ProjectListItemCollapsable>

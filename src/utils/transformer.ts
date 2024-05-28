@@ -14,6 +14,7 @@ export const serialize = (data: any): any => {
         if (Array.isArray(data)) return data.map(serialize);
         return Object.fromEntries(Object.entries(data).map(([k, v]) => [k, serialize(v)]));
     }
+
     return data;
 };
 

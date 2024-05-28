@@ -219,8 +219,6 @@ export const project = router({
                         updatedAt: 'desc',
                     },
                     include: {
-                        stargizers: true,
-                        watchers: true,
                         children: {
                             include: {
                                 parent: true,
@@ -280,6 +278,12 @@ export const project = router({
                                 goals: {
                                     where: nonArchivedPartialQuery,
                                 },
+                                stargizers: true,
+                                watchers: true,
+                                participants: true,
+                                children: {
+                                    where: accessFilter,
+                                },
                             },
                         },
                     },
@@ -298,7 +302,9 @@ export const project = router({
 
                         return {
                             goals,
-                            project: addCalculatedProjectFields(rest, activityId, role),
+                            project: Object.assign(addCalculatedProjectFields(rest, activityId, role), {
+                                _count,
+                            }),
                         };
                     }),
                     totalGoalsCount: res.reduce((acc, cur) => {

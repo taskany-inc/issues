@@ -1,4 +1,4 @@
-import { DashboardPage, projectsLimit } from '../components/DashboardPage/DashboardPage';
+import { DashboardPage } from '../components/DashboardPage/DashboardPage';
 import { declareSsrProps } from '../utils/declareSsrProps';
 import { filtersPanelSsrInit } from '../utils/filters';
 
@@ -8,9 +8,8 @@ export const getServerSideProps = declareSsrProps(
 
         const { ssrHelpers } = params;
 
-        await ssrHelpers.project.getUserProjectsWithGoals.fetchInfinite({
+        await ssrHelpers.v2.project.userProjectsWithGoals.fetchInfinite({
             goalsQuery: queryState,
-            limit: projectsLimit,
         });
 
         return {

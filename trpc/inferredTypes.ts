@@ -1,6 +1,9 @@
 import { inferRouterOutputs } from '@trpc/server';
 
+import { DB } from '../generated/kysely/types';
+
 import { TrpcRouter } from './router';
+import { ExtractTypeFromGenerated } from './utils';
 
 type RouterOutputs = inferRouterOutputs<TrpcRouter>;
 
@@ -23,3 +26,10 @@ export type State = RouterOutputs['state']['all'][number];
 export type StateType = State['type'];
 export type DashboardProject = RouterOutputs['project']['getUserProjectsWithGoals']['groups'][number]['project'];
 export type DashboardGoal = RouterOutputs['project']['getUserProjectsWithGoals']['groups'][number]['goals'][number];
+
+export type DashboardProjectV2 = RouterOutputs['v2']['project']['userProjectsWithGoals']['groups'][number];
+export type DashboardGoalV2 = NonNullable<DashboardProjectV2['goals']>[number];
+
+export type ExtractDBTypes = {
+    [K in keyof DB]: ExtractTypeFromGenerated<DB[K]>;
+};
