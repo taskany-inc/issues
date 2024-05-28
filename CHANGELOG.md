@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.39.1](https://github.com/taskany-inc/issues/compare/v2.39.0...v2.39.1) (2024-05-28)
+
+
+### Bug Fixes
+
+* return Gravatar host ([22cd40a](https://github.com/taskany-inc/issues/commit/22cd40affd6f8fde0aadcd60de93824f827aa609))
+
 ## [2.39.0](https://github.com/taskany-inc/issues/compare/v2.38.1...v2.39.0) (2024-05-28)
 
 
