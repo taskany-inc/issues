@@ -434,7 +434,11 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                     onChange={onTransferToChange}
                                     renderTrigger={(props) => (
                                         <Button
-                                            text={tr('New project owner')}
+                                            text={
+                                                transferTo?.user?.name ??
+                                                transferTo?.user?.email ??
+                                                tr('New project owner')
+                                            }
                                             ref={props.ref}
                                             onClick={props.onClick}
                                             iconLeft={nullable(transferTo?.user, ({ image, email, name }) => (
