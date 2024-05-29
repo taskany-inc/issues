@@ -1,15 +1,63 @@
-import { sql } from 'kysely';
+import { AnyColumnWithTable, Expression, OrderByExpression, sql } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
+import { OrderByDirection, DirectedOrderByStringReference } from 'kysely/dist/cjs/parser/order-by-parser';
 
 import { db } from '../connection/kysely';
 import { QueryWithFilters } from '../../src/schema/common';
-import { Role } from '../../generated/kysely/types';
+import { DB, Role } from '../../generated/kysely/types';
 
 interface GoalQueryParams {
     query?: QueryWithFilters;
     activityId: string;
     role: Role;
 }
+
+const mapSortParamsToTableColumns = (sort: QueryWithFilters['sort']): Array<OrderByExpression<DB, 'Goal', unknown>> => {
+    if (!sort) {
+        return ['Goal.updatedAt desc'];
+    }
+
+    const mapToTableColumn: Record<
+        keyof NonNullable<QueryWithFilters['sort']>,
+        AnyColumnWithTable<DB, 'Goal'> | Record<OrderByDirection, Expression<string>>
+    > = {
+        title: 'Goal.title',
+        state: {
+            asc: sql`state.title asc`,
+            desc: sql`state.title desc`,
+        },
+        priority: {
+            asc: sql`priority.value asc`,
+            desc: sql`priority.value desc`,
+        },
+        project: {
+            asc: sql`project.title asc`,
+            desc: sql`project.title desc`,
+        },
+        activity: {
+            asc: sql`activity.name asc`,
+            desc: sql`activity.name desc`,
+        },
+        owner: {
+            asc: sql`owner.name asc`,
+            desc: sql`owner.name desc`,
+        },
+        updatedAt: 'Goal.updatedAt',
+        createdAt: 'Goal.createdAt',
+    };
+
+    return (
+        Object.entries(sort) as Array<[keyof NonNullable<QueryWithFilters['sort']>, NonNullable<OrderByDirection>]>
+    ).map<OrderByExpression<DB, 'Goal', unknown>>(([key, dir]) => {
+        const rule = mapToTableColumn[key];
+
+        if (typeof rule === 'string') {
+            return `${rule} ${dir}` as DirectedOrderByStringReference<DB, 'Goal', unknown>;
+        }
+
+        return rule[dir];
+    });
+};
 
 export const getGoalList = (params: GoalQueryParams) => {
     return db
@@ -157,6 +205,6 @@ export const getGoalList = (params: GoalQueryParams) => {
             ),
         )
         .limit(30)
-        .orderBy('Goal.updatedAt desc')
+        .orderBy(mapSortParamsToTableColumns(params.query?.sort))
         .groupBy(['Goal.id', 'owner.id', 'state.id', 'priority.id']);
 };

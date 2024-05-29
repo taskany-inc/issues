@@ -28,6 +28,10 @@ const testProjectTitle = 'Test project title in e2e';
 const testProjectDescription = 'Test project description in e2e';
 const testProjectKey = keyPredictor(testProjectTitle);
 const customKey = 'CUSTOMKEY';
+const fifthProjectForTest = 'Fifth project';
+const fifthProjectKey = keyPredictor(fifthProjectForTest);
+const sixthProjectForTest = 'Sixth project';
+const sixthProjectKey = keyPredictor(sixthProjectForTest);
 
 const testProjectTitleRu = 'Тестовый проект';
 const testProjectKeyRu = keyPredictor(testProjectTitleRu);
@@ -206,6 +210,28 @@ describe('Projects', () => {
     });
 
     describe('project page', () => {
+        before(() => {
+            cy.task('db:create:project', {
+                title: fifthProjectForTest,
+                key: fifthProjectKey,
+                ownerEmail: Cypress.env('ADMIN_EMAIL'),
+            }).then((p) => {
+                Cypress.env('fifthProject', p.id);
+            });
+            cy.task('db:create:project', {
+                title: sixthProjectForTest,
+                key: sixthProjectKey,
+                ownerEmail: Cypress.env('ADMIN_EMAIL'),
+            }).then((p) => {
+                Cypress.env('sixthProject', p.id);
+            });
+        });
+
+        after(() => {
+            cy.task('db:remove:project', { id: Cypress.env('sixthProject') });
+            cy.task('db:remove:project', { id: Cypress.env('fifthProject') });
+        });
+
         beforeEach(() => {
             cy.get(filtersPanelResetButton.query).should('exist').click();
             cy.get(projectListItem.query).should('exist').and('have.length.greaterThan', 1);
