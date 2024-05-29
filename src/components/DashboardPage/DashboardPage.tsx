@@ -36,7 +36,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         trpc.v2.project.userProjectsWithGoals.useInfiniteQuery(
             { goalsQuery: queryState },
             {
-                getNextPageParam: (p) => p.pagiantion.offset,
+                getNextPageParam: ({ pagination }) => pagination.offset,
                 keepPreviousData: true,
                 staleTime: refreshInterval,
             },
@@ -52,7 +52,11 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             return acc;
         }, []);
 
-        return [gr, gr.flatMap((group) => group.goals).length, pages?.[pages.length - 1].totalGoalsCount ?? 0];
+        return [
+            gr,
+            gr.reduce((acc, group) => acc + group._count.goals, 0),
+            pages?.[pages.length - 1].totalGoalsCount ?? 0,
+        ];
     }, [pages]);
 
     useFMPMetric(!!data);
