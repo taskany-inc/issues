@@ -1,6 +1,14 @@
+import {
+    AnchorHTMLAttributes,
+    BlockquoteHTMLAttributes,
+    HTMLAttributes,
+    ImgHTMLAttributes,
+    LiHTMLAttributes,
+    OlHTMLAttributes,
+} from 'react';
 import remarkEmoji from 'remark-emoji';
 import { useRemarkSync, UseRemarkSyncOptions } from 'react-remark';
-import { Link, Text } from '@taskany/bricks/harmony';
+import { Image, Link, Text } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 
@@ -8,6 +16,23 @@ const mdAndPlainUrls =
     /((\[.*\])?(\(|<))?((https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})(?:(\s?("|').*("|'))?))((\)|>)?)/gi;
 const mdLiteralUrl = /((\[.*\])(\()(.*)((\)))|(<(.*)>))/i;
 const toClearCharacters = '.,!]})>';
+
+export const markdownComponents = {
+    a: (props: AnchorHTMLAttributes<HTMLAnchorElement>) => <Link {...props} target="_blank" view="inline" />,
+    img: (props: ImgHTMLAttributes<HTMLImageElement>) => <Image {...props} />,
+    ul: (props: HTMLAttributes<HTMLUListElement>) => <Text as="ul" {...props} />,
+    ol: (props: OlHTMLAttributes<HTMLOListElement>) => <Text as="ol" {...props} />,
+    li: (props: LiHTMLAttributes<HTMLLIElement>) => <Text as="li" {...props} />,
+    h1: (props: HTMLAttributes<HTMLDivElement>) => <Text as="h1" {...props} />,
+    h2: (props: HTMLAttributes<HTMLDivElement>) => <Text as="h2" {...props} />,
+    h3: (props: HTMLAttributes<HTMLDivElement>) => <Text as="h3" {...props} />,
+    h4: (props: HTMLAttributes<HTMLDivElement>) => <Text as="h4" {...props} />,
+    h5: (props: HTMLAttributes<HTMLDivElement>) => <Text as="h5" {...props} />,
+    h6: (props: HTMLAttributes<HTMLDivElement>) => <Text as="h6" {...props} />,
+    p: (props: HTMLAttributes<HTMLDivElement>) => <Text as="p" {...props} />,
+    strong: (props: HTMLAttributes<HTMLDivElement>) => <Text as="strong" {...props} />,
+    blockquote: (props: BlockquoteHTMLAttributes<HTMLQuoteElement>) => <Text as="blockquote" {...props} />,
+};
 
 const cleanUrl = (url: string): string => {
     const trimURL = url.trim();
@@ -63,13 +88,11 @@ const ssrRenderOptions: UseRemarkSyncOptions = {
 
     rehypeReactOptions: {
         components: {
-            a: (props: React.ComponentProps<typeof Link>) => <Link {...props} target="_blank" view="inline" />,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            img: (props: any) => (
-                // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-                <img
+            ...markdownComponents,
+            img: (props: React.ComponentProps<typeof Image>) => (
+                <Image
                     {...props}
-                    onClick={dispatchModalEvent(ModalEvent.ImageFullScreen, { src: props.src, alt: props.alt })}
+                    onClick={dispatchModalEvent(ModalEvent.ImageFullScreen, { src: props.src ?? '', alt: props.alt })}
                 />
             ),
             p: ({ children }: React.PropsWithChildren) => {
