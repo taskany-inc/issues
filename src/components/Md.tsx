@@ -1,5 +1,4 @@
 import React from 'react';
-import { Md as Markdown } from '@taskany/bricks/harmony';
 
 import { useMarkdown } from '../hooks/useMarkdown';
 
@@ -9,9 +8,9 @@ interface MdProps {
 }
 
 const Md: React.FC<MdProps> = ({ children = '', className, ...attr }) => (
-    <Markdown className={className} {...attr}>
+    <div className={className} {...attr}>
         {useMarkdown(children)}
-    </Markdown>
+    </div>
 );
 
 export default Md;
