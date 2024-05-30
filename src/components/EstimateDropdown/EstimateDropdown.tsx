@@ -1,5 +1,5 @@
 import { DatePicker, DatePickerYear, DatePickerQuarter, DatePickerStrict, Text } from '@taskany/bricks/harmony';
-import { ComponentProps, useCallback, useMemo, useState } from 'react';
+import { ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import { nullable } from '@taskany/bricks';
 
 import { formateEstimate, getDateString } from '../../utils/dateTime';
@@ -31,16 +31,18 @@ interface EstimateDropdownProps {
     onClose?: () => void;
 }
 
+const toEstimateState = (value: Estimate): EstimateState => ({
+    range: { end: new Date(value.date) },
+    type: value.type,
+});
+
 export const EstimateDropdown = ({ value, onChange, onClose, placement, ...props }: EstimateDropdownProps) => {
     const locale = useLocale();
-    const [estimate, setEstimate] = useState<EstimateState | undefined>(
-        value
-            ? {
-                  range: { end: new Date(value.date) },
-                  type: value.type,
-              }
-            : undefined,
-    );
+    const [estimate, setEstimate] = useState<EstimateState | undefined>(value ? toEstimateState(value) : undefined);
+
+    useEffect(() => {
+        setEstimate(value ? toEstimateState(value) : undefined);
+    }, [value]);
 
     const onChangeHandler = useCallback(
         (value?: EstimateState) => {

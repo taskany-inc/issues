@@ -21,6 +21,7 @@ export const getProjectList = ({ activityId, role, limit = 5 }: GetProjectListPa
             'Project.averageScore',
             'Project.updatedAt',
             'Project.activityId',
+            'Project.flowId',
             jsonBuildObject({
                 id: ref('activity.id'),
                 user: fn.toJson('user'),
