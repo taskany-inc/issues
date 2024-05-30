@@ -123,6 +123,17 @@ export const GoalForm: React.FC<GoalFormProps> = ({
             tags,
             id,
         },
+        defaultValues: {
+            title: '',
+            description: '',
+            owner: null,
+            parent: null,
+            state: null,
+            priority: null,
+            estimate: null,
+            tags: [],
+            id: null,
+        },
     });
 
     const parentWatcher = watch('parent');
