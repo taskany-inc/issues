@@ -67,7 +67,7 @@ const getUserItemsWhereSchema = ({ type, activityId }: { type: 'goal' | 'project
 export const project = router({
     suggestions: protectedProcedure
         .input(projectSuggestionsSchema)
-        .query(async ({ input: { query, take = 5, include }, ctx }) => {
+        .query(async ({ input: { query, take = 5, include, filter }, ctx }) => {
             const { activityId, role } = ctx.session.user;
 
             const includeInput = {
@@ -96,10 +96,10 @@ export const project = router({
                             mode: 'insensitive',
                         },
                         ...accessFilter,
-                        ...(include
+                        ...(include?.length || filter?.length
                             ? {
                                   id: {
-                                      notIn: include,
+                                      notIn: [...(filter || []), ...(include || [])],
                                   },
                               }
                             : {}),
@@ -530,7 +530,7 @@ export const project = router({
         }),
     create: protectedProcedure
         .input(projectCreateSchema)
-        .mutation(async ({ ctx, input: { id, title, description, flow } }) => {
+        .mutation(async ({ ctx, input: { id, title, description, flow, parent } }) => {
             const { activityId } = ctx.session.user;
 
             try {
@@ -543,6 +543,9 @@ export const project = router({
                         flowId: flow.id,
                         watchers: {
                             connect: [activityId].map((id) => ({ id })),
+                        },
+                        parent: {
+                            connect: parent?.map(({ id }) => ({ id })),
                         },
                     },
                 });

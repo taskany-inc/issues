@@ -37,6 +37,7 @@ import {
     stateCombobox,
     usersCombobox,
 } from '../../utils/domObjects';
+import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { TagsList } from '../TagsList/TagsList';
 import { GoalParentDropdown } from '../GoalParentDropdown/GoalParentDropdown';
 import { UserDropdown } from '../UserDropdown/UserDropdown';
@@ -161,6 +162,10 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         setGoalType(goalTypeMap.default);
     }, [setValue, goalType, parent]);
 
+    const onNewProjectClick = useCallback(() => {
+        dispatchModalEvent(ModalEvent.GoalCreateModal)();
+    }, []);
+
     return (
         <ModalContent {...attrs}>
             <form onSubmit={handleSubmit(onSubmit)} className={s.Form}>
@@ -231,6 +236,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                     error={errorsResolver(field.name)}
                                     disabled={busy}
                                     className={s.GoalFormParentDropdown}
+                                    onNewProjectClick={onNewProjectClick}
                                     {...field}
                                     {...projectsCombobox.attr}
                                 />

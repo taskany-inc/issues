@@ -15,6 +15,7 @@ export const getServerSideProps = declareSsrProps(
 
         try {
             const project = await ssrHelpers.project.getById.fetch({ id, goalsQuery: queryState });
+            await ssrHelpers.flow.recommedations.fetch();
 
             if (!project) {
                 throw new TRPCError({ code: 'NOT_FOUND' });

@@ -1,4 +1,4 @@
-import React, { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FormEvent, useCallback, useContext, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
@@ -23,6 +23,7 @@ import { FlowDropdown } from '../FlowDropdown/FlowDropdown';
 import { trpc } from '../../utils/trpcClient';
 import { ProjectCreate, projectCreateSchema } from '../../schema/project';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { GoalParentDropdown } from '../GoalParentDropdown/GoalParentDropdown';
 import { HelpButton } from '../HelpButton/HelpButton';
 import {
     projectCancelButton,
@@ -33,6 +34,7 @@ import {
 } from '../../utils/domObjects';
 import RotatableTip from '../RotatableTip/RotatableTip';
 import { FormAction, FormActions } from '../FormActions/FormActions';
+import { ProjectContext } from '../ProjectContext/ProjectContext';
 
 import { tr } from './ProjectCreateForm.i18n';
 import s from './ProjectCreateForm.module.css';
@@ -44,6 +46,9 @@ const ProjectCreateForm: React.FC = () => {
     const { createProject } = useProjectResource('');
     const [busy, setBusy] = useState(false);
     const [dirtyKey, setDirtyKey] = useState(false);
+
+    const { project: parent } = useContext(ProjectContext);
+    const { data: flowRecomendations = [] } = trpc.flow.recommedations.useQuery();
 
     const {
         register,
@@ -57,6 +62,10 @@ const ProjectCreateForm: React.FC = () => {
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,
+        defaultValues: {
+            parent: parent ? [{ id: parent.id, title: parent.title }] : undefined,
+            flow: flowRecomendations[0],
+        },
     });
 
     const errorsResolver = errorsProvider(errors, isSubmitted);
@@ -64,7 +73,6 @@ const ProjectCreateForm: React.FC = () => {
     const keyWatcher = watch('id');
 
     const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
-    const flowRecomendations = trpc.flow.recommedations.useQuery();
     const existingProject = trpc.project.getById.useQuery(
         {
             id: keyWatcher,
@@ -75,12 +83,6 @@ const ProjectCreateForm: React.FC = () => {
     );
 
     const isKeyUnique = Boolean(!existingProject?.data);
-
-    useEffect(() => {
-        if (flowRecomendations.data) {
-            setValue('flow', flowRecomendations.data[0]);
-        }
-    }, [setValue, flowRecomendations]);
 
     const onCreateProject = useCallback(
         (form: ProjectCreate) => {
@@ -208,6 +210,23 @@ const ProjectCreateForm: React.FC = () => {
                     </div>
 
                     <FormActions className={s.FormActions} align="left">
+                        <FormAction className={s.FormAction}>
+                            <Controller
+                                name="parent"
+                                control={control}
+                                render={({ field }) => (
+                                    <GoalParentDropdown
+                                        mode="multiple"
+                                        label="Parent projects"
+                                        placeholder={tr('Enter project')}
+                                        error={errorsResolver(field.name)}
+                                        disabled={busy}
+                                        className={s.ProjectFormParentDropdown}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormAction>
                         <FormAction className={s.FormAction}>
                             <Controller
                                 name="flow"

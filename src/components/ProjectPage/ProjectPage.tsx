@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import NextLink from 'next/link';
 import { nullable } from '@taskany/bricks';
 import { ListView, Breadcrumb, Breadcrumbs, Link } from '@taskany/bricks/harmony';
@@ -17,6 +17,7 @@ import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { FiltersBarItem } from '../FiltersBar/FiltersBar';
 import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
+import { ProjectContext } from '../ProjectContext/ProjectContext';
 
 import { tr } from './ProjectPage.i18n';
 import s from './ProjectPage.module.css';
@@ -77,55 +78,59 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         [setPreview],
     );
 
+    const ctx = useMemo(() => ({ project: project ?? null }), [project]);
+
     return (
-        <Page
-            user={user}
-            ssrTime={ssrTime}
-            title={tr
-                .raw('title', {
-                    project: project?.title,
-                })
-                .join('')}
-            header={
-                <FiltersPanel
-                    title={project?.title || tr('Projects')}
-                    total={projectDeepInfo?.meta?.count}
-                    counter={projectDeepInfo?.goals?.length}
-                    filterPreset={preset}
-                    loading={isLoadingDeepInfoProject}
-                >
-                    <FiltersBarItem>
-                        <ProjectPageTabs id={id} editable={project?._isEditable} />
-                    </FiltersBarItem>
-                </FiltersPanel>
-            }
-        >
-            {nullable(project?.parent, (p) => (
-                <Breadcrumbs className={s.Breadcrumbs}>
-                    {p.map((item) => (
-                        <Breadcrumb key={item.id}>
-                            <NextLink href={routes.project(item.id)} passHref legacyBehavior>
-                                <Link>{item.title}</Link>
-                            </NextLink>
-                        </Breadcrumb>
-                    ))}
-                </Breadcrumbs>
-            ))}
-
-            <ListView onKeyboardClick={handleItemEnter}>
-                {nullable(project, (p) => (
-                    <ProjectListItemConnected
-                        key={p.id}
-                        visible
-                        editable
-                        project={p}
-                        onTagClick={setTagsFilterOutside}
-                        queryState={queryState}
-                    />
+        <ProjectContext.Provider value={ctx}>
+            <Page
+                user={user}
+                ssrTime={ssrTime}
+                title={tr
+                    .raw('title', {
+                        project: project?.title,
+                    })
+                    .join('')}
+                header={
+                    <FiltersPanel
+                        title={project?.title || tr('Projects')}
+                        total={projectDeepInfo?.meta?.count}
+                        counter={projectDeepInfo?.goals?.length}
+                        filterPreset={preset}
+                        loading={isLoadingDeepInfoProject}
+                    >
+                        <FiltersBarItem>
+                            <ProjectPageTabs id={id} editable={project?._isEditable} />
+                        </FiltersBarItem>
+                    </FiltersPanel>
+                }
+            >
+                {nullable(project?.parent, (p) => (
+                    <Breadcrumbs className={s.Breadcrumbs}>
+                        {p.map((item) => (
+                            <Breadcrumb key={item.id}>
+                                <NextLink href={routes.project(item.id)} passHref legacyBehavior>
+                                    <Link>{item.title}</Link>
+                                </NextLink>
+                            </Breadcrumb>
+                        ))}
+                    </Breadcrumbs>
                 ))}
-            </ListView>
 
-            <PresetModals preset={preset} />
-        </Page>
+                <ListView onKeyboardClick={handleItemEnter}>
+                    {nullable(project, (p) => (
+                        <ProjectListItemConnected
+                            key={p.id}
+                            visible
+                            editable
+                            project={p}
+                            onTagClick={setTagsFilterOutside}
+                            queryState={queryState}
+                        />
+                    ))}
+                </ListView>
+
+                <PresetModals preset={preset} />
+            </Page>
+        </ProjectContext.Provider>
     );
 };

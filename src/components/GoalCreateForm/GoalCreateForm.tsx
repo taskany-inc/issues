@@ -1,8 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { IconUpSmallSolid, IconDownSmallSolid } from '@taskany/icons';
 import { Button, Text } from '@taskany/bricks/harmony';
 import { KeyCode, useKeyboard } from '@taskany/bricks';
-import { useRouter as useNextRouter } from 'next/router';
 
 import { useRouter } from '../../hooks/router';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -23,6 +22,7 @@ import {
     goalForm,
 } from '../../utils/domObjects';
 import { FormAction } from '../FormActions/FormActions';
+import { ProjectContext } from '../ProjectContext/ProjectContext';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import { tr } from './GoalCreateForm.i18n';
@@ -36,10 +36,6 @@ interface GoalCreateFormProps {
 
 const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, personal }) => {
     const router = useRouter();
-    const {
-        asPath,
-        query: { id },
-    } = useNextRouter();
     const { user } = usePageContext();
     const [goalCreateFormActionCache, setGoalCreateFormActionCache] = useLocalStorage('goalCreateFormAction');
     const [busy, setBusy] = useState(false);
@@ -50,14 +46,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
     const defaultPriority = useMemo(() => priorities?.filter((priority) => priority.default)[0], [priorities]);
     const [isOpen, setIsOpen] = useState(false);
 
-    const { data: project } = trpc.project.getById.useQuery(
-        {
-            id: id as string,
-        },
-        {
-            enabled: Boolean(asPath.includes('/projects/') && id),
-        },
-    );
+    const { project: parent } = useContext(ProjectContext);
 
     const createOptions = [
         {
@@ -151,7 +140,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
             busy={busy}
             validitySchema={goalCommonSchema}
             owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
-            parent={project ?? undefined}
+            parent={parent ?? undefined}
             personal={personal}
             priority={defaultPriority ?? undefined}
             onSubmit={createGoal}

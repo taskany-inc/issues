@@ -15,3 +15,7 @@
 .FormActions {
     align-items: center;
 }
+
+.ProjectFormParentDropdown {
+    min-width: 190px;
+}
