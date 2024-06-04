@@ -6,6 +6,7 @@ import { IconAddOutline } from '@taskany/icons';
 import { trpc } from '../../utils/trpcClient';
 import { Dropdown, DropdownTrigger, DropdownPanel, DropdownGuardedProps } from '../Dropdown/Dropdown';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
+import { ModalContext } from '../ModalOnEvent';
 
 import s from './GoalParentDropdown.module.css';
 import { tr } from './GoalParentDropdown.i18n';
@@ -25,8 +26,10 @@ type GoalParentDropdownProps = {
     placeholder?: string;
     disabled?: boolean;
     readOnly?: boolean;
+    filter?: string[];
     placement?: ComponentProps<typeof DropdownPanel>['placement'];
     onClose?: () => void;
+    onNewProjectClick?: () => void;
 } & DropdownGuardedProps<GoalParentValue>;
 
 export const GoalParentDropdown = ({
@@ -37,58 +40,63 @@ export const GoalParentDropdown = ({
     placement,
     onChange,
     onClose,
+    filter,
+    onNewProjectClick,
     ...props
 }: GoalParentDropdownProps) => {
+    const { values, filterIds } = useMemo(() => {
+        const res: GoalParentValue[] = [];
+        const values = res.concat(value || []);
+
+        const filterIds = Array.from(
+            values.reduce((acum, { id }) => {
+                acum.add(id);
+
+                return acum;
+            }, new Set<string>(filter)),
+        );
+
+        return {
+            values,
+            filterIds,
+        };
+    }, [value, filter]);
+
     const [inputState, setInputState] = useState(query);
 
-    const { data: userProjects = [] } = trpc.v2.project.userProjects.useQuery(undefined, {
-        keepPreviousData: true,
-    });
+    const enableSuggestion = inputState.length >= 2;
 
-    useEffect(() => {
-        setInputState(query);
-    }, [query]);
-
-    const { data } = trpc.project.suggestions.useQuery(
+    const { data: userProjects = [] } = trpc.v2.project.userProjects.useQuery(
         {
-            query: inputState,
+            take: 10,
+            filter: filterIds,
         },
         {
-            enabled: inputState.length >= 2,
+            keepPreviousData: true,
+        },
+    );
+
+    const { data: suggestionsProjects = [] } = trpc.project.suggestions.useQuery(
+        {
+            query: inputState,
+            filter: filterIds,
+        },
+        {
+            enabled: enableSuggestion,
+            keepPreviousData: true,
             cacheTime: 0,
             staleTime: 0,
         },
     );
 
-    const suggestions = useMemo<GoalParentValue[]>(
-        () => (data && data?.length > 0 ? data : userProjects.slice(0, 10)),
-        [data, userProjects],
-    );
-
-    const values = useMemo(() => {
-        const res: GoalParentValue[] = [];
-        return res.concat(value || []);
-    }, [value]);
-
-    const valuesMap = useMemo(() => {
-        return values.reduce<Record<string, boolean>>((acc, cur) => {
-            acc[cur.id] = true;
-            return acc;
-        }, {});
-    }, [values]);
-
-    const items = useMemo(() => {
-        if (mode === 'single') {
-            return suggestions;
-        }
-
-        return suggestions.filter((suggestion) => !valuesMap[suggestion.id]);
-    }, [mode, suggestions, valuesMap]);
+    useEffect(() => {
+        setInputState(query);
+    }, [query]);
 
     const handleCreateProject = useCallback(() => {
-        dispatchModalEvent(ModalEvent.GoalCreateModal)();
+        onNewProjectClick?.();
         dispatchModalEvent(ModalEvent.ProjectCreateModal)();
-    }, []);
+    }, [onNewProjectClick]);
 
     const handleClose = useCallback(() => {
         onClose?.();
@@ -114,7 +122,7 @@ export const GoalParentDropdown = ({
                 width={320}
                 value={values}
                 title={tr('Suggestions')}
-                items={items}
+                items={enableSuggestion ? suggestionsProjects : userProjects}
                 placement={placement}
                 mode={mode}
                 selectable
@@ -133,13 +141,19 @@ export const GoalParentDropdown = ({
                     </div>
                 )}
             >
-                <Button
-                    text={tr('Create project')}
-                    view="ghost"
-                    iconLeft={<IconAddOutline size="s" />}
-                    onClick={handleCreateProject}
-                    className={s.CreateProjectButton}
-                />
+                <ModalContext.Consumer>
+                    {(ctx) =>
+                        nullable(!ctx[ModalEvent.ProjectCreateModal], () => (
+                            <Button
+                                text={tr('Create project')}
+                                view="ghost"
+                                iconLeft={<IconAddOutline size="s" />}
+                                onClick={handleCreateProject}
+                                className={s.CreateProjectButton}
+                            />
+                        ))
+                    }
+                </ModalContext.Consumer>
             </DropdownPanel>
         </Dropdown>
     );

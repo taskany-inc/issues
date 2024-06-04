@@ -7,9 +7,10 @@ interface GetProjectListParams {
     activityId: string;
     role: Role;
     limit?: number;
+    filter?: string[];
 }
 
-export const getProjectList = ({ activityId, role, limit = 5 }: GetProjectListParams) => {
+export const getProjectList = ({ activityId, role, limit = 5, filter = [] }: GetProjectListParams) => {
     /* TODO: implements calculated fields like `./project.ts -> addCalculatedProjectFields` */
     const query = db
         .selectFrom('Project')
@@ -90,6 +91,7 @@ export const getProjectList = ({ activityId, role, limit = 5 }: GetProjectListPa
                 ]),
             ),
         )
+        .$if(filter.length > 0, (qb) => qb.where('Project.id', 'not in', filter))
         .orderBy('Project.updatedAt desc')
         .limit(limit);
 

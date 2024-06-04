@@ -1,8 +1,9 @@
 {
-    "Project": "",
-    "Owner": "",
-    "Priority": "",
-    "State": "",
-    "Estimate": "",
-    "Not chosen": ""
+    "Parent projects": "Parent projects",
+    "Project": "Project",
+    "Owner": "Owner",
+    "Priority": "Priority",
+    "State": "State",
+    "Estimate": "Estimate",
+    "Not chosen": "Not chosen"
 }

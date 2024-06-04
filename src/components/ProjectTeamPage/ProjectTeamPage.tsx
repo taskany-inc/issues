@@ -14,6 +14,7 @@ import { TeamComboBox } from '../TeamComboBox/TeamComboBox';
 import { CommonHeader } from '../CommonHeader';
 import { TeamMemberListItem } from '../TeamMemberListItem/TeamMemberListItem';
 import { Team } from '../../types/crew';
+import { ProjectContext } from '../ProjectContext/ProjectContext';
 
 import { tr } from './ProjectTeamPage.i18n';
 import s from './ProjectTeamPage.module.css';
@@ -51,6 +52,8 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
         [project, updateProjectTeams],
     );
 
+    const ctx = useMemo(() => ({ project: project ?? null }), [project]);
+
     if (!project) return null;
 
     const pageTitle = tr
@@ -60,60 +63,62 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
         .join('');
 
     return (
-        <Page
-            user={user}
-            ssrTime={ssrTime}
-            title={pageTitle}
-            header={
-                <CommonHeader title={project.title} {...pageHeader.attr}>
-                    <ProjectPageTabs id={id} editable={project?._isEditable} />
-                </CommonHeader>
-            }
-        >
-            {nullable(project._isEditable, () => (
-                <div className={s.ProjectTeamPageActions}>
-                    <TeamComboBox project={project} text={tr('Add team')} placeholder={tr('Enter the title')} />
-                </div>
-            ))}
-            {nullable(teams, (ts) => (
-                <TreeView>
-                    {ts.map((t) => (
-                        <TreeViewNode
-                            title={
-                                <Link
-                                    className={s.ProjectTeamPageTeamLink}
-                                    href={routes.crewTeam(t.id)}
-                                    target="_blank"
-                                >
-                                    <TeamListItem name={t.name} units={t.units} onRemoveClick={() => onRemove(t)} />
-                                </Link>
-                            }
-                            key={t.id}
-                            visible
-                        >
-                            <TreeViewElement>
-                                <Table>
-                                    {t.memberships.map(({ user, roles, percentage }) => (
-                                        <Link
-                                            key={user.id}
-                                            className={s.ProjectTeamPageTeamLink}
-                                            target="_blank"
-                                            href={routes.crewUser(user.id)}
-                                        >
-                                            <TeamMemberListItem
-                                                roles={roles}
-                                                name={user.name}
-                                                email={user.email}
-                                                percentage={percentage}
-                                            />
-                                        </Link>
-                                    ))}
-                                </Table>
-                            </TreeViewElement>
-                        </TreeViewNode>
-                    ))}
-                </TreeView>
-            ))}
-        </Page>
+        <ProjectContext.Provider value={ctx}>
+            <Page
+                user={user}
+                ssrTime={ssrTime}
+                title={pageTitle}
+                header={
+                    <CommonHeader title={project.title} {...pageHeader.attr}>
+                        <ProjectPageTabs id={id} editable={project?._isEditable} />
+                    </CommonHeader>
+                }
+            >
+                {nullable(project._isEditable, () => (
+                    <div className={s.ProjectTeamPageActions}>
+                        <TeamComboBox project={project} text={tr('Add team')} placeholder={tr('Enter the title')} />
+                    </div>
+                ))}
+                {nullable(teams, (ts) => (
+                    <TreeView>
+                        {ts.map((t) => (
+                            <TreeViewNode
+                                title={
+                                    <Link
+                                        className={s.ProjectTeamPageTeamLink}
+                                        href={routes.crewTeam(t.id)}
+                                        target="_blank"
+                                    >
+                                        <TeamListItem name={t.name} units={t.units} onRemoveClick={() => onRemove(t)} />
+                                    </Link>
+                                }
+                                key={t.id}
+                                visible
+                            >
+                                <TreeViewElement>
+                                    <Table>
+                                        {t.memberships.map(({ user, roles, percentage }) => (
+                                            <Link
+                                                key={user.id}
+                                                className={s.ProjectTeamPageTeamLink}
+                                                target="_blank"
+                                                href={routes.crewUser(user.id)}
+                                            >
+                                                <TeamMemberListItem
+                                                    roles={roles}
+                                                    name={user.name}
+                                                    email={user.email}
+                                                    percentage={percentage}
+                                                />
+                                            </Link>
+                                        ))}
+                                    </Table>
+                                </TreeViewElement>
+                            </TreeViewNode>
+                        ))}
+                    </TreeView>
+                ))}
+            </Page>
+        </ProjectContext.Provider>
     );
 };

@@ -11,6 +11,12 @@ export const projectSuggestionsSchema = z.object({
     query: z.string(),
     take: z.number().optional(),
     include: z.array(z.string()).optional(),
+    filter: z.array(z.string()).optional(),
+});
+
+export const userProjectsSchema = z.object({
+    take: z.number().optional(),
+    filter: z.array(z.string()).optional(),
 });
 
 export type ProjectDeepInfo = z.infer<typeof projectDeepInfoSchema>;
@@ -33,6 +39,14 @@ export const projectCreateSchema = z.object({
         id: z.string(),
         title: z.string(),
     }),
+    parent: z
+        .array(
+            z.object({
+                id: z.string(),
+                title: z.string(),
+            }),
+        )
+        .optional(),
 });
 
 export type ProjectCreate = z.infer<typeof projectCreateSchema>;

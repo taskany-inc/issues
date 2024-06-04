@@ -53,7 +53,7 @@ export function declareSsrProps<T = ExternalPageProps>(
         });
 
         await ssrHelpers.appConfig.get.fetch();
-        await ssrHelpers.v2.project.userProjects.fetch();
+        await ssrHelpers.v2.project.userProjects.fetch({});
         await ssrHelpers.filter.getUserFilters.fetch();
 
         const ssrTime = Date.now();
