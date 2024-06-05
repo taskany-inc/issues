@@ -20,7 +20,7 @@ export const declareGoalsSsrProps = (baseQueryState: Partial<QueryState> = {}) =
                 await ssrHelpers.project.getAll.fetchInfinite({
                     limit: pageSize,
                     goalsQuery: queryState,
-                    firstLevel: !!queryState.project?.length,
+                    firstLevel: !queryState.project?.length,
                 });
             } else {
                 await ssrHelpers.goal.getBatch.fetchInfinite({
