@@ -332,6 +332,7 @@ export const project = router({
         .query(
             async ({ ctx, input: { cursor, skip, limit, firstLevel, goalsQuery, includePersonal = false } = {} }) => {
                 const { activityId, role } = ctx.session.user;
+                const projectIds = goalsQuery?.project ?? [];
 
                 if (goalsQuery && goalsQuery.stateType) {
                     const stateByTypes = await prisma.state.findMany({
@@ -357,9 +358,12 @@ export const project = router({
 
                 const whereQuery = {
                     personal: includePersonal ? {} : false,
-                    goals: {
-                        some: goalsQuery ? goalsFilter(goalsQuery, activityId, role).where : {},
-                    },
+                    id: projectIds.length
+                        ? {
+                              in: projectIds,
+                          }
+                        : {},
+                    goals: goalsQuery ? { some: goalsFilter(goalsQuery, activityId, role).where } : {},
                 };
 
                 const projects = await prisma.project
@@ -398,7 +402,7 @@ export const project = router({
         .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
             const { activityId, role } = ctx.session.user;
 
-            const allProjects = await prisma.project
+            return prisma.project
                 .findMany({
                     orderBy: {
                         createdAt: 'asc',
@@ -411,9 +415,6 @@ export const project = router({
                     }),
                 })
                 .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
-
-            // FIX: it is hack!
-            return allProjects.filter((p) => p._count.parent === 0);
         }),
     getById: protectedProcedure
         .input(
