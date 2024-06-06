@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.41.0](https://github.com/taskany-inc/issues/compare/v2.40.0...v2.41.0) (2024-06-06)
+
+
+### Features
+
+* add GoalParentCombobox to Project Create Modal ([9191ae2](https://github.com/taskany-inc/issues/commit/9191ae2303333e6986b3b09a0c2804e3ba5167ee))
+
+
+### Bug Fixes
+
+* remove nested projects from serp ([4bcc072](https://github.com/taskany-inc/issues/commit/4bcc07261d324d812ba55981ce04bf51763fa43f))
+
 ## [2.40.0](https://github.com/taskany-inc/issues/compare/v2.39.1...v2.40.0) (2024-05-30)
 
 
