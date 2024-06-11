@@ -630,22 +630,22 @@ export const project = router({
 
                     await Promise.all(
                         newParents.map((parent) => {
-                            const recipients = prepareRecipients([
+                            return prepareRecipients([
                                 parent.activity,
                                 ...parent.accessUsers,
                                 ...parent.participants,
                                 ...parent.watchers,
-                            ]);
-
-                            return createEmail('childProjectCreated', {
-                                to: recipients,
-                                childKey: updatedProject.id,
-                                childTitle: updatedProject.title,
-                                projectKey: parent.id,
-                                projectTitle: parent.title,
-                                author: ctx.session.user.name || ctx.session.user.email,
-                                authorEmail: ctx.session.user.email,
-                            });
+                            ]).then((recipients) =>
+                                createEmail('childProjectCreated', {
+                                    to: recipients,
+                                    childKey: updatedProject.id,
+                                    childTitle: updatedProject.title,
+                                    projectKey: parent.id,
+                                    projectTitle: parent.title,
+                                    author: ctx.session.user.name || ctx.session.user.email,
+                                    authorEmail: ctx.session.user.email,
+                                }),
+                            );
                         }),
                     );
                 }
@@ -668,22 +668,22 @@ export const project = router({
 
                     await Promise.all(
                         oldParents.map((parent) => {
-                            const recipients = prepareRecipients([
+                            return prepareRecipients([
                                 parent.activity,
                                 ...parent.accessUsers,
                                 ...parent.participants,
                                 ...parent.watchers,
-                            ]);
-
-                            return createEmail('childProjectDeleted', {
-                                to: recipients,
-                                childKey: updatedProject.id,
-                                childTitle: updatedProject.title,
-                                projectKey: parent.id,
-                                projectTitle: parent.title,
-                                author: ctx.session.user.name || ctx.session.user.email,
-                                authorEmail: ctx.session.user.email,
-                            });
+                            ]).then((recipients) =>
+                                createEmail('childProjectDeleted', {
+                                    to: recipients,
+                                    childKey: updatedProject.id,
+                                    childTitle: updatedProject.title,
+                                    projectKey: parent.id,
+                                    projectTitle: parent.title,
+                                    author: ctx.session.user.name || ctx.session.user.email,
+                                    authorEmail: ctx.session.user.email,
+                                }),
+                            );
                         }),
                     );
                 }
@@ -713,7 +713,7 @@ export const project = router({
                     ];
                 }
 
-                const recipients = prepareRecipients([
+                const recipients = await prepareRecipients([
                     ...project.participants,
                     ...updatedProject.accessUsers,
                     ...project.watchers,
@@ -838,7 +838,7 @@ export const project = router({
                 });
 
                 await createEmail('projectTransfered', {
-                    to: prepareRecipients([newOwner]),
+                    to: await prepareRecipients([newOwner]),
                     key: project.id,
                     title: project.title,
                     author: ctx.session.user.name || ctx.session.user.email,
@@ -934,11 +934,11 @@ export const project = router({
                             },
                         },
                     }),
-                    prisma.user.findMany({ where: { activityId: { in: participants } } }),
+                    prisma.activity.findMany({ where: { id: { in: participants } }, include: { user: true } }),
                 ]);
 
                 await createEmail('addParticipantsToProject', {
-                    to: prepareRecipients(recipients.map((user) => ({ user }))),
+                    to: await prepareRecipients(recipients),
                     key: updatedProject.id,
                     title: updatedProject.title,
                     author: ctx.session.user.name || ctx.session.user.email,
@@ -964,11 +964,11 @@ export const project = router({
                             },
                         },
                     }),
-                    prisma.user.findMany({ where: { activityId: { in: participants } } }),
+                    prisma.activity.findMany({ where: { id: { in: participants } }, include: { user: true } }),
                 ]);
 
                 await createEmail('removeParticipantsToProject', {
-                    to: prepareRecipients(recipients.map((user) => ({ user }))),
+                    to: await prepareRecipients(recipients),
                     key: updatedProject.id,
                     title: updatedProject.title,
                     author: ctx.session.user.name || ctx.session.user.email,

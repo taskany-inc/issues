@@ -172,6 +172,33 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
         [updateSettingsMutation, utils.user.settings],
     );
 
+    const [allowNotifyFlag, setAllowNotifyFlag] = useState(settings?.data?.enableEmailNotify);
+
+    const onChangeAllowNotifies = useCallback<ChangeEventHandler<HTMLInputElement>>(
+        async (e) => {
+            const enableEmailNotify = e.target.checked;
+            setAllowNotifyFlag(enableEmailNotify);
+
+            const promise = updateSettingsMutation.mutateAsync(
+                {
+                    enableEmailNotify,
+                },
+                {
+                    onSuccess: () => {
+                        utils.user.settings.invalidate();
+                    },
+                },
+            );
+
+            const [res] = await notifyPromise(promise, 'userSettingsUpdate');
+
+            if (res && res.enableEmailNotify) {
+                setBetaUser(res.enableEmailNotify);
+            }
+        },
+        [updateSettingsMutation, utils.user.settings],
+    );
+
     useEffect(() => {
         if (appearanceTheme) setTheme(appearanceTheme);
     }, [setTheme, appearanceTheme, resolvedTheme]);
@@ -285,6 +312,17 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                 </RadioControl>
                             ))}
                         </RadioGroup>
+                    </Fieldset>
+                </SettingsCard>
+
+                <SettingsCard>
+                    <Fieldset title={tr('Subscription settings')}>
+                        <FormControl className={s.FormControl}>
+                            <FormControlLabel weight="bold" className={s.FormControlLabel}>
+                                {tr('Allow notifications')}:
+                            </FormControlLabel>
+                            <Checkbox checked={allowNotifyFlag} onChange={onChangeAllowNotifies} />
+                        </FormControl>
                     </Fieldset>
                 </SettingsCard>
 

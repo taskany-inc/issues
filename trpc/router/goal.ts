@@ -401,7 +401,7 @@ export const goal = router({
             const newGoal = await createGoal(input, actualProject.id, activityId, role);
             await updateProjectUpdatedAt(actualProject.id);
 
-            const recipients = prepareRecipients([
+            const recipients = await prepareRecipients([
                 ...actualProject.participants,
                 ...actualProject.watchers,
                 actualProject.activity,
@@ -418,7 +418,7 @@ export const goal = router({
                     authorEmail: ctx.session.user.email,
                 }),
                 createEmail('goalAssigned', {
-                    to: prepareRecipients([newGoal.owner]),
+                    to: await prepareRecipients([newGoal.owner]),
                     shortId: newGoal._shortId,
                     title: newGoal.title,
                     author: ctx.session.user.name || ctx.session.user.email,
@@ -682,7 +682,7 @@ export const goal = router({
                     await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
                 }
 
-                const recipients = prepareRecipients([
+                const recipients = await prepareRecipients([
                     ...actualGoal.participants,
                     ...actualGoal.watchers,
                     actualGoal.activity,
@@ -703,7 +703,7 @@ export const goal = router({
                 if (actualGoal.ownerId !== input.owner.id) {
                     await Promise.all([
                         createEmail('goalUnassigned', {
-                            to: prepareRecipients([actualGoal.owner]),
+                            to: await prepareRecipients([actualGoal.owner]),
                             shortId: _shortId,
                             title: actualGoal.title,
                             author: ctx.session.user.name || ctx.session.user.email,
@@ -817,7 +817,7 @@ export const goal = router({
                         .run();
                 }
 
-                const recipients = prepareRecipients([
+                const recipients = await prepareRecipients([
                     ...actualGoal.participants,
                     ...actualGoal.watchers,
                     actualGoal.activity,
@@ -928,7 +928,7 @@ export const goal = router({
                     .recalcAverageProjectScore()
                     .run();
 
-                const recipients = prepareRecipients([
+                const recipients = await prepareRecipients([
                     ...actualGoal.participants,
                     ...actualGoal.watchers,
                     actualGoal.activity,
@@ -1524,7 +1524,7 @@ export const goal = router({
                 let recipients: string[] = [];
 
                 if (updatedGoal && connectedProject) {
-                    recipients = prepareRecipients([
+                    recipients = await prepareRecipients([
                         updatedGoal.owner,
                         updatedGoal.activity,
                         connectedProject.activity,
