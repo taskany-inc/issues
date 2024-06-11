@@ -318,13 +318,14 @@ model State {
 }
 
 model Settings {
-  id       String    @id @default(cuid())
-  theme    String    @default("system")
-  beta     Boolean   @default(true)
-  flow     Flow?     @relation(fields: [flowId], references: [id])
-  flowId   String?
-  activity Activity?
-  locale   String    @default("en")
+  id                String    @id @default(cuid())
+  theme             String    @default("system")
+  beta              Boolean   @default(true)
+  flow              Flow?     @relation(fields: [flowId], references: [id])
+  flowId            String?
+  activity          Activity?
+  locale            String    @default("en")
+  enableEmailNotify Boolean   @default(true)
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt

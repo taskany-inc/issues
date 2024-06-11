@@ -117,7 +117,7 @@ export const createComment = async ({
     }
 
     if (newComment.activity.user) {
-        const recipients = prepareRecipients([
+        const recipients = await prepareRecipients([
             ...actualGoal.participants,
             ...actualGoal.watchers,
             actualGoal.activity,

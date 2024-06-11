@@ -18,4 +18,5 @@ export const settingsUserSchema = z.object({
     theme: z.string().optional(),
     beta: z.boolean().optional(),
     locale: z.string().optional(),
+    enableEmailNotify: z.boolean().optional(),
 });

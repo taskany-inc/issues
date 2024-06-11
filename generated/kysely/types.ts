@@ -270,6 +270,7 @@ export type Settings = {
     beta: Generated<boolean>;
     flowId: string | null;
     locale: Generated<string>;
+    enableEmailNotify: Generated<boolean>;
     createdAt: Generated<Timestamp>;
     updatedAt: Generated<Timestamp>;
 };
