@@ -15,9 +15,11 @@ const renderQuote = (quote: string) =>
         .split('\n')
         .map((part: string) => `> ${part}`)
         .join('\n');
-const notice = "_NB: you got this email because  you're the owner/issuer/participant/watcher of this goal or project._";
+const notice = "_NB: you got this email because you're the owner/issuer/participant/watcher of this goal or project._";
 const footer = `
 ____
+
+[Manage notifications](${absUrl('/users/settings')})
 
 © ${new Date().getFullYear()} Taskany inc.
 `;
