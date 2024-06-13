@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.42.0](https://github.com/taskany-inc/issues/compare/v2.41.0...v2.42.0) (2024-06-13)
+
+
+### Features
+
+* **Emails:** append link to user settings ([3e4348f](https://github.com/taskany-inc/issues/commit/3e4348fd84e09a5575992a3558e838d06754f5d4))
+* **Settings:** email notify control ([8038890](https://github.com/taskany-inc/issues/commit/8038890e11af16e7459fd3b5b955215acf7e791d))
+
 ## [2.41.0](https://github.com/taskany-inc/issues/compare/v2.40.0...v2.41.0) (2024-06-06)
 
 
