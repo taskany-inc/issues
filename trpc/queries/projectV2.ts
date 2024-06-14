@@ -7,163 +7,6 @@ import { DB, Role } from '../../generated/kysely/types';
 import { QueryWithFilters } from '../../src/schema/common';
 import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
-interface GetProjectListParams {
-    activityId: string;
-    role: Role;
-    filter?: string[];
-    limit?: number;
-    offset?: number;
-    goalsQuery?: QueryWithFilters;
-}
-
-export const getProjectList = ({
-    activityId,
-    role,
-    limit = 5,
-    offset = 0,
-    goalsQuery,
-    filter = [],
-}: GetProjectListParams) => {
-    const query = db
-        .selectFrom('Project')
-        .leftJoin('User as user', 'Project.activityId', 'user.activityId')
-        .selectAll('Project')
-        .select(({ fn, exists, val, selectFrom, ref }) => [
-            exists(
-                selectFrom('_projectWatchers').select('B').where('A', '=', activityId).whereRef('B', '=', 'Project.id'),
-            ).as('_isWatching'),
-            exists(
-                selectFrom('_projectStargizers')
-                    .select('B')
-                    .where('A', '=', activityId)
-                    .whereRef('B', '=', 'Project.id'),
-            ).as('_isStarred'),
-            sql<boolean>`("Project"."activityId" = ${val(activityId)})`.as('_isOwner'),
-            sql<boolean>`((${val(role === Role.ADMIN)} or "Project"."activityId" = ${val(
-                activityId,
-            )}) and not "Project"."personal")`.as('_isEditable'),
-            jsonBuildObject({
-                activityId: ref('user.activityId'),
-                user: fn.toJson('user'),
-            }).as('activity'),
-        ])
-        .where(({ eb, selectFrom }) =>
-            eb
-                .or([
-                    eb(
-                        'Project.id',
-                        'in',
-                        selectFrom('_projectWatchers')
-                            .select('B') // projectId
-                            .where('A', '=', activityId)
-                            .union(
-                                selectFrom('_projectParticipants')
-                                    .select('B') // projectId
-                                    .where('A', '=', activityId),
-                            )
-                            .union(
-                                selectFrom('_projectStargizers')
-                                    .select('B') // projectId
-                                    .where('A', '=', activityId),
-                            ),
-                    ),
-                    eb(
-                        'Project.id',
-                        'in',
-                        selectFrom('Goal')
-                            .select('Goal.projectId')
-                            .distinctOn('Goal.projectId') // pick only unique values
-                            .where(
-                                'Goal.id',
-                                'in',
-                                selectFrom('_goalWatchers')
-                                    .select('B') // goalId
-                                    .where('A', '=', activityId)
-                                    .union(
-                                        selectFrom('_goalParticipants')
-                                            .select('B') // goalId
-                                            .where('A', '=', activityId),
-                                    ),
-                            )
-                            .where('Goal.archived', 'is', false)
-                            .$if(goalsQuery?.project != null && goalsQuery.project.length > 0, (qb) =>
-                                qb.where('Goal.projectId', 'in', goalsQuery?.project || []),
-                            )
-                            .$if(goalsQuery?.owner != null && goalsQuery.owner.length > 0, (qb) =>
-                                qb.where('Goal.ownerId', 'in', goalsQuery?.owner || []),
-                            )
-                            .$if(goalsQuery?.issuer != null && goalsQuery.issuer.length > 0, (qb) =>
-                                qb.where('Goal.activityId', 'in', goalsQuery?.issuer || []),
-                            )
-                            .$if(goalsQuery?.priority != null && goalsQuery.priority.length > 0, (qb) =>
-                                qb.where('Goal.priorityId', 'in', goalsQuery?.priority || []),
-                            )
-                            .$if(goalsQuery?.state != null && goalsQuery.state.length > 0, (qb) =>
-                                qb.where('Goal.stateId', 'in', goalsQuery?.state || []),
-                            )
-                            .$if(goalsQuery?.stateType != null && goalsQuery.stateType.length > 0, (qb) =>
-                                qb.where('Goal.stateId', 'in', ({ selectFrom }) =>
-                                    selectFrom('State')
-                                        .select('State.id')
-                                        .where('State.type', 'in', goalsQuery?.stateType || []),
-                                ),
-                            )
-                            .$if(goalsQuery?.tag != null && goalsQuery.tag.length > 0, (qb) =>
-                                qb.where('Goal.id', 'in', ({ selectFrom }) =>
-                                    selectFrom('_GoalToTag')
-                                        .select('A')
-                                        .where('B', 'in', goalsQuery?.tag || []),
-                                ),
-                            )
-                            .$if(goalsQuery?.participant != null && goalsQuery.participant.length > 0, (qb) =>
-                                qb.where('Goal.id', 'in', ({ selectFrom }) =>
-                                    selectFrom('_goalParticipants')
-                                        .select('A')
-                                        .where('B', 'in', goalsQuery?.participant || []),
-                                ),
-                            )
-                            .$if(goalsQuery?.query != null && goalsQuery.query.length > 0, (qb) =>
-                                qb.where(({ or, eb }) =>
-                                    or([
-                                        eb('Goal.title', 'ilike', goalsQuery?.query || ''),
-                                        eb('Goal.description', 'ilike', goalsQuery?.query || ''),
-                                        eb('Goal.projectId', 'in', (qb) =>
-                                            qb
-                                                .selectFrom('Project')
-                                                .select('Project.id')
-                                                .where((eb) =>
-                                                    eb.or([
-                                                        eb('Project.title', 'ilike', goalsQuery?.query || ''),
-                                                        eb('Project.description', 'ilike', goalsQuery?.query || ''),
-                                                    ]),
-                                                ),
-                                        ),
-                                    ]),
-                                ),
-                            )
-                            .$if(role === Role.USER, (qb) => qb.where('Goal.ownerId', '=', activityId)),
-                    ),
-                ])
-                .and('Project.archived', 'is not', true),
-        )
-        .$if(role === Role.USER, (qb) =>
-            /* check private access to project */
-            qb.where(({ eb, not, exists, selectFrom }) =>
-                eb.or([
-                    eb('Project.activityId', '=', activityId),
-                    eb('Project.id', 'in', selectFrom('_projectAccess').select('B').where('A', '=', activityId)),
-                    not(exists(selectFrom('_projectAccess').select('B').where('_projectAccess.A', '=', activityId))),
-                ]),
-            ),
-        )
-        .$if(filter.length > 0, (qb) => qb.where('Project.id', 'not in', filter))
-        .orderBy('Project.updatedAt desc')
-        .offset(offset)
-        .limit(limit);
-
-    return query;
-};
-
 export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId: string; role: Role }) => {
     return db
         .selectFrom('Project')
@@ -323,6 +166,7 @@ export const getUserProjectsQuery = ({
                                                               ),
                                                       ),
                                                       eb('Goal.ownerId', '=', activityId),
+                                                      eb('Goal.activityId', '=', activityId),
                                                   ]),
                                               ]),
                                           ),
@@ -400,255 +244,239 @@ const mapSortParamsToTableColumns = (sort: QueryWithFilters['sort']): Array<Orde
 };
 
 interface GetProjectsWithGoalsByIdsParams extends GetUserProjectsQueryParams {
-    in: Array<{ id: string }>;
+    in?: Array<{ id: string }>;
     goalsQuery?: QueryWithFilters;
     limit?: number;
     offset?: number;
 }
 
-export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams) => {
-    const { goalsQuery, in: inList, limit = 5, offset = 0, ...user } = params;
+/** Limit for subquery goals by project */
+const dashboardGoalByProjectLimit = 30;
 
+export const getUserProjectsWithGoalsV2 = (params: GetProjectsWithGoalsByIdsParams) => {
     return db
+        .with('subs_projects', (db) =>
+            db
+                .selectFrom('_projectParticipants')
+                .select('B')
+                .where('A', '=', params.activityId)
+                .union(db.selectFrom('_projectWatchers').select('B').where('A', '=', params.activityId))
+                .union(db.selectFrom('_projectStargizers').select('B').where('A', '=', params.activityId)),
+        )
+        .with('subs_goals', (db) =>
+            db
+                .selectFrom('_goalParticipants')
+                .select('B')
+                .where('A', '=', params.activityId)
+                .union(db.selectFrom('_goalWatchers').select('B').where('A', '=', params.activityId))
+                .union(db.selectFrom('_goalStargizers').select('B').where('A', '=', params.activityId)),
+        )
+        .with('project_ids', (db) =>
+            db
+                .selectFrom('Project')
+                .select('Project.id as pid')
+                .where(({ or, eb }) =>
+                    or([
+                        eb('Project.id', 'in', ({ selectFrom }) => selectFrom('subs_projects').select('B')),
+                        eb('Project.activityId', '=', params.activityId),
+                    ]),
+                )
+                .union(
+                    db
+                        .selectFrom('_parentChildren')
+                        .select('B as pid')
+                        .where('A', 'in', ({ selectFrom }) => selectFrom('subs_projects').select('B')),
+                ),
+        )
+        .with('goals', (db) =>
+            db
+                .selectFrom('Goal')
+                .selectAll('Goal')
+                .leftJoinLateral(
+                    ({ selectFrom }) =>
+                        selectFrom('Activity')
+                            .distinctOn('Activity.id')
+                            .innerJoin('User', 'User.activityId', 'Activity.id')
+                            .leftJoin('Ghost', 'Ghost.id', 'Activity.ghostId')
+                            .selectAll('Activity')
+                            .select([sql`"User"`.as('user'), sql`"Ghost"`.as('ghost')])
+                            .whereRef('Activity.id', 'in', (qb) =>
+                                qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
+                            )
+                            .as('participant'),
+                    (join) => join.onTrue(),
+                )
+                .leftJoinLateral(
+                    ({ selectFrom }) =>
+                        selectFrom('_GoalToTag')
+                            .innerJoin('Tag', 'Tag.id', 'B')
+                            .selectAll('Tag')
+                            .whereRef('A', '=', 'Goal.id')
+                            .as('tag'),
+                    (join) => join.onTrue(),
+                )
+                .leftJoinLateral(
+                    ({ selectFrom }) =>
+                        selectFrom('GoalAchieveCriteria')
+                            .leftJoin('Goal as criteriaGoal', 'GoalAchieveCriteria.criteriaGoalId', 'Goal.id')
+                            .selectAll('GoalAchieveCriteria')
+                            .select([sql`"criteriaGoal"`.as('criteriaGoal')])
+                            .whereRef('GoalAchieveCriteria.goalId', '=', 'Goal.id')
+                            .where('GoalAchieveCriteria.deleted', 'is not', true)
+                            .as('criteria'),
+                    (join) => join.onTrue(),
+                )
+                .select((eb) => [
+                    sql<string>`concat("Goal"."projectId", '-', "Goal"."scopeId")::text`.as('_shortId'),
+                    jsonBuildObject({
+                        comments: sql<number>`(select count("Comment".id) from "Comment" where "Comment"."goalId" = "Goal".id)`,
+                    }).as('_count'),
+                    eb
+                        .case()
+                        .when(eb.fn.count('criteria.id'), '>', 0)
+                        .then(eb.fn.agg('array_agg', [sql`"criteria"`]).distinct())
+                        .else(null)
+                        .end()
+                        .as('criteria'),
+                    eb
+                        .case()
+                        .when(eb.fn.count('tag.id'), '>', 0)
+                        .then(eb.fn.agg('array_agg', [sql`"tag"`]).distinct())
+                        .else(null)
+                        .end()
+                        .as('tags'),
+                    eb
+                        .case()
+                        .when(eb.fn.count('participant.id'), '>', 0)
+                        .then(eb.fn.agg('array_agg', [sql`"participant"`]).distinct())
+                        .else(null)
+                        .end()
+                        .as('participants'),
+                ])
+                .where(({ or, eb }) =>
+                    or([
+                        eb('Goal.id', 'in', ({ selectFrom }) => selectFrom('subs_goals').select('B')),
+                        eb('Goal.projectId', 'in', ({ selectFrom }) => selectFrom('project_ids').select('pid')),
+                        eb('Goal.ownerId', '=', params.activityId),
+                        eb('Goal.activityId', '=', params.activityId),
+                    ]),
+                )
+                .where(({ or, and, eb, val, selectFrom }) => {
+                    const { goalsQuery } = params;
+                    const estimate: Array<Date> = [];
+
+                    if (goalsQuery?.estimate != null) {
+                        const parsedEstimateFilter = decodeUrlDateRange(goalsQuery.estimate[0]);
+
+                        if (parsedEstimateFilter) {
+                            const end = new Date(getDateString(parsedEstimateFilter.end));
+                            const start = parsedEstimateFilter.start
+                                ? new Date(getDateString(parsedEstimateFilter.start))
+                                : null;
+
+                            if (start != null) {
+                                estimate.push(start, end);
+                            } else {
+                                estimate.push(end);
+                            }
+                        }
+                    }
+
+                    const filters: Record<keyof NonNullable<typeof goalsQuery>, null | ReturnType<typeof eb>> = {
+                        project: eb('Goal.projectId', 'in', goalsQuery?.project || []),
+                        owner: eb('Goal.ownerId', 'in', goalsQuery?.owner || []),
+                        issuer: eb('Goal.activityId', 'in', goalsQuery?.issuer || []),
+                        participant: eb('participant.id', 'in', goalsQuery?.participant || []),
+                        priority: eb('Goal.priorityId', 'in', goalsQuery?.priority || []),
+                        state: eb('Goal.stateId', 'in', goalsQuery?.state || []),
+                        stateType: eb('Goal.stateId', 'in', ({ selectFrom }) =>
+                            selectFrom('State')
+                                .select('State.id')
+                                .where('State.type', 'in', goalsQuery?.stateType || []),
+                        ),
+                        tag: eb('tag.id', 'in', goalsQuery?.tag || []),
+                        estimate:
+                            // eslint-disable-next-line no-nested-ternary
+                            estimate.length > 0
+                                ? estimate.length === 1
+                                    ? eb('Goal.estimate', 'in', val<Date>(estimate[0]))
+                                    : and([
+                                          eb('Goal.estimate', '>=', val<Date>(estimate[0])),
+                                          eb('Goal.estimate', '<=', val<Date>(estimate[1])),
+                                      ])
+                                : null,
+                        query: or([
+                            eb('Goal.title', 'ilike', goalsQuery?.query || ''),
+                            eb('Goal.description', 'ilike', goalsQuery?.query || ''),
+                            eb('Goal.projectId', 'in', () =>
+                                selectFrom('Project')
+                                    .select('Project.id')
+                                    .where((eb) =>
+                                        eb.or([
+                                            eb('Project.title', 'ilike', goalsQuery?.query || ''),
+                                            eb('Project.description', 'ilike', goalsQuery?.query || ''),
+                                        ]),
+                                    ),
+                            ),
+                        ]),
+                        sort: null,
+                        starred: null,
+                        watching: null,
+                    };
+
+                    const filterToApply: Array<ReturnType<typeof eb>> = [];
+
+                    if (goalsQuery != null) {
+                        (Object.keys(goalsQuery) as Array<keyof typeof goalsQuery>).forEach((key) => {
+                            const expr = filters[key];
+                            if (goalsQuery[key] != null && expr != null) {
+                                filterToApply.push(expr);
+                            }
+                        });
+                    }
+
+                    return and(filterToApply);
+                })
+                .where('Goal.archived', 'is not', true)
+                .groupBy('Goal.id')
+                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort)),
+        )
         .selectFrom('Project')
         .leftJoinLateral(
             ({ selectFrom }) =>
-                /**
-                 * TODO:
-                 * find the decision for pass closure `selectFrom` func
-                 * as queryBuilder inside any query function
-                 */
-                selectFrom('Goal')
-                    .innerJoin('User as owner', 'owner.activityId', 'Goal.ownerId')
-                    .innerJoin('User as activity', 'activity.activityId', 'Goal.activityId')
-                    .innerJoin('State as state', 'state.id', 'Goal.stateId')
-                    .innerJoin('Priority as priority', 'priority.id', 'Goal.priorityId')
-                    .leftJoinLateral(
-                        ({ selectFrom: selectFrom2 }) =>
-                            selectFrom2('Tag')
-                                .selectAll('Tag')
-                                .distinctOn('Tag.id')
-                                .where('Tag.id', 'in', (qb) =>
-                                    qb.selectFrom('_GoalToTag').select('B').whereRef('A', '=', 'Goal.id'),
-                                )
-                                .as('tag'),
-                        (join) => join.onTrue(),
-                    )
-                    .leftJoinLateral(
-                        ({ selectFrom: selectFrom2 }) =>
-                            selectFrom2('User')
-                                .selectAll('User')
-                                .distinctOn('User.activityId')
-                                .whereRef('User.activityId', 'in', (qb) =>
-                                    qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
-                                )
-                                .groupBy('User.id')
-                                .as('participant'),
-                        (join) => join.onTrue(),
-                    )
-                    .leftJoinLateral(
+                selectFrom('goals')
+                    .selectAll('goals')
+                    .innerJoin(
                         ({ selectFrom }) =>
-                            selectFrom('GoalAchieveCriteria')
-                                .leftJoin(
-                                    'Goal as criteriaGoal',
-                                    'GoalAchieveCriteria.criteriaGoalId',
-                                    'criteriaGoal.id',
-                                )
-                                .selectAll('GoalAchieveCriteria')
-                                .select(({ eb, fn }) => [
-                                    eb
-                                        .case()
-                                        .when('criteriaGoal.id', 'is not', null)
-                                        .then(fn.toJson('criteriaGoal'))
-                                        .else(null)
-                                        .end()
-                                        .as('criteriaGoal'),
-                                ])
-                                .whereRef('GoalAchieveCriteria.goalId', '=', 'Goal.id')
-                                .as('criteria'),
-                        (join) => join.onTrue(),
+                            selectFrom('Activity')
+                                .selectAll('Activity')
+                                .innerJoin('User', 'User.activityId', 'Activity.id')
+                                .leftJoin('Ghost', 'Ghost.id', 'Activity.ghostId')
+                                .select([sql`"User"`.as('user'), sql`"Ghost"`.as('ghost')])
+                                .as('owner'),
+                        (join) => join.onRef('owner.id', '=', 'goals.ownerId'),
                     )
-                    .selectAll('Goal')
-                    .select(({ fn, eb, ref }) => [
-                        sql<string>`concat("Goal"."projectId", '-', "Goal"."scopeId")::text`.as('_shortId'),
-                        jsonBuildObject({
-                            comments: sql<number>`(select count("Comment".id) from "Comment" where "Comment"."goalId" = "Goal".id)`,
-                        }).as('_count'),
-                        eb
-                            .case()
-                            .when(fn.count('participant.id'), '>', 0)
-                            .then(
-                                fn.agg('array_agg', [
-                                    jsonBuildObject({
-                                        activityId: ref('participant.activityId'),
-                                        user: fn.toJson('participant'),
-                                    }),
-                                ]),
-                            )
-                            .else(null)
-                            .end()
-                            .as('participants'),
-                        eb
-                            .case()
-                            .when(fn.count('tag.id'), '>', 0)
-                            .then(fn.agg('array_agg', [fn.toJson('tag')]))
-                            .else(null)
-                            .end()
-                            .as('tags'),
-                        eb
-                            .case()
-                            .when(fn.count('criteria.id'), '>', 0)
-                            .then(fn.agg('array_agg', [fn.toJson('criteria')]))
-                            .else(null)
-                            .end()
-                            .as('criteria'),
-                        jsonBuildObject({
-                            activityId: ref('owner.activityId'),
-                            user: fn.toJson('owner'),
-                        }).as('owner'),
-                        jsonBuildObject({
-                            activityId: ref('activity.activityId'),
-                            user: fn.toJson('activity'),
-                        }).as('activity'),
-                        fn.toJson('state').as('state'),
-                        fn.toJson('priority').as('priority'),
+                    .innerJoin(
+                        ({ selectFrom }) =>
+                            selectFrom('Activity')
+                                .selectAll('Activity')
+                                .innerJoin('User', 'User.activityId', 'Activity.id')
+                                .leftJoin('Ghost', 'Ghost.id', 'Activity.ghostId')
+                                .select([sql`"User"`.as('user'), sql`"Ghost"`.as('ghost')])
+                                .as('activityUser'),
+                        (join) => join.onRef('activityUser.id', '=', 'goals.activityId'),
+                    )
+                    .innerJoin('User as activity', 'activity.activityId', 'goals.activityId')
+                    .innerJoin('State as state', 'state.id', 'goals.stateId')
+                    .innerJoin('Priority as priority', 'priority.id', 'goals.priorityId')
+                    .select([
+                        sql`"owner"`.as('owner'),
+                        sql`"activityUser"`.as('activity'),
+                        sql`"state"`.as('state'),
+                        sql`"priority"`.as('priority'),
                     ])
-                    .where(({ or, and, eb, ref, val, selectFrom }) => {
-                        const estimate: Array<Date> = [];
-
-                        if (goalsQuery?.estimate != null) {
-                            const parsedEstimateFilter = decodeUrlDateRange(goalsQuery.estimate[0]);
-
-                            if (parsedEstimateFilter) {
-                                const end = new Date(getDateString(parsedEstimateFilter.end));
-                                const start = parsedEstimateFilter.start
-                                    ? new Date(getDateString(parsedEstimateFilter.start))
-                                    : null;
-
-                                if (start != null) {
-                                    estimate.push(start, end);
-                                } else {
-                                    estimate.push(end);
-                                }
-                            }
-                        }
-
-                        const filters: Record<keyof NonNullable<typeof goalsQuery>, null | ReturnType<typeof eb>> = {
-                            project: eb('Goal.projectId', 'in', goalsQuery?.project || []),
-                            owner: eb('Goal.ownerId', 'in', goalsQuery?.owner || []),
-                            issuer: eb('Goal.activityId', 'in', goalsQuery?.issuer || []),
-                            participant: eb('participant.activityId', 'in', goalsQuery?.participant || []),
-                            priority: eb('Goal.priorityId', 'in', goalsQuery?.priority || []),
-                            state: eb('Goal.stateId', 'in', goalsQuery?.state || []),
-                            stateType: eb('Goal.stateId', 'in', ({ selectFrom }) =>
-                                selectFrom('State')
-                                    .select('State.id')
-                                    .where('State.type', 'in', goalsQuery?.stateType || []),
-                            ),
-                            tag: eb('tag.id', 'in', goalsQuery?.tag || []),
-                            estimate:
-                                // eslint-disable-next-line no-nested-ternary
-                                estimate.length > 0
-                                    ? estimate.length === 1
-                                        ? eb('Goal.estimate', 'in', val<Date>(estimate[0]))
-                                        : and([
-                                              eb('Goal.estimate', '>=', val<Date>(estimate[0])),
-                                              eb('Goal.estimate', '<=', val<Date>(estimate[1])),
-                                          ])
-                                    : null,
-                            query: or([
-                                eb('Goal.title', 'ilike', goalsQuery?.query || ''),
-                                eb('Goal.description', 'ilike', goalsQuery?.query || ''),
-                                eb('Goal.projectId', 'in', () =>
-                                    selectFrom('Project')
-                                        .select('Project.id')
-                                        .where((eb) =>
-                                            eb.or([
-                                                eb('Project.title', 'ilike', goalsQuery?.query || ''),
-                                                eb('Project.description', 'ilike', goalsQuery?.query || ''),
-                                            ]),
-                                        ),
-                                ),
-                            ]),
-                            sort: null,
-                            starred: null,
-                            watching: null,
-                        };
-
-                        const filterToApply: Array<ReturnType<typeof eb>> = [];
-
-                        if (goalsQuery != null) {
-                            (Object.keys(goalsQuery) as Array<keyof typeof goalsQuery>).forEach((key) => {
-                                const expr = filters[key];
-                                if (goalsQuery[key] != null && expr != null) {
-                                    filterToApply.push(expr);
-                                }
-                            });
-                        }
-
-                        return and([
-                            eb('Goal.archived', 'is not', true),
-                            or([
-                                and([
-                                    or([
-                                        eb('Goal.ownerId', '=', user.activityId),
-                                        eb('Goal.activityId', '=', user.activityId),
-                                        eb(
-                                            'Goal.id',
-                                            'in',
-                                            selectFrom('Goal')
-                                                .select('id')
-                                                .where(
-                                                    'id',
-                                                    'in',
-                                                    selectFrom('_goalParticipants')
-                                                        .select('B')
-                                                        .where('A', '=', user.activityId)
-                                                        .union(
-                                                            selectFrom('_goalWatchers')
-                                                                .select('B')
-                                                                .where('A', '=', user.activityId),
-                                                        )
-                                                        .union(
-                                                            selectFrom('_goalStargizers')
-                                                                .select('B')
-                                                                .where('A', '=', user.activityId),
-                                                        ),
-                                                )
-                                                .where('archived', 'is not', true),
-                                        ),
-                                    ]),
-                                    and(filterToApply),
-                                ]),
-                                and([eb('Goal.projectId', '=', ref('Project.id')), and(filterToApply)]),
-                            ]),
-                        ]);
-                    })
-                    .$if(user.role === Role.USER, (qb) =>
-                        qb.where('Goal.projectId', 'in', ({ selectFrom }) =>
-                            selectFrom('Project')
-                                .select('Project.id')
-                                .where(({ eb, not, exists, selectFrom }) =>
-                                    eb.or([
-                                        eb('Project.activityId', '=', user.activityId),
-                                        eb(
-                                            'Project.id',
-                                            'in',
-                                            selectFrom('_projectAccess').select('B').where('A', '=', user.activityId),
-                                        ),
-                                        not(
-                                            exists(
-                                                selectFrom('_projectAccess')
-                                                    .select('B')
-                                                    .where('_projectAccess.A', '=', user.activityId),
-                                            ),
-                                        ),
-                                    ]),
-                                ),
-                        ),
-                    )
-                    .orderBy(mapSortParamsToTableColumns(goalsQuery?.sort))
-                    .groupBy(['Goal.id', 'owner.id', 'state.id', 'priority.id', 'activity.id'])
+                    .whereRef('goals.projectId', '=', 'Project.id')
+                    .limit(dashboardGoalByProjectLimit)
                     .as('goal'),
             (join) => join.onTrue(),
         )
@@ -662,18 +490,22 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                 .end()
                 .as('goals'),
         ])
-        .$if(inList.length > 0, (qb) =>
-            qb.where(
-                'Project.id',
-                'in',
-                inList.map(({ id }) => id),
-            ),
+        .where('Project.archived', 'is not', true)
+        .where(({ or, eb }) =>
+            or([
+                eb('Project.id', 'in', ({ selectFrom }) => selectFrom('project_ids').select('pid')),
+                eb('Project.id', 'in', ({ selectFrom }) =>
+                    selectFrom('Goal')
+                        .select('Goal.projectId as pid')
+                        .where('Goal.id', 'in', ({ selectFrom }) => selectFrom('subs_goals').select('B')),
+                ),
+            ]),
         )
-        .groupBy(['Project.id'])
+        .groupBy('Project.id')
         .orderBy('Project.updatedAt desc')
-        .$if(goalsQuery != null, (qb) => qb.having(({ fn }) => fn.count('goal.id'), '>', 0))
-        .limit(limit)
-        .offset(offset);
+        .$if(params.goalsQuery != null, (qb) => qb.having(({ fn }) => fn.count('goal.id'), '>', 0))
+        .limit(params.limit || 5)
+        .offset(params.offset || 0);
 };
 
 interface GetWholeGoalCountByProjectIds {
