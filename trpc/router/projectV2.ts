@@ -3,10 +3,9 @@ import { z } from 'zod';
 import { router, protectedProcedure } from '../trpcBackend';
 import { userProjectsSchema } from '../../src/schema/project';
 import {
-    getChildrenProjectsId,
     getProjectsByIds,
     getUserProjectsQuery,
-    getUserProjectsWithGoals,
+    getUserProjectsWithGoalsV2,
     getWholeGoalCountByProjectIds,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema } from '../../src/schema/common';
@@ -54,21 +53,6 @@ interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
     })[];
 }
 
-const fetchRecursiveProjects = async <R extends { id: string }>(outerRes: R[], cursor = 0, level = 0): Promise<R[]> => {
-    return getChildrenProjectsId({ in: outerRes.slice(cursor, outerRes.length) })
-        .execute()
-        .then((res) => {
-            if (!res?.length || level === 1) {
-                return outerRes;
-            }
-
-            cursor = outerRes.length;
-            outerRes.push(...(res as R[]));
-
-            return fetchRecursiveProjects(outerRes, cursor, level + 1);
-        });
-};
-
 export const project = router({
     userProjects: protectedProcedure.input(userProjectsSchema).query(async ({ ctx, input: { take, filter } }) => {
         const { activityId, role } = ctx.session.user;
@@ -104,77 +88,66 @@ export const project = router({
                 session: { user },
             } = ctx;
 
-            // eslint-disable-next-line newline-per-chained-call
-            const res = await getUserProjectsQuery({ ...user, includeSubsGoals: true })
-                .clearLimit()
-                .clearSelect()
-                .select('Project.id')
-                .execute();
-
-            const allProjects = await fetchRecursiveProjects(res);
-
-            const extendedProjectsQuery = getProjectsByIds({
+            const goalsByProject = await getUserProjectsWithGoalsV2({
                 ...user,
-                in: allProjects,
-            });
-
-            const projectsWithGoals = getUserProjectsWithGoals({
-                ...user,
-                in: allProjects,
                 goalsQuery,
                 limit: limit + 1,
                 offset,
-            });
+            })
+                .$castTo<ProjectsWithGoals>()
+                .execute();
 
-            const countQuery = getWholeGoalCountByProjectIds({
-                in: allProjects,
-            });
+            const projectIds = goalsByProject.map(({ id }) => ({ id }));
 
-            return Promise.all([
-                extendedProjectsQuery.$castTo<ProjectResponse>().execute(),
-                projectsWithGoals.$castTo<ProjectsWithGoals>().execute(),
-                countQuery.executeTakeFirst(),
-            ]).then(([projects, goalsByProject, goalsCountsByProjects]) => {
-                const projectsExtendedDataMap = new Map(projects.map((project) => [project.id, project]));
+            const [extendedProjects, goalsCountsByProjects] = await Promise.all([
+                getProjectsByIds({
+                    ...user,
+                    in: projectIds,
+                })
+                    .$castTo<ProjectResponse>()
+                    .execute(),
+                getWholeGoalCountByProjectIds({ in: projectIds }).executeTakeFirst(),
+            ]);
 
-                const resultProjects = [];
+            const projectsExtendedDataMap = new Map(extendedProjects.map((project) => [project.id, project]));
 
-                for (const { id, goals } of goalsByProject.slice(0, limit)) {
-                    const currentProject = projectsExtendedDataMap.get(id);
-                    if (currentProject == null) {
-                        throw new Error(`Missing project by id: ${id}`);
-                    }
+            const resultProjects = [];
 
-                    if (goals) {
-                        for (const goal of goals) {
-                            goal.participants = pickUniqueValues(goal.participants, 'id');
-                            goal.tags = pickUniqueValues(goal.tags, 'id');
-
-                            goal._achivedCriteriaWeight = null;
-
-                            if (goal.criteria != null) {
-                                const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<
-                                    ProjectsWithGoals['goals'][number]['criteria']
-                                >;
-                                // FIX: maybe try calculate in sql
-                                goal._achivedCriteriaWeight = baseCalcCriteriaWeight(uniqCriteria);
-                                delete goal.criteria;
-                            }
-                        }
-                        currentProject.goals = goals;
-                    }
-
-                    resultProjects.push(currentProject);
+            for (const { id, goals } of goalsByProject.slice(0, limit)) {
+                const currentProject = projectsExtendedDataMap.get(id);
+                if (currentProject == null) {
+                    throw new Error(`Missing project by id: ${id}`);
                 }
 
-                return {
-                    groups: resultProjects,
-                    pagination: {
-                        limit,
-                        offset: goalsByProject.length < limit + 1 ? undefined : offset + (limit ?? 0),
-                    },
-                    totalGoalsCount: goalsCountsByProjects?.wholeGoalsCount ?? 0,
-                };
-            });
+                if (goals) {
+                    for (const goal of goals) {
+                        goal.participants = pickUniqueValues(goal.participants, 'id');
+                        goal.tags = pickUniqueValues(goal.tags, 'id');
+
+                        goal._achivedCriteriaWeight = null;
+
+                        if (goal.criteria != null) {
+                            const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<
+                                ProjectsWithGoals['goals'][number]['criteria']
+                            >;
+                            // FIX: maybe try calculate in sql
+                            goal._achivedCriteriaWeight = baseCalcCriteriaWeight(uniqCriteria);
+                            delete goal.criteria;
+                        }
+                    }
+                    currentProject.goals = goals;
+                }
+
+                resultProjects.push(currentProject);
+            }
+
+            return {
+                groups: resultProjects,
+                pagination: {
+                    limit,
+                    offset: goalsByProject.length < limit + 1 ? undefined : offset + (limit ?? 0),
+                },
+                totalGoalsCount: goalsCountsByProjects?.wholeGoalsCount ?? 0,
+            };
         }),
 });
