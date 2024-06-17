@@ -55,7 +55,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
         return [
             gr,
             gr.reduce((acc, group) => acc + group._count.goals, 0),
-            pages?.[pages.length - 1].totalGoalsCount ?? 0,
+            pages.reduce((acc, { totalGoalsCount = 0 }) => acc + Number(totalGoalsCount), 0),
         ];
     }, [pages]);
 

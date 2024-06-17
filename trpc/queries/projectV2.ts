@@ -45,13 +45,6 @@ export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId
                 activityId: ref('user.activityId'),
                 user: fn.toJson('user'),
             }).as('activity'),
-            jsonBuildObject({
-                stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
-                watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
-                children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
-                participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
-                goals: sql<number>`(select count("Goal".id) from "Goal" where "Goal"."projectId" = "Project".id and "Goal".archived is not true)`,
-            }).as('_count'),
         ])
         .select([
             sql`(select count("B")::int from "_parentChildren" where "A" = "Project".id)`.as('children'),
@@ -253,7 +246,7 @@ interface GetProjectsWithGoalsByIdsParams extends GetUserProjectsQueryParams {
 /** Limit for subquery goals by project */
 const dashboardGoalByProjectLimit = 30;
 
-export const getUserProjectsWithGoalsV2 = (params: GetProjectsWithGoalsByIdsParams) => {
+export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams) => {
     return db
         .with('subs_projects', (db) =>
             db
@@ -329,7 +322,10 @@ export const getUserProjectsWithGoalsV2 = (params: GetProjectsWithGoalsByIdsPara
                 .select((eb) => [
                     sql<string>`concat("Goal"."projectId", '-', "Goal"."scopeId")::text`.as('_shortId'),
                     jsonBuildObject({
-                        comments: sql<number>`(select count("Comment".id) from "Comment" where "Comment"."goalId" = "Goal".id)`,
+                        comments: eb
+                            .selectFrom('Comment')
+                            .select(({ fn }) => [fn.count('Comment.id').as('count')])
+                            .whereRef('Comment.goalId', '=', 'Goal.id'),
                     }).as('_count'),
                     eb
                         .case()
@@ -489,6 +485,13 @@ export const getUserProjectsWithGoalsV2 = (params: GetProjectsWithGoalsByIdsPara
                 .else(null)
                 .end()
                 .as('goals'),
+            jsonBuildObject({
+                stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
+                watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
+                children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
+                participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
+                goals: fn.count('goal.id'),
+            }).as('_count'),
         ])
         .where('Project.archived', 'is not', true)
         .where(({ or, eb }) =>
@@ -515,10 +518,13 @@ interface GetWholeGoalCountByProjectIds {
 export const getWholeGoalCountByProjectIds = (params: GetWholeGoalCountByProjectIds) => {
     return db
         .selectFrom('Project')
-        .select([
-            sql<number>`sum((select count("Goal".id) from "Goal" where "Goal".archived is not true and "Goal"."projectId" = "Project".id))`.as(
-                'wholeGoalsCount',
-            ),
+        .select((eb) => [
+            eb
+                .selectFrom('Goal')
+                .select(({ fn }) => [fn.count('Goal.id').as('count')])
+                .whereRef('Goal.projectId', '=', 'Project.id')
+                .where('Goal.archived', 'is not', true)
+                .as('wholeGoalsCount'),
         ])
         .$if(params.in.length > 0, (qb) =>
             qb.where(

@@ -5,7 +5,7 @@ import { userProjectsSchema } from '../../src/schema/project';
 import {
     getProjectsByIds,
     getUserProjectsQuery,
-    getUserProjectsWithGoalsV2,
+    getUserProjectsWithGoals,
     getWholeGoalCountByProjectIds,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema } from '../../src/schema/common';
@@ -27,13 +27,6 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
     participants: ProjectActivity[];
     goals?: any[]; // this prop is overrides below
     children: any[]; // TODO: rly need this on Dashboard Page
-    _count: {
-        children: number;
-        stargizers: number;
-        watchers: number;
-        participants: number;
-        goals: number;
-    };
 };
 
 interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
@@ -51,6 +44,13 @@ interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
             >
         >;
     })[];
+    _count: {
+        children: number;
+        stargizers: number;
+        watchers: number;
+        participants: number;
+        goals: number;
+    };
 }
 
 export const project = router({
@@ -88,7 +88,7 @@ export const project = router({
                 session: { user },
             } = ctx;
 
-            const goalsByProject = await getUserProjectsWithGoalsV2({
+            const goalsByProject = await getUserProjectsWithGoals({
                 ...user,
                 goalsQuery,
                 limit: limit + 1,
@@ -113,7 +113,7 @@ export const project = router({
 
             const resultProjects = [];
 
-            for (const { id, goals } of goalsByProject.slice(0, limit)) {
+            for (const { id, goals, _count } of goalsByProject.slice(0, limit)) {
                 const currentProject = projectsExtendedDataMap.get(id);
                 if (currentProject == null) {
                     throw new Error(`Missing project by id: ${id}`);
@@ -138,7 +138,7 @@ export const project = router({
                     currentProject.goals = goals;
                 }
 
-                resultProjects.push(currentProject);
+                resultProjects.push({ ...currentProject, _count });
             }
 
             return {
