@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.43.1](https://github.com/taskany-inc/issues/compare/v2.43.0...v2.43.1) (2024-06-20)
+
+
+### Bug Fixes
+
+* **Dashboard:** filter by dates works ([5902246](https://github.com/taskany-inc/issues/commit/590224682335f419b0535afa54db63b27070d3d6))
+
 ## [2.43.0](https://github.com/taskany-inc/issues/compare/v2.42.0...v2.43.0) (2024-06-20)
 
 
