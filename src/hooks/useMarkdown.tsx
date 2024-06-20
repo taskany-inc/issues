@@ -6,11 +6,14 @@ import {
     LiHTMLAttributes,
     OlHTMLAttributes,
 } from 'react';
+import NextLink from 'next/link';
 import remarkEmoji from 'remark-emoji';
 import { useRemarkSync, UseRemarkSyncOptions } from 'react-remark';
 import { Image, Link, Text } from '@taskany/bricks/harmony';
 
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
+import { parseCrewLink } from '../utils/crew';
+import { InlineUserBadge } from '../components/InlineUserBadge/InlineUserBadge';
 
 const mdAndPlainUrls =
     /((\[.*\])?(\(|<))?((https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})(?:(\s?("|').*("|'))?))((\)|>)?)/gi;
@@ -89,6 +92,18 @@ const ssrRenderOptions: UseRemarkSyncOptions = {
     rehypeReactOptions: {
         components: {
             ...markdownComponents,
+            a: ({ href, title, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) => {
+                const login = href ? parseCrewLink(href) : '';
+
+                if (href && login) {
+                    return (
+                        <NextLink href={href} passHref target="_blank">
+                            <InlineUserBadge tooltip={title} name={login} email={login} size="xs" />
+                        </NextLink>
+                    );
+                }
+                return <Link {...props} title={title} href={href} target="_blank" view="inline" />;
+            },
             img: (props: React.ComponentProps<typeof Image>) => (
                 <Image
                     {...props}

@@ -26,7 +26,8 @@ export const routes = {
     whatsnew: (release: string, locale: TLocale) => `/whatsnew/${release}/${locale}`,
 
     crewTeam: (id: string) => `${process.env.NEXT_PUBLIC_CREW_URL}teams/${id}`,
-    crewUser: (id: string) => `${process.env.NEXT_PUBLIC_CREW_URL}users/${id}`,
+    crewUserByEmail: (email: string) => `${process.env.NEXT_PUBLIC_CREW_URL}users/email/${email}`,
+    crewUser: (login: string) => `${process.env.NEXT_PUBLIC_CREW_URL}${login}`,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
