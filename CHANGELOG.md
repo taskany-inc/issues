@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.43.0](https://github.com/taskany-inc/issues/compare/v2.42.0...v2.43.0) (2024-06-20)
+
+
+### Features
+
+* **Dashboard:** apply sorting rules ([aa69c45](https://github.com/taskany-inc/issues/commit/aa69c4546060017d768b937158b7fd6b5a202e35))
+* **Dashboard:** rewrite query for kysely usage ([0d673a5](https://github.com/taskany-inc/issues/commit/0d673a5ed8224ff1bcddea4f55e32aeb5391cf31))
+* monaco user autocomplete ([5c6effa](https://github.com/taskany-inc/issues/commit/5c6effa773780f5cfbd10019aa3f765dd671765b))
+
+
+### Bug Fixes
+
+* **Dashboard:** goals counter ([6098aab](https://github.com/taskany-inc/issues/commit/6098aab81b7ccbe86a55d855c5772706d679cd1b))
+
 ## [2.42.0](https://github.com/taskany-inc/issues/compare/v2.41.0...v2.42.0) (2024-06-13)
 
 
