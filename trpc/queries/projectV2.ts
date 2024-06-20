@@ -357,7 +357,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                         eb('Goal.activityId', '=', params.activityId),
                     ]),
                 )
-                .where(({ or, and, eb, val, selectFrom }) => {
+                .where(({ or, and, eb, selectFrom, cast, val }) => {
                     const { goalsQuery } = params;
                     const estimate: Array<Date> = [];
 
@@ -395,10 +395,10 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                             // eslint-disable-next-line no-nested-ternary
                             estimate.length > 0
                                 ? estimate.length === 1
-                                    ? eb('Goal.estimate', '=', val<Date>(estimate[0]))
+                                    ? eb('Goal.estimate', '=', cast<Date>(val<Date>(estimate[0]), 'date'))
                                     : and([
-                                          eb('Goal.estimate', '>=', val<Date>(estimate[0])),
-                                          eb('Goal.estimate', '<=', val<Date>(estimate[1])),
+                                          eb('Goal.estimate', '>=', cast<Date>(val<Date>(estimate[0]), 'date')),
+                                          eb('Goal.estimate', '<=', cast<Date>(val<Date>(estimate[1]), 'date')),
                                       ])
                                 : null,
                         query: or([
@@ -496,12 +496,8 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
         .where('Project.archived', 'is not', true)
         .where(({ or, eb }) =>
             or([
+                eb('Project.id', 'in', ({ selectFrom }) => selectFrom('goals').select('goals.projectId')),
                 eb('Project.id', 'in', ({ selectFrom }) => selectFrom('project_ids').select('pid')),
-                eb('Project.id', 'in', ({ selectFrom }) =>
-                    selectFrom('Goal')
-                        .select('Goal.projectId as pid')
-                        .where('Goal.id', 'in', ({ selectFrom }) => selectFrom('subs_goals').select('B')),
-                ),
             ]),
         )
         .groupBy('Project.id')
