@@ -1,0 +1,9 @@
+.InlineUserBadge {
+    vertical-align: middle;
+    padding-right: 0;
+    padding-top: 0;
+}
+
+.InlineUserBadge:first-child {
+    padding-left: 0;
+}

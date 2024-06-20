@@ -47,13 +47,19 @@ export const FormControlEditor = React.forwardRef<HTMLDivElement, React.Componen
                         });
 
                         return {
-                            suggestions: users.map((user) => {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            suggestions: users.reduce<any[]>((acum, user) => {
+                                if (!user.login) {
+                                    return acum;
+                                }
+
+                                const { login } = user;
                                 const label = getUserName(user);
 
                                 const startColumn = position.column - query.length;
-                                const endColumn = startColumn + label.length;
+                                const endColumn = startColumn + login.length;
 
-                                return {
+                                acum.push({
                                     label,
                                     range: {
                                         startColumn,
@@ -61,7 +67,7 @@ export const FormControlEditor = React.forwardRef<HTMLDivElement, React.Componen
                                         startLineNumber: position.lineNumber,
                                         endLineNumber: position.lineNumber,
                                     },
-                                    insertText: `[${label}](${routes.crewUser(user.id)})`,
+                                    insertText: `[${login}](${routes.crewUser(user.login)} "${user.name}")`,
                                     kind: monaco.languages.CompletionItemKind.User,
                                     additionalTextEdits: [
                                         {
@@ -75,8 +81,10 @@ export const FormControlEditor = React.forwardRef<HTMLDivElement, React.Componen
                                         },
                                     ],
                                     filterText: query,
-                                };
-                            }),
+                                });
+
+                                return acum;
+                            }, []),
                         };
                     },
                     resolveCompletionItem: (item) => {

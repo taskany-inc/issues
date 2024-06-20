@@ -102,7 +102,7 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
                                                 key={user.id}
                                                 className={s.ProjectTeamPageTeamLink}
                                                 target="_blank"
-                                                href={routes.crewUser(user.id)}
+                                                href={routes.crewUserByEmail(user.email)}
                                             >
                                                 <TeamMemberListItem
                                                     roles={roles}

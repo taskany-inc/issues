@@ -12,6 +12,7 @@
 
 .HistoryUserBadge {
     position: relative;
+    vertical-align: text-bottom;
     bottom: -7px;
 }
 
