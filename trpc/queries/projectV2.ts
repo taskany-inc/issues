@@ -395,7 +395,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                             // eslint-disable-next-line no-nested-ternary
                             estimate.length > 0
                                 ? estimate.length === 1
-                                    ? eb('Goal.estimate', 'in', val<Date>(estimate[0]))
+                                    ? eb('Goal.estimate', '=', val<Date>(estimate[0]))
                                     : and([
                                           eb('Goal.estimate', '>=', val<Date>(estimate[0])),
                                           eb('Goal.estimate', '<=', val<Date>(estimate[1])),
