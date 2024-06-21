@@ -17,81 +17,94 @@ editorLoader.config({
 const triggerCharacter = '@';
 const emptySuggestions = { suggestions: [] };
 
+const initAutocomlete = (() => {
+    let isInited = false;
+
+    return (initFn: () => void) => {
+        if (!isInited) {
+            initFn();
+            isInited = true;
+        }
+    };
+})();
+
 export const FormControlEditor = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof FormEditor>>(
     ({ onMount, ...props }, ref) => {
         const utils = trpc.useContext();
 
         const onMountCallback = useCallback<NonNullable<React.ComponentProps<typeof FormEditor>['onMount']>>(
             (editor, monaco) => {
-                monaco.languages.registerCompletionItemProvider('markdown', {
-                    provideCompletionItems: async (model, position) => {
-                        const line = model.getValueInRange({
-                            startColumn: 0,
-                            endColumn: position.column,
-                            startLineNumber: position.lineNumber,
-                            endLineNumber: position.lineNumber,
-                        });
+                initAutocomlete(() =>
+                    monaco.languages.registerCompletionItemProvider('markdown', {
+                        provideCompletionItems: async (model, position) => {
+                            const line = model.getValueInRange({
+                                startColumn: 0,
+                                endColumn: position.column,
+                                startLineNumber: position.lineNumber,
+                                endLineNumber: position.lineNumber,
+                            });
 
-                        if (line.indexOf(triggerCharacter) < 0) {
-                            return emptySuggestions;
-                        }
+                            if (line.indexOf(triggerCharacter) < 0) {
+                                return emptySuggestions;
+                            }
 
-                        const query = line.slice(line.lastIndexOf(triggerCharacter) + 1, position.column);
+                            const query = line.slice(line.lastIndexOf(triggerCharacter) + 1, position.column);
 
-                        if (!query.length) {
-                            return emptySuggestions;
-                        }
+                            if (!query.length) {
+                                return emptySuggestions;
+                            }
 
-                        const users = await utils.crew.getUsers.fetch({
-                            query,
-                        });
+                            const users = await utils.crew.getUsers.fetch({
+                                query,
+                            });
 
-                        return {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            suggestions: users.reduce<any[]>((acum, user) => {
-                                if (!user.login) {
-                                    return acum;
-                                }
+                            return {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                suggestions: users.reduce<any[]>((acum, user) => {
+                                    if (!user.login) {
+                                        return acum;
+                                    }
 
-                                const { login } = user;
-                                const label = getUserName(user);
+                                    const { login } = user;
+                                    const label = getUserName(user);
 
-                                const startColumn = position.column - query.length;
-                                const endColumn = startColumn + login.length;
+                                    const startColumn = position.column - query.length;
+                                    const endColumn = startColumn + login.length;
 
-                                acum.push({
-                                    label,
-                                    range: {
-                                        startColumn,
-                                        endColumn,
-                                        startLineNumber: position.lineNumber,
-                                        endLineNumber: position.lineNumber,
-                                    },
-                                    insertText: `[${login}](${routes.crewUser(user.login)} "${user.name}")`,
-                                    kind: monaco.languages.CompletionItemKind.User,
-                                    additionalTextEdits: [
-                                        {
-                                            range: {
-                                                startColumn: startColumn - 1,
-                                                endColumn: startColumn,
-                                                startLineNumber: position.lineNumber,
-                                                endLineNumber: position.lineNumber,
-                                            },
-                                            text: null,
+                                    acum.push({
+                                        label,
+                                        range: {
+                                            startColumn,
+                                            endColumn,
+                                            startLineNumber: position.lineNumber,
+                                            endLineNumber: position.lineNumber,
                                         },
-                                    ],
-                                    filterText: query,
-                                });
+                                        insertText: `[${login}](${routes.crewUser(user.login)} "${user.name}")`,
+                                        kind: monaco.languages.CompletionItemKind.User,
+                                        additionalTextEdits: [
+                                            {
+                                                range: {
+                                                    startColumn: startColumn - 1,
+                                                    endColumn: startColumn,
+                                                    startLineNumber: position.lineNumber,
+                                                    endLineNumber: position.lineNumber,
+                                                },
+                                                text: null,
+                                            },
+                                        ],
+                                        filterText: query,
+                                    });
 
-                                return acum;
-                            }, []),
-                        };
-                    },
-                    resolveCompletionItem: (item) => {
-                        return item;
-                    },
-                    triggerCharacters: [triggerCharacter],
-                });
+                                    return acum;
+                                }, []),
+                            };
+                        },
+                        resolveCompletionItem: (item) => {
+                            return item;
+                        },
+                        triggerCharacters: [triggerCharacter],
+                    }),
+                );
 
                 onMount?.(editor, monaco);
             },
