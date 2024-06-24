@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.44.0](https://github.com/taskany-inc/issues/compare/v2.43.1...v2.44.0) (2024-06-24)
+
+
+### Features
+
+* add markdown user badge ([c62ce93](https://github.com/taskany-inc/issues/commit/c62ce9325ec2d19b3a633916787ad85d2b0d0e5f))
+
 ## [2.43.1](https://github.com/taskany-inc/issues/compare/v2.43.0...v2.43.1) (2024-06-20)
 
 
