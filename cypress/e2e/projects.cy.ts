@@ -216,14 +216,14 @@ describe('Projects', () => {
                 key: fifthProjectKey,
                 ownerEmail: Cypress.env('ADMIN_EMAIL'),
             }).then((p) => {
-                Cypress.env('fifthProject', p.id);
+                Cypress.env('fifthProject', p);
             });
             cy.task('db:create:project', {
                 title: sixthProjectForTest,
                 key: sixthProjectKey,
                 ownerEmail: Cypress.env('ADMIN_EMAIL'),
             }).then((p) => {
-                Cypress.env('sixthProject', p.id);
+                Cypress.env('sixthProject', p);
             });
         });
 

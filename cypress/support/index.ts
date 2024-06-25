@@ -278,14 +278,14 @@ Cypress.Commands.addAll({
 Cypress.Commands.addAll(
     { prevSubject: 'element' },
     {
-        getErrorTooltip: (subject: JQuery<HTMLSpanElement>, errorMessage: string) => {
+        getTippy: <T extends HTMLElement>(subject: JQuery<T>, text: string) => {
             return cy
                 .wrap(subject)
                 .realHover()
                 .invoke('attr', 'aria-describedby')
                 .should('not.be.undefined')
                 .then((ttId) => {
-                    return cy.get(`#${ttId}`).should('have.text', errorMessage);
+                    return cy.get(`#${ttId}`).should('have.text', text);
                 });
         },
     },

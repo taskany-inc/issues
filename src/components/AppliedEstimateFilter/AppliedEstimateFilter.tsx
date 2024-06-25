@@ -4,6 +4,7 @@ import { TagCleanButton } from '@taskany/bricks/harmony';
 import { AppliedFilter } from '../AppliedFilter/AppliedFilter';
 import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';
 import { decodeEstimateFromUrl, encodeUrlDateRange } from '../../utils/dateTime';
+import { appliedFiltersPanelEstimate } from '../../utils/domObjects';
 
 interface AppliedEstimateFilterProps {
     label?: string;
@@ -55,6 +56,7 @@ export const AppliedEstimateFilter = ({
                 placement="bottom"
                 onChange={handleChange}
                 onClose={onClose}
+                {...appliedFiltersPanelEstimate.attr}
             />
         </AppliedFilter>
     );

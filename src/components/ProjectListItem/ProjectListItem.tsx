@@ -7,6 +7,7 @@ import { ComponentProps, useMemo } from 'react';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectSubscriptionButtons } from '../ProjectSubscriptionButtons';
 import { safeUserData } from '../../utils/getUserName';
+import { watch, participants as participantsDO } from '../../utils/domObjects';
 
 import s from './ProjectListItem.module.css';
 
@@ -45,7 +46,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
             ))}
 
             {nullable(participantUserGroup, (p) => (
-                <TableCell width={90}>
+                <TableCell width={90} {...participantsDO.attr}>
                     <UserGroup users={p} />
                 </TableCell>
             ))}
@@ -76,7 +77,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
                             <IconStarSolid size="s" />
                         ))}
                         {nullable(watching, () => (
-                            <IconEyeOutline size="s" />
+                            <IconEyeOutline size="s" {...watch.attr} />
                         ))}
                     </>,
                 )}

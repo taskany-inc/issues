@@ -6,7 +6,12 @@ import { formateEstimate, getDateString } from '../../utils/dateTime';
 import { DropdownPanel, Dropdown, DropdownTrigger } from '../Dropdown/Dropdown';
 import { useLocale } from '../../hooks/useLocale';
 import { DateRange, DateType } from '../../types/date';
-import { estimateYearTrigger, estimateQuarterTrigger, estimateStrictDateTrigger } from '../../utils/domObjects';
+import {
+    estimateYearTrigger,
+    estimateQuarterTrigger,
+    estimateStrictDateTrigger,
+    combobox,
+} from '../../utils/domObjects';
 
 import { tr } from './EstimateDropdown.i18n';
 import s from './EstimateDropdown.module.css';
@@ -19,7 +24,7 @@ interface Estimate {
 
 type EstimateState = Parameters<ComponentProps<typeof DatePicker>['onChange']>['0'];
 
-interface EstimateDropdownProps {
+interface EstimateDropdownProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
     label?: ComponentProps<typeof DropdownTrigger>['label'];
     error?: ComponentProps<typeof DropdownTrigger>['error'];
     view?: ComponentProps<typeof DropdownTrigger>['view'];
@@ -116,7 +121,7 @@ export const EstimateDropdown = ({ value, onChange, onClose, placement, ...props
                     </Text>
                 ))}
             </DropdownTrigger>
-            <DropdownPanel width={330} placement={placement} className={s.EstimateDropdownPanel}>
+            <DropdownPanel width={330} placement={placement} className={s.EstimateDropdownPanel} {...combobox.attr}>
                 <DatePicker translates={translates.default} value={estimate} onChange={onChangeHandler}>
                     <DatePickerYear translates={translates.year} {...estimateYearTrigger.attr} />
                     <DatePickerQuarter translates={translates.quarter} {...estimateQuarterTrigger.attr} withAliases />

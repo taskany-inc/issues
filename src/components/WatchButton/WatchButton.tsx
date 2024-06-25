@@ -2,6 +2,8 @@ import React, { MouseEvent } from 'react';
 import { IconEyeOutline, IconEyeClosedSolid } from '@taskany/icons';
 import { Button } from '@taskany/bricks/harmony';
 
+import { watch } from '../../utils/domObjects';
+
 import { tr } from './WatchButton.i18n';
 
 interface WatchButtonProps {
@@ -33,6 +35,7 @@ export const WatchButton: React.FC<WatchButtonProps> = ({ watcher, onToggle }) =
             text={watcher ? tr('Watching') : tr('Watch')}
             iconLeft={<Icon watching={!!watcher} />}
             onClick={onClick}
+            {...watch.attr}
         />
     );
 };

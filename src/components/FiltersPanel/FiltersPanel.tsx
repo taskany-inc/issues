@@ -4,7 +4,14 @@ import { nullable, useLatest } from '@taskany/bricks';
 
 import { FilterQueryState, QueryState, SortableProps, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { FilterById } from '../../../trpc/inferredTypes';
-import { filtersPanel, filtersPanelTitle, filtersPanelResetButton } from '../../utils/domObjects';
+import {
+    filtersPanel,
+    filtersPanelTitle,
+    filtersPanelResetButton,
+    appliedFiltersPanel,
+    appliedFiltersPanelEstimate,
+    appliedFiltersPanelState,
+} from '../../utils/domObjects';
 import {
     FilterBarCounter,
     FiltersBarLayoutSwitch,
@@ -286,6 +293,7 @@ export const FiltersPanel: FC<{
                     queryString={queryString}
                     onDeletePreset={filterStarHandler}
                     onSavePreset={filterStarHandler}
+                    {...appliedFiltersPanel.attr}
                 >
                     {nullable(Boolean(filterQuery?.state) || Boolean(filterQuery?.stateType), () => (
                         <AppliedStateFilter
@@ -295,6 +303,7 @@ export const FiltersPanel: FC<{
                             onChange={handleChange('state')}
                             onClose={onApplyClick}
                             onClearFilter={onClearFilter('state')}
+                            {...appliedFiltersPanelState.attr}
                         />
                     ))}
                     {nullable(Boolean(filterQuery?.issuer), () => (
@@ -331,6 +340,7 @@ export const FiltersPanel: FC<{
                             onChange={setPartialQueryByKey('estimate')}
                             onClose={onApplyClick}
                             onClearFilter={onClearFilter('estimate')}
+                            {...appliedFiltersPanelEstimate.attr}
                         />
                     ))}
                     {nullable(Boolean(filterQuery?.priority), () => (
