@@ -103,7 +103,7 @@ export const createDateRange = (year: number, quarter?: QuartersKeys | null): Da
     return createYearRange(year);
 };
 
-const createQuarterRangeFromDate = (value: Date): DateRange => {
+export const createQuarterRangeFromDate = (value: Date): DateRange => {
     return createDateRange(getYearFromDate(value), getQuarterFromDate(value));
 };
 

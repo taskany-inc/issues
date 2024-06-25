@@ -16,6 +16,7 @@ import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { State } from '../State';
 import { GoalCriteriaPreview } from '../GoalCriteria/GoalCriteria';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
+import { participants } from '../../utils/domObjects';
 
 import s from './GoalTableList.module.css';
 
@@ -113,8 +114,10 @@ export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
                         className: s.GoalTableColumnSecondary,
                     },
                     {
-                        content: nullable(goal.participants?.map(safeUserData).filter(Boolean), (participants) => (
-                            <UserGroup users={participants} />
+                        content: nullable(goal.participants?.map(safeUserData).filter(Boolean), (participantsList) => (
+                            <span {...participants.attr}>
+                                <UserGroup users={participantsList} />
+                            </span>
                         )),
                         width: 100,
                     },

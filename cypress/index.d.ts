@@ -1,3 +1,5 @@
+import { Goal } from '@prisma/client';
+
 import { CommentEditSchema } from '../src/schema/comment';
 import { GoalCommentCreateSchema, GoalCommon, GoalUpdate } from '../src/schema/goal';
 import { ProjectCreate } from '../src/schema/project';
@@ -61,7 +63,7 @@ declare global {
             task(
                 event: 'db:create:project',
                 data: { title: string; key: string; description?: string; ownerEmail: string },
-            ): Chainable<any>;
+            ): Chainable<string>;
             task(event: 'db:remove:project', data: { id: string }): Chainable<null>;
             task(
                 event: 'db:create:user',
@@ -71,14 +73,24 @@ declare global {
             task(event: 'db:remove:user', data?: { ids: string[] }): Chainable<null>;
             task(
                 event: 'db:create:goal',
-                data?: { title: string; projectId: string; ownerEmail: string },
-            ): Chainable<any>;
+                data: { title: string; projectId: string; ownerEmail: string },
+            ): Chainable<Goal>;
             task(event: 'db:create:tag', data: { title: string; userEmail: string }): Chainable<TagData>;
             task(event: 'db:remove:tag', data: { id: string }): Chainable<null>;
+            task(event: 'db:remove:goal', data: { id: string }): Chainable<null>;
+            task(event: 'db:watch:project', data: { projectId: string; userId: string }): Chainable<null>;
+            task(event: 'db:watch:goal', data: { goalId: string; userId: string }): Chainable<null>;
+            task(event: 'db:unwatch:project', data: { projectId: string; userId: string }): Chainable<null>;
+            task(event: 'db:unwatch:goal', data: { goalId: string; userId: string }): Chainable<null>;
+            task(event: 'db:participate:project', data: { projectId: string; userId: string }): Chainable<null>;
+            task(event: 'db:participate:goal', data: { goalId: string; userId: string }): Chainable<null>;
+            task(event: 'db:dropParticipate:project', data: { projectId: string; userId: string }): Chainable<null>;
+            task(event: 'db:dropParticipate:goal', data: { goalId: string; userId: string }): Chainable<null>;
             interceptEditor(): Chainable<void>;
             waitEditor(): Chainable<void>;
             loadLangFile(): Chainable<void>;
             getErrorTooltip(errorMessage: string): Chainable<JQuery<HTMLElement>>;
+            getTippy(errorMessage: string): Chainable<JQuery<HTMLElement>>;
             getMultipleFields<T extends string>(selector: T[]): Chainable<Record<keyof T, string>>;
         }
         interface Cypress {
