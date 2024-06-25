@@ -16,6 +16,10 @@ export const filtersPanel = DO('filtersPanel');
 export const filtersPanelTitle = filtersPanel.add('title');
 export const filtersPanelResetButton = filtersPanel.add('resetButton');
 
+export const appliedFiltersPanel = DO('appliedFiltersPanel');
+export const appliedFiltersPanelEstimate = appliedFiltersPanel.add('estimate');
+export const appliedFiltersPanelState = appliedFiltersPanel.add('state');
+
 export const projectCreateForm = DO('projectCreateForm');
 export const projectTitleInput = projectCreateForm.add('titleInput');
 export const projectDescriptionInput = projectCreateForm.add('descriptionInput');
@@ -142,3 +146,6 @@ export const goalDependencyKinds = {
 export const goalDependencyGoalsListItem = goalDependencies.add('goalsListItem');
 export const pageContent = DO('pageContent');
 export const dashboardLoadMore = DO('dashboardLoadMore');
+
+export const watch = DO('watch');
+export const participants = DO('participants');

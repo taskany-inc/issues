@@ -1,6 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { Goal, PrismaClient } from '@prisma/client';
 
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
+import { createQuarterRangeFromDate } from '../../src/utils/dateTime';
 
 type TaskParams<K extends string, D, R> = {
     [key in K]: D extends void ? (data?: D) => R : (data: D) => R;
@@ -20,13 +21,22 @@ export type DbTasks =
               description?: string;
               ownerEmail: string;
           },
-          Promise<any>
+          Promise<string>
       >
     | TaskParams<'db:remove:project', { id: string }, Promise<null>>
+    | TaskParams<'db:remove:projects', Array<{ id: string }>, Promise<null>>
     | TaskParams<'db:create:user', { email: string; name?: string; password: string; provider: string }, Promise<any>>
     | TaskParams<'db:remove:user', { id: string }, Promise<null>>
-    | TaskParams<'db:create:goal', { title: string; projectId: string; ownerEmail: string }, Promise<any>>
+    | TaskParams<'db:create:goal', { title: string; projectId: string; ownerEmail: string }, Promise<Goal>>
     | TaskParams<'db:remove:goal', { id: string }, Promise<null>>
+    | TaskParams<'db:watch:project', { projectId: string; userId: string }, Promise<null>>
+    | TaskParams<'db:watch:goal', { goalId: string; userId: string }, Promise<null>>
+    | TaskParams<'db:unwatch:project', { projectId: string; userId: string }, Promise<null>>
+    | TaskParams<'db:unwatch:goal', { goalId: string; userId: string }, Promise<null>>
+    | TaskParams<'db:participate:project', { projectId: string; userId: string }, Promise<null>>
+    | TaskParams<'db:participate:goal', { goalId: string; userId: string }, Promise<null>>
+    | TaskParams<'db:dropParticipate:project', { projectId: string; userId: string }, Promise<null>>
+    | TaskParams<'db:dropParticipate:goal', { goalId: string; userId: string }, Promise<null>>
     | TaskParams<'db:create:tag', { title: string; userEmail: string }, Promise<any>>
     | TaskParams<'db:remove:tag', { id: string }, Promise<null>>;
 
@@ -55,7 +65,7 @@ export const initDb = (on: DbPluginEvents) => {
                     activityId: user.activityId!,
                 },
             });
-            return project;
+            return project.id;
         },
 
         'db:remove:project': async ({ id }) => {
@@ -110,26 +120,34 @@ export const initDb = (on: DbPluginEvents) => {
         },
 
         'db:remove:user': async ({ id }) => {
-            await prisma.user.delete({ where: { id } });
+            await prisma.user.delete({ where: { id }, include: { activity: { include: { settings: true } } } });
             return null;
         },
 
         'db:create:goal': async ({ title, projectId, ownerEmail }) => {
-            const [user, goals] = await Promise.all([
+            const [user, goals, defaultState, defaultPriority] = await Promise.all([
                 prisma.user.findUniqueOrThrow({ where: { email: ownerEmail } }),
                 prisma.goal.findMany({ where: { projectId } }),
+                prisma.state.findFirstOrThrow({ where: { default: true } }),
+                prisma.priority.findFirstOrThrow({ where: { default: true } }),
             ]);
 
             if (!user.activityId) return;
+
+            const estimateData = createQuarterRangeFromDate(new Date());
 
             const goal = await prisma.goal.create({
                 data: {
                     title,
                     description: '',
-                    projectId,
-                    activityId: user.activityId,
-                    ownerId: user.activityId,
                     scopeId: goals.length + 1,
+                    estimate: estimateData.end,
+                    estimateType: 'Quarter',
+                    project: { connect: { id: projectId } },
+                    state: { connect: { id: defaultState.id } },
+                    priority: { connect: { id: defaultPriority.id } },
+                    activity: { connect: { id: user.activityId } },
+                    owner: { connect: { id: user.activityId } },
                 },
             });
 
@@ -141,6 +159,106 @@ export const initDb = (on: DbPluginEvents) => {
 
         'db:remove:goal': async ({ id }) => {
             await prisma.goal.delete({ where: { id } });
+            return null;
+        },
+
+        'db:watch:project': async ({ projectId, userId }) => {
+            await prisma.project.update({
+                where: { id: projectId },
+                data: {
+                    watchers: {
+                        connect: { id: userId },
+                    },
+                },
+            });
+
+            return null;
+        },
+
+        'db:watch:goal': async ({ goalId, userId }) => {
+            await prisma.goal.update({
+                where: { id: goalId },
+                data: {
+                    watchers: {
+                        connect: { id: userId },
+                    },
+                },
+            });
+            return null;
+        },
+
+        'db:unwatch:project': async ({ projectId, userId }) => {
+            await prisma.project.update({
+                where: { id: projectId },
+                data: {
+                    watchers: {
+                        disconnect: { id: userId },
+                    },
+                },
+            });
+
+            return null;
+        },
+
+        'db:unwatch:goal': async ({ goalId, userId }) => {
+            await prisma.goal.update({
+                where: { id: goalId },
+                data: {
+                    watchers: {
+                        disconnect: { id: userId },
+                    },
+                },
+            });
+            return null;
+        },
+
+        'db:participate:project': async ({ projectId, userId }) => {
+            await prisma.project.update({
+                where: { id: projectId },
+                data: {
+                    participants: {
+                        connect: { id: userId },
+                    },
+                },
+            });
+
+            return null;
+        },
+
+        'db:participate:goal': async ({ goalId, userId }) => {
+            await prisma.goal.update({
+                where: { id: goalId },
+                data: {
+                    participants: {
+                        connect: { id: userId },
+                    },
+                },
+            });
+            return null;
+        },
+
+        'db:dropParticipate:project': async ({ projectId, userId }) => {
+            await prisma.project.update({
+                where: { id: projectId },
+                data: {
+                    participants: {
+                        disconnect: { id: userId },
+                    },
+                },
+            });
+
+            return null;
+        },
+
+        'db:dropParticipate:goal': async ({ goalId, userId }) => {
+            await prisma.goal.update({
+                where: { id: goalId },
+                data: {
+                    participants: {
+                        disconnect: { id: userId },
+                    },
+                },
+            });
             return null;
         },
     });

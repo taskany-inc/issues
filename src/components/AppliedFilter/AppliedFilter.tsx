@@ -4,7 +4,7 @@ import cn from 'classnames';
 
 import s from './AppliedFilter.module.css';
 
-interface AppliedFilterProps {
+interface AppliedFilterProps extends React.HTMLAttributes<HTMLDivElement> {
     className?: string;
     label?: string;
     readOnly?: boolean;

@@ -79,7 +79,7 @@ before(() => {
         key: projectKey,
         ownerEmail: Cypress.env('ADMIN_EMAIL'),
     }).then((p) => {
-        Cypress.env('stubProject', p.id);
+        Cypress.env('stubProject', p);
     });
     cy.task('db:create:tag', {
         title: testTag,
