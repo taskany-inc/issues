@@ -43,22 +43,22 @@ before(() => {
         title: projectTitle,
         key: keyPredictor(projectTitle),
         ownerEmail: Cypress.env('ADMIN_EMAIL'),
-    }).then((project: { id: string }) => {
-        Cypress.env('projectId', project.id);
+    }).then((project) => {
+        Cypress.env('projectId', project);
 
-        createGoal(userTestGoalDependenciesTitle, project.id, userEmail).then(({ id, _shortId }) => {
+        createGoal(userTestGoalDependenciesTitle, project, userEmail).then(({ id, _shortId }) => {
             Cypress.env('userGoal', { id, _shortId });
         });
-        createGoal(adminTestGoalDependenciesTitle, project.id).then(({ id, _shortId }) => {
+        createGoal(adminTestGoalDependenciesTitle, project).then(({ id, _shortId }) => {
             Cypress.env('adminGoal', { id, _shortId });
         });
-        createGoal(goalTitleBlocks, project.id).then(({ id, _shortId }) => {
+        createGoal(goalTitleBlocks, project).then(({ id, _shortId }) => {
             Cypress.env(`${dependencyKind.blocks}Goal`, { id, _shortId });
         });
-        createGoal(goalTitleDependsOn, project.id).then(({ id, _shortId }) => {
+        createGoal(goalTitleDependsOn, project).then(({ id, _shortId }) => {
             Cypress.env(`${dependencyKind.dependsOn}Goal`, { id, _shortId });
         });
-        createGoal(goalTitleRelatedTo, project.id).then(({ id, _shortId }) => {
+        createGoal(goalTitleRelatedTo, project).then(({ id, _shortId }) => {
             Cypress.env(`${dependencyKind.relatedTo}Goal`, { id, _shortId });
         });
     });

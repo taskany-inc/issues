@@ -26,8 +26,8 @@ before(() => {
         title: projectTitle,
         key: projectKey,
         ownerEmail: userEmail,
-    }).then((p: { id: string }) => {
-        Cypress.env('stubProject', p.id);
+    }).then((p: string) => {
+        Cypress.env('stubProject', p);
     });
 });
 
