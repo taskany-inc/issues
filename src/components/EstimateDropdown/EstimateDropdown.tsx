@@ -5,13 +5,14 @@ import { nullable } from '@taskany/bricks';
 import { formateEstimate, getDateString } from '../../utils/dateTime';
 import { DropdownPanel, Dropdown, DropdownTrigger } from '../Dropdown/Dropdown';
 import { useLocale } from '../../hooks/useLocale';
-import { DateType } from '../../types/date';
+import { DateRange, DateType } from '../../types/date';
 import { estimateYearTrigger, estimateQuarterTrigger, estimateStrictDateTrigger } from '../../utils/domObjects';
 
 import { tr } from './EstimateDropdown.i18n';
 import s from './EstimateDropdown.module.css';
 
 interface Estimate {
+    range?: DateRange;
     date: string;
     type?: DateType;
 }
@@ -31,10 +32,22 @@ interface EstimateDropdownProps {
     onClose?: () => void;
 }
 
-const toEstimateState = (value: Estimate): EstimateState => ({
-    range: { end: new Date(value.date) },
-    type: value.type,
-});
+const toEstimateState = (value: Estimate): EstimateState => {
+    if (value.range) {
+        return {
+            range: {
+                end: new Date(value.range.end),
+                start: value.range.start != null ? new Date(value.range.start) : undefined,
+            },
+            type: value.type,
+        };
+    }
+
+    return {
+        range: { end: new Date(value.date), start: undefined },
+        type: value.type,
+    };
+};
 
 export const EstimateDropdown = ({ value, onChange, onClose, placement, ...props }: EstimateDropdownProps) => {
     const locale = useLocale();
