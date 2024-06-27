@@ -54,7 +54,7 @@ export const FormControlEditor = React.forwardRef<HTMLDivElement, React.Componen
                                 return emptySuggestions;
                             }
 
-                            const users = await utils.crew.getUsers.fetch({
+                            const users = await utils.crew.searchUsers.fetch({
                                 query,
                             });
 

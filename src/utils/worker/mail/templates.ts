@@ -619,3 +619,61 @@ ${footer}`);
         text: subject,
     };
 };
+
+interface GoalAssignedEmailProps {
+    to: SendMailProps['to'];
+    shortId: string;
+    commentId: string;
+    body: string;
+    title: string;
+    authorEmail: string;
+    author?: string;
+}
+
+export const mentionedInComment = async ({
+    to,
+    author = 'Somebody',
+    shortId,
+    commentId,
+    title,
+    body,
+}: GoalAssignedEmailProps) => {
+    const goalUrl = absUrl(`/goals/${shortId}`);
+    const replyUrl = `${goalUrl}#comment-${commentId}`;
+    const subject = `🧑‍💻 ${author} mention you on #${shortId}`;
+    const html = md.render(`
+        🧑‍💻 **${author}** mention on comment to **[${shortId}: ${title}](${replyUrl})**:
+
+        ${renderQuote(body)}
+
+        🗣 [Reply](${replyUrl}) to this comment.
+
+        ${footer}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
+
+export const mentionedInGoal = async ({ to, author = 'Somebody', shortId, title, body }: GoalAssignedEmailProps) => {
+    const goalUrl = absUrl(`/goals/${shortId}`);
+    const subject = `🧑‍💻 ${author} mention you on #${shortId}`;
+    const html = md.render(`
+        🧑‍💻 **${author}** mention on **[${shortId}: ${title}](${goalUrl})**:
+
+        ${renderQuote(body)}
+
+        ${notice}
+
+        ${footer}`);
+
+    return {
+        to,
+        subject,
+        html: withBaseTmplStyles(html),
+        text: subject,
+    };
+};
