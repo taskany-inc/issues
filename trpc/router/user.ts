@@ -5,6 +5,7 @@ import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
 import { settingsUserSchema, suggestionsUserSchema, updateUserSchema } from '../../src/schema/user';
 import { safeUserData } from '../../src/utils/getUserName';
+import { getLocalUsersByCrew } from '../../src/utils/db/crew';
 
 export const user = router({
     suggestions: protectedProcedure
@@ -169,46 +170,21 @@ export const user = router({
 
         return users.reduce<{ id: string; user: NonNullable<ReturnType<typeof safeUserData>> }[]>((acc, cur) => {
             const userData = safeUserData(cur.activity);
+
             if (userData && cur.activity) acc.push({ id: cur.activity.id, user: userData });
             return acc;
         }, []);
     }),
-    сreateUserByCrew: protectedProcedure
+    getLocalUsersByCrew: protectedProcedure
         .input(
-            z.object({
-                email: z.string(),
-                name: z.string().optional(),
-                login: z.string().optional(),
-            }),
+            z.array(
+                z.object({
+                    email: z.string(),
+                    name: z.string().optional(),
+                    login: z.string().optional(),
+                    id: z.string(),
+                }),
+            ),
         )
-        .mutation(async ({ input }) => {
-            const user = await prisma.user.findFirst({
-                where: {
-                    OR: [{ nickname: input.login }, { email: input.email }],
-                },
-            });
-
-            if (user) return { ...user, name: user.name || undefined, image: user.image || undefined };
-
-            const newUser = await prisma.user.create({
-                data: {
-                    email: input.email,
-                    name: input.name,
-                    nickname: input.login,
-                    activity: {
-                        create: {
-                            settings: {
-                                create: {},
-                            },
-                        },
-                    },
-                },
-            });
-
-            return {
-                ...newUser,
-                name: newUser.name || undefined,
-                image: newUser.image || undefined,
-            };
-        }),
+        .mutation(async ({ input }) => getLocalUsersByCrew(input)),
 });

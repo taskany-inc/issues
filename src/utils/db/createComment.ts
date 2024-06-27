@@ -1,12 +1,15 @@
 import { Role, StateType } from '@prisma/client';
+import * as Sentry from '@sentry/nextjs';
 
 import { prisma } from '../prisma';
 import { goalIncludeCriteriaParams, recalculateCriteriaScore } from '../recalculateCriteriaScore';
 import { prepareRecipients } from '../prepareRecipients';
 import { createEmail } from '../createEmail';
+import { parseCrewLoginFromText } from '../crew';
 
 import { updateProjectUpdatedAt } from './updateProjectUpdatedAt';
 import { addCalculatedGoalsFields } from './calculatedGoalsFields';
+import { getLocalUsersByCrewLogin } from './crew';
 
 export const createComment = async ({
     description,
@@ -146,6 +149,22 @@ export const createComment = async ({
                 authorEmail: newComment.activity.user.email,
                 body: newComment.description,
             });
+        }
+
+        try {
+            const { items: localUsers } = await getLocalUsersByCrewLogin(parseCrewLoginFromText(description));
+
+            await createEmail('mentionedInComment', {
+                to: await prepareRecipients(localUsers),
+                shortId: _shortId,
+                title: actualGoal.title,
+                commentId: newComment.id,
+                author: newComment.activity.user?.name || newComment.activity.user?.email,
+                authorEmail: newComment.activity.user?.email,
+                body: newComment.description,
+            });
+        } catch (error) {
+            Sentry.captureException(error);
         }
     }
 

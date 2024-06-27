@@ -5,16 +5,7 @@ import { getGroupListSchema } from '../../src/schema/crew';
 import { CrewUser, Team } from '../../src/types/crew';
 import { protectedProcedure, router } from '../trpcBackend';
 import { prisma } from '../../src/utils/prisma';
-
-const getToken = () => {
-    const authorization = process.env.CREW_API_TOKEN;
-
-    if (!authorization) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'No api token for crew' });
-    }
-
-    return authorization;
-};
+import { getToken } from '../../src/utils/db/crew';
 
 export const crew = router({
     teamSuggetions: protectedProcedure.input(getGroupListSchema).query(async ({ input }) => {
@@ -60,7 +51,7 @@ export const crew = router({
                 };
             });
         }),
-    getUsers: protectedProcedure
+    searchUsers: protectedProcedure
         .input(
             z.object({
                 query: z.string(),

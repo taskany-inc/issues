@@ -1,4 +1,5 @@
 export interface UserData {
+    id: string;
     email: string;
     name?: string | null;
     nickname?: string | null;
@@ -38,6 +39,7 @@ export const prepareUserDataFromActivity = <
 
     return {
         ...target,
+        id: target.id,
         email: target.email,
         name: target.name,
         nickname: target.nickname,
@@ -95,6 +97,7 @@ export const safeUserData = <T extends { [key: string]: any }, V extends { user?
     if (!data) return undefined;
 
     return {
+        id: data.id,
         name: getUserName(data),
         email: data.email,
         image: data.image ?? undefined,

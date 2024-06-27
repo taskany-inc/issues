@@ -6,15 +6,13 @@ import { safeUserData } from '../../utils/getUserName';
 import { trpc } from '../../utils/trpcClient';
 import { Dropdown, DropdownTrigger, DropdownPanel, DropdownGuardedProps } from '../Dropdown/Dropdown';
 import { useUserResource } from '../../hooks/useUserResource';
+import { CrewUser } from '../../types/crew';
 
 import s from './UserDropdown.module.css';
 import { tr } from './UserDropdown.i18n';
 
-interface UserValue {
-    name?: string;
-    email: string;
-    image?: string;
-}
+interface UserValue extends Omit<CrewUser, 'login'> {}
+
 export interface UserDropdownValue {
     id: string;
     user?: UserValue;
@@ -49,9 +47,9 @@ export const UserDropdown = ({
 }: UserDropdownProps) => {
     const [inputState, setInputState] = useState(query);
 
-    const { createUserByCrew } = useUserResource();
+    const { getUsersByCrew } = useUserResource();
 
-    const { data: crewUsers } = trpc.crew.getUsers.useQuery(
+    const { data: crewUsers } = trpc.crew.searchUsers.useQuery(
         { query: inputState, filter },
         {
             enabled: inputState.length >= 2,
@@ -88,12 +86,22 @@ export const UserDropdown = ({
 
             if (!lastAddedUser?.user) return;
 
-            const goalsUser = await createUserByCrew(lastAddedUser.user);
+            const {
+                items: [{ user: goalsUser }],
+            } = await getUsersByCrew([lastAddedUser.user]);
+
+            if (!goalsUser?.activityId) {
+                return;
+            }
 
             const newUser = {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                id: goalsUser.activityId!,
-                user: goalsUser,
+                id: goalsUser.activityId,
+                user: {
+                    id: goalsUser.id,
+                    email: goalsUser.email,
+                    name: goalsUser.name || undefined,
+                    image: goalsUser.image || undefined,
+                },
             };
 
             if (mode === 'single') {
@@ -105,7 +113,7 @@ export const UserDropdown = ({
 
             onChange?.([...crewUsers, newUser]);
         },
-        [createUserByCrew, mode, onChange],
+        [getUsersByCrew, mode, onChange],
     );
 
     return (
