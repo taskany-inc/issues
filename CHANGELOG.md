@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.44.1](https://github.com/taskany-inc/issues/compare/v2.44.0...v2.44.1) (2024-06-27)
+
+
+### Bug Fixes
+
+* **EstimateDropdown:** calculate estimate value ([f592dc1](https://github.com/taskany-inc/issues/commit/f592dc1a70013011f64619cf203fe1973079b4d7))
+
 ## [2.44.0](https://github.com/taskany-inc/issues/compare/v2.43.1...v2.44.0) (2024-06-24)
 
 
