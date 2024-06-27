@@ -1,22 +1,17 @@
 import { useCallback } from 'react';
 
 import { trpc } from '../utils/trpcClient';
-
-interface CrewUser {
-    email: string;
-    name?: string;
-    login?: string;
-}
+import { CrewUser } from '../utils/db/types';
 
 export const useUserResource = () => {
-    const createUserMutation = trpc.user.сreateUserByCrew.useMutation();
+    const getUsersByCrewMutation = trpc.user.getLocalUsersByCrew.useMutation();
 
-    const createUserByCrew = useCallback(
-        async (user: CrewUser) => createUserMutation.mutateAsync(user),
-        [createUserMutation],
+    const getUsersByCrew = useCallback(
+        async (users: CrewUser[]) => getUsersByCrewMutation.mutateAsync(users),
+        [getUsersByCrewMutation],
     );
 
     return {
-        createUserByCrew,
+        getUsersByCrew,
     };
 };

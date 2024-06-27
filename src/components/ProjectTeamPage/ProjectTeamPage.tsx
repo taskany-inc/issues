@@ -2,6 +2,7 @@ import { nullable } from '@taskany/bricks';
 import { Link, Table, TreeView, TreeViewElement, TreeViewNode } from '@taskany/bricks/harmony';
 import { useCallback, useMemo } from 'react';
 
+import { Team } from '../../utils/db/types';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { routes } from '../../hooks/router';
 import { useProjectResource } from '../../hooks/useProjectResource';
@@ -13,7 +14,6 @@ import { TeamListItem } from '../TeamListItem/TeamListItem';
 import { TeamComboBox } from '../TeamComboBox/TeamComboBox';
 import { CommonHeader } from '../CommonHeader';
 import { TeamMemberListItem } from '../TeamMemberListItem/TeamMemberListItem';
-import { Team } from '../../types/crew';
 import { ProjectContext } from '../ProjectContext/ProjectContext';
 
 import { tr } from './ProjectTeamPage.i18n';

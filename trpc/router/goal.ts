@@ -56,6 +56,8 @@ import { prepareRecipients } from '../../src/utils/prepareRecipients';
 import { updateProjectUpdatedAt } from '../../src/utils/db/updateProjectUpdatedAt';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 import { createComment } from '../../src/utils/db/createComment';
+import { parseCrewLoginFromText } from '../../src/utils/crew';
+import { getLocalUsersByCrewLogin } from '../../src/utils/db/crewIntegration';
 import { getShortId } from '../../src/utils/getShortId';
 import { criteriaQuery } from '../queries/criteria';
 import { extendQuery } from '../utils';
@@ -407,7 +409,17 @@ export const goal = router({
                 actualProject.activity,
             ]);
 
+            const { items: localUsers } = await getLocalUsersByCrewLogin(parseCrewLoginFromText(newGoal.description));
+
             await Promise.all([
+                createEmail('mentionedInGoal', {
+                    to: await prepareRecipients(localUsers),
+                    shortId: newGoal._shortId,
+                    title: newGoal.title,
+                    author: ctx.session.user.name || ctx.session.user.email,
+                    authorEmail: ctx.session.user.email,
+                    body: newGoal.description,
+                }),
                 createEmail('goalCreated', {
                     to: recipients,
                     projectKey: actualProject.id,
