@@ -150,31 +150,7 @@
     "Dropdown": {
         "Not chosen": {
             "ru": "Не выбрано",
-            "en": ""
-        }
-    },
-    "Estimate": {
-        "Date is past": {
-            "ru": "Выбранная дата уже прошла",
-            "en": "Selected date is past"
-        }
-    },
-    "EstimateDate": {
-        "Date title": {
-            "ru": "Дата",
-            "en": "Strict date"
-        },
-        "Date clue": {
-            "ru": "Или можно указать точную дату вручную, если есть строгий дедлайн.",
-            "en": "Or you can choose a date if you have strict deadline."
-        },
-        "Date input mask": {
-            "ru": "99.99.9999",
-            "en": "99/99/9999"
-        },
-        "Date input mask placeholder": {
-            "ru": "dd.mm.yyyy",
-            "en": "mm/dd/yyyy"
+            "en": "Not chosen"
         }
     },
     "EstimateDropdown": {
@@ -213,26 +189,6 @@
         "warning": {
             "ru": "Выбранная дата уже прошла",
             "en": "Selected date is past"
-        }
-    },
-    "EstimateQuarter": {
-        "Quarter title": {
-            "ru": "Квартал",
-            "en": "Quarter"
-        },
-        "Quarter clue": {
-            "ru": "Можно указать квартал: Q1, Q2, Q3, Q4. Сейчас {quarter}, заканчивается {end}.",
-            "en": "This is the date shortcut: Q1, Q2, Q3, Q4. Currently is {quarter}. End is {end}."
-        }
-    },
-    "EstimateYear": {
-        "Year title": {
-            "ru": "Год",
-            "en": "Year"
-        },
-        "Year clue": {
-            "ru": "Если выбрать только год, то датой будет выбран конец года, например: {end}.",
-            "en": "If you are selecting only year it means the deadline will be the end of the year. For example: {end}."
         }
     },
     "ExplorePageHeader": {
@@ -282,12 +238,6 @@
     "FilterAutoCompleteInput": {
         "Search...": {
             "ru": "Поиск...",
-            "en": ""
-        }
-    },
-    "FilterBase": {
-        "Suggestions": {
-            "ru": "Предложения",
             "en": ""
         }
     },
@@ -399,6 +349,12 @@
             "en": "Sort"
         }
     },
+    "FlowDropdown": {
+        "Suggestions": {
+            "ru": "Предложения",
+            "en": "Suggestions"
+        }
+    },
     "FormControlEditor": {
         "Attach files": {
             "ru": "Загрузить файл",
@@ -427,10 +383,14 @@
             "en": ""
         }
     },
-    "GoalActivityFeed": {
-        "Add achievement criteria": {
-            "ru": "Добавить критерий",
-            "en": "Add achievement criteria"
+    "GoalActivityWithTabs": {
+        "Comments": {
+            "ru": "",
+            "en": ""
+        },
+        "Activity": {
+            "ru": "",
+            "en": ""
         }
     },
     "GoalContentHeader": {
@@ -529,10 +489,6 @@
         "relatedTo": {
             "ru": "Связана с",
             "en": "Relates to"
-        },
-        "Kind": {
-            "ru": "Вид зависимости",
-            "en": ""
         }
     },
     "GoalEditForm": {
@@ -599,6 +555,12 @@
         "Edit": {
             "ru": "Редактировать",
             "en": "Edit"
+        }
+    },
+    "GoalSelect": {
+        "Suggestions": {
+            "ru": "Предложения",
+            "en": "Suggestions"
         }
     },
     "GoalSidebar": {
@@ -990,6 +952,14 @@
             "ru": "Доступ",
             "en": "Access"
         },
+        "Public": {
+            "ru": "Публичный",
+            "en": "Public"
+        },
+        "Private": {
+            "ru": "Приватный",
+            "en": "Private"
+        },
         "Add user": {
             "ru": "Добавить пользователя",
             "en": "Add user"
@@ -1028,13 +998,17 @@
             "ru": "Короткое описание",
             "en": "Short description"
         },
-        "Flow": {
-            "ru": "Флоу",
-            "en": "Flow"
+        "Enter project": {
+            "ru": "Проект",
+            "en": "Enter project"
         },
         "Flow or state title": {
             "ru": "Модель или статус",
             "en": "Flow or state title"
+        },
+        "Flow": {
+            "ru": "Флоу",
+            "en": "Flow"
         },
         "Cancel": {
             "ru": "Отмена",
@@ -1176,13 +1150,13 @@
             "ru": "Чтобы подтвердить передачу прав на проект {project} введите ключ проекта и выберите нового владельца ниже.",
             "en": "To confirm transfering {project} ownership please type project key {key} and select new owner below."
         },
-        "New project owner": {
-            "ru": "Новый владелец",
-            "en": "New project owner"
-        },
         "Enter name or email": {
             "ru": "Имя или почта",
             "en": "Enter name or email"
+        },
+        "New project owner": {
+            "ru": "Новый владелец",
+            "en": "New project owner"
         },
         "Cannot delete project now": {
             "ru": "Невозможно сейчас удалить проект",
@@ -1198,6 +1172,24 @@
         },
         "Ok, got it": {
             "ru": "Хорошо, сделаю",
+            "en": "Ok, got it"
+        }
+    },
+    "ProjectSwitchPublicConfirmModal": {
+        "You are going to make project public": {
+            "ru": "Вы собираетесь сделать проект публичным",
+            "en": "You are going to make project public"
+        },
+        "Project goals will be available to all users": {
+            "ru": "Цели проекта станут доступны всем пользователям",
+            "en": "Project goals will be available to all users"
+        },
+        "Cancel": {
+            "ru": "Отмена",
+            "en": "Cancel"
+        },
+        "Ok, got it": {
+            "ru": "Хорошо",
             "en": "Ok, got it"
         }
     },
@@ -1253,12 +1245,6 @@
         "Stars": {
             "ru": "В избранное",
             "en": "Stars"
-        }
-    },
-    "StarredFilter": {
-        "Starred": {
-            "ru": "Избранное",
-            "en": "Starred"
         }
     },
     "TagComboBox": {
@@ -1356,6 +1342,14 @@
             "ru": "Язык",
             "en": ""
         },
+        "Subscription settings": {
+            "ru": "Настройки подписки",
+            "en": "Subscription settings"
+        },
+        "Allow notifications": {
+            "ru": "Разрешить уведомления",
+            "en": "Allow notifications"
+        },
         "You are hero": {
             "ru": "Ты наш герой",
             "en": ""
@@ -1385,12 +1379,6 @@
         "Watch": {
             "ru": "Следить",
             "en": "Watch"
-        }
-    },
-    "WatchingFilter": {
-        "Watching": {
-            "ru": "Подписки",
-            "en": "Watching"
         }
     },
     "WhatsNew": {

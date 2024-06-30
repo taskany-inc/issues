@@ -9,11 +9,11 @@ import { useGoalResource } from '../../hooks/useGoalResource';
 import { usePageContext } from '../../hooks/usePageContext';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
 import { CommentView } from '../CommentView/CommentView';
-import { GoalActivity } from '../GoalActivity';
 import { GoalCriteriaView, mapCriteria } from '../GoalCriteria/GoalCriteria';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
+import { GoalActivityV2 } from '../GoalActivityWithTabs/GoalActivityV2';
 
 import { tr } from './GoalActivityFeed.i18n';
 import s from './GoalActivityFeed.module.css';
@@ -31,7 +31,7 @@ interface GoalActivityFeedProps {
 }
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
-    ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }, ref) => {
+    ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }) => {
         const { user } = usePageContext();
         const {
             onGoalCommentUpdate,
@@ -56,6 +56,12 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             {
                 invalidate: {
                     getById: shortId,
+                    getGoalCommentsFeed: {
+                        goalId: goal.id,
+                    },
+                    getGoalActivityFeed: {
+                        goalId: goal.id,
+                    },
                 },
                 afterInvalidate: onInvalidate,
             },
@@ -140,7 +146,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
 
         return (
             <>
-                <GoalActivity
+                {/* <GoalActivity
                     ref={ref}
                     feed={goal._activityFeed}
                     header={
@@ -223,7 +229,85 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                             onDelete={onGoalCommentDelete(value.id)}
                         />
                     )}
-                />
+                /> */}
+
+                {nullable(goal._criteria?.length || goal._isEditable, () => (
+                    <GoalCriteriaView
+                        goalId={goal.id}
+                        canEdit={goal._isEditable}
+                        onUpdate={handleUpdateCriteria}
+                        onCheck={handleUpdateCriteriaState}
+                        onConvert={handleConvertCriteriaToGoal}
+                        onRemove={handleRemoveCriteria}
+                        list={goal._criteria?.map((criteria) => mapCriteria(criteria, criteria.criteriaGoal))}
+                    >
+                        {nullable(goal._isEditable, () => (
+                            <GoalFormPopupTrigger
+                                offset={[-20, 0]}
+                                renderTrigger={(props) => (
+                                    <AddInlineTrigger
+                                        text={tr('Add achievement criteria')}
+                                        ref={props.ref}
+                                        onClick={props.onClick}
+                                        centered={false}
+                                    />
+                                )}
+                            >
+                                <GoalCriteriaSuggest
+                                    id={goal.id}
+                                    withModeSwitch
+                                    defaultMode="simple"
+                                    items={goal._criteria.map((criteria) => ({
+                                        ...criteria,
+                                        goal: criteria.criteriaGoal,
+                                    }))}
+                                    onSubmit={handleCreateCriteria}
+                                    validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                                />
+                            </GoalFormPopupTrigger>
+                        ))}
+                    </GoalCriteriaView>
+                ))}
+                {nullable(lastStateComment, (value) => (
+                    <CommentView
+                        pin
+                        id={value.id}
+                        author={value.author}
+                        description={value.description}
+                        state={value.state ?? undefined}
+                        createdAt={value.createdAt}
+                        reactions={value.reactions}
+                        onSubmit={onGoalCommentSubmit(value)}
+                        onReactionToggle={onGoalCommentReactionToggle(value.id)}
+                        onDelete={onGoalCommentDelete(value.id)}
+                        className={s.PinnedComment}
+                    />
+                ))}
+
+                <GoalActivityV2
+                    goalId={goal.id}
+                    renderCommentItem={(value) => (
+                        <CommentView
+                            id={value.id}
+                            author={value.author}
+                            description={value.description}
+                            state={value.state}
+                            createdAt={value.createdAt}
+                            highlight={value.id === highlightCommentId}
+                            reactions={value.reactions}
+                            onSubmit={onGoalCommentSubmit(value)}
+                            onReactionToggle={onGoalCommentReactionToggle(value.id)}
+                            onDelete={onGoalCommentDelete(value.id)}
+                        />
+                    )}
+                >
+                    <GoalCommentCreateForm
+                        goalId={goal.id}
+                        stateId={goal.stateId}
+                        states={goal._isEditable || goal._isParticipant ? goal.project?.flow.states : undefined}
+                        onSubmit={onGoalCommentCreate}
+                    />
+                </GoalActivityV2>
 
                 {nullable(goal._isEditable, () => (
                     <>

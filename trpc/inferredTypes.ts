@@ -30,6 +30,9 @@ export type DashboardGoal = RouterOutputs['project']['getUserProjectsWithGoals']
 export type DashboardProjectV2 = RouterOutputs['v2']['project']['userProjectsWithGoals']['groups'][number];
 export type DashboardGoalV2 = NonNullable<DashboardProjectV2['goals']>[number];
 
+export type GoalActivityHistory = RouterOutputs['goal']['getGoalActivityFeed'];
+export type GoalComments = RouterOutputs['goal']['getGoalCommentsFeed'];
+
 export type ExtractDBTypes = {
     [K in keyof DB]: ExtractTypeFromGenerated<DB[K]>;
 };

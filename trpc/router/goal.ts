@@ -61,6 +61,10 @@ import { getLocalUsersByCrewLogin } from '../../src/utils/db/crewIntegration';
 import { getShortId } from '../../src/utils/getShortId';
 import { criteriaQuery } from '../queries/criteria';
 import { extendQuery } from '../utils';
+import { commentsByGoalIdQuery, reactionsForGoalComments } from '../queries/comments';
+import { ReactionsMap } from '../../src/types/reactions';
+import { safeGetUserName } from '../../src/utils/getUserName';
+import { extraDataForEachRecord, historyQuery } from '../queries/history';
 
 import { tr } from './router.i18n';
 
@@ -597,6 +601,15 @@ export const goal = router({
                     action: 'change',
                     previousValue: actualGoal.ownerId,
                     nextValue: input.owner.id,
+                });
+            }
+
+            if (actualGoal.stateId !== input.state.id) {
+                history.push({
+                    subject: 'state',
+                    action: 'change',
+                    previousValue: actualGoal.stateId,
+                    nextValue: input.state.id,
                 });
             }
 
@@ -1845,5 +1858,80 @@ export const goal = router({
             }
 
             return null;
+        }),
+    getGoalActivityFeed: protectedProcedure
+        .input(z.object({ goalId: z.string() }))
+        .use(goalAccessMiddleware)
+        .query(async ({ input }) => {
+            const activity = await historyQuery(input).execute();
+            const extraHistory = await extraDataForEachRecord(activity);
+
+            return extraHistory;
+        }),
+    getGoalCommentsFeed: protectedProcedure
+        .input(z.object({ goalId: z.string() }))
+        .use(goalAccessMiddleware)
+        .query(async ({ input }) => {
+            const commentsQuery = commentsByGoalIdQuery(input).execute();
+            const reactionsQuery = reactionsForGoalComments(input).execute();
+
+            return Promise.all([commentsQuery, reactionsQuery]).then(([comments, reactions]) => {
+                const reactsMap = reactions.reduce<{ [key: string]: Array<(typeof reactions)[number]> }>((acc, r) => {
+                    const k = r.commentId;
+
+                    if (k == null) {
+                        return acc;
+                    }
+
+                    if (!acc[k]) {
+                        acc[k] = [];
+                    }
+
+                    acc[k].push(r);
+
+                    return acc;
+                }, {});
+
+                const limit = 10;
+
+                return comments.map((comment) => {
+                    const currentReactions = reactsMap[comment.id]?.reduce<ReactionsMap>((acc, cur) => {
+                        const data = {
+                            activityId: cur.activityId,
+                            name: safeGetUserName(cur.activity),
+                        };
+
+                        if (acc[cur.emoji]) {
+                            acc[cur.emoji].count += 1;
+                            acc[cur.emoji].authors.push(data);
+                        } else {
+                            acc[cur.emoji] = {
+                                count: 1,
+                                authors: [data],
+                                remains: 0,
+                            };
+                        }
+
+                        return acc;
+                    }, {});
+
+                    for (const key in currentReactions) {
+                        if (key in currentReactions) {
+                            const reaction = currentReactions[key];
+                            const { authors } = reaction;
+
+                            if (authors.length > limit) {
+                                reaction.authors = authors.slice(0, limit);
+                                reaction.remains = authors.length - limit;
+                            }
+                        }
+                    }
+
+                    return {
+                        ...comment,
+                        reactions: currentReactions,
+                    };
+                });
+            });
         }),
 });

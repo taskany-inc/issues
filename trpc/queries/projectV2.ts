@@ -7,6 +7,8 @@ import { DB, Role } from '../../generated/kysely/types';
 import { QueryWithFilters } from '../../src/schema/common';
 import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
+import { getUserActivity } from './activity';
+
 export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId: string; role: Role }) => {
     return db
         .selectFrom('Project')
@@ -302,18 +304,11 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                 .selectFrom('Goal')
                 .selectAll('Goal')
                 .leftJoinLateral(
-                    ({ selectFrom }) =>
-                        selectFrom('Activity')
-                            .distinctOn('Activity.id')
-                            .innerJoin('User', 'User.activityId', 'Activity.id')
-                            .leftJoin('Ghost', 'Ghost.id', 'Activity.ghostId')
-                            .selectAll('Activity')
-                            .select([sql`"User"`.as('user'), sql`"Ghost"`.as('ghost')])
-                            .whereRef('Activity.id', 'in', (qb) =>
-                                qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
-                            )
-                            .as('participant'),
-                    (join) => join.onTrue(),
+                    () => getUserActivity().as('participant'),
+                    (join) =>
+                        join.onRef('participant.id', 'in', (qb) =>
+                            qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
+                        ),
                 )
                 .leftJoinLateral(
                     ({ selectFrom }) =>
@@ -476,23 +471,11 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                 selectFrom('goals')
                     .selectAll('goals')
                     .innerJoin(
-                        ({ selectFrom }) =>
-                            selectFrom('Activity')
-                                .selectAll('Activity')
-                                .innerJoin('User', 'User.activityId', 'Activity.id')
-                                .leftJoin('Ghost', 'Ghost.id', 'Activity.ghostId')
-                                .select([sql`"User"`.as('user'), sql`"Ghost"`.as('ghost')])
-                                .as('owner'),
+                        () => getUserActivity().as('owner'),
                         (join) => join.onRef('owner.id', '=', 'goals.ownerId'),
                     )
                     .innerJoin(
-                        ({ selectFrom }) =>
-                            selectFrom('Activity')
-                                .selectAll('Activity')
-                                .innerJoin('User', 'User.activityId', 'Activity.id')
-                                .leftJoin('Ghost', 'Ghost.id', 'Activity.ghostId')
-                                .select([sql`"User"`.as('user'), sql`"Ghost"`.as('ghost')])
-                                .as('activityUser'),
+                        () => getUserActivity().as('activityUser'),
                         (join) => join.onRef('activityUser.id', '=', 'goals.activityId'),
                     )
                     .innerJoin('User as activity', 'activity.activityId', 'goals.activityId')
