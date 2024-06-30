@@ -6,17 +6,18 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
-import { usePageContext } from '../../hooks/usePageContext';
+// import { usePageContext } from '../../hooks/usePageContext';
 import { GoalDeleteModal } from '../GoalDeleteModal/GoalDeleteModal';
-import { CommentView } from '../CommentView/CommentView';
-import { GoalActivity } from '../GoalActivity';
-import { GoalCriteriaView, mapCriteria } from '../GoalCriteria/GoalCriteria';
-import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
-import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
-import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
+// import { CommentView } from '../CommentView/CommentView';
+// import { GoalActivity } from '../GoalActivity';
+// import { GoalCriteriaView, mapCriteria } from '../GoalCriteria/GoalCriteria';
+// import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
+// import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
+// import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
+import { GoalActivityV2 } from '../GoalActivityWithTabs/GoalActivityV2';
 
-import { tr } from './GoalActivityFeed.i18n';
-import s from './GoalActivityFeed.module.css';
+// import { tr } from './GoalActivityFeed.i18n';
+// import s from './GoalActivityFeed.module.css';
 
 const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 const GoalEditForm = dynamic(() => import('../GoalEditForm/GoalEditForm'));
@@ -31,22 +32,22 @@ interface GoalActivityFeedProps {
 }
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
-    ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }, ref) => {
-        const { user } = usePageContext();
+    ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }) => {
+        // const { user } = usePageContext();
         const {
-            onGoalCommentUpdate,
+            // onGoalCommentUpdate,
             onGoalDelete,
-            onGoalCriteriaAdd,
-            onGoalCriteriaToggle,
-            onGoalCriteriaUpdate,
-            onGoalCriteriaRemove,
-            onGoalCriteriaConvert,
-            validateGoalCriteriaBindings,
+            // onGoalCriteriaAdd,
+            // onGoalCriteriaToggle,
+            // onGoalCriteriaUpdate,
+            // onGoalCriteriaRemove,
+            // onGoalCriteriaConvert,
+            // validateGoalCriteriaBindings,
             onGoalCommentCreate,
-            onGoalCommentReactionToggle,
-            onGoalCommentDelete,
-            lastStateComment,
-            highlightCommentId,
+            // onGoalCommentReactionToggle,
+            // onGoalCommentDelete,
+            // lastStateComment,
+            // highlightCommentId,
         } = useGoalResource(
             {
                 id: goal?.id,
@@ -66,81 +67,81 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             onGoalDeleteConfirm?.();
         }, [onGoalDelete, onGoalDeleteConfirm]);
 
-        const onGoalCommentSubmit = useCallback(
-            (comment: { activityId: string; id: string }) => {
-                return comment.activityId === user?.activityId ? onGoalCommentUpdate(comment.id) : undefined;
-            },
-            [onGoalCommentUpdate, user?.activityId],
-        );
+        // const onGoalCommentSubmit = useCallback(
+        //     (comment: { activityId: string; id: string }) => {
+        //         return comment.activityId === user?.activityId ? onGoalCommentUpdate(comment.id) : undefined;
+        //     },
+        //     [onGoalCommentUpdate, user?.activityId],
+        // );
 
-        const handleCreateCriteria = useCallback(
-            async (data: { title: string; weight: string; selected?: { id?: string } }) => {
-                await onGoalCriteriaAdd({
-                    title: data.title,
-                    weight: String(data.weight),
-                    goalId: goal.id,
-                    criteriaGoal: data.selected?.id
-                        ? {
-                              id: data.selected.id,
-                          }
-                        : undefined,
-                });
-            },
-            [goal.id, onGoalCriteriaAdd],
-        );
+        // const handleCreateCriteria = useCallback(
+        //     async (data: { title: string; weight: string; selected?: { id?: string } }) => {
+        //         await onGoalCriteriaAdd({
+        //             title: data.title,
+        //             weight: String(data.weight),
+        //             goalId: goal.id,
+        //             criteriaGoal: data.selected?.id
+        //                 ? {
+        //                       id: data.selected.id,
+        //                   }
+        //                 : undefined,
+        //         });
+        //     },
+        //     [goal.id, onGoalCriteriaAdd],
+        // );
 
-        const handleUpdateCriteria = useCallback(
-            async (data: { id?: string; title: string; weight?: number; criteriaGoal?: { id?: string } }) => {
-                if (!data.id) return;
+        // const handleUpdateCriteria = useCallback(
+        //     async (data: { id?: string; title: string; weight?: number; criteriaGoal?: { id?: string } }) => {
+        //         if (!data.id) return;
 
-                await onGoalCriteriaUpdate({
-                    id: data.id,
-                    title: data.title,
-                    weight: String(data.weight),
-                    goalId: goal.id,
-                    criteriaGoal: data.criteriaGoal?.id
-                        ? {
-                              id: data.criteriaGoal.id,
-                          }
-                        : undefined,
-                });
-            },
-            [goal.id, onGoalCriteriaUpdate],
-        );
+        //         await onGoalCriteriaUpdate({
+        //             id: data.id,
+        //             title: data.title,
+        //             weight: String(data.weight),
+        //             goalId: goal.id,
+        //             criteriaGoal: data.criteriaGoal?.id
+        //                 ? {
+        //                       id: data.criteriaGoal.id,
+        //                   }
+        //                 : undefined,
+        //         });
+        //     },
+        //     [goal.id, onGoalCriteriaUpdate],
+        // );
 
-        const handleRemoveCriteria = useCallback(
-            async (data: { id: string }) => {
-                await onGoalCriteriaRemove({
-                    id: data.id,
-                    goalId: goal.id,
-                });
-            },
-            [goal.id, onGoalCriteriaRemove],
-        );
+        // const handleRemoveCriteria = useCallback(
+        //     async (data: { id: string }) => {
+        //         await onGoalCriteriaRemove({
+        //             id: data.id,
+        //             goalId: goal.id,
+        //         });
+        //     },
+        //     [goal.id, onGoalCriteriaRemove],
+        // );
 
-        const handleUpdateCriteriaState = useCallback(
-            async (data: { id: string; isDone: boolean }) => {
-                await onGoalCriteriaToggle({
-                    id: data.id,
-                    isDone: data.isDone,
-                });
-            },
-            [onGoalCriteriaToggle],
-        );
+        // const handleUpdateCriteriaState = useCallback(
+        //     async (data: { id: string; isDone: boolean }) => {
+        //         await onGoalCriteriaToggle({
+        //             id: data.id,
+        //             isDone: data.isDone,
+        //         });
+        //     },
+        //     [onGoalCriteriaToggle],
+        // );
 
-        const handleConvertCriteriaToGoal = useCallback(
-            async (data: { id: string; title: string }) => {
-                onGoalCriteriaConvert({
-                    id: data.id,
-                    title: data.title,
-                });
-            },
-            [onGoalCriteriaConvert],
-        );
+        // const handleConvertCriteriaToGoal = useCallback(
+        //     async (data: { id: string; title: string }) => {
+        //         onGoalCriteriaConvert({
+        //             id: data.id,
+        //             title: data.title,
+        //         });
+        //     },
+        //     [onGoalCriteriaConvert],
+        // );
 
         return (
             <>
-                <GoalActivity
+                {/* <GoalActivity
                     ref={ref}
                     feed={goal._activityFeed}
                     header={
@@ -223,7 +224,16 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                             onDelete={onGoalCommentDelete(value.id)}
                         />
                     )}
-                />
+                /> */}
+
+                <GoalActivityV2 goalId={goal.id}>
+                    <GoalCommentCreateForm
+                        goalId={goal.id}
+                        stateId={goal.stateId}
+                        states={goal._isEditable || goal._isParticipant ? goal.project?.flow.states : undefined}
+                        onSubmit={onGoalCommentCreate}
+                    />
+                </GoalActivityV2>
 
                 {nullable(goal._isEditable, () => (
                     <>
