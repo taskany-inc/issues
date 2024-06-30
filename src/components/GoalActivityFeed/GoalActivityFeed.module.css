@@ -1,3 +1,8 @@
 .PinnedComment {
     padding-bottom: 0;
 }
+
+.PinnedComment::after {
+    content: none;
+    display: none;
+}

@@ -563,7 +563,7 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
     );
 
     return (
-        <ActivityFeedItem>
+        <ActivityFeedItem className={classes.GoalCriteriaIsolate}>
             <Circle size={32} className={classes.GoalCriteriaCircle}>
                 <IconMessageTickOutline size="s" />
             </Circle>

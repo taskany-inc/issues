@@ -83,3 +83,8 @@
 .CriteriaGoalProject, .CriteriaIsDone {
     color: var(--text-secondary);
 }
+
+.GoalCriteriaIsolate::after {
+    content: none;
+    display: none;
+}

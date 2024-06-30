@@ -76,6 +76,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
         {
             invalidate: {
                 getById: goal._shortId,
+                getGoalActivityFeed: { goalId: goal?.id },
             },
             afterInvalidate: dispatchPreviewUpdateEvent,
         },

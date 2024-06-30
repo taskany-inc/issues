@@ -31,6 +31,12 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         {
             invalidate: {
                 getById: goal._shortId,
+                getGoalActivityFeed: {
+                    goalId: goal.id,
+                },
+                getGoalCommentsFeed: {
+                    goalId: goal.id,
+                },
             },
             afterInvalidate: dispatchPreviewUpdateEvent,
         },

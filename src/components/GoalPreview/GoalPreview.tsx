@@ -33,7 +33,10 @@ const GoalPreviewModal: React.FC<GoalPreviewProps> = ({ shortId, goal, defaults,
 
     const { onGoalStateChange } = useGoalResource(
         { id: goal?.id },
-        { invalidate: { getById: goal?._shortId }, afterInvalidate: dispatchPreviewUpdateEvent },
+        {
+            invalidate: { getById: goal?._shortId, getGoalActivityFeed: { goalId: goal?.id } },
+            afterInvalidate: dispatchPreviewUpdateEvent,
+        },
     );
 
     const commentsRef = useRef<HTMLDivElement>(null);

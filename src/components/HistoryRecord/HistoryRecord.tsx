@@ -24,7 +24,7 @@ import cn from 'classnames';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
 import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
-import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } from '../../types/history';
+import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } from '../../../trpc/queries/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';
 import { useLocale } from '../../hooks/useLocale';
 import { getUserName, prepareUserDataFromActivity, safeUserData } from '../../utils/getUserName';
@@ -64,7 +64,7 @@ interface HistoryChangeProps<T> {
 
 const HistoryRecordText = ({ children, className, ...props }: ComponentProps<typeof Text>) => {
     return (
-        <Text as="span" size="xs" className={cn(s.HistoryRecordText, className)} {...props}>
+        <Text as="span" size="s" className={cn(s.HistoryRecordText, className)} {...props}>
             {children}
         </Text>
     );
@@ -414,6 +414,7 @@ const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title
                     title={criteriaGoal.title}
                     state={criteriaGoal.state}
                     href={routes.goal(`${criteriaGoal.projectId}-${criteriaGoal.scopeId}`)}
+                    strike={strike}
                 />
             </>
         );

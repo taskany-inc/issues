@@ -208,3 +208,14 @@ export const getGoalList = (params: GoalQueryParams) => {
         .orderBy(mapSortParamsToTableColumns(params.query?.sort))
         .groupBy(['Goal.id', 'owner.id', 'state.id', 'priority.id']);
 };
+
+export const goalBaseQuery = () => {
+    return db
+        .selectFrom('Goal')
+        .innerJoin('State', 'State.id', 'Goal.stateId')
+        .selectAll('Goal')
+        .select(({ fn, val, cast }) => [
+            fn('concat', ['Goal.projectId', cast(val('-'), 'text'), 'Goal.scopeId']).as('_shortId'),
+            sql`to_json("State")`.as('state'),
+        ]);
+};
