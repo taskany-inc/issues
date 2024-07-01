@@ -341,7 +341,11 @@ export const getGoalDeepQuery = (user?: { activityId: string; role: Role }) => {
         priority: true,
         project: {
             include: {
-                parent: true,
+                parent: {
+                    include: {
+                        participants: true,
+                    },
+                },
                 tags: true,
                 flow: {
                     include: {
