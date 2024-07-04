@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.46.0](https://github.com/taskany-inc/issues/compare/v2.45.0...v2.46.0) (2024-07-04)
+
+
+### Features
+
+* support email notification ([4fde81d](https://github.com/taskany-inc/issues/commit/4fde81dfbee2e6b8a55ed7ff8ce64e9e43873930))
+
 ## [2.45.0](https://github.com/taskany-inc/issues/compare/v2.44.1...v2.45.0) (2024-07-01)
 
 
