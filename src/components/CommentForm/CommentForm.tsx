@@ -18,6 +18,7 @@ interface CommentFormProps {
     autoFocus?: boolean;
     busy?: boolean;
     description?: string;
+    passedError?: { message: string };
 
     onSubmit: (form: CommentSchema) => void | Promise<void>;
     onChange?: (form: CommentSchema) => void;
@@ -35,6 +36,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     onSubmit,
     onFocus,
     onCancel,
+    passedError,
 }) => {
     const [error, setError] = useState<{ message: string } | undefined>();
     const ref = useRef(null);
@@ -86,7 +88,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         outline
                         {...commentFormDescription.attr}
                     />
-                    {nullable(error, (err) => (
+                    {nullable(error || passedError, (err) => (
                         <FormControlError error={err} />
                     ))}
                 </FormControl>
