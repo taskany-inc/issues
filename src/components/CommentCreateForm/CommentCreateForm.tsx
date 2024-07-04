@@ -50,6 +50,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     const descriptionRef = useLatest(description);
     const [focused, setFocused] = useState(Boolean(currentDescription));
     const [busy, setBusy] = useState(false);
+    const [error, setError] = useState<{ message: string } | undefined>();
 
     const onCommentFocus = useCallback(() => {
         setFocused(true);
@@ -59,6 +60,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     const onCommentChange = useCallback(
         ({ description }: { description: string }) => {
             setDescription(description);
+            setError(undefined);
             onChange?.({ description, stateId: pushState?.id });
         },
         [onChange, pushState?.id],
@@ -66,6 +68,11 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
 
     const onCommentSubmit = useCallback(
         async (form: CommentSchema & { stateId?: string }) => {
+            if (!form.description.length) {
+                setError({ message: tr("Comments's description is required") });
+                return;
+            }
+
             setBusy(true);
             setFocused(false);
 
@@ -131,6 +138,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                 onSubmit={onCommentFormSubmit('pushState')}
                 onCancel={onCancelCreate}
                 onFocus={onCommentFocus}
+                passedError={error}
                 actionButton={
                     <>
                         <Button view="primary" disabled={busy} onClick={onCommentСlick} text={tr('Comment')} />

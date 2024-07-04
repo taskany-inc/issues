@@ -1,4 +1,5 @@
 {
     "Comment": "Написать",
-    "Update state": "Обновить статус"
+    "Update state": "Обновить статус",
+    "Comments's description is required": "Текст комментария обязателен"
 }
