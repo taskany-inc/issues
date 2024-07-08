@@ -181,7 +181,7 @@ export const user = router({
                 z.object({
                     email: z.string(),
                     name: z.string().optional(),
-                    login: z.string().optional(),
+                    login: z.string().nullish(),
                     id: z.string(),
                 }),
             ),
