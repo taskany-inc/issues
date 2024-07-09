@@ -642,13 +642,13 @@ export const mentionedInComment = async ({
     const replyUrl = `${goalUrl}#comment-${commentId}`;
     const subject = `🧑‍💻 ${author} mention you on #${shortId}`;
     const html = md.render(`
-        🧑‍💻 **${author}** mention on comment to **[${shortId}: ${title}](${replyUrl})**:
+🧑‍💻 **${author}** mention on comment to **[${shortId}: ${title}](${replyUrl})**:
 
-        ${renderQuote(body)}
+${renderQuote(body)}
 
-        🗣 [Reply](${replyUrl}) to this comment.
+🗣 [Reply](${replyUrl}) to this comment.
 
-        ${footer}`);
+${footer}`);
 
     return {
         to,
@@ -662,13 +662,13 @@ export const mentionedInGoal = async ({ to, author = 'Somebody', shortId, title,
     const goalUrl = absUrl(`/goals/${shortId}`);
     const subject = `🧑‍💻 ${author} mention you on #${shortId}`;
     const html = md.render(`
-        🧑‍💻 **${author}** mention on **[${shortId}: ${title}](${goalUrl})**:
+🧑‍💻 **${author}** mention on **[${shortId}: ${title}](${goalUrl})**:
 
-        ${renderQuote(body)}
+${renderQuote(body)}
 
-        ${notice}
+${notice}
 
-        ${footer}`);
+${footer}`);
 
     return {
         to,
