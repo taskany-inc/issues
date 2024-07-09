@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.46.1](https://github.com/taskany-inc/issues/compare/v2.46.0...v2.46.1) (2024-07-09)
+
+
+### Bug Fixes
+
+* **crew integration:** allow nulls in crew user logins ([6d0bcb9](https://github.com/taskany-inc/issues/commit/6d0bcb9730ff79301cbfe8d47a393edc7980d205))
+* delete spaces in mention templates ([5fd63f1](https://github.com/taskany-inc/issues/commit/5fd63f1e004102be6ce26704e07a2540cd72feb7))
+
 ## [2.46.0](https://github.com/taskany-inc/issues/compare/v2.45.0...v2.46.0) (2024-07-04)
 
 
