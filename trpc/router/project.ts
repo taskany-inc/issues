@@ -422,6 +422,29 @@ export const project = router({
                 })
                 .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
         }),
+    getStarred: protectedProcedure.query(async ({ ctx }) => {
+        const { activityId, role } = ctx.session.user;
+
+        const whereQuery = {
+            stargizers: {
+                some: {
+                    id: activityId,
+                },
+            },
+        };
+        return prisma.project
+            .findMany({
+                orderBy: {
+                    createdAt: 'asc',
+                },
+                ...getProjectSchema({
+                    role,
+                    activityId,
+                    whereQuery,
+                }),
+            })
+            .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
+    }),
     getById: protectedProcedure
         .input(
             z.object({
