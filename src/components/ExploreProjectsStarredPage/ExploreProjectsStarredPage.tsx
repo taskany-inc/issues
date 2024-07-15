@@ -5,10 +5,10 @@ import NextLink from 'next/link';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { routes } from '../../hooks/router';
 import { Page } from '../Page/Page';
-import { ExplorePageHeader } from '../ExplorePageHeader/ExplorePageHeader';
 import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
 import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { trpc } from '../../utils/trpcClient';
+import { CommonHeader } from '../CommonHeader';
 
 import { tr } from './ExploreProjectsStarredPage.i18n';
 
@@ -18,7 +18,7 @@ export const ExploreProjectsStarredPage = ({ user, ssrTime }: ExternalPageProps)
     if (!data) return null;
 
     return (
-        <Page user={user} ssrTime={ssrTime} title={tr('title')} header={<ExplorePageHeader />}>
+        <Page user={user} ssrTime={ssrTime} title={tr('title')} header={<CommonHeader title={tr('Starred')} />}>
             <Table>
                 {data.map((project) =>
                     nullable(project, (p) => (
