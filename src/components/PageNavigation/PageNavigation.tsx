@@ -70,6 +70,10 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
                     href: routes.project(p.id),
                 })),
                 {
+                    title: tr('Starred'),
+                    href: routes.exploreProjectsStarred(),
+                },
+                {
                     title: tr('All projects'),
                     href: routes.exploreProjects(),
                 },

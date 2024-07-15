@@ -20,6 +20,7 @@ export const routes = {
 
     exploreProjects: () => '/explore/projects',
     exploreTopProjects: () => '/explore/top',
+    exploreProjectsStarred: () => '/explore/projects/starred',
     exploreGoals: () => '/explore/goals',
 
     help: (slug: AvailableHelpPages) => `/help/${slug}`,
