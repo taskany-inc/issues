@@ -1,20 +1,17 @@
 import { customAlphabet, nanoid } from 'nanoid';
 import { alphanumeric } from 'nanoid-dictionary';
-import { GoalHistory, Comment, Activity, User, Goal, Role, Prisma, Reaction, StateType } from '@prisma/client';
+import { Goal, Role, Prisma, StateType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { GoalCommon, dependencyKind, exceptionsDependencyKind } from '../../schema/goal';
 import { nonArchievedGoalsPartialQuery } from '../../../trpc/queries/goals';
-import { HistoryRecordWithActivity, HistoryRecordSubject, castToSubject } from '../../types/history';
-import { ReactionsMap } from '../../types/reactions';
 import { getProjectSchema } from '../../../trpc/queries/project';
 import { prisma } from '../prisma';
-import { subjectToEnumValue } from '../goalHistory';
 import { safeGetUserEmail, safeGetUserName } from '../getUserName';
 import { calcAchievedWeight } from '../recalculateCriteriaScore';
 import { db } from '../../../trpc/connection/kysely';
 
-import { addCalculatedGoalsFields, addCommonCalculatedGoalFields } from './calculatedGoalsFields';
+import { addCalculatedGoalsFields } from './calculatedGoalsFields';
 
 /**
  * Type-safe wrapper in raw SQL query.
@@ -267,206 +264,6 @@ export const clearEmptyPersonalProject = async (id?: string | null) => {
     }
 
     return null;
-};
-
-type RequestParamsBySubject = { [K in keyof HistoryRecordSubject]?: { ids: string[]; sourceIdx: number[] } };
-
-export const goalHistorySeparator = ', ';
-
-export const getGoalHistory = async <T extends GoalHistory & { activity: Activity & { user: User | null } }>(
-    history: T[],
-) => {
-    const requestParamsBySubjects = history.reduce<RequestParamsBySubject>(
-        (acc, { subject, previousValue, nextValue }, index) => {
-            const allValues = (previousValue ?? '')
-                .split(goalHistorySeparator)
-                .concat((nextValue ?? '').split(goalHistorySeparator))
-                .filter(Boolean);
-
-            if (subjectToEnumValue(subject)) {
-                acc[subject] = {
-                    ids: (acc[subject]?.ids ?? []).concat(...allValues),
-                    sourceIdx: (acc[subject]?.sourceIdx ?? []).concat(index),
-                };
-            }
-
-            return acc;
-        },
-        {},
-    );
-
-    const historyWithMeta: HistoryRecordWithActivity[] = [];
-    const needRequestForSubject = Object.keys(requestParamsBySubjects) as (keyof typeof requestParamsBySubjects)[];
-    const replacedValueIdx = needRequestForSubject
-        .map((subject) => (requestParamsBySubjects[subject] || {}).sourceIdx)
-        .flat();
-
-    if (needRequestForSubject.length) {
-        const results = await Promise.all(
-            needRequestForSubject.map((subject) => {
-                const { ids } = requestParamsBySubjects[subject] || {};
-
-                const query = {
-                    where: {
-                        id: {
-                            in: ids,
-                        },
-                    },
-                };
-
-                switch (subject) {
-                    case 'dependencies':
-                        return prisma.goal
-                            .findMany({
-                                where: query.where,
-                                include: {
-                                    state: true,
-                                },
-                            })
-                            .then((deps) => deps.map((dep) => ({ ...dep, ...addCommonCalculatedGoalFields(dep) })));
-                    case 'tags':
-                        return prisma.tag.findMany(query);
-                    case 'owner':
-                    case 'participants':
-                        return prisma.activity.findMany({
-                            where: query.where,
-                            include: {
-                                user: true,
-                                ghost: true,
-                            },
-                        });
-                    case 'state':
-                        return prisma.state.findMany({ where: query.where });
-                    case 'project':
-                        return prisma.project.findMany({ where: query.where });
-                    case 'partnerProject':
-                        return prisma.project.findMany({ where: query.where });
-                    case 'criteria':
-                        return prisma.goalAchieveCriteria.findMany({
-                            where: query.where,
-                            include: {
-                                criteriaGoal: {
-                                    include: {
-                                        state: true,
-                                    },
-                                },
-                            },
-                        });
-                    case 'priority':
-                        return prisma.priority.findMany({ where: query.where });
-                    default:
-                        throw new Error('query for history record is undefined');
-                }
-            }),
-        );
-
-        const meta: Map<string, (typeof results)[number][number]> = new Map(
-            results.flat().map((value) => [value.id, value]),
-        );
-
-        history.forEach((item, index) => {
-            const valueCanBeArray = ['dependencies', 'tags', 'estimates'].includes(item.subject);
-            let prev;
-            let next;
-
-            if (valueCanBeArray) {
-                prev = item.previousValue?.split(goalHistorySeparator).map((id) => meta.get(id)) ?? null;
-                next = item.nextValue?.split(goalHistorySeparator).map((id) => meta.get(id)) ?? null;
-            } else {
-                prev = item.previousValue ? meta.get(item.previousValue) : null;
-                next = item.nextValue ? meta.get(item.nextValue) : null;
-            }
-
-            if (castToSubject(item)) {
-                if (replacedValueIdx.includes(index)) {
-                    historyWithMeta[index] = {
-                        ...item,
-                        previousValue: prev || null,
-                        nextValue: next || null,
-                    };
-                } else {
-                    historyWithMeta[index] = item;
-                }
-            }
-        });
-    }
-
-    return historyWithMeta;
-};
-
-type MixHistoryWithCommentsReturnType<H, C> =
-    | { type: 'history'; value: H }
-    | { type: 'comment'; value: Omit<C, 'reactions'> & { reactions: ReactionsMap } };
-
-export const mixHistoryWithComments = <
-    H extends HistoryRecordWithActivity,
-    C extends Comment & { reactions: (Reaction & Pick<HistoryRecordWithActivity, 'activity'>)[] },
->(
-    history: H[],
-    comments: C[],
-): {
-    _activityFeed: MixHistoryWithCommentsReturnType<H, C>[];
-    _comments: Extract<MixHistoryWithCommentsReturnType<H, C>, { type: 'comment' }>['value'][];
-    comments: C[];
-} => {
-    const activity: MixHistoryWithCommentsReturnType<H, C>[] = history.map((record) => {
-        return {
-            type: 'history',
-            value: record,
-        };
-    });
-
-    const limit = 10;
-    const _comments = comments?.map((comment) => {
-        const reactions = comment?.reactions?.reduce<ReactionsMap>((acc, cur) => {
-            const data = {
-                activityId: cur.activityId,
-                name: safeGetUserName(cur.activity),
-            };
-
-            if (acc[cur.emoji]) {
-                acc[cur.emoji].count += 1;
-                acc[cur.emoji].authors.push(data);
-            } else {
-                acc[cur.emoji] = {
-                    count: 1,
-                    authors: [data],
-                    remains: 0,
-                };
-            }
-
-            return acc;
-        }, {});
-
-        for (const key in reactions) {
-            if (key in reactions) {
-                const { authors } = reactions[key];
-
-                if (authors.length > limit) {
-                    reactions[key].authors = authors.slice(0, limit);
-                    reactions[key].remains = authors.length - limit;
-                }
-            }
-        }
-
-        return {
-            ...comment,
-            reactions,
-        };
-    });
-
-    for (const comment of _comments) {
-        activity.push({
-            type: 'comment',
-            value: comment,
-        });
-    }
-
-    return {
-        _activityFeed: activity.sort((a, b) => a.value.createdAt.getTime() - b.value.createdAt.getTime()),
-        _comments,
-        comments: [],
-    };
 };
 
 type GoalRelation<T> = T & { _kind: dependencyKind | exceptionsDependencyKind } & ReturnType<

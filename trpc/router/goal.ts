@@ -22,10 +22,7 @@ import { connectionMap } from '../queries/connections';
 import {
     createGoal,
     changeGoalProject,
-    getGoalHistory,
-    mixHistoryWithComments,
     makeGoalRelationMap,
-    goalHistorySeparator,
     createPersonalProject,
     clearEmptyPersonalProject,
     countPrivateDependencies,
@@ -64,7 +61,7 @@ import { extendQuery } from '../utils';
 import { commentsByGoalIdQuery, reactionsForGoalComments } from '../queries/comments';
 import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
-import { extraDataForEachRecord, historyQuery } from '../queries/history';
+import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
 
 import { tr } from './router.i18n';
 
@@ -276,8 +273,6 @@ export const goal = router({
 
                 if (!goal) return null;
 
-                const history = await getGoalHistory(goal.history || []);
-
                 const [versaCriteriaGoals, privateDepsCount] = await Promise.all([
                     prisma.goalAchieveCriteria.findMany({
                         where: {
@@ -333,7 +328,6 @@ export const goal = router({
                 return {
                     ...goal,
                     ...addCalculatedGoalsFields(goal, activityId, role),
-                    ...mixHistoryWithComments(history, goal.comments),
                     _hasPrivateDeps,
                     _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                     _relations: makeGoalRelationMap(

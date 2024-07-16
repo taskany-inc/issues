@@ -40,7 +40,7 @@ type ExtraMixedActivityFeed =
           >;
       };
 
-export const GoalActivityV2 = forwardRef<HTMLDivElement, React.PropsWithChildren<GoalActivityProps>>(
+export const GoalActivityWithTabs = forwardRef<HTMLDivElement, React.PropsWithChildren<GoalActivityProps>>(
     ({ goalId, renderCommentItem, children }, ref) => {
         const [activeTab, setActiveTab] = useState<AllowedTabs>('comments');
         const [comments, historyFeed] = trpc.useQueries((ctx) => [
