@@ -13,7 +13,7 @@ import { GoalCriteriaView, mapCriteria } from '../GoalCriteria/GoalCriteria';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
-import { GoalActivityV2 } from '../GoalActivityWithTabs/GoalActivityV2';
+import { GoalActivityWithTabs } from '../GoalActivityWithTabs/GoalActivityWithTabs';
 
 import { tr } from './GoalActivityFeed.i18n';
 import s from './GoalActivityFeed.module.css';
@@ -146,91 +146,6 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
 
         return (
             <>
-                {/* <GoalActivity
-                    ref={ref}
-                    feed={goal._activityFeed}
-                    header={
-                        <>
-                            {nullable(goal._criteria?.length || goal._isEditable, () => (
-                                <GoalCriteriaView
-                                    goalId={goal.id}
-                                    canEdit={goal._isEditable}
-                                    onUpdate={handleUpdateCriteria}
-                                    onCheck={handleUpdateCriteriaState}
-                                    onConvert={handleConvertCriteriaToGoal}
-                                    onRemove={handleRemoveCriteria}
-                                    list={goal._criteria?.map((criteria) =>
-                                        mapCriteria(criteria, criteria.criteriaGoal),
-                                    )}
-                                >
-                                    {nullable(goal._isEditable, () => (
-                                        <GoalFormPopupTrigger
-                                            offset={[-20, 0]}
-                                            renderTrigger={(props) => (
-                                                <AddInlineTrigger
-                                                    text={tr('Add achievement criteria')}
-                                                    ref={props.ref}
-                                                    onClick={props.onClick}
-                                                    centered={false}
-                                                />
-                                            )}
-                                        >
-                                            <GoalCriteriaSuggest
-                                                id={goal.id}
-                                                withModeSwitch
-                                                defaultMode="simple"
-                                                items={goal._criteria.map((criteria) => ({
-                                                    ...criteria,
-                                                    goal: criteria.criteriaGoal,
-                                                }))}
-                                                onSubmit={handleCreateCriteria}
-                                                validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                                            />
-                                        </GoalFormPopupTrigger>
-                                    ))}
-                                </GoalCriteriaView>
-                            ))}
-                            {nullable(lastStateComment, (value) => (
-                                <CommentView
-                                    pin
-                                    id={value.id}
-                                    author={value.author}
-                                    description={value.description}
-                                    state={value.state ?? undefined}
-                                    createdAt={value.createdAt}
-                                    reactions={value.reactions}
-                                    onSubmit={onGoalCommentSubmit(value)}
-                                    onReactionToggle={onGoalCommentReactionToggle(value.id)}
-                                    onDelete={onGoalCommentDelete(value.id)}
-                                    className={s.PinnedComment}
-                                />
-                            ))}
-                        </>
-                    }
-                    footer={
-                        <GoalCommentCreateForm
-                            goalId={goal.id}
-                            stateId={goal.stateId}
-                            states={goal._isEditable || goal._isParticipant ? goal.project?.flow.states : undefined}
-                            onSubmit={onGoalCommentCreate}
-                        />
-                    }
-                    renderCommentItem={(value) => (
-                        <CommentView
-                            id={value.id}
-                            author={value.author}
-                            description={value.description}
-                            state={value.state}
-                            createdAt={value.createdAt}
-                            highlight={value.id === highlightCommentId}
-                            reactions={value.reactions}
-                            onSubmit={onGoalCommentSubmit(value)}
-                            onReactionToggle={onGoalCommentReactionToggle(value.id)}
-                            onDelete={onGoalCommentDelete(value.id)}
-                        />
-                    )}
-                /> */}
-
                 {nullable(goal._criteria?.length || goal._isEditable, () => (
                     <GoalCriteriaView
                         goalId={goal.id}
@@ -284,7 +199,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     />
                 ))}
 
-                <GoalActivityV2
+                <GoalActivityWithTabs
                     goalId={goal.id}
                     renderCommentItem={(value) => (
                         <CommentView
@@ -307,7 +222,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                         states={goal._isEditable || goal._isParticipant ? goal.project?.flow.states : undefined}
                         onSubmit={onGoalCommentCreate}
                     />
-                </GoalActivityV2>
+                </GoalActivityWithTabs>
 
                 {nullable(goal._isEditable, () => (
                     <>

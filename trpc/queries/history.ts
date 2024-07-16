@@ -97,7 +97,7 @@ const subjectToEnumValue = (subject: string): subject is keyof HistoryRecordSubj
     return subject in subjectToTableNameMap;
 };
 
-const goalHistorySeparator = ', ';
+export const goalHistorySeparator = ', ';
 
 export const historyQuery = ({ goalId }: HistoryQueryParams) =>
     db
