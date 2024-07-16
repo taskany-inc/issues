@@ -14,6 +14,7 @@ import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { GoalActivityWithTabs } from '../GoalActivityWithTabs/GoalActivityWithTabs';
+import { safeUserData } from '../../utils/getUserName';
 
 import { tr } from './GoalActivityFeed.i18n';
 import s from './GoalActivityFeed.module.css';
@@ -45,13 +46,11 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             onGoalCommentCreate,
             onGoalCommentReactionToggle,
             onGoalCommentDelete,
-            lastStateComment,
             highlightCommentId,
         } = useGoalResource(
             {
                 id: goal?.id,
                 stateId: goal?.stateId,
-                comments: goal?._comments,
             },
             {
                 invalidate: {
@@ -183,11 +182,11 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                         ))}
                     </GoalCriteriaView>
                 ))}
-                {nullable(lastStateComment, (value) => (
+                {nullable(goal._lastComment, (value) => (
                     <CommentView
                         pin
                         id={value.id}
-                        author={value.author}
+                        author={safeUserData(value.activity)}
                         description={value.description}
                         state={value.state ?? undefined}
                         createdAt={value.createdAt}

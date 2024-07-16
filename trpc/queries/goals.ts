@@ -514,30 +514,6 @@ export const getGoalDeepQuery = (user?: { activityId: string; role: Role }) => {
             },
             where: depsWhere,
         },
-        comments: {
-            orderBy: {
-                createdAt: 'asc',
-            },
-            include: {
-                activity: {
-                    include: {
-                        user: true,
-                        ghost: true,
-                    },
-                },
-                state: true,
-                reactions: {
-                    include: {
-                        activity: {
-                            include: {
-                                user: true,
-                                ghost: true,
-                            },
-                        },
-                    },
-                },
-            },
-        },
         reactions: {
             include: {
                 activity: {

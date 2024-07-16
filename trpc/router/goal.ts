@@ -242,6 +242,32 @@ export const goal = router({
                             activityId,
                             role,
                         }),
+                        comments: {
+                            orderBy: { updatedAt: 'desc' },
+                            take: 1,
+                            where: {
+                                stateId: { not: null },
+                            },
+                            include: {
+                                activity: {
+                                    include: {
+                                        user: true,
+                                        ghost: true,
+                                    },
+                                },
+                                reactions: {
+                                    include: {
+                                        activity: {
+                                            include: {
+                                                user: true,
+                                                ghost: true,
+                                            },
+                                        },
+                                    },
+                                },
+                                state: true,
+                            },
+                        },
                         goalAchiveCriteria: {
                             include: {
                                 criteriaGoal: {
