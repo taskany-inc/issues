@@ -12,7 +12,6 @@ import {
 } from '../schema/criteria';
 import { ModalEvent, dispatchModalEvent } from '../utils/dispatchModal';
 import { TagObject } from '../types/tag';
-import { safeUserData } from '../utils/getUserName';
 import { GoalByIdReturnType } from '../../trpc/inferredTypes';
 
 import { useHighlightedComment } from './useHighlightedComment';
@@ -33,7 +32,7 @@ interface Configuration {
 interface GoalFields {
     id?: string;
     stateId?: string | null;
-    comments?: NonNullable<GoalByIdReturnType>['_comments'];
+    lastStateUpdateComment?: NonNullable<GoalByIdReturnType>['_lastComment'];
 }
 
 export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
@@ -256,22 +255,6 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         },
         [deleteGoalComment, invalidate],
     );
-
-    const lastStateComment = useMemo(() => {
-        if ((fields.comments?.length ?? 0) <= 1) {
-            return null;
-        }
-
-        const foundResult = fields.comments?.findLast((comment) => comment.stateId);
-        if (!foundResult) return;
-
-        return foundResult.stateId === fields.stateId
-            ? {
-                  ...foundResult,
-                  author: safeUserData(foundResult.activity),
-              }
-            : null;
-    }, [fields.comments, fields.stateId]);
 
     const onGoalCriteriaAdd = useCallback(
         async (val: AddCriteriaSchema, invalidateKey?: RefetchKeys | RefetchKeys[]) => {
@@ -498,7 +481,6 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
 
     return {
         highlightCommentId,
-        lastStateComment,
 
         invalidate,
 
