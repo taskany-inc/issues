@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.46.3](https://github.com/taskany-inc/issues/compare/v2.46.2...v2.46.3) (2024-07-18)
+
+
+### Bug Fixes
+
+* **CommentView:** disable edit comment on double-click ([251f1de](https://github.com/taskany-inc/issues/commit/251f1de66018d8a6bfde53cf15ba273353987944))
+* **worker:** update build settings to recommended for node20 ([fe4ad14](https://github.com/taskany-inc/issues/commit/fe4ad14c5dc96cb66859e9da74e6a47dfd757fa8))
+
 ## [2.46.2](https://github.com/taskany-inc/issues/compare/v2.46.1...v2.46.2) (2024-07-15)
 
 
