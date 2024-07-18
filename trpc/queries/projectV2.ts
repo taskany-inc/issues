@@ -109,6 +109,16 @@ interface GetUserProjectsQueryParams {
     includeSubsGoals?: boolean;
 }
 
+export const getStarredProjectsIds = (activityId: string) => {
+    return db
+        .selectFrom('Project')
+        .select(['Project.id'])
+        .where('Project.id', 'in', ({ selectFrom }) =>
+            selectFrom('_projectStargizers').select('B').where('A', '=', activityId),
+        )
+        .where('Project.archived', 'is not', true);
+};
+
 export const getUserProjectsQuery = ({
     activityId,
     role,

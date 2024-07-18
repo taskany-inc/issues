@@ -9,12 +9,12 @@ import { ProjectListItem } from '../ProjectListItem/ProjectListItem';
 import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { trpc } from '../../utils/trpcClient';
 import { CommonHeader } from '../CommonHeader';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './ExploreProjectsStarredPage.i18n';
 
 export const ExploreProjectsStarredPage = ({ user, ssrTime }: ExternalPageProps) => {
-    const { data } = trpc.project.getStarred.useQuery();
-
+    const { data } = trpc.v2.project.starred.useQuery();
     if (!data) return null;
 
     return (
@@ -29,9 +29,9 @@ export const ExploreProjectsStarredPage = ({ user, ssrTime }: ExternalPageProps)
                                         id={p.id}
                                         stargizers={p._count.stargizers}
                                         owner={p.activity}
-                                        starred={p._isStarred}
-                                        watching={p._isWatching}
-                                        participants={p.participants}
+                                        starred={!!p._isStarred}
+                                        watching={!!p._isWatching}
+                                        participants={p.participants as ActivityByIdReturnType[]}
                                         averageScore={p.averageScore}
                                     />
                                 </TableRowItem>

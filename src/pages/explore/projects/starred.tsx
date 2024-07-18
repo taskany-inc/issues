@@ -3,7 +3,7 @@ import { declareSsrProps } from '../../../utils/declareSsrProps';
 
 export const getServerSideProps = declareSsrProps(
     async ({ ssrHelpers }) => {
-        await ssrHelpers.project.getStarred.fetch();
+        await ssrHelpers.v2.project.starred.fetch();
     },
     {
         private: true,
