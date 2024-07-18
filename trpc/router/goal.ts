@@ -57,7 +57,7 @@ import { parseCrewLoginFromText } from '../../src/utils/crew';
 import { getLocalUsersByCrewLogin } from '../../src/utils/db/crewIntegration';
 import { getShortId } from '../../src/utils/getShortId';
 import { criteriaQuery } from '../queries/criteria';
-import { extendQuery } from '../utils';
+import { applyLastStateUpdateComment, extendQuery } from '../utils';
 import { commentsByGoalIdQuery, reactionsForGoalComments } from '../queries/comments';
 import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
@@ -354,6 +354,7 @@ export const goal = router({
                 return {
                     ...goal,
                     ...addCalculatedGoalsFields(goal, activityId, role),
+                    ...applyLastStateUpdateComment(goal),
                     _hasPrivateDeps,
                     _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                     _relations: makeGoalRelationMap(
