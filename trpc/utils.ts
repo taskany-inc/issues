@@ -1,8 +1,15 @@
 import { ColumnType } from 'kysely';
+import prisma from '@prisma/client';
 
 import { Timestamp } from '../generated/kysely/types';
+import { ReactionsMap } from '../src/types/reactions';
+import { safeGetUserName } from '../src/utils/getUserName';
 
 import { db } from './connection/kysely';
+
+interface UserActivity {
+    activity: prisma.Activity & { user: prisma.User; ghost: prisma.Ghost | null };
+}
 
 export type DBQuery = ReturnType<(typeof db)['selectFrom']>;
 
@@ -34,4 +41,51 @@ export type ExtractTypeFromGenerated<T> = {
         : T[K] extends Timestamp | null
         ? Date | null
         : T[K];
+};
+
+export const applyLastStateUpdateComment = (goal: any) => {
+    const lastCommentWithUpdateState: prisma.Comment &
+        UserActivity & { reactions: (prisma.Reaction & UserActivity)[]; state: prisma.State } = goal.comments?.[0];
+
+    let reactions: ReactionsMap = {};
+    if (lastCommentWithUpdateState) {
+        const limit = 10;
+        reactions = lastCommentWithUpdateState.reactions?.reduce<ReactionsMap>((acc, cur) => {
+            const data = {
+                activityId: cur.activityId,
+                name: safeGetUserName(cur.activity),
+            };
+
+            if (acc[cur.emoji]) {
+                acc[cur.emoji].count += 1;
+                acc[cur.emoji].authors.push(data);
+            } else {
+                acc[cur.emoji] = {
+                    count: 1,
+                    authors: [data],
+                    remains: 0,
+                };
+            }
+
+            return acc;
+        }, {});
+
+        for (const key in reactions) {
+            if (key in reactions) {
+                const { authors } = reactions[key];
+
+                if (authors.length > limit) {
+                    reactions[key].authors = authors.slice(0, limit);
+                    reactions[key].remains = authors.length - limit;
+                }
+            }
+        }
+    }
+
+    return {
+        _lastComment: {
+            ...lastCommentWithUpdateState,
+            reactions,
+        },
+    };
 };
