@@ -508,15 +508,16 @@ export const project = router({
         .use(projectAccessMiddleware)
         .query(async ({ ctx, input: { id, goalsQuery = {} } }) => {
             const { activityId, role } = ctx.session.user;
+            const goalsWhere = {
+                OR: [{ projectId: id }, { partnershipProjects: { some: { id } } }],
+            };
 
             const [allProjectGoals, filtredProjectGoals] = await Promise.all([
                 prisma.goal.count({
-                    where: {
-                        projectId: id,
-                    },
+                    where: goalsWhere,
                 }),
                 prisma.goal.findMany({
-                    ...goalsFilter(goalsQuery, activityId, role, { projectId: id }),
+                    ...goalsFilter(goalsQuery, activityId, role, goalsWhere),
                     include: getGoalDeepQuery({
                         activityId,
                         role,

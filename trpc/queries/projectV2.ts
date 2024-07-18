@@ -291,6 +291,12 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                         .where('A', 'in', ({ selectFrom }) => selectFrom('subs_projects').select('B')),
                 ),
         )
+        .with('partnership_goals', (db) =>
+            db
+                .selectFrom('_partnershipProjects')
+                .where('B', 'in', ({ selectFrom }) => selectFrom('project_ids').select('pid'))
+                .select('A'),
+        )
         .with('goals', (db) =>
             db
                 .selectFrom('Goal')
@@ -329,6 +335,15 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                             .as('criteria'),
                     (join) => join.onTrue(),
                 )
+                .leftJoinLateral(
+                    ({ selectFrom }) =>
+                        selectFrom('_partnershipProjects')
+                            .innerJoin('Project', 'Project.id', 'B')
+                            .selectAll('Project')
+                            .whereRef('A', '=', 'Goal.id')
+                            .as('partnershipProject'),
+                    (join) => join.onTrue(),
+                )
                 .select((eb) => [
                     sql<string>`concat("Goal"."projectId", '-', "Goal"."scopeId")::text`.as('_shortId'),
                     jsonBuildObject({
@@ -358,11 +373,19 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                         .else(null)
                         .end()
                         .as('participants'),
+                    eb
+                        .case()
+                        .when(eb.fn.count('partnershipProject.id'), '>', 0)
+                        .then(eb.fn.agg('array_agg', [sql`"partnershipProject"`]).distinct())
+                        .else(null)
+                        .end()
+                        .as('partnershipProjects'),
                 ])
                 .where(({ or, eb }) =>
                     or([
                         eb('Goal.id', 'in', ({ selectFrom }) => selectFrom('subs_goals').select('B')),
                         eb('Goal.projectId', 'in', ({ selectFrom }) => selectFrom('project_ids').select('pid')),
+                        eb('Goal.id', 'in', ({ selectFrom }) => selectFrom('partnership_goals').select('A')),
                         eb('Goal.ownerId', '=', params.activityId),
                         eb('Goal.activityId', '=', params.activityId),
                     ]),
@@ -481,7 +504,14 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                         sql`"state"`.as('state'),
                         sql`"priority"`.as('priority'),
                     ])
-                    .whereRef('goals.projectId', '=', 'Project.id')
+                    .where((eb) =>
+                        eb.or([
+                            eb('goals.id', '=', () =>
+                                selectFrom('_partnershipProjects').whereRef('B', '=', 'Project.id').select('A'),
+                            ),
+                            eb('goals.projectId', '=', eb.ref('Project.id')),
+                        ]),
+                    )
                     .limit(dashboardGoalByProjectLimit)
                     .as('goal'),
             (join) => join.onTrue(),
