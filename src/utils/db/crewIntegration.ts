@@ -151,6 +151,7 @@ export const getCrewUserByLogin = async (login: string) => {
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: response.statusText });
     }
 
+    // @ts-ignore
     const data: CrewUser = await response.json();
 
     return data;
