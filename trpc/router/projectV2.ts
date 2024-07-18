@@ -1,9 +1,12 @@
 import { z } from 'zod';
+import { sql } from 'kysely';
+import { jsonBuildObject } from 'kysely/helpers/postgres';
 
 import { router, protectedProcedure } from '../trpcBackend';
 import { userProjectsSchema } from '../../src/schema/project';
 import {
     getProjectsByIds,
+    getStarredProjectsIds,
     getUserProjectsQuery,
     getUserProjectsWithGoals,
     getWholeGoalCountByProjectIds,
@@ -71,6 +74,27 @@ export const project = router({
             console.error(error);
 
             return Promise.reject();
+        }
+    }),
+
+    starred: protectedProcedure.query(async ({ ctx }) => {
+        const { activityId, role } = ctx.session.user;
+        try {
+            const projectIds = await getStarredProjectsIds(activityId).execute();
+
+            return getProjectsByIds({ activityId, in: projectIds, role })
+                .select([
+                    jsonBuildObject({
+                        stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
+                        watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
+                        children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
+                        participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
+                    }).as('_count'),
+                ])
+                .$castTo<ProjectResponse & Pick<ProjectsWithGoals, '_count'>>()
+                .execute();
+        } catch (e) {
+            console.log(e);
         }
     }),
 
