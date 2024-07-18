@@ -80,12 +80,14 @@ export const applyLastStateUpdateComment = (goal: any) => {
                 }
             }
         }
+
+        return {
+            _lastComment: {
+                ...lastCommentWithUpdateState,
+                reactions,
+            },
+        };
     }
 
-    return {
-        _lastComment: {
-            ...lastCommentWithUpdateState,
-            reactions,
-        },
-    };
+    return null;
 };
