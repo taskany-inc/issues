@@ -95,13 +95,6 @@ export const CommentView: FC<CommentViewProps> = ({
 
     const canEdit = Boolean(onSubmit);
 
-    const onCommentDoubleClick = useCallback<React.MouseEventHandler>((e) => {
-        if (e.detail === 2) {
-            setEditMode(true);
-            setFocused(true);
-        }
-    }, []);
-
     const onCommentSubmit = useCallback(
         async (form: CommentSchema) => {
             setEditMode(false);
@@ -210,11 +203,7 @@ export const CommentView: FC<CommentViewProps> = ({
                     }
                 />
             ) : (
-                <Card
-                    className={cn(s.CommentCard, { [s.CommentCard_highlighted]: highlight })}
-                    onClick={canEdit ? onCommentDoubleClick : undefined}
-                    {...headerColors}
-                >
+                <Card className={cn(s.CommentCard, { [s.CommentCard_highlighted]: highlight })} {...headerColors}>
                     <CardInfo onClick={onDateViewTypeChange} className={s.CardInfo} corner>
                         {nullable(author, (data) => (
                             <CommentViewHeader
