@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.47.0](https://github.com/taskany-inc/issues/compare/v2.46.3...v2.47.0) (2024-07-22)
+
+
+### Features
+
+* add starred projects tab ([c066096](https://github.com/taskany-inc/issues/commit/c0660965959a4843f87bdcae5e7ed8480f16485d))
+
 ## [2.46.3](https://github.com/taskany-inc/issues/compare/v2.46.2...v2.46.3) (2024-07-18)
 
 
