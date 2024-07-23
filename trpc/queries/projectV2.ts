@@ -489,7 +489,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                     ])
                     .where((eb) =>
                         eb.or([
-                            eb('goals.id', '=', () =>
+                            eb('goals.id', 'in', () =>
                                 selectFrom('_partnershipProjects').whereRef('B', '=', 'Project.id').select('A'),
                             ),
                             eb('goals.projectId', '=', eb.ref('Project.id')),
