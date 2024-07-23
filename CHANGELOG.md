@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.47.1](https://github.com/taskany-inc/issues/compare/v2.47.0...v2.47.1) (2024-07-23)
+
+
+### Bug Fixes
+
+* **Dashboard:** filter by partnershipProjects now is correct ([02eaf52](https://github.com/taskany-inc/issues/commit/02eaf52433860681c75523e66e8d1c2c8b0ef781))
+
 ## [2.47.0](https://github.com/taskany-inc/issues/compare/v2.46.3...v2.47.0) (2024-07-23)
 
 
