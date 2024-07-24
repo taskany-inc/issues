@@ -1,5 +1,5 @@
 import { nullable } from '@taskany/bricks';
-import { Table, Link } from '@taskany/bricks/harmony';
+import { Table, Link, Text, Card, CardContent } from '@taskany/bricks/harmony';
 import NextLink from 'next/link';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
@@ -12,34 +12,56 @@ import { CommonHeader } from '../CommonHeader';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 
 import { tr } from './ExploreProjectsStarredPage.i18n';
+import classes from './ExploreProjectsStarredPage.module.css';
 
 export const ExploreProjectsStarredPage = ({ user, ssrTime }: ExternalPageProps) => {
     const { data } = trpc.v2.project.starred.useQuery();
-    if (!data) return null;
 
     return (
         <Page user={user} ssrTime={ssrTime} title={tr('title')} header={<CommonHeader title={tr('Starred')} />}>
-            <Table>
-                {data.map((project) =>
-                    nullable(project, (p) => (
-                        <NextLink key={p.id} href={routes.project(p.id)} passHref legacyBehavior>
-                            <Link>
-                                <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
-                                    <ProjectListItem
-                                        id={p.id}
-                                        stargizers={p._count.stargizers}
-                                        owner={p.activity}
-                                        starred={!!p._isStarred}
-                                        watching={!!p._isWatching}
-                                        participants={p.participants as ActivityByIdReturnType[]}
-                                        averageScore={p.averageScore}
-                                    />
-                                </TableRowItem>
-                            </Link>
-                        </NextLink>
-                    )),
-                )}
-            </Table>
+            {nullable(data, (projects) =>
+                nullable(
+                    projects.length,
+                    () => (
+                        <Table>
+                            {projects.map((project) =>
+                                nullable(project, (p) => (
+                                    <NextLink key={p.id} href={routes.project(p.id)} passHref legacyBehavior>
+                                        <Link>
+                                            <TableRowItem
+                                                title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}
+                                            >
+                                                <ProjectListItem
+                                                    id={p.id}
+                                                    stargizers={p._count.stargizers}
+                                                    owner={p.activity}
+                                                    starred={!!p._isStarred}
+                                                    watching={!!p._isWatching}
+                                                    participants={p.participants as ActivityByIdReturnType[]}
+                                                    averageScore={p.averageScore}
+                                                />
+                                            </TableRowItem>
+                                        </Link>
+                                    </NextLink>
+                                )),
+                            )}
+                        </Table>
+                    ),
+                    <Card className={classes.EmptyStarredProjectsCard}>
+                        <CardContent>
+                            <Text weight="thin" as="span">
+                                {tr("You haven't starred any projects")}{' '}
+                                {tr('Go to any project page and mark it with a star')}
+                            </Text>
+                            <NextLink href={routes.exploreProjects()} passHref legacyBehavior>
+                                <Link view="secondary">
+                                    <Text>{tr('All projects')}</Text>
+                                </Link>
+                            </NextLink>
+                        </CardContent>
+                    </Card>,
+                ),
+            )}
         </Page>
     );
 };

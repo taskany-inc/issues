@@ -82,6 +82,10 @@ export const project = router({
         try {
             const projectIds = await getStarredProjectsIds(activityId).execute();
 
+            if (!projectIds?.length) {
+                return [];
+            }
+
             return getProjectsByIds({ activityId, in: projectIds, role })
                 .select([
                     jsonBuildObject({
