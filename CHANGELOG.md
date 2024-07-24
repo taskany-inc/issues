@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.47.2](https://github.com/taskany-inc/issues/compare/v2.47.1...v2.47.2) (2024-07-24)
+
+
+### Bug Fixes
+
+* **StarredProjects:** fix empty list ([b6d99ef](https://github.com/taskany-inc/issues/commit/b6d99ef8e1333df43fac803c0b36cf36fee208b9))
+
 ## [2.47.1](https://github.com/taskany-inc/issues/compare/v2.47.0...v2.47.1) (2024-07-23)
 
 
