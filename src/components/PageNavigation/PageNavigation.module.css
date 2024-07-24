@@ -1,0 +1,7 @@
+.PageNavigationItemLink a:hover {
+  color: inherit;
+}
+
+.PageNavigationLogo {
+  display: flex;
+}

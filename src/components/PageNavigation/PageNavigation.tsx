@@ -1,8 +1,5 @@
 import { FC, useMemo } from 'react';
 import { IconBellOutline } from '@taskany/icons';
-import { nullable } from '@taskany/bricks';
-import { useRouter } from 'next/router';
-
 import {
     Navigation,
     NavigationItem,
@@ -10,9 +7,13 @@ import {
     NavigationSidebar,
     NavigationSidebarContent,
     NavigationSidebarHeader,
-    NavigationSidebarLogo,
     NavigationSidebarTitle,
-} from '../NavigationSidebar/NavigationSidebar';
+    TaskanyLogo,
+} from '@taskany/bricks/harmony';
+import { useRouter } from 'next/router';
+import { nullable } from '@taskany/bricks';
+import NextLink from 'next/link';
+
 import { NavigationSidebarActionButton } from '../NavigationSidebarActionButton/NavigationSidebarActionButton';
 import { routes } from '../../hooks/router';
 import { refreshInterval } from '../../utils/config';
@@ -20,6 +21,7 @@ import { trpc } from '../../utils/trpcClient';
 import { header, headerMenuExplore, headerMenuGoals } from '../../utils/domObjects';
 
 import { tr } from './PageNavigation.i18n';
+import s from './PageNavigation.module.css';
 
 interface AppNavigationProps {
     logo?: string;
@@ -85,7 +87,9 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
     return (
         <NavigationSidebar {...header.attr}>
             <NavigationSidebarHeader>
-                <NavigationSidebarLogo logo={logo} href={routes.index()} />
+                <NextLink href={routes.index()} passHref className={s.PageNavigationLogo}>
+                    <TaskanyLogo src={logo} size="m" />
+                </NextLink>
                 <NavigationSidebarTitle>{tr('Goals')}</NavigationSidebarTitle>
                 <IconBellOutline size="s" />
             </NavigationSidebarHeader>
@@ -94,27 +98,39 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
                 <Navigation>
                     <NavigationSection title={tr('Goals')}>
                         {goalsRoutes.map(({ title, href }) => (
-                            <NavigationItem key={href} selected={!isPresetActive && activeRoute === href} href={href}>
-                                {title}
-                            </NavigationItem>
+                            <div key={href} className={s.PageNavigationItemLink}>
+                                <NextLink href={href} legacyBehavior>
+                                    <NavigationItem selected={!isPresetActive && activeRoute === href} href={href}>
+                                        {title}
+                                    </NavigationItem>
+                                </NextLink>
+                            </div>
                         ))}
                     </NavigationSection>
 
                     {nullable(presetRoutes, () => (
                         <NavigationSection title={tr('Preset')}>
                             {presetRoutes.map(({ title, href }) => (
-                                <NavigationItem key={href} selected={nextRouter.asPath === href} href={href}>
-                                    {title}
-                                </NavigationItem>
+                                <div key={href} className={s.PageNavigationItemLink}>
+                                    <NextLink href={href} legacyBehavior>
+                                        <NavigationItem key={href} selected={nextRouter.asPath === href} href={href}>
+                                            {title}
+                                        </NavigationItem>
+                                    </NextLink>
+                                </div>
                             ))}
                         </NavigationSection>
                     ))}
 
                     <NavigationSection title={tr('Projects')}>
                         {projectsRoutes.map(({ title, href }) => (
-                            <NavigationItem key={href} selected={activeRoute === href} href={href}>
-                                {title}
-                            </NavigationItem>
+                            <div key={href} className={s.PageNavigationItemLink}>
+                                <NextLink href={href} legacyBehavior>
+                                    <NavigationItem key={href} selected={activeRoute === href} href={href}>
+                                        {title}
+                                    </NavigationItem>
+                                </NextLink>
+                            </div>
                         ))}
                     </NavigationSection>
                 </Navigation>
