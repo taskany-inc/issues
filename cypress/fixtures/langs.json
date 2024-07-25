@@ -480,7 +480,7 @@
     "GoalDependency": {
         "blocks": {
             "ru": "Блокирует",
-            "en": "Blocked by"
+            "en": "Blocks"
         },
         "dependsOn": {
             "ru": "Зависит от",
@@ -566,7 +566,7 @@
     "GoalSidebar": {
         "blocks": {
             "ru": "Блокирует",
-            "en": "Blocked by"
+            "en": "Blocks"
         },
         "dependsOn": {
             "ru": "Зависит от",
