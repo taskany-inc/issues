@@ -76,7 +76,7 @@ export const GoalParentDropdown = ({
         },
     );
 
-    const { data: suggestionsProjects = [] } = trpc.project.suggestions.useQuery(
+    const { data: suggestionsProjects = [] } = trpc.v2.project.suggestions.useQuery(
         {
             query: inputState,
             filter: filterIds,

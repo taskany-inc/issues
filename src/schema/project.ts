@@ -10,7 +10,6 @@ export const projectDeepInfoSchema = queryWithFiltersSchema.extend({
 export const projectSuggestionsSchema = z.object({
     query: z.string(),
     take: z.number().optional(),
-    include: z.array(z.string()).optional(),
     filter: z.array(z.string()).optional(),
 });
 

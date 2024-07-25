@@ -553,3 +553,44 @@ export const getWholeGoalCountByProjectIds = (params: GetWholeGoalCountByProject
             ),
         );
 };
+
+interface GetProjectSuggestionsParams {
+    activityId: string;
+    role: Role;
+    query: string;
+    filter?: string[];
+    limit?: number;
+}
+
+export const getProjectSuggestions = ({
+    role,
+    filter = [],
+    query,
+    limit = 5,
+    activityId,
+}: GetProjectSuggestionsParams) => {
+    return db
+        .selectFrom('Project')
+        .selectAll()
+        .where('Project.archived', 'is not', true)
+        .where('Project.title', 'ilike', `%${query}%`)
+        .$if(role === Role.USER, (qb) =>
+            qb.where(({ or, eb, not, exists }) =>
+                or([
+                    eb('Project.activityId', '=', activityId),
+                    eb('Project.id', 'in', ({ selectFrom }) =>
+                        selectFrom('_projectAccess').select('B').where('A', '=', activityId),
+                    ),
+                    not(
+                        exists(({ selectFrom }) =>
+                            selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
+                        ),
+                    ),
+                ]),
+            ),
+        )
+        .$if(filter.length > 0, (qb) => qb.where('Project.id', 'not in', filter))
+        .groupBy('Project.id')
+        .orderBy(sql`CHAR_LENGTH(title)`)
+        .limit(limit);
+};

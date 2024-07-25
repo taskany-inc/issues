@@ -8,7 +8,6 @@ import {
     projectCreateSchema,
     projectTransferOwnershipSchema,
     projectUpdateSchema,
-    projectSuggestionsSchema,
     projectDeleteSchema,
     participantsToProjectSchema,
     teamsToProjectSchema,
@@ -65,68 +64,6 @@ const getUserItemsWhereSchema = ({ type, activityId }: { type: 'goal' | 'project
 };
 
 export const project = router({
-    suggestions: protectedProcedure
-        .input(projectSuggestionsSchema)
-        .query(async ({ input: { query, take = 5, include, filter }, ctx }) => {
-            const { activityId, role } = ctx.session.user;
-
-            const includeInput = {
-                activity: {
-                    include: {
-                        user: true,
-                    },
-                },
-                flow: {
-                    include: {
-                        states: true,
-                    },
-                },
-            };
-
-            // TODO: should we use getProjectSchema here?
-
-            const accessFilter = getProjectAccessFilter(activityId, role);
-            const requests = [
-                prisma.project.findMany({
-                    take,
-                    where: {
-                        personal: false,
-                        title: {
-                            contains: query,
-                            mode: 'insensitive',
-                        },
-                        ...accessFilter,
-                        ...(include?.length || filter?.length
-                            ? {
-                                  id: {
-                                      notIn: [...(filter || []), ...(include || [])],
-                                  },
-                              }
-                            : {}),
-                        ...nonArchivedPartialQuery,
-                    },
-                    include: includeInput,
-                }),
-            ];
-
-            if (include) {
-                requests.push(
-                    prisma.project.findMany({
-                        where: {
-                            id: {
-                                in: include,
-                            },
-                            personal: false,
-                            ...accessFilter,
-                            ...nonArchivedPartialQuery,
-                        },
-                        include: includeInput,
-                    }),
-                );
-            }
-
-            return Promise.all(requests).then(([suggest, included = []]) => [...included, ...suggest]);
-        }),
     getUserProjectsWithGoals: protectedProcedure
         .input(
             z.object({
