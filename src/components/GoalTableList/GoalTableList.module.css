@@ -14,8 +14,7 @@
 }
 
 .Owner {
-    max-width: var(--table-cell-width);
-    white-space: nowrap;
+    max-width: calc(var(--table-cell-width) - var(--gap-m));
 }
 
 .RelativeTime {
