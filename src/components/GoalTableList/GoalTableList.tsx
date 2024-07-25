@@ -108,7 +108,14 @@ export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
                     },
                     {
                         content: nullable(safeUserData(goal.owner), (user) => (
-                            <User className={s.Owner} name={user.name} src={user.image} email={user.email} />
+                            <User
+                                className={s.Owner}
+                                name={user.name}
+                                src={user.image}
+                                email={user.email}
+                                ellipsis
+                                title={user.name}
+                            />
                         )),
                         width: 172,
                         className: s.GoalTableColumnSecondary,
