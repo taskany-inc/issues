@@ -22,31 +22,11 @@ export const filtersPanelSsrInit = async ({ query, ssrHelpers, req }: SSRProps) 
         : browserQueryState;
 
     await Promise.all([
-        ssrHelpers.user.suggestions.fetch({
-            take: filtersTakeCount,
-            query: '',
-            include: queryState.owner,
-        }),
-        ssrHelpers.user.suggestions.fetch({
-            take: filtersTakeCount,
-            query: '',
-            include: queryState.participant,
-        }),
-        ssrHelpers.user.suggestions.fetch({
-            take: filtersTakeCount,
-            query: '',
-            include: queryState.issuer,
-        }),
-        ssrHelpers.project.suggestions.fetch({
-            take: filtersTakeCount,
-            query: '',
-            include: queryState.project,
-        }),
-        ssrHelpers.tag.suggestions.fetch({
-            take: filtersTakeCount,
-            query: '',
-            include: queryState.tag,
-        }),
+        ssrHelpers.user.getFilterUsersByIds.fetch(queryState.owner ?? []),
+        ssrHelpers.user.getFilterUsersByIds.fetch(queryState.participant ?? []),
+        ssrHelpers.user.getFilterUsersByIds.fetch(queryState.issuer ?? []),
+        ssrHelpers.project.getByIds.fetch({ ids: queryState.project ?? [] }),
+        ssrHelpers.tag.getByIds.fetch(queryState.tag ?? []),
         ssrHelpers.state.all.fetch(),
     ]);
 

@@ -3,10 +3,11 @@ import { sql } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
 
 import { router, protectedProcedure } from '../trpcBackend';
-import { userProjectsSchema } from '../../src/schema/project';
+import { projectSuggestionsSchema, userProjectsSchema } from '../../src/schema/project';
 import {
     getProjectsByIds,
     getStarredProjectsIds,
+    getProjectSuggestions,
     getUserProjectsQuery,
     getUserProjectsWithGoals,
     getWholeGoalCountByProjectIds,
@@ -57,6 +58,29 @@ interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
 }
 
 export const project = router({
+    suggestions: protectedProcedure
+        .input(projectSuggestionsSchema)
+        .query(async ({ input: { query, take = 5, filter }, ctx }) => {
+            const { activityId, role } = ctx.session.user;
+
+            try {
+                const sql = getProjectSuggestions({
+                    role,
+                    query,
+                    filter,
+                    limit: take,
+                    activityId,
+                });
+
+                const res = await sql.execute();
+
+                return res;
+            } catch (error) {
+                console.error(error);
+
+                return Promise.reject(error);
+            }
+        }),
     userProjects: protectedProcedure.input(userProjectsSchema).query(async ({ ctx, input: { take, filter } }) => {
         const { activityId, role } = ctx.session.user;
         try {
