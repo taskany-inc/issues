@@ -5,7 +5,7 @@ import { IconArrowDownOutline, IconArrowUpOutline } from '@taskany/icons';
 
 import { SortDirection } from '../../hooks/useUrlFilterParams';
 
-const getNextDirection = (currentDirection?: SortDirection): SortDirection => {
+const getNextDirection = (currentDirection?: SortDirection | null): SortDirection | null => {
     switch (currentDirection) {
         case 'asc':
             return 'desc';
@@ -18,8 +18,8 @@ const getNextDirection = (currentDirection?: SortDirection): SortDirection => {
 
 interface SortButtonProps extends Omit<ComponentProps<typeof Button>, 'value' | 'onChange'> {
     title: string;
-    value?: SortDirection;
-    onChange?: (value: SortDirection) => void;
+    value?: SortDirection | null;
+    onChange?: (value: SortDirection | null) => void;
 }
 
 export const SortButton: FC<SortButtonProps> = ({ title, value, onChange }) => {
