@@ -1,4 +1,4 @@
-import React, { FormEvent, useCallback, useContext, useRef, useState } from 'react';
+import React, { FormEvent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
@@ -71,6 +71,13 @@ const ProjectCreateForm: React.FC = () => {
     const errorsResolver = errorsProvider(errors, isSubmitted);
     const titleWatcher = watch('title');
     const keyWatcher = watch('id');
+    const flowWatch = watch('flow');
+
+    useEffect(() => {
+        if (!flowWatch && flowRecomendations.length) {
+            setValue('flow', flowRecomendations[0]);
+        }
+    }, [setValue, flowRecomendations, flowWatch]);
 
     const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
     const existingProject = trpc.project.getById.useQuery(
