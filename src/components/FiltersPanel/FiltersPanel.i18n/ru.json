@@ -12,9 +12,5 @@
     "Participant": "Участник",
     "Filter": "Фильтр",
     "Reset": "Сбросить",
-    "Grouping": "Группировка",
-    "Title": "Название",
-    "Activity": "Автор",
-    "UpdatedAt": "Обновлено",
-    "CreatedAt": "Создано"
+    "Grouping": "Группировка"
 }

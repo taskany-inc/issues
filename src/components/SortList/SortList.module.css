@@ -1,0 +1,12 @@
+.SortList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+}
+
+.SortListButtons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
+}

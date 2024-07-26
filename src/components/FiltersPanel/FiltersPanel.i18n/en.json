@@ -12,9 +12,5 @@
     "Participant": "Participant",
     "Filter": "Filter",
     "Reset": "Reset",
-    "Grouping": "Grouping",
-    "Title": "Title",
-    "Activity": "Issuer",
-    "UpdatedAt": "Updated",
-    "CreatedAt": "Created"
+    "Grouping": "Grouping"
 }

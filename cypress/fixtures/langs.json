@@ -38,6 +38,10 @@
         }
     },
     "CommentCreateForm": {
+        "Comments's description is required": {
+            "ru": "Текст комментария обязателен",
+            "en": ""
+        },
         "Comment": {
             "ru": "Написать",
             "en": "Comment"
@@ -211,6 +215,28 @@
             "en": "Taskany — Explore — Projects"
         }
     },
+    "ExploreProjectsStarredPage": {
+        "title": {
+            "ru": "Taskany — Обзор — Проекты — Избранное",
+            "en": "Taskany — Explore — Projects - Starred"
+        },
+        "Starred": {
+            "ru": "Избранные проекты",
+            "en": "Starred Projects"
+        },
+        "You haven't starred any projects": {
+            "ru": "Нет отмеченных звездочкой проектов.",
+            "en": "You haven't starred any projects."
+        },
+        "Go to any project page and mark it with a star": {
+            "ru": "Перейди на страницу любого проекта и отметь его звездочкой",
+            "en": "Go to any project page and mark it with a star"
+        },
+        "All projects": {
+            "ru": "Все проекты",
+            "en": "All projects page"
+        }
+    },
     "ExploreTopProjectsPage": {
         "title": {
             "ru": "Taskany — Обзор — Проекты",
@@ -320,22 +346,6 @@
             "ru": "Участник",
             "en": "Participant"
         },
-        "Title": {
-            "ru": "Название",
-            "en": "Title"
-        },
-        "Activity": {
-            "ru": "Автор",
-            "en": "Issuer"
-        },
-        "UpdatedAt": {
-            "ru": "Обновлено",
-            "en": "Updated"
-        },
-        "CreatedAt": {
-            "ru": "Создано",
-            "en": "Created"
-        },
         "Reset": {
             "ru": "Сбросить",
             "en": "Reset"
@@ -383,14 +393,24 @@
             "en": ""
         }
     },
+    "GoalActivityFeed": {
+        "Add achievement criteria": {
+            "ru": "Добавить критерий",
+            "en": "Add achievement criteria"
+        }
+    },
     "GoalActivityWithTabs": {
         "Comments": {
-            "ru": "",
-            "en": ""
+            "ru": "Комментарии",
+            "en": "Comments"
         },
         "Activity": {
-            "ru": "",
-            "en": ""
+            "ru": "Вся активность",
+            "en": "All activity"
+        },
+        "Loading ...": {
+            "ru": "Загрузка ...",
+            "en": "Loading ..."
         }
     },
     "GoalContentHeader": {
@@ -1235,6 +1255,40 @@
         "Pro tip!": {
             "ru": "Держи совет!",
             "en": "Pro tip!"
+        }
+    },
+    "SortList": {
+        "Title": {
+            "ru": "",
+            "en": ""
+        },
+        "State": {
+            "ru": "",
+            "en": ""
+        },
+        "Priority": {
+            "ru": "",
+            "en": ""
+        },
+        "Project": {
+            "ru": "",
+            "en": ""
+        },
+        "Activity": {
+            "ru": "",
+            "en": ""
+        },
+        "Owner": {
+            "ru": "",
+            "en": ""
+        },
+        "UpdatedAt": {
+            "ru": "",
+            "en": ""
+        },
+        "CreatedAt": {
+            "ru": "",
+            "en": ""
         }
     },
     "StarButton": {
