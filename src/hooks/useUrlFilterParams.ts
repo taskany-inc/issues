@@ -220,7 +220,6 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         (queryState: Partial<QueryState>) => {
             const newUrl = router.asPath.split('?')[0];
             const urlParams = buildURLSearchParams({ groupBy, ...queryState });
-            console.log(urlParams.toString());
 
             const isEmptySearch = !Array.from(urlParams.keys()).length;
 

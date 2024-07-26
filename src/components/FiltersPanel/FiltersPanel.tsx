@@ -2,7 +2,7 @@ import { FC, useCallback, memo, useState, useEffect, ReactNode, useMemo } from '
 import { Button } from '@taskany/bricks/harmony';
 import { nullable, useLatest } from '@taskany/bricks';
 
-import { FilterQueryState, QueryState, SortableProps, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import { FilterQueryState, QueryState, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { FilterById } from '../../../trpc/inferredTypes';
 import {
     filtersPanel,
@@ -38,7 +38,7 @@ import { AppliedStateFilter } from '../AppliedStateFilter/AppliedStateFilter';
 import { AppliedUsersFilter } from '../AppliedUsersFilter/AppliedUsersFilter';
 import { PageUserMenu } from '../PageUserMenu';
 import { AppliedTagFilter } from '../AppliedTagFilter/AppliedTagFilter';
-import { SortButton } from '../SortButton/SortButton';
+import { SortList } from '../SortList/SortList';
 
 import { tr } from './FiltersPanel.i18n';
 
@@ -160,44 +160,6 @@ export const FiltersPanel: FC<{
         ];
     }, []);
 
-    const sortItems: { id: SortableProps; title: string }[] = useMemo(
-        () => [
-            {
-                id: 'title',
-                title: tr('Title'),
-            },
-            {
-                id: 'state',
-                title: tr('State'),
-            },
-            {
-                id: 'priority',
-                title: tr('Priority'),
-            },
-            {
-                id: 'project',
-                title: tr('Project'),
-            },
-            {
-                id: 'activity',
-                title: tr('Activity'),
-            },
-            {
-                id: 'owner',
-                title: tr('Owner'),
-            },
-            {
-                id: 'updatedAt',
-                title: tr('UpdatedAt'),
-            },
-            {
-                id: 'createdAt',
-                title: tr('CreatedAt'),
-            },
-        ],
-        [],
-    );
-
     const restFilterItems = useMemo(() => {
         if (filterQuery && filterQuery.stateType) {
             filterQuery.state = [];
@@ -255,30 +217,26 @@ export const FiltersPanel: FC<{
 
                         <FiltersBarDropdownTitle>{tr('Sort')}</FiltersBarDropdownTitle>
                         <FiltersBarDropdownContent>
-                            {sortItems.map(({ id, title }) => (
-                                <SortButton
-                                    title={title}
-                                    key={id}
-                                    value={filterQuery?.sort?.[id]}
-                                    onChange={(value) => {
-                                        let sortParams = (filterQuery?.sortParams ?? []).slice();
+                            <SortList
+                                value={filterQuery?.sortParams}
+                                onChange={(key, dir) => {
+                                    let sortParams = (filterQuery?.sortParams ?? []).slice();
 
-                                        if (!value) {
-                                            sortParams = sortParams.filter(({ key }) => key !== id);
+                                    if (!dir) {
+                                        sortParams = sortParams.filter(({ key: k }) => key !== k);
+                                    } else {
+                                        const paramExistingIndex = sortParams.findIndex(({ key: k }) => key === k);
+
+                                        if (paramExistingIndex > -1) {
+                                            sortParams[paramExistingIndex] = { key, dir };
                                         } else {
-                                            const paramExistingIndex = sortParams.findIndex(({ key }) => key === id);
-
-                                            if (paramExistingIndex > -1) {
-                                                sortParams[paramExistingIndex] = { key: id, dir: value };
-                                            } else {
-                                                sortParams.push({ key: id, dir: value });
-                                            }
+                                            sortParams.push({ key, dir });
                                         }
+                                    }
 
-                                        setSortFilter(sortParams);
-                                    }}
-                                />
-                            ))}
+                                    setSortFilter(sortParams);
+                                }}
+                            />
                         </FiltersBarDropdownContent>
                     </FiltersBarViewDropdown>
                 </FiltersBarItem>

@@ -27,7 +27,7 @@ export const SortButton: FC<SortButtonProps> = ({ title, value, onChange }) => {
         <Button
             text={title}
             view={value ? 'checked' : 'default'}
-            iconLeft={nullable(value, (v) =>
+            iconRight={nullable(value, (v) =>
                 v === 'asc' ? <IconArrowDownOutline size="s" /> : <IconArrowUpOutline size="s" />,
             )}
             onClick={() => onChange?.(getNextDirection(value))}
