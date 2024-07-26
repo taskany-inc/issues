@@ -23,6 +23,22 @@ import { header, headerMenuExplore, headerMenuGoals } from '../../utils/domObjec
 import { tr } from './PageNavigation.i18n';
 import s from './PageNavigation.module.css';
 
+interface PageNavigationItemProps {
+    href: string;
+    title: string;
+    selected: boolean;
+}
+
+const PageNavigationItem: FC<PageNavigationItemProps> = ({ href, selected, title }) => (
+    <div key={href} className={s.PageNavigationItemLink}>
+        <NextLink href={href} legacyBehavior>
+            <NavigationItem selected={selected} href={href}>
+                {title}
+            </NavigationItem>
+        </NextLink>
+    </div>
+);
+
 interface AppNavigationProps {
     logo?: string;
 }
@@ -98,39 +114,31 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
                 <Navigation>
                     <NavigationSection title={tr('Goals')}>
                         {goalsRoutes.map(({ title, href }) => (
-                            <div key={href} className={s.PageNavigationItemLink}>
-                                <NextLink href={href} legacyBehavior>
-                                    <NavigationItem selected={!isPresetActive && activeRoute === href} href={href}>
-                                        {title}
-                                    </NavigationItem>
-                                </NextLink>
-                            </div>
+                            <PageNavigationItem
+                                key={href}
+                                selected={!isPresetActive && activeRoute === href}
+                                href={href}
+                                title={title}
+                            />
                         ))}
                     </NavigationSection>
 
                     {nullable(presetRoutes, () => (
                         <NavigationSection title={tr('Preset')}>
                             {presetRoutes.map(({ title, href }) => (
-                                <div key={href} className={s.PageNavigationItemLink}>
-                                    <NextLink href={href} legacyBehavior>
-                                        <NavigationItem key={href} selected={nextRouter.asPath === href} href={href}>
-                                            {title}
-                                        </NavigationItem>
-                                    </NextLink>
-                                </div>
+                                <PageNavigationItem
+                                    key={href}
+                                    selected={nextRouter.asPath === href}
+                                    href={href}
+                                    title={title}
+                                />
                             ))}
                         </NavigationSection>
                     ))}
 
                     <NavigationSection title={tr('Projects')}>
                         {projectsRoutes.map(({ title, href }) => (
-                            <div key={href} className={s.PageNavigationItemLink}>
-                                <NextLink href={href} legacyBehavior>
-                                    <NavigationItem key={href} selected={activeRoute === href} href={href}>
-                                        {title}
-                                    </NavigationItem>
-                                </NextLink>
-                            </div>
+                            <PageNavigationItem key={href} selected={activeRoute === href} href={href} title={title} />
                         ))}
                     </NavigationSection>
                 </Navigation>
