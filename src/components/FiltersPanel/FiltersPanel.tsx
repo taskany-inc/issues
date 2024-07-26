@@ -261,18 +261,21 @@ export const FiltersPanel: FC<{
                                     key={id}
                                     value={filterQuery?.sort?.[id]}
                                     onChange={(value) => {
-                                        const newSortQuery = {
-                                            ...filterQuery?.sort,
-                                            ...{
-                                                [id]: value,
-                                            },
-                                        };
+                                        let sortParams = (filterQuery?.sortParams ?? []).slice();
 
                                         if (!value) {
-                                            delete newSortQuery[id];
+                                            sortParams = sortParams.filter(({ key }) => key !== id);
+                                        } else {
+                                            const paramExistingIndex = sortParams.findIndex(({ key }) => key === id);
+
+                                            if (paramExistingIndex > -1) {
+                                                sortParams[paramExistingIndex] = { key: id, dir: value };
+                                            } else {
+                                                sortParams.push({ key: id, dir: value });
+                                            }
                                         }
 
-                                        setSortFilter(newSortQuery);
+                                        setSortFilter(sortParams);
                                     }}
                                 />
                             ))}

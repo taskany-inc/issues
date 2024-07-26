@@ -182,64 +182,100 @@ export const goalsFilter = (
 
     let orderBy: any = [];
 
-    if (data.sort?.updatedAt) {
-        orderBy = [{ updatedAt: data.sort.updatedAt }];
-    }
-
-    if (data.sort?.createdAt) {
-        orderBy.push({
-            createdAt: data.sort.createdAt,
-        });
-    }
-
-    if (data.sort?.title) {
-        orderBy.push({
-            title: data.sort.title,
-        });
-    }
-
-    if (data.sort?.priority) {
-        orderBy.push({
-            priority: {
-                value: data.sort.priority,
-            },
-        });
-    }
-
-    if (data.sort?.state) {
-        orderBy.push({
+    if (data.sortParams) {
+        const mapToSortedField = {
+            title: undefined,
+            createdAt: undefined,
+            updatedAt: undefined,
             state: {
-                title: data.sort.state,
+                asc: { title: 'asc' },
+                desc: { title: 'desc' },
             },
-        });
-    }
-
-    if (data.sort?.project) {
-        orderBy.push({
+            priority: {
+                asc: { value: 'asc' },
+                desc: { value: 'desc' },
+            },
             project: {
-                title: data.sort.project,
+                asc: { title: 'asc' },
+                desc: { title: 'desc' },
             },
-        });
-    }
-
-    if (data.sort?.activity) {
-        orderBy.push({
             activity: {
-                user: {
-                    name: data.sort.activity,
-                },
+                asc: { user: { name: 'asc' } },
+                desc: { user: { name: 'desc' } },
             },
-        });
-    }
-
-    if (data.sort?.owner) {
-        orderBy.push({
             owner: {
-                user: {
-                    name: data.sort.owner,
-                },
+                asc: { user: { name: 'asc' } },
+                desc: { user: { name: 'desc' } },
             },
+        };
+        data.sortParams.forEach(({ key, dir }) => {
+            const sortField = mapToSortedField[key];
+            if (sortField == null) {
+                orderBy.push({ [key]: dir });
+            } else {
+                orderBy.push({ [key]: sortField[dir] });
+            }
         });
+    } else {
+        if (data.sort?.updatedAt) {
+            orderBy = [{ updatedAt: data.sort.updatedAt }];
+        }
+
+        if (data.sort?.createdAt) {
+            orderBy.push({
+                createdAt: data.sort.createdAt,
+            });
+        }
+
+        if (data.sort?.title) {
+            orderBy.push({
+                title: data.sort.title,
+            });
+        }
+
+        if (data.sort?.priority) {
+            orderBy.push({
+                priority: {
+                    value: data.sort.priority,
+                },
+            });
+        }
+
+        if (data.sort?.state) {
+            orderBy.push({
+                state: {
+                    title: data.sort.state,
+                },
+            });
+        }
+
+        if (data.sort?.project) {
+            orderBy.push({
+                project: {
+                    title: data.sort.project,
+                },
+            });
+        }
+
+        if (data.sort?.activity) {
+            orderBy.push({
+                activity: {
+                    user: {
+                        name: data.sort.activity,
+                    },
+                },
+            });
+        }
+
+        if (data.sort?.owner) {
+            orderBy.push({
+                owner: {
+                    user: {
+                        name: data.sort.owner,
+                    },
+                },
+            });
+        }
     }
 
     const starredFilter: Prisma.GoalFindManyArgs['where'] = data.starred

@@ -201,8 +201,10 @@ export const getUserProjectsQuery = ({
         .orderBy('Project.updatedAt desc');
 };
 
-const mapSortParamsToTableColumns = (sort: QueryWithFilters['sort']): Array<OrderByExpression<DB, 'Goal', unknown>> => {
-    if (!sort) {
+const mapSortParamsToTableColumns = (
+    sort: QueryWithFilters['sortParams'] = [],
+): Array<OrderByExpression<DB, 'Goal', unknown>> => {
+    if (!sort.length) {
         return ['Goal.updatedAt desc'];
     }
 
@@ -211,33 +213,31 @@ const mapSortParamsToTableColumns = (sort: QueryWithFilters['sort']): Array<Orde
         AnyColumnWithTable<DB, 'Goal'> | Record<OrderByDirection, Expression<string>>
     > = {
         title: 'Goal.title',
-        state: {
-            asc: sql`state.title asc`,
-            desc: sql`state.title desc`,
-        },
-        priority: {
-            asc: sql`priority.value asc`,
-            desc: sql`priority.value desc`,
-        },
-        project: {
-            asc: sql`project.title asc`,
-            desc: sql`project.title desc`,
-        },
-        activity: {
-            asc: sql`activity.name asc`,
-            desc: sql`activity.name desc`,
-        },
-        owner: {
-            asc: sql`owner.name asc`,
-            desc: sql`owner.name desc`,
-        },
         updatedAt: 'Goal.updatedAt',
         createdAt: 'Goal.createdAt',
+        state: {
+            asc: sql`(select title from "State" where "State".id = "Goal"."stateId") asc`,
+            desc: sql`(select title from "State" where "State".id = "Goal"."stateId") desc`,
+        },
+        priority: {
+            asc: sql`(select value from "Priority" where "Priority".id = "Goal"."priorityId") asc`,
+            desc: sql`(select value from "Priority" where "Priority".id = "Goal"."priorityId") desc`,
+        },
+        project: {
+            asc: sql`(select title from "Project" where "Project".id = "Goal"."projectId") asc`,
+            desc: sql`(select title from "Project" where "Project".id = "Goal"."projectId") desc`,
+        },
+        activity: {
+            asc: sql`(select name from "User" where "User"."activityId" = "Goal"."activityId") asc`,
+            desc: sql`(select name from "User" where "User"."activityId" = "Goal"."activityId") desc`,
+        },
+        owner: {
+            asc: sql`(select name from "User" where "User"."activityId" = "Goal"."ownerId") asc`,
+            desc: sql`(select name from "User" where "User"."activityId" = "Goal"."ownerId") desc`,
+        },
     };
 
-    return (
-        Object.entries(sort) as Array<[keyof NonNullable<QueryWithFilters['sort']>, NonNullable<OrderByDirection>]>
-    ).map<OrderByExpression<DB, 'Goal', unknown>>(([key, dir]) => {
+    return sort.map<OrderByExpression<DB, 'Goal', unknown>>(({ key, dir }) => {
         const rule = mapToTableColumn[key];
 
         if (typeof rule === 'string') {
@@ -443,6 +443,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                                     ),
                             ),
                         ]),
+                        sortParams: null,
                         sort: null,
                         starred: null,
                         watching: null,
@@ -463,7 +464,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                 })
                 .where('Goal.archived', 'is not', true)
                 .groupBy('Goal.id')
-                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort)),
+                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sortParams)),
         )
         .selectFrom('Project')
         .leftJoinLateral(
