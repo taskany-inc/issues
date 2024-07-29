@@ -31,8 +31,7 @@ export interface FilterQueryState {
     participant: string[];
     project: string[];
     query: string;
-    sort: { [K in SortableProps]?: SortDirection | null };
-    sortParams: Array<{ key: SortableProps; dir: Exclude<SortDirection, null> }>;
+    sort: Array<{ key: SortableProps; dir: Exclude<SortDirection, null> }>;
 }
 
 const groupByValue = {
@@ -67,28 +66,13 @@ const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 const parseSortQueryParam = (param = '') =>
     param.split(',').reduce((acc, curr) => {
         if (curr) {
-            const [id, direction] = curr.split(':');
-            acc[id as SortableProps] = direction as NonNullable<SortDirection>;
-        }
-        return acc;
-    }, {} as Record<SortableProps, NonNullable<SortDirection>>);
-
-const parseSortQueryParamV2 = (param = '') =>
-    param.split(',').reduce((acc, curr) => {
-        if (curr) {
             const [key, dir] = curr.split(':') as [SortableProps, SortDirection];
             acc.push({ key, dir });
         }
         return acc;
-    }, [] as QueryState['sortParams']);
+    }, [] as QueryState['sort']);
 
-const stringifySortQueryParam = (param: QueryState['sort']) =>
-    Object.entries(param)
-        .map(([id, direction]) => `${id}:${direction}`)
-        .join(',');
-
-const stringifySortQueryParamV2 = (param: QueryState['sortParams']) =>
-    param.map(({ key, dir }) => `${key}:${dir}`).join(',');
+const stringifySortQueryParam = (param: QueryState['sort']) => param.map(({ key, dir }) => `${key}:${dir}`).join(',');
 
 export const buildURLSearchParams = ({
     priority = [],
@@ -103,8 +87,7 @@ export const buildURLSearchParams = ({
     query = '',
     starred,
     watching,
-    sort = {},
-    sortParams = [],
+    sort = [],
     groupBy,
     limit,
 }: Partial<QueryState>): URLSearchParams => {
@@ -130,9 +113,7 @@ export const buildURLSearchParams = ({
 
     project.length > 0 ? urlParams.set('project', Array.from(project).toString()) : urlParams.delete('project');
 
-    Object.keys(sort).length > 0 ? urlParams.set('sort', stringifySortQueryParam(sort)) : urlParams.delete('sort');
-
-    sortParams.length > 0 ? urlParams.set('sort', stringifySortQueryParamV2(sortParams)) : urlParams.delete('sort');
+    sort.length > 0 ? urlParams.set('sort', stringifySortQueryParam(sort)) : urlParams.delete('sort');
 
     query.length > 0 ? urlParams.set('query', query.toString()) : urlParams.delete('query');
 
@@ -171,7 +152,6 @@ export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
     if (query.query) queryMap.query = parseQueryParam(query.query?.toString()).toString();
     if (query.sort) {
         queryMap.sort = parseSortQueryParam(query.sort?.toString());
-        queryMap.sortParams = parseSortQueryParamV2(query.sort?.toString());
     }
 
     return queryMap;
@@ -286,8 +266,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             starred: false,
             watching: false,
             query: '',
-            sort: {} as { [K in SortableProps]: SortDirection },
-            sortParams: [],
+            sort: [],
             groupBy: undefined,
         });
     }, [pushStateToRouter]);
@@ -339,7 +318,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setProjectFilter: pushStateProvider.key('project'),
             setStarredFilter: pushStateProvider.key('starred'),
             setWatchingFilter: pushStateProvider.key('watching'),
-            setSortFilter: pushStateProvider.key('sortParams'),
+            setSortFilter: pushStateProvider.key('sort'),
             setFulltextFilter: pushStateProvider.key('query'),
             setLimitFilter: pushStateProvider.key('limit'),
             setGroupBy: pushStateProvider.key('groupBy'),

@@ -202,14 +202,14 @@ export const getUserProjectsQuery = ({
 };
 
 const mapSortParamsToTableColumns = (
-    sort: QueryWithFilters['sortParams'] = [],
+    sort: QueryWithFilters['sort'] = [],
 ): Array<OrderByExpression<DB, 'Goal', unknown>> => {
     if (!sort.length) {
         return ['Goal.updatedAt desc'];
     }
 
     const mapToTableColumn: Record<
-        keyof NonNullable<QueryWithFilters['sort']>,
+        NonNullable<QueryWithFilters['sort']>[number]['key'],
         AnyColumnWithTable<DB, 'Goal'> | Record<OrderByDirection, Expression<string>>
     > = {
         title: 'Goal.title',
@@ -443,7 +443,6 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                                     ),
                             ),
                         ]),
-                        sortParams: null,
                         sort: null,
                         starred: null,
                         watching: null,
@@ -464,7 +463,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                 })
                 .where('Goal.archived', 'is not', true)
                 .groupBy('Goal.id')
-                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sortParams)),
+                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort)),
         )
         .selectFrom('Project')
         .leftJoinLateral(

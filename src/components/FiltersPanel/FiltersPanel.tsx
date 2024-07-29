@@ -218,9 +218,9 @@ export const FiltersPanel: FC<{
                         <FiltersBarDropdownTitle>{tr('Sort')}</FiltersBarDropdownTitle>
                         <FiltersBarDropdownContent>
                             <SortList
-                                value={filterQuery?.sortParams}
+                                value={filterQuery?.sort}
                                 onChange={(key, dir) => {
-                                    let sortParams = (filterQuery?.sortParams ?? []).slice();
+                                    let sortParams = (filterQuery?.sort ?? []).slice();
 
                                     if (!dir) {
                                         sortParams = sortParams.filter(({ key: k }) => key !== k);

@@ -180,9 +180,9 @@ export const goalsFilter = (
               },
           };
 
-    let orderBy: any = [];
+    const orderBy: any = [];
 
-    if (data.sortParams) {
+    if (data.sort) {
         const mapToSortedField = {
             title: undefined,
             createdAt: undefined,
@@ -208,7 +208,7 @@ export const goalsFilter = (
                 desc: { user: { name: 'desc' } },
             },
         };
-        data.sortParams.forEach(({ key, dir }) => {
+        data.sort.forEach(({ key, dir }) => {
             const sortField = mapToSortedField[key];
             if (sortField == null) {
                 orderBy.push({ [key]: dir });
@@ -216,66 +216,6 @@ export const goalsFilter = (
                 orderBy.push({ [key]: sortField[dir] });
             }
         });
-    } else {
-        if (data.sort?.updatedAt) {
-            orderBy = [{ updatedAt: data.sort.updatedAt }];
-        }
-
-        if (data.sort?.createdAt) {
-            orderBy.push({
-                createdAt: data.sort.createdAt,
-            });
-        }
-
-        if (data.sort?.title) {
-            orderBy.push({
-                title: data.sort.title,
-            });
-        }
-
-        if (data.sort?.priority) {
-            orderBy.push({
-                priority: {
-                    value: data.sort.priority,
-                },
-            });
-        }
-
-        if (data.sort?.state) {
-            orderBy.push({
-                state: {
-                    title: data.sort.state,
-                },
-            });
-        }
-
-        if (data.sort?.project) {
-            orderBy.push({
-                project: {
-                    title: data.sort.project,
-                },
-            });
-        }
-
-        if (data.sort?.activity) {
-            orderBy.push({
-                activity: {
-                    user: {
-                        name: data.sort.activity,
-                    },
-                },
-            });
-        }
-
-        if (data.sort?.owner) {
-            orderBy.push({
-                owner: {
-                    user: {
-                        name: data.sort.owner,
-                    },
-                },
-            });
-        }
     }
 
     const starredFilter: Prisma.GoalFindManyArgs['where'] = data.starred
