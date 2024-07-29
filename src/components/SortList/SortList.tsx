@@ -19,8 +19,8 @@ interface SingleSortItem {
 }
 
 export const SortList: React.FC<SortListProps> = ({ value, onChange }) => {
-    const sortItems: { [K in SortableProps]: string } = useMemo(
-        () => ({
+    const { itemsToRender, sortItems } = useMemo(() => {
+        const sortItems = {
             title: tr('Title'),
             state: tr('State'),
             priority: tr('Priority'),
@@ -29,17 +29,17 @@ export const SortList: React.FC<SortListProps> = ({ value, onChange }) => {
             owner: tr('Owner'),
             updatedAt: tr('UpdatedAt'),
             createdAt: tr('CreatedAt'),
-        }),
-        [],
-    );
+        };
 
-    const itemsToRender: SingleSortItem[] = useMemo(() => {
-        return (Object.entries(sortItems) as Array<[SortableProps, string]>).map(([id, title]) => ({
-            id,
-            title,
-            dir: null,
-        }));
-    }, [sortItems]);
+        return {
+            sortItems,
+            itemsToRender: (Object.entries(sortItems) as Array<[SortableProps, string]>).map(([id, title]) => ({
+                id,
+                title,
+                dir: null,
+            })),
+        };
+    }, []);
 
     const selected: SingleSortItem[] | undefined = useMemo(() => {
         return value?.map(({ key, dir }) => ({ id: key, title: sortItems[key], dir }));

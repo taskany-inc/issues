@@ -31,7 +31,7 @@ export interface FilterQueryState {
     participant: string[];
     project: string[];
     query: string;
-    sort: Array<{ key: SortableProps; dir: Exclude<SortDirection, null> }>;
+    sort: Array<{ key: SortableProps; dir: SortDirection }>;
 }
 
 const groupByValue = {
