@@ -11,21 +11,7 @@ export const StateTypeEnum = z.nativeEnum(StateType);
 export type ToggleSubscription = z.infer<typeof ToggleSubscriptionSchema>;
 
 const sortDirectionValue = z.enum(['asc', 'desc']);
-const sortDirectionValueOptional = sortDirectionValue.nullish();
 const sortPropEnum = z.enum(['title', 'state', 'priority', 'project', 'activity', 'owner', 'updatedAt', 'createdAt']);
-
-export const sortablePropertiesSchema = z
-    .object({
-        title: sortDirectionValueOptional,
-        state: sortDirectionValueOptional,
-        priority: sortDirectionValueOptional,
-        project: sortDirectionValueOptional,
-        activity: sortDirectionValueOptional,
-        owner: sortDirectionValueOptional,
-        updatedAt: sortDirectionValueOptional,
-        createdAt: sortDirectionValueOptional,
-    })
-    .optional();
 
 export const sortablePropertiesArraySchema = z
     .array(
@@ -46,8 +32,7 @@ export const queryWithFiltersSchema = z.object({
     owner: z.array(z.string()).optional(),
     participant: z.array(z.string()).optional(),
     project: z.array(z.string()).optional(),
-    sort: sortablePropertiesSchema,
-    sortParams: sortablePropertiesArraySchema,
+    sort: sortablePropertiesArraySchema,
     query: z.string().optional(),
     starred: z.boolean().optional(),
     watching: z.boolean().optional(),

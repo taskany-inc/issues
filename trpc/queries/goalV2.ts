@@ -18,7 +18,7 @@ const mapSortParamsToTableColumns = (sort: QueryWithFilters['sort']): Array<Orde
     }
 
     const mapToTableColumn: Record<
-        keyof NonNullable<QueryWithFilters['sort']>,
+        NonNullable<QueryWithFilters['sort']>[number]['key'],
         AnyColumnWithTable<DB, 'Goal'> | Record<OrderByDirection, Expression<string>>
     > = {
         title: 'Goal.title',
@@ -46,9 +46,7 @@ const mapSortParamsToTableColumns = (sort: QueryWithFilters['sort']): Array<Orde
         createdAt: 'Goal.createdAt',
     };
 
-    return (
-        Object.entries(sort) as Array<[keyof NonNullable<QueryWithFilters['sort']>, NonNullable<OrderByDirection>]>
-    ).map<OrderByExpression<DB, 'Goal', unknown>>(([key, dir]) => {
+    return sort.map<OrderByExpression<DB, 'Goal', unknown>>(({ key, dir }) => {
         const rule = mapToTableColumn[key];
 
         if (typeof rule === 'string') {
@@ -59,6 +57,10 @@ const mapSortParamsToTableColumns = (sort: QueryWithFilters['sort']): Array<Orde
     });
 };
 
+/**
+ * @deprecated
+ * DONT USE THIS QUERY
+ */
 export const getGoalList = (params: GoalQueryParams) => {
     return db
         .selectFrom('Goal')

@@ -8,7 +8,7 @@ import { tr } from './SortList.i18n';
 import styles from './SortList.module.css';
 
 interface SortListProps {
-    value?: FilterQueryState['sortParams'];
+    value?: FilterQueryState['sort'];
     onChange: (key: SortableProps, dir: SortDirection | null) => void;
 }
 
