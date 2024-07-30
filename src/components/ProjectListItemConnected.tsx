@@ -52,22 +52,22 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
         },
     );
 
-    const ids = useMemo(() => project?.children.map(({ id }) => id) || [], [project]);
+    const ids = useMemo(() => project?.children?.map(({ id }) => id) || [], [project]);
     const { data: childrenProjects = [], isLoading } = trpc.project.getByIds.useQuery({ ids, goalsQuery: queryState });
 
     useEffect(() => {
         const unsubUpdate = on('on:goal:update', (updatedId) => {
             const idInList = projectDeepInfo?.goals.find(({ _shortId }) => _shortId === updatedId);
-            if (idInList) {
-                utils.project.getDeepInfo.invalidate();
-                utils.project.getByIds.invalidate();
+            if (idInList?.projectId != null) {
+                utils.project.getDeepInfo.invalidate({ id: idInList.projectId });
+                utils.project.getByIds.invalidate({ ids: [idInList.projectId] });
             }
         });
 
         const unsubDelete = on('on:goal:delete', (updatedId) => {
             const idInList = projectDeepInfo?.goals.find(({ _shortId }) => _shortId === updatedId);
-            if (idInList) {
-                utils.project.getDeepInfo.invalidate();
+            if (idInList?.projectId != null) {
+                utils.project.getDeepInfo.invalidate({ id: idInList.projectId });
             }
         });
 
