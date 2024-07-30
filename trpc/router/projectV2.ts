@@ -12,6 +12,7 @@ import {
     getUserProjectsWithGoals,
     getWholeGoalCountByProjectIds,
     getDeepChildrenProjectsId,
+    getAllProjectsQuery,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema } from '../../src/schema/common';
 import {
@@ -41,7 +42,7 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
     activity: ProjectActivity;
     participants: ProjectActivity[];
     goals?: any[]; // this prop is overrides below
-    children: any[]; // TODO: rly need this on Dashboard Page
+    children: ExtractTypeFromGenerated<Project>[] | null;
 };
 
 interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
@@ -222,6 +223,37 @@ export const project = router({
                     offset: goalsByProject.length < limit + 1 ? undefined : offset + (limit ?? 0),
                 },
                 totalGoalsCount: goalsCountsByProjects?.wholeGoalsCount ?? 0,
+            };
+        }),
+
+    getAll: protectedProcedure
+        .input(
+            z.object({
+                limit: z.number().optional(),
+                goalsQuery: queryWithFiltersSchema.optional(),
+                firstLevel: z.boolean(),
+                cursor: z.number().optional(),
+            }),
+        )
+        .query(async ({ input, ctx }) => {
+            const { limit = 20, cursor = 0, goalsQuery, firstLevel: _ = true } = input;
+
+            const projects = await getAllProjectsQuery({
+                ...ctx.session.user,
+                firstLevel: goalsQuery?.project == null,
+                limit: limit + 1,
+                cursor,
+                ids: goalsQuery?.project,
+            })
+                .$castTo<ProjectResponse & Pick<ProjectsWithGoals, '_count'>>()
+                .execute();
+
+            return {
+                projects: projects.slice(0, limit),
+                pagination: {
+                    limit,
+                    offset: projects.length < limit + 1 ? undefined : cursor + (limit ?? 0),
+                },
             };
         }),
 });
