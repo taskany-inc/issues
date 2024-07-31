@@ -40,10 +40,18 @@ const groupByValue = {
 
 type GroupByParam = keyof typeof groupByValue;
 
+const pageViewValue = {
+    kanban: true,
+    list: true,
+};
+
+export type PageView = keyof typeof pageViewValue;
+
 interface BaseQueryState {
     starred: boolean;
     watching: boolean;
     groupBy?: GroupByParam;
+    view?: PageView;
     limit?: number;
 }
 
@@ -57,6 +65,18 @@ const parseGroupByParam = (value?: string): GroupByParam | undefined => {
     }
 
     return valueIsGroupByParam(value) ? value : undefined;
+};
+
+const valueIsViewParam = (value: string): value is PageView => {
+    return value in pageViewValue;
+};
+
+const parseViewParam = (value?: string): PageView | undefined => {
+    if (!value) {
+        return undefined;
+    }
+
+    return valueIsViewParam(value) ? value : undefined;
 };
 
 export interface QueryState extends BaseQueryState, FilterQueryState {}
@@ -89,6 +109,7 @@ export const buildURLSearchParams = ({
     watching,
     sort = [],
     groupBy,
+    view,
     limit,
 }: Partial<QueryState>): URLSearchParams => {
     const urlParams = new URLSearchParams();
@@ -125,6 +146,8 @@ export const buildURLSearchParams = ({
 
     limit ? urlParams.set('limit', limit.toString()) : urlParams.delete('limit');
 
+    view && valueIsViewParam(view) ? urlParams.set('view', view) : urlParams.delete('view');
+
     return urlParams;
 };
 
@@ -132,6 +155,7 @@ export const parseBaseValues = (query: ParsedUrlQuery): BaseQueryState => ({
     starred: Boolean(parseInt(parseQueryParam(query.starred?.toString()).toString(), 10)),
     watching: Boolean(parseInt(parseQueryParam(query.watching?.toString()).toString(), 10)),
     groupBy: parseGroupByParam(query.groupBy?.toString()),
+    view: parseViewParam(query.view?.toString()),
     limit: query.limit ? Number(query.limit) : undefined,
 });
 
@@ -173,19 +197,20 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
-    const { queryState, queryFilterState, groupBy } = useMemo(() => {
+    const { queryState, queryFilterState, groupBy, view } = useMemo(() => {
         const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { groupBy, id, ...queries } = query;
+        const { groupBy, view, id, ...queries } = query;
 
         const { queryState = undefined, queryFilterState = undefined } = Object.keys(queries).length
-            ? parseQueryState({ groupBy, ...queries })
+            ? parseQueryState({ groupBy, view, ...queries })
             : {};
 
         return {
             queryFilterState,
             queryState,
             groupBy: groupBy as GroupByParam | undefined,
+            view: view as PageView | undefined,
         };
     }, [router.query, currentPreset]);
 
@@ -268,6 +293,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             query: '',
             sort: [],
             groupBy: undefined,
+            view: undefined,
         });
     }, [pushStateToRouter]);
 
@@ -322,6 +348,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setFulltextFilter: pushStateProvider.key('query'),
             setLimitFilter: pushStateProvider.key('limit'),
             setGroupBy: pushStateProvider.key('groupBy'),
+            setView: pushStateProvider.key('view'),
             batchQueryState: pushStateProvider.batch(),
         }),
         [pushStateProvider],
@@ -336,6 +363,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         setTagsFilterOutside,
         resetQueryState,
         setPreset,
+        view,
         ...setters,
     };
 };

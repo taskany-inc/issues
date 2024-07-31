@@ -1,25 +1,27 @@
-import { ComponentProps, useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { ListView } from '@taskany/bricks/harmony';
 
-import { QueryState } from '../hooks/useUrlFilterParams';
+import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';
 import { trpc } from '../utils/trpcClient';
 import { useFMPMetric } from '../utils/telemetry';
-import { GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { FilterById, GoalByIdReturnType } from '../../trpc/inferredTypes';
 
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
 import { ProjectListItemConnected } from './ProjectListItemConnected';
 
 interface GroupedGoalListProps {
-    queryState?: QueryState;
-    onTagClick?: ComponentProps<typeof ProjectListItemConnected>['onTagClick'];
+    filterPreset?: FilterById;
 }
 
 export const projectsSize = 20;
 
-export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, onTagClick }) => {
+export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }) => {
+    const { queryState } = useUrlFilterParams({
+        preset: filterPreset,
+    });
     const { setPreview, on } = useGoalPreview();
     const utils = trpc.useContext();
     const { data, fetchNextPage, hasNextPage } = trpc.project.getAll.useInfiniteQuery(
@@ -68,12 +70,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ queryState, on
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {projectsOnScreen.map((project) => (
-                <ProjectListItemConnected
-                    key={project.id}
-                    project={project}
-                    queryState={queryState}
-                    onTagClick={onTagClick}
-                />
+                <ProjectListItemConnected key={project.id} project={project} filterPreset={filterPreset} />
             ))}
 
             {nullable(hasNextPage, () => (

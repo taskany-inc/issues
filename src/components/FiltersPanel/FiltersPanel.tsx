@@ -20,8 +20,6 @@ import {
     FiltersBar,
     FiltersBarItem,
     FiltersBarTitle,
-    LayoutType,
-    layoutType,
     FiltersBarDropdownTitle,
     FiltersBarDropdownContent,
     AddFilterDropdown,
@@ -30,6 +28,7 @@ import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
 import { Separator } from '../Separator/Separator';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useFilterResource } from '../../hooks/useFilterResource';
+import { usePageContext } from '../../hooks/usePageContext';
 import { AppliedFiltersBar } from '../AppliedFiltersBar/AppliedFiltersBar';
 import { AppliedEstimateFilter } from '../AppliedEstimateFilter/AppliedEstimateFilter';
 import { AppliedGoalParentFilter } from '../AppliedGoalParentFilter/AppliedGoalParentFilter';
@@ -49,9 +48,11 @@ export const FiltersPanel: FC<{
     loading?: boolean;
     filterPreset?: FilterById;
     enableViewToggle?: boolean;
+    enableLayoutToggle?: boolean;
     children?: ReactNode;
-}> = memo(({ children, title, total = 0, counter = 0, enableViewToggle, filterPreset }) => {
+}> = memo(({ children, title, total = 0, counter = 0, enableViewToggle, enableLayoutToggle, filterPreset }) => {
     const { toggleFilterStar } = useFilterResource();
+    const { user } = usePageContext();
 
     const {
         currentPreset,
@@ -62,12 +63,13 @@ export const FiltersPanel: FC<{
         setSortFilter,
         queryFilterState,
         groupBy,
+        view,
         setGroupBy,
+        setView,
     } = useUrlFilterParams({
         preset: filterPreset,
     });
 
-    const [layout] = useState<LayoutType>(layoutType.table);
     const [filterQuery, setFilterQuery] = useState<Partial<FilterQueryState> | undefined>(queryFilterState);
     const filterQueryRef = useLatest(filterQuery);
 
@@ -195,10 +197,14 @@ export const FiltersPanel: FC<{
                         <FilterBarCounter total={total} counter={counter} />
                     </FiltersBarControlGroup>
                 </FiltersBarItem>
-                <FiltersBarItem>
-                    <FiltersBarLayoutSwitch value={layout} />
-                </FiltersBarItem>
-                <Separator />
+                {nullable(enableLayoutToggle && user?.settings?.beta, () => (
+                    <>
+                        <FiltersBarItem>
+                            <FiltersBarLayoutSwitch value={view} onChange={setView} />
+                        </FiltersBarItem>
+                        <Separator />
+                    </>
+                ))}
 
                 <FiltersBarItem>
                     <FiltersBarViewDropdown>

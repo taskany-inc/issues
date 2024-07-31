@@ -13,6 +13,7 @@ import {
     DropdownPanel,
     MenuItem,
     Spinner,
+    FlatProgressBar,
 } from '@taskany/bricks/harmony';
 import { nullable, useClickOutside } from '@taskany/bricks';
 import {
@@ -418,11 +419,16 @@ export const CriteriaList: React.FC<CriteriaListProps> = ({
 };
 
 interface GoalCriteriaPreviewProps {
+    view?: 'circle' | 'flat';
     achievedWeight: number;
     goalId: string;
 }
 
-export const GoalCriteriaPreview: React.FC<GoalCriteriaPreviewProps> = ({ achievedWeight, goalId }) => {
+export const GoalCriteriaPreview: React.FC<GoalCriteriaPreviewProps> = ({
+    achievedWeight,
+    goalId,
+    view = 'circle',
+}) => {
     const [popupVisible, setPopupVisible] = useState(false);
     const triggerRef = useRef<HTMLSpanElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -459,7 +465,13 @@ export const GoalCriteriaPreview: React.FC<GoalCriteriaPreviewProps> = ({ achiev
     return (
         <>
             <span ref={triggerRef} className={classes.GoalCriteriaTrigger} onClick={handleOpen}>
-                <CircleProgressBar value={achievedWeight} />
+                {nullable(
+                    view === 'circle',
+                    () => (
+                        <CircleProgressBar value={achievedWeight} />
+                    ),
+                    <FlatProgressBar value={achievedWeight} />,
+                )}
             </span>
             <Popup
                 reference={triggerRef}
