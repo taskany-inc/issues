@@ -6,10 +6,9 @@ import { DateType } from '../../types/date';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { PrivateDepsWarning } from '../PrivateDepsWarning/PrivateDepsWarning';
 import { UserDropdown } from '../UserDropdown/UserDropdown';
-import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';
+import { EstimateDropdown, getEstimateDropdownValueFromDate } from '../EstimateDropdown/EstimateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown/PriorityDropdown';
 import { Priority } from '../../types/priority';
-import { getDateString } from '../../utils/dateTime';
 import { safeUserData } from '../../utils/getUserName';
 
 import s from './IssueStats.module.css';
@@ -68,7 +67,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
             {nullable(estimate, (e) => (
                 <Separator>
                     <EstimateDropdown
-                        value={{ date: getDateString(e), type: estimateType ?? 'Strict' }}
+                        value={getEstimateDropdownValueFromDate(e, estimateType)}
                         label="Estimate"
                         view="default"
                         readOnly

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { ComponentProps, useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { ListView, TreeViewElement } from '@taskany/bricks/harmony';
 
@@ -9,6 +9,7 @@ import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
+import { buildKanban } from '../../utils/kanban';
 import { getPageTitle } from '../../utils/getPageTitle';
 import { Page } from '../Page/Page';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
@@ -20,6 +21,7 @@ import { routes } from '../../hooks/router';
 import { GoalTableList } from '../GoalTableList/GoalTableList';
 import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
+import { Kanban } from '../Kanban/Kanban';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -28,7 +30,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
     const { preset } = useFiltersPreset({ defaultPresetFallback });
 
-    const { currentPreset, queryState } = useUrlFilterParams({
+    const { currentPreset, queryState, view } = useUrlFilterParams({
         preset,
     });
 
@@ -44,7 +46,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
     const pages = useMemo(() => data?.pages || [], [data?.pages]);
 
-    const [groupsOnScreen, goalsCount, totalGoalsCount] = useMemo(() => {
+    const [groupsOnScreen, canbansByProject, goalsCount, totalGoalsCount] = useMemo(() => {
         const groups = pages?.[0]?.groups;
 
         const gr = pages.reduce<typeof groups>((acc, cur) => {
@@ -52,8 +54,15 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             return acc;
         }, []);
 
+        const canbans = gr.reduce<Record<string, ComponentProps<typeof Kanban>['value']>>((acum, project) => {
+            acum[project.id] = buildKanban(project.goals ?? []);
+
+            return acum;
+        }, {});
+
         return [
             gr,
+            canbans,
             gr.reduce((acc, group) => acc + group._count.goals, 0),
             pages.reduce((acc, { totalGoalsCount = 0 }) => acc + Number(totalGoalsCount), 0),
         ];
@@ -101,28 +110,39 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                     counter={goalsCount}
                     filterPreset={preset}
                     loading={isLoading}
+                    enableLayoutToggle
                 />
             }
         >
             <ListView onKeyboardClick={handleItemEnter}>
-                {groupsOnScreen?.map(({ goals, ...project }) => (
-                    <ProjectListItemCollapsable
-                        key={project.id}
-                        interactive={false}
-                        visible
-                        project={project}
-                        href={routes.project(project.id)}
-                        goals={nullable(goals, (g) => (
+                {groupsOnScreen?.map(({ goals, ...project }) => {
+                    const kanban = canbansByProject[project.id];
+
+                    const children = nullable(
+                        view === 'kanban',
+                        () => <Kanban value={kanban} filterPreset={preset} />,
+                        nullable(goals, (g) => (
                             <TreeViewElement>
                                 <GoalTableList goals={g} />
                             </TreeViewElement>
-                        ))}
-                    >
-                        {nullable(!goals?.length, () => (
-                            <InlineCreateGoalControl project={project} />
-                        ))}
-                    </ProjectListItemCollapsable>
-                ))}
+                        )),
+                    );
+
+                    return (
+                        <ProjectListItemCollapsable
+                            key={project.id}
+                            interactive={false}
+                            visible
+                            project={project}
+                            href={routes.project(project.id, view ? `view=${view}` : undefined)}
+                            goals={children}
+                        >
+                            {nullable(!goals?.length, () => (
+                                <InlineCreateGoalControl project={project} />
+                            ))}
+                        </ProjectListItemCollapsable>
+                    );
+                })}
             </ListView>
 
             {nullable(hasNextPage, () => (

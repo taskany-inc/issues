@@ -6,7 +6,7 @@ import { TLocale } from '../utils/getLang';
 export const routes = {
     index: () => '/',
 
-    project: (id: string) => `/projects/${id}`,
+    project: (id: string, query?: string) => `/projects/${id}${query ? `?${query}` : ''}`,
     projectSettings: (id: string) => `/projects/${id}/settings`,
     projectTeam: (id: string) => `/projects/${id}/team`,
 

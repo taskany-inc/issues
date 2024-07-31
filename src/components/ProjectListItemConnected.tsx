@@ -2,9 +2,10 @@ import { FC, useMemo, useEffect, ComponentProps, MouseEventHandler } from 'react
 import { nullable } from '@taskany/bricks';
 import { TreeViewElement } from '@taskany/bricks/harmony';
 
-import { GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { FilterById, GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';
-import { QueryState } from '../hooks/useUrlFilterParams';
+import { buildKanban } from '../utils/kanban';
+import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';
 import { routes } from '../hooks/router';
 
@@ -12,11 +13,12 @@ import { GoalTableList } from './GoalTableList/GoalTableList';
 import { ProjectListItemCollapsable } from './ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { InlineCreateGoalControl } from './InlineCreateGoalControl/InlineCreateGoalControl';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
+import { Kanban } from './Kanban/Kanban';
 
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
-    queryState?: Partial<QueryState>;
+    parent?: ComponentProps<typeof ProjectListItemCollapsable>['project'];
+    filterPreset?: FilterById;
     onClickProvider?: (g: Partial<GoalByIdReturnType>) => MouseEventHandler<HTMLElement>;
-    onTagClick?: ComponentProps<typeof GoalTableList>['onTagClick'];
 }
 
 const onProjectClickHandler = (e: React.MouseEvent) => {
@@ -28,11 +30,14 @@ const onProjectClickHandler = (e: React.MouseEvent) => {
 };
 
 export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
-    queryState,
+    filterPreset,
+    parent,
     project,
-    onTagClick,
     ...props
 }) => {
+    const { queryState, setTagsFilterOutside, view } = useUrlFilterParams({
+        preset: filterPreset,
+    });
     const { on } = useGoalPreview();
     const utils = trpc.useContext();
 
@@ -72,27 +77,53 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
         };
     }, [on, projectDeepInfo?.goals, utils.project.getByIds, utils.project.getDeepInfo]);
 
+    const kanban = useMemo(() => buildKanban(projectDeepInfo?.goals || []), [projectDeepInfo]);
+
+    const subNodes = useMemo(
+        () =>
+            childrenProjects.map((p) => (
+                <ProjectListItemConnected
+                    key={p.id}
+                    project={p}
+                    parent={project}
+                    filterPreset={filterPreset}
+                    titleSize={view === 'kanban' ? 'l' : 'm'}
+                />
+            )),
+        [childrenProjects, view, filterPreset, project],
+    );
+
     return (
-        <ProjectListItemCollapsable
-            href={routes.project(project.id)}
-            onClick={onProjectClickHandler}
-            project={project}
-            goals={nullable(projectDeepInfo?.goals, (goals) => (
-                <TreeViewElement>
-                    <GoalTableList goals={goals} onTagClick={onTagClick} onGoalClick={onProjectClickHandler} />
-                </TreeViewElement>
-            ))}
-            {...props}
-        >
-            <TreeViewElement>
-                {nullable(
-                    !projectDeepInfo?.goals.length,
-                    () => !isLoading && <InlineCreateGoalControl project={project} />,
+        <>
+            <ProjectListItemCollapsable
+                href={routes.project(project.id, view ? `view=${view}` : undefined)}
+                onClick={onProjectClickHandler}
+                project={project}
+                parent={view === 'kanban' ? parent : undefined}
+                goals={nullable(projectDeepInfo?.goals, (goals) =>
+                    view === 'kanban' ? (
+                        <Kanban value={kanban} filterPreset={filterPreset} />
+                    ) : (
+                        <TreeViewElement>
+                            <GoalTableList
+                                goals={goals}
+                                onTagClick={setTagsFilterOutside}
+                                onGoalClick={onProjectClickHandler}
+                            />
+                        </TreeViewElement>
+                    ),
                 )}
-            </TreeViewElement>
-            {childrenProjects.map((p) => (
-                <ProjectListItemConnected key={p.id} project={p} queryState={queryState} titleSize="m" />
-            ))}
-        </ProjectListItemCollapsable>
+                {...props}
+            >
+                <TreeViewElement>
+                    {nullable(
+                        !projectDeepInfo?.goals.length,
+                        () => !isLoading && <InlineCreateGoalControl project={project} />,
+                    )}
+                </TreeViewElement>
+                {nullable(view !== 'kanban', () => subNodes)}
+            </ProjectListItemCollapsable>
+            {nullable(view === 'kanban', () => subNodes)}
+        </>
     );
 };

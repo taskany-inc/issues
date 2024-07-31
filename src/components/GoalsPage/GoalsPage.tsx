@@ -23,7 +23,6 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback, baseQueryState
         currentPreset,
         queryState: urlQueryState,
         groupBy,
-        setTagsFilterOutside,
     } = useUrlFilterParams({
         preset,
     });
@@ -62,9 +61,9 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback, baseQueryState
             {nullable(
                 groupedView,
                 () => (
-                    <GroupedGoalList queryState={queryState} onTagClick={setTagsFilterOutside} />
+                    <GroupedGoalList filterPreset={preset} />
                 ),
-                <FlatGoalList queryState={queryState} onTagClick={setTagsFilterOutside} />,
+                <FlatGoalList filterPreset={preset} />,
             )}
             <PresetModals preset={preset} />
         </Page>
