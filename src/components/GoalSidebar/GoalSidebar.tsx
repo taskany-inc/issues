@@ -1,7 +1,7 @@
 import { ComponentProps, FC, useCallback, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { Tag, TagCleanButton } from '@taskany/bricks/harmony';
-import { IconArrowRightOutline, IconBinOutline, IconXCircleSolid } from '@taskany/icons';
+import { IconArrowRightOutline, IconBinOutline, IconLayersSubtractOutline, IconXCircleSolid } from '@taskany/icons';
 
 import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { UserBadge } from '../UserBadge/UserBadge';
@@ -334,6 +334,12 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 ref={props.ref}
                             />
                         )}
+                    />
+                    <br />
+                    <AddInlineTrigger
+                        icon={<IconLayersSubtractOutline size="xs" />}
+                        text={tr('Clone goal')}
+                        onClick={dispatchModalEvent(ModalEvent.GoalCreateModal, goal)}
                     />
                     <br />
                     <AddInlineTrigger

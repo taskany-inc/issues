@@ -10,7 +10,7 @@ import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { GoalForm } from '../GoalForm/GoalForm';
 import { trpc } from '../../utils/trpcClient';
 import { GoalCommon, goalCommonSchema } from '../../schema/goal';
-import { ActivityByIdReturnType, GoalCreateReturnType } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType, GoalByIdReturnType, GoalCreateReturnType } from '../../../trpc/inferredTypes';
 import { useGoalResource } from '../../hooks/useGoalResource';
 import {
     combobox,
@@ -28,13 +28,25 @@ import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 import { tr } from './GoalCreateForm.i18n';
 import s from './GoalCreateForm.module.css';
 
-interface GoalCreateFormProps {
-    title?: string;
+interface GoalCreateFormProps
+    extends Partial<Pick<NonNullable<GoalByIdReturnType>, 'priority' | 'description' | 'title' | 'personal' | 'tags'>> {
     onGoalCreate?: (val: GoalCreateReturnType) => void;
-    personal?: boolean;
+    project?: {
+        id: string;
+        title: string;
+        flowId: string;
+    } | null;
 }
 
-const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, personal }) => {
+const GoalCreateForm: React.FC<GoalCreateFormProps> = ({
+    title,
+    onGoalCreate,
+    personal,
+    project,
+    description,
+    priority,
+    tags,
+}) => {
     const router = useRouter();
     const { user } = usePageContext();
     const [goalCreateFormActionCache, setGoalCreateFormActionCache] = useLocalStorage('goalCreateFormAction');
@@ -139,12 +151,14 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({ title, onGoalCreate, pe
         <GoalForm
             busy={busy}
             validitySchema={goalCommonSchema}
-            owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
-            parent={parent ?? undefined}
-            personal={personal}
-            priority={defaultPriority ?? undefined}
+            personal={!!personal}
             onSubmit={createGoal}
             title={title}
+            description={description}
+            owner={{ id: user?.activityId, user } as ActivityByIdReturnType}
+            parent={project ?? parent ?? undefined}
+            priority={priority ?? defaultPriority ?? undefined}
+            tags={tags}
             actionButton={
                 <FormAction className={s.FormActions}>
                     <Button
