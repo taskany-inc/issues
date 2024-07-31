@@ -21,14 +21,13 @@ export enum ModalEvent {
 
 export interface MapModalToComponentProps {
     [ModalEvent.GoalCreateModal]: {
+        onGoalCreate?: (goal: GoalCreateReturnType) => void;
         project?: {
             id: string;
             title: string;
             flowId: string;
-        };
-        title?: string;
-        onGoalCreate?: (goal: GoalCreateReturnType) => void;
-    };
+        } | null;
+    } & Partial<Pick<NonNullable<GoalByIdReturnType>, 'priority' | 'description' | 'title' | 'personal' | 'tags'>>;
     [ModalEvent.ProjectSwitchPublicConfirmModal]: {
         onConfirm?: () => void;
     };
