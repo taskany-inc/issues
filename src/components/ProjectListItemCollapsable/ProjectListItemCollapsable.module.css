@@ -9,3 +9,9 @@
     gap: var(--gap-xs);
     justify-content: space-between;
 }
+
+.ProjectSubTitle {
+    color: var(--text-ghost);
+    font-size: inherit;
+    font-weight: inherit;
+}

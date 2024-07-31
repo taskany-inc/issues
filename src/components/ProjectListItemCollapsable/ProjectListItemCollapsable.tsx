@@ -14,6 +14,7 @@ import s from './ProjectListItemCollapsable.module.css';
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
     project: NonNullable<DashboardProject>;
+    parent?: NonNullable<DashboardProject>;
     goals?: ReactNode;
     children?: React.ReactNode;
     onClick?: MouseEventHandler<HTMLElement>;
@@ -24,6 +25,7 @@ interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof Tre
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
     editable,
     project,
+    parent,
     children,
     goals,
     href,
@@ -38,6 +40,9 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
             title={
                 <div className={s.ProjectTitleWrapper}>
                     <TableRowItemTitle size={titleSize} {...projectListItemTitle.attr}>
+                        {nullable(parent, (p) => (
+                            <Text as="span" className={s.ProjectSubTitle}>{`${p.title} / `}</Text>
+                        ))}
                         {project.title}
                     </TableRowItemTitle>
                     {nullable(project._count.children, (count) => (

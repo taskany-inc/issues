@@ -1,9 +1,10 @@
-import { ComponentProps, FC, HTMLAttributes, ReactNode } from 'react';
+import { ComponentProps, FC, HTMLAttributes, ReactNode, useCallback } from 'react';
 import cn from 'classnames';
 import { nullable } from '@taskany/bricks';
 import { Text, Switch, SwitchControl, Button } from '@taskany/bricks/harmony';
 import { IconAddOutline, IconAdjustHorizontalSolid, IconAlignTopSolid, IconListUnorderedOutline } from '@taskany/icons';
 
+import { PageView } from '../../hooks/useUrlFilterParams';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 import s from './FiltersBar.module.css';
@@ -27,33 +28,30 @@ export const FilterBarCounter: FC<FilterBarCounterProps> = ({ counter, total }) 
     </Text>
 );
 
-export const layoutType = {
-    kanban: 'kanban',
-    table: 'table',
-} as const;
-
-export type LayoutType = keyof typeof layoutType;
-
 interface FiltersBarLayoutSwitchProps {
-    value: LayoutType;
+    value?: PageView;
+    onChange?: (value: PageView) => void;
 }
 
-export const FiltersBarLayoutSwitch: FC<FiltersBarLayoutSwitchProps> = ({ value }) => (
-    <Switch value={value}>
-        <SwitchControl
-            disabled
-            className={s.FiltersBarButton}
-            iconLeft={<IconListUnorderedOutline size="s" />}
-            value={layoutType.table}
-        />
-        <SwitchControl
-            disabled
-            className={s.FiltersBarButton}
-            iconLeft={<IconAlignTopSolid size="s" />}
-            value={layoutType.kanban}
-        />
-    </Switch>
-);
+export const FiltersBarLayoutSwitch: FC<FiltersBarLayoutSwitchProps> = ({ value = 'list', onChange }) => {
+    const onChangeCallback = useCallback(
+        (_: React.SyntheticEvent<HTMLButtonElement>, active: string) => {
+            onChange?.(active as PageView);
+        },
+        [onChange],
+    );
+
+    return (
+        <Switch value={value} onChange={onChangeCallback}>
+            <SwitchControl
+                className={s.FiltersBarButton}
+                iconLeft={<IconListUnorderedOutline size="s" />}
+                value="list"
+            />
+            <SwitchControl className={s.FiltersBarButton} iconLeft={<IconAlignTopSolid size="s" />} value="kanban" />
+        </Switch>
+    );
+};
 
 export const FiltersBar: FC<HTMLAttributes<HTMLDivElement>> = ({ children, className, ...props }) => (
     <div className={cn(s.FiltersBar, className)} {...props}>

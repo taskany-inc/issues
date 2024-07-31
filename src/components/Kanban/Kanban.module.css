@@ -1,0 +1,15 @@
+.KanbanState{
+    margin-bottom: var(--gap-m);
+}
+
+.KanbanLink {
+    display: block;
+}
+
+.KanbanLink:hover { 
+    color: inherit;
+}
+
+.KanbanLink:not(:last-child) {
+    margin-bottom: var(--gap-sm);
+}

@@ -54,6 +54,11 @@ const toEstimateState = (value: Estimate): EstimateState => {
     };
 };
 
+export const getEstimateDropdownValueFromDate = (date: Date, type?: DateType | null) => ({
+    date: getDateString(date),
+    type: type ?? 'Strict',
+});
+
 export const EstimateDropdown = ({ value, onChange, onClose, placement, ...props }: EstimateDropdownProps) => {
     const locale = useLocale();
     const [estimate, setEstimate] = useState<EstimateState | undefined>(value ? toEstimateState(value) : undefined);

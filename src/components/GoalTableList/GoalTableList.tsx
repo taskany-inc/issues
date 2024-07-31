@@ -1,5 +1,5 @@
 import { Badge, Table, Tag, Text, User, UserGroup, ListViewItem } from '@taskany/bricks/harmony';
-import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
+import { MouseEventHandler, useCallback, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
@@ -34,20 +34,7 @@ export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
     ...attrs
 }: GoalTableListProps<T>) => {
     const locale = useLocale();
-    const { shortId, preview, setPreview, on } = useGoalPreview();
-
-    useEffect(() => {
-        const unsubDelete = on('on:goal:delete', (updatedId) => {
-            const idInList = goals.find(({ _shortId }) => _shortId === updatedId);
-            if (idInList) {
-                setPreview(null);
-            }
-        });
-
-        return () => {
-            unsubDelete();
-        };
-    }, [goals, preview, setPreview, on]);
+    const { shortId, preview, setPreview } = useGoalPreview();
 
     const onGoalPreviewShow = useCallback(
         (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>

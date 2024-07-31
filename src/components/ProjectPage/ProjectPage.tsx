@@ -29,7 +29,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
     const { preset } = useFiltersPreset({ defaultPresetFallback });
 
-    const { queryState, setTagsFilterOutside } = useUrlFilterParams({
+    const { queryState } = useUrlFilterParams({
         preset,
     });
 
@@ -97,6 +97,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                         counter={projectDeepInfo?.goals?.length}
                         filterPreset={preset}
                         loading={isLoadingDeepInfoProject}
+                        enableLayoutToggle
                     >
                         <FiltersBarItem>
                             <ProjectPageTabs id={id} editable={project?._isEditable} />
@@ -118,14 +119,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
                 <ListView onKeyboardClick={handleItemEnter}>
                     {nullable(project, (p) => (
-                        <ProjectListItemConnected
-                            key={p.id}
-                            visible
-                            editable
-                            project={p}
-                            onTagClick={setTagsFilterOutside}
-                            queryState={queryState}
-                        />
+                        <ProjectListItemConnected key={p.id} visible editable project={p} filterPreset={preset} />
                     ))}
                 </ListView>
 
