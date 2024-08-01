@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.48.0](https://github.com/taskany-inc/issues/compare/v2.47.2...v2.48.0) (2024-08-01)
+
+
+### Features
+
+* **GoalSidebar:** clone goal ([2fde536](https://github.com/taskany-inc/issues/commit/2fde536c652f89cd9bfac3c5ed9cb2a927f25bd1))
+* kysely project suggestion ([b0dc889](https://github.com/taskany-inc/issues/commit/b0dc88968619c8529f1bee82355dfcc2d4f982dc))
+* **SortList:** brand new component ([51154a8](https://github.com/taskany-inc/issues/commit/51154a84051fecb701aef9fd5c6cdac61018d0c8))
+
+
+### Bug Fixes
+
+* blocks translation ([f953726](https://github.com/taskany-inc/issues/commit/f95372690643bdfb103ba682cbb6729f82599456))
+* **Dashboard,Goals,Project:** correct sort order ([6f98254](https://github.com/taskany-inc/issues/commit/6f98254892816d4bc35f0c0a79fec8d576d4282f))
+* default flow doesn't loaded ([f1b553a](https://github.com/taskany-inc/issues/commit/f1b553a73d53e5fb1d3883bbfc75f550f01481ed))
+* **FormControlEditor:** add a env to an internal cdn link ([1041cdb](https://github.com/taskany-inc/issues/commit/1041cdb83a04cde7a58c6950d31a4032a571011d))
+* **GoalTableList:** overflow goal owner name ([b3c9e58](https://github.com/taskany-inc/issues/commit/b3c9e5852c4d667cd44c8142fb874ac521e259d3))
+* **GoalTableList:** overflow goal owner name ([24d928c](https://github.com/taskany-inc/issues/commit/24d928c48a83173c31da1853e576cac89e389ebf))
+* **Sorting:** remove unused code ([d8a4075](https://github.com/taskany-inc/issues/commit/d8a40754b57feb47856e868893e68c65a49b6fd9))
+* **SortList:** union useMemo calls ([2fe1968](https://github.com/taskany-inc/issues/commit/2fe19689f5841b39a7ea9e77434277f71eaa40b8))
+
 ## [2.47.2](https://github.com/taskany-inc/issues/compare/v2.47.1...v2.47.2) (2024-07-24)
 
 
