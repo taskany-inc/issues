@@ -1,10 +1,10 @@
-import { Badge, Table, Tag, Text, User, UserGroup, ListViewItem } from '@taskany/bricks/harmony';
-import { MouseEventHandler, useCallback, useMemo } from 'react';
+import { Badge, Table, Tag, Text, User, UserGroup, ListViewItem, Tooltip } from '@taskany/bricks/harmony';
+import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
-import { IconMessageTextOutline } from '@taskany/icons';
+import { IconGitBranchOutline, IconMessageTextOutline } from '@taskany/icons';
 
+import { State as StateType } from '../../../trpc/inferredTypes';
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
-import { DashboardGoal } from '../../../trpc/inferredTypes';
 import { safeUserData } from '../../utils/getUserName';
 import { calculateElapsedDays, formateEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
@@ -27,14 +27,47 @@ interface GoalTableListProps<T> {
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
 }
 
-export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
+interface IdentifierRecord {
+    id: string;
+    title: string;
+}
+
+interface GoalTableListItem extends IdentifierRecord {
+    shortId: string;
+    commentsCount?: number;
+    tags: Array<IdentifierRecord> | null;
+    updatedAt: Date;
+    owner: ReturnType<typeof safeUserData>;
+    participants?: Array<ReturnType<typeof safeUserData>>;
+    state: StateType | null;
+    estimate?: { value: Date; type: 'Strict' | 'Quarter' | 'Year' | null } | null;
+    priority?: string | null;
+    achievedCriteriaWeight?: number | null;
+    project?: IdentifierRecord | null;
+    isInPartnerProject?: boolean;
+}
+
+export const GoalTableList = <T extends GoalTableListItem>({
     goals,
     onGoalClick,
     onTagClick,
     ...attrs
 }: GoalTableListProps<T>) => {
     const locale = useLocale();
-    const { shortId, preview, setPreview } = useGoalPreview();
+    const { shortId, preview, setPreview, on } = useGoalPreview();
+
+    useEffect(() => {
+        const unsubDelete = on('on:goal:delete', (updatedId) => {
+            const idInList = goals.find(({ shortId }) => shortId === updatedId);
+            if (idInList) {
+                setPreview(null);
+            }
+        });
+
+        return () => {
+            unsubDelete();
+        };
+    }, [goals, preview, setPreview, on]);
 
     const onGoalPreviewShow = useCallback(
         (goal: Parameters<typeof setPreview>[1]): MouseEventHandler<HTMLAnchorElement> =>
@@ -50,98 +83,117 @@ export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
 
     const data = useMemo(
         () =>
-            goals.map((goal) => ({
-                goal,
-                list: [
-                    {
-                        content: (
-                            <>
-                                <Text className={s.GoalTitle}>{goal.title}</Text>
-                                {nullable(goal.tags, (tags) => (
-                                    <TagsList>
-                                        {tags.map((tag) => (
-                                            <Tag key={tag.id} onClick={onTagClick?.({ id: tag.id })}>
-                                                {tag.title}
-                                            </Tag>
+            goals.map((goal) => {
+                return {
+                    goal,
+                    list: [
+                        {
+                            content: (
+                                <>
+                                    <Text className={s.GoalTitle}>
+                                        {nullable(goal.isInPartnerProject && goal.project?.title, (title) => (
+                                            <Tooltip
+                                                placement="bottom"
+                                                target={
+                                                    <Badge
+                                                        className={s.GoalTitlePartnterIcon}
+                                                        size="s"
+                                                        weight="regular"
+                                                        iconLeft={<IconGitBranchOutline size="s" />}
+                                                    />
+                                                }
+                                            >
+                                                {title}
+                                            </Tooltip>
                                         ))}
-                                    </TagsList>
-                                ))}
-                                {nullable(
-                                    goal.updatedAt,
-                                    (date) =>
-                                        calculateElapsedDays(date) === 0 && (
-                                            <RelativeTime date={date} kind="Updated" className={s.RelativeTime} />
-                                        ),
-                                )}
-                            </>
-                        ),
-                        className: s.TableListItemTitle,
-                    },
-                    {
-                        content: nullable(goal._count?.comments, (count) => (
-                            <Badge
-                                size="s"
-                                weight="regular"
-                                text={count}
-                                iconLeft={<IconMessageTextOutline size="s" />}
-                            />
-                        )),
-                        width: 40,
-                        className: s.GoalTableColumnSecondary,
-                    },
-                    {
-                        content: nullable(goal.state, (s) => <State state={s} />),
-                        width: 130,
-                    },
-                    {
-                        content: nullable(safeUserData(goal.owner), (user) => (
-                            <User
-                                className={s.Owner}
-                                name={user.name}
-                                src={user.image}
-                                email={user.email}
-                                ellipsis
-                                title={user.name}
-                            />
-                        )),
-                        width: 172,
-                        className: s.GoalTableColumnSecondary,
-                    },
-                    {
-                        content: nullable(goal.participants?.map(safeUserData).filter(Boolean), (participantsList) => (
-                            <span {...participants.attr}>
-                                <UserGroup users={participantsList} />
-                            </span>
-                        )),
-                        width: 100,
-                    },
-                    {
-                        content: nullable(goal.estimate, (estimate) => (
-                            <Text size="s">
-                                {formateEstimate(estimate, {
-                                    type: goal.estimateType === 'Year' ? goal.estimateType : 'Quarter',
-                                    locale,
-                                })}
-                            </Text>
-                        )),
-                        width: 95,
-                        className: s.GoalTableColumnSecondary,
-                    },
-                    {
-                        content: nullable(goal.priority?.title, (title) => (
-                            <Text size="s">{getPriorityText(title)}</Text>
-                        )),
-                        width: 90,
-                        className: s.GoalTableColumnSecondary,
-                    },
-                    {
-                        content: goal._achivedCriteriaWeight != null && goal.id != null && (
-                            <GoalCriteriaPreview achievedWeight={goal._achivedCriteriaWeight} goalId={goal.id} />
-                        ),
-                        width: 24,
-                    },
-                ],
-            })),
+                                        {goal.title}
+                                    </Text>
+                                    {nullable(goal.tags, (tags) => (
+                                        <TagsList>
+                                            {tags.map((tag) => (
+                                                <Tag key={tag.id} onClick={onTagClick?.({ id: tag.id })}>
+                                                    {tag.title}
+                                                </Tag>
+                                            ))}
+                                        </TagsList>
+                                    ))}
+                                    {nullable(
+                                        goal.updatedAt,
+                                        (date) =>
+                                            calculateElapsedDays(date) === 0 && (
+                                                <RelativeTime date={date} kind="Updated" className={s.RelativeTime} />
+                                            ),
+                                    )}
+                                </>
+                            ),
+                            className: s.TableListItemTitle,
+                        },
+                        {
+                            content: nullable(goal.commentsCount, (count) => (
+                                <Badge
+                                    size="s"
+                                    weight="regular"
+                                    text={count}
+                                    iconLeft={<IconMessageTextOutline size="s" />}
+                                />
+                            )),
+                            width: 40,
+                            className: s.GoalTableColumnSecondary,
+                        },
+                        {
+                            content: nullable(goal.state, (s) => <State state={s} />),
+                            width: 130,
+                        },
+                        {
+                            content: nullable(goal.owner, (user) => (
+                                <User
+                                    className={s.Owner}
+                                    name={user.name}
+                                    src={user.image}
+                                    email={user.email}
+                                    ellipsis
+                                    title={user.name}
+                                />
+                            )),
+                            width: 172,
+                            className: s.GoalTableColumnSecondary,
+                        },
+                        {
+                            content: nullable(goal.participants?.filter(Boolean), (participantsList) => (
+                                <span {...participants.attr}>
+                                    <UserGroup users={participantsList} />
+                                </span>
+                            )),
+                            width: 100,
+                        },
+                        {
+                            content: nullable(goal.estimate, (estimate) => (
+                                <Text size="s">
+                                    {formateEstimate(estimate.value, {
+                                        type: estimate.type === 'Year' ? estimate.type : 'Quarter',
+                                        locale,
+                                    })}
+                                </Text>
+                            )),
+                            width: 95,
+                            className: s.GoalTableColumnSecondary,
+                        },
+                        {
+                            content: nullable(goal.priority, (priority) => (
+                                <Text size="s">{getPriorityText(priority)}</Text>
+                            )),
+                            width: 90,
+                            className: s.GoalTableColumnSecondary,
+                        },
+                        {
+                            content: goal.achievedCriteriaWeight != null && goal.id != null && (
+                                <GoalCriteriaPreview achievedWeight={goal.achievedCriteriaWeight} goalId={goal.id} />
+                            ),
+                            width: 24,
+                        },
+                    ],
+                };
+            }),
         [goals, locale, onTagClick],
     );
 
@@ -153,14 +205,18 @@ export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
                 return (
                     <NextLink
                         key={goal.id}
-                        href={routes.goal(goal?._shortId as string)}
-                        onClick={onGoalPreviewShow(goal)}
+                        href={routes.goal(goal.shortId as string)}
+                        onClick={onGoalPreviewShow({
+                            _shortId: goal.shortId,
+                            title: goal.title,
+                            state: goal.state,
+                        })}
                     >
                         <ListViewItem
                             value={row.goal}
                             renderItem={({ active, hovered: _, ...props }) => (
                                 <TableListItem
-                                    selected={goal._shortId === shortId || goal.id === preview?.id}
+                                    selected={goal.shortId === shortId || goal.id === preview?.id}
                                     hovered={active}
                                     {...props}
                                 >

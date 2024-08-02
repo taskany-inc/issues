@@ -145,7 +145,7 @@ export const getDateTypeFromRange = ({ start, end }: DateRange): DateType => {
 };
 
 export const formateEstimate = (
-    date: Date,
+    date: Date | string,
     {
         locale,
         type,
@@ -154,15 +154,16 @@ export const formateEstimate = (
         type?: DateType;
     },
 ): string => {
+    const realDate = new Date(date);
     if (type === 'Year') {
-        return String(getYearFromDate(date));
+        return String(getYearFromDate(realDate));
     }
 
     if (type === 'Quarter') {
-        return `${getQuarterFromDate(date)}/${getYearFromDate(date)}`;
+        return `${getQuarterFromDate(realDate)}/${getYearFromDate(realDate)}`;
     }
 
-    return createLocaleDate(date, { locale });
+    return createLocaleDate(realDate, { locale });
 };
 
 export const dateAgo = (date: Date, pastDate: number, { locale }: LocaleArg): string | undefined => {

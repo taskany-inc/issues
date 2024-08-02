@@ -481,11 +481,16 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                     .innerJoin('User as activity', 'activity.activityId', 'goals.activityId')
                     .innerJoin('State as state', 'state.id', 'goals.stateId')
                     .innerJoin('Priority as priority', 'priority.id', 'goals.priorityId')
+                    .leftJoinLateral(
+                        ({ selectFrom }) => selectFrom('Project').selectAll('Project').as('project'),
+                        (join) => join.on('goals.personal', 'is not', true).onRef('goals.projectId', '=', 'project.id'),
+                    )
                     .select([
                         sql`"owner"`.as('owner'),
                         sql`"activityUser"`.as('activity'),
                         sql`"state"`.as('state'),
                         sql`"priority"`.as('priority'),
+                        sql`"project"`.as('project'),
                     ])
                     .where((eb) =>
                         eb.or([
