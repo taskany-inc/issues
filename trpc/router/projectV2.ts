@@ -13,7 +13,17 @@ import {
     getWholeGoalCountByProjectIds,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema } from '../../src/schema/common';
-import { Project, User, Goal, Tag, State, GoalAchieveCriteria, Ghost, Activity } from '../../generated/kysely/types';
+import {
+    Project,
+    User,
+    Goal,
+    Tag,
+    State,
+    GoalAchieveCriteria,
+    Ghost,
+    Activity,
+    Priority,
+} from '../../generated/kysely/types';
 import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 
@@ -40,6 +50,11 @@ interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
         tags: Tag[] | null;
         owner: ProjectActivity;
         _achivedCriteriaWeight: number | null;
+        _counts: { comments: number };
+        state: ExtractTypeFromGenerated<State>;
+        priority: ExtractTypeFromGenerated<Priority>;
+        partnershipProjects: Array<ExtractTypeFromGenerated<Project>>;
+        project: ExtractTypeFromGenerated<Project>;
         criteria?: Array<
             ExtractTypeFromGenerated<
                 GoalAchieveCriteria & {
@@ -163,10 +178,12 @@ export const project = router({
 
             const projectsExtendedDataMap = new Map(extendedProjects.map((project) => [project.id, project]));
 
-            const resultProjects = [];
+            const resultProjects: (Omit<ProjectResponse, 'goals'> & ProjectsWithGoals)[] = [];
 
             for (const { id, goals, _count } of goalsByProject.slice(0, limit)) {
-                const currentProject = projectsExtendedDataMap.get(id);
+                const currentProject = projectsExtendedDataMap.get(id) as
+                    | (Omit<ProjectResponse, 'goals'> & ProjectsWithGoals)
+                    | undefined;
                 if (currentProject == null) {
                     throw new Error(`Missing project by id: ${id}`);
                 }

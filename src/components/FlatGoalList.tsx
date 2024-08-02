@@ -6,7 +6,8 @@ import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 import { trpc } from '../utils/trpcClient';
 import { refreshInterval } from '../utils/config';
 import { useFMPMetric } from '../utils/telemetry';
-import { FilterById, GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { safeUserData } from '../utils/getUserName';
 
 import { GoalTableList } from './GoalTableList/GoalTableList';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
@@ -72,7 +73,44 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {nullable(goalsOnScreen, (goals) => (
-                <GoalTableList goals={goals} onTagClick={setTagsFilterOutside} />
+                <GoalTableList
+                    goals={goals.map(
+                        ({
+                            _shortId,
+                            _count,
+                            _achivedCriteriaWeight,
+                            title,
+                            id,
+                            participants,
+                            owner,
+                            tags,
+                            state,
+                            updatedAt,
+                            priority,
+                            estimate,
+                            estimateType,
+                        }) => ({
+                            title,
+                            id,
+                            shortId: _shortId,
+                            commentsCount: _count?.comments,
+                            tags,
+                            updatedAt,
+                            owner: safeUserData(owner),
+                            participants: participants?.map(safeUserData),
+                            state,
+                            estimate: estimate
+                                ? {
+                                      value: estimate,
+                                      type: estimateType,
+                                  }
+                                : null,
+                            priority: priority?.title,
+                            achievedCriteriaWeight: _achivedCriteriaWeight,
+                        }),
+                    )}
+                    onTagClick={setTagsFilterOutside}
+                />
             ))}
 
             {nullable(hasNextPage, () => (

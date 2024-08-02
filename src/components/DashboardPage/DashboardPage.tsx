@@ -22,6 +22,7 @@ import { GoalTableList } from '../GoalTableList/GoalTableList';
 import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { Kanban } from '../Kanban/Kanban';
+import { safeUserData } from '../../utils/getUserName';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -123,7 +124,49 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                         () => <Kanban value={kanban} filterPreset={preset} />,
                         nullable(goals, (g) => (
                             <TreeViewElement>
-                                <GoalTableList goals={g} />
+                                <GoalTableList
+                                    goals={g.map(
+                                        ({
+                                            _shortId,
+                                            _counts,
+                                            _achivedCriteriaWeight,
+                                            title,
+                                            id,
+                                            participants,
+                                            owner,
+                                            tags,
+                                            state,
+                                            updatedAt,
+                                            priority,
+                                            partnershipProjects,
+                                            estimate,
+                                            estimateType,
+                                            projectId,
+                                            project: parent,
+                                        }) => ({
+                                            title,
+                                            id,
+                                            shortId: _shortId,
+                                            commentsCount: _counts?.comments,
+                                            tags,
+                                            updatedAt,
+                                            owner: safeUserData(owner),
+                                            participants: participants?.map(safeUserData),
+                                            state,
+                                            estimate: estimate
+                                                ? {
+                                                      value: estimate,
+                                                      type: estimateType,
+                                                  }
+                                                : null,
+                                            priority: priority.title,
+                                            achievedCriteriaWeight: _achivedCriteriaWeight,
+                                            partnershipProjects,
+                                            isInPartnerProject: project.id !== projectId,
+                                            project: parent,
+                                        }),
+                                    )}
+                                />
                             </TreeViewElement>
                         )),
                     );

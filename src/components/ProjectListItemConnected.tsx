@@ -8,6 +8,7 @@ import { buildKanban } from '../utils/kanban';
 import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';
 import { routes } from '../hooks/router';
+import { safeUserData } from '../utils/getUserName';
 
 import { GoalTableList } from './GoalTableList/GoalTableList';
 import { ProjectListItemCollapsable } from './ProjectListItemCollapsable/ProjectListItemCollapsable';
@@ -106,7 +107,47 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     ) : (
                         <TreeViewElement>
                             <GoalTableList
-                                goals={goals}
+                                goals={goals.map(
+                                    ({
+                                        _shortId,
+                                        _count,
+                                        _achivedCriteriaWeight,
+                                        title,
+                                        id,
+                                        participants,
+                                        owner,
+                                        tags,
+                                        state,
+                                        updatedAt,
+                                        priority,
+                                        partnershipProjects,
+                                        estimate,
+                                        estimateType,
+                                        projectId,
+                                        project: parent,
+                                    }) => ({
+                                        title,
+                                        id,
+                                        shortId: _shortId,
+                                        commentsCount: _count?.comments,
+                                        tags,
+                                        updatedAt,
+                                        owner: safeUserData(owner),
+                                        participants: participants?.map(safeUserData),
+                                        state,
+                                        estimate: estimate
+                                            ? {
+                                                  value: estimate,
+                                                  type: estimateType,
+                                              }
+                                            : null,
+                                        priority: priority?.title,
+                                        achievedCriteriaWeight: _achivedCriteriaWeight,
+                                        partnershipProjects,
+                                        isInPartnerProject: project.id !== projectId,
+                                        project: parent,
+                                    }),
+                                )}
                                 onTagClick={setTagsFilterOutside}
                                 onGoalClick={onProjectClickHandler}
                             />
