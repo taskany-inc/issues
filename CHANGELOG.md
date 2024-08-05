@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.49.0](https://github.com/taskany-inc/issues/compare/v2.48.0...v2.49.0) (2024-08-05)
+
+
+### Features
+
+* kanban mode ([ea8cd07](https://github.com/taskany-inc/issues/commit/ea8cd07d03fe2a6604cd88b87b3d47d1ae1c8199))
+
 ## [2.48.0](https://github.com/taskany-inc/issues/compare/v2.47.2...v2.48.0) (2024-08-01)
 
 
