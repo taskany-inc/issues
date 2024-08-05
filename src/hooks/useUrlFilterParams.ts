@@ -224,7 +224,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const pushStateToRouter = useCallback(
         (queryState: Partial<QueryState>) => {
             const newUrl = router.asPath.split('?')[0];
-            const urlParams = buildURLSearchParams({ groupBy, ...queryState });
+            const urlParams = buildURLSearchParams({ groupBy, view, ...queryState });
 
             const isEmptySearch = !Array.from(urlParams.keys()).length;
 
@@ -236,7 +236,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
 
             router.push(!isEmptySearch ? `${newUrl}?${urlParams}` : newUrl);
         },
-        [groupBy, router],
+        [groupBy, view, router],
     );
 
     const pushStateProvider = useMemo(() => {
