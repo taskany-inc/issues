@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.49.1](https://github.com/taskany-inc/issues/compare/v2.49.0...v2.49.1) (2024-08-05)
+
+
+### Bug Fixes
+
+* filter update with view props ([55e4388](https://github.com/taskany-inc/issues/commit/55e4388c4e133fa3d425ae6eda56614e9e875ea5))
+
 ## [2.49.0](https://github.com/taskany-inc/issues/compare/v2.48.0...v2.49.0) (2024-08-05)
 
 
